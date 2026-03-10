@@ -25,7 +25,8 @@ import {
   TrendingUp,
   Landmark,
   Briefcase,
-  UserPlus
+  UserPlus,
+  Shield
 } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
