@@ -135,9 +135,12 @@ Build an app that analyses all options for personal and business investment in A
 3. ~~Fix Recharts console warnings~~ ✅ DONE
 4. ~~Tax Planning Calendar~~ ✅ DONE
 5. ~~Mobile Version~~ ✅ DONE
-6. Advisor Connect - Book time with a financial advisor
-7. Export to accounting software
-8. Superannuation guarantee calculator
+6. ~~Sidebar tab grouping~~ ✅ DONE
+7. ~~CGT multi-year records~~ ✅ DONE
+8. ~~Report risk colors with clickable links~~ ✅ DONE
+9. Advisor Connect - Book time with a financial advisor
+10. Export to accounting software
+11. Superannuation guarantee calculator
 
 ## Completed This Session (March 2026)
 - ✅ Integrated Salary Packaging Calculator (/salary-packaging)
