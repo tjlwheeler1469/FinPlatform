@@ -198,6 +198,8 @@ const AppRouter = () => {
       <Route path="/income-splitting" element={<IncomeSplitting />} />
       <Route path="/division-7a" element={<Division7ACalculator />} />
       <Route path="/cgt-events" element={<CGTEventTracker />} />
+      <Route path="/trust-distributions" element={<TrustDistributionAnalysis />} />
+      <Route path="/recommendations" element={<FinancialRecommendations />} />
     </Routes>
   );
 };
