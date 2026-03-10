@@ -14,6 +14,10 @@ import MonteCarloSimulation from "@/pages/MonteCarloSimulation";
 import LoanCalculator from "@/pages/LoanCalculator";
 import SavedScenarios from "@/pages/SavedScenarios";
 import ScenarioBuilder from "@/pages/ScenarioBuilder";
+import CGTCalculator from "@/pages/CGTCalculator";
+import HistoricalTaxComparison from "@/pages/HistoricalTaxComparison";
+import SMSFOptimizer from "@/pages/SMSFOptimizer";
+import ReportGenerator from "@/pages/ReportGenerator";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
