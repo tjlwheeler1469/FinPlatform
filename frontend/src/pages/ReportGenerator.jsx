@@ -577,7 +577,8 @@ const ReportGenerator = () => {
                               color: "#EF4444",
                               icon: "🔴",
                               title: "Reduce Debt Exposure",
-                              detail: `Your debt-to-asset ratio is ${debtRatio.toFixed(0)}%. Consider paying down high-interest debt or refinancing to reduce risk.`
+                              detail: `Your debt-to-asset ratio is ${debtRatio.toFixed(0)}%. Consider paying down high-interest debt or refinancing to reduce risk.`,
+                              link: "/loan-calculator"
                             });
                           } else if (debtRatio > 40) {
                             recommendations.push({
@@ -585,7 +586,8 @@ const ReportGenerator = () => {
                               color: "#D4AF37",
                               icon: "🟡",
                               title: "Monitor Debt Levels",
-                              detail: `Debt ratio of ${debtRatio.toFixed(0)}% is manageable but review loan terms. Consider accelerating mortgage payments if rates rise.`
+                              detail: `Debt ratio of ${debtRatio.toFixed(0)}% is manageable but review loan terms. Consider accelerating mortgage payments if rates rise.`,
+                              link: "/loan-calculator"
                             });
                           } else if (debtRatio > 0) {
                             recommendations.push({
@@ -593,7 +595,8 @@ const ReportGenerator = () => {
                               color: "#10B981",
                               icon: "🟢",
                               title: "Debt Position Strong",
-                              detail: `Debt ratio of ${debtRatio.toFixed(0)}% is healthy. Current leverage is appropriate for wealth building.`
+                              detail: `Debt ratio of ${debtRatio.toFixed(0)}% is healthy. Current leverage is appropriate for wealth building.`,
+                              link: "/recommendations"
                             });
                           }
                           
@@ -605,7 +608,8 @@ const ReportGenerator = () => {
                               color: "#EF4444",
                               icon: "🔴",
                               title: "Improve Risk-Adjusted Returns",
-                              detail: `Portfolio volatility (${volatility.toFixed(0)}%) is high relative to expected returns. Consider diversifying into lower-risk assets like bonds or term deposits.`
+                              detail: `Portfolio volatility (${volatility.toFixed(0)}%) is high relative to expected returns. Consider diversifying into lower-risk assets like bonds or term deposits.`,
+                              link: "/monte-carlo"
                             });
                           } else if (riskAdjustedReturn < 0.6) {
                             recommendations.push({
@@ -613,7 +617,8 @@ const ReportGenerator = () => {
                               color: "#D4AF37",
                               icon: "🟡",
                               title: "Rebalance Portfolio",
-                              detail: `Risk-adjusted return of ${(riskAdjustedReturn * 100).toFixed(0)}% is moderate. Review asset allocation to optimize the risk/reward balance.`
+                              detail: `Risk-adjusted return of ${(riskAdjustedReturn * 100).toFixed(0)}% is moderate. Review asset allocation to optimize the risk/reward balance.`,
+                              link: "/monte-carlo"
                             });
                           } else {
                             recommendations.push({
@@ -621,7 +626,8 @@ const ReportGenerator = () => {
                               color: "#10B981",
                               icon: "🟢",
                               title: "Portfolio Well Balanced",
-                              detail: `Risk-adjusted return is strong. Expected ${expectedReturn.toFixed(1)}% return with ${volatility.toFixed(0)}% volatility is well-optimized.`
+                              detail: `Risk-adjusted return is strong. Expected ${expectedReturn.toFixed(1)}% return with ${volatility.toFixed(0)}% volatility is well-optimized.`,
+                              link: "/dashboard"
                             });
                           }
                           
@@ -632,7 +638,8 @@ const ReportGenerator = () => {
                               color: "#D4AF37",
                               icon: "🟡",
                               title: "Tax Optimization Opportunity",
-                              detail: `Effective tax rate of ${effectiveRate.toFixed(1)}% is high. Consider salary sacrifice, trust distributions, or maximizing deductions.`
+                              detail: `Effective tax rate of ${effectiveRate.toFixed(1)}% is high. Consider salary sacrifice, trust distributions, or maximizing deductions.`,
+                              link: "/tax-analysis"
                             });
                           }
                           
@@ -642,7 +649,8 @@ const ReportGenerator = () => {
                             color: "#3B82F6",
                             icon: "🔵",
                             title: "Maximize Super Contributions",
-                            detail: "Review concessional contribution caps ($30,000/year). Salary sacrifice can reduce taxable income while building retirement wealth."
+                            detail: "Review concessional contribution caps ($30,000/year). Salary sacrifice can reduce taxable income while building retirement wealth.",
+                            link: "/smsf-optimizer"
                           });
                           
                           // Diversification
@@ -651,7 +659,8 @@ const ReportGenerator = () => {
                             color: "#10B981",
                             icon: "🟢",
                             title: "Maintain Diversification",
-                            detail: "Continue spreading investments across property, shares, bonds, and cash to reduce concentration risk."
+                            detail: "Continue spreading investments across property, shares, bonds, and cash to reduce concentration risk.",
+                            link: "/recommendations"
                           });
                           
                           return recommendations.map((rec, i) => (
