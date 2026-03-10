@@ -19,7 +19,9 @@ import {
   Repeat,
   Wallet,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Users,
+  Shield
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -28,6 +30,7 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard, title: "Dashboard" },
   { path: "/budget", label: "Budget", icon: Wallet, title: "Household Budget" },
+  { path: "/income-splitting", label: "Income Splitting", icon: Users, title: "Income Splitting" },
   { path: "/tax-analysis", label: "Tax Analysis", icon: Calculator, title: "Tax Analysis" },
   { path: "/cgt-calculator", label: "CGT Calculator", icon: TrendingUp, title: "Capital Gains Tax" },
   { path: "/tax-loss-harvesting", label: "Tax Harvesting", icon: Scissors, title: "Tax Loss Harvesting" },
