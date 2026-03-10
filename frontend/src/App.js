@@ -1,12 +1,9 @@
-import { useState, useEffect, createContext, useContext, useCallback, useRef } from "react";
+import { useState, useEffect, createContext, useContext } from "react";
 import "@/App.css";
-import { BrowserRouter, Routes, Route, useNavigate, useLocation, Navigate } from "react-router-dom";
-import axios from "axios";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
-import { toast } from "sonner";
 
 // Pages
-import LandingPage from "@/pages/LandingPage";
 import Dashboard from "@/pages/Dashboard";
 import TaxAnalysis from "@/pages/TaxAnalysis";
 import PropertyPortfolio from "@/pages/PropertyPortfolio";
@@ -19,249 +16,168 @@ import HistoricalTaxComparison from "@/pages/HistoricalTaxComparison";
 import SMSFOptimizer from "@/pages/SMSFOptimizer";
 import ReportGenerator from "@/pages/ReportGenerator";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+// Portfolio Context for sharing dummy data across components
+const PortfolioContext = createContext(null);
 
-// Auth Context
-const AuthContext = createContext(null);
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
+export const usePortfolio = () => {
+  const context = useContext(PortfolioContext);
   if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error("usePortfolio must be used within a PortfolioProvider");
   }
   return context;
 };
 
-// Auth Provider Component
-const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+// Dummy Portfolio Data
+const DUMMY_PORTFOLIO = {
+  personal: {
+    name: "John Smith",
+    age: 45,
+    taxableIncome: 185000,
+    entityType: "personal"
+  },
+  investments: {
+    cash_savings: 75000,
+    term_deposit_amount: 150000,
+    term_deposit_rate: 4.8,
+    shares_value: 320000,
+    shares_dividend_yield: 4.2,
+    franking_percentage: 85,
+    bonds_value: 80000,
+    bonds_yield: 5.2,
+    etf_value: 145000,
+    etf_yield: 3.5,
+    smsf_balance: 580000,
+    properties: [
+      {
+        property_id: "prop_001",
+        name: "Sydney Investment Unit",
+        value: 850000,
+        rental_income: 36000,
+        mortgage_amount: 510000,
+        mortgage_rate: 6.29,
+        mortgage_term_years: 25,
+        annual_expenses: 8500,
+        depreciation_building: 6500,
+        depreciation_fixtures: 3200
+      },
+      {
+        property_id: "prop_002",
+        name: "Melbourne Townhouse",
+        value: 720000,
+        rental_income: 32000,
+        mortgage_amount: 432000,
+        mortgage_rate: 6.15,
+        mortgage_term_years: 28,
+        annual_expenses: 7200,
+        depreciation_building: 5800,
+        depreciation_fixtures: 2800
+      }
+    ]
+  },
+  expenses: {
+    school_fees: 28000,
+    childcare: 0,
+    health_insurance: 4200,
+    private_expenses: 65000,
+    work_related: 3500,
+    other_deductible: 2200
+  },
+  summary: {
+    totalAssets: 2920000,
+    totalDebt: 942000,
+    netWorth: 1978000,
+    annualIncome: 253400,
+    totalTax: 58200,
+    netIncome: 195200
+  }
+};
 
-  const checkAuth = useCallback(async () => {
-    try {
-      const response = await axios.get(`${API}/auth/me`, {
-        withCredentials: true
-      });
-      setUser(response.data);
-    } catch (error) {
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+// Investment Recommendations
+const RECOMMENDATIONS = [
+  {
+    id: 1,
+    type: "tax_optimization",
+    priority: "high",
+    title: "Maximize Salary Sacrifice",
+    description: "You have $5,000 unused concessional cap. Salary sacrificing this amount saves $1,850 in tax (37% → 15%).",
+    impact: "+$1,850/year",
+    action: "Increase salary sacrifice to $25,000"
+  },
+  {
+    id: 2,
+    type: "property",
+    priority: "high",
+    title: "Negative Gearing Tax Benefit",
+    description: "Your Sydney property generates $12,400 annual tax deduction. Consider a depreciation schedule review.",
+    impact: "+$4,588/year",
+    action: "Get updated depreciation report"
+  },
+  {
+    id: 3,
+    type: "diversification",
+    priority: "medium",
+    title: "Rebalance to International ETFs",
+    description: "Portfolio is 85% Australian assets. Consider 20% allocation to international markets for diversification.",
+    impact: "Reduced risk",
+    action: "Allocate $58,000 to VGS/IVV"
+  },
+  {
+    id: 4,
+    type: "super",
+    priority: "medium",
+    title: "Spouse Contribution Benefit",
+    description: "If spouse earns under $37,000, contribute $3,000 to their super for $540 tax offset.",
+    impact: "+$540/year",
+    action: "Make spouse super contribution"
+  },
+  {
+    id: 5,
+    type: "cgt",
+    priority: "low",
+    title: "CGT Timing Strategy",
+    description: "Shares held for 11 months. Wait 1 more month for 50% CGT discount if selling.",
+    impact: "50% CGT reduction",
+    action: "Defer any sales by 30 days"
+  },
+  {
+    id: 6,
+    type: "debt",
+    priority: "medium",
+    title: "Debt Recycling Opportunity",
+    description: "Convert $75k non-deductible savings to investment loan. Interest becomes tax deductible.",
+    impact: "+$2,775/year",
+    action: "Consult mortgage broker"
+  }
+];
 
-  useEffect(() => {
-    // CRITICAL: If returning from OAuth callback, skip the /me check.
-    // AuthCallback will exchange the session_id and establish the session first.
-    if (window.location.hash?.includes('session_id=')) {
-      setLoading(false);
-      return;
-    }
-    checkAuth();
-  }, [checkAuth]);
-
-  const login = () => {
-    // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
-    const redirectUrl = window.location.origin + '/dashboard';
-    window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
-  };
-
-  const logout = async () => {
-    try {
-      await axios.post(`${API}/auth/logout`, {}, { withCredentials: true });
-      setUser(null);
-      toast.success("Logged out successfully");
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
-  };
+const PortfolioProvider = ({ children }) => {
+  const [portfolio, setPortfolio] = useState(DUMMY_PORTFOLIO);
+  const [recommendations, setRecommendations] = useState(RECOMMENDATIONS);
 
   return (
-    <AuthContext.Provider value={{ user, setUser, loading, login, logout, checkAuth }}>
+    <PortfolioContext.Provider value={{ portfolio, setPortfolio, recommendations, setRecommendations }}>
       {children}
-    </AuthContext.Provider>
+    </PortfolioContext.Provider>
   );
-};
-
-// Auth Callback Component
-const AuthCallback = () => {
-  const navigate = useNavigate();
-  const { setUser } = useAuth();
-  const hasProcessed = useRef(false);
-
-  useEffect(() => {
-    if (hasProcessed.current) return;
-    hasProcessed.current = true;
-
-    const processAuth = async () => {
-      const hash = window.location.hash;
-      const sessionId = hash.split('session_id=')[1]?.split('&')[0];
-
-      if (!sessionId) {
-        navigate('/');
-        return;
-      }
-
-      try {
-        const response = await axios.post(
-          `${API}/auth/session`,
-          { session_id: sessionId },
-          { withCredentials: true }
-        );
-        setUser(response.data);
-        navigate('/dashboard', { state: { user: response.data }, replace: true });
-      } catch (error) {
-        console.error("Auth error:", error);
-        toast.error("Authentication failed");
-        navigate('/');
-      }
-    };
-
-    processAuth();
-  }, [navigate, setUser]);
-
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-        <p className="text-muted-foreground">Authenticating...</p>
-      </div>
-    </div>
-  );
-};
-
-// Protected Route Component
-const ProtectedRoute = ({ children }) => {
-  const { user, loading } = useAuth();
-  const location = useLocation();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <Navigate to="/" state={{ from: location }} replace />;
-  }
-
-  return children;
 };
 
 // App Router Component
 const AppRouter = () => {
-  const location = useLocation();
-
-  // Check URL fragment for session_id SYNCHRONOUSLY during render
-  if (location.hash?.includes('session_id=')) {
-    return <AuthCallback />;
-  }
-
   return (
     <Routes>
-      <Route path="/" element={<LandingPage />} />
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/tax-analysis"
-        element={
-          <ProtectedRoute>
-            <TaxAnalysis />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/property-portfolio"
-        element={
-          <ProtectedRoute>
-            <PropertyPortfolio />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/monte-carlo"
-        element={
-          <ProtectedRoute>
-            <MonteCarloSimulation />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/loan-calculator"
-        element={
-          <ProtectedRoute>
-            <LoanCalculator />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/scenarios"
-        element={
-          <ProtectedRoute>
-            <SavedScenarios />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/scenario-builder"
-        element={
-          <ProtectedRoute>
-            <ScenarioBuilder />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/scenario-builder/:scenarioId"
-        element={
-          <ProtectedRoute>
-            <ScenarioBuilder />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/cgt-calculator"
-        element={
-          <ProtectedRoute>
-            <CGTCalculator />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/historical-tax"
-        element={
-          <ProtectedRoute>
-            <HistoricalTaxComparison />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/smsf-optimizer"
-        element={
-          <ProtectedRoute>
-            <SMSFOptimizer />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/reports"
-        element={
-          <ProtectedRoute>
-            <ReportGenerator />
-          </ProtectedRoute>
-        }
-      />
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/tax-analysis" element={<TaxAnalysis />} />
+      <Route path="/property-portfolio" element={<PropertyPortfolio />} />
+      <Route path="/monte-carlo" element={<MonteCarloSimulation />} />
+      <Route path="/loan-calculator" element={<LoanCalculator />} />
+      <Route path="/scenarios" element={<SavedScenarios />} />
+      <Route path="/scenario-builder" element={<ScenarioBuilder />} />
+      <Route path="/scenario-builder/:scenarioId" element={<ScenarioBuilder />} />
+      <Route path="/cgt-calculator" element={<CGTCalculator />} />
+      <Route path="/historical-tax" element={<HistoricalTaxComparison />} />
+      <Route path="/smsf-optimizer" element={<SMSFOptimizer />} />
+      <Route path="/reports" element={<ReportGenerator />} />
     </Routes>
   );
 };
@@ -270,10 +186,10 @@ function App() {
   return (
     <div className="App min-h-screen bg-background">
       <BrowserRouter>
-        <AuthProvider>
+        <PortfolioProvider>
           <AppRouter />
           <Toaster position="top-right" richColors />
-        </AuthProvider>
+        </PortfolioProvider>
       </BrowserRouter>
     </div>
   );
