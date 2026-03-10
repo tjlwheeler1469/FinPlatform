@@ -21,6 +21,7 @@ import ScenarioComparison from "@/pages/ScenarioComparison";
 import TaxLossHarvesting from "@/pages/TaxLossHarvesting";
 import DividendReinvestment from "@/pages/DividendReinvestment";
 import HouseholdBudget from "@/pages/HouseholdBudget";
+import IncomeSplitting from "@/pages/IncomeSplitting";
 
 // Portfolio Context for sharing dummy data across components
 const PortfolioContext = createContext(null);
