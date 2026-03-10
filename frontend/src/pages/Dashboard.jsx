@@ -231,8 +231,8 @@ const Dashboard = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-[200px]">
-                <ResponsiveContainer width="100%" height="100%">
+              <div className="h-[200px] min-h-[200px]">
+                <ResponsiveContainer width="100%" height="100%" minWidth={200}>
                   <PieChart>
                     <Pie
                       data={assetAllocation}
