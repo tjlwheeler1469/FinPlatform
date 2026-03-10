@@ -548,6 +548,9 @@ def generate_pdf_report_data(scenario_analysis: Dict[str, Any]) -> Dict[str, Any
             {
                 "title": "Investment Projections",
                 "data": scenario_analysis.get("monte_carlo_projection", {})
+            }
+        ]
+    }
 
 # ==================== SALARY PACKAGING CALCULATOR ====================
 
