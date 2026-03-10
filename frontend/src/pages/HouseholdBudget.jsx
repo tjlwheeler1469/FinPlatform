@@ -282,8 +282,8 @@ const HouseholdBudget = () => {
                   <CardTitle className="font-['Manrope']">Monthly Expense Breakdown</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
+                  <div className="h-[300px] min-h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={250}>
                       <PieChart>
                         <Pie
                           data={expenseByCategory}
@@ -312,8 +312,8 @@ const HouseholdBudget = () => {
                   <CardTitle className="font-['Manrope']">12-Month Cashflow Projection</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
+                  <div className="h-[300px] min-h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={250}>
                       <BarChart data={monthlyProjection}>
                         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                         <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={11} />
@@ -338,8 +338,8 @@ const HouseholdBudget = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-[250px]">
-                    <ResponsiveContainer width="100%" height="100%">
+                  <div className="h-[250px] min-h-[250px]">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={250}>
                       <AreaChart data={cumulativeSavings}>
                         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                         <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
