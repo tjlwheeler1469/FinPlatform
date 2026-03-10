@@ -75,6 +75,9 @@ Build an app that analyses all options for personal and business investment in A
 - `/api/salary-packaging/items` - Get available packaging items
 - `/api/analyze/property-comparison` - Compare investment properties
 - `/api/analyze/scenario-comparison` - Compare multiple investment scenarios
+- `/api/analyze/tax-loss-harvesting` - Tax loss harvesting opportunities
+- `/api/analyze/dividend-reinvestment` - Dividend reinvestment vs cash comparison
+- `/api/dividend/historical-growth` - Historical dividend growth rates
 
 ### Frontend Pages - Original
 - Landing Page with hero section
@@ -94,6 +97,8 @@ Build an app that analyses all options for personal and business investment in A
 - Salary Packaging Calculator - FBT implications, tax benefits, NFP caps
 - Property Comparison - Side-by-side property analysis with yield, ROE, projections
 - Scenario Comparison - Multi-scenario comparison with charts and differences
+- Tax Loss Harvesting - Identify loss harvesting opportunities with wash sale warnings
+- Dividend Reinvestment - Compare reinvest vs cash with historical benchmark options
 
 ## Prioritized Backlog
 
@@ -110,8 +115,8 @@ Build an app that analyses all options for personal and business investment in A
 - ✅ Salary packaging calculator (March 2026)
 - ✅ Investment property comparison tool (March 2026)
 - ✅ Multi-scenario comparison view (March 2026)
-- Tax loss harvesting suggestions
-- Dividend reinvestment calculator
+- ✅ Tax loss harvesting suggestions (March 2026)
+- ✅ Dividend reinvestment calculator (March 2026)
 
 ### P2 - Medium Priority (Future)
 - Superannuation guarantee calculator
@@ -126,13 +131,15 @@ Build an app that analyses all options for personal and business investment in A
 
 ## Next Tasks
 1. Advisor Connect - Book time with a financial advisor
-2. Tax loss harvesting suggestions
-3. Dividend reinvestment calculator
-4. Export to accounting software
+2. Export to accounting software
+3. Superannuation guarantee calculator
 
 ## Completed This Session (March 2026)
 - ✅ Integrated Salary Packaging Calculator (/salary-packaging)
 - ✅ Integrated Property Comparison Tool (/property-comparison)
 - ✅ Integrated Scenario Comparison View (/scenario-comparison)
-- ✅ Added navigation links for all 3 new features
-- ✅ Testing: 100% backend, 100% frontend pass rate
+- ✅ Added Tax Loss Harvesting (/tax-loss-harvesting) - with demo portfolio & manual entry
+- ✅ Added Dividend Reinvestment Calculator (/dividend-reinvestment) - with historical 5yr/10yr benchmarks
+- ✅ Fixed page title state bug in navigation
+- ✅ Navigation now has 15 items total
+- ✅ Testing: All APIs verified working
