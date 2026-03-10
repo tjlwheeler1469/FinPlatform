@@ -285,8 +285,8 @@ const Dashboard = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-[250px] min-h-[250px]">
-                <ResponsiveContainer width="100%" height="100%" minWidth={300}>
+              <ChartContainer height={250}>
+                <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={projectionData}>
                     <defs>
                       <linearGradient id="colorMedian" x1="0" y1="0" x2="0" y2="1">
@@ -335,7 +335,7 @@ const Dashboard = () => {
                     />
                   </AreaChart>
                 </ResponsiveContainer>
-              </div>
+              </ChartContainer>
               {monteCarloData && (
                 <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t">
                   <div className="text-center">
