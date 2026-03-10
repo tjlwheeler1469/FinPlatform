@@ -87,33 +87,52 @@ const MONTHS = [
   "July", "August", "September", "October", "November", "December"
 ];
 
+// Frequency multipliers to convert to monthly
+const FREQUENCY_TO_MONTHLY = {
+  weekly: 52 / 12,      // ~4.33
+  fortnightly: 26 / 12, // ~2.17
+  monthly: 1,
+  quarterly: 1 / 3,
+  annual: 1 / 12
+};
+
+const FREQUENCY_OPTIONS = [
+  { value: "weekly", label: "Weekly" },
+  { value: "fortnightly", label: "Fortnightly" },
+  { value: "monthly", label: "Monthly" },
+  { value: "quarterly", label: "Quarterly" },
+  { value: "annual", label: "Annual" }
+];
+
 const HouseholdBudget = () => {
   const { portfolio } = usePortfolio();
   
   // Income sources - integrated from portfolio
   const [incomes, setIncomes] = useState([
-    { id: 1, source: "Employment", amount: portfolio.personal.taxableIncome, frequency: "annual" },
-    { id: 2, source: "Rental Income (Sydney)", amount: portfolio.investments.properties[0]?.rental_income || 0, frequency: "annual" },
-    { id: 3, source: "Rental Income (Melbourne)", amount: portfolio.investments.properties[1]?.rental_income || 0, frequency: "annual" },
-    { id: 4, source: "Dividends", amount: Math.round(portfolio.investments.shares_value * (portfolio.investments.shares_dividend_yield / 100)), frequency: "annual" },
-    { id: 5, source: "Term Deposit Interest", amount: Math.round(portfolio.investments.term_deposit_amount * (portfolio.investments.term_deposit_rate / 100)), frequency: "annual" }
+    { id: 1, source: "Employment (James)", amount: 3558, frequency: "weekly" },
+    { id: 2, source: "Employment (Sarah)", amount: 1827, frequency: "weekly" },
+    { id: 3, source: "Rental Income (Sydney)", amount: portfolio.investments.properties[0]?.rental_income || 0, frequency: "annual" },
+    { id: 4, source: "Rental Income (Melbourne)", amount: portfolio.investments.properties[1]?.rental_income || 0, frequency: "annual" },
+    { id: 5, source: "Dividends", amount: Math.round(portfolio.investments.shares_value * (portfolio.investments.shares_dividend_yield / 100)), frequency: "annual" },
+    { id: 6, source: "Term Deposit Interest", amount: Math.round(portfolio.investments.term_deposit_amount * (portfolio.investments.term_deposit_rate / 100)), frequency: "annual" }
   ]);
 
-  // Regular monthly expenses
+  // Regular expenses with various frequencies
   const [expenses, setExpenses] = useState([
     { id: 1, category: "mortgage", description: "Sydney Mortgage", amount: Math.round((portfolio.investments.properties[0]?.mortgage_amount || 0) * 0.065 / 12), frequency: "monthly" },
     { id: 2, category: "mortgage", description: "Melbourne Mortgage", amount: Math.round((portfolio.investments.properties[1]?.mortgage_amount || 0) * 0.062 / 12), frequency: "monthly" },
     { id: 3, category: "utilities", description: "Electricity & Gas", amount: 350, frequency: "monthly" },
-    { id: 4, category: "utilities", description: "Water", amount: 80, frequency: "monthly" },
-    { id: 5, category: "groceries", description: "Food & Household", amount: 1200, frequency: "monthly" },
-    { id: 6, category: "transport", description: "Car Loan", amount: 650, frequency: "monthly" },
-    { id: 7, category: "transport", description: "Fuel & Rego", amount: 400, frequency: "monthly" },
-    { id: 8, category: "phone_internet", description: "Mobile & Internet", amount: 180, frequency: "monthly" },
-    { id: 9, category: "insurance", description: "Health Insurance", amount: Math.round(portfolio.expenses.health_insurance / 12), frequency: "monthly" },
-    { id: 10, category: "insurance", description: "Home & Car Insurance", amount: 280, frequency: "monthly" },
-    { id: 11, category: "education", description: "School Fees", amount: Math.round(portfolio.expenses.school_fees / 12), frequency: "monthly" },
-    { id: 12, category: "entertainment", description: "Streaming & Subscriptions", amount: 120, frequency: "monthly" },
-    { id: 13, category: "savings", description: "Emergency Fund", amount: 500, frequency: "monthly" }
+    { id: 4, category: "utilities", description: "Water", amount: 240, frequency: "quarterly" },
+    { id: 5, category: "groceries", description: "Food & Household", amount: 300, frequency: "weekly" },
+    { id: 6, category: "transport", description: "Car Loan", amount: 325, frequency: "fortnightly" },
+    { id: 7, category: "transport", description: "Fuel", amount: 80, frequency: "weekly" },
+    { id: 8, category: "transport", description: "Rego & CTP", amount: 1400, frequency: "annual" },
+    { id: 9, category: "phone_internet", description: "Mobile & Internet", amount: 180, frequency: "monthly" },
+    { id: 10, category: "insurance", description: "Health Insurance", amount: portfolio.expenses.health_insurance, frequency: "annual" },
+    { id: 11, category: "insurance", description: "Home & Car Insurance", amount: 3360, frequency: "annual" },
+    { id: 12, category: "education", description: "School Fees", amount: portfolio.expenses.school_fees / 4, frequency: "quarterly" },
+    { id: 13, category: "entertainment", description: "Streaming & Subscriptions", amount: 120, frequency: "monthly" },
+    { id: 14, category: "savings", description: "Emergency Fund", amount: 250, frequency: "fortnightly" }
   ]);
 
   // One-off costs
