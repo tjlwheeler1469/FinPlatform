@@ -1710,6 +1710,71 @@ async def generate_scenario_report(scenario: ScenarioCreate, request: Request):
     
     return report_data
 
+# ==================== SALARY PACKAGING ENDPOINTS ====================
+
+class PackagingItem(BaseModel):
+    type: str
+    amount: float
+
+class SalaryPackagingRequest(BaseModel):
+    gross_salary: float
+    packaging_items: List[PackagingItem]
+    is_nfp_employee: bool = False
+    nfp_cap: float = 0
+    marginal_tax_rate: float = 0.30
+
+@api_router.post("/analyze/salary-packaging")
+async def analyze_salary_packaging(request: SalaryPackagingRequest):
+    """Calculate salary packaging benefits and FBT implications"""
+    items = [{"type": item.type, "amount": item.amount} for item in request.packaging_items]
+    return calculate_salary_packaging(
+        request.gross_salary,
+        items,
+        request.is_nfp_employee,
+        request.nfp_cap,
+        request.marginal_tax_rate
+    )
+
+@api_router.get("/salary-packaging/items")
+async def get_packaging_items():
+    """Get list of available salary packaging items"""
+    return {
+        "items": [
+            {"type": key, **value}
+            for key, value in PACKAGING_ITEMS.items()
+        ],
+        "nfp_caps": {
+            "hospitals": NFP_CAP_HOSPITALS,
+            "charities": NFP_CAP_CHARITIES
+        },
+        "fbt_rate": FBT_RATE * 100
+    }
+
+# ==================== PROPERTY COMPARISON ENDPOINTS ====================
+
+class PropertyComparisonRequest(BaseModel):
+    properties: List[Dict[str, Any]]
+    marginal_tax_rate: float = 0.30
+    investment_horizon_years: int = 10
+    expected_capital_growth: float = 0.04
+
+@api_router.post("/analyze/property-comparison")
+async def analyze_property_comparison(request: PropertyComparisonRequest):
+    """Compare multiple investment properties"""
+    return compare_investment_properties(
+        request.properties,
+        request.marginal_tax_rate,
+        request.investment_horizon_years,
+        request.expected_capital_growth
+    )
+
+# ==================== SCENARIO COMPARISON ENDPOINTS ====================
+
+@api_router.post("/analyze/scenario-comparison")
+async def analyze_scenario_comparison(request: ScenarioComparisonInput):
+    """Compare multiple investment scenarios side by side"""
+    return compare_scenarios(request.scenarios)
+
 # ==================== HEALTH CHECK ====================
 
 @api_router.get("/")
