@@ -230,6 +230,38 @@ const AppRouter = () => {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/cgt-calculator"
+        element={
+          <ProtectedRoute>
+            <CGTCalculator />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/historical-tax"
+        element={
+          <ProtectedRoute>
+            <HistoricalTaxComparison />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/smsf-optimizer"
+        element={
+          <ProtectedRoute>
+            <SMSFOptimizer />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/reports"
+        element={
+          <ProtectedRoute>
+            <ReportGenerator />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 };
