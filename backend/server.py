@@ -1,15 +1,17 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException, Request, Response, Depends
+from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
-from typing import List
+from pydantic import BaseModel, Field
+from typing import List, Optional, Dict, Any
 import uuid
-from datetime import datetime, timezone
-
+from datetime import datetime, timezone, timedelta
+import httpx
+import numpy as np
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -19,52 +21,803 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
-# Create the main app without a prefix
-app = FastAPI()
+# Create the main app
+app = FastAPI(title="Australian Investment Analyzer")
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
-# Define Models
-class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
+# ==================== MODELS ====================
+
+class User(BaseModel):
+    user_id: str
+    email: str
+    name: str
+    picture: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class UserSession(BaseModel):
+    session_id: str = Field(default_factory=lambda: f"sess_{uuid.uuid4().hex[:16]}")
+    user_id: str
+    session_token: str
+    expires_at: datetime
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class SessionRequest(BaseModel):
+    session_id: str
+
+# Investment Input Models
+class PropertyInput(BaseModel):
+    property_id: str = Field(default_factory=lambda: f"prop_{uuid.uuid4().hex[:8]}")
+    name: str
+    value: float
+    rental_income: float = 0
+    mortgage_amount: float = 0
+    mortgage_rate: float = 0  # Annual interest rate %
+    mortgage_term_years: int = 30
+    annual_expenses: float = 0  # Rates, maintenance, insurance
+    depreciation_building: float = 0
+    depreciation_fixtures: float = 0
+
+class InvestmentInput(BaseModel):
+    cash_savings: float = 0
+    term_deposit_amount: float = 0
+    term_deposit_rate: float = 0  # %
+    shares_value: float = 0
+    shares_dividend_yield: float = 0  # %
+    franking_percentage: float = 100  # % of dividends that are franked
+    bonds_value: float = 0
+    bonds_yield: float = 0  # %
+    etf_value: float = 0
+    etf_yield: float = 0
+    smsf_balance: float = 0
+    properties: List[PropertyInput] = []
+
+class ExpenseInput(BaseModel):
+    school_fees: float = 0
+    childcare: float = 0
+    health_insurance: float = 0
+    private_expenses: float = 0  # Non-deductible
+    work_related: float = 0  # Deductible
+    other_deductible: float = 0
+
+class ScenarioInput(BaseModel):
+    scenario_id: str = Field(default_factory=lambda: f"scen_{uuid.uuid4().hex[:12]}")
+    name: str
+    entity_type: str = "personal"  # personal or company
+    taxable_income: float = 0
+    investments: InvestmentInput = InvestmentInput()
+    expenses: ExpenseInput = ExpenseInput()
+    simulation_years: int = 10
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ScenarioCreate(BaseModel):
+    name: str
+    entity_type: str = "personal"
+    taxable_income: float = 0
+    investments: InvestmentInput = InvestmentInput()
+    expenses: ExpenseInput = ExpenseInput()
+    simulation_years: int = 10
+
+# ==================== AUSTRALIAN TAX RATES 2024-25 ====================
+
+PERSONAL_TAX_BRACKETS_2024_25 = [
+    (18200, 0),
+    (45000, 0.16),
+    (135000, 0.30),
+    (190000, 0.37),
+    (float('inf'), 0.45)
+]
+
+# Stage 3 tax cuts effective from July 2024
+PERSONAL_TAX_BRACKETS_2025_26 = [
+    (18200, 0),
+    (45000, 0.16),
+    (135000, 0.30),
+    (190000, 0.37),
+    (float('inf'), 0.45)
+]
+
+COMPANY_TAX_RATE_BASE = 0.25  # Base rate entities (aggregated turnover < $50m)
+COMPANY_TAX_RATE_FULL = 0.30  # Full rate
+
+MEDICARE_LEVY_RATE = 0.02
+MEDICARE_LEVY_THRESHOLD = 24276  # Singles threshold 2024-25
+
+# ==================== TAX CALCULATION FUNCTIONS ====================
+
+def calculate_personal_income_tax(taxable_income: float, year: str = "2024-25") -> Dict[str, float]:
+    """Calculate Australian personal income tax"""
+    brackets = PERSONAL_TAX_BRACKETS_2024_25
     
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    tax = 0
+    prev_threshold = 0
+    breakdown = []
+    
+    for threshold, rate in brackets:
+        if taxable_income <= prev_threshold:
+            break
+        taxable_in_bracket = min(taxable_income, threshold) - prev_threshold
+        tax_in_bracket = taxable_in_bracket * rate
+        tax += tax_in_bracket
+        if taxable_in_bracket > 0 and rate > 0:
+            breakdown.append({
+                "bracket": f"${prev_threshold:,.0f} - ${threshold:,.0f}" if threshold != float('inf') else f"${prev_threshold:,.0f}+",
+                "rate": rate * 100,
+                "taxable": taxable_in_bracket,
+                "tax": tax_in_bracket
+            })
+        prev_threshold = threshold
+    
+    # Medicare levy
+    medicare_levy = 0
+    if taxable_income > MEDICARE_LEVY_THRESHOLD:
+        medicare_levy = taxable_income * MEDICARE_LEVY_RATE
+    
+    total_tax = tax + medicare_levy
+    effective_rate = (total_tax / taxable_income * 100) if taxable_income > 0 else 0
+    
+    return {
+        "taxable_income": taxable_income,
+        "income_tax": tax,
+        "medicare_levy": medicare_levy,
+        "total_tax": total_tax,
+        "effective_rate": effective_rate,
+        "net_income": taxable_income - total_tax,
+        "breakdown": breakdown
+    }
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
+def calculate_company_tax(taxable_income: float, is_base_rate_entity: bool = True) -> Dict[str, float]:
+    """Calculate Australian company tax"""
+    rate = COMPANY_TAX_RATE_BASE if is_base_rate_entity else COMPANY_TAX_RATE_FULL
+    tax = taxable_income * rate
+    
+    return {
+        "taxable_income": taxable_income,
+        "tax_rate": rate * 100,
+        "company_tax": tax,
+        "net_profit": taxable_income - tax,
+        "is_base_rate_entity": is_base_rate_entity
+    }
 
-# Add your routes to the router instead of directly to app
+def calculate_franking_credits(dividend: float, franking_percentage: float = 100) -> Dict[str, float]:
+    """Calculate franking credits for dividends"""
+    franking_rate = COMPANY_TAX_RATE_BASE  # Assume base rate entity
+    franked_portion = dividend * (franking_percentage / 100)
+    unfranked_portion = dividend - franked_portion
+    
+    # Franking credit = Franked dividend × (company tax rate / (1 - company tax rate))
+    franking_credit = franked_portion * (franking_rate / (1 - franking_rate))
+    grossed_up_dividend = dividend + franking_credit
+    
+    return {
+        "cash_dividend": dividend,
+        "franking_percentage": franking_percentage,
+        "franked_portion": franked_portion,
+        "unfranked_portion": unfranked_portion,
+        "franking_credit": franking_credit,
+        "grossed_up_dividend": grossed_up_dividend,
+        "franking_rate_used": franking_rate * 100
+    }
+
+def calculate_negative_gearing(property_data: PropertyInput, marginal_tax_rate: float) -> Dict[str, Any]:
+    """Calculate negative gearing benefits for a property"""
+    # Annual interest
+    annual_interest = property_data.mortgage_amount * (property_data.mortgage_rate / 100)
+    
+    # Total deductions
+    total_deductions = (
+        annual_interest +
+        property_data.annual_expenses +
+        property_data.depreciation_building +
+        property_data.depreciation_fixtures
+    )
+    
+    # Net rental position
+    net_rental = property_data.rental_income - total_deductions
+    
+    # Tax benefit (if negative gearing)
+    tax_benefit = 0
+    if net_rental < 0:
+        tax_benefit = abs(net_rental) * marginal_tax_rate
+    
+    return {
+        "property_name": property_data.name,
+        "property_value": property_data.value,
+        "rental_income": property_data.rental_income,
+        "mortgage_interest": annual_interest,
+        "other_expenses": property_data.annual_expenses,
+        "depreciation": property_data.depreciation_building + property_data.depreciation_fixtures,
+        "total_deductions": total_deductions,
+        "net_rental_income": net_rental,
+        "is_negatively_geared": net_rental < 0,
+        "annual_tax_benefit": tax_benefit,
+        "cash_flow_after_tax": net_rental + tax_benefit
+    }
+
+def calculate_loan_repayment(principal: float, annual_rate: float, years: int) -> Dict[str, Any]:
+    """Calculate loan repayment schedule with variable rate scenarios"""
+    monthly_rate = annual_rate / 100 / 12
+    n_payments = years * 12
+    
+    if monthly_rate == 0:
+        monthly_payment = principal / n_payments
+    else:
+        monthly_payment = principal * (monthly_rate * (1 + monthly_rate)**n_payments) / ((1 + monthly_rate)**n_payments - 1)
+    
+    total_repayment = monthly_payment * n_payments
+    total_interest = total_repayment - principal
+    
+    # Variable rate scenarios
+    scenarios = []
+    for rate_change in [-2, -1, 0, 1, 2]:
+        new_rate = max(0, annual_rate + rate_change)
+        new_monthly_rate = new_rate / 100 / 12
+        if new_monthly_rate == 0:
+            new_monthly = principal / n_payments
+        else:
+            new_monthly = principal * (new_monthly_rate * (1 + new_monthly_rate)**n_payments) / ((1 + new_monthly_rate)**n_payments - 1)
+        scenarios.append({
+            "rate_change": rate_change,
+            "new_rate": new_rate,
+            "monthly_payment": new_monthly,
+            "annual_payment": new_monthly * 12,
+            "total_interest": new_monthly * n_payments - principal
+        })
+    
+    return {
+        "principal": principal,
+        "annual_rate": annual_rate,
+        "term_years": years,
+        "monthly_payment": monthly_payment,
+        "annual_payment": monthly_payment * 12,
+        "total_repayment": total_repayment,
+        "total_interest": total_interest,
+        "variable_rate_scenarios": scenarios
+    }
+
+def calculate_debt_to_equity(total_assets: float, total_debt: float) -> Dict[str, float]:
+    """Calculate debt to equity ratio and related metrics"""
+    equity = total_assets - total_debt
+    debt_to_equity = (total_debt / equity) if equity > 0 else float('inf')
+    debt_to_assets = (total_debt / total_assets) if total_assets > 0 else 0
+    equity_ratio = (equity / total_assets) if total_assets > 0 else 0
+    
+    return {
+        "total_assets": total_assets,
+        "total_debt": total_debt,
+        "equity": equity,
+        "debt_to_equity_ratio": debt_to_equity,
+        "debt_to_assets_ratio": debt_to_assets,
+        "equity_ratio": equity_ratio,
+        "leverage_multiple": (total_assets / equity) if equity > 0 else float('inf')
+    }
+
+def run_monte_carlo_simulation(
+    initial_value: float,
+    expected_return: float,
+    volatility: float,
+    years: int,
+    simulations: int = 1000
+) -> Dict[str, Any]:
+    """Run Monte Carlo simulation for investment projections"""
+    np.random.seed(42)  # For reproducibility
+    
+    # Generate random returns for each simulation
+    results = np.zeros((simulations, years + 1))
+    results[:, 0] = initial_value
+    
+    for year in range(1, years + 1):
+        # Generate random annual returns using log-normal distribution
+        random_returns = np.random.normal(expected_return, volatility, simulations)
+        results[:, year] = results[:, year - 1] * (1 + random_returns)
+    
+    final_values = results[:, -1]
+    
+    # Calculate percentiles for each year
+    percentiles = {
+        "years": list(range(years + 1)),
+        "p10": [float(np.percentile(results[:, i], 10)) for i in range(years + 1)],
+        "p25": [float(np.percentile(results[:, i], 25)) for i in range(years + 1)],
+        "p50": [float(np.percentile(results[:, i], 50)) for i in range(years + 1)],
+        "p75": [float(np.percentile(results[:, i], 75)) for i in range(years + 1)],
+        "p90": [float(np.percentile(results[:, i], 90)) for i in range(years + 1)]
+    }
+    
+    return {
+        "initial_value": initial_value,
+        "expected_return": expected_return * 100,
+        "volatility": volatility * 100,
+        "simulation_years": years,
+        "num_simulations": simulations,
+        "final_value_mean": float(np.mean(final_values)),
+        "final_value_median": float(np.median(final_values)),
+        "final_value_std": float(np.std(final_values)),
+        "probability_of_loss": float(np.mean(final_values < initial_value) * 100),
+        "probability_double": float(np.mean(final_values > initial_value * 2) * 100),
+        "percentile_projections": percentiles,
+        "best_case": float(np.max(final_values)),
+        "worst_case": float(np.min(final_values))
+    }
+
+# ==================== AUTH HELPERS ====================
+
+async def get_current_user(request: Request) -> User:
+    """Get current authenticated user from session token"""
+    session_token = request.cookies.get("session_token")
+    
+    if not session_token:
+        auth_header = request.headers.get("Authorization")
+        if auth_header and auth_header.startswith("Bearer "):
+            session_token = auth_header.split(" ")[1]
+    
+    if not session_token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    session = await db.user_sessions.find_one(
+        {"session_token": session_token},
+        {"_id": 0}
+    )
+    
+    if not session:
+        raise HTTPException(status_code=401, detail="Invalid session")
+    
+    expires_at = session["expires_at"]
+    if isinstance(expires_at, str):
+        expires_at = datetime.fromisoformat(expires_at)
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+    if expires_at < datetime.now(timezone.utc):
+        raise HTTPException(status_code=401, detail="Session expired")
+    
+    user = await db.users.find_one(
+        {"user_id": session["user_id"]},
+        {"_id": 0}
+    )
+    
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+    
+    return User(**user)
+
+# ==================== AUTH ENDPOINTS ====================
+
+@api_router.post("/auth/session")
+async def create_session(session_req: SessionRequest, response: Response):
+    """Exchange session_id for session_token"""
+    try:
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(
+                "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data",
+                headers={"X-Session-ID": session_req.session_id}
+            )
+            
+            if resp.status_code != 200:
+                raise HTTPException(status_code=401, detail="Invalid session")
+            
+            data = resp.json()
+    except Exception as e:
+        logger.error(f"Auth error: {e}")
+        raise HTTPException(status_code=401, detail="Authentication failed")
+    
+    # Check if user exists
+    existing_user = await db.users.find_one(
+        {"email": data["email"]},
+        {"_id": 0}
+    )
+    
+    if existing_user:
+        user_id = existing_user["user_id"]
+        await db.users.update_one(
+            {"user_id": user_id},
+            {"$set": {
+                "name": data["name"],
+                "picture": data.get("picture"),
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+    else:
+        user_id = f"user_{uuid.uuid4().hex[:12]}"
+        new_user = {
+            "user_id": user_id,
+            "email": data["email"],
+            "name": data["name"],
+            "picture": data.get("picture"),
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.users.insert_one(new_user)
+    
+    # Create session
+    session_token = data["session_token"]
+    expires_at = datetime.now(timezone.utc) + timedelta(days=7)
+    
+    session = {
+        "session_id": f"sess_{uuid.uuid4().hex[:16]}",
+        "user_id": user_id,
+        "session_token": session_token,
+        "expires_at": expires_at.isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.user_sessions.insert_one(session)
+    
+    # Set cookie
+    response.set_cookie(
+        key="session_token",
+        value=session_token,
+        httponly=True,
+        secure=True,
+        samesite="none",
+        path="/",
+        max_age=7 * 24 * 60 * 60
+    )
+    
+    user = await db.users.find_one({"user_id": user_id}, {"_id": 0})
+    return user
+
+@api_router.get("/auth/me")
+async def get_me(request: Request):
+    """Get current user"""
+    user = await get_current_user(request)
+    return user.model_dump()
+
+@api_router.post("/auth/logout")
+async def logout(request: Request, response: Response):
+    """Logout user"""
+    session_token = request.cookies.get("session_token")
+    if session_token:
+        await db.user_sessions.delete_one({"session_token": session_token})
+    
+    response.delete_cookie(key="session_token", path="/")
+    return {"message": "Logged out"}
+
+# ==================== SCENARIO ENDPOINTS ====================
+
+@api_router.post("/scenarios", response_model=Dict)
+async def create_scenario(scenario: ScenarioCreate, request: Request):
+    """Create a new investment scenario"""
+    user = await get_current_user(request)
+    
+    scenario_data = scenario.model_dump()
+    scenario_data["scenario_id"] = f"scen_{uuid.uuid4().hex[:12]}"
+    scenario_data["user_id"] = user.user_id
+    scenario_data["created_at"] = datetime.now(timezone.utc).isoformat()
+    scenario_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    # Convert nested models to dicts
+    if "investments" in scenario_data:
+        investments = scenario_data["investments"]
+        if "properties" in investments:
+            investments["properties"] = [p if isinstance(p, dict) else p for p in investments["properties"]]
+    
+    await db.scenarios.insert_one(scenario_data)
+    
+    result = await db.scenarios.find_one(
+        {"scenario_id": scenario_data["scenario_id"]},
+        {"_id": 0}
+    )
+    return result
+
+@api_router.get("/scenarios", response_model=List[Dict])
+async def get_scenarios(request: Request):
+    """Get all scenarios for current user"""
+    user = await get_current_user(request)
+    
+    scenarios = await db.scenarios.find(
+        {"user_id": user.user_id},
+        {"_id": 0}
+    ).sort("updated_at", -1).to_list(100)
+    
+    return scenarios
+
+@api_router.get("/scenarios/{scenario_id}", response_model=Dict)
+async def get_scenario(scenario_id: str, request: Request):
+    """Get a specific scenario"""
+    user = await get_current_user(request)
+    
+    scenario = await db.scenarios.find_one(
+        {"scenario_id": scenario_id, "user_id": user.user_id},
+        {"_id": 0}
+    )
+    
+    if not scenario:
+        raise HTTPException(status_code=404, detail="Scenario not found")
+    
+    return scenario
+
+@api_router.put("/scenarios/{scenario_id}", response_model=Dict)
+async def update_scenario(scenario_id: str, scenario: ScenarioCreate, request: Request):
+    """Update a scenario"""
+    user = await get_current_user(request)
+    
+    existing = await db.scenarios.find_one(
+        {"scenario_id": scenario_id, "user_id": user.user_id}
+    )
+    
+    if not existing:
+        raise HTTPException(status_code=404, detail="Scenario not found")
+    
+    update_data = scenario.model_dump()
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.scenarios.update_one(
+        {"scenario_id": scenario_id},
+        {"$set": update_data}
+    )
+    
+    result = await db.scenarios.find_one(
+        {"scenario_id": scenario_id},
+        {"_id": 0}
+    )
+    return result
+
+@api_router.delete("/scenarios/{scenario_id}")
+async def delete_scenario(scenario_id: str, request: Request):
+    """Delete a scenario"""
+    user = await get_current_user(request)
+    
+    result = await db.scenarios.delete_one(
+        {"scenario_id": scenario_id, "user_id": user.user_id}
+    )
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Scenario not found")
+    
+    return {"message": "Scenario deleted"}
+
+# ==================== ANALYSIS ENDPOINTS ====================
+
+@api_router.post("/analyze/tax")
+async def analyze_tax(
+    taxable_income: float,
+    entity_type: str = "personal",
+    is_base_rate_entity: bool = True
+):
+    """Calculate tax for given income"""
+    if entity_type == "personal":
+        return calculate_personal_income_tax(taxable_income)
+    else:
+        return calculate_company_tax(taxable_income, is_base_rate_entity)
+
+@api_router.post("/analyze/franking")
+async def analyze_franking(
+    dividend: float,
+    franking_percentage: float = 100
+):
+    """Calculate franking credits"""
+    return calculate_franking_credits(dividend, franking_percentage)
+
+@api_router.post("/analyze/negative-gearing")
+async def analyze_negative_gearing(
+    property_data: PropertyInput,
+    marginal_tax_rate: float = 0.30
+):
+    """Calculate negative gearing benefits"""
+    return calculate_negative_gearing(property_data, marginal_tax_rate)
+
+@api_router.post("/analyze/loan")
+async def analyze_loan(
+    principal: float,
+    annual_rate: float,
+    years: int = 30
+):
+    """Calculate loan repayment with variable rate scenarios"""
+    return calculate_loan_repayment(principal, annual_rate, years)
+
+@api_router.post("/analyze/debt-equity")
+async def analyze_debt_equity(
+    total_assets: float,
+    total_debt: float
+):
+    """Calculate debt to equity ratio"""
+    return calculate_debt_to_equity(total_assets, total_debt)
+
+@api_router.post("/analyze/monte-carlo")
+async def analyze_monte_carlo(
+    initial_value: float,
+    expected_return: float = 0.07,
+    volatility: float = 0.15,
+    years: int = 10,
+    simulations: int = 1000
+):
+    """Run Monte Carlo simulation"""
+    return run_monte_carlo_simulation(
+        initial_value,
+        expected_return,
+        volatility,
+        years,
+        min(simulations, 5000)  # Cap simulations
+    )
+
+@api_router.post("/analyze/full-scenario")
+async def analyze_full_scenario(scenario: ScenarioCreate):
+    """Comprehensive analysis of an investment scenario"""
+    inv = scenario.investments
+    exp = scenario.expenses
+    
+    # Calculate total assets and debt
+    total_property_value = sum(p.value for p in inv.properties)
+    total_mortgage = sum(p.mortgage_amount for p in inv.properties)
+    
+    total_assets = (
+        inv.cash_savings +
+        inv.term_deposit_amount +
+        inv.shares_value +
+        inv.bonds_value +
+        inv.etf_value +
+        inv.smsf_balance +
+        total_property_value
+    )
+    
+    total_debt = total_mortgage
+    
+    # Investment income
+    term_deposit_income = inv.term_deposit_amount * (inv.term_deposit_rate / 100)
+    dividend_income = inv.shares_value * (inv.shares_dividend_yield / 100)
+    bond_income = inv.bonds_value * (inv.bonds_yield / 100)
+    etf_income = inv.etf_value * (inv.etf_yield / 100)
+    
+    # Property analysis
+    property_analyses = []
+    total_rental_income = 0
+    total_property_deductions = 0
+    
+    # Calculate marginal tax rate first
+    if scenario.entity_type == "personal":
+        tax_result = calculate_personal_income_tax(scenario.taxable_income)
+        # Get marginal rate from last bracket
+        marginal_rate = 0.30  # Default
+        for threshold, rate in PERSONAL_TAX_BRACKETS_2024_25:
+            if scenario.taxable_income <= threshold:
+                marginal_rate = rate
+                break
+    else:
+        marginal_rate = COMPANY_TAX_RATE_BASE
+    
+    for prop in inv.properties:
+        prop_analysis = calculate_negative_gearing(prop, marginal_rate)
+        property_analyses.append(prop_analysis)
+        total_rental_income += prop.rental_income
+        total_property_deductions += prop_analysis["total_deductions"]
+    
+    # Franking credits
+    franking_result = calculate_franking_credits(dividend_income, inv.franking_percentage)
+    
+    # Calculate taxable income with all sources
+    total_investment_income = (
+        term_deposit_income +
+        franking_result["grossed_up_dividend"] +
+        bond_income +
+        etf_income +
+        total_rental_income -
+        total_property_deductions
+    )
+    
+    total_deductions = (
+        exp.work_related +
+        exp.other_deductible +
+        total_property_deductions
+    )
+    
+    adjusted_taxable_income = scenario.taxable_income + total_investment_income - exp.work_related - exp.other_deductible
+    
+    # Tax calculation
+    if scenario.entity_type == "personal":
+        tax_analysis = calculate_personal_income_tax(adjusted_taxable_income)
+        # Add franking credit offset
+        tax_analysis["franking_credit_offset"] = franking_result["franking_credit"]
+        tax_analysis["total_tax"] = max(0, tax_analysis["total_tax"] - franking_result["franking_credit"])
+        tax_analysis["net_income"] = adjusted_taxable_income - tax_analysis["total_tax"]
+    else:
+        tax_analysis = calculate_company_tax(adjusted_taxable_income)
+    
+    # Debt to equity
+    debt_equity = calculate_debt_to_equity(total_assets, total_debt)
+    
+    # Monte Carlo for total investment portfolio
+    investment_portfolio = inv.shares_value + inv.etf_value
+    monte_carlo = None
+    if investment_portfolio > 0:
+        # Blend expected return based on allocation
+        weighted_return = 0.07  # Conservative estimate
+        monte_carlo = run_monte_carlo_simulation(
+            investment_portfolio,
+            weighted_return,
+            0.15,
+            scenario.simulation_years,
+            1000
+        )
+    
+    # Loan analysis for all properties
+    loan_analyses = []
+    for prop in inv.properties:
+        if prop.mortgage_amount > 0:
+            loan_analysis = calculate_loan_repayment(
+                prop.mortgage_amount,
+                prop.mortgage_rate,
+                prop.mortgage_term_years
+            )
+            loan_analysis["property_name"] = prop.name
+            loan_analyses.append(loan_analysis)
+    
+    return {
+        "scenario_name": scenario.name,
+        "entity_type": scenario.entity_type,
+        "summary": {
+            "total_assets": total_assets,
+            "total_debt": total_debt,
+            "net_worth": total_assets - total_debt,
+            "total_investment_income": total_investment_income,
+            "total_deductions": total_deductions
+        },
+        "income_breakdown": {
+            "employment_income": scenario.taxable_income,
+            "term_deposit_income": term_deposit_income,
+            "dividend_income": dividend_income,
+            "franking_credits": franking_result["franking_credit"],
+            "bond_income": bond_income,
+            "etf_income": etf_income,
+            "net_rental_income": total_rental_income - total_property_deductions
+        },
+        "expense_breakdown": {
+            "school_fees": exp.school_fees,
+            "childcare": exp.childcare,
+            "health_insurance": exp.health_insurance,
+            "private_expenses": exp.private_expenses,
+            "deductible_expenses": exp.work_related + exp.other_deductible
+        },
+        "tax_analysis": tax_analysis,
+        "franking_analysis": franking_result,
+        "property_analyses": property_analyses,
+        "debt_equity_analysis": debt_equity,
+        "loan_analyses": loan_analyses,
+        "monte_carlo_projection": monte_carlo
+    }
+
+# ==================== TAX RATES INFO ====================
+
+@api_router.get("/tax-rates")
+async def get_tax_rates():
+    """Get current Australian tax rates"""
+    return {
+        "personal": {
+            "year": "2024-25",
+            "brackets": [
+                {"threshold": 18200, "rate": 0, "description": "Tax-free threshold"},
+                {"threshold": 45000, "rate": 16, "description": "16% on $18,201 - $45,000"},
+                {"threshold": 135000, "rate": 30, "description": "30% on $45,001 - $135,000"},
+                {"threshold": 190000, "rate": 37, "description": "37% on $135,001 - $190,000"},
+                {"threshold": None, "rate": 45, "description": "45% on $190,001+"}
+            ],
+            "medicare_levy": {
+                "rate": 2,
+                "threshold": MEDICARE_LEVY_THRESHOLD
+            }
+        },
+        "company": {
+            "base_rate": COMPANY_TAX_RATE_BASE * 100,
+            "full_rate": COMPANY_TAX_RATE_FULL * 100,
+            "base_rate_threshold": 50000000
+        },
+        "franking_credit_rate": COMPANY_TAX_RATE_BASE * 100
+    }
+
+# ==================== HEALTH CHECK ====================
+
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "Australian Investment Analyzer API", "version": "1.0.0"}
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
-    
-    # Convert to dict and serialize datetime to ISO string for MongoDB
-    doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
-    
-    _ = await db.status_checks.insert_one(doc)
-    return status_obj
-
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
-    
-    # Convert ISO string timestamps back to datetime objects
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
-    
-    return status_checks
+@api_router.get("/health")
+async def health_check():
+    return {"status": "healthy", "timestamp": datetime.now(timezone.utc).isoformat()}
 
 # Include the router in the main app
 app.include_router(api_router)
@@ -76,13 +829,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
