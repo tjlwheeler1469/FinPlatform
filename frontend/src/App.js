@@ -26,6 +26,7 @@ import Division7ACalculator from "@/pages/Division7ACalculator";
 import CGTEventTracker from "@/pages/CGTEventTracker";
 import TrustDistributionAnalysis from "@/pages/TrustDistributionAnalysis";
 import FinancialRecommendations from "@/pages/FinancialRecommendations";
+import TaxCalendar from "@/pages/TaxCalendar";
 
 // Portfolio Context for sharing dummy data across components
 const PortfolioContext = createContext(null);
