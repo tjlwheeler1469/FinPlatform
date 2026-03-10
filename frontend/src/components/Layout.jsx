@@ -23,7 +23,9 @@ import {
   Users,
   Shield,
   FileCheck,
-  Receipt
+  Receipt,
+  Lightbulb,
+  PieChart
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
