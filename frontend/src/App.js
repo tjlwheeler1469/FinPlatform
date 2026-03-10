@@ -15,6 +15,9 @@ import CGTCalculator from "@/pages/CGTCalculator";
 import HistoricalTaxComparison from "@/pages/HistoricalTaxComparison";
 import SMSFOptimizer from "@/pages/SMSFOptimizer";
 import ReportGenerator from "@/pages/ReportGenerator";
+import SalaryPackaging from "@/pages/SalaryPackaging";
+import PropertyComparison from "@/pages/PropertyComparison";
+import ScenarioComparison from "@/pages/ScenarioComparison";
 
 // Portfolio Context for sharing dummy data across components
 const PortfolioContext = createContext(null);
