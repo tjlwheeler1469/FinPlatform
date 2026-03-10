@@ -448,8 +448,8 @@ const IncomeSplitting = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {distributionPieData.length > 0 && (
-                    <div className="h-[200px] min-h-[200px]">
-                      <ResponsiveContainer width="100%" height="100%" minWidth={150}>
+                    <ChartContainer height={200}>
+                      <ResponsiveContainer width="100%" height="100%">
                         <RechartsPie>
                           <Pie
                             data={distributionPieData}
@@ -466,7 +466,7 @@ const IncomeSplitting = () => {
                           <Tooltip formatter={(v) => formatCurrency(v)} />
                         </RechartsPie>
                       </ResponsiveContainer>
-                    </div>
+                    </ChartContainer>
                   )}
                   
                   <div className="space-y-2">
