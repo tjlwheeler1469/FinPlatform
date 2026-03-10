@@ -167,27 +167,14 @@ const SavedScenarios = () => {
               </Card>
             ))}
           </div>
-        ) : filteredScenarios.length === 0 ? (
+        ) : filteredScenarios.length === 0 && searchQuery ? (
           <Card data-testid="empty-state">
             <CardContent className="p-12 text-center">
               <FolderOpen className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-xl font-semibold mb-2">No scenarios found</h3>
               <p className="text-muted-foreground mb-6">
-                {searchQuery 
-                  ? "No scenarios match your search. Try a different query."
-                  : "Create your first investment scenario to get started."
-                }
+                No scenarios match your search. Try a different query.
               </p>
-              {!searchQuery && (
-                <Button 
-                  onClick={() => navigate("/scenario-builder")}
-                  className="bg-[#0F392B] hover:bg-[#0F392B]/90"
-                  data-testid="create-first-btn"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Create Scenario
-                </Button>
-              )}
             </CardContent>
           </Card>
         ) : (
