@@ -23,6 +23,7 @@ import {
   Briefcase
 } from "lucide-react";
 import { usePortfolio } from "@/App";
+import ChartContainer from "@/components/ChartContainer";
 import axios from "axios";
 import {
   AreaChart,
