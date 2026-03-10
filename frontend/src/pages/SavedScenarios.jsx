@@ -97,6 +97,21 @@ const DEMO_SCENARIOS = [
     },
     created_at: "2024-01-20T14:00:00Z",
     updated_at: "2024-02-28T16:45:00Z"
+  },
+  {
+    scenario_id: "demo_004",
+    name: "Family Trust Structure",
+    entity_type: "trust",
+    taxable_income: 150000,
+    investments: {
+      cash_savings: 50000,
+      shares_value: 400000,
+      bonds_value: 50000,
+      etf_value: 100000,
+      properties: [{}]
+    },
+    created_at: "2024-03-05T10:00:00Z",
+    updated_at: "2024-03-10T14:00:00Z"
   }
 ];
 
