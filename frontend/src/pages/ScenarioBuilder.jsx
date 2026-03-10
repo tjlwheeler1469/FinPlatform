@@ -627,7 +627,7 @@ const ScenarioBuilder = () => {
 
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full max-w-2xl grid-cols-5">
+          <TabsList className="grid w-full max-w-3xl grid-cols-6">
             <TabsTrigger value="people">
               <Users className="h-4 w-4 mr-2" />
               People
@@ -636,6 +636,12 @@ const ScenarioBuilder = () => {
               <TabsTrigger value="companies">
                 <Briefcase className="h-4 w-4 mr-2" />
                 Companies
+              </TabsTrigger>
+            )}
+            {entityType === "trust" && (
+              <TabsTrigger value="trusts">
+                <Shield className="h-4 w-4 mr-2" />
+                Trusts
               </TabsTrigger>
             )}
             <TabsTrigger value="properties">
