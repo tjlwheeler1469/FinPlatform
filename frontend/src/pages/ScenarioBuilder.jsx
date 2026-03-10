@@ -939,6 +939,211 @@ const ScenarioBuilder = () => {
             </TabsContent>
           )}
 
+          {/* Trusts Tab */}
+          {entityType === "trust" && (
+            <TabsContent value="trusts" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="font-['Manrope']">Trust Structures</CardTitle>
+                      <CardDescription>
+                        Configure family trusts and discretionary trusts with beneficiary distributions
+                      </CardDescription>
+                    </div>
+                    <Button variant="outline" size="sm" onClick={addTrust} data-testid="add-trust">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Trust
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {trusts.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Shield className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                      <p>No trusts added yet</p>
+                      <Button variant="outline" className="mt-3" onClick={addTrust}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Your First Trust
+                      </Button>
+                    </div>
+                  ) : (
+                    trusts.map((trust, index) => (
+                      <div key={trust.id} className="p-4 rounded-lg border space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg bg-[#0F392B]/20 flex items-center justify-center">
+                              <Shield className="h-5 w-5 text-[#0F392B]" />
+                            </div>
+                            <Badge className="bg-[#0F392B]/10 text-[#0F392B]">Trust {index + 1}</Badge>
+                          </div>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => removeTrust(index)}
+                            data-testid={`remove-trust-${index}`}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="space-y-2">
+                            <Label>Trust Name</Label>
+                            <Input
+                              value={trust.name}
+                              onChange={(e) => updateTrust(index, 'name', e.target.value)}
+                              placeholder="Family Trust"
+                              data-testid={`trust-${index}-name`}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>ABN</Label>
+                            <Input
+                              value={trust.abn}
+                              onChange={(e) => updateTrust(index, 'abn', e.target.value)}
+                              placeholder="XX XXX XXX XXX"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Trust Type</Label>
+                            <select
+                              value={trust.trust_type}
+                              onChange={(e) => updateTrust(index, 'trust_type', e.target.value)}
+                              className="w-full h-10 px-3 rounded-md border border-input bg-background"
+                            >
+                              <option value="discretionary">Discretionary</option>
+                              <option value="unit">Unit Trust</option>
+                              <option value="hybrid">Hybrid Trust</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="space-y-2">
+                            <Label>Trustee Type</Label>
+                            <select
+                              value={trust.trustee_type}
+                              onChange={(e) => updateTrust(index, 'trustee_type', e.target.value)}
+                              className="w-full h-10 px-3 rounded-md border border-input bg-background"
+                            >
+                              <option value="individual">Individual Trustee</option>
+                              <option value="corporate">Corporate Trustee</option>
+                            </select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Trustee Name</Label>
+                            <Input
+                              value={trust.trustee_name}
+                              onChange={(e) => updateTrust(index, 'trustee_name', e.target.value)}
+                              placeholder={trust.trustee_type === "corporate" ? "Trustee Pty Ltd" : "Full Name"}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Net Trust Income</Label>
+                            <div className="relative">
+                              <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                              <Input
+                                type="number"
+                                value={trust.net_income}
+                                onChange={(e) => updateTrust(index, 'net_income', Number(e.target.value))}
+                                className="pl-10"
+                                data-testid={`trust-${index}-income`}
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Beneficiaries */}
+                        <div className="mt-4 pt-4 border-t">
+                          <div className="flex items-center justify-between mb-3">
+                            <h4 className="font-semibold">Beneficiaries & Distributions</h4>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={() => addBeneficiary(index)}
+                            >
+                              <Plus className="h-4 w-4 mr-2" />
+                              Add Beneficiary
+                            </Button>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            {trust.beneficiaries?.map((ben, bIndex) => (
+                              <div key={ben.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                                <div className="w-8 h-8 rounded-full bg-[#D4AF37]/20 flex items-center justify-center">
+                                  <User className="h-4 w-4 text-[#D4AF37]" />
+                                </div>
+                                <Input
+                                  value={ben.name}
+                                  onChange={(e) => updateBeneficiary(index, bIndex, 'name', e.target.value)}
+                                  className="flex-1"
+                                  placeholder="Beneficiary Name"
+                                />
+                                <select
+                                  value={ben.relationship}
+                                  onChange={(e) => updateBeneficiary(index, bIndex, 'relationship', e.target.value)}
+                                  className="w-32 h-10 px-2 rounded-md border border-input bg-background text-sm"
+                                >
+                                  <option value="family">Family</option>
+                                  <option value="company">Company</option>
+                                  <option value="other_trust">Other Trust</option>
+                                </select>
+                                <div className="flex items-center gap-1 w-24">
+                                  <Input
+                                    type="number"
+                                    value={ben.distribution_percentage}
+                                    onChange={(e) => updateBeneficiary(index, bIndex, 'distribution_percentage', Number(e.target.value))}
+                                    className="w-16 text-center"
+                                    min={0}
+                                    max={100}
+                                  />
+                                  <span className="text-sm text-muted-foreground">%</span>
+                                </div>
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon"
+                                  onClick={() => removeBeneficiary(index, bIndex)}
+                                >
+                                  <Trash2 className="h-4 w-4 text-destructive" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Distribution Summary */}
+                          <div className="mt-3 p-3 rounded-lg bg-[#0F392B]/5 flex justify-between items-center">
+                            <span className="text-sm text-muted-foreground">
+                              Total Distribution: {trust.beneficiaries?.reduce((sum, b) => sum + (b.distribution_percentage || 0), 0)}%
+                            </span>
+                            <span className="font-semibold text-[#0F392B]">
+                              {formatCurrency(trust.net_income)} to distribute
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Trust Tax Note */}
+                        <div className="p-3 rounded-lg bg-[#D4AF37]/10">
+                          <p className="text-sm text-muted-foreground">
+                            <strong>Note:</strong> Trusts don't pay tax directly. Income is distributed to beneficiaries 
+                            who are taxed at their individual marginal rates. Undistributed income is taxed at 47%.
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  )}
+
+                  {trusts.length > 0 && (
+                    <div className="p-4 rounded-lg bg-[#0F392B]/10 flex justify-between items-center">
+                      <span className="font-semibold">Total Trust Income</span>
+                      <span className="text-xl font-bold text-[#0F392B]">{formatCurrency(totalTrustIncome)}</span>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
+
           {/* Properties Tab */}
           <TabsContent value="properties" className="space-y-4">
             <Card>
