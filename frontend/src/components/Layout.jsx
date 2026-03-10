@@ -21,7 +21,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Users,
-  Shield
+  Shield,
+  FileCheck
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -35,6 +36,7 @@ const navItems = [
   { path: "/cgt-calculator", label: "CGT Calculator", icon: TrendingUp, title: "Capital Gains Tax" },
   { path: "/tax-loss-harvesting", label: "Tax Harvesting", icon: Scissors, title: "Tax Loss Harvesting" },
   { path: "/historical-tax", label: "Tax History", icon: History, title: "Tax History" },
+  { path: "/division-7a", label: "Division 7A", icon: FileCheck, title: "Division 7A Calculator" },
   { path: "/property-portfolio", label: "Properties", icon: Building2, title: "Property Portfolio" },
   { path: "/property-comparison", label: "Compare Properties", icon: Home, title: "Property Comparison" },
   { path: "/smsf-optimizer", label: "SMSF", icon: PiggyBank, title: "SMSF Optimizer" },
