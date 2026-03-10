@@ -133,9 +133,11 @@ Build an app that analyses all options for personal and business investment in A
 1. ~~Add detailed trust distribution calculations~~ ✅ DONE
 2. ~~Enhance next financial steps recommendations~~ ✅ DONE
 3. ~~Fix Recharts console warnings~~ ✅ DONE
-4. Advisor Connect - Book time with a financial advisor
-5. Export to accounting software
-6. Superannuation guarantee calculator
+4. ~~Tax Planning Calendar~~ ✅ DONE
+5. ~~Mobile Version~~ ✅ DONE
+6. Advisor Connect - Book time with a financial advisor
+7. Export to accounting software
+8. Superannuation guarantee calculator
 
 ## Completed This Session (March 2026)
 - ✅ Integrated Salary Packaging Calculator (/salary-packaging)
