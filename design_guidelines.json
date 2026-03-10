@@ -1,0 +1,153 @@
+{
+  "identity": {
+    "name": "E1",
+    "role": "Creative Designer",
+    "mission": "Create a top 1% Australian Investment Analysis App that blends Swiss precision with Australian organic wealth aesthetics.",
+    "principles": [
+      "Fusion over Imitation: Swiss Grid + Australian Nature Palette",
+      "Emotion First: Trust, Authority, Growth",
+      "Content is King: Data is the hero, UI is the stage",
+      "Negative Space: 2-3x standard spacing",
+      "Contrast: High contrast for data legibility"
+    ]
+  },
+  "design_system": {
+    "theme_strategy": "Smart Hybrid",
+    "theme_logic": "Default to Light Mode for trust and clarity on Landing/Marketing pages. Allow toggle to Dark Mode for 'Pro' Dashboard views (Bloomberg terminal vibe).",
+    "colors": {
+      "palette_name": "Swiss Eco-Fintech",
+      "primary": {
+        "name": "Deep Eucalyptus",
+        "hex": "#0F392B",
+        "usage": "Primary Brand, Headings, Active States",
+        "tailwind_var": "--primary"
+      },
+      "secondary": {
+        "name": "Wattle Gold",
+        "hex": "#D4AF37",
+        "usage": "Accents, Success Metrics, 'Premium' features",
+        "tailwind_var": "--secondary"
+      },
+      "neutral": {
+        "light_bg": "#F8F9FA",
+        "dark_bg": "#0A0A0A",
+        "light_surface": "#FFFFFF",
+        "dark_surface": "#121212",
+        "border_light": "#E2E8F0",
+        "border_dark": "#27272A"
+      },
+      "functional": {
+        "success": "#10B981",
+        "warning": "#F59E0B",
+        "error": "#EF4444",
+        "info": "#3B82F6"
+      },
+      "forbidden": ["#1B93A4", "#7351B7"]
+    },
+    "typography": {
+      "headings": {
+        "family": "Manrope",
+        "weights": ["600", "700", "800"],
+        "usage": "All Headings (H1-H6), Big Metrics",
+        "letter_spacing": "tracking-tight"
+      },
+      "body": {
+        "family": "Inter",
+        "weights": ["400", "500"],
+        "usage": "Paragraphs, UI Labels, Data Tables",
+        "letter_spacing": "tracking-normal"
+      },
+      "mono": {
+        "family": "JetBrains Mono",
+        "usage": "Code snippets, Financial formulas"
+      }
+    },
+    "spacing": {
+      "scale": "Generous",
+      "base_unit": "4px",
+      "container_padding": "p-6 md:p-12",
+      "section_gap": "gap-8 md:gap-16"
+    },
+    "radius": {
+      "default": "rounded-sm",
+      "buttons": "rounded-md",
+      "cards": "rounded-lg"
+    },
+    "shadows": {
+      "card": "shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]",
+      "dropdown": "shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),0_2px_4px_-1px_rgba(0,0,0,0.06)]",
+      "hover": "shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1),0_4px_6px_-2px_rgba(0,0,0,0.05)]"
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-[#0F392B] text-white hover:bg-[#0F392B]/90 shadow-sm",
+      "secondary": "bg-[#F8F9FA] text-[#0F392B] border border-[#E2E8F0] hover:bg-[#F1F5F9]",
+      "accent": "bg-[#D4AF37] text-white hover:bg-[#D4AF37]/90"
+    },
+    "cards": {
+      "style": "bg-card text-card-foreground border border-border/50 shadow-sm hover:shadow-md transition-all duration-200",
+      "padding": "p-6"
+    },
+    "inputs": {
+      "style": "h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+    },
+    "charts": {
+      "library": "recharts",
+      "style": "Minimalist, thin lines, no grid lines (or very subtle), custom tooltips"
+    }
+  },
+  "layout_strategies": {
+    "dashboard": {
+      "type": "Bento Grid",
+      "classes": "grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6",
+      "rules": [
+        "Summary metrics: col-span-1",
+        "Main Chart: col-span-2 row-span-2 or col-span-3",
+        "Lists/Feeds: col-span-1 row-span-2"
+      ]
+    },
+    "marketing": {
+      "type": "Asymmetric Swiss",
+      "classes": "grid grid-cols-1 md:grid-cols-12 gap-8",
+      "rules": [
+        "Hero: col-span-full md:col-span-8",
+        "Feature: col-span-4",
+        "Use negative space to guide eye"
+      ]
+    }
+  },
+  "assets": {
+    "images": [
+      {
+        "category": "hero_background",
+        "url": "https://images.unsplash.com/photo-1769188409186-864de08c4642?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODh8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBzeWRuZXklMjBza3lsaW5lJTIwZmluYW5jZXxlbnwwfHx8fDE3NzMxNDA2NjV8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Modern Sydney Skyline - Use with overlay for Hero section"
+      },
+      {
+        "category": "finance_context",
+        "url": "https://images.unsplash.com/photo-1537849156823-51cf0388f86c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2OTF8MHwxfHNlYXJjaHwxfHxhdXN0cmFsaWFuJTIwY3VycmVuY3klMjBub3RlcyUyMGJ1c2luZXNzfGVufDB8fHx8MTc3MzE0MDY3MHww&ixlib=rb-4.1.0&q=85",
+        "description": "Australian Currency - Use for 'Cash' or 'Investment' sections"
+      }
+    ],
+    "icons": "lucide-react"
+  },
+  "instructions_to_main_agent": [
+    "1. SETUP: Install 'recharts' and 'lucide-react' if not present.",
+    "2. THEME: Update 'tailwind.config.js' with the 'Swiss Eco-Fintech' palette. Override default shadcn colors.",
+    "3. FONTS: Import 'Manrope' and 'Inter' from Google Fonts in 'index.css'.",
+    "4. COMPONENTS: Customize Shadcn components to match the 'Design System' rules (radius, shadows, borders).",
+    "5. LAYOUT: Build the Dashboard using the 'Bento Grid' strategy.",
+    "6. CHARTS: Use Recharts for all financial visualizations. Style them to be minimal and clean.",
+    "7. IMAGES: Use the provided Unsplash URLs. DO NOT use placeholders.",
+    "8. TESTING: Add 'data-testid' to all interactive elements."
+  ],
+  "universal_guidelines": [
+    "Avoid 'AI Slop': No generic centered layouts, no default blue gradients.",
+    "Dark Mode: Must be 'Deep Charcoal' (#0A0A0A), NOT pure black.",
+    "Contrast: Ensure text meets WCAG AA standards.",
+    "Motion: Add subtle hover states and transitions (duration-200 ease-in-out).",
+    "Glassmorphism: Use 'backdrop-blur-md' and 'bg-white/80' for sticky headers.",
+    "Data-TestId: MANDATORY for all interactive elements."
+  ]
+}
