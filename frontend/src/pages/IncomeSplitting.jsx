@@ -281,8 +281,8 @@ const IncomeSplitting = () => {
                   <CardTitle className="font-['Manrope']">Tax by Family Member</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-[250px] min-h-[250px]">
-                    <ResponsiveContainer width="100%" height="100%" minWidth={250}>
+                  <ChartContainer height={250}>
+                    <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={memberComparisonData}>
                         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                         <XAxis dataKey="name" />
@@ -293,7 +293,7 @@ const IncomeSplitting = () => {
                         <Bar dataKey="optimized" name="Optimized" fill="#10B981" />
                       </BarChart>
                     </ResponsiveContainer>
-                  </div>
+                  </ChartContainer>
                 </CardContent>
               </Card>
 
