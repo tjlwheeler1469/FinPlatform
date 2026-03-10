@@ -1174,6 +1174,110 @@ async def get_tax_rates():
         "franking_credit_rate": COMPANY_TAX_RATE_BASE * 100
     }
 
+@api_router.get("/tax-rates/historical")
+async def get_historical_tax_rates():
+    """Get historical Australian tax rates for comparison"""
+    result = {}
+    for year, data in HISTORICAL_TAX_BRACKETS.items():
+        brackets = []
+        prev = 0
+        for threshold, rate in data["brackets"]:
+            brackets.append({
+                "from": prev,
+                "to": threshold if threshold != float('inf') else None,
+                "rate": rate * 100
+            })
+            prev = threshold
+        result[year] = {
+            "brackets": brackets,
+            "medicare_threshold": data["medicare_threshold"],
+            "description": data["description"]
+        }
+    return {
+        "personal": result,
+        "company": HISTORICAL_COMPANY_RATES
+    }
+
+@api_router.post("/analyze/tax-comparison")
+async def analyze_tax_comparison(
+    taxable_income: float,
+    years: List[str] = ["2024-25", "2023-24", "2022-23"]
+):
+    """Compare tax across different years"""
+    comparisons = []
+    for year in years:
+        if year in HISTORICAL_TAX_BRACKETS:
+            result = calculate_personal_income_tax_historical(taxable_income, year)
+            comparisons.append(result)
+    
+    # Calculate savings from Stage 3 cuts
+    if len(comparisons) >= 2:
+        current = comparisons[0]
+        previous = comparisons[1]
+        savings = previous["total_tax"] - current["total_tax"]
+    else:
+        savings = 0
+    
+    return {
+        "taxable_income": taxable_income,
+        "comparisons": comparisons,
+        "stage_3_savings": savings,
+        "savings_percentage": (savings / comparisons[1]["total_tax"] * 100) if len(comparisons) >= 2 and comparisons[1]["total_tax"] > 0 else 0
+    }
+
+@api_router.post("/analyze/cgt")
+async def analyze_capital_gains(
+    purchase_price: float,
+    sale_price: float,
+    holding_period_months: int,
+    marginal_tax_rate: float = 0.30,
+    entity_type: str = "individual",
+    improvement_costs: float = 0,
+    selling_costs: float = 0
+):
+    """Calculate Capital Gains Tax"""
+    return calculate_capital_gains_tax(
+        purchase_price,
+        sale_price,
+        holding_period_months,
+        marginal_tax_rate,
+        entity_type,
+        improvement_costs,
+        selling_costs
+    )
+
+@api_router.post("/analyze/smsf")
+async def analyze_smsf_contributions(
+    age: int,
+    current_super_balance: float,
+    taxable_income: float,
+    employer_contribution: float = 0,
+    salary_sacrifice: float = 0,
+    personal_contribution: float = 0,
+    spouse_contribution: float = 0
+):
+    """Calculate SMSF contribution strategy and benefits"""
+    return calculate_smsf_contribution_strategy(
+        age,
+        current_super_balance,
+        taxable_income,
+        employer_contribution,
+        salary_sacrifice,
+        personal_contribution,
+        spouse_contribution
+    )
+
+@api_router.post("/analyze/full-scenario/report")
+async def generate_scenario_report(scenario: ScenarioCreate, request: Request):
+    """Generate comprehensive report data for a scenario"""
+    # First run the full analysis
+    analysis = await analyze_full_scenario(scenario)
+    
+    # Generate report structure
+    report_data = generate_pdf_report_data(analysis)
+    
+    return report_data
+
 # ==================== HEALTH CHECK ====================
 
 @api_router.get("/")
