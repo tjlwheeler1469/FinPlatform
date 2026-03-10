@@ -7,15 +7,26 @@ Build an app that analyses all options for personal and business investment in A
 - Current 2024-25 Australian tax rates + announced future rates
 - Advanced analysis with Monte Carlo simulations
 - Multiple property portfolio with negative gearing calculations
-- Emergent-managed Google Auth for user accounts
+- **NO LOGIN REQUIRED** - Direct access to app
 - All Australian financial products (personal & business)
 - Pure mathematical models without AI integration
+- Demo portfolio with investment recommendations
 
-## User Personas
-1. **Individual Investors** - Managing personal wealth across cash, shares, property
-2. **Business Owners** - Comparing personal vs company tax structures
-3. **Property Investors** - Analyzing negative gearing benefits across multiple properties
-4. **Financial Planners** - Running scenario comparisons for clients
+## Demo Portfolio Data
+- **User**: John Smith, 45 years old, $185,000 taxable income
+- **Net Worth**: $1,978,000
+- **Total Assets**: $2,920,000
+- **Total Debt**: $942,000 (32% debt ratio)
+- **Properties**: 2 investment properties (Sydney Unit & Melbourne Townhouse, both negatively geared)
+- **Investments**: Cash ($75k), Term Deposits ($150k), Shares ($320k), ETFs ($145k), Bonds ($80k), SMSF ($580k)
+
+## Investment Recommendations
+1. **Maximize Salary Sacrifice** (HIGH) - Save $1,850/year in tax
+2. **Negative Gearing Tax Benefit** (HIGH) - $4,588/year from depreciation review
+3. **Rebalance to International ETFs** (MEDIUM) - Reduce concentration risk
+4. **Spouse Contribution Benefit** (MEDIUM) - $540 tax offset
+5. **CGT Timing Strategy** (LOW) - Wait for 50% discount eligibility
+6. **Debt Recycling Opportunity** (MEDIUM) - Convert non-deductible debt
 
 ## Core Requirements (Static)
 - ✅ Australian 2024-25 personal tax brackets (Stage 3 cuts)
