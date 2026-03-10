@@ -591,7 +591,7 @@ const ScenarioBuilder = () => {
               </div>
               <div className="space-y-2">
                 <Label>Entity Type</Label>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   <Button
                     variant={entityType === "personal" ? "default" : "outline"}
                     onClick={() => setEntityType("personal")}
@@ -609,6 +609,15 @@ const ScenarioBuilder = () => {
                   >
                     <Briefcase className="h-4 w-4 mr-2" />
                     Company
+                  </Button>
+                  <Button
+                    variant={entityType === "trust" ? "default" : "outline"}
+                    onClick={() => setEntityType("trust")}
+                    className={entityType === "trust" ? "bg-[#0F392B]" : ""}
+                    data-testid="type-trust"
+                  >
+                    <Shield className="h-4 w-4 mr-2" />
+                    Trust
                   </Button>
                 </div>
               </div>
