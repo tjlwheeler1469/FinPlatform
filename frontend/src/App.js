@@ -22,6 +22,7 @@ import TaxLossHarvesting from "@/pages/TaxLossHarvesting";
 import DividendReinvestment from "@/pages/DividendReinvestment";
 import HouseholdBudget from "@/pages/HouseholdBudget";
 import IncomeSplitting from "@/pages/IncomeSplitting";
+import Division7ACalculator from "@/pages/Division7ACalculator";
 
 // Portfolio Context for sharing dummy data across components
 const PortfolioContext = createContext(null);
