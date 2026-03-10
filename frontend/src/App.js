@@ -193,6 +193,7 @@ const AppRouter = () => {
       <Route path="/tax-loss-harvesting" element={<TaxLossHarvesting />} />
       <Route path="/dividend-reinvestment" element={<DividendReinvestment />} />
       <Route path="/income-splitting" element={<IncomeSplitting />} />
+      <Route path="/division-7a" element={<Division7ACalculator />} />
     </Routes>
   );
 };
