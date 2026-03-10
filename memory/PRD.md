@@ -152,3 +152,9 @@ Build an app that analyses all options for personal and business investment in A
 - ✅ Fixed Report data output issues:
   - Tax Analysis now shows bracket breakdown table
   - Investment Projections now shows percentile projections by year table
+- ✅ Multi-person support (up to 2 people for couples/families)
+  - Each person has: name, age, income, super %, salary sacrifice, deductions
+- ✅ Multi-company support (unlimited companies)
+  - Each company has: name, ABN, base rate entity toggle, revenue, expenses, taxable income, franking account
+- ✅ Fixed Saved Scenarios loading demo data correctly
+- ✅ Property ownership can be assigned to person1, person2, joint, or any company
