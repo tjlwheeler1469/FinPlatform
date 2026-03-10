@@ -131,10 +131,10 @@ const Dashboard = () => {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
-              Portfolio Dashboard
+              Wheeler Family Portfolio
             </h1>
             <p className="text-muted-foreground mt-1">
-              {portfolio.personal.name} • {portfolio.personal.age} years old • {formatCurrency(portfolio.personal.taxableIncome)} income
+              {formatCurrency(portfolio.personal.taxableIncome)} combined income • 2 investment properties
             </p>
           </div>
           <Button 
