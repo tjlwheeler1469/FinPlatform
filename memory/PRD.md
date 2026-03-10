@@ -232,4 +232,23 @@ Build an app that analyses all options for personal and business investment in A
   - Responsive grid layouts for mobile viewports
   - iOS zoom prevention on inputs
   - Reduced motion support for accessibility
+- ✅ **Sidebar Tab Grouping** (December 2025):
+  - Reorganized navigation into 6 collapsible groups
+  - Overview: Dashboard, Recommendations
+  - Planning: Budget, Income Splitting, Trust Analysis, Scenario Comparison
+  - Property: Properties, Property Comparison
+  - Tax & CGT: Tax Analysis, CGT, Tax Calendar, Tax History, Tax Harvesting
+  - Calculators: Loan, Monte Carlo, Division 7A, Salary Packaging, Dividends, SMSF
+  - Reports: Reports, Saved Scenarios
+- ✅ **Combined CGT Page** (/cgt):
+  - Merged CGT Calculator and CGT Events into single page
+  - 4 tabs: Events, Holdings, Summary, Calculator
+  - Multi-year support with FY dropdown (2022-23 to 2025-26)
+  - Multi-year summary chart showing gains/losses per year
+  - Loss carry forward tracking
+  - Event deletion with trash icons
+- ✅ **Report Generator Risk Colors**:
+  - Recommendations now color-coded: Red (High Risk), Amber (Medium Risk), Green (Low Risk)
+  - Clickable recommendations navigate to relevant pages
+  - View Details links for each recommendation
 
