@@ -189,6 +189,7 @@ const AppRouter = () => {
       <Route path="/scenario-builder" element={<ScenarioBuilder />} />
       <Route path="/scenario-builder/:scenarioId" element={<ScenarioBuilder />} />
       <Route path="/cgt-calculator" element={<CGTCalculator />} />
+      <Route path="/cgt" element={<CGT />} />
       <Route path="/historical-tax" element={<HistoricalTaxComparison />} />
       <Route path="/smsf-optimizer" element={<SMSFOptimizer />} />
       <Route path="/reports" element={<ReportGenerator />} />
