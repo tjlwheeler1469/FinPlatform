@@ -8,12 +8,14 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import { 
   Save, 
   DollarSign, 
   Percent,
   Building2,
   User,
+  Users,
   Plus,
   Trash2,
   Home,
@@ -21,7 +23,9 @@ import {
   ArrowRight,
   PiggyBank,
   TrendingUp,
-  Landmark
+  Landmark,
+  Briefcase,
+  UserPlus
 } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
@@ -38,6 +42,31 @@ const formatCurrency = (value) => {
   }).format(value);
 };
 
+const defaultPerson = {
+  id: "",
+  name: "",
+  age: 45,
+  taxable_income: 0,
+  employer_super: 0,
+  salary_sacrifice: 0,
+  deductions: {
+    work_related: 0,
+    self_education: 0,
+    other: 0
+  }
+};
+
+const defaultCompany = {
+  id: "",
+  name: "",
+  abn: "",
+  taxable_income: 0,
+  revenue: 0,
+  expenses: 0,
+  is_base_rate_entity: true, // < $50M turnover = 25% tax rate
+  franking_account_balance: 0
+};
+
 const defaultProperty = {
   property_id: "",
   name: "",
@@ -48,7 +77,8 @@ const defaultProperty = {
   mortgage_term_years: 30,
   annual_expenses: 0,
   depreciation_building: 0,
-  depreciation_fixtures: 0
+  depreciation_fixtures: 0,
+  owner: "joint" // "person1", "person2", "joint", "company_0", etc.
 };
 
 const defaultInvestments = {
@@ -75,6 +105,96 @@ const defaultExpenses = {
   other_deductible: 0
 };
 
+// Demo scenarios data
+const DEMO_SCENARIOS = {
+  demo_001: {
+    name: "Wheeler Family - Current",
+    entity_type: "personal",
+    people: [
+      { id: "p1", name: "James Wheeler", age: 47, taxable_income: 185000, employer_super: 11, salary_sacrifice: 5000, deductions: { work_related: 2500, self_education: 0, other: 500 } },
+      { id: "p2", name: "Sarah Wheeler", age: 44, taxable_income: 95000, employer_super: 11, salary_sacrifice: 3000, deductions: { work_related: 1800, self_education: 1200, other: 300 } }
+    ],
+    companies: [],
+    investments: {
+      cash_savings: 75000,
+      term_deposit_amount: 50000,
+      term_deposit_rate: 4.75,
+      shares_value: 320000,
+      shares_dividend_yield: 4.2,
+      franking_percentage: 85,
+      bonds_value: 80000,
+      bonds_yield: 5.2,
+      etf_value: 145000,
+      etf_yield: 3.5,
+      smsf_balance: 420000,
+      properties: [
+        { property_id: "prop1", name: "Sydney Investment", value: 1250000, rental_income: 52000, mortgage_amount: 650000, mortgage_rate: 6.49, mortgage_term_years: 25, annual_expenses: 8500, depreciation_building: 12500, depreciation_fixtures: 3200, owner: "joint" },
+        { property_id: "prop2", name: "Melbourne Unit", value: 680000, rental_income: 28600, mortgage_amount: 340000, mortgage_rate: 6.24, mortgage_term_years: 28, annual_expenses: 5200, depreciation_building: 6800, depreciation_fixtures: 2100, owner: "person1" }
+      ]
+    },
+    expenses: { school_fees: 35000, childcare: 0, health_insurance: 4800, private_expenses: 12000, work_related: 4300, other_deductible: 800 },
+    simulation_years: 10
+  },
+  demo_002: {
+    name: "Retirement Planning 2030",
+    entity_type: "personal",
+    people: [
+      { id: "p1", name: "James Wheeler", age: 52, taxable_income: 150000, employer_super: 11, salary_sacrifice: 15000, deductions: { work_related: 2000, self_education: 0, other: 500 } },
+      { id: "p2", name: "Sarah Wheeler", age: 49, taxable_income: 80000, employer_super: 11, salary_sacrifice: 10000, deductions: { work_related: 1500, self_education: 0, other: 300 } }
+    ],
+    companies: [],
+    investments: {
+      cash_savings: 100000,
+      term_deposit_amount: 80000,
+      term_deposit_rate: 4.5,
+      shares_value: 400000,
+      shares_dividend_yield: 4.5,
+      franking_percentage: 90,
+      bonds_value: 150000,
+      bonds_yield: 5.0,
+      etf_value: 200000,
+      etf_yield: 3.2,
+      smsf_balance: 850000,
+      properties: [
+        { property_id: "prop1", name: "Sydney Investment", value: 1450000, rental_income: 58000, mortgage_amount: 450000, mortgage_rate: 6.29, mortgage_term_years: 20, annual_expenses: 9000, depreciation_building: 14500, depreciation_fixtures: 3500, owner: "joint" }
+      ]
+    },
+    expenses: { school_fees: 0, childcare: 0, health_insurance: 5200, private_expenses: 15000, work_related: 3500, other_deductible: 1000 },
+    simulation_years: 15
+  },
+  demo_003: {
+    name: "Company Structure Analysis",
+    entity_type: "company",
+    people: [
+      { id: "p1", name: "James Wheeler", age: 47, taxable_income: 120000, employer_super: 11, salary_sacrifice: 0, deductions: { work_related: 0, self_education: 0, other: 0 } }
+    ],
+    companies: [
+      { id: "c1", name: "Wheeler Consulting Pty Ltd", abn: "12 345 678 901", taxable_income: 180000, revenue: 450000, expenses: 270000, is_base_rate_entity: true, franking_account_balance: 45000 },
+      { id: "c2", name: "Wheeler Property Holdings", abn: "98 765 432 109", taxable_income: 95000, revenue: 120000, expenses: 25000, is_base_rate_entity: true, franking_account_balance: 22000 }
+    ],
+    investments: {
+      cash_savings: 200000,
+      term_deposit_amount: 100000,
+      term_deposit_rate: 4.8,
+      shares_value: 500000,
+      shares_dividend_yield: 4.0,
+      franking_percentage: 100,
+      bonds_value: 100000,
+      bonds_yield: 5.5,
+      etf_value: 0,
+      etf_yield: 0,
+      smsf_balance: 380000,
+      properties: [
+        { property_id: "prop1", name: "Commercial Office", value: 1800000, rental_income: 95000, mortgage_amount: 900000, mortgage_rate: 6.75, mortgage_term_years: 20, annual_expenses: 18000, depreciation_building: 45000, depreciation_fixtures: 8000, owner: "company_0" },
+        { property_id: "prop2", name: "Warehouse", value: 950000, rental_income: 48000, mortgage_amount: 500000, mortgage_rate: 6.50, mortgage_term_years: 25, annual_expenses: 12000, depreciation_building: 23750, depreciation_fixtures: 4500, owner: "company_1" },
+        { property_id: "prop3", name: "Residential Investment", value: 720000, rental_income: 32000, mortgage_amount: 380000, mortgage_rate: 6.24, mortgage_term_years: 28, annual_expenses: 6500, depreciation_building: 7200, depreciation_fixtures: 2400, owner: "person1" }
+      ]
+    },
+    expenses: { school_fees: 0, childcare: 0, health_insurance: 4800, private_expenses: 8000, work_related: 0, other_deductible: 0 },
+    simulation_years: 10
+  }
+};
+
 const ScenarioBuilder = () => {
   const navigate = useNavigate();
   const { scenarioId } = useParams();
@@ -82,40 +202,61 @@ const ScenarioBuilder = () => {
 
   const [name, setName] = useState("My Investment Scenario");
   const [entityType, setEntityType] = useState("personal");
-  const [taxableIncome, setTaxableIncome] = useState(120000);
+  
+  // Multi-person support
+  const [people, setPeople] = useState([
+    { ...defaultPerson, id: "p1", name: "Person 1", taxable_income: 120000 }
+  ]);
+  
+  // Multi-company support
+  const [companies, setCompanies] = useState([]);
+  
   const [investments, setInvestments] = useState(defaultInvestments);
   const [expenses, setExpenses] = useState(defaultExpenses);
   const [simulationYears, setSimulationYears] = useState(10);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [analysisResult, setAnalysisResult] = useState(null);
+  const [activeTab, setActiveTab] = useState("people");
 
   useEffect(() => {
     if (isEditing) {
-      fetchScenario();
+      loadScenario();
     }
   }, [scenarioId]);
 
-  const fetchScenario = async () => {
+  const loadScenario = () => {
     setLoading(true);
-    try {
-      const response = await axios.get(`${API}/scenarios/${scenarioId}`, { 
-        withCredentials: true 
-      });
-      const data = response.data;
-      setName(data.name);
-      setEntityType(data.entity_type);
-      setTaxableIncome(data.taxable_income || 0);
-      setInvestments(data.investments || defaultInvestments);
-      setExpenses(data.expenses || defaultExpenses);
-      setSimulationYears(data.simulation_years || 10);
-    } catch (error) {
-      console.error("Error fetching scenario:", error);
-      toast.error("Failed to load scenario");
-      navigate("/scenarios");
-    } finally {
-      setLoading(false);
+    // Check if it's a demo scenario
+    if (scenarioId && DEMO_SCENARIOS[scenarioId]) {
+      const demo = DEMO_SCENARIOS[scenarioId];
+      setName(demo.name);
+      setEntityType(demo.entity_type);
+      setPeople(demo.people || [{ ...defaultPerson, id: "p1", name: "Person 1" }]);
+      setCompanies(demo.companies || []);
+      setInvestments(demo.investments || defaultInvestments);
+      setExpenses(demo.expenses || defaultExpenses);
+      setSimulationYears(demo.simulation_years || 10);
+      toast.success("Scenario loaded");
+    } else {
+      // Try to fetch from API
+      axios.get(`${API}/scenarios/${scenarioId}`, { withCredentials: true })
+        .then(response => {
+          const data = response.data;
+          setName(data.name);
+          setEntityType(data.entity_type);
+          setPeople(data.people || [{ ...defaultPerson, id: "p1", name: "Person 1" }]);
+          setCompanies(data.companies || []);
+          setInvestments(data.investments || defaultInvestments);
+          setExpenses(data.expenses || defaultExpenses);
+          setSimulationYears(data.simulation_years || 10);
+        })
+        .catch(error => {
+          console.error("Error fetching scenario:", error);
+          toast.error("Failed to load scenario - using defaults");
+        });
     }
+    setLoading(false);
   };
 
   const saveScenario = async () => {
@@ -124,21 +265,19 @@ const ScenarioBuilder = () => {
       const scenarioData = {
         name,
         entity_type: entityType,
-        taxable_income: taxableIncome,
+        people,
+        companies,
+        taxable_income: people.reduce((sum, p) => sum + (p.taxable_income || 0), 0),
         investments,
         expenses,
         simulation_years: simulationYears
       };
 
-      if (isEditing) {
-        await axios.put(`${API}/scenarios/${scenarioId}`, scenarioData, { 
-          withCredentials: true 
-        });
+      if (isEditing && !scenarioId.startsWith("demo_")) {
+        await axios.put(`${API}/scenarios/${scenarioId}`, scenarioData, { withCredentials: true });
         toast.success("Scenario updated");
       } else {
-        await axios.post(`${API}/scenarios`, scenarioData, { 
-          withCredentials: true 
-        });
+        await axios.post(`${API}/scenarios`, scenarioData, { withCredentials: true });
         toast.success("Scenario saved");
         navigate("/scenarios");
       }
@@ -153,10 +292,15 @@ const ScenarioBuilder = () => {
   const analyzeScenario = async () => {
     setLoading(true);
     try {
+      const totalPersonalIncome = people.reduce((sum, p) => sum + (p.taxable_income || 0), 0);
+      const totalCompanyIncome = companies.reduce((sum, c) => sum + (c.taxable_income || 0), 0);
+      
       const response = await axios.post(`${API}/analyze/full-scenario`, {
         name,
         entity_type: entityType,
-        taxable_income: taxableIncome,
+        taxable_income: entityType === "personal" ? totalPersonalIncome : totalCompanyIncome,
+        people,
+        companies,
         investments,
         expenses,
         simulation_years: simulationYears
@@ -171,6 +315,55 @@ const ScenarioBuilder = () => {
     }
   };
 
+  // Person management
+  const addPerson = () => {
+    if (people.length < 2) {
+      setPeople([
+        ...people,
+        { ...defaultPerson, id: `p${people.length + 1}`, name: `Person ${people.length + 1}` }
+      ]);
+    }
+  };
+
+  const removePerson = (index) => {
+    if (people.length > 1) {
+      setPeople(people.filter((_, i) => i !== index));
+    }
+  };
+
+  const updatePerson = (index, field, value) => {
+    const updated = [...people];
+    if (field.includes('.')) {
+      const [parent, child] = field.split('.');
+      updated[index] = { 
+        ...updated[index], 
+        [parent]: { ...updated[index][parent], [child]: value }
+      };
+    } else {
+      updated[index] = { ...updated[index], [field]: value };
+    }
+    setPeople(updated);
+  };
+
+  // Company management
+  const addCompany = () => {
+    setCompanies([
+      ...companies,
+      { ...defaultCompany, id: `c${companies.length + 1}`, name: `Company ${companies.length + 1}` }
+    ]);
+  };
+
+  const removeCompany = (index) => {
+    setCompanies(companies.filter((_, i) => i !== index));
+  };
+
+  const updateCompany = (index, field, value) => {
+    const updated = [...companies];
+    updated[index] = { ...updated[index], [field]: value };
+    setCompanies(updated);
+  };
+
+  // Property management
   const addProperty = () => {
     setInvestments({
       ...investments,
@@ -198,19 +391,30 @@ const ScenarioBuilder = () => {
     });
   };
 
-  if (loading && isEditing) {
-    return (
-      <Layout>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        </div>
-      </Layout>
-    );
-  }
+  // Calculate totals
+  const totalPersonalIncome = people.reduce((sum, p) => sum + (p.taxable_income || 0), 0);
+  const totalCompanyIncome = companies.reduce((sum, c) => sum + (c.taxable_income || 0), 0);
+  const totalInvestmentValue = (investments.cash_savings || 0) + 
+    (investments.term_deposit_amount || 0) + 
+    (investments.shares_value || 0) + 
+    (investments.bonds_value || 0) + 
+    (investments.etf_value || 0);
+
+  // Get owner options for properties
+  const getOwnerOptions = () => {
+    const options = [{ value: "joint", label: "Joint Ownership" }];
+    people.forEach((p, i) => {
+      options.push({ value: `person${i + 1}`, label: p.name || `Person ${i + 1}` });
+    });
+    companies.forEach((c, i) => {
+      options.push({ value: `company_${i}`, label: c.name || `Company ${i + 1}` });
+    });
+    return options;
+  };
 
   return (
     <Layout>
-      <div className="space-y-8" data-testid="scenario-builder-page">
+      <div className="space-y-6" data-testid="scenario-builder-page">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
@@ -218,10 +422,10 @@ const ScenarioBuilder = () => {
               {isEditing ? "Edit Scenario" : "New Scenario"}
             </h1>
             <p className="text-muted-foreground mt-1">
-              Build and analyze your investment scenario
+              {entityType === "personal" ? "Personal & Family" : "Company Structure"} Analysis
             </p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-2">
             <Button 
               variant="outline"
               onClick={analyzeScenario}
@@ -233,8 +437,8 @@ const ScenarioBuilder = () => {
             </Button>
             <Button 
               onClick={saveScenario}
-              className="bg-[#0F392B] hover:bg-[#0F392B]/90"
               disabled={saving}
+              className="bg-[#0F392B] hover:bg-[#0F392B]/90"
               data-testid="save-btn"
             >
               <Save className="h-4 w-4 mr-2" />
@@ -243,359 +447,638 @@ const ScenarioBuilder = () => {
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Input Section */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Basic Info */}
-            <Card data-testid="basic-info-card">
+        {/* Scenario Name & Type */}
+        <Card>
+          <CardContent className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="md:col-span-2 space-y-2">
+                <Label>Scenario Name</Label>
+                <Input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="My Investment Scenario"
+                  data-testid="scenario-name"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Entity Type</Label>
+                <div className="flex gap-2">
+                  <Button
+                    variant={entityType === "personal" ? "default" : "outline"}
+                    onClick={() => setEntityType("personal")}
+                    className={entityType === "personal" ? "bg-[#0F392B]" : ""}
+                    data-testid="type-personal"
+                  >
+                    <Users className="h-4 w-4 mr-2" />
+                    Personal
+                  </Button>
+                  <Button
+                    variant={entityType === "company" ? "default" : "outline"}
+                    onClick={() => setEntityType("company")}
+                    className={entityType === "company" ? "bg-[#0F392B]" : ""}
+                    data-testid="type-company"
+                  >
+                    <Briefcase className="h-4 w-4 mr-2" />
+                    Company
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Main Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full max-w-2xl grid-cols-5">
+            <TabsTrigger value="people">
+              <Users className="h-4 w-4 mr-2" />
+              People
+            </TabsTrigger>
+            {entityType === "company" && (
+              <TabsTrigger value="companies">
+                <Briefcase className="h-4 w-4 mr-2" />
+                Companies
+              </TabsTrigger>
+            )}
+            <TabsTrigger value="properties">
+              <Home className="h-4 w-4 mr-2" />
+              Properties
+            </TabsTrigger>
+            <TabsTrigger value="investments">
+              <TrendingUp className="h-4 w-4 mr-2" />
+              Investments
+            </TabsTrigger>
+            <TabsTrigger value="expenses">
+              <DollarSign className="h-4 w-4 mr-2" />
+              Expenses
+            </TabsTrigger>
+          </TabsList>
+
+          {/* People Tab */}
+          <TabsContent value="people" className="space-y-4">
+            <Card>
               <CardHeader>
-                <CardTitle className="font-['Manrope']">Basic Information</CardTitle>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="font-['Manrope']">Personal Information</CardTitle>
+                    <CardDescription>
+                      Add up to 2 people (e.g., yourself and spouse/partner)
+                    </CardDescription>
+                  </div>
+                  {people.length < 2 && (
+                    <Button variant="outline" size="sm" onClick={addPerson} data-testid="add-person">
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      Add Person
+                    </Button>
+                  )}
+                </div>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Scenario Name</Label>
-                    <Input
-                      id="name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="My Investment Scenario"
-                      data-testid="scenario-name-input"
-                    />
-                  </div>
+                {people.map((person, index) => (
+                  <div key={person.id} className="p-4 rounded-lg border space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-[#0F392B] text-white flex items-center justify-center">
+                          <User className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <Badge variant="outline">Person {index + 1}</Badge>
+                        </div>
+                      </div>
+                      {people.length > 1 && (
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => removePerson(index)}
+                          data-testid={`remove-person-${index}`}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      )}
+                    </div>
 
-                  <div className="space-y-2">
-                    <Label>Entity Type</Label>
-                    <div className="flex gap-2">
-                      <Button
-                        variant={entityType === "personal" ? "default" : "outline"}
-                        className={entityType === "personal" ? "bg-[#0F392B]" : ""}
-                        onClick={() => setEntityType("personal")}
-                        data-testid="personal-entity-btn"
-                      >
-                        <User className="h-4 w-4 mr-2" />
-                        Personal
-                      </Button>
-                      <Button
-                        variant={entityType === "company" ? "default" : "outline"}
-                        className={entityType === "company" ? "bg-[#D4AF37] text-[#0F392B]" : ""}
-                        onClick={() => setEntityType("company")}
-                        data-testid="company-entity-btn"
-                      >
-                        <Building2 className="h-4 w-4 mr-2" />
-                        Company
-                      </Button>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <Label>Name</Label>
+                        <Input
+                          value={person.name}
+                          onChange={(e) => updatePerson(index, 'name', e.target.value)}
+                          placeholder="Full Name"
+                          data-testid={`person-${index}-name`}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Age</Label>
+                        <Input
+                          type="number"
+                          value={person.age}
+                          onChange={(e) => updatePerson(index, 'age', Number(e.target.value))}
+                          data-testid={`person-${index}-age`}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Taxable Income</Label>
+                        <div className="relative">
+                          <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            type="number"
+                            value={person.taxable_income}
+                            onChange={(e) => updatePerson(index, 'taxable_income', Number(e.target.value))}
+                            className="pl-10"
+                            data-testid={`person-${index}-income`}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <Label>Employer Super (%)</Label>
+                        <Input
+                          type="number"
+                          value={person.employer_super}
+                          onChange={(e) => updatePerson(index, 'employer_super', Number(e.target.value))}
+                          data-testid={`person-${index}-super`}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Salary Sacrifice</Label>
+                        <div className="relative">
+                          <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            type="number"
+                            value={person.salary_sacrifice}
+                            onChange={(e) => updatePerson(index, 'salary_sacrifice', Number(e.target.value))}
+                            className="pl-10"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Work-Related Deductions</Label>
+                        <div className="relative">
+                          <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            type="number"
+                            value={person.deductions?.work_related || 0}
+                            onChange={(e) => updatePerson(index, 'deductions.work_related', Number(e.target.value))}
+                            className="pl-10"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
+                ))}
 
-                <div className="space-y-2">
-                  <Label htmlFor="taxable-income">
-                    {entityType === "personal" ? "Annual Taxable Income" : "Company Taxable Income"}
-                  </Label>
-                  <div className="relative">
-                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="taxable-income"
-                      type="number"
-                      value={taxableIncome}
-                      onChange={(e) => setTaxableIncome(Number(e.target.value))}
-                      className="pl-10"
-                      data-testid="taxable-income-input"
-                    />
-                  </div>
+                {/* Total Summary */}
+                <div className="p-4 rounded-lg bg-[#0F392B]/5 flex justify-between items-center">
+                  <span className="font-semibold">Combined Personal Income</span>
+                  <span className="text-xl font-bold text-[#0F392B]">{formatCurrency(totalPersonalIncome)}</span>
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
 
-            {/* Investments */}
-            <Card data-testid="investments-card">
-              <CardHeader>
-                <CardTitle className="font-['Manrope']">Investments</CardTitle>
-                <CardDescription>Enter your investment holdings</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Tabs defaultValue="cash" className="space-y-6">
-                  <TabsList className="grid grid-cols-4 w-full">
-                    <TabsTrigger value="cash">Cash</TabsTrigger>
-                    <TabsTrigger value="shares">Shares</TabsTrigger>
-                    <TabsTrigger value="bonds">Bonds/ETF</TabsTrigger>
-                    <TabsTrigger value="property">Property</TabsTrigger>
-                  </TabsList>
-
-                  <TabsContent value="cash" className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label>Cash Savings</Label>
-                        <div className="relative">
-                          <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            type="number"
-                            value={investments.cash_savings}
-                            onChange={(e) => setInvestments({...investments, cash_savings: Number(e.target.value)})}
-                            className="pl-10"
-                            data-testid="cash-savings-input"
-                          />
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Term Deposit Amount</Label>
-                        <div className="relative">
-                          <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            type="number"
-                            value={investments.term_deposit_amount}
-                            onChange={(e) => setInvestments({...investments, term_deposit_amount: Number(e.target.value)})}
-                            className="pl-10"
-                            data-testid="term-deposit-input"
-                          />
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Term Deposit Rate (%)</Label>
-                        <div className="relative">
-                          <Percent className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            type="number"
-                            step="0.1"
-                            value={investments.term_deposit_rate}
-                            onChange={(e) => setInvestments({...investments, term_deposit_rate: Number(e.target.value)})}
-                            className="pl-10"
-                            data-testid="term-deposit-rate-input"
-                          />
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <Label>SMSF Balance</Label>
-                        <div className="relative">
-                          <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            type="number"
-                            value={investments.smsf_balance}
-                            onChange={(e) => setInvestments({...investments, smsf_balance: Number(e.target.value)})}
-                            className="pl-10"
-                            data-testid="smsf-input"
-                          />
-                        </div>
-                      </div>
+          {/* Companies Tab */}
+          {entityType === "company" && (
+            <TabsContent value="companies" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="font-['Manrope']">Company Structures</CardTitle>
+                      <CardDescription>
+                        Add multiple companies for analysis (e.g., operating company, holding company)
+                      </CardDescription>
                     </div>
-                  </TabsContent>
-
-                  <TabsContent value="shares" className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label>Shares Value</Label>
-                        <div className="relative">
-                          <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            type="number"
-                            value={investments.shares_value}
-                            onChange={(e) => setInvestments({...investments, shares_value: Number(e.target.value)})}
-                            className="pl-10"
-                            data-testid="shares-value-input"
-                          />
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Dividend Yield (%)</Label>
-                        <div className="relative">
-                          <Percent className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            type="number"
-                            step="0.1"
-                            value={investments.shares_dividend_yield}
-                            onChange={(e) => setInvestments({...investments, shares_dividend_yield: Number(e.target.value)})}
-                            className="pl-10"
-                            data-testid="dividend-yield-input"
-                          />
-                        </div>
-                      </div>
-                      <div className="space-y-2 md:col-span-2">
-                        <Label>Franking Percentage (%)</Label>
-                        <div className="relative">
-                          <Percent className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            type="number"
-                            value={investments.franking_percentage}
-                            onChange={(e) => setInvestments({...investments, franking_percentage: Number(e.target.value)})}
-                            className="pl-10"
-                            max={100}
-                            data-testid="franking-percentage-input"
-                          />
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          Percentage of dividends that are franked (fully franked = 100%)
-                        </p>
-                      </div>
-                    </div>
-                  </TabsContent>
-
-                  <TabsContent value="bonds" className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label>Bonds Value</Label>
-                        <div className="relative">
-                          <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            type="number"
-                            value={investments.bonds_value}
-                            onChange={(e) => setInvestments({...investments, bonds_value: Number(e.target.value)})}
-                            className="pl-10"
-                            data-testid="bonds-value-input"
-                          />
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Bonds Yield (%)</Label>
-                        <div className="relative">
-                          <Percent className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            type="number"
-                            step="0.1"
-                            value={investments.bonds_yield}
-                            onChange={(e) => setInvestments({...investments, bonds_yield: Number(e.target.value)})}
-                            className="pl-10"
-                            data-testid="bonds-yield-input"
-                          />
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <Label>ETF Value</Label>
-                        <div className="relative">
-                          <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            type="number"
-                            value={investments.etf_value}
-                            onChange={(e) => setInvestments({...investments, etf_value: Number(e.target.value)})}
-                            className="pl-10"
-                            data-testid="etf-value-input"
-                          />
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <Label>ETF Yield (%)</Label>
-                        <div className="relative">
-                          <Percent className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            type="number"
-                            step="0.1"
-                            value={investments.etf_yield}
-                            onChange={(e) => setInvestments({...investments, etf_yield: Number(e.target.value)})}
-                            className="pl-10"
-                            data-testid="etf-yield-input"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </TabsContent>
-
-                  <TabsContent value="property" className="space-y-4">
-                    <Button 
-                      variant="outline" 
-                      onClick={addProperty}
-                      className="w-full"
-                      data-testid="add-property-btn"
-                    >
+                    <Button variant="outline" size="sm" onClick={addCompany} data-testid="add-company">
                       <Plus className="h-4 w-4 mr-2" />
-                      Add Property
+                      Add Company
                     </Button>
-
-                    {investments.properties.map((property, index) => (
-                      <Card key={property.property_id || index} className="p-4" data-testid={`property-${index}`}>
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center gap-2">
-                            <Home className="h-5 w-5 text-[#0F392B]" />
-                            <Input
-                              value={property.name}
-                              onChange={(e) => updateProperty(index, 'name', e.target.value)}
-                              className="font-semibold border-0 p-0 h-auto focus-visible:ring-0"
-                              placeholder="Property Name"
-                            />
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {companies.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Briefcase className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                      <p>No companies added yet</p>
+                      <Button variant="outline" className="mt-3" onClick={addCompany}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Your First Company
+                      </Button>
+                    </div>
+                  ) : (
+                    companies.map((company, index) => (
+                      <div key={company.id} className="p-4 rounded-lg border space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg bg-[#D4AF37]/20 flex items-center justify-center">
+                              <Building2 className="h-5 w-5 text-[#D4AF37]" />
+                            </div>
+                            <Badge className="bg-[#D4AF37]/10 text-[#D4AF37]">Company {index + 1}</Badge>
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => removeProperty(index)}
-                            className="text-destructive"
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => removeCompany(index)}
+                            data-testid={`remove-company-${index}`}
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-4 w-4 text-destructive" />
                           </Button>
                         </div>
 
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                          <div className="space-y-1">
-                            <Label className="text-xs">Value</Label>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="space-y-2">
+                            <Label>Company Name</Label>
+                            <Input
+                              value={company.name}
+                              onChange={(e) => updateCompany(index, 'name', e.target.value)}
+                              placeholder="Company Pty Ltd"
+                              data-testid={`company-${index}-name`}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>ABN</Label>
+                            <Input
+                              value={company.abn}
+                              onChange={(e) => updateCompany(index, 'abn', e.target.value)}
+                              placeholder="XX XXX XXX XXX"
+                              data-testid={`company-${index}-abn`}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Base Rate Entity?</Label>
+                            <div className="flex items-center gap-2 h-10">
+                              <Switch
+                                checked={company.is_base_rate_entity}
+                                onCheckedChange={(v) => updateCompany(index, 'is_base_rate_entity', v)}
+                              />
+                              <span className="text-sm text-muted-foreground">
+                                {company.is_base_rate_entity ? "25% tax rate" : "30% tax rate"}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="space-y-2">
+                            <Label>Annual Revenue</Label>
+                            <div className="relative">
+                              <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                              <Input
+                                type="number"
+                                value={company.revenue}
+                                onChange={(e) => updateCompany(index, 'revenue', Number(e.target.value))}
+                                className="pl-10"
+                                data-testid={`company-${index}-revenue`}
+                              />
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Business Expenses</Label>
+                            <div className="relative">
+                              <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                              <Input
+                                type="number"
+                                value={company.expenses}
+                                onChange={(e) => updateCompany(index, 'expenses', Number(e.target.value))}
+                                className="pl-10"
+                              />
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Taxable Income</Label>
+                            <div className="relative">
+                              <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                              <Input
+                                type="number"
+                                value={company.taxable_income}
+                                onChange={(e) => updateCompany(index, 'taxable_income', Number(e.target.value))}
+                                className="pl-10"
+                                data-testid={`company-${index}-income`}
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label>Franking Account Balance</Label>
+                            <div className="relative">
+                              <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                              <Input
+                                type="number"
+                                value={company.franking_account_balance}
+                                onChange={(e) => updateCompany(index, 'franking_account_balance', Number(e.target.value))}
+                                className="pl-10"
+                              />
+                            </div>
+                          </div>
+                          <div className="p-3 rounded-lg bg-muted/50">
+                            <p className="text-sm text-muted-foreground">Estimated Company Tax</p>
+                            <p className="text-lg font-bold text-[#D4AF37]">
+                              {formatCurrency(company.taxable_income * (company.is_base_rate_entity ? 0.25 : 0.30))}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+
+                  {companies.length > 0 && (
+                    <div className="p-4 rounded-lg bg-[#D4AF37]/10 flex justify-between items-center">
+                      <span className="font-semibold">Total Company Income</span>
+                      <span className="text-xl font-bold text-[#D4AF37]">{formatCurrency(totalCompanyIncome)}</span>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
+
+          {/* Properties Tab */}
+          <TabsContent value="properties" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="font-['Manrope']">Investment Properties</CardTitle>
+                    <CardDescription>
+                      Add properties and assign ownership to individuals or companies
+                    </CardDescription>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={addProperty} data-testid="add-property">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Property
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {investments.properties.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Home className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                    <p>No properties added yet</p>
+                    <Button variant="outline" className="mt-3" onClick={addProperty}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Your First Property
+                    </Button>
+                  </div>
+                ) : (
+                  investments.properties.map((property, index) => (
+                    <div key={property.property_id} className="p-4 rounded-lg border space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-lg bg-[#3B82F6]/20 flex items-center justify-center">
+                            <Home className="h-5 w-5 text-[#3B82F6]" />
+                          </div>
+                          <Input
+                            value={property.name}
+                            onChange={(e) => updateProperty(index, 'name', e.target.value)}
+                            placeholder="Property Name"
+                            className="w-48"
+                          />
+                        </div>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => removeProperty(index)}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="space-y-2">
+                          <Label>Property Value</Label>
+                          <div className="relative">
+                            <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input
                               type="number"
                               value={property.value}
                               onChange={(e) => updateProperty(index, 'value', Number(e.target.value))}
+                              className="pl-10"
                             />
                           </div>
-                          <div className="space-y-1">
-                            <Label className="text-xs">Rental Income (pa)</Label>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Annual Rental Income</Label>
+                          <div className="relative">
+                            <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input
                               type="number"
                               value={property.rental_income}
                               onChange={(e) => updateProperty(index, 'rental_income', Number(e.target.value))}
+                              className="pl-10"
                             />
                           </div>
-                          <div className="space-y-1">
-                            <Label className="text-xs">Mortgage</Label>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Mortgage Amount</Label>
+                          <div className="relative">
+                            <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input
                               type="number"
                               value={property.mortgage_amount}
                               onChange={(e) => updateProperty(index, 'mortgage_amount', Number(e.target.value))}
+                              className="pl-10"
                             />
                           </div>
-                          <div className="space-y-1">
-                            <Label className="text-xs">Rate (%)</Label>
-                            <Input
-                              type="number"
-                              step="0.1"
-                              value={property.mortgage_rate}
-                              onChange={(e) => updateProperty(index, 'mortgage_rate', Number(e.target.value))}
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label className="text-xs">Expenses (pa)</Label>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Owner</Label>
+                          <select
+                            value={property.owner}
+                            onChange={(e) => updateProperty(index, 'owner', e.target.value)}
+                            className="w-full h-10 px-3 rounded-md border border-input bg-background"
+                          >
+                            {getOwnerOptions().map(opt => (
+                              <option key={opt.value} value={opt.value}>{opt.label}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="space-y-2">
+                          <Label>Interest Rate (%)</Label>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={property.mortgage_rate}
+                            onChange={(e) => updateProperty(index, 'mortgage_rate', Number(e.target.value))}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Loan Term (years)</Label>
+                          <Input
+                            type="number"
+                            value={property.mortgage_term_years}
+                            onChange={(e) => updateProperty(index, 'mortgage_term_years', Number(e.target.value))}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Annual Expenses</Label>
+                          <div className="relative">
+                            <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input
                               type="number"
                               value={property.annual_expenses}
                               onChange={(e) => updateProperty(index, 'annual_expenses', Number(e.target.value))}
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label className="text-xs">Depreciation</Label>
-                            <Input
-                              type="number"
-                              value={property.depreciation_building + property.depreciation_fixtures}
-                              onChange={(e) => updateProperty(index, 'depreciation_building', Number(e.target.value))}
+                              className="pl-10"
                             />
                           </div>
                         </div>
-                      </Card>
-                    ))}
-
-                    {investments.properties.length === 0 && (
-                      <div className="text-center py-8 text-muted-foreground">
-                        <Building2 className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                        <p>No properties added yet</p>
+                        <div className="space-y-2">
+                          <Label>Building Depreciation</Label>
+                          <div className="relative">
+                            <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              type="number"
+                              value={property.depreciation_building}
+                              onChange={(e) => updateProperty(index, 'depreciation_building', Number(e.target.value))}
+                              className="pl-10"
+                            />
+                          </div>
+                        </div>
                       </div>
-                    )}
-                  </TabsContent>
-                </Tabs>
+                    </div>
+                  ))
+                )}
               </CardContent>
             </Card>
+          </TabsContent>
 
-            {/* Expenses */}
-            <Card data-testid="expenses-card">
+          {/* Investments Tab */}
+          <TabsContent value="investments" className="space-y-4">
+            <Card>
               <CardHeader>
-                <CardTitle className="font-['Manrope']">Expenses</CardTitle>
-                <CardDescription>Enter your annual expenses</CardDescription>
+                <CardTitle className="font-['Manrope']">Investment Portfolio</CardTitle>
+                <CardDescription>Cash, shares, bonds, ETFs and superannuation</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Cash */}
+                  <div className="space-y-4">
+                    <h4 className="font-semibold flex items-center gap-2">
+                      <DollarSign className="h-4 w-4 text-[#10B981]" />
+                      Cash & Deposits
+                    </h4>
+                    <div className="space-y-3">
+                      <div className="space-y-2">
+                        <Label>Cash Savings</Label>
+                        <Input
+                          type="number"
+                          value={investments.cash_savings}
+                          onChange={(e) => setInvestments({ ...investments, cash_savings: Number(e.target.value) })}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Term Deposit</Label>
+                        <Input
+                          type="number"
+                          value={investments.term_deposit_amount}
+                          onChange={(e) => setInvestments({ ...investments, term_deposit_amount: Number(e.target.value) })}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>TD Rate (%)</Label>
+                        <Input
+                          type="number"
+                          step="0.1"
+                          value={investments.term_deposit_rate}
+                          onChange={(e) => setInvestments({ ...investments, term_deposit_rate: Number(e.target.value) })}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Shares & ETFs */}
+                  <div className="space-y-4">
+                    <h4 className="font-semibold flex items-center gap-2">
+                      <TrendingUp className="h-4 w-4 text-[#3B82F6]" />
+                      Shares & ETFs
+                    </h4>
+                    <div className="space-y-3">
+                      <div className="space-y-2">
+                        <Label>Shares Value</Label>
+                        <Input
+                          type="number"
+                          value={investments.shares_value}
+                          onChange={(e) => setInvestments({ ...investments, shares_value: Number(e.target.value) })}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Dividend Yield (%)</Label>
+                        <Input
+                          type="number"
+                          step="0.1"
+                          value={investments.shares_dividend_yield}
+                          onChange={(e) => setInvestments({ ...investments, shares_dividend_yield: Number(e.target.value) })}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>ETF Value</Label>
+                        <Input
+                          type="number"
+                          value={investments.etf_value}
+                          onChange={(e) => setInvestments({ ...investments, etf_value: Number(e.target.value) })}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Bonds & Super */}
+                  <div className="space-y-4">
+                    <h4 className="font-semibold flex items-center gap-2">
+                      <PiggyBank className="h-4 w-4 text-[#D4AF37]" />
+                      Bonds & Super
+                    </h4>
+                    <div className="space-y-3">
+                      <div className="space-y-2">
+                        <Label>Bonds Value</Label>
+                        <Input
+                          type="number"
+                          value={investments.bonds_value}
+                          onChange={(e) => setInvestments({ ...investments, bonds_value: Number(e.target.value) })}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Bonds Yield (%)</Label>
+                        <Input
+                          type="number"
+                          step="0.1"
+                          value={investments.bonds_yield}
+                          onChange={(e) => setInvestments({ ...investments, bonds_yield: Number(e.target.value) })}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>SMSF Balance</Label>
+                        <Input
+                          type="number"
+                          value={investments.smsf_balance}
+                          onChange={(e) => setInvestments({ ...investments, smsf_balance: Number(e.target.value) })}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-lg bg-[#10B981]/10 flex justify-between items-center">
+                  <span className="font-semibold">Total Investment Value (excl. property)</span>
+                  <span className="text-xl font-bold text-[#10B981]">{formatCurrency(totalInvestmentValue)}</span>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Expenses Tab */}
+          <TabsContent value="expenses" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="font-['Manrope']">Deductible Expenses</CardTitle>
+                <CardDescription>Expenses that may be tax deductible</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="space-y-2">
                     <Label>School Fees</Label>
                     <div className="relative">
@@ -603,9 +1086,8 @@ const ScenarioBuilder = () => {
                       <Input
                         type="number"
                         value={expenses.school_fees}
-                        onChange={(e) => setExpenses({...expenses, school_fees: Number(e.target.value)})}
+                        onChange={(e) => setExpenses({ ...expenses, school_fees: Number(e.target.value) })}
                         className="pl-10"
-                        data-testid="school-fees-input"
                       />
                     </div>
                   </div>
@@ -616,9 +1098,8 @@ const ScenarioBuilder = () => {
                       <Input
                         type="number"
                         value={expenses.childcare}
-                        onChange={(e) => setExpenses({...expenses, childcare: Number(e.target.value)})}
+                        onChange={(e) => setExpenses({ ...expenses, childcare: Number(e.target.value) })}
                         className="pl-10"
-                        data-testid="childcare-input"
                       />
                     </div>
                   </div>
@@ -629,22 +1110,32 @@ const ScenarioBuilder = () => {
                       <Input
                         type="number"
                         value={expenses.health_insurance}
-                        onChange={(e) => setExpenses({...expenses, health_insurance: Number(e.target.value)})}
+                        onChange={(e) => setExpenses({ ...expenses, health_insurance: Number(e.target.value) })}
                         className="pl-10"
-                        data-testid="health-insurance-input"
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label>Work-Related (Deductible)</Label>
+                    <Label>Work-Related</Label>
                     <div className="relative">
                       <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
                         type="number"
                         value={expenses.work_related}
-                        onChange={(e) => setExpenses({...expenses, work_related: Number(e.target.value)})}
+                        onChange={(e) => setExpenses({ ...expenses, work_related: Number(e.target.value) })}
                         className="pl-10"
-                        data-testid="work-related-input"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Private Expenses</Label>
+                    <div className="relative">
+                      <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        type="number"
+                        value={expenses.private_expenses}
+                        onChange={(e) => setExpenses({ ...expenses, private_expenses: Number(e.target.value) })}
+                        className="pl-10"
                       />
                     </div>
                   </div>
@@ -655,167 +1146,77 @@ const ScenarioBuilder = () => {
                       <Input
                         type="number"
                         value={expenses.other_deductible}
-                        onChange={(e) => setExpenses({...expenses, other_deductible: Number(e.target.value)})}
+                        onChange={(e) => setExpenses({ ...expenses, other_deductible: Number(e.target.value) })}
                         className="pl-10"
-                        data-testid="other-deductible-input"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Private (Non-Deductible)</Label>
-                    <div className="relative">
-                      <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        type="number"
-                        value={expenses.private_expenses}
-                        onChange={(e) => setExpenses({...expenses, private_expenses: Number(e.target.value)})}
-                        className="pl-10"
-                        data-testid="private-expenses-input"
                       />
                     </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
 
-          {/* Analysis Results Sidebar */}
-          <div className="space-y-6">
-            <Card data-testid="analysis-summary">
-              <CardHeader>
-                <CardTitle className="font-['Manrope']">Analysis Summary</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {analysisResult ? (
-                  <div className="space-y-4">
-                    <div className="p-4 rounded-lg bg-[#0F392B] text-white">
-                      <p className="text-sm text-white/80">Net Worth</p>
-                      <p className="text-2xl font-bold">
-                        {formatCurrency(analysisResult.summary?.net_worth || 0)}
-                      </p>
-                    </div>
-
-                    <div className="space-y-3">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Total Assets</span>
-                        <span className="font-semibold">
-                          {formatCurrency(analysisResult.summary?.total_assets || 0)}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Total Debt</span>
-                        <span className="font-semibold text-destructive">
-                          {formatCurrency(analysisResult.summary?.total_debt || 0)}
-                        </span>
-                      </div>
-                      <Separator />
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Investment Income</span>
-                        <span className="font-semibold text-[#10B981]">
-                          {formatCurrency(analysisResult.summary?.total_investment_income || 0)}
-                        </span>
-                      </div>
-                    </div>
-
-                    <Separator />
-
-                    <div className="space-y-3">
-                      <h4 className="font-semibold">Tax Summary</h4>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Total Tax</span>
-                        <span className="font-semibold">
-                          {formatCurrency(analysisResult.tax_analysis?.total_tax || analysisResult.tax_analysis?.company_tax || 0)}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Effective Rate</span>
-                        <span className="font-semibold">
-                          {(analysisResult.tax_analysis?.effective_rate || analysisResult.tax_analysis?.tax_rate || 0).toFixed(1)}%
-                        </span>
-                      </div>
-                      {analysisResult.tax_analysis?.franking_credit_offset > 0 && (
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Franking Credit</span>
-                          <span className="font-semibold text-[#D4AF37]">
-                            -{formatCurrency(analysisResult.tax_analysis.franking_credit_offset)}
-                          </span>
-                        </div>
-                      )}
-                      <div className="p-3 rounded-lg bg-[#10B981]/10">
-                        <div className="flex justify-between">
-                          <span className="font-medium">Net Income</span>
-                          <span className="font-bold text-[#10B981]">
-                            {formatCurrency(analysisResult.tax_analysis?.net_income || analysisResult.tax_analysis?.net_profit || 0)}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {analysisResult.debt_equity_analysis && (
-                      <>
-                        <Separator />
-                        <div className="space-y-3">
-                          <h4 className="font-semibold">Leverage</h4>
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Debt to Equity</span>
-                            <span className="font-semibold">
-                              {analysisResult.debt_equity_analysis.debt_to_equity_ratio.toFixed(2)}
-                            </span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Equity Ratio</span>
-                            <span className="font-semibold">
-                              {(analysisResult.debt_equity_analysis.equity_ratio * 100).toFixed(1)}%
-                            </span>
-                          </div>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <Calculator className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">
-                      Click "Analyze" to see results
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Quick Stats */}
-            <Card>
-              <CardContent className="p-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-3 rounded-lg bg-muted">
-                    <PiggyBank className="h-6 w-6 mx-auto mb-2 text-[#0F392B]" />
-                    <p className="text-xs text-muted-foreground">Cash & Deposits</p>
-                    <p className="font-semibold">
-                      {formatCurrency(investments.cash_savings + investments.term_deposit_amount)}
-                    </p>
-                  </div>
-                  <div className="text-center p-3 rounded-lg bg-muted">
-                    <TrendingUp className="h-6 w-6 mx-auto mb-2 text-[#10B981]" />
-                    <p className="text-xs text-muted-foreground">Shares & ETFs</p>
-                    <p className="font-semibold">
-                      {formatCurrency(investments.shares_value + investments.etf_value)}
-                    </p>
-                  </div>
-                  <div className="text-center p-3 rounded-lg bg-muted">
-                    <Building2 className="h-6 w-6 mx-auto mb-2 text-[#D4AF37]" />
-                    <p className="text-xs text-muted-foreground">Properties</p>
-                    <p className="font-semibold">{investments.properties.length}</p>
-                  </div>
-                  <div className="text-center p-3 rounded-lg bg-muted">
-                    <Landmark className="h-6 w-6 mx-auto mb-2 text-[#3B82F6]" />
-                    <p className="text-xs text-muted-foreground">Bonds</p>
-                    <p className="font-semibold">{formatCurrency(investments.bonds_value)}</p>
-                  </div>
+                <div className="mt-6 space-y-2">
+                  <Label>Simulation Years</Label>
+                  <Input
+                    type="number"
+                    value={simulationYears}
+                    onChange={(e) => setSimulationYears(Number(e.target.value))}
+                    className="w-32"
+                    min={1}
+                    max={30}
+                  />
                 </div>
               </CardContent>
             </Card>
-          </div>
-        </div>
+          </TabsContent>
+        </Tabs>
+
+        {/* Analysis Results */}
+        {analysisResult && (
+          <Card className="border-[#10B981]">
+            <CardHeader>
+              <CardTitle className="font-['Manrope'] flex items-center gap-2">
+                <Calculator className="h-5 w-5 text-[#10B981]" />
+                Analysis Results
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="p-4 rounded-lg bg-muted/50">
+                  <p className="text-sm text-muted-foreground">Total Tax</p>
+                  <p className="text-xl font-bold text-destructive">
+                    {formatCurrency(analysisResult.tax_analysis?.tax_payable || 0)}
+                  </p>
+                </div>
+                <div className="p-4 rounded-lg bg-muted/50">
+                  <p className="text-sm text-muted-foreground">Effective Rate</p>
+                  <p className="text-xl font-bold">
+                    {(analysisResult.tax_analysis?.effective_rate || 0).toFixed(1)}%
+                  </p>
+                </div>
+                <div className="p-4 rounded-lg bg-muted/50">
+                  <p className="text-sm text-muted-foreground">Net Worth</p>
+                  <p className="text-xl font-bold text-[#10B981]">
+                    {formatCurrency(analysisResult.summary?.net_worth || 0)}
+                  </p>
+                </div>
+                <div className="p-4 rounded-lg bg-muted/50">
+                  <p className="text-sm text-muted-foreground">Projected (Median)</p>
+                  <p className="text-xl font-bold text-[#0F392B]">
+                    {formatCurrency(analysisResult.monte_carlo?.median_outcome || 0)}
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4 flex justify-end">
+                <Button 
+                  onClick={() => navigate("/reports")}
+                  className="bg-[#0F392B] hover:bg-[#0F392B]/90"
+                >
+                  View Full Report
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </Layout>
   );
