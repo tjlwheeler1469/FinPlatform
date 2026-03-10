@@ -171,13 +171,13 @@ const IncomeSplitting = () => {
 
   // Calculate current scenario (no splitting)
   const currentScenario = {
-    totalIncome: familyMembers.reduce((sum, m) => sum + m.income, 0) + 
+    totalIncome: familyMembers.reduce((sum, m) => sum + (m.taxableIncome || 0), 0) + 
                  incomeSources.dividends + incomeSources.trustDistributions + incomeSources.interestIncome,
     taxes: familyMembers.map(m => ({
       ...m,
-      totalIncome: m.income + (m.id === 1 ? incomeSources.dividends + incomeSources.trustDistributions + incomeSources.interestIncome : 0),
-      tax: calculateTax(m.income + (m.id === 1 ? incomeSources.dividends + incomeSources.trustDistributions + incomeSources.interestIncome : 0)),
-      marginalRate: getMarginalRate(m.income + (m.id === 1 ? incomeSources.dividends + incomeSources.trustDistributions + incomeSources.interestIncome : 0))
+      totalIncome: (m.taxableIncome || 0) + (m.relationship === 'primary' ? incomeSources.dividends + incomeSources.trustDistributions + incomeSources.interestIncome : 0),
+      tax: calculateTax((m.taxableIncome || 0) + (m.relationship === 'primary' ? incomeSources.dividends + incomeSources.trustDistributions + incomeSources.interestIncome : 0)),
+      marginalRate: getMarginalRate((m.taxableIncome || 0) + (m.relationship === 'primary' ? incomeSources.dividends + incomeSources.trustDistributions + incomeSources.interestIncome : 0))
     }))
   };
   currentScenario.totalTax = currentScenario.taxes.reduce((sum, t) => sum + t.tax, 0);
@@ -186,7 +186,7 @@ const IncomeSplitting = () => {
   const optimizedScenario = {
     taxes: familyMembers.map(m => {
       const distributed = distributions[m.id] || 0;
-      const totalIncome = m.income + distributed;
+      const totalIncome = (m.taxableIncome || 0) + distributed;
       return {
         ...m,
         distributed,
