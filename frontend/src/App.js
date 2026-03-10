@@ -24,6 +24,8 @@ import HouseholdBudget from "@/pages/HouseholdBudget";
 import IncomeSplitting from "@/pages/IncomeSplitting";
 import Division7ACalculator from "@/pages/Division7ACalculator";
 import CGTEventTracker from "@/pages/CGTEventTracker";
+import TrustDistributionAnalysis from "@/pages/TrustDistributionAnalysis";
+import FinancialRecommendations from "@/pages/FinancialRecommendations";
 
 // Portfolio Context for sharing dummy data across components
 const PortfolioContext = createContext(null);
