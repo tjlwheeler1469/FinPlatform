@@ -536,6 +536,139 @@ const ReportGenerator = () => {
                     </div>
                   ))}
 
+                  {/* Financial Recommendations */}
+                  {reportData && (
+                    <div className="p-4 rounded-lg border border-[#0F392B] bg-[#0F392B]/5">
+                      <h3 className="text-lg font-semibold font-['Manrope'] mb-4 flex items-center gap-2">
+                        <Lightbulb className="h-5 w-5 text-[#D4AF37]" />
+                        Recommended Next Steps
+                      </h3>
+                      
+                      {/* Generate recommendations based on report data */}
+                      <div className="space-y-3">
+                        {/* Debt/Equity Analysis */}
+                        {(() => {
+                          const summary = reportData.sections?.find(s => s.title === 'Executive Summary')?.data;
+                          const totalDebt = summary?.total_debt || 0;
+                          const totalAssets = summary?.total_assets || 0;
+                          const debtRatio = totalAssets > 0 ? (totalDebt / totalAssets * 100) : 0;
+                          
+                          const projections = reportData.sections?.find(s => s.title === 'Investment Projections')?.data;
+                          const expectedReturn = projections?.expected_return || 7;
+                          const volatility = projections?.volatility || 15;
+                          
+                          const taxData = reportData.sections?.find(s => s.title === 'Tax Analysis')?.data;
+                          const effectiveRate = taxData?.effective_rate || 30;
+                          
+                          const recommendations = [];
+                          
+                          // Debt recommendations
+                          if (debtRatio > 60) {
+                            recommendations.push({
+                              priority: "High",
+                              color: "#EF4444",
+                              icon: "🔴",
+                              title: "Reduce Debt Exposure",
+                              detail: `Your debt-to-asset ratio is ${debtRatio.toFixed(0)}%. Consider paying down high-interest debt or refinancing to reduce risk.`
+                            });
+                          } else if (debtRatio > 40) {
+                            recommendations.push({
+                              priority: "Medium",
+                              color: "#D4AF37",
+                              icon: "🟡",
+                              title: "Monitor Debt Levels",
+                              detail: `Debt ratio of ${debtRatio.toFixed(0)}% is manageable but review loan terms. Consider accelerating mortgage payments if rates rise.`
+                            });
+                          } else if (debtRatio > 0) {
+                            recommendations.push({
+                              priority: "Low",
+                              color: "#10B981",
+                              icon: "🟢",
+                              title: "Debt Position Strong",
+                              detail: `Debt ratio of ${debtRatio.toFixed(0)}% is healthy. Current leverage is appropriate for wealth building.`
+                            });
+                          }
+                          
+                          // Risk/Return recommendations
+                          const riskAdjustedReturn = expectedReturn / (volatility || 1);
+                          if (riskAdjustedReturn < 0.4) {
+                            recommendations.push({
+                              priority: "High",
+                              color: "#EF4444",
+                              icon: "🔴",
+                              title: "Improve Risk-Adjusted Returns",
+                              detail: `Portfolio volatility (${volatility.toFixed(0)}%) is high relative to expected returns. Consider diversifying into lower-risk assets like bonds or term deposits.`
+                            });
+                          } else if (riskAdjustedReturn < 0.6) {
+                            recommendations.push({
+                              priority: "Medium",
+                              color: "#D4AF37",
+                              icon: "🟡",
+                              title: "Rebalance Portfolio",
+                              detail: `Risk-adjusted return of ${(riskAdjustedReturn * 100).toFixed(0)}% is moderate. Review asset allocation to optimize the risk/reward balance.`
+                            });
+                          } else {
+                            recommendations.push({
+                              priority: "Low",
+                              color: "#10B981",
+                              icon: "🟢",
+                              title: "Portfolio Well Balanced",
+                              detail: `Risk-adjusted return is strong. Expected ${expectedReturn.toFixed(1)}% return with ${volatility.toFixed(0)}% volatility is well-optimized.`
+                            });
+                          }
+                          
+                          // Tax recommendations
+                          if (effectiveRate > 35) {
+                            recommendations.push({
+                              priority: "High",
+                              color: "#D4AF37",
+                              icon: "🟡",
+                              title: "Tax Optimization Opportunity",
+                              detail: `Effective tax rate of ${effectiveRate.toFixed(1)}% is high. Consider salary sacrifice, trust distributions, or maximizing deductions.`
+                            });
+                          }
+                          
+                          // Super recommendations
+                          recommendations.push({
+                            priority: "Medium",
+                            color: "#3B82F6",
+                            icon: "🔵",
+                            title: "Maximize Super Contributions",
+                            detail: "Review concessional contribution caps ($30,000/year). Salary sacrifice can reduce taxable income while building retirement wealth."
+                          });
+                          
+                          // Diversification
+                          recommendations.push({
+                            priority: "Low",
+                            color: "#10B981",
+                            icon: "🟢",
+                            title: "Maintain Diversification",
+                            detail: "Continue spreading investments across property, shares, bonds, and cash to reduce concentration risk."
+                          });
+                          
+                          return recommendations.map((rec, i) => (
+                            <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-white border">
+                              <span className="text-lg">{rec.icon}</span>
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="font-semibold">{rec.title}</span>
+                                  <Badge 
+                                    variant="outline" 
+                                    className="text-xs"
+                                    style={{ borderColor: rec.color, color: rec.color }}
+                                  >
+                                    {rec.priority} Priority
+                                  </Badge>
+                                </div>
+                                <p className="text-sm text-muted-foreground">{rec.detail}</p>
+                              </div>
+                            </div>
+                          ));
+                        })()}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Disclaimer */}
                   <div className="p-4 rounded-lg bg-muted/50 text-sm text-muted-foreground">
                     <p className="font-semibold mb-2">Disclaimer</p>
