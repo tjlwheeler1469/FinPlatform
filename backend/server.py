@@ -983,10 +983,6 @@ def compare_scenarios(scenarios: List[Dict[str, Any]]) -> Dict[str, Any]:
             "net_worth_range": max(c["summary"]["net_worth"] for c in comparisons) - min(c["summary"]["net_worth"] for c in comparisons)
         }
     }
-            }
-        ],
-        "disclaimer": "This report is for informational purposes only and does not constitute financial advice. Consult a qualified financial advisor for personalized recommendations."
-    }
 
 def calculate_franking_credits(dividend: float, franking_percentage: float = 100) -> Dict[str, float]:
     """Calculate franking credits for dividends"""
