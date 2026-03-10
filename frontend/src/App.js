@@ -195,6 +195,7 @@ const AppRouter = () => {
       <Route path="/dividend-reinvestment" element={<DividendReinvestment />} />
       <Route path="/income-splitting" element={<IncomeSplitting />} />
       <Route path="/division-7a" element={<Division7ACalculator />} />
+      <Route path="/cgt-events" element={<CGTEventTracker />} />
     </Routes>
   );
 };
