@@ -20,6 +20,7 @@ import PropertyComparison from "@/pages/PropertyComparison";
 import ScenarioComparison from "@/pages/ScenarioComparison";
 import TaxLossHarvesting from "@/pages/TaxLossHarvesting";
 import DividendReinvestment from "@/pages/DividendReinvestment";
+import HouseholdBudget from "@/pages/HouseholdBudget";
 
 // Portfolio Context for sharing dummy data across components
 const PortfolioContext = createContext(null);
@@ -32,10 +33,10 @@ export const usePortfolio = () => {
   return context;
 };
 
-// Dummy Portfolio Data
+// Dummy Portfolio Data - Wheeler Family
 const DUMMY_PORTFOLIO = {
   personal: {
-    name: "John Smith",
+    name: "Wheeler Family",
     age: 45,
     taxableIncome: 185000,
     entityType: "personal"
@@ -172,6 +173,7 @@ const AppRouter = () => {
     <Routes>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/budget" element={<HouseholdBudget />} />
       <Route path="/tax-analysis" element={<TaxAnalysis />} />
       <Route path="/property-portfolio" element={<PropertyPortfolio />} />
       <Route path="/monte-carlo" element={<MonteCarloSimulation />} />
