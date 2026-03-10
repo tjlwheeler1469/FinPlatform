@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { 
   TrendingUp, 
   LayoutDashboard, 
@@ -25,11 +26,15 @@ import {
   FileCheck,
   Lightbulb,
   PieChart,
-  CalendarDays
+  CalendarDays,
+  Save,
+  AlertCircle,
+  Eye
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { usePortfolio } from "@/App";
 
 // Grouped navigation structure
 const navGroups = [
@@ -37,6 +42,7 @@ const navGroups = [
     name: "Overview",
     items: [
       { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard, title: "Dashboard" },
+      { path: "/overview", label: "Family Overview", icon: Eye, title: "Family Overview" },
       { path: "/recommendations", label: "Recommendations", icon: Lightbulb, title: "Financial Recommendations" },
     ]
   },
