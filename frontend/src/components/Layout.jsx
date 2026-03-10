@@ -1,14 +1,4 @@
-import { useAuth } from "@/App";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { 
   TrendingUp, 
   LayoutDashboard, 
@@ -17,22 +7,20 @@ import {
   BarChart3, 
   Landmark,
   FolderOpen,
-  LogOut,
   Menu,
   X,
-  Plus,
   FileText,
   History,
   PiggyBank
 } from "lucide-react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { path: "/tax-analysis", label: "Tax Analysis", icon: Calculator },
-  { path: "/cgt-calculator", label: "CGT Calculator", icon: TrendingUp },
+  { path: "/cgt-calculator", label: "CGT", icon: TrendingUp },
   { path: "/historical-tax", label: "Tax History", icon: History },
   { path: "/property-portfolio", label: "Property", icon: Building2 },
   { path: "/smsf-optimizer", label: "SMSF", icon: PiggyBank },
@@ -43,15 +31,8 @@ const navItems = [
 ];
 
 const Layout = ({ children }) => {
-  const { user, logout } = useAuth();
   const location = useLocation();
-  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const getInitials = (name) => {
-    if (!name) return "U";
-    return name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
-  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -62,7 +43,7 @@ const Layout = ({ children }) => {
           <Link to="/dashboard" className="flex items-center gap-2" data-testid="logo-link">
             <TrendingUp className="h-6 w-6 text-[#0F392B]" />
             <span className="font-bold font-['Manrope'] text-foreground hidden sm:inline">
-              WealthOptimizer
+              WealthOptimizer AU
             </span>
           </Link>
 
@@ -86,59 +67,16 @@ const Layout = ({ children }) => {
             ))}
           </nav>
 
-          {/* Right side */}
-          <div className="flex items-center gap-3">
-            <Button
-              data-testid="new-scenario-btn"
-              onClick={() => navigate("/scenario-builder")}
-              className="hidden sm:flex bg-[#D4AF37] text-[#0F392B] hover:bg-[#D4AF37]/90"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              New Scenario
-            </Button>
-
-            {/* User Menu */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-10 w-10 rounded-full" data-testid="user-menu-trigger">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src={user?.picture} alt={user?.name} />
-                    <AvatarFallback className="bg-[#0F392B] text-white">
-                      {getInitials(user?.name)}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">{user?.name}</p>
-                    <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem 
-                  data-testid="logout-btn"
-                  onClick={logout}
-                  className="text-destructive focus:text-destructive cursor-pointer"
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Log out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {/* Mobile menu button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="lg:hidden"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              data-testid="mobile-menu-btn"
-            >
-              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </Button>
-          </div>
+          {/* Mobile menu button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="lg:hidden"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            data-testid="mobile-menu-btn"
+          >
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
         </div>
 
         {/* Mobile Navigation */}
@@ -162,17 +100,6 @@ const Layout = ({ children }) => {
                   {item.label}
                 </Link>
               ))}
-              <Button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  navigate("/scenario-builder");
-                }}
-                className="mt-2 bg-[#D4AF37] text-[#0F392B] hover:bg-[#D4AF37]/90"
-                data-testid="mobile-new-scenario-btn"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                New Scenario
-              </Button>
             </nav>
           </div>
         )}
