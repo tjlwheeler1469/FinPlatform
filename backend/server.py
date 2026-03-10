@@ -1774,6 +1774,316 @@ async def analyze_scenario_comparison(request: ScenarioComparisonInput):
     """Compare multiple investment scenarios side by side"""
     return compare_scenarios(request.scenarios)
 
+# ==================== TAX LOSS HARVESTING ====================
+
+class HoldingInput(BaseModel):
+    symbol: str
+    name: str
+    purchase_price: float
+    current_price: float
+    quantity: float
+    purchase_date: str  # YYYY-MM-DD format
+    asset_type: str = "shares"  # shares, etf, crypto
+
+class TaxLossHarvestingRequest(BaseModel):
+    holdings: List[HoldingInput]
+    realized_gains: float = 0  # Already realized gains this FY
+    marginal_tax_rate: float = 0.37
+
+def calculate_tax_loss_harvesting(holdings: List[Dict], realized_gains: float, marginal_rate: float):
+    """Analyze holdings for tax loss harvesting opportunities"""
+    from datetime import datetime
+    
+    opportunities = []
+    total_unrealized_gains = 0
+    total_unrealized_losses = 0
+    
+    for h in holdings:
+        cost_basis = h["purchase_price"] * h["quantity"]
+        current_value = h["current_price"] * h["quantity"]
+        gain_loss = current_value - cost_basis
+        gain_loss_pct = ((h["current_price"] - h["purchase_price"]) / h["purchase_price"]) * 100 if h["purchase_price"] > 0 else 0
+        
+        # Calculate holding period
+        try:
+            purchase_dt = datetime.strptime(h["purchase_date"], "%Y-%m-%d")
+            days_held = (datetime.now() - purchase_dt).days
+        except:
+            days_held = 0
+        
+        # CGT discount eligibility (held > 12 months)
+        cgt_discount_eligible = days_held > 365
+        
+        if gain_loss < 0:
+            total_unrealized_losses += abs(gain_loss)
+            # Tax benefit from harvesting this loss
+            tax_benefit = abs(gain_loss) * marginal_rate
+            
+            opportunities.append({
+                "symbol": h["symbol"],
+                "name": h["name"],
+                "type": "loss",
+                "cost_basis": round(cost_basis, 2),
+                "current_value": round(current_value, 2),
+                "unrealized_loss": round(abs(gain_loss), 2),
+                "gain_loss_pct": round(gain_loss_pct, 1),
+                "days_held": days_held,
+                "tax_benefit": round(tax_benefit, 2),
+                "recommendation": "Consider selling to harvest loss",
+                "wash_sale_warning": "Avoid repurchasing within 30 days to prevent wash sale"
+            })
+        else:
+            total_unrealized_gains += gain_loss
+    
+    # Sort by largest loss first
+    opportunities.sort(key=lambda x: x.get("unrealized_loss", 0), reverse=True)
+    
+    # Calculate potential tax savings
+    max_harvestable = min(total_unrealized_losses, realized_gains + total_unrealized_gains)
+    potential_tax_savings = max_harvestable * marginal_rate
+    
+    # Net position after offsetting
+    net_gains_after_harvest = max(0, realized_gains - total_unrealized_losses)
+    
+    return {
+        "opportunities": opportunities,
+        "summary": {
+            "total_unrealized_gains": round(total_unrealized_gains, 2),
+            "total_unrealized_losses": round(total_unrealized_losses, 2),
+            "realized_gains_ytd": round(realized_gains, 2),
+            "max_harvestable_losses": round(max_harvestable, 2),
+            "potential_tax_savings": round(potential_tax_savings, 2),
+            "net_gains_after_harvest": round(net_gains_after_harvest, 2),
+            "tax_on_net_gains": round(net_gains_after_harvest * marginal_rate * 0.5, 2)  # With 50% CGT discount
+        },
+        "recommendations": generate_harvest_recommendations(
+            total_unrealized_losses, realized_gains, total_unrealized_gains, marginal_rate
+        )
+    }
+
+def generate_harvest_recommendations(losses: float, realized: float, unrealized_gains: float, rate: float):
+    """Generate actionable tax loss harvesting recommendations"""
+    recs = []
+    
+    if losses > 0 and realized > 0:
+        offset = min(losses, realized)
+        savings = offset * rate
+        recs.append(f"Harvest ${offset:,.0f} in losses to offset your ${realized:,.0f} realized gains, saving ${savings:,.0f} in tax")
+    
+    if losses > realized and unrealized_gains > 0:
+        carry_forward = losses - realized
+        recs.append(f"After offsetting realized gains, you can carry forward ${carry_forward:,.0f} in losses to future years")
+    
+    if losses == 0:
+        recs.append("No tax loss harvesting opportunities found - all positions are in profit")
+    
+    recs.append("Remember: Losses can be carried forward indefinitely to offset future capital gains")
+    recs.append("Wash sale rule: Avoid repurchasing substantially identical securities within 30 days")
+    
+    return recs
+
+@api_router.post("/analyze/tax-loss-harvesting")
+async def analyze_tax_loss_harvesting(request: TaxLossHarvestingRequest):
+    """Analyze portfolio for tax loss harvesting opportunities"""
+    holdings = [h.dict() for h in request.holdings]
+    return calculate_tax_loss_harvesting(
+        holdings,
+        request.realized_gains,
+        request.marginal_tax_rate
+    )
+
+# ==================== DIVIDEND REINVESTMENT CALCULATOR ====================
+
+class DividendReinvestmentRequest(BaseModel):
+    initial_investment: float
+    dividend_yield: float  # Annual yield as decimal (e.g., 0.04 for 4%)
+    capital_growth_rate: float = 0.05  # Annual growth rate
+    dividend_growth_rate: float = 0.03  # Annual dividend growth
+    years: int = 20
+    reinvest_dividends: bool = True
+    tax_rate: float = 0.30  # Marginal tax rate for dividends
+    franking_percentage: float = 0.85  # % of dividends that are franked
+
+# Historical dividend growth rates for Australian market
+HISTORICAL_DIVIDEND_GROWTH = {
+    "asx_5yr": 0.032,  # 3.2% average 5-year
+    "asx_10yr": 0.028,  # 2.8% average 10-year
+    "banks_5yr": 0.025,
+    "banks_10yr": 0.022,
+    "resources_5yr": 0.045,
+    "resources_10yr": 0.038,
+    "reits_5yr": 0.035,
+    "reits_10yr": 0.030
+}
+
+def calculate_dividend_reinvestment(
+    initial: float,
+    div_yield: float,
+    cap_growth: float,
+    div_growth: float,
+    years: int,
+    reinvest: bool,
+    tax_rate: float,
+    franking_pct: float
+):
+    """Calculate dividend reinvestment vs cash comparison"""
+    
+    reinvest_data = []
+    cash_data = []
+    
+    # Reinvestment scenario
+    reinvest_value = initial
+    reinvest_shares = 1000  # Assume 1000 units initially
+    reinvest_cumulative_dividends = 0
+    current_div_yield = div_yield
+    
+    # Cash dividend scenario
+    cash_value = initial
+    cash_cumulative_dividends = 0
+    cash_current_div_yield = div_yield
+    
+    for year in range(1, years + 1):
+        # REINVEST SCENARIO
+        # Capital appreciation
+        reinvest_value *= (1 + cap_growth)
+        
+        # Dividend payment (on current value)
+        dividend_amount = reinvest_value * current_div_yield
+        
+        # Franking credit calculation
+        franked_amount = dividend_amount * franking_pct
+        unfranked_amount = dividend_amount * (1 - franking_pct)
+        franking_credit = franked_amount * (0.30 / 0.70)  # Gross up
+        
+        # Tax on dividends (reduced by franking credits)
+        gross_dividend = dividend_amount + franking_credit
+        tax_payable = gross_dividend * tax_rate - franking_credit
+        net_dividend = dividend_amount - max(0, tax_payable)
+        
+        # Reinvest net dividend
+        reinvest_value += net_dividend
+        reinvest_cumulative_dividends += dividend_amount
+        
+        # Increase dividend yield for next year
+        current_div_yield *= (1 + div_growth)
+        
+        reinvest_data.append({
+            "year": year,
+            "portfolio_value": round(reinvest_value, 2),
+            "dividend_paid": round(dividend_amount, 2),
+            "cumulative_dividends": round(reinvest_cumulative_dividends, 2),
+            "total_return": round(reinvest_value - initial, 2)
+        })
+        
+        # CASH DIVIDEND SCENARIO
+        cash_value *= (1 + cap_growth)
+        cash_dividend = cash_value * cash_current_div_yield
+        
+        # Same tax calculation
+        cash_franked = cash_dividend * franking_pct
+        cash_franking_credit = cash_franked * (0.30 / 0.70)
+        cash_gross = cash_dividend + cash_franking_credit
+        cash_tax = cash_gross * tax_rate - cash_franking_credit
+        cash_net_dividend = cash_dividend - max(0, cash_tax)
+        
+        cash_cumulative_dividends += cash_net_dividend
+        cash_current_div_yield *= (1 + div_growth)
+        
+        cash_data.append({
+            "year": year,
+            "portfolio_value": round(cash_value, 2),
+            "dividend_received": round(cash_net_dividend, 2),
+            "cumulative_dividends": round(cash_cumulative_dividends, 2),
+            "total_wealth": round(cash_value + cash_cumulative_dividends, 2)
+        })
+    
+    # Final comparison
+    final_reinvest = reinvest_data[-1]["portfolio_value"]
+    final_cash_total = cash_data[-1]["total_wealth"]
+    reinvest_advantage = final_reinvest - final_cash_total
+    
+    # CAGR calculations
+    reinvest_cagr = ((final_reinvest / initial) ** (1/years) - 1) * 100
+    cash_cagr = ((final_cash_total / initial) ** (1/years) - 1) * 100
+    
+    return {
+        "reinvest_projection": reinvest_data,
+        "cash_projection": cash_data,
+        "comparison": {
+            "initial_investment": initial,
+            "years": years,
+            "final_reinvest_value": round(final_reinvest, 2),
+            "final_cash_portfolio": round(cash_data[-1]["portfolio_value"], 2),
+            "final_cash_dividends": round(cash_cumulative_dividends, 2),
+            "final_cash_total": round(final_cash_total, 2),
+            "reinvest_advantage": round(reinvest_advantage, 2),
+            "reinvest_advantage_pct": round((reinvest_advantage / initial) * 100, 1),
+            "reinvest_cagr": round(reinvest_cagr, 2),
+            "cash_cagr": round(cash_cagr, 2)
+        },
+        "inputs": {
+            "dividend_yield": div_yield * 100,
+            "capital_growth": cap_growth * 100,
+            "dividend_growth": div_growth * 100,
+            "tax_rate": tax_rate * 100,
+            "franking_percentage": franking_pct * 100
+        },
+        "historical_benchmarks": HISTORICAL_DIVIDEND_GROWTH,
+        "recommendations": generate_drip_recommendations(
+            reinvest_advantage, final_reinvest, initial, years, div_yield
+        )
+    }
+
+def generate_drip_recommendations(advantage: float, final_val: float, initial: float, years: int, yield_rate: float):
+    """Generate dividend reinvestment recommendations"""
+    recs = []
+    
+    multiple = final_val / initial
+    recs.append(f"Over {years} years, reinvesting dividends grows ${initial:,.0f} to ${final_val:,.0f} ({multiple:.1f}x)")
+    
+    if advantage > 0:
+        recs.append(f"Dividend reinvestment provides ${advantage:,.0f} MORE than taking cash dividends")
+        recs.append("The power of compounding makes reinvestment increasingly beneficial over time")
+    
+    if yield_rate >= 0.05:
+        recs.append("High-yield stocks benefit significantly from reinvestment due to larger dividend amounts")
+    
+    recs.append("Consider DRP (Dividend Reinvestment Plan) to automate reinvestment without brokerage fees")
+    recs.append("For income needs, taking cash dividends may be preferable despite lower total returns")
+    
+    return recs
+
+@api_router.post("/analyze/dividend-reinvestment")
+async def analyze_dividend_reinvestment(request: DividendReinvestmentRequest):
+    """Calculate dividend reinvestment vs cash comparison"""
+    return calculate_dividend_reinvestment(
+        request.initial_investment,
+        request.dividend_yield,
+        request.capital_growth_rate,
+        request.dividend_growth_rate,
+        request.years,
+        request.reinvest_dividends,
+        request.tax_rate,
+        request.franking_percentage
+    )
+
+@api_router.get("/dividend/historical-growth")
+async def get_historical_dividend_growth():
+    """Get historical dividend growth rates for Australian market"""
+    return {
+        "rates": HISTORICAL_DIVIDEND_GROWTH,
+        "description": {
+            "asx_5yr": "ASX 200 average dividend growth (5-year)",
+            "asx_10yr": "ASX 200 average dividend growth (10-year)",
+            "banks_5yr": "Big 4 Banks average (5-year)",
+            "banks_10yr": "Big 4 Banks average (10-year)",
+            "resources_5yr": "Mining/Resources sector (5-year)",
+            "resources_10yr": "Mining/Resources sector (10-year)",
+            "reits_5yr": "A-REITs average (5-year)",
+            "reits_10yr": "A-REITs average (10-year)"
+        }
+    }
+
 # ==================== HEALTH CHECK ====================
 
 @api_router.get("/")
