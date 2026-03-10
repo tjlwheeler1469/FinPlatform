@@ -25,7 +25,8 @@ import {
   FileCheck,
   Receipt,
   Lightbulb,
-  PieChart
+  PieChart,
+  CalendarDays
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -34,6 +35,7 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard, title: "Dashboard" },
   { path: "/recommendations", label: "Recommendations", icon: Lightbulb, title: "Financial Recommendations" },
+  { path: "/tax-calendar", label: "Tax Calendar", icon: CalendarDays, title: "Tax Planning Calendar" },
   { path: "/budget", label: "Budget", icon: Wallet, title: "Household Budget" },
   { path: "/income-splitting", label: "Income Splitting", icon: Users, title: "Income Splitting" },
   { path: "/trust-distributions", label: "Trust Analysis", icon: PieChart, title: "Trust Distribution Analysis" },
@@ -55,10 +57,21 @@ const navItems = [
   { path: "/scenarios", label: "Saved Scenarios", icon: FolderOpen, title: "Saved Scenarios" },
 ];
 
+// Mobile bottom navigation - key features for quick access
+const mobileBottomNav = [
+  { path: "/dashboard", label: "Home", icon: LayoutDashboard },
+  { path: "/recommendations", label: "Advice", icon: Lightbulb },
+  { path: "/tax-calendar", label: "Calendar", icon: CalendarDays },
+  { path: "/budget", label: "Budget", icon: Wallet },
+  { path: "/reports", label: "Reports", icon: FileText },
+];
+
 const Layout = ({ children }) => {
   const location = useLocation();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
 
   // Fix page title on navigation
   useEffect(() => {
@@ -70,8 +83,39 @@ const Layout = ({ children }) => {
     }
   }, [location.pathname]);
 
+  // Swipe gesture handling for mobile menu
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    
+    if (isRightSwipe && touchStart < 50) {
+      setMobileMenuOpen(true);
+    }
+    if (isLeftSwipe && mobileMenuOpen) {
+      setMobileMenuOpen(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-background flex">
+    <div 
+      className="min-h-screen bg-background flex"
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+    >
       {/* Left Sidebar - Desktop */}
       <aside 
         className={cn(
@@ -131,57 +175,111 @@ const Layout = ({ children }) => {
       </aside>
 
       {/* Mobile Header */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-[#0F392B] text-white z-50 flex items-center justify-between px-4">
+      <header className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-[#0F392B] text-white z-50 flex items-center justify-between px-4 safe-area-inset-top">
         <Link to="/dashboard" className="flex items-center gap-2">
-          <TrendingUp className="h-6 w-6 text-[#D4AF37]" />
-          <span className="font-bold font-['Manrope']">Wheeler Family</span>
+          <TrendingUp className="h-5 w-5 text-[#D4AF37]" />
+          <span className="font-bold font-['Manrope'] text-sm">Wheeler Family</span>
         </Link>
         <Button
           variant="ghost"
           size="icon"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="text-white hover:bg-white/10"
+          className="text-white hover:bg-white/10 h-10 w-10"
           data-testid="mobile-menu-btn"
         >
           {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </Button>
       </header>
 
-      {/* Mobile Menu Overlay */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 z-40 bg-black/50" onClick={() => setMobileMenuOpen(false)}>
-          <div 
-            className="w-64 h-full bg-[#0F392B] text-white pt-16"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <nav className="p-4 overflow-y-auto h-full">
-              {navItems.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  onClick={() => setMobileMenuOpen(false)}
-                  data-testid={`mobile-nav-${item.path.slice(1)}`}
-                  className={cn(
-                    "flex items-center gap-3 px-3 py-3 rounded-lg mb-1 transition-colors",
-                    location.pathname === item.path
-                      ? "bg-white/20 text-white"
-                      : "text-white/70 hover:bg-white/10"
-                  )}
-                >
-                  <item.icon className="h-5 w-5" />
-                  <span className="text-sm font-medium">{item.label}</span>
-                </Link>
-              ))}
-            </nav>
-          </div>
+      {/* Mobile Menu Overlay - Swipeable */}
+      <div 
+        className={cn(
+          "lg:hidden fixed inset-0 z-40 transition-all duration-300",
+          mobileMenuOpen ? "visible" : "invisible"
+        )}
+      >
+        {/* Backdrop */}
+        <div 
+          className={cn(
+            "absolute inset-0 bg-black transition-opacity duration-300",
+            mobileMenuOpen ? "opacity-50" : "opacity-0"
+          )}
+          onClick={() => setMobileMenuOpen(false)}
+        />
+        
+        {/* Slide-out Menu */}
+        <div 
+          className={cn(
+            "absolute left-0 top-0 w-72 h-full bg-[#0F392B] text-white pt-14 transition-transform duration-300 ease-out",
+            mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+          )}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <nav className="p-4 overflow-y-auto h-[calc(100%-56px)] pb-20">
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                onClick={() => setMobileMenuOpen(false)}
+                data-testid={`mobile-nav-${item.path.slice(1)}`}
+                className={cn(
+                  "flex items-center gap-3 px-4 py-3.5 rounded-xl mb-1 transition-all active:scale-95",
+                  location.pathname === item.path
+                    ? "bg-white/20 text-white"
+                    : "text-white/70 hover:bg-white/10 active:bg-white/20"
+                )}
+              >
+                <item.icon className="h-5 w-5 flex-shrink-0" />
+                <span className="text-sm font-medium">{item.label}</span>
+              </Link>
+            ))}
+          </nav>
         </div>
-      )}
+      </div>
+
+      {/* Mobile Bottom Navigation Bar */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-border z-40 safe-area-inset-bottom">
+        <div className="grid grid-cols-5 h-full">
+          {mobileBottomNav.map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                data-testid={`bottom-nav-${item.path.slice(1)}`}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-0.5 transition-all active:scale-95",
+                  isActive 
+                    ? "text-[#0F392B]" 
+                    : "text-muted-foreground"
+                )}
+              >
+                <div className={cn(
+                  "p-1.5 rounded-xl transition-colors",
+                  isActive && "bg-[#0F392B]/10"
+                )}>
+                  <item.icon className={cn(
+                    "h-5 w-5 transition-all",
+                    isActive && "scale-110"
+                  )} />
+                </div>
+                <span className={cn(
+                  "text-[10px] font-medium",
+                  isActive && "font-semibold"
+                )}>
+                  {item.label}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
 
       {/* Main Content */}
       <main 
         className={cn(
           "flex-1 min-h-screen transition-all duration-300",
-          "pt-16 lg:pt-0",
+          "pt-14 pb-20 lg:pt-0 lg:pb-0", // Account for mobile header and bottom nav
           sidebarCollapsed ? "lg:ml-16" : "lg:ml-56"
         )}
       >
