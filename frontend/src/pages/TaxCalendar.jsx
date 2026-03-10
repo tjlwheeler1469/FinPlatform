@@ -85,26 +85,60 @@ const TaxCalendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
   const [customEvents, setCustomEvents] = useState([]);
+  const [hiddenEvents, setHiddenEvents] = useState([]);
+  const [completedEvents, setCompletedEvents] = useState([]);
   const [showAddEvent, setShowAddEvent] = useState(false);
   const [newEvent, setNewEvent] = useState({ title: "", date: "", description: "", category: "custom" });
   const [activeTab, setActiveTab] = useState("calendar");
   const [filterCategory, setFilterCategory] = useState("all");
+  const [selectedYear, setSelectedYear] = useState("2024-25");
 
-  // Load custom events from localStorage
+  // Financial years
+  const financialYears = [
+    { value: "2023-24", label: "FY 2023-24" },
+    { value: "2024-25", label: "FY 2024-25" },
+    { value: "2025-26", label: "FY 2025-26" },
+    { value: "all", label: "All Years" }
+  ];
+
+  // Load from localStorage
   useEffect(() => {
-    const saved = localStorage.getItem("taxCalendarEvents");
-    if (saved) {
-      setCustomEvents(JSON.parse(saved));
-    }
+    const savedCustom = localStorage.getItem("taxCalendarEvents");
+    const savedHidden = localStorage.getItem("taxCalendarHidden");
+    const savedCompleted = localStorage.getItem("taxCalendarCompleted");
+    if (savedCustom) setCustomEvents(JSON.parse(savedCustom));
+    if (savedHidden) setHiddenEvents(JSON.parse(savedHidden));
+    if (savedCompleted) setCompletedEvents(JSON.parse(savedCompleted));
   }, []);
 
-  // Save custom events to localStorage
+  // Save to localStorage
   useEffect(() => {
     localStorage.setItem("taxCalendarEvents", JSON.stringify(customEvents));
   }, [customEvents]);
 
-  // Combine standard and custom events
-  const allEvents = [...AUSTRALIAN_TAX_DATES, ...customEvents];
+  useEffect(() => {
+    localStorage.setItem("taxCalendarHidden", JSON.stringify(hiddenEvents));
+  }, [hiddenEvents]);
+
+  useEffect(() => {
+    localStorage.setItem("taxCalendarCompleted", JSON.stringify(completedEvents));
+  }, [completedEvents]);
+
+  // Combine standard and custom events, excluding hidden
+  const allEvents = [...AUSTRALIAN_TAX_DATES, ...customEvents].filter(e => !hiddenEvents.includes(e.id));
+
+  // Filter by financial year
+  const getFinancialYear = (dateStr) => {
+    const date = new Date(dateStr);
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    if (month >= 6) return `${year}-${(year + 1).toString().slice(2)}`;
+    return `${year - 1}-${year.toString().slice(2)}`;
+  };
+
+  const filteredByYear = selectedYear === "all" 
+    ? allEvents 
+    : allEvents.filter(e => getFinancialYear(e.date) === selectedYear);
 
   // Get events for a specific date
   const getEventsForDate = (date) => {
