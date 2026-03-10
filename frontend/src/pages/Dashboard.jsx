@@ -232,8 +232,8 @@ const Dashboard = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-[200px] min-h-[200px]">
-                <ResponsiveContainer width="100%" height="100%" minWidth={200}>
+              <ChartContainer height={200}>
+                <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={assetAllocation}
@@ -258,7 +258,7 @@ const Dashboard = () => {
                     />
                   </PieChart>
                 </ResponsiveContainer>
-              </div>
+              </ChartContainer>
               <div className="grid grid-cols-2 gap-2 mt-4">
                 {assetAllocation.map((item) => (
                   <div key={item.name} className="flex items-center gap-2 text-sm">
