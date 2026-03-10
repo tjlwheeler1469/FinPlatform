@@ -129,19 +129,45 @@ const IncomeSplitting = () => {
   const [newMemberRelationship, setNewMemberRelationship] = useState("adult_child");
 
   useEffect(() => {
-    // Initialize distributions evenly among eligible members
-    const eligibleMembers = familyMembers.filter(m => m.canReceive);
+    // Initialize distributions based on trust distribution percentages
+    const beneficiaries = familyMembers.filter(m => m.isTrustBeneficiary);
     const totalSplittable = incomeSources.dividends + incomeSources.trustDistributions;
-    const perMember = Math.round(totalSplittable / eligibleMembers.length);
     
     const initial = {};
-    eligibleMembers.forEach((m, i) => {
-      initial[m.id] = i === eligibleMembers.length - 1 
-        ? totalSplittable - (perMember * (eligibleMembers.length - 1))
-        : perMember;
+    beneficiaries.forEach((m) => {
+      initial[m.id] = Math.round(totalSplittable * (m.trustDistribution / 100));
     });
     setDistributions(initial);
-  }, []);
+  }, [familyMembers, incomeSources.dividends, incomeSources.trustDistributions]);
+
+  // Handle adding new family member
+  const handleAddMember = () => {
+    if (!newMemberName.trim()) {
+      toast.error("Please enter a name");
+      return;
+    }
+    addFamilyMember({
+      name: newMemberName,
+      relationship: newMemberRelationship,
+      taxableIncome: 0,
+      isTrustBeneficiary: false,
+      trustDistribution: 0
+    });
+    setNewMemberName("");
+    setShowAddMember(false);
+    toast.success("Family member added - changes will sync across all pages");
+  };
+
+  // Handle removing family member
+  const handleRemoveMember = (id) => {
+    removeFamilyMember(id);
+    toast.success("Family member removed - changes will sync across all pages");
+  };
+
+  // Handle updating member income
+  const handleUpdateIncome = (id, income) => {
+    updateFamilyMember(id, { taxableIncome: Number(income) });
+  };
 
   // Calculate current scenario (no splitting)
   const currentScenario = {
