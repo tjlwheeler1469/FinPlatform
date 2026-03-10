@@ -106,6 +106,7 @@ const mobileBottomNav = [
 
 const Layout = ({ children }) => {
   const location = useLocation();
+  const { hasUnsavedChanges, saveAllData } = usePortfolio();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [expandedGroups, setExpandedGroups] = useState(() => {
