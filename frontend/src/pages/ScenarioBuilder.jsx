@@ -338,6 +338,7 @@ const ScenarioBuilder = () => {
         entity_type: entityType,
         people,
         companies,
+        trusts,
         taxable_income: people.reduce((sum, p) => sum + (p.taxable_income || 0), 0),
         investments,
         expenses,
