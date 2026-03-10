@@ -22,6 +22,7 @@ import {
   Shield
 } from "lucide-react";
 import { usePortfolio } from "@/App";
+import ChartContainer from "@/components/ChartContainer";
 import {
   BarChart,
   Bar,
