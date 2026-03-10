@@ -197,6 +197,33 @@ const Layout = ({ children }) => {
           )}
         </div>
 
+        {/* Save Button - Shows when there are unsaved changes */}
+        {hasUnsavedChanges && !sidebarCollapsed && (
+          <div className="px-3 py-2 border-b border-white/10">
+            <Button 
+              onClick={saveAllData}
+              className="w-full bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-[#0F392B] font-semibold"
+              size="sm"
+              data-testid="sidebar-save-btn"
+            >
+              <Save className="h-4 w-4 mr-2" />
+              Save Changes
+            </Button>
+          </div>
+        )}
+        {hasUnsavedChanges && sidebarCollapsed && (
+          <div className="px-2 py-2 border-b border-white/10">
+            <Button 
+              onClick={saveAllData}
+              className="w-full bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-[#0F392B]"
+              size="icon"
+              title="Save Changes"
+            >
+              <Save className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
+
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto py-2 px-2">
           {navGroups.map((group) => (
