@@ -22,7 +22,8 @@ import {
   ChevronRight,
   Users,
   Shield,
-  FileCheck
+  FileCheck,
+  Receipt
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -34,6 +35,7 @@ const navItems = [
   { path: "/income-splitting", label: "Income Splitting", icon: Users, title: "Income Splitting" },
   { path: "/tax-analysis", label: "Tax Analysis", icon: Calculator, title: "Tax Analysis" },
   { path: "/cgt-calculator", label: "CGT Calculator", icon: TrendingUp, title: "Capital Gains Tax" },
+  { path: "/cgt-events", label: "CGT Events", icon: Receipt, title: "CGT Event Tracker" },
   { path: "/tax-loss-harvesting", label: "Tax Harvesting", icon: Scissors, title: "Tax Loss Harvesting" },
   { path: "/historical-tax", label: "Tax History", icon: History, title: "Tax History" },
   { path: "/division-7a", label: "Division 7A", icon: FileCheck, title: "Division 7A Calculator" },
