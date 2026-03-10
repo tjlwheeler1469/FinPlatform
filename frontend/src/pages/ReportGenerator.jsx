@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { usePortfolio } from "@/App";
 import { 
   FileText, 
   Download, 
@@ -38,29 +39,116 @@ const formatDate = (dateString) => {
   });
 };
 
+// Demo scenarios for report generation
+const DEMO_SCENARIOS = [
+  {
+    scenario_id: "demo_001",
+    name: "Current Portfolio Analysis",
+    entity_type: "personal",
+    taxable_income: 185000,
+    investments: {
+      cash_savings: 75000,
+      term_deposit_amount: 150000,
+      term_deposit_rate: 4.8,
+      shares_value: 320000,
+      shares_dividend_yield: 4.2,
+      franking_percentage: 85,
+      bonds_value: 80000,
+      bonds_yield: 5.2,
+      etf_value: 145000,
+      etf_yield: 3.5,
+      smsf_balance: 580000,
+      properties: [
+        {
+          property_id: "prop_001",
+          name: "Sydney Investment Unit",
+          value: 850000,
+          rental_income: 36000,
+          mortgage_amount: 510000,
+          mortgage_rate: 6.29,
+          mortgage_term_years: 25,
+          annual_expenses: 8500,
+          depreciation_building: 6500,
+          depreciation_fixtures: 3200
+        }
+      ]
+    },
+    expenses: {
+      school_fees: 28000,
+      childcare: 0,
+      health_insurance: 4200,
+      private_expenses: 65000,
+      work_related: 3500,
+      other_deductible: 2200
+    },
+    simulation_years: 10
+  },
+  {
+    scenario_id: "demo_002",
+    name: "Retirement Planning 2030",
+    entity_type: "personal",
+    taxable_income: 150000,
+    investments: {
+      cash_savings: 100000,
+      term_deposit_amount: 200000,
+      term_deposit_rate: 5.0,
+      shares_value: 400000,
+      shares_dividend_yield: 4.5,
+      franking_percentage: 100,
+      bonds_value: 150000,
+      bonds_yield: 5.5,
+      etf_value: 200000,
+      etf_yield: 4.0,
+      smsf_balance: 800000,
+      properties: []
+    },
+    expenses: {
+      school_fees: 0,
+      childcare: 0,
+      health_insurance: 5000,
+      private_expenses: 50000,
+      work_related: 2000,
+      other_deductible: 1500
+    },
+    simulation_years: 15
+  },
+  {
+    scenario_id: "demo_003",
+    name: "Company Structure Analysis",
+    entity_type: "company",
+    taxable_income: 350000,
+    investments: {
+      cash_savings: 200000,
+      term_deposit_amount: 100000,
+      term_deposit_rate: 4.5,
+      shares_value: 500000,
+      shares_dividend_yield: 3.8,
+      franking_percentage: 100,
+      bonds_value: 100000,
+      bonds_yield: 5.0,
+      etf_value: 0,
+      etf_yield: 0,
+      smsf_balance: 0,
+      properties: []
+    },
+    expenses: {
+      school_fees: 0,
+      childcare: 0,
+      health_insurance: 0,
+      private_expenses: 0,
+      work_related: 15000,
+      other_deductible: 25000
+    },
+    simulation_years: 10
+  }
+];
+
 const ReportGenerator = () => {
-  const [scenarios, setScenarios] = useState([]);
+  const { portfolio } = usePortfolio();
+  const [scenarios] = useState(DEMO_SCENARIOS);
   const [selectedScenario, setSelectedScenario] = useState(null);
   const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [fetchingScenarios, setFetchingScenarios] = useState(false);
-
-  const fetchScenarios = async () => {
-    setFetchingScenarios(true);
-    try {
-      const response = await axios.get(`${API}/scenarios`, { withCredentials: true });
-      setScenarios(response.data);
-    } catch (error) {
-      console.error("Error fetching scenarios:", error);
-      toast.error("Failed to load scenarios");
-    } finally {
-      setFetchingScenarios(false);
-    }
-  };
-
-  useState(() => {
-    fetchScenarios();
-  }, []);
 
   const generateReport = async (scenario) => {
     setLoading(true);
