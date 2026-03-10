@@ -185,3 +185,31 @@ Build an app that analyses all options for personal and business investment in A
   - Tax optimization suggestions
   - Super contribution recommendations
   - Priority levels: High/Medium/Low with color coding
+
+## Completed This Session (December 2025)
+- ✅ **Trust Distribution Analysis** page (/trust-distributions):
+  - Detailed tax impact per beneficiary
+  - Interactive sliders to adjust distribution percentages
+  - Real-time tax calculations with bracket breakdowns
+  - Tax comparison chart (with vs without income splitting)
+  - Effective rates comparison by beneficiary
+  - Dynamic recommendations based on distribution strategy
+  - Add/remove beneficiaries functionality
+  - Distribution pie chart visualization
+- ✅ **Financial Recommendations** page (/recommendations):
+  - Dynamic recommendations based on portfolio metrics
+  - Portfolio Health Score radar chart (6 dimensions)
+  - Debt/Asset ratio, Sharpe ratio, diversification, tax efficiency analysis
+  - Priority distribution (High/Medium/Low) visualization
+  - Tabbed interface: Overview, Recommendations, Metrics
+  - Detailed metrics cards for debt, risk, assets, and tax efficiency
+  - Monte Carlo integration for projected outcomes
+- ✅ **Fixed Recharts Console Warnings**:
+  - Created ChartContainer component with ResizeObserver
+  - Prevents charts from rendering with negative dimensions
+  - Uses requestAnimationFrame for proper timing
+  - Applied to Dashboard, IncomeSplitting, and new pages
+- ✅ **Navigation Updates**:
+  - Added Recommendations and Trust Analysis to sidebar
+  - Updated nav icons (Lightbulb for Recommendations, PieChart for Trust Analysis)
+
