@@ -19,10 +19,15 @@ import {
   PieChart,
   Scale,
   Building2,
-  Shield
+  Shield,
+  Plus,
+  Trash2,
+  Save
 } from "lucide-react";
 import { usePortfolio } from "@/App";
 import ChartContainer from "@/components/ChartContainer";
+import { Link } from "react-router-dom";
+import { toast } from "sonner";
 import {
   BarChart,
   Bar,
@@ -89,15 +94,14 @@ const getMarginalRate = (income) => {
 const COLORS = ['#0F392B', '#D4AF37', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'];
 
 const IncomeSplitting = () => {
-  const { portfolio } = usePortfolio();
-  
-  // Family members for income splitting
-  const [familyMembers, setFamilyMembers] = useState([
-    { id: 1, name: "James Wheeler", relationship: "Primary", income: 185000, canReceive: false },
-    { id: 2, name: "Sarah Wheeler", relationship: "Spouse", income: 95000, canReceive: true },
-    { id: 3, name: "Adult Child 1", relationship: "Adult Child", income: 25000, canReceive: true },
-    { id: 4, name: "Adult Child 2", relationship: "Adult Child", income: 0, canReceive: true }
-  ]);
+  const { 
+    familyMembers, 
+    updateFamilyMember, 
+    addFamilyMember, 
+    removeFamilyMember,
+    hasUnsavedChanges,
+    saveAllData
+  } = usePortfolio();
 
   // Income sources that can be split
   const [incomeSources, setIncomeSources] = useState({
