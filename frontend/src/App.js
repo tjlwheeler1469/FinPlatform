@@ -18,6 +18,8 @@ import ReportGenerator from "@/pages/ReportGenerator";
 import SalaryPackaging from "@/pages/SalaryPackaging";
 import PropertyComparison from "@/pages/PropertyComparison";
 import ScenarioComparison from "@/pages/ScenarioComparison";
+import TaxLossHarvesting from "@/pages/TaxLossHarvesting";
+import DividendReinvestment from "@/pages/DividendReinvestment";
 
 // Portfolio Context for sharing dummy data across components
 const PortfolioContext = createContext(null);
@@ -184,6 +186,8 @@ const AppRouter = () => {
       <Route path="/salary-packaging" element={<SalaryPackaging />} />
       <Route path="/property-comparison" element={<PropertyComparison />} />
       <Route path="/scenario-comparison" element={<ScenarioComparison />} />
+      <Route path="/tax-loss-harvesting" element={<TaxLossHarvesting />} />
+      <Route path="/dividend-reinvestment" element={<DividendReinvestment />} />
     </Routes>
   );
 };
