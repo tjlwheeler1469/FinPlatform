@@ -12,6 +12,7 @@ import LoanCalculator from "@/pages/LoanCalculator";
 import SavedScenarios from "@/pages/SavedScenarios";
 import ScenarioBuilder from "@/pages/ScenarioBuilder";
 import CGTCalculator from "@/pages/CGTCalculator";
+import CGT from "@/pages/CGT";
 import HistoricalTaxComparison from "@/pages/HistoricalTaxComparison";
 import SMSFOptimizer from "@/pages/SMSFOptimizer";
 import ReportGenerator from "@/pages/ReportGenerator";
