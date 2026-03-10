@@ -71,6 +71,10 @@ Build an app that analyses all options for personal and business investment in A
 - `/api/analyze/tax-comparison` - Compare tax across multiple years
 - `/api/tax-rates/historical` - Historical tax rates (2020-21 to 2024-25)
 - `/api/analyze/full-scenario/report` - Generate PDF report data
+- `/api/analyze/salary-packaging` - Salary packaging FBT calculator
+- `/api/salary-packaging/items` - Get available packaging items
+- `/api/analyze/property-comparison` - Compare investment properties
+- `/api/analyze/scenario-comparison` - Compare multiple investment scenarios
 
 ### Frontend Pages - Original
 - Landing Page with hero section
@@ -87,6 +91,9 @@ Build an app that analyses all options for personal and business investment in A
 - Historical Tax Comparison - Compare tax across 5 years, see Stage 3 savings
 - SMSF Optimizer - Contribution strategy, caps, Division 293, projections
 - Report Generator - Generate and download/print comprehensive reports
+- Salary Packaging Calculator - FBT implications, tax benefits, NFP caps
+- Property Comparison - Side-by-side property analysis with yield, ROE, projections
+- Scenario Comparison - Multi-scenario comparison with charts and differences
 
 ## Prioritized Backlog
 
@@ -99,16 +106,16 @@ Build an app that analyses all options for personal and business investment in A
 - ✅ SMSF contribution optimizer
 - ✅ Report generator
 
-### P1 - High Priority (Future)
-- Salary packaging calculator
-- Investment property comparison tool
+### P1 - High Priority
+- ✅ Salary packaging calculator (March 2026)
+- ✅ Investment property comparison tool (March 2026)
+- ✅ Multi-scenario comparison view (March 2026)
 - Tax loss harvesting suggestions
 - Dividend reinvestment calculator
 
 ### P2 - Medium Priority (Future)
 - Superannuation guarantee calculator
 - Rental yield optimizer
-- Multi-scenario comparison view
 - Export to accounting software
 
 ### P3 - Nice to Have
@@ -118,7 +125,14 @@ Build an app that analyses all options for personal and business investment in A
 - Share scenarios with advisors
 
 ## Next Tasks
-1. Add salary packaging calculator
-2. Investment property comparison tool
-3. Tax loss harvesting suggestions
-4. Multi-scenario comparison view
+1. Advisor Connect - Book time with a financial advisor
+2. Tax loss harvesting suggestions
+3. Dividend reinvestment calculator
+4. Export to accounting software
+
+## Completed This Session (March 2026)
+- ✅ Integrated Salary Packaging Calculator (/salary-packaging)
+- ✅ Integrated Property Comparison Tool (/property-comparison)
+- ✅ Integrated Scenario Comparison View (/scenario-comparison)
+- ✅ Added navigation links for all 3 new features
+- ✅ Testing: 100% backend, 100% frontend pass rate
