@@ -206,7 +206,7 @@ const HouseholdBudget = () => {
   const expenseByCategory = EXPENSE_CATEGORIES.map(cat => {
     const total = expenses
       .filter(exp => exp.category === cat.id)
-      .reduce((sum, exp) => sum + (exp.frequency === "annual" ? exp.amount / 12 : exp.amount), 0);
+      .reduce((sum, exp) => sum + toMonthly(exp.amount, exp.frequency), 0);
     return { name: cat.label, value: Math.round(total), color: cat.color };
   }).filter(item => item.value > 0);
 
