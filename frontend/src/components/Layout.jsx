@@ -33,8 +33,10 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard, title: "Dashboard" },
+  { path: "/recommendations", label: "Recommendations", icon: Lightbulb, title: "Financial Recommendations" },
   { path: "/budget", label: "Budget", icon: Wallet, title: "Household Budget" },
   { path: "/income-splitting", label: "Income Splitting", icon: Users, title: "Income Splitting" },
+  { path: "/trust-distributions", label: "Trust Analysis", icon: PieChart, title: "Trust Distribution Analysis" },
   { path: "/tax-analysis", label: "Tax Analysis", icon: Calculator, title: "Tax Analysis" },
   { path: "/cgt-calculator", label: "CGT Calculator", icon: TrendingUp, title: "Capital Gains Tax" },
   { path: "/cgt-events", label: "CGT Events", icon: Receipt, title: "CGT Event Tracker" },
