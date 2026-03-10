@@ -257,3 +257,228 @@
     page-break-before: always;
   }
 }
+
+/* Mobile-specific styles */
+@media (max-width: 1023px) {
+  /* Safe area insets for notched phones */
+  .safe-area-inset-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .safe-area-inset-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  /* Touch-friendly buttons */
+  button, 
+  a,
+  [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Larger touch targets for inputs */
+  input,
+  select,
+  textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
+    min-height: 48px;
+  }
+  
+  /* Swipeable cards */
+  .swipeable-card {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  
+  .swipeable-card::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .swipeable-card > * {
+    scroll-snap-align: start;
+    flex-shrink: 0;
+  }
+  
+  /* Mobile card adjustments */
+  .card-hover:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+  
+  /* Pull to refresh indicator area */
+  .pull-to-refresh {
+    overscroll-behavior-y: contain;
+  }
+  
+  /* Mobile-optimized grid */
+  .mobile-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  
+  .mobile-grid-1 {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Floating action button */
+  .fab {
+    position: fixed;
+    bottom: 5rem;
+    right: 1rem;
+    z-index: 30;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .fab:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Slide-up sheet animation */
+  .slide-up-sheet {
+    animation: slideUpSheet 0.3s ease-out forwards;
+  }
+  
+  @keyframes slideUpSheet {
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  /* Bottom sheet styles */
+  .bottom-sheet {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: hsl(var(--card));
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+    padding: 1rem;
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+    z-index: 50;
+  }
+  
+  .bottom-sheet-handle {
+    width: 40px;
+    height: 4px;
+    background: hsl(var(--muted-foreground));
+    border-radius: 2px;
+    margin: 0 auto 1rem;
+    opacity: 0.3;
+  }
+  
+  /* Horizontal scroll for cards on mobile */
+  .horizontal-scroll {
+    display: flex;
+    overflow-x: auto;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .horizontal-scroll::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .horizontal-scroll > * {
+    scroll-snap-align: start;
+    flex-shrink: 0;
+    width: 85%;
+    max-width: 320px;
+  }
+  
+  /* Compact tables on mobile */
+  .mobile-table {
+    font-size: 0.75rem;
+  }
+  
+  .mobile-table th,
+  .mobile-table td {
+    padding: 0.5rem;
+  }
+  
+  /* Sticky header on scroll */
+  .sticky-mobile-header {
+    position: sticky;
+    top: 3.5rem;
+    z-index: 20;
+    background: hsl(var(--background));
+    padding: 0.75rem 0;
+    border-bottom: 1px solid hsl(var(--border));
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 375px) {
+  .mobile-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .text-responsive-sm {
+    font-size: 0.75rem;
+  }
+  
+  .text-responsive-base {
+    font-size: 0.875rem;
+  }
+}
+
+/* Tablet-specific styles */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .tablet-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .tablet-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .card-hover {
+    border-width: 2px;
+  }
+  
+  button:focus-visible {
+    outline: 3px solid currentColor;
+    outline-offset: 2px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .animate-fade-in,
+  .animate-slide-up,
+  .animate-pulse-glow {
+    animation: none;
+  }
+}
+
