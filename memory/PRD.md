@@ -168,3 +168,20 @@ Build an app that analyses all options for personal and business investment in A
   - Distribution sliders for allocating trust/dividend income
   - Tax savings calculator
   - Strategy guides: Trust distributions, Dividend streaming, Bucket companies
+- ✅ **Division 7A Loan Calculator** (/division-7a):
+  - Compliant loan repayment calculator
+  - Benchmark interest rate (8.77% for 2024-25)
+  - Secured (25yr) vs Unsecured (7yr) terms
+  - Deemed dividend and tax impact calculation
+  - Full amortization schedule
+- ✅ **Budget: Weekly/Fortnightly Frequencies**:
+  - Support for weekly, fortnightly, monthly, quarterly, annual
+  - Auto-conversion to monthly totals
+  - Employment income now weekly-based for accuracy
+- ✅ **Report Financial Recommendations**:
+  - Recommended Next Steps based on analysis
+  - Debt/Equity ratio assessment
+  - Risk-adjusted return analysis
+  - Tax optimization suggestions
+  - Super contribution recommendations
+  - Priority levels: High/Medium/Low with color coding
