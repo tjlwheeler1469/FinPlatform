@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,12 @@ import {
   Building2,
   TrendingUp,
   PieChart,
-  Lightbulb
+  Lightbulb,
+  ArrowRight,
+  AlertTriangle,
+  CheckCircle,
+  Scale,
+  Percent
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import axios from "axios";
