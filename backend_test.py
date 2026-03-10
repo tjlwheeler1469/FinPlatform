@@ -738,8 +738,25 @@ class AustralianInvestmentAPITester:
         
         # Tax and rates tests
         self.test_tax_rates_api()
+        self.test_historical_tax_rates()
         self.test_personal_tax_calculation()
         self.test_company_tax_calculation()
+        self.test_tax_comparison()
+        
+        # NEW FEATURES - CGT Calculator
+        print("\n🆕 Testing NEW CGT Calculator Features:")
+        self.test_cgt_calculator_individual()
+        self.test_cgt_calculator_company()
+        self.test_cgt_calculator_capital_loss()
+        
+        # NEW FEATURES - SMSF Optimizer
+        print("\n🆕 Testing NEW SMSF Optimizer Features:")
+        self.test_smsf_optimizer_basic()
+        self.test_smsf_optimizer_div293()
+        
+        # NEW FEATURES - Report Generator
+        print("\n🆕 Testing NEW Report Generator:")
+        self.test_report_generator()
         
         # Investment analysis tests
         self.test_franking_credits_calculator()
