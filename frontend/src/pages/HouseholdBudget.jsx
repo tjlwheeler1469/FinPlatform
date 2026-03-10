@@ -145,13 +145,18 @@ const HouseholdBudget = () => {
 
   const [activeTab, setActiveTab] = useState("overview");
 
+  // Helper to convert any frequency to monthly
+  const toMonthly = (amount, frequency) => {
+    return amount * (FREQUENCY_TO_MONTHLY[frequency] || 1);
+  };
+
   // Calculate totals
   const totalMonthlyIncome = incomes.reduce((sum, inc) => {
-    return sum + (inc.frequency === "annual" ? inc.amount / 12 : inc.amount);
+    return sum + toMonthly(inc.amount, inc.frequency);
   }, 0);
 
   const totalMonthlyExpenses = expenses.reduce((sum, exp) => {
-    return sum + (exp.frequency === "annual" ? exp.amount / 12 : exp.amount);
+    return sum + toMonthly(exp.amount, exp.frequency);
   }, 0);
 
   const totalAnnualOneOff = oneOffCosts.reduce((sum, cost) => sum + cost.amount, 0);
