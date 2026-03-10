@@ -1,7 +1,8 @@
-import { useState, useEffect, createContext, useContext } from "react";
+import { useState, useEffect, createContext, useContext, useCallback } from "react";
 import "@/App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
+import { toast } from "sonner";
 
 // Pages
 import Dashboard from "@/pages/Dashboard";
@@ -28,8 +29,9 @@ import CGTEventTracker from "@/pages/CGTEventTracker";
 import TrustDistributionAnalysis from "@/pages/TrustDistributionAnalysis";
 import FinancialRecommendations from "@/pages/FinancialRecommendations";
 import TaxCalendar from "@/pages/TaxCalendar";
+import FamilyOverview from "@/pages/FamilyOverview";
 
-// Portfolio Context for sharing dummy data across components
+// Portfolio Context for sharing data across components
 const PortfolioContext = createContext(null);
 
 export const usePortfolio = () => {
@@ -40,8 +42,107 @@ export const usePortfolio = () => {
   return context;
 };
 
-// Dummy Portfolio Data - Wheeler Family
-const DUMMY_PORTFOLIO = {
+// Default Family Members (shared across Trust, Income Splitting, Tax Analysis, Budget)
+const DEFAULT_FAMILY_MEMBERS = [
+  { 
+    id: 1, 
+    name: "James Wheeler", 
+    relationship: "primary",
+    age: 45,
+    taxableIncome: 120000,
+    salaryIncome: 120000,
+    dividendIncome: 8500,
+    rentalIncome: 18000,
+    otherIncome: 0,
+    deductions: 5200,
+    superBalance: 320000,
+    isTrustBeneficiary: true,
+    trustDistribution: 30
+  },
+  { 
+    id: 2, 
+    name: "Sarah Wheeler", 
+    relationship: "spouse",
+    age: 43,
+    taxableIncome: 65000,
+    salaryIncome: 65000,
+    dividendIncome: 4200,
+    rentalIncome: 18000,
+    otherIncome: 0,
+    deductions: 2800,
+    superBalance: 260000,
+    isTrustBeneficiary: true,
+    trustDistribution: 30
+  },
+  { 
+    id: 3, 
+    name: "Emily Wheeler", 
+    relationship: "adult_child",
+    age: 22,
+    taxableIncome: 25000,
+    salaryIncome: 25000,
+    dividendIncome: 0,
+    rentalIncome: 0,
+    otherIncome: 0,
+    deductions: 0,
+    superBalance: 15000,
+    isTrustBeneficiary: true,
+    trustDistribution: 20
+  },
+  { 
+    id: 4, 
+    name: "Michael Wheeler", 
+    relationship: "adult_child",
+    age: 19,
+    taxableIncome: 0,
+    salaryIncome: 0,
+    dividendIncome: 0,
+    rentalIncome: 0,
+    otherIncome: 0,
+    deductions: 0,
+    superBalance: 5000,
+    isTrustBeneficiary: true,
+    trustDistribution: 20
+  }
+];
+
+// Default Trust Configuration
+const DEFAULT_TRUST = {
+  name: "Wheeler Family Trust",
+  type: "discretionary",
+  netIncome: 150000,
+  financialYear: "2024-25"
+};
+
+// Default Household Budget
+const DEFAULT_BUDGET = {
+  frequency: "monthly",
+  income: {
+    salary1: 10000,
+    salary2: 5417,
+    rental: 3000,
+    dividends: 1058,
+    other: 0
+  },
+  expenses: {
+    mortgage: 4200,
+    utilities: 450,
+    groceries: 1200,
+    transport: 800,
+    insurance: 650,
+    schoolFees: 2333,
+    childcare: 0,
+    entertainment: 600,
+    dining: 400,
+    subscriptions: 150,
+    clothing: 300,
+    medical: 200,
+    other: 500
+  }
+};
+
+// Default Portfolio Data
+const DEFAULT_PORTFOLIO = {
   personal: {
     name: "Wheeler Family",
     age: 45,
@@ -164,11 +265,214 @@ const RECOMMENDATIONS = [
 ];
 
 const PortfolioProvider = ({ children }) => {
-  const [portfolio, setPortfolio] = useState(DUMMY_PORTFOLIO);
+  // Core portfolio state
+  const [portfolio, setPortfolio] = useState(DEFAULT_PORTFOLIO);
   const [recommendations, setRecommendations] = useState(RECOMMENDATIONS);
+  
+  // Shared family data state
+  const [familyMembers, setFamilyMembers] = useState(DEFAULT_FAMILY_MEMBERS);
+  const [trust, setTrust] = useState(DEFAULT_TRUST);
+  const [budget, setBudget] = useState(DEFAULT_BUDGET);
+  
+  // Track unsaved changes
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [lastSaved, setLastSaved] = useState(null);
+
+  // Load saved data from localStorage on mount
+  useEffect(() => {
+    const savedData = localStorage.getItem("wheelerFamilyData");
+    if (savedData) {
+      try {
+        const parsed = JSON.parse(savedData);
+        if (parsed.familyMembers) setFamilyMembers(parsed.familyMembers);
+        if (parsed.trust) setTrust(parsed.trust);
+        if (parsed.budget) setBudget(parsed.budget);
+        if (parsed.portfolio) setPortfolio(parsed.portfolio);
+        if (parsed.lastSaved) setLastSaved(parsed.lastSaved);
+      } catch (e) {
+        console.error("Error loading saved data:", e);
+      }
+    }
+  }, []);
+
+  // Update family member
+  const updateFamilyMember = useCallback((id, updates) => {
+    setFamilyMembers(prev => prev.map(m => 
+      m.id === id ? { ...m, ...updates } : m
+    ));
+    setHasUnsavedChanges(true);
+  }, []);
+
+  // Add family member
+  const addFamilyMember = useCallback((member) => {
+    const newMember = {
+      id: Date.now(),
+      name: member.name || "New Member",
+      relationship: member.relationship || "other",
+      age: member.age || 0,
+      taxableIncome: 0,
+      salaryIncome: 0,
+      dividendIncome: 0,
+      rentalIncome: 0,
+      otherIncome: 0,
+      deductions: 0,
+      superBalance: 0,
+      isTrustBeneficiary: false,
+      trustDistribution: 0,
+      ...member
+    };
+    setFamilyMembers(prev => [...prev, newMember]);
+    setHasUnsavedChanges(true);
+    return newMember;
+  }, []);
+
+  // Remove family member
+  const removeFamilyMember = useCallback((id) => {
+    setFamilyMembers(prev => prev.filter(m => m.id !== id));
+    setHasUnsavedChanges(true);
+  }, []);
+
+  // Update trust
+  const updateTrust = useCallback((updates) => {
+    setTrust(prev => ({ ...prev, ...updates }));
+    setHasUnsavedChanges(true);
+  }, []);
+
+  // Update budget
+  const updateBudget = useCallback((category, field, value) => {
+    setBudget(prev => ({
+      ...prev,
+      [category]: {
+        ...prev[category],
+        [field]: value
+      }
+    }));
+    setHasUnsavedChanges(true);
+  }, []);
+
+  // Set budget frequency
+  const setBudgetFrequency = useCallback((frequency) => {
+    setBudget(prev => ({ ...prev, frequency }));
+    setHasUnsavedChanges(true);
+  }, []);
+
+  // Save all data
+  const saveAllData = useCallback(() => {
+    const dataToSave = {
+      familyMembers,
+      trust,
+      budget,
+      portfolio,
+      lastSaved: new Date().toISOString()
+    };
+    localStorage.setItem("wheelerFamilyData", JSON.stringify(dataToSave));
+    setHasUnsavedChanges(false);
+    setLastSaved(dataToSave.lastSaved);
+    toast.success("All changes saved successfully");
+  }, [familyMembers, trust, budget, portfolio]);
+
+  // Reset to defaults
+  const resetToDefaults = useCallback(() => {
+    setFamilyMembers(DEFAULT_FAMILY_MEMBERS);
+    setTrust(DEFAULT_TRUST);
+    setBudget(DEFAULT_BUDGET);
+    setPortfolio(DEFAULT_PORTFOLIO);
+    setHasUnsavedChanges(true);
+    toast.info("Reset to default values");
+  }, []);
+
+  // Get trust beneficiaries
+  const getTrustBeneficiaries = useCallback(() => {
+    return familyMembers.filter(m => m.isTrustBeneficiary);
+  }, [familyMembers]);
+
+  // Get primary earners (for tax analysis)
+  const getPrimaryEarners = useCallback(() => {
+    return familyMembers.filter(m => 
+      m.relationship === "primary" || m.relationship === "spouse"
+    );
+  }, [familyMembers]);
+
+  // Calculate total family income
+  const getTotalFamilyIncome = useCallback(() => {
+    return familyMembers.reduce((sum, m) => sum + (m.taxableIncome || 0), 0);
+  }, [familyMembers]);
+
+  // Calculate monthly cashflow
+  const getMonthlyCashflow = useCallback(() => {
+    const totalIncome = Object.values(budget.income).reduce((a, b) => a + b, 0);
+    const totalExpenses = Object.values(budget.expenses).reduce((a, b) => a + b, 0);
+    return {
+      income: totalIncome,
+      expenses: totalExpenses,
+      surplus: totalIncome - totalExpenses
+    };
+  }, [budget]);
+
+  // Generate 12-month cashflow projection
+  const getCashflowProjection = useCallback(() => {
+    const monthly = getMonthlyCashflow();
+    const projection = [];
+    let cumulativeSavings = portfolio.investments.cash_savings;
+    
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const currentMonth = new Date().getMonth();
+    
+    for (let i = 0; i < 12; i++) {
+      const monthIndex = (currentMonth + i) % 12;
+      cumulativeSavings += monthly.surplus;
+      
+      projection.push({
+        month: months[monthIndex],
+        income: monthly.income,
+        expenses: monthly.expenses,
+        surplus: monthly.surplus,
+        cumulativeSavings: Math.max(0, cumulativeSavings)
+      });
+    }
+    
+    return projection;
+  }, [getMonthlyCashflow, portfolio.investments.cash_savings]);
 
   return (
-    <PortfolioContext.Provider value={{ portfolio, setPortfolio, recommendations, setRecommendations }}>
+    <PortfolioContext.Provider value={{ 
+      // Original portfolio data
+      portfolio, 
+      setPortfolio, 
+      recommendations, 
+      setRecommendations,
+      
+      // Shared family data
+      familyMembers,
+      setFamilyMembers,
+      updateFamilyMember,
+      addFamilyMember,
+      removeFamilyMember,
+      
+      // Trust data
+      trust,
+      setTrust,
+      updateTrust,
+      getTrustBeneficiaries,
+      
+      // Budget data
+      budget,
+      setBudget,
+      updateBudget,
+      setBudgetFrequency,
+      
+      // Derived data helpers
+      getPrimaryEarners,
+      getTotalFamilyIncome,
+      getMonthlyCashflow,
+      getCashflowProjection,
+      
+      // Save/Reset
+      hasUnsavedChanges,
+      lastSaved,
+      saveAllData,
+      resetToDefaults
+    }}>
       {children}
     </PortfolioContext.Provider>
   );
@@ -180,6 +484,7 @@ const AppRouter = () => {
     <Routes>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/overview" element={<FamilyOverview />} />
       <Route path="/budget" element={<HouseholdBudget />} />
       <Route path="/tax-analysis" element={<TaxAnalysis />} />
       <Route path="/property-portfolio" element={<PropertyPortfolio />} />
