@@ -519,6 +519,7 @@ const ScenarioBuilder = () => {
   // Calculate totals
   const totalPersonalIncome = people.reduce((sum, p) => sum + (p.taxable_income || 0), 0);
   const totalCompanyIncome = companies.reduce((sum, c) => sum + (c.taxable_income || 0), 0);
+  const totalTrustIncome = trusts.reduce((sum, t) => sum + (t.net_income || 0), 0);
   const totalInvestmentValue = (investments.cash_savings || 0) + 
     (investments.term_deposit_amount || 0) + 
     (investments.shares_value || 0) + 
@@ -533,6 +534,9 @@ const ScenarioBuilder = () => {
     });
     companies.forEach((c, i) => {
       options.push({ value: `company_${i}`, label: c.name || `Company ${i + 1}` });
+    });
+    trusts.forEach((t, i) => {
+      options.push({ value: `trust_${i}`, label: t.name || `Trust ${i + 1}` });
     });
     return options;
   };
