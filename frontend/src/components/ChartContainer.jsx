@@ -22,8 +22,12 @@ const ChartContainer = ({ children, height = 250, className = "" }) => {
       }
     };
 
-    // Initial check
-    updateDimensions();
+    // Use requestAnimationFrame to ensure DOM is fully laid out before measuring
+    // This prevents the race condition where charts render before dimensions are available
+    const rafId = requestAnimationFrame(() => {
+      // Additional small delay to ensure CSS has been applied
+      setTimeout(updateDimensions, 50);
+    });
 
     // Use ResizeObserver for responsive updates
     const resizeObserver = new ResizeObserver((entries) => {
@@ -39,6 +43,7 @@ const ChartContainer = ({ children, height = 250, className = "" }) => {
     resizeObserver.observe(container);
 
     return () => {
+      cancelAnimationFrame(rafId);
       resizeObserver.disconnect();
     };
   }, []);
