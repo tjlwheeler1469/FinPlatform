@@ -27,6 +27,10 @@ Build an app that analyses all options for personal and business investment in A
 - ✅ Debt to equity ratio
 - ✅ User authentication (Google OAuth)
 - ✅ Scenario saving and management
+- ✅ Capital Gains Tax calculator (NEW)
+- ✅ Historical tax comparison (NEW)
+- ✅ SMSF contribution optimizer (NEW)
+- ✅ Report generator (NEW)
 
 ## Architecture
 - **Frontend**: React 19, Tailwind CSS, Shadcn UI, Recharts
@@ -36,7 +40,7 @@ Build an app that analyses all options for personal and business investment in A
 
 ## What's Been Implemented (March 2026)
 
-### Backend APIs
+### Backend APIs - Original
 - `/api/auth/session` - Google OAuth session exchange
 - `/api/auth/me` - Get current user
 - `/api/auth/logout` - Logout user
@@ -50,7 +54,14 @@ Build an app that analyses all options for personal and business investment in A
 - `/api/analyze/full-scenario` - Comprehensive scenario analysis
 - `/api/tax-rates` - Current Australian tax rates
 
-### Frontend Pages
+### Backend APIs - NEW (March 2026)
+- `/api/analyze/cgt` - Capital Gains Tax calculator (50% individual, 33.33% SMSF, 0% company discounts)
+- `/api/analyze/smsf` - SMSF contribution optimizer with Division 293, projections
+- `/api/analyze/tax-comparison` - Compare tax across multiple years
+- `/api/tax-rates/historical` - Historical tax rates (2020-21 to 2024-25)
+- `/api/analyze/full-scenario/report` - Generate PDF report data
+
+### Frontend Pages - Original
 - Landing Page with hero section
 - Dashboard with portfolio overview
 - Tax Analysis (personal & company)
@@ -60,32 +71,43 @@ Build an app that analyses all options for personal and business investment in A
 - Saved Scenarios management
 - Scenario Builder (create/edit)
 
+### Frontend Pages - NEW (March 2026)
+- CGT Calculator - Calculate capital gains with discount eligibility
+- Historical Tax Comparison - Compare tax across 5 years, see Stage 3 savings
+- SMSF Optimizer - Contribution strategy, caps, Division 293, projections
+- Report Generator - Generate and download/print comprehensive reports
+
 ## Prioritized Backlog
 
-### P0 - Critical (Done)
+### P0 - Critical (All Done ✅)
 - ✅ Core tax calculations
 - ✅ User authentication
 - ✅ Scenario saving
+- ✅ Capital gains tax calculator
+- ✅ Historical tax comparison
+- ✅ SMSF contribution optimizer
+- ✅ Report generator
 
 ### P1 - High Priority (Future)
-- Capital gains tax calculator
-- Historical tax rate comparison (year-over-year)
-- PDF report generation
-- Export scenarios to Excel
+- Salary packaging calculator
+- Investment property comparison tool
+- Tax loss harvesting suggestions
+- Dividend reinvestment calculator
 
 ### P2 - Medium Priority (Future)
-- Superannuation contribution optimizer
-- Salary sacrifice calculator
-- SMSF compliance checker
-- Multi-currency support
+- Superannuation guarantee calculator
+- Rental yield optimizer
+- Multi-scenario comparison view
+- Export to accounting software
 
 ### P3 - Nice to Have
 - Tax planning calendar with due dates
 - Integration with bank feeds
 - Mobile app version
+- Share scenarios with advisors
 
 ## Next Tasks
-1. Add CGT calculator
-2. Implement PDF report export
-3. Add historical tax rate comparison
-4. Build SMSF contribution optimizer
+1. Add salary packaging calculator
+2. Investment property comparison tool
+3. Tax loss harvesting suggestions
+4. Multi-scenario comparison view
