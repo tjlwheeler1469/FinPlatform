@@ -100,20 +100,33 @@ const IncomeSplitting = () => {
     addFamilyMember, 
     removeFamilyMember,
     hasUnsavedChanges,
-    saveAllData
+    saveAllData,
+    trust,
+    portfolio
   } = usePortfolio();
 
   // Income sources that can be split
   const [incomeSources, setIncomeSources] = useState({
     dividends: Math.round(portfolio.investments.shares_value * (portfolio.investments.shares_dividend_yield / 100)),
     rentalIncome: portfolio.investments.properties.reduce((sum, p) => sum + (p.rental_income || 0), 0),
-    trustDistributions: 50000,
+    trustDistributions: trust.netIncome,
     interestIncome: Math.round(portfolio.investments.term_deposit_amount * (portfolio.investments.term_deposit_rate / 100))
   });
+
+  // Update income sources when trust changes
+  useEffect(() => {
+    setIncomeSources(prev => ({
+      ...prev,
+      trustDistributions: trust.netIncome
+    }));
+  }, [trust.netIncome]);
 
   // Distribution strategy
   const [distributions, setDistributions] = useState({});
   const [activeTab, setActiveTab] = useState("analysis");
+  const [showAddMember, setShowAddMember] = useState(false);
+  const [newMemberName, setNewMemberName] = useState("");
+  const [newMemberRelationship, setNewMemberRelationship] = useState("adult_child");
 
   useEffect(() => {
     // Initialize distributions evenly among eligible members
