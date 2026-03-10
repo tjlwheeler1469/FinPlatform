@@ -277,6 +277,9 @@ const ScenarioBuilder = () => {
   // Multi-company support
   const [companies, setCompanies] = useState([]);
   
+  // Multi-trust support
+  const [trusts, setTrusts] = useState([]);
+  
   const [investments, setInvestments] = useState(defaultInvestments);
   const [expenses, setExpenses] = useState(defaultExpenses);
   const [simulationYears, setSimulationYears] = useState(10);
