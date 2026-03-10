@@ -143,12 +143,12 @@ const TaxCalendar = () => {
   // Get events for a specific date
   const getEventsForDate = (date) => {
     const dateStr = date.toISOString().split("T")[0];
-    return allEvents.filter(event => event.date === dateStr);
+    return filteredByYear.filter(event => event.date === dateStr);
   };
 
   // Get events for current month
   const getEventsForMonth = (year, month) => {
-    return allEvents.filter(event => {
+    return filteredByYear.filter(event => {
       const eventDate = new Date(event.date);
       return eventDate.getFullYear() === year && eventDate.getMonth() === month;
     });
@@ -159,7 +159,7 @@ const TaxCalendar = () => {
     const today = new Date();
     const thirtyDaysLater = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
     
-    return allEvents
+    return filteredByYear
       .filter(event => {
         const eventDate = new Date(event.date);
         return eventDate >= today && eventDate <= thirtyDaysLater;
@@ -172,13 +172,36 @@ const TaxCalendar = () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    return allEvents
+    return filteredByYear
       .filter(event => {
         const eventDate = new Date(event.date);
-        return eventDate < today;
+        return eventDate < today && !completedEvents.includes(event.id);
       })
       .sort((a, b) => new Date(b.date) - new Date(a.date))
       .slice(0, 5);
+  };
+
+  // Mark event as completed
+  const handleCompleteEvent = (eventId) => {
+    if (completedEvents.includes(eventId)) {
+      setCompletedEvents(completedEvents.filter(id => id !== eventId));
+      toast.success("Event marked as incomplete");
+    } else {
+      setCompletedEvents([...completedEvents, eventId]);
+      toast.success("Event marked as completed");
+    }
+  };
+
+  // Hide/show event
+  const handleHideEvent = (eventId) => {
+    setHiddenEvents([...hiddenEvents, eventId]);
+    toast.success("Event hidden");
+  };
+
+  // Restore hidden event
+  const handleRestoreEvent = (eventId) => {
+    setHiddenEvents(hiddenEvents.filter(id => id !== eventId));
+    toast.success("Event restored");
   };
 
   // Calendar navigation
