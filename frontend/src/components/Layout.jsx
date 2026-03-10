@@ -14,31 +14,45 @@ import {
   PiggyBank,
   Briefcase,
   Scale,
-  Home
+  Home,
+  Scissors,
+  Repeat
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { path: "/tax-analysis", label: "Tax Analysis", icon: Calculator },
-  { path: "/cgt-calculator", label: "CGT", icon: TrendingUp },
-  { path: "/historical-tax", label: "Tax History", icon: History },
-  { path: "/property-portfolio", label: "Property", icon: Building2 },
-  { path: "/property-comparison", label: "Compare", icon: Home },
-  { path: "/smsf-optimizer", label: "SMSF", icon: PiggyBank },
-  { path: "/salary-packaging", label: "Salary Pkg", icon: Briefcase },
-  { path: "/monte-carlo", label: "Monte Carlo", icon: BarChart3 },
-  { path: "/loan-calculator", label: "Loans", icon: Landmark },
-  { path: "/scenario-comparison", label: "Compare All", icon: Scale },
-  { path: "/reports", label: "Reports", icon: FileText },
-  { path: "/scenarios", label: "Scenarios", icon: FolderOpen },
+  { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard, title: "Dashboard" },
+  { path: "/tax-analysis", label: "Tax Analysis", icon: Calculator, title: "Tax Analysis" },
+  { path: "/cgt-calculator", label: "CGT", icon: TrendingUp, title: "Capital Gains Tax" },
+  { path: "/historical-tax", label: "Tax History", icon: History, title: "Tax History" },
+  { path: "/tax-loss-harvesting", label: "Harvest", icon: Scissors, title: "Tax Loss Harvesting" },
+  { path: "/property-portfolio", label: "Property", icon: Building2, title: "Property Portfolio" },
+  { path: "/property-comparison", label: "Compare", icon: Home, title: "Property Comparison" },
+  { path: "/smsf-optimizer", label: "SMSF", icon: PiggyBank, title: "SMSF Optimizer" },
+  { path: "/salary-packaging", label: "Salary Pkg", icon: Briefcase, title: "Salary Packaging" },
+  { path: "/dividend-reinvestment", label: "Dividends", icon: Repeat, title: "Dividend Reinvestment" },
+  { path: "/monte-carlo", label: "Monte Carlo", icon: BarChart3, title: "Monte Carlo Simulation" },
+  { path: "/loan-calculator", label: "Loans", icon: Landmark, title: "Loan Calculator" },
+  { path: "/scenario-comparison", label: "Compare All", icon: Scale, title: "Scenario Comparison" },
+  { path: "/reports", label: "Reports", icon: FileText, title: "Reports" },
+  { path: "/scenarios", label: "Scenarios", icon: FolderOpen, title: "Saved Scenarios" },
 ];
 
 const Layout = ({ children }) => {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Fix page title on navigation
+  useEffect(() => {
+    const currentNav = navItems.find(item => item.path === location.pathname);
+    if (currentNav) {
+      document.title = `${currentNav.title} | WealthOptimizer AU`;
+    } else {
+      document.title = "WealthOptimizer AU";
+    }
+  }, [location.pathname]);
 
   return (
     <div className="min-h-screen bg-background">
