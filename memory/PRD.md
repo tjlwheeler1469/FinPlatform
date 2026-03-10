@@ -215,4 +215,19 @@ Build an app that analyses all options for personal and business investment in A
 - ✅ **Navigation Updates**:
   - Added Recommendations and Trust Analysis to sidebar
   - Updated nav icons (Lightbulb for Recommendations, PieChart for Trust Analysis)
+- ✅ **Tax Planning Calendar** page (/tax-calendar):
+  - Pre-populated Australian tax dates: BAS, Super Guarantee, PAYG, FBT, Tax Returns
+  - Monthly calendar view with navigation
+  - Upcoming events view (Next 7 days, Next 30 days)
+  - All events view with category filters
+  - Add custom events modal (stored in localStorage)
+  - Overdue items highlighting
+  - 25+ Australian tax deadline entries
+- ✅ **Mobile Version Enhancements**:
+  - Bottom navigation bar with 5 quick access icons (Home, Advice, Calendar, Budget, Reports)
+  - Slide-out hamburger menu with swipe gesture support
+  - Touch-optimized CSS (44px min touch targets, safe area insets)
+  - Responsive grid layouts for mobile viewports
+  - iOS zoom prevention on inputs
+  - Reduced motion support for accessibility
 
