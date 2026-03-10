@@ -356,7 +356,125 @@ const ReportGenerator = () => {
                         {section.title}
                       </h3>
 
-                      {Array.isArray(section.data) ? (
+                      {/* Special handling for Tax Analysis with breakdown */}
+                      {section.title === 'Tax Analysis' && section.data?.breakdown ? (
+                        <div className="space-y-4">
+                          {/* Main tax data */}
+                          <div className="grid grid-cols-2 gap-3">
+                            {Object.entries(section.data)
+                              .filter(([key, v]) => key !== 'breakdown' && v !== null && v !== undefined)
+                              .map(([key, value]) => (
+                                <div key={key} className="flex justify-between p-2 rounded bg-muted/30">
+                                  <span className="text-muted-foreground capitalize text-sm">
+                                    {key.replace(/_/g, ' ')}:
+                                  </span>
+                                  <span className="font-semibold text-sm">
+                                    {typeof value === 'number' 
+                                      ? (key.includes('rate') 
+                                          ? `${value.toFixed(1)}%` 
+                                          : formatCurrency(value))
+                                      : value
+                                    }
+                                  </span>
+                                </div>
+                              ))
+                            }
+                          </div>
+                          {/* Tax bracket breakdown */}
+                          <div className="mt-4">
+                            <h4 className="font-medium text-sm mb-2">Tax Bracket Breakdown</h4>
+                            <div className="overflow-x-auto">
+                              <table className="w-full text-sm">
+                                <thead>
+                                  <tr className="border-b">
+                                    <th className="text-left p-2">Bracket</th>
+                                    <th className="text-right p-2">Rate</th>
+                                    <th className="text-right p-2">Taxable</th>
+                                    <th className="text-right p-2">Tax</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {section.data.breakdown.map((bracket, i) => (
+                                    <tr key={i} className="border-b">
+                                      <td className="p-2 text-muted-foreground">{bracket.bracket}</td>
+                                      <td className="text-right p-2">{bracket.rate}%</td>
+                                      <td className="text-right p-2">{formatCurrency(bracket.taxable)}</td>
+                                      <td className="text-right p-2 font-medium">{formatCurrency(bracket.tax)}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+                      ) : section.title === 'Investment Projections' && section.data?.percentile_projections ? (
+                        /* Special handling for Investment Projections with percentiles */
+                        <div className="space-y-4">
+                          {/* Main projection data */}
+                          <div className="grid grid-cols-2 gap-3">
+                            {Object.entries(section.data)
+                              .filter(([key, v]) => key !== 'percentile_projections' && v !== null && v !== undefined && typeof v !== 'object')
+                              .map(([key, value]) => (
+                                <div key={key} className="flex justify-between p-2 rounded bg-muted/30">
+                                  <span className="text-muted-foreground capitalize text-sm">
+                                    {key.replace(/_/g, ' ')}:
+                                  </span>
+                                  <span className="font-semibold text-sm">
+                                    {typeof value === 'number' 
+                                      ? (key.includes('probability') || key.includes('volatility') || key.includes('return')
+                                          ? `${value.toFixed(1)}%` 
+                                          : formatCurrency(value))
+                                      : value
+                                    }
+                                  </span>
+                                </div>
+                              ))
+                            }
+                          </div>
+                          {/* Percentile projections table */}
+                          {section.data.percentile_projections?.years && (
+                            <div className="mt-4">
+                              <h4 className="font-medium text-sm mb-2">Percentile Projections by Year</h4>
+                              <div className="overflow-x-auto">
+                                <table className="w-full text-sm">
+                                  <thead>
+                                    <tr className="border-b">
+                                      <th className="text-left p-2">Year</th>
+                                      <th className="text-right p-2">10th %ile</th>
+                                      <th className="text-right p-2">25th %ile</th>
+                                      <th className="text-right p-2">50th (Median)</th>
+                                      <th className="text-right p-2">75th %ile</th>
+                                      <th className="text-right p-2">90th %ile</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {section.data.percentile_projections.years.map((year, i) => (
+                                      <tr key={i} className="border-b">
+                                        <td className="p-2 font-medium">Year {year}</td>
+                                        <td className="text-right p-2 text-destructive">
+                                          {formatCurrency(section.data.percentile_projections.p10?.[i] || 0)}
+                                        </td>
+                                        <td className="text-right p-2 text-[#D4AF37]">
+                                          {formatCurrency(section.data.percentile_projections.p25?.[i] || 0)}
+                                        </td>
+                                        <td className="text-right p-2 font-semibold">
+                                          {formatCurrency(section.data.percentile_projections.p50?.[i] || 0)}
+                                        </td>
+                                        <td className="text-right p-2 text-[#10B981]">
+                                          {formatCurrency(section.data.percentile_projections.p75?.[i] || 0)}
+                                        </td>
+                                        <td className="text-right p-2 text-[#0F392B]">
+                                          {formatCurrency(section.data.percentile_projections.p90?.[i] || 0)}
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ) : Array.isArray(section.data) ? (
                         section.data.length > 0 ? (
                           <div className="space-y-3">
                             {section.data.map((item, i) => (
