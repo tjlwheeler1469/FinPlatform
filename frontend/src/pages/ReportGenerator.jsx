@@ -655,20 +655,52 @@ const ReportGenerator = () => {
                           });
                           
                           return recommendations.map((rec, i) => (
-                            <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-white border">
-                              <span className="text-lg">{rec.icon}</span>
+                            <div 
+                              key={i} 
+                              className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
+                                rec.priority === 'High' ? 'bg-red-50 border-red-200 hover:border-red-400' :
+                                rec.priority === 'Medium' ? 'bg-amber-50 border-amber-200 hover:border-amber-400' :
+                                'bg-green-50 border-green-200 hover:border-green-400'
+                              }`}
+                              onClick={() => rec.link && window.location.assign(rec.link)}
+                              data-testid={`recommendation-${i}`}
+                            >
+                              <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                                rec.priority === 'High' ? 'bg-red-100' :
+                                rec.priority === 'Medium' ? 'bg-amber-100' :
+                                'bg-green-100'
+                              }`}>
+                                {rec.priority === 'High' ? (
+                                  <AlertTriangle className="h-5 w-5 text-red-600" />
+                                ) : rec.priority === 'Medium' ? (
+                                  <Scale className="h-5 w-5 text-amber-600" />
+                                ) : (
+                                  <CheckCircle className="h-5 w-5 text-green-600" />
+                                )}
+                              </div>
                               <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-1">
-                                  <span className="font-semibold">{rec.title}</span>
+                                  <span className={`font-semibold ${
+                                    rec.priority === 'High' ? 'text-red-800' :
+                                    rec.priority === 'Medium' ? 'text-amber-800' :
+                                    'text-green-800'
+                                  }`}>{rec.title}</span>
                                   <Badge 
-                                    variant="outline" 
-                                    className="text-xs"
-                                    style={{ borderColor: rec.color, color: rec.color }}
+                                    className={`text-xs ${
+                                      rec.priority === 'High' ? 'bg-red-600' :
+                                      rec.priority === 'Medium' ? 'bg-amber-500' :
+                                      'bg-green-600'
+                                    }`}
                                   >
-                                    {rec.priority} Priority
+                                    {rec.priority} Risk
                                   </Badge>
                                 </div>
                                 <p className="text-sm text-muted-foreground">{rec.detail}</p>
+                                {rec.link && (
+                                  <div className="mt-2 flex items-center text-sm font-medium text-[#0F392B]">
+                                    View Details <ArrowRight className="h-4 w-4 ml-1" />
+                                  </div>
+                                )}
                               </div>
                             </div>
                           ));
