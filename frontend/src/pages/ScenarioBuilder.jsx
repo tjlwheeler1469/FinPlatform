@@ -214,6 +214,50 @@ const DEMO_SCENARIOS = {
     },
     expenses: { school_fees: 0, childcare: 0, health_insurance: 4800, private_expenses: 8000, work_related: 0, other_deductible: 0 },
     simulation_years: 10
+  },
+  demo_004: {
+    name: "Family Trust Structure",
+    entity_type: "trust",
+    people: [
+      { id: "p1", name: "James Wheeler", age: 47, taxable_income: 120000, employer_super: 11, salary_sacrifice: 0, deductions: { work_related: 0, self_education: 0, other: 0 } },
+      { id: "p2", name: "Sarah Wheeler", age: 44, taxable_income: 65000, employer_super: 11, salary_sacrifice: 0, deductions: { work_related: 0, self_education: 0, other: 0 } }
+    ],
+    companies: [],
+    trusts: [
+      { 
+        id: "t1", 
+        name: "Wheeler Family Trust", 
+        abn: "55 123 456 789", 
+        trust_type: "discretionary", 
+        trustee_type: "corporate",
+        trustee_name: "Wheeler Trustee Pty Ltd",
+        net_income: 150000,
+        beneficiaries: [
+          { id: "b1", name: "James Wheeler", relationship: "family", distribution_percentage: 30, is_presently_entitled: true },
+          { id: "b2", name: "Sarah Wheeler", relationship: "family", distribution_percentage: 30, is_presently_entitled: true },
+          { id: "b3", name: "Emily Wheeler (Adult Child)", relationship: "family", distribution_percentage: 20, is_presently_entitled: true },
+          { id: "b4", name: "Michael Wheeler (Adult Child)", relationship: "family", distribution_percentage: 20, is_presently_entitled: true }
+        ]
+      }
+    ],
+    investments: {
+      cash_savings: 50000,
+      term_deposit_amount: 0,
+      term_deposit_rate: 4.5,
+      shares_value: 400000,
+      shares_dividend_yield: 4.5,
+      franking_percentage: 85,
+      bonds_value: 50000,
+      bonds_yield: 5.0,
+      etf_value: 100000,
+      etf_yield: 3.5,
+      smsf_balance: 320000,
+      properties: [
+        { property_id: "prop1", name: "Trust Investment Property", value: 850000, rental_income: 42000, mortgage_amount: 400000, mortgage_rate: 6.35, mortgage_term_years: 25, annual_expenses: 7500, depreciation_building: 8500, depreciation_fixtures: 2800, owner: "trust_0" }
+      ]
+    },
+    expenses: { school_fees: 0, childcare: 0, health_insurance: 4800, private_expenses: 10000, work_related: 0, other_deductible: 0 },
+    simulation_years: 10
   }
 };
 
