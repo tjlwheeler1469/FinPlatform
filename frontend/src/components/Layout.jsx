@@ -20,10 +20,9 @@ import {
   Wallet,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Users,
-  Shield,
   FileCheck,
-  Receipt,
   Lightbulb,
   PieChart,
   CalendarDays
@@ -32,30 +31,63 @@ import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
-const navItems = [
-  { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard, title: "Dashboard" },
-  { path: "/recommendations", label: "Recommendations", icon: Lightbulb, title: "Financial Recommendations" },
-  { path: "/tax-calendar", label: "Tax Calendar", icon: CalendarDays, title: "Tax Planning Calendar" },
-  { path: "/budget", label: "Budget", icon: Wallet, title: "Household Budget" },
-  { path: "/income-splitting", label: "Income Splitting", icon: Users, title: "Income Splitting" },
-  { path: "/trust-distributions", label: "Trust Analysis", icon: PieChart, title: "Trust Distribution Analysis" },
-  { path: "/tax-analysis", label: "Tax Analysis", icon: Calculator, title: "Tax Analysis" },
-  { path: "/cgt-calculator", label: "CGT Calculator", icon: TrendingUp, title: "Capital Gains Tax" },
-  { path: "/cgt-events", label: "CGT Events", icon: Receipt, title: "CGT Event Tracker" },
-  { path: "/tax-loss-harvesting", label: "Tax Harvesting", icon: Scissors, title: "Tax Loss Harvesting" },
-  { path: "/historical-tax", label: "Tax History", icon: History, title: "Tax History" },
-  { path: "/division-7a", label: "Division 7A", icon: FileCheck, title: "Division 7A Calculator" },
-  { path: "/property-portfolio", label: "Properties", icon: Building2, title: "Property Portfolio" },
-  { path: "/property-comparison", label: "Compare Properties", icon: Home, title: "Property Comparison" },
-  { path: "/smsf-optimizer", label: "SMSF", icon: PiggyBank, title: "SMSF Optimizer" },
-  { path: "/salary-packaging", label: "Salary Packaging", icon: Briefcase, title: "Salary Packaging" },
-  { path: "/dividend-reinvestment", label: "Dividends", icon: Repeat, title: "Dividend Reinvestment" },
-  { path: "/monte-carlo", label: "Monte Carlo", icon: BarChart3, title: "Monte Carlo Simulation" },
-  { path: "/loan-calculator", label: "Loan Calculator", icon: Landmark, title: "Loan Calculator" },
-  { path: "/scenario-comparison", label: "Compare Scenarios", icon: Scale, title: "Scenario Comparison" },
-  { path: "/reports", label: "Reports", icon: FileText, title: "Reports" },
-  { path: "/scenarios", label: "Saved Scenarios", icon: FolderOpen, title: "Saved Scenarios" },
+// Grouped navigation structure
+const navGroups = [
+  {
+    name: "Overview",
+    items: [
+      { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard, title: "Dashboard" },
+      { path: "/recommendations", label: "Recommendations", icon: Lightbulb, title: "Financial Recommendations" },
+    ]
+  },
+  {
+    name: "Planning",
+    items: [
+      { path: "/budget", label: "Budget", icon: Wallet, title: "Household Budget" },
+      { path: "/income-splitting", label: "Income Splitting", icon: Users, title: "Income Splitting" },
+      { path: "/trust-distributions", label: "Trust Analysis", icon: PieChart, title: "Trust Distribution Analysis" },
+      { path: "/scenario-comparison", label: "Scenario Comparison", icon: Scale, title: "Scenario Comparison" },
+    ]
+  },
+  {
+    name: "Property",
+    items: [
+      { path: "/property-portfolio", label: "Properties", icon: Building2, title: "Property Portfolio" },
+      { path: "/property-comparison", label: "Property Comparison", icon: Home, title: "Property Comparison" },
+    ]
+  },
+  {
+    name: "Tax & CGT",
+    items: [
+      { path: "/tax-analysis", label: "Tax Analysis", icon: Calculator, title: "Tax Analysis" },
+      { path: "/cgt", label: "CGT", icon: TrendingUp, title: "Capital Gains Tax" },
+      { path: "/tax-calendar", label: "Tax Calendar", icon: CalendarDays, title: "Tax Planning Calendar" },
+      { path: "/historical-tax", label: "Tax History", icon: History, title: "Tax History" },
+      { path: "/tax-loss-harvesting", label: "Tax Harvesting", icon: Scissors, title: "Tax Loss Harvesting" },
+    ]
+  },
+  {
+    name: "Calculators",
+    items: [
+      { path: "/loan-calculator", label: "Loan", icon: Landmark, title: "Loan Calculator" },
+      { path: "/monte-carlo", label: "Monte Carlo", icon: BarChart3, title: "Monte Carlo Simulation" },
+      { path: "/division-7a", label: "Division 7A", icon: FileCheck, title: "Division 7A Calculator" },
+      { path: "/salary-packaging", label: "Salary Packaging", icon: Briefcase, title: "Salary Packaging" },
+      { path: "/dividend-reinvestment", label: "Dividends", icon: Repeat, title: "Dividend Reinvestment" },
+      { path: "/smsf-optimizer", label: "SMSF", icon: PiggyBank, title: "SMSF Optimizer" },
+    ]
+  },
+  {
+    name: "Reports",
+    items: [
+      { path: "/reports", label: "Reports", icon: FileText, title: "Reports" },
+      { path: "/scenarios", label: "Saved Scenarios", icon: FolderOpen, title: "Saved Scenarios" },
+    ]
+  }
 ];
+
+// Flatten for title lookup and mobile nav
+const allNavItems = navGroups.flatMap(group => group.items);
 
 // Mobile bottom navigation - key features for quick access
 const mobileBottomNav = [
@@ -70,18 +102,38 @@ const Layout = ({ children }) => {
   const location = useLocation();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [expandedGroups, setExpandedGroups] = useState(() => {
+    // Expand all groups by default
+    return navGroups.reduce((acc, group) => {
+      acc[group.name] = true;
+      return acc;
+    }, {});
+  });
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
 
   // Fix page title on navigation
   useEffect(() => {
-    const currentNav = navItems.find(item => item.path === location.pathname);
+    const currentNav = allNavItems.find(item => item.path === location.pathname);
     if (currentNav) {
       document.title = `${currentNav.title} | Wheeler Family Portfolio`;
     } else {
       document.title = "Wheeler Family Portfolio";
     }
   }, [location.pathname]);
+
+  // Toggle group expansion
+  const toggleGroup = (groupName) => {
+    setExpandedGroups(prev => ({
+      ...prev,
+      [groupName]: !prev[groupName]
+    }));
+  };
+
+  // Check if any item in group is active
+  const isGroupActive = (group) => {
+    return group.items.some(item => location.pathname === item.path);
+  };
 
   // Swipe gesture handling for mobile menu
   const minSwipeDistance = 50;
@@ -139,25 +191,51 @@ const Layout = ({ children }) => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto py-4 px-2">
-          {navItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              data-testid={`nav-${item.path.slice(1)}`}
-              className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 transition-colors",
-                location.pathname === item.path
-                  ? "bg-white/20 text-white"
-                  : "text-white/70 hover:bg-white/10 hover:text-white"
-              )}
-              title={sidebarCollapsed ? item.label : undefined}
-            >
-              <item.icon className="h-5 w-5 flex-shrink-0" />
+        <nav className="flex-1 overflow-y-auto py-2 px-2">
+          {navGroups.map((group) => (
+            <div key={group.name} className="mb-1">
+              {/* Group Header */}
               {!sidebarCollapsed && (
-                <span className="text-sm font-medium truncate">{item.label}</span>
+                <button
+                  onClick={() => toggleGroup(group.name)}
+                  className={cn(
+                    "w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition-colors",
+                    isGroupActive(group) ? "text-[#D4AF37]" : "text-white/50 hover:text-white/70"
+                  )}
+                >
+                  {group.name}
+                  <ChevronDown className={cn(
+                    "h-3 w-3 transition-transform",
+                    expandedGroups[group.name] ? "rotate-0" : "-rotate-90"
+                  )} />
+                </button>
               )}
-            </Link>
+              
+              {/* Group Items */}
+              {(sidebarCollapsed || expandedGroups[group.name]) && (
+                <div className={cn(!sidebarCollapsed && "ml-1")}>
+                  {group.items.map((item) => (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      data-testid={`nav-${item.path.slice(1)}`}
+                      className={cn(
+                        "flex items-center gap-3 px-3 py-2 rounded-lg mb-0.5 transition-colors",
+                        location.pathname === item.path
+                          ? "bg-white/20 text-white"
+                          : "text-white/70 hover:bg-white/10 hover:text-white"
+                      )}
+                      title={sidebarCollapsed ? item.label : undefined}
+                    >
+                      <item.icon className="h-4 w-4 flex-shrink-0" />
+                      {!sidebarCollapsed && (
+                        <span className="text-sm font-medium truncate">{item.label}</span>
+                      )}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
           ))}
         </nav>
 
@@ -215,23 +293,30 @@ const Layout = ({ children }) => {
           )}
           onClick={(e) => e.stopPropagation()}
         >
-          <nav className="p-4 overflow-y-auto h-[calc(100%-56px)] pb-20">
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                onClick={() => setMobileMenuOpen(false)}
-                data-testid={`mobile-nav-${item.path.slice(1)}`}
-                className={cn(
-                  "flex items-center gap-3 px-4 py-3.5 rounded-xl mb-1 transition-all active:scale-95",
-                  location.pathname === item.path
-                    ? "bg-white/20 text-white"
-                    : "text-white/70 hover:bg-white/10 active:bg-white/20"
-                )}
-              >
-                <item.icon className="h-5 w-5 flex-shrink-0" />
-                <span className="text-sm font-medium">{item.label}</span>
-              </Link>
+          <nav className="p-3 overflow-y-auto h-[calc(100%-56px)] pb-20">
+            {navGroups.map((group) => (
+              <div key={group.name} className="mb-2">
+                <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-white/50">
+                  {group.name}
+                </div>
+                {group.items.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setMobileMenuOpen(false)}
+                    data-testid={`mobile-nav-${item.path.slice(1)}`}
+                    className={cn(
+                      "flex items-center gap-3 px-4 py-3 rounded-xl mb-0.5 transition-all active:scale-95",
+                      location.pathname === item.path
+                        ? "bg-white/20 text-white"
+                        : "text-white/70 hover:bg-white/10 active:bg-white/20"
+                    )}
+                  >
+                    <item.icon className="h-5 w-5 flex-shrink-0" />
+                    <span className="text-sm font-medium">{item.label}</span>
+                  </Link>
+                ))}
+              </div>
             ))}
           </nav>
         </div>
@@ -279,7 +364,7 @@ const Layout = ({ children }) => {
       <main 
         className={cn(
           "flex-1 min-h-screen transition-all duration-300",
-          "pt-14 pb-20 lg:pt-0 lg:pb-0", // Account for mobile header and bottom nav
+          "pt-14 pb-20 lg:pt-0 lg:pb-0",
           sidebarCollapsed ? "lg:ml-16" : "lg:ml-56"
         )}
       >
