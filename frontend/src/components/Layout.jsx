@@ -20,7 +20,10 @@ import {
   LogOut,
   Menu,
   X,
-  Plus
+  Plus,
+  FileText,
+  History,
+  PiggyBank
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -29,10 +32,14 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { path: "/tax-analysis", label: "Tax Analysis", icon: Calculator },
-  { path: "/property-portfolio", label: "Property Portfolio", icon: Building2 },
+  { path: "/cgt-calculator", label: "CGT Calculator", icon: TrendingUp },
+  { path: "/historical-tax", label: "Tax History", icon: History },
+  { path: "/property-portfolio", label: "Property", icon: Building2 },
+  { path: "/smsf-optimizer", label: "SMSF", icon: PiggyBank },
   { path: "/monte-carlo", label: "Monte Carlo", icon: BarChart3 },
-  { path: "/loan-calculator", label: "Loan Calculator", icon: Landmark },
-  { path: "/scenarios", label: "Saved Scenarios", icon: FolderOpen },
+  { path: "/loan-calculator", label: "Loans", icon: Landmark },
+  { path: "/reports", label: "Reports", icon: FileText },
+  { path: "/scenarios", label: "Scenarios", icon: FolderOpen },
 ];
 
 const Layout = ({ children }) => {
