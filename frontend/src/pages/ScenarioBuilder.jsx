@@ -435,6 +435,59 @@ const ScenarioBuilder = () => {
     setCompanies(updated);
   };
 
+  // Trust management
+  const addTrust = () => {
+    setTrusts([
+      ...trusts,
+      { 
+        ...defaultTrust, 
+        id: `t${trusts.length + 1}`, 
+        name: `Family Trust ${trusts.length + 1}`,
+        beneficiaries: people.map((p, i) => ({
+          ...defaultBeneficiary,
+          id: `b${i + 1}`,
+          name: p.name,
+          distribution_percentage: Math.round(100 / people.length)
+        }))
+      }
+    ]);
+  };
+
+  const removeTrust = (index) => {
+    setTrusts(trusts.filter((_, i) => i !== index));
+  };
+
+  const updateTrust = (index, field, value) => {
+    const updated = [...trusts];
+    updated[index] = { ...updated[index], [field]: value };
+    setTrusts(updated);
+  };
+
+  const addBeneficiary = (trustIndex) => {
+    const updated = [...trusts];
+    updated[trustIndex].beneficiaries.push({
+      ...defaultBeneficiary,
+      id: `b${Date.now()}`,
+      name: "New Beneficiary"
+    });
+    setTrusts(updated);
+  };
+
+  const removeBeneficiary = (trustIndex, beneficiaryIndex) => {
+    const updated = [...trusts];
+    updated[trustIndex].beneficiaries = updated[trustIndex].beneficiaries.filter((_, i) => i !== beneficiaryIndex);
+    setTrusts(updated);
+  };
+
+  const updateBeneficiary = (trustIndex, beneficiaryIndex, field, value) => {
+    const updated = [...trusts];
+    updated[trustIndex].beneficiaries[beneficiaryIndex] = {
+      ...updated[trustIndex].beneficiaries[beneficiaryIndex],
+      [field]: value
+    };
+    setTrusts(updated);
+  };
+
   // Property management
   const addProperty = () => {
     setInvestments({
