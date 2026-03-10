@@ -11,7 +11,10 @@ import {
   X,
   FileText,
   History,
-  PiggyBank
+  PiggyBank,
+  Briefcase,
+  Scale,
+  Home
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
@@ -23,9 +26,12 @@ const navItems = [
   { path: "/cgt-calculator", label: "CGT", icon: TrendingUp },
   { path: "/historical-tax", label: "Tax History", icon: History },
   { path: "/property-portfolio", label: "Property", icon: Building2 },
+  { path: "/property-comparison", label: "Compare", icon: Home },
   { path: "/smsf-optimizer", label: "SMSF", icon: PiggyBank },
+  { path: "/salary-packaging", label: "Salary Pkg", icon: Briefcase },
   { path: "/monte-carlo", label: "Monte Carlo", icon: BarChart3 },
   { path: "/loan-calculator", label: "Loans", icon: Landmark },
+  { path: "/scenario-comparison", label: "Compare All", icon: Scale },
   { path: "/reports", label: "Reports", icon: FileText },
   { path: "/scenarios", label: "Scenarios", icon: FolderOpen },
 ];

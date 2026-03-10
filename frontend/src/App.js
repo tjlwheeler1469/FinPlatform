@@ -181,6 +181,9 @@ const AppRouter = () => {
       <Route path="/historical-tax" element={<HistoricalTaxComparison />} />
       <Route path="/smsf-optimizer" element={<SMSFOptimizer />} />
       <Route path="/reports" element={<ReportGenerator />} />
+      <Route path="/salary-packaging" element={<SalaryPackaging />} />
+      <Route path="/property-comparison" element={<PropertyComparison />} />
+      <Route path="/scenario-comparison" element={<ScenarioComparison />} />
     </Routes>
   );
 };
