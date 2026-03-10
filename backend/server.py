@@ -548,6 +548,438 @@ def generate_pdf_report_data(scenario_analysis: Dict[str, Any]) -> Dict[str, Any
             {
                 "title": "Investment Projections",
                 "data": scenario_analysis.get("monte_carlo_projection", {})
+
+# ==================== SALARY PACKAGING CALCULATOR ====================
+
+# FBT Rates and Thresholds 2024-25
+FBT_RATE = 0.47  # FBT rate
+FBT_GROSS_UP_RATE_TYPE_1 = 2.0802  # GST claimable
+FBT_GROSS_UP_RATE_TYPE_2 = 1.8868  # No GST
+
+# Common salary packaging items
+PACKAGING_ITEMS = {
+    "novated_lease": {"fbt_exempt": False, "gst_claimable": True, "description": "Novated car lease"},
+    "laptop": {"fbt_exempt": True, "gst_claimable": True, "description": "Portable electronic devices (one per FBT year)"},
+    "super_contribution": {"fbt_exempt": True, "gst_claimable": False, "description": "Additional super contributions"},
+    "work_related_items": {"fbt_exempt": True, "gst_claimable": True, "description": "Work-related equipment"},
+    "meal_entertainment": {"fbt_exempt": False, "gst_claimable": True, "description": "Meal entertainment"},
+    "living_away_allowance": {"fbt_exempt": False, "gst_claimable": False, "description": "Living away from home"},
+    "car_parking": {"fbt_exempt": False, "gst_claimable": False, "description": "Car parking"},
+    "health_insurance": {"fbt_exempt": False, "gst_claimable": False, "description": "Private health insurance"},
+}
+
+# Not-for-profit exemption caps
+NFP_CAP_HOSPITALS = 17000  # Public hospitals, ambulance services
+NFP_CAP_CHARITIES = 31177  # Public benevolent institutions
+
+def calculate_salary_packaging(
+    gross_salary: float,
+    packaging_items: List[Dict[str, Any]],
+    is_nfp_employee: bool = False,
+    nfp_cap: float = 0,
+    marginal_tax_rate: float = 0.30
+) -> Dict[str, Any]:
+    """Calculate salary packaging benefits and FBT implications"""
+    
+    total_packaged = 0
+    total_fbt_exempt = 0
+    total_fbt_liable = 0
+    fbt_payable = 0
+    items_analysis = []
+    
+    for item in packaging_items:
+        item_type = item.get("type", "other")
+        amount = item.get("amount", 0)
+        item_config = PACKAGING_ITEMS.get(item_type, {"fbt_exempt": False, "gst_claimable": False})
+        
+        is_exempt = item_config.get("fbt_exempt", False)
+        gst_claimable = item_config.get("gst_claimable", False)
+        
+        # For NFP employees, certain benefits are capped and exempt
+        if is_nfp_employee and nfp_cap > 0:
+            exempt_amount = min(amount, max(0, nfp_cap - total_fbt_exempt))
+            liable_amount = amount - exempt_amount
+            total_fbt_exempt += exempt_amount
+        elif is_exempt:
+            exempt_amount = amount
+            liable_amount = 0
+            total_fbt_exempt += amount
+        else:
+            exempt_amount = 0
+            liable_amount = amount
+        
+        # Calculate FBT for liable amount
+        if liable_amount > 0:
+            gross_up_rate = FBT_GROSS_UP_RATE_TYPE_1 if gst_claimable else FBT_GROSS_UP_RATE_TYPE_2
+            taxable_value = liable_amount * gross_up_rate
+            fbt_on_item = taxable_value * FBT_RATE
+            fbt_payable += fbt_on_item
+            total_fbt_liable += liable_amount
+        else:
+            fbt_on_item = 0
+        
+        total_packaged += amount
+        
+        items_analysis.append({
+            "type": item_type,
+            "description": item_config.get("description", item_type),
+            "amount": amount,
+            "fbt_exempt_amount": exempt_amount,
+            "fbt_liable_amount": liable_amount,
+            "fbt_payable": fbt_on_item,
+            "is_fbt_exempt": is_exempt or (is_nfp_employee and exempt_amount > 0)
+        })
+    
+    # Calculate tax savings
+    # Pre-tax salary packaging reduces taxable income
+    tax_on_full_salary = calculate_personal_income_tax(gross_salary)["total_tax"]
+    reduced_taxable = gross_salary - total_fbt_exempt  # Only exempt items reduce taxable income
+    tax_on_reduced = calculate_personal_income_tax(reduced_taxable)["total_tax"]
+    income_tax_saved = tax_on_full_salary - tax_on_reduced
+    
+    # Net benefit = tax saved - FBT paid (by employer, but often passed to employee)
+    net_benefit = income_tax_saved - fbt_payable
+    
+    # Effective value of packaging
+    effective_value = total_packaged + net_benefit
+    
+    return {
+        "gross_salary": gross_salary,
+        "total_packaged_amount": total_packaged,
+        "total_fbt_exempt": total_fbt_exempt,
+        "total_fbt_liable": total_fbt_liable,
+        "fbt_payable": fbt_payable,
+        "income_tax_saved": income_tax_saved,
+        "net_benefit": net_benefit,
+        "effective_value": effective_value,
+        "items_analysis": items_analysis,
+        "is_nfp_employee": is_nfp_employee,
+        "nfp_cap_used": total_fbt_exempt if is_nfp_employee else 0,
+        "nfp_cap_remaining": max(0, nfp_cap - total_fbt_exempt) if is_nfp_employee else 0,
+        "recommendations": generate_packaging_recommendations(
+            gross_salary, total_packaged, total_fbt_exempt, 
+            is_nfp_employee, nfp_cap, marginal_tax_rate
+        )
+    }
+
+def generate_packaging_recommendations(
+    salary: float,
+    packaged: float,
+    exempt: float,
+    is_nfp: bool,
+    nfp_cap: float,
+    marginal_rate: float
+) -> List[str]:
+    """Generate salary packaging recommendations"""
+    recommendations = []
+    
+    if is_nfp and nfp_cap > exempt:
+        remaining = nfp_cap - exempt
+        potential_saving = remaining * marginal_rate
+        recommendations.append(
+            f"You have ${remaining:,.0f} NFP cap remaining. Using this could save ~${potential_saving:,.0f} in tax."
+        )
+    
+    if marginal_rate >= 0.37:
+        recommendations.append(
+            "High income earner - consider maximizing super contributions before other packaging."
+        )
+    
+    if packaged < salary * 0.1:
+        recommendations.append(
+            "Consider packaging work-related items like laptops (FBT exempt) to increase tax benefits."
+        )
+    
+    recommendations.append(
+        "Review novated lease options for your next vehicle - can provide significant tax savings."
+    )
+    
+    if not recommendations:
+        recommendations.append("Current packaging strategy is well optimized.")
+    
+    return recommendations
+
+# ==================== PROPERTY COMPARISON CALCULATOR ====================
+
+def compare_investment_properties(
+    properties: List[Dict[str, Any]],
+    marginal_tax_rate: float = 0.30,
+    investment_horizon_years: int = 10,
+    expected_capital_growth: float = 0.04
+) -> Dict[str, Any]:
+    """Compare multiple investment properties side by side"""
+    
+    comparisons = []
+    
+    for prop in properties:
+        # Basic property metrics
+        value = prop.get("value", 0)
+        rental_income = prop.get("rental_income", 0)
+        mortgage_amount = prop.get("mortgage_amount", 0)
+        mortgage_rate = prop.get("mortgage_rate", 0) / 100
+        annual_expenses = prop.get("annual_expenses", 0)
+        depreciation = prop.get("depreciation_building", 0) + prop.get("depreciation_fixtures", 0)
+        
+        # Calculate yields
+        gross_yield = (rental_income / value * 100) if value > 0 else 0
+        
+        # Annual costs
+        annual_interest = mortgage_amount * mortgage_rate
+        total_costs = annual_interest + annual_expenses
+        
+        # Net rental income
+        net_rental = rental_income - total_costs
+        net_yield = (net_rental / value * 100) if value > 0 else 0
+        
+        # Cash flow analysis
+        is_negatively_geared = (rental_income - total_costs - depreciation) < 0
+        
+        # Tax deductions
+        total_deductions = annual_interest + annual_expenses + depreciation
+        tax_benefit = 0
+        if rental_income < total_deductions:
+            tax_benefit = (total_deductions - rental_income) * marginal_tax_rate
+        
+        # After-tax cash flow
+        cash_flow_before_tax = rental_income - annual_interest - annual_expenses
+        cash_flow_after_tax = cash_flow_before_tax + tax_benefit
+        
+        # Equity position
+        equity = value - mortgage_amount
+        lvr = (mortgage_amount / value * 100) if value > 0 else 0
+        
+        # Return on equity (cash on cash)
+        deposit_assumed = equity if equity > 0 else value * 0.2
+        return_on_equity = (cash_flow_after_tax / deposit_assumed * 100) if deposit_assumed > 0 else 0
+        
+        # Projected values
+        future_value = value * ((1 + expected_capital_growth) ** investment_horizon_years)
+        capital_gain = future_value - value
+        
+        # Total return calculation
+        cumulative_cash_flow = cash_flow_after_tax * investment_horizon_years
+        total_return = capital_gain + cumulative_cash_flow
+        annualized_return = ((total_return / equity) / investment_horizon_years * 100) if equity > 0 else 0
+        
+        comparisons.append({
+            "property_name": prop.get("name", "Unknown"),
+            "property_id": prop.get("property_id", ""),
+            "metrics": {
+                "current_value": value,
+                "rental_income": rental_income,
+                "gross_yield": round(gross_yield, 2),
+                "net_yield": round(net_yield, 2),
+                "mortgage_amount": mortgage_amount,
+                "mortgage_rate": prop.get("mortgage_rate", 0),
+                "lvr": round(lvr, 1),
+                "equity": equity
+            },
+            "cash_flow": {
+                "annual_income": rental_income,
+                "annual_interest": annual_interest,
+                "annual_expenses": annual_expenses,
+                "depreciation": depreciation,
+                "total_deductions": total_deductions,
+                "net_rental_income": net_rental,
+                "tax_benefit": tax_benefit,
+                "cash_flow_before_tax": cash_flow_before_tax,
+                "cash_flow_after_tax": cash_flow_after_tax,
+                "is_negatively_geared": is_negatively_geared
+            },
+            "returns": {
+                "return_on_equity": round(return_on_equity, 2),
+                "projected_value": round(future_value, 0),
+                "expected_capital_gain": round(capital_gain, 0),
+                "cumulative_cash_flow": round(cumulative_cash_flow, 0),
+                "total_return": round(total_return, 0),
+                "annualized_return": round(annualized_return, 2)
+            },
+            "scores": {
+                "yield_score": min(100, gross_yield * 15),  # Scale yield to score
+                "cash_flow_score": 50 + (cash_flow_after_tax / 1000),  # Centered at 50
+                "growth_potential": min(100, expected_capital_growth * 100 * 20),
+                "risk_score": 100 - lvr  # Lower LVR = lower risk
+            }
+        })
+    
+    # Rank properties
+    for metric in ["gross_yield", "return_on_equity", "cash_flow_after_tax"]:
+        if metric == "cash_flow_after_tax":
+            values = [c["cash_flow"]["cash_flow_after_tax"] for c in comparisons]
+        elif metric == "gross_yield":
+            values = [c["metrics"]["gross_yield"] for c in comparisons]
+        else:
+            values = [c["returns"]["return_on_equity"] for c in comparisons]
+        
+        sorted_indices = sorted(range(len(values)), key=lambda i: values[i], reverse=True)
+        for rank, idx in enumerate(sorted_indices):
+            if "rankings" not in comparisons[idx]:
+                comparisons[idx]["rankings"] = {}
+            comparisons[idx]["rankings"][metric] = rank + 1
+    
+    # Find best property for different strategies
+    best_yield = max(comparisons, key=lambda x: x["metrics"]["gross_yield"])
+    best_cash_flow = max(comparisons, key=lambda x: x["cash_flow"]["cash_flow_after_tax"])
+    best_growth = max(comparisons, key=lambda x: x["returns"]["annualized_return"])
+    
+    return {
+        "comparisons": comparisons,
+        "summary": {
+            "total_properties": len(properties),
+            "total_value": sum(p.get("value", 0) for p in properties),
+            "total_debt": sum(p.get("mortgage_amount", 0) for p in properties),
+            "total_equity": sum(c["metrics"]["equity"] for c in comparisons),
+            "total_rental_income": sum(p.get("rental_income", 0) for p in properties),
+            "total_cash_flow": sum(c["cash_flow"]["cash_flow_after_tax"] for c in comparisons),
+            "average_yield": sum(c["metrics"]["gross_yield"] for c in comparisons) / len(comparisons) if comparisons else 0,
+            "average_lvr": sum(c["metrics"]["lvr"] for c in comparisons) / len(comparisons) if comparisons else 0
+        },
+        "recommendations": {
+            "best_for_yield": best_yield["property_name"],
+            "best_for_cash_flow": best_cash_flow["property_name"],
+            "best_for_growth": best_growth["property_name"]
+        },
+        "analysis_parameters": {
+            "marginal_tax_rate": marginal_tax_rate * 100,
+            "investment_horizon": investment_horizon_years,
+            "expected_growth_rate": expected_capital_growth * 100
+        }
+    }
+
+# ==================== SCENARIO COMPARISON ====================
+
+class ScenarioComparisonInput(BaseModel):
+    scenarios: List[Dict[str, Any]]
+    
+def compare_scenarios(scenarios: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """Compare multiple investment scenarios side by side"""
+    
+    comparisons = []
+    
+    for scenario in scenarios:
+        name = scenario.get("name", "Unnamed")
+        entity_type = scenario.get("entity_type", "personal")
+        taxable_income = scenario.get("taxable_income", 0)
+        investments = scenario.get("investments", {})
+        expenses = scenario.get("expenses", {})
+        
+        # Calculate totals
+        total_liquid = (
+            investments.get("cash_savings", 0) +
+            investments.get("term_deposit_amount", 0) +
+            investments.get("shares_value", 0) +
+            investments.get("bonds_value", 0) +
+            investments.get("etf_value", 0)
+        )
+        
+        properties = investments.get("properties", [])
+        total_property = sum(p.get("value", 0) for p in properties)
+        total_mortgage = sum(p.get("mortgage_amount", 0) for p in properties)
+        
+        total_assets = total_liquid + total_property + investments.get("smsf_balance", 0)
+        total_debt = total_mortgage
+        net_worth = total_assets - total_debt
+        
+        # Investment income
+        term_deposit_income = investments.get("term_deposit_amount", 0) * investments.get("term_deposit_rate", 0) / 100
+        dividend_income = investments.get("shares_value", 0) * investments.get("shares_dividend_yield", 0) / 100
+        bond_income = investments.get("bonds_value", 0) * investments.get("bonds_yield", 0) / 100
+        etf_income = investments.get("etf_value", 0) * investments.get("etf_yield", 0) / 100
+        rental_income = sum(p.get("rental_income", 0) for p in properties)
+        
+        total_investment_income = term_deposit_income + dividend_income + bond_income + etf_income + rental_income
+        
+        # Tax calculation
+        if entity_type == "personal":
+            tax_result = calculate_personal_income_tax(taxable_income + total_investment_income)
+            total_tax = tax_result["total_tax"]
+            effective_rate = tax_result["effective_rate"]
+        else:
+            tax_result = calculate_company_tax(taxable_income + total_investment_income)
+            total_tax = tax_result["company_tax"]
+            effective_rate = tax_result["tax_rate"]
+        
+        net_income = taxable_income + total_investment_income - total_tax
+        
+        # Debt metrics
+        debt_to_equity = (total_debt / net_worth) if net_worth > 0 else float('inf')
+        debt_to_assets = (total_debt / total_assets * 100) if total_assets > 0 else 0
+        
+        comparisons.append({
+            "scenario_name": name,
+            "entity_type": entity_type,
+            "summary": {
+                "total_assets": total_assets,
+                "total_debt": total_debt,
+                "net_worth": net_worth,
+                "debt_to_equity": round(debt_to_equity, 2),
+                "debt_to_assets_pct": round(debt_to_assets, 1)
+            },
+            "income": {
+                "employment_income": taxable_income,
+                "investment_income": total_investment_income,
+                "total_income": taxable_income + total_investment_income
+            },
+            "tax": {
+                "total_tax": total_tax,
+                "effective_rate": effective_rate,
+                "net_income": net_income
+            },
+            "allocation": {
+                "cash_and_deposits": investments.get("cash_savings", 0) + investments.get("term_deposit_amount", 0),
+                "shares": investments.get("shares_value", 0),
+                "etfs": investments.get("etf_value", 0),
+                "bonds": investments.get("bonds_value", 0),
+                "property": total_property,
+                "super": investments.get("smsf_balance", 0)
+            },
+            "properties": {
+                "count": len(properties),
+                "total_value": total_property,
+                "total_mortgage": total_mortgage,
+                "total_rental": rental_income
+            }
+        })
+    
+    # Calculate differences between scenarios
+    if len(comparisons) >= 2:
+        base = comparisons[0]
+        differences = []
+        for comp in comparisons[1:]:
+            diff = {
+                "compared_to": base["scenario_name"],
+                "scenario": comp["scenario_name"],
+                "net_worth_diff": comp["summary"]["net_worth"] - base["summary"]["net_worth"],
+                "tax_diff": comp["tax"]["total_tax"] - base["tax"]["total_tax"],
+                "income_diff": comp["income"]["total_income"] - base["income"]["total_income"],
+                "net_income_diff": comp["tax"]["net_income"] - base["tax"]["net_income"]
+            }
+            differences.append(diff)
+    else:
+        differences = []
+    
+    # Find best scenario for each metric
+    best_net_worth = max(comparisons, key=lambda x: x["summary"]["net_worth"])
+    best_income = max(comparisons, key=lambda x: x["tax"]["net_income"])
+    lowest_tax = min(comparisons, key=lambda x: x["tax"]["effective_rate"])
+    lowest_risk = min(comparisons, key=lambda x: x["summary"]["debt_to_equity"] if x["summary"]["debt_to_equity"] != float('inf') else 999)
+    
+    return {
+        "comparisons": comparisons,
+        "differences": differences,
+        "best_for": {
+            "net_worth": best_net_worth["scenario_name"],
+            "net_income": best_income["scenario_name"],
+            "tax_efficiency": lowest_tax["scenario_name"],
+            "lowest_risk": lowest_risk["scenario_name"]
+        },
+        "summary": {
+            "scenarios_compared": len(scenarios),
+            "highest_net_worth": max(c["summary"]["net_worth"] for c in comparisons),
+            "lowest_net_worth": min(c["summary"]["net_worth"] for c in comparisons),
+            "net_worth_range": max(c["summary"]["net_worth"] for c in comparisons) - min(c["summary"]["net_worth"] for c in comparisons)
+        }
+    }
             }
         ],
         "disclaimer": "This report is for informational purposes only and does not constitute financial advice. Consult a qualified financial advisor for personalized recommendations."
