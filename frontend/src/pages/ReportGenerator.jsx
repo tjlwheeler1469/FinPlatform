@@ -11,8 +11,10 @@ import {
   DollarSign,
   Building2,
   TrendingUp,
-  PieChart
+  PieChart,
+  Lightbulb
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import axios from "axios";
 import { toast } from "sonner";
 
