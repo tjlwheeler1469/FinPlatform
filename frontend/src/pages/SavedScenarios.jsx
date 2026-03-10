@@ -31,11 +31,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import axios from "axios";
+import { usePortfolio } from "@/App";
 import { toast } from "sonner";
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
 
 const formatCurrency = (value) => {
   return new Intl.NumberFormat('en-AU', {
@@ -54,42 +51,68 @@ const formatDate = (dateString) => {
   });
 };
 
+// Demo scenarios using the portfolio data
+const DEMO_SCENARIOS = [
+  {
+    scenario_id: "demo_001",
+    name: "Current Portfolio Analysis",
+    entity_type: "personal",
+    taxable_income: 185000,
+    investments: {
+      cash_savings: 75000,
+      shares_value: 320000,
+      bonds_value: 80000,
+      etf_value: 145000,
+      properties: [{}, {}]
+    },
+    created_at: "2024-03-01T10:00:00Z",
+    updated_at: "2024-03-10T15:30:00Z"
+  },
+  {
+    scenario_id: "demo_002",
+    name: "Retirement Planning 2030",
+    entity_type: "personal",
+    taxable_income: 150000,
+    investments: {
+      cash_savings: 100000,
+      shares_value: 400000,
+      bonds_value: 150000,
+      etf_value: 200000,
+      properties: [{}]
+    },
+    created_at: "2024-02-15T09:00:00Z",
+    updated_at: "2024-03-05T11:20:00Z"
+  },
+  {
+    scenario_id: "demo_003",
+    name: "Company Structure Analysis",
+    entity_type: "company",
+    taxable_income: 350000,
+    investments: {
+      cash_savings: 200000,
+      shares_value: 500000,
+      bonds_value: 100000,
+      etf_value: 0,
+      properties: [{}, {}, {}]
+    },
+    created_at: "2024-01-20T14:00:00Z",
+    updated_at: "2024-02-28T16:45:00Z"
+  }
+];
+
 const SavedScenarios = () => {
   const navigate = useNavigate();
-  const [scenarios, setScenarios] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { portfolio } = usePortfolio();
+  const [scenarios, setScenarios] = useState(DEMO_SCENARIOS);
+  const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteId, setDeleteId] = useState(null);
 
-  const fetchScenarios = async () => {
-    try {
-      const response = await axios.get(`${API}/scenarios`, { withCredentials: true });
-      setScenarios(response.data);
-    } catch (error) {
-      console.error("Error fetching scenarios:", error);
-      toast.error("Failed to load scenarios");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchScenarios();
-  }, []);
-
   const deleteScenario = async () => {
     if (!deleteId) return;
-    
-    try {
-      await axios.delete(`${API}/scenarios/${deleteId}`, { withCredentials: true });
-      setScenarios(scenarios.filter(s => s.scenario_id !== deleteId));
-      toast.success("Scenario deleted");
-    } catch (error) {
-      console.error("Error deleting scenario:", error);
-      toast.error("Failed to delete scenario");
-    } finally {
-      setDeleteId(null);
-    }
+    setScenarios(scenarios.filter(s => s.scenario_id !== deleteId));
+    toast.success("Scenario deleted");
+    setDeleteId(null);
   };
 
   const filteredScenarios = scenarios.filter(s => 
