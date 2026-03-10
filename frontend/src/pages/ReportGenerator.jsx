@@ -284,55 +284,39 @@ const ReportGenerator = () => {
               <CardDescription>Choose a scenario to generate report</CardDescription>
             </CardHeader>
             <CardContent>
-              {fetchingScenarios ? (
-                <div className="space-y-3">
-                  {[1, 2, 3].map(i => (
-                    <div key={i} className="h-16 rounded-lg bg-muted animate-pulse" />
-                  ))}
-                </div>
-              ) : scenarios.length === 0 ? (
-                <div className="text-center py-8">
-                  <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">No scenarios found</p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Create a scenario first to generate reports
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {scenarios.map((scenario) => (
-                    <div
-                      key={scenario.scenario_id}
-                      className={`p-4 rounded-lg border cursor-pointer transition-colors ${
-                        selectedScenario?.scenario_id === scenario.scenario_id
-                          ? 'border-[#0F392B] bg-[#0F392B]/5'
-                          : 'border-border hover:border-[#0F392B]/50'
-                      }`}
-                      onClick={() => generateReport(scenario)}
-                      data-testid={`scenario-${scenario.scenario_id}`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                          scenario.entity_type === 'company' 
-                            ? 'bg-[#D4AF37]/10' 
-                            : 'bg-[#0F392B]/10'
-                        }`}>
-                          {scenario.entity_type === 'company' 
-                            ? <Building2 className="h-4 w-4 text-[#D4AF37]" />
-                            : <DollarSign className="h-4 w-4 text-[#0F392B]" />
-                          }
-                        </div>
-                        <div>
-                          <p className="font-medium text-sm">{scenario.name}</p>
-                          <p className="text-xs text-muted-foreground capitalize">
-                            {scenario.entity_type}
-                          </p>
-                        </div>
+              <div className="space-y-2">
+                {scenarios.map((scenario) => (
+                  <div
+                    key={scenario.scenario_id}
+                    className={`p-4 rounded-lg border cursor-pointer transition-colors ${
+                      selectedScenario?.scenario_id === scenario.scenario_id
+                        ? 'border-[#0F392B] bg-[#0F392B]/5'
+                        : 'border-border hover:border-[#0F392B]/50'
+                    }`}
+                    onClick={() => generateReport(scenario)}
+                    data-testid={`scenario-${scenario.scenario_id}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                        scenario.entity_type === 'company' 
+                          ? 'bg-[#D4AF37]/10' 
+                          : 'bg-[#0F392B]/10'
+                      }`}>
+                        {scenario.entity_type === 'company' 
+                          ? <Building2 className="h-4 w-4 text-[#D4AF37]" />
+                          : <DollarSign className="h-4 w-4 text-[#0F392B]" />
+                        }
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm">{scenario.name}</p>
+                        <p className="text-xs text-muted-foreground capitalize">
+                          {scenario.entity_type}
+                        </p>
                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
+                  </div>
+                ))}
+              </div>
             </CardContent>
           </Card>
 
