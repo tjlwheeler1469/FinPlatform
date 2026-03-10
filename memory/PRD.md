@@ -158,3 +158,13 @@ Build an app that analyses all options for personal and business investment in A
   - Each company has: name, ABN, base rate entity toggle, revenue, expenses, taxable income, franking account
 - ✅ Fixed Saved Scenarios loading demo data correctly
 - ✅ Property ownership can be assigned to person1, person2, joint, or any company
+- ✅ **Trust Structures** added as entity type:
+  - Discretionary, Unit, and Hybrid trust types
+  - Individual or Corporate trustee options
+  - Beneficiary management with distribution percentages
+  - Trust income distribution tracking
+- ✅ **Income Splitting Strategies** page (/income-splitting):
+  - Family member tax comparison (current vs optimized)
+  - Distribution sliders for allocating trust/dividend income
+  - Tax savings calculator
+  - Strategy guides: Trust distributions, Dividend streaming, Bucket companies
