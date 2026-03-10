@@ -141,5 +141,14 @@ Build an app that analyses all options for personal and business investment in A
 - ✅ Added Tax Loss Harvesting (/tax-loss-harvesting) - with demo portfolio & manual entry
 - ✅ Added Dividend Reinvestment Calculator (/dividend-reinvestment) - with historical 5yr/10yr benchmarks
 - ✅ Fixed page title state bug in navigation
-- ✅ Navigation now has 15 items total
-- ✅ Testing: All APIs verified working
+- ✅ Rebranded to "Wheeler Family Portfolio"
+- ✅ Moved navigation to left sidebar (collapsible)
+- ✅ Added Household Budget page (/budget) with:
+  - Income sources integrated from portfolio
+  - Regular monthly expenses with categories
+  - One-off costs by month (holidays, car repairs, etc.)
+  - 12-month cashflow projection charts
+  - Cumulative savings projection
+- ✅ Fixed Report data output issues:
+  - Tax Analysis now shows bracket breakdown table
+  - Investment Projections now shows percentile projections by year table
