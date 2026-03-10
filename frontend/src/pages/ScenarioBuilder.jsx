@@ -68,6 +68,27 @@ const defaultCompany = {
   franking_account_balance: 0
 };
 
+const defaultTrust = {
+  id: "",
+  name: "",
+  abn: "",
+  trust_type: "discretionary", // discretionary, unit, hybrid
+  trustee_type: "individual", // individual, corporate
+  trustee_name: "",
+  net_income: 0,
+  beneficiaries: [],
+  distributions: {}
+};
+
+const defaultBeneficiary = {
+  id: "",
+  name: "",
+  relationship: "family", // family, company, other_trust
+  tax_file_number: "",
+  distribution_percentage: 0,
+  is_presently_entitled: true
+};
+
 const defaultProperty = {
   property_id: "",
   name: "",
