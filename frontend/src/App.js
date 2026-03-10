@@ -201,6 +201,7 @@ const AppRouter = () => {
       <Route path="/cgt-events" element={<CGTEventTracker />} />
       <Route path="/trust-distributions" element={<TrustDistributionAnalysis />} />
       <Route path="/recommendations" element={<FinancialRecommendations />} />
+      <Route path="/tax-calendar" element={<TaxCalendar />} />
     </Routes>
   );
 };
