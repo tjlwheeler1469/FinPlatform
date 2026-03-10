@@ -303,6 +303,7 @@ const ScenarioBuilder = () => {
       setEntityType(demo.entity_type);
       setPeople(demo.people || [{ ...defaultPerson, id: "p1", name: "Person 1" }]);
       setCompanies(demo.companies || []);
+      setTrusts(demo.trusts || []);
       setInvestments(demo.investments || defaultInvestments);
       setExpenses(demo.expenses || defaultExpenses);
       setSimulationYears(demo.simulation_years || 10);
@@ -316,6 +317,7 @@ const ScenarioBuilder = () => {
           setEntityType(data.entity_type);
           setPeople(data.people || [{ ...defaultPerson, id: "p1", name: "Person 1" }]);
           setCompanies(data.companies || []);
+          setTrusts(data.trusts || []);
           setInvestments(data.investments || defaultInvestments);
           setExpenses(data.expenses || defaultExpenses);
           setSimulationYears(data.simulation_years || 10);
