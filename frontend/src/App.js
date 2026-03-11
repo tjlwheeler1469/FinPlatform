@@ -36,6 +36,7 @@ import RentalYieldOptimizer from "@/pages/RentalYieldOptimizer";
 import HoldingsPerformance from "@/pages/HoldingsPerformance";
 import ExportData from "@/pages/ExportData";
 import AdvancedScenarioModeling from "@/pages/AdvancedScenarioModeling";
+import FamilyMemberProfile from "@/pages/FamilyMemberProfile";
 
 // Portfolio Context for sharing data across components
 const PortfolioContext = createContext(null);
