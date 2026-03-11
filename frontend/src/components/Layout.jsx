@@ -50,6 +50,7 @@ const navGroups = [
     items: [
       { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard, title: "Dashboard" },
       { path: "/overview", label: "Family Overview", icon: Eye, title: "Family Overview" },
+      { path: "/family-wealth", label: "Wealth Dashboard", icon: TrendingUp, title: "Family Wealth Dashboard" },
       { path: "/recommendations", label: "Recommendations", icon: Lightbulb, title: "Financial Recommendations" },
     ]
   },
