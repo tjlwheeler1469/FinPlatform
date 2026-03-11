@@ -48,8 +48,9 @@ import ClientOnboarding from "@/pages/ClientOnboarding";
 import Copilot from "@/pages/Copilot";
 import DailyBriefing from "@/pages/DailyBriefing";
 import AdviserDashboard from "@/pages/AdviserDashboard";
-import ClientPortal from "@/pages/ClientPortal";
+import ClientPortalMerged from "@/pages/ClientPortalMerged";
 import ModeSelector from "@/pages/ModeSelector";
+import PracticeManagement from "@/pages/PracticeManagement";
 
 // Compliance Modal
 import { ComplianceModal } from "@/components/ComplianceDisclaimer";
