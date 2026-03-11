@@ -184,6 +184,40 @@ Build an app that analyses all options for personal and business investment in A
 
 ### Session Continuation (March 2026 - LATEST)
 
+- ✅ **Live Price Updates** (Share Portfolio)
+  - "Start Live" button activates 30-second auto-updates
+  - Realistic price fluctuations (2% max change with slight upward bias)
+  - Live status indicator shows timestamp
+  - Green button with "Live • Xs ago" when active
+  - Toast notification on activation
+
+- ✅ **Notifications Panel**
+  - Bell icon with unread count badge in sidebar
+  - Slide-out panel with notification list
+  - 4 tabs: All, Unread, Tasks, Meetings
+  - 5 notification types: Task, Meeting, Market, Compliance, Invoice
+  - Settings section with 6 toggles for notification preferences
+  - Mark all read and Clear all functionality
+  - Mock notifications stored in localStorage
+
+- ✅ **Calendar Integration** (Practice Management - Meetings)
+  - "Add to Calendar" dropdown on each meeting card
+  - Export options: Google Calendar, Outlook.com, Office 365, Apple Calendar (.ics)
+  - "Export All" button to download all meetings as .ics
+  - Calendar Integrations settings card with OAuth setup
+  - Connect buttons for Google and Outlook (requires API keys)
+  - Apple Calendar uses .ics export (no OAuth needed)
+  - Generates valid .ics files compatible with all calendar apps
+
+- ✅ **Mobile Responsive Design**
+  - Client Portal: Compact header, responsive grid, mobile-friendly navigation
+  - Practice Management: Compact header, 6 tabs accessible, stacked KPI cards
+  - All interactive elements accessible on mobile viewports
+
+- ✅ **Sidebar Scroll Fix**
+  - Improved scroll position persistence using interval-based retry mechanism
+  - Fixed race condition with multiple attempts (10 retries, 50ms interval)
+
 - ✅ **Client Portal with JWT Authentication** (/client-portal)
   - Email/password login form with registration option
   - "Try Demo Account" button for testing
