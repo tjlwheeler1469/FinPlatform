@@ -2792,7 +2792,7 @@ async def financial_advisor_chat(request: ChatMessage):
     anthropic_key = os.environ.get('ANTHROPIC_API_KEY')
     emergent_key = os.environ.get('EMERGENT_LLM_KEY')
     
-    has_ai = openai_key or anthropic_key or emergent_key
+    has_ai = bool(openai_key or anthropic_key or emergent_key)
     
     if has_ai:
         # TODO: Implement actual LLM integration
