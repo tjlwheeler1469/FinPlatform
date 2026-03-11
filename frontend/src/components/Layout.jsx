@@ -61,11 +61,12 @@ const navGroups = [
   {
     name: "Overview",
     items: [
+      { path: "/daily-briefing", label: "Daily Briefing", icon: Sun, title: "Daily Briefing", badge: "New" },
       { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard, title: "Dashboard" },
       { path: "/overview", label: "Family Overview", icon: Eye, title: "Family Overview" },
       { path: "/family-wealth", label: "Wealth Dashboard", icon: TrendingUp, title: "Family Wealth Dashboard" },
       { path: "/recommendations", label: "Recommendations", icon: Lightbulb, title: "Financial Recommendations" },
-      { path: "/copilot", label: "AI Copilot", icon: Sparkles, title: "AI Copilot", badge: "New" },
+      { path: "/copilot", label: "AI Copilot", icon: Sparkles, title: "AI Copilot" },
     ]
   },
   {
@@ -126,6 +127,8 @@ const navGroups = [
   {
     name: "Adviser Tools",
     items: [
+      { path: "/adviser-dashboard", label: "Adviser Dashboard", icon: Briefcase, title: "Adviser Dashboard", badge: "New" },
+      { path: "/client-portal", label: "Client Portal", icon: UserCircle, title: "Client Portal" },
       { path: "/collaboration", label: "Collaboration", icon: UserPlus, title: "Collaboration" },
       { path: "/statement-of-advice", label: "SOA Generator", icon: ClipboardList, title: "Statement of Advice" },
     ]
