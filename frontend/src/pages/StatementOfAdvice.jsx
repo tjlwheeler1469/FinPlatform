@@ -420,11 +420,23 @@ This advice is provided by [${soaData.licenseeName || 'Licensee Name'}] (AFSL ${
               <span className="text-sm text-muted-foreground">{Math.round(completionProgress)}%</span>
             </div>
             <Progress value={completionProgress} className="h-2" />
-            {completionProgress < 70 && (
-              <p className="text-xs text-muted-foreground mt-2">
-                Complete at least 70% of required fields to generate the SOA
-              </p>
-            )}
+            <div className="flex items-center justify-between mt-3">
+              {completionProgress < 70 && (
+                <p className="text-xs text-muted-foreground">
+                  Complete at least 70% of required fields to generate the SOA
+                </p>
+              )}
+              <div className="flex items-center gap-2 ml-auto">
+                <Checkbox 
+                  id="soa-acknowledge"
+                  checked={soaData.acknowledged || false}
+                  onCheckedChange={(checked) => updateSOA("acknowledged", checked)}
+                />
+                <label htmlFor="soa-acknowledge" className="text-xs text-muted-foreground cursor-pointer">
+                  I confirm this advice meets ASIC RG 175 and best interests duty requirements
+                </label>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
