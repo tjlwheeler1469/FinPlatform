@@ -793,9 +793,11 @@ function App() {
     <div className="App min-h-screen bg-background">
       <BrowserRouter>
         <PortfolioProvider>
-          <ComplianceModal />
-          <AppRouter />
-          <Toaster position="top-right" richColors />
+          <NotificationsProvider>
+            <ComplianceModal />
+            <AppRouter />
+            <Toaster position="top-right" richColors />
+          </NotificationsProvider>
         </PortfolioProvider>
       </BrowserRouter>
     </div>
