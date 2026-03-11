@@ -176,11 +176,18 @@ const Layout = ({ children }) => {
 
   // Preserve sidebar scroll position on navigation
   useEffect(() => {
-    // Use setTimeout with a small delay to ensure DOM is fully ready before restoring scroll
-    const restoreScroll = () => {
+    // Save current scroll position before navigation
+    const savedScrollPosition = scrollPositionRef.current;
+    
+    // Use multiple attempts to restore scroll position with increasing delays
+    const restoreScroll = (attempts = 0) => {
       const sidebar = sidebarNavRef.current;
-      if (sidebar && scrollPositionRef.current > 0) {
-        sidebar.scrollTop = scrollPositionRef.current;
+      if (sidebar && savedScrollPosition > 0) {
+        sidebar.scrollTop = savedScrollPosition;
+        // If scroll didn't apply and we have attempts left, try again
+        if (sidebar.scrollTop !== savedScrollPosition && attempts < 3) {
+          requestAnimationFrame(() => restoreScroll(attempts + 1));
+        }
       }
     };
     
@@ -190,13 +197,14 @@ const Layout = ({ children }) => {
       mainContent.scrollTo(0, 0);
     }
     
-    // Restore sidebar scroll after a small delay to ensure DOM is ready
-    // Using setTimeout with 20ms delay to fix timing race condition
-    const timeoutId = setTimeout(() => {
-      requestAnimationFrame(restoreScroll);
-    }, 20);
+    // Restore sidebar scroll with multiple timing strategies
+    // Immediate attempt
+    requestAnimationFrame(() => {
+      restoreScroll(0);
+      // Backup attempt after a delay
+      setTimeout(() => restoreScroll(0), 50);
+    });
     
-    return () => clearTimeout(timeoutId);
   }, [location.pathname]);
 
   // Save sidebar scroll position on scroll
