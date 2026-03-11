@@ -66,9 +66,35 @@ const COLORS = ['#0F392B', '#D4AF37', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'
 
 const FinancialRecommendations = () => {
   const { portfolio } = usePortfolio();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
   const [monteCarloData, setMonteCarloData] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Action links for recommendations
+  const ACTION_LINKS = {
+    "Rebalance portfolio": "/strategic-planning",
+    "Review asset allocation": "/strategic-planning",
+    "Continue monitoring": "/dashboard",
+    "Consider debt reduction strategy": "/loan-calculator",
+    "Review loan terms annually": "/loan-calculator",
+    "Consider investment leverage": "/strategic-planning",
+    "Add missing asset classes": "/share-portfolio",
+    "Add international ETFs": "/share-portfolio",
+    "Annual rebalancing": "/strategic-planning",
+    "Build cash reserves": "/budget",
+    "Deploy idle cash": "/share-portfolio",
+    "Maintain current levels": "/dashboard",
+    "Tax optimization review": "/tax-analysis-sync",
+    "Annual tax planning": "/tax-calendar",
+    "Review super contributions": "/smsf-optimizer",
+    "Update depreciation report": "/property-portfolio"
+  };
+
+  const handleActionClick = (action) => {
+    const path = ACTION_LINKS[action] || "/dashboard";
+    navigate(path);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
