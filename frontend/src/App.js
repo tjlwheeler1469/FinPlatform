@@ -731,6 +731,7 @@ const AppRouter = () => {
       <Route path="/trust-distributions" element={<TrustDistributionAnalysis />} />
       <Route path="/recommendations" element={<FinancialRecommendations />} />
       <Route path="/tax-calendar" element={<TaxCalendar />} />
+      <Route path="/share-portfolio" element={<SharePortfolio />} />
     </Routes>
   );
 };

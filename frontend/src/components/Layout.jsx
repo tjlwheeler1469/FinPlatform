@@ -29,7 +29,8 @@ import {
   CalendarDays,
   Save,
   AlertCircle,
-  Eye
+  Eye,
+  LineChart
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -60,6 +61,12 @@ const navGroups = [
     items: [
       { path: "/property-portfolio", label: "Properties", icon: Building2, title: "Property Portfolio" },
       { path: "/property-comparison", label: "Property Comparison", icon: Home, title: "Property Comparison" },
+    ]
+  },
+  {
+    name: "Shares",
+    items: [
+      { path: "/share-portfolio", label: "Share Portfolio", icon: LineChart, title: "Share Portfolio" },
     ]
   },
   {
