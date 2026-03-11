@@ -176,6 +176,9 @@ Build an app that analyses all options for personal and business investment in A
 33. ~~Adviser Dashboard~~ ✅ DONE (December 2025) - Multi-client management with KPIs and compliance tracking
 34. ~~Client Portal~~ ✅ DONE (December 2025) - Simplified client view with goals and documents
 35. ~~Dual-Mode Navigation~~ ✅ DONE (December 2025) - Personal/Adviser/Client mode switching with distinct navigation
+36. ~~Client Portal Authentication~~ ✅ DONE (March 2026) - JWT-based login/register with demo mode
+37. ~~Practice Management~~ ✅ DONE (March 2026) - Tasks, Meetings, Time Tracking, Billing, Compliance
+38. ~~Remember Mode Choice~~ ✅ DONE (March 2026) - Auto-redirect to preferred mode on app load
 
 ## Latest Session Updates (December 2025 - Current)
 
