@@ -132,21 +132,62 @@ const getMarginalRate = (income) => {
 const COLORS = ['#0F392B', '#D4AF37', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'];
 
 const TrustDistributionAnalysis = () => {
-  const { portfolio } = usePortfolio();
+  const { 
+    familyMembers, 
+    updateFamilyMember, 
+    addFamilyMember, 
+    removeFamilyMember,
+    trust,
+    updateTrust
+  } = usePortfolio();
   
-  // Trust configuration
-  const [trustIncome, setTrustIncome] = useState(150000);
-  const [trustType, setTrustType] = useState("discretionary");
-  
-  // Beneficiaries with their existing income
-  const [beneficiaries, setBeneficiaries] = useState([
-    { id: 1, name: "James Wheeler", type: "individual", existingIncome: 120000, distribution: 30 },
-    { id: 2, name: "Sarah Wheeler", type: "individual", existingIncome: 65000, distribution: 30 },
-    { id: 3, name: "Emily Wheeler (Adult)", type: "individual", existingIncome: 25000, distribution: 20 },
-    { id: 4, name: "Michael Wheeler (Adult)", type: "individual", existingIncome: 0, distribution: 20 }
-  ]);
+  // Trust configuration - linked to shared trust state
+  const trustIncome = trust.netIncome;
+  const setTrustIncome = (value) => updateTrust({ netIncome: Number(value) });
+  const trustType = trust.type;
+  const setTrustType = (value) => updateTrust({ type: value });
 
   const [showDetailed, setShowDetailed] = useState(null);
+
+  // Get beneficiaries from shared family members
+  const beneficiaries = familyMembers.filter(m => m.isTrustBeneficiary).map(m => ({
+    id: m.id,
+    name: m.name,
+    type: "individual",
+    existingIncome: m.taxableIncome || 0,
+    distribution: m.trustDistribution || 0
+  }));
+
+  // Update distribution for a beneficiary
+  const updateDistribution = (id, value) => {
+    updateFamilyMember(id, { trustDistribution: Math.max(0, Math.min(100, value)) });
+  };
+
+  // Update existing income for a beneficiary
+  const updateExistingIncome = (id, value) => {
+    updateFamilyMember(id, { taxableIncome: Number(value) });
+  };
+
+  // Add beneficiary (set isTrustBeneficiary to true for existing member)
+  const addBeneficiary = () => {
+    const nonBeneficiaries = familyMembers.filter(m => !m.isTrustBeneficiary);
+    if (nonBeneficiaries.length > 0) {
+      updateFamilyMember(nonBeneficiaries[0].id, { isTrustBeneficiary: true, trustDistribution: 0 });
+    } else {
+      addFamilyMember({
+        name: `Beneficiary ${familyMembers.length + 1}`,
+        relationship: "other",
+        taxableIncome: 0,
+        isTrustBeneficiary: true,
+        trustDistribution: 0
+      });
+    }
+  };
+
+  // Remove beneficiary (set isTrustBeneficiary to false)
+  const removeBeneficiary = (id) => {
+    updateFamilyMember(id, { isTrustBeneficiary: false, trustDistribution: 0 });
+  };
 
   // Calculate distributions and tax for each beneficiary
   const calculateBeneficiaryTax = (beneficiary) => {
