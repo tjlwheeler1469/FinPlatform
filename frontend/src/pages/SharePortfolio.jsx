@@ -284,7 +284,16 @@ const SharePortfolio = () => {
               Manage personal, joint, and company share holdings
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
+            <Button 
+              variant="outline" 
+              onClick={handleRefreshPrices}
+              disabled={refreshing}
+              data-testid="refresh-prices-btn"
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+              {refreshing ? 'Refreshing...' : 'Refresh Prices'}
+            </Button>
             <Button variant="outline" onClick={syncDividendsToBudget}>
               Sync to Budget
             </Button>
@@ -293,6 +302,26 @@ const SharePortfolio = () => {
             </Button>
           </div>
         </div>
+
+        {/* Data Source Indicator */}
+        {lastRefreshed && (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            {isMockData ? (
+              <WifiOff className="h-4 w-4 text-amber-500" />
+            ) : (
+              <Wifi className="h-4 w-4 text-green-500" />
+            )}
+            <span>
+              {isMockData ? 'Simulated prices' : 'Live prices'} • 
+              Last updated: {lastRefreshed.toLocaleTimeString()}
+            </span>
+            {isMockData && (
+              <Badge variant="outline" className="text-amber-600 border-amber-300">
+                Demo Mode
+              </Badge>
+            )}
+          </div>
+        )}
 
         {/* Summary Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
