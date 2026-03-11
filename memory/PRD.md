@@ -239,6 +239,10 @@ Build an app that analyses all options for personal and business investment in A
   - Stock sell scenario with CGT (50% discount) calculation
   - 12-month cashflow projection chart
   - Chat interface with message history
+  - **15 Global Languages**: English, Chinese, Spanish, Hindi, Arabic, Portuguese, Bengali, Russian, Japanese, German, French, Korean, Vietnamese, Italian, Turkish
+  - **Smart Alerts**: Context-aware notifications for BAS due dates, tax deadlines, risk profile completion, high debt ratio, super contribution deadlines
+  - **Knowledge Base**: 20+ Australian financial concepts explained (franking credits, negative gearing, CGT, ETFs, super contributions, etc.)
+  - **How-To Guides**: Step-by-step guidance for tax reduction, investing, retirement planning
 
 - ✅ **Navigation Updates**
   - New "Adviser Tools" section with Collaboration and SOA Generator
