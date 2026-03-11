@@ -769,6 +769,8 @@ const AppRouter = () => {
       <Route path="/collaboration" element={<Collaboration />} />
       <Route path="/risk-profiler" element={<RiskProfiler />} />
       <Route path="/statement-of-advice" element={<StatementOfAdvice />} />
+      <Route path="/onboarding" element={<ClientOnboarding />} />
+      <Route path="/copilot" element={<Copilot />} />
     </Routes>
   );
 };
