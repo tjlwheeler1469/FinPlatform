@@ -175,6 +175,7 @@ Build an app that analyses all options for personal and business investment in A
 32. ~~Daily Briefing~~ ✅ DONE (December 2025) - Personalized daily summary with AI recommendations
 33. ~~Adviser Dashboard~~ ✅ DONE (December 2025) - Multi-client management with KPIs and compliance tracking
 34. ~~Client Portal~~ ✅ DONE (December 2025) - Simplified client view with goals and documents
+35. ~~Dual-Mode Navigation~~ ✅ DONE (December 2025) - Personal/Adviser/Client mode switching with distinct navigation
 
 ## Latest Session Updates (December 2025 - Current)
 
