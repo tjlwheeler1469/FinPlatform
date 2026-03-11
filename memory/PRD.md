@@ -217,6 +217,8 @@ Build an app that analyses all options for personal and business investment in A
   - Generates downloadable SOA text file
   - Saved SOAs tab with export functionality
   - localStorage persistence
+  - **Acknowledgment checkbox visible on first page** (no scrolling required)
+  - Generate button requires checkbox to be checked
 
 - ✅ **Client Onboarding Wizard** (/onboarding)
   - 6-step guided wizard: Welcome → Profile → Risk Assessment → Goals → Review → Complete
