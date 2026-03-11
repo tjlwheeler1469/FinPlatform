@@ -142,6 +142,10 @@ const Layout = ({ children }) => {
   });
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
+  
+  // Ref for sidebar scroll position preservation
+  const sidebarNavRef = useRef(null);
+  const scrollPositionRef = useRef(0);
 
   // Fix page title on navigation
   useEffect(() => {
@@ -153,14 +157,26 @@ const Layout = ({ children }) => {
     }
   }, [location.pathname]);
 
-  // Prevent scroll jump on navigation - keep sidebar position stable
+  // Preserve sidebar scroll position on navigation
   useEffect(() => {
-    // Get main content element and scroll it to top on route change
+    // Save current scroll position before navigation
+    const sidebar = sidebarNavRef.current;
+    if (sidebar) {
+      // Restore saved scroll position after render
+      sidebar.scrollTop = scrollPositionRef.current;
+    }
+    
+    // Scroll main content to top on route change
     const mainContent = document.getElementById('main-content');
     if (mainContent) {
       mainContent.scrollTo(0, 0);
     }
   }, [location.pathname]);
+
+  // Save sidebar scroll position on scroll
+  const handleSidebarScroll = (e) => {
+    scrollPositionRef.current = e.target.scrollTop;
+  };
 
   // Toggle group expansion
   const toggleGroup = (groupName) => {
