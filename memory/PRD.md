@@ -275,4 +275,18 @@ Build an app that analyses all options for personal and business investment in A
   - Primary earner and spouse linked from Income Splitting
   - Income data syncs with Household Budget
   - Tax calculations update across all pages
-
+- ✅ **Share Portfolio Page** (/share-portfolio) - December 2025:
+  - Personal, joint, and company share ownership structures
+  - Summary cards: Total Value, Unrealised Gain/Loss, Annual Dividends, Company Franking
+  - Ownership tabs (All, Personal, Joint, Company) for filtering
+  - CRUD operations: Add Holding modal, Delete share
+  - Ownership Distribution pie chart
+  - Annual Dividends breakdown by ownership type
+  - "Sync to Budget" button updates household budget with dividend income
+  - Company Dividend Distribution sliders (To Personal, To Trust, Retained)
+  - Distribute Dividends button updates trust income and franking account
+  - ATO Compliance notice for franking credits
+  - Integrated into navigation under new "Shares" group
+- ✅ **Codebase Cleanup** - December 2025:
+  - Deleted redundant CGTCalculator.jsx and CGTEventTracker.jsx (merged into CGT.jsx)
+  - Added redirects from /cgt-calculator and /cgt-events to /cgt
