@@ -12,7 +12,6 @@ import MonteCarloSimulation from "@/pages/MonteCarloSimulation";
 import LoanCalculator from "@/pages/LoanCalculator";
 import SavedScenarios from "@/pages/SavedScenarios";
 import ScenarioBuilder from "@/pages/ScenarioBuilder";
-import CGTCalculator from "@/pages/CGTCalculator";
 import CGT from "@/pages/CGT";
 import HistoricalTaxComparison from "@/pages/HistoricalTaxComparison";
 import SMSFOptimizer from "@/pages/SMSFOptimizer";
@@ -25,7 +24,6 @@ import DividendReinvestment from "@/pages/DividendReinvestment";
 import HouseholdBudget from "@/pages/HouseholdBudget";
 import IncomeSplitting from "@/pages/IncomeSplitting";
 import Division7ACalculator from "@/pages/Division7ACalculator";
-import CGTEventTracker from "@/pages/CGTEventTracker";
 import TrustDistributionAnalysis from "@/pages/TrustDistributionAnalysis";
 import FinancialRecommendations from "@/pages/FinancialRecommendations";
 import TaxCalendar from "@/pages/TaxCalendar";
@@ -715,7 +713,6 @@ const AppRouter = () => {
       <Route path="/scenarios" element={<SavedScenarios />} />
       <Route path="/scenario-builder" element={<ScenarioBuilder />} />
       <Route path="/scenario-builder/:scenarioId" element={<ScenarioBuilder />} />
-      <Route path="/cgt-calculator" element={<CGTCalculator />} />
       <Route path="/cgt" element={<CGT />} />
       <Route path="/historical-tax" element={<HistoricalTaxComparison />} />
       <Route path="/smsf-optimizer" element={<SMSFOptimizer />} />
@@ -727,7 +724,6 @@ const AppRouter = () => {
       <Route path="/dividend-reinvestment" element={<DividendReinvestment />} />
       <Route path="/income-splitting" element={<IncomeSplitting />} />
       <Route path="/division-7a" element={<Division7ACalculator />} />
-      <Route path="/cgt-events" element={<CGTEventTracker />} />
       <Route path="/trust-distributions" element={<TrustDistributionAnalysis />} />
       <Route path="/recommendations" element={<FinancialRecommendations />} />
       <Route path="/tax-calendar" element={<TaxCalendar />} />
