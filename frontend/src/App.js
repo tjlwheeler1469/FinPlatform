@@ -486,13 +486,15 @@ const PortfolioProvider = ({ children }) => {
       trust,
       budget,
       portfolio,
+      sharePortfolio,
+      company,
       lastSaved: new Date().toISOString()
     };
     localStorage.setItem("wheelerFamilyData", JSON.stringify(dataToSave));
     setHasUnsavedChanges(false);
     setLastSaved(dataToSave.lastSaved);
     toast.success("All changes saved successfully");
-  }, [familyMembers, trust, budget, portfolio]);
+  }, [familyMembers, trust, budget, portfolio, sharePortfolio, company]);
 
   // Reset to defaults
   const resetToDefaults = useCallback(() => {
@@ -500,9 +502,90 @@ const PortfolioProvider = ({ children }) => {
     setTrust(DEFAULT_TRUST);
     setBudget(DEFAULT_BUDGET);
     setPortfolio(DEFAULT_PORTFOLIO);
+    setSharePortfolio(DEFAULT_SHARE_PORTFOLIO);
+    setCompany(DEFAULT_COMPANY);
     setHasUnsavedChanges(true);
     toast.info("Reset to default values");
   }, []);
+
+  // Share Portfolio functions
+  const addShare = useCallback((share) => {
+    const newShare = {
+      id: Date.now(),
+      ...share
+    };
+    setSharePortfolio(prev => [...prev, newShare]);
+    setHasUnsavedChanges(true);
+    return newShare;
+  }, []);
+
+  const updateShare = useCallback((id, updates) => {
+    setSharePortfolio(prev => prev.map(s => 
+      s.id === id ? { ...s, ...updates } : s
+    ));
+    setHasUnsavedChanges(true);
+  }, []);
+
+  const removeShare = useCallback((id) => {
+    setSharePortfolio(prev => prev.filter(s => s.id !== id));
+    setHasUnsavedChanges(true);
+  }, []);
+
+  // Update company
+  const updateCompany = useCallback((updates) => {
+    setCompany(prev => ({ ...prev, ...updates }));
+    setHasUnsavedChanges(true);
+  }, []);
+
+  // Calculate dividend income by ownership type
+  const getDividendsByOwnership = useCallback(() => {
+    const dividends = {
+      personal: {}, // { memberId: { gross, franking, net } }
+      joint: { gross: 0, franking: 0, net: 0 },
+      company: { gross: 0, franking: 0, net: 0 }
+    };
+
+    sharePortfolio.forEach(share => {
+      const grossDividend = share.quantity * share.currentPrice * (share.dividendYield / 100);
+      const frankingCredit = grossDividend * (share.frankingPercentage / 100) * (company.taxRate / (1 - company.taxRate));
+      
+      if (share.ownership === 'personal') {
+        const ownerId = share.ownerId;
+        if (!dividends.personal[ownerId]) {
+          dividends.personal[ownerId] = { gross: 0, franking: 0, net: 0 };
+        }
+        dividends.personal[ownerId].gross += grossDividend;
+        dividends.personal[ownerId].franking += frankingCredit;
+        dividends.personal[ownerId].net += grossDividend + frankingCredit;
+      } else if (share.ownership === 'joint') {
+        dividends.joint.gross += grossDividend;
+        dividends.joint.franking += frankingCredit;
+        dividends.joint.net += grossDividend + frankingCredit;
+      } else if (share.ownership === 'company') {
+        dividends.company.gross += grossDividend;
+        dividends.company.franking += frankingCredit;
+        dividends.company.net += grossDividend + frankingCredit;
+      }
+    });
+
+    return dividends;
+  }, [sharePortfolio, company.taxRate]);
+
+  // Get shares by ownership type
+  const getSharesByOwnership = useCallback((ownership) => {
+    return sharePortfolio.filter(s => s.ownership === ownership);
+  }, [sharePortfolio]);
+
+  // Calculate total portfolio value by ownership
+  const getPortfolioValueByOwnership = useCallback(() => {
+    const values = { personal: 0, joint: 0, company: 0, total: 0 };
+    sharePortfolio.forEach(share => {
+      const value = share.quantity * share.currentPrice;
+      values[share.ownership] += value;
+      values.total += value;
+    });
+    return values;
+  }, [sharePortfolio]);
 
   // Get trust beneficiaries
   const getTrustBeneficiaries = useCallback(() => {
