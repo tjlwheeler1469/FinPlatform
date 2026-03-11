@@ -65,12 +65,14 @@ const navGroups = [
     items: [
       { path: "/property-portfolio", label: "Properties", icon: Building2, title: "Property Portfolio" },
       { path: "/property-comparison", label: "Property Comparison", icon: Home, title: "Property Comparison" },
+      { path: "/rental-yield-optimizer", label: "Yield Optimizer", icon: Target, title: "Rental Yield Optimizer" },
     ]
   },
   {
     name: "Shares",
     items: [
       { path: "/share-portfolio", label: "Share Portfolio", icon: LineChart, title: "Share Portfolio" },
+      { path: "/holdings-performance", label: "Performance", icon: Activity, title: "Holdings Performance" },
     ]
   },
   {
