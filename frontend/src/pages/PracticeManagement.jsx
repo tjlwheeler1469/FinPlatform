@@ -38,10 +38,14 @@ import {
   Pause,
   ArrowUpRight,
   TrendingUp,
-  BarChart3
+  BarChart3,
+  Download,
+  Settings
 } from "lucide-react";
 import { toast } from "sonner";
 import ChartContainer from "@/components/ChartContainer";
+import { CalendarExportButton, CalendarBulkExportButton } from "@/components/CalendarIntegration";
+import CalendarIntegrationSettings from "@/components/CalendarIntegration";
 import {
   BarChart,
   Bar,
