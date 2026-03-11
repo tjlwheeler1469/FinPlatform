@@ -191,6 +191,26 @@ Build an app that analyses all options for personal and business investment in A
   - Related Pages links (Tax Analysis, Income Splitting, Trust Distribution, Share Portfolio)
   - Accessible via eye button from Tax Analysis Sync page
 
+- ✅ **Family Wealth Dashboard** (/family-wealth) - Combined wealth, tax savings & inter-generational planning
+  - Summary cards: Total Net Worth ($3.27M), Total Assets, Total Debt, Annual Tax Savings ($53K), Total Super
+  - **Combined Wealth tab**:
+    - Wealth Composition pie chart (Property Equity, Shares, Super, Cash, Trust Assets, Company)
+    - Wealth by Family Member bar chart (Super + Shares breakdown)
+    - Wealth Projection chart (configurable 10/20/30 years, 6% growth)
+    - Clickable member list linking to individual profiles
+  - **Tax Savings tab**:
+    - Total Annual Tax Savings ($53,505 for Wheeler Family)
+    - Breakdown bar chart by strategy
+    - Active strategies: Income Splitting, Trust Distributions, Super Contributions, Franking Credits, Negative Gearing
+  - **Wealth Transfer tab**:
+    - Estate summary: Current Value, Projected Value at Transfer Age, Years to Transfer, Per Beneficiary
+    - Estate Transfer Age slider (70-100)
+    - Annual Gifting slider ($0-$100K)
+    - Wealth transfer strategies with priority badges (High/Medium)
+    - Next Generation Beneficiaries cards with estimated inheritance
+    - Tax considerations (Super death tax, Property CGT)
+  - Related Pages links
+
 ## Previous Session (December 2025)
 - ✅ **Share Portfolio** (/share-portfolio) - Personal, joint, company ownership with dividends
 - ✅ **Calculation Methodology** (/calculation-methodology) - ATO/ASIC references for all calculations
