@@ -905,6 +905,8 @@ const FinancialRecommendations = () => {
             </div>
           </TabsContent>
         </Tabs>
+
+        <ComplianceFooter />
       </div>
     </Layout>
   );
