@@ -131,7 +131,8 @@ Build an app that analyses all options for personal and business investment in A
 
 ### P3 - Nice to Have
 - Tax planning calendar with due dates ✅ DONE
-- Bank Feeds integration (Plaid) - User opted out
+- Bank Feeds integration (Plaid) ✅ DONE (Sandbox mode)
+- Xero/MYOB Direct API ✅ DONE (Sandbox mode)
 - Mobile app version ✅ DONE (responsive)
 - Share scenarios with advisors
 
@@ -158,18 +159,59 @@ Build an app that analyses all options for personal and business investment in A
 20. ~~Real-time Stock Data Integration~~ ✅ DONE (December 2025) - Mock data (Alpha Vantage ready)
 21. ~~Lifecycle Planning~~ ✅ DONE (December 2025) - Retirement, Estate, Goals
 22. ~~AI Financial Advisor Chatbot~~ ✅ DONE (December 2025) - Demo mode (LLM ready)
+23. ~~Sidebar Scroll Fix~~ ✅ DONE (December 2025) - Using requestAnimationFrame
+24. ~~Bank Feeds (Plaid)~~ ✅ DONE (December 2025) - Sandbox mode with 8 AU banks
+25. ~~Xero/MYOB Direct API~~ ✅ DONE (December 2025) - OAuth sandbox with mock data
 
 ## Latest Session Updates (December 2025 - Current)
 
-### New Features Implemented
+### New Features Implemented (Latest)
 
-- ✅ **Real-time Stock Data Integration** ✅ DONE (December 2025) - Mock data (Alpha Vantage ready)
-21. ✅ **Lifecycle Planning** ✅ DONE (December 2025) - Retirement, Estate, Goals
-22. ✅ **AI Financial Advisor Chatbot** ✅ DONE (December 2025) - Demo mode (LLM ready)
+- ✅ **Bank Feeds via Plaid** (/bank-feeds)
+  - Sandbox mode with 8 Australian banks:
+    - CommBank, Westpac, NAB, ANZ
+    - Macquarie Bank, ING Australia
+    - Bendigo Bank, Bankwest
+  - Mock account connections with balance display
+  - Accounts and Transactions tabs
+  - Import Balances to Budget functionality
+  - Ready for production Plaid API keys
 
-## Latest Session Updates (December 2025 - Current)
+- ✅ **Xero/MYOB Direct API Integration** (/accounting-integrations)
+  - OAuth 2.0 sandbox simulation
+  - Xero: Mock Wheeler Family Trust data with accounts
+  - MYOB: Mock Wheeler Property Holdings data
+  - Synced Data Preview with accounts table
+  - Production Setup instructions included
+  - Sync and Import functionality
 
-### New Features Implemented
+- ✅ **Tax Calendar API Integration**
+  - Fetches from /api/notifications/tax-deadlines
+  - Auto-populated ATO deadlines:
+    - BAS Q1-Q4 (Quarterly)
+    - Super Guarantee Q1-Q4
+    - PAYG Installment Q1-Q4
+    - Individual/Company Tax Return
+    - FBT Return and Installments
+  - Category filters for all deadline types
+  - ComplianceFooter added
+
+- ✅ **Sidebar Scroll Position Fix**
+  - Uses useRef and requestAnimationFrame
+  - Preserves scroll position on navigation
+  - Main content scrolls to top on route change
+
+- ✅ **Navigation Updates**
+  - New "Data & Integrations" section:
+    - Bank Feeds (Plaid)
+    - Xero / MYOB
+    - Import Data
+    - Export Data
+    - Reports
+    - Saved Scenarios
+    - Methodology
+
+### Previous Features (This Session)
 
 - ✅ **AU Regulatory Compliance (ASIC/ATO/Corporations Act)**
   - ComplianceModal shows on first visit with:
