@@ -461,9 +461,7 @@ const TrustDistributionAnalysis = () => {
                       <div>
                         <Input
                           value={result.name}
-                          onChange={(e) => setBeneficiaries(prev => prev.map(b => 
-                            b.id === result.id ? { ...b, name: e.target.value } : b
-                          ))}
+                          onChange={(e) => updateFamilyMember(result.id, { name: e.target.value })}
                           className="font-semibold border-0 p-0 h-auto focus-visible:ring-0"
                         />
                         <p className="text-sm text-muted-foreground">
@@ -509,9 +507,7 @@ const TrustDistributionAnalysis = () => {
                       <Input
                         type="number"
                         value={result.existingIncome}
-                        onChange={(e) => setBeneficiaries(prev => prev.map(b => 
-                          b.id === result.id ? { ...b, existingIncome: Number(e.target.value) } : b
-                        ))}
+                        onChange={(e) => updateExistingIncome(result.id, Number(e.target.value))}
                         className="w-32 h-6 text-xs"
                       />
                     </div>
