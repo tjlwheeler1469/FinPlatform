@@ -140,9 +140,11 @@ Build an app that analyses all options for personal and business investment in A
 8. ~~Report risk colors with clickable links~~ ✅ DONE
 9. ~~Shared family data model with Save button~~ ✅ DONE
 10. ~~Family Overview with 12-month cashflow~~ ✅ DONE
-11. Advisor Connect - Book time with a financial advisor
-12. Export to accounting software
-13. Superannuation guarantee calculator
+11. ~~Share Portfolio page~~ ✅ DONE (December 2025)
+12. Advisor Connect - Book time with a financial advisor
+13. Export to accounting software (CSV/PDF for Xero/MYOB)
+14. Superannuation guarantee calculator
+15. Data Sync for Tax Analysis - Ensure consistent individual data across modules
 
 ## Completed This Session (March 2026)
 - ✅ Integrated Salary Packaging Calculator (/salary-packaging)
