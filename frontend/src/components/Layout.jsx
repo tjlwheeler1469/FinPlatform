@@ -30,7 +30,11 @@ import {
   Save,
   AlertCircle,
   Eye,
-  LineChart
+  LineChart,
+  Download,
+  BookOpen,
+  Target,
+  Activity
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
