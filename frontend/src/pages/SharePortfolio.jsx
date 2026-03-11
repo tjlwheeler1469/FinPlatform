@@ -352,14 +352,33 @@ const SharePortfolio = () => {
             </p>
           </div>
           <div className="flex gap-2 flex-wrap">
+            {/* Live Updates Toggle */}
+            <Button 
+              variant={isLiveUpdates ? "default" : "outline"}
+              onClick={toggleLiveUpdates}
+              className={isLiveUpdates ? "bg-green-600 hover:bg-green-700" : ""}
+              data-testid="live-updates-btn"
+            >
+              {isLiveUpdates ? (
+                <>
+                  <Radio className="h-4 w-4 mr-2 animate-pulse" />
+                  Live • {formatLastUpdate()}
+                </>
+              ) : (
+                <>
+                  <Play className="h-4 w-4 mr-2" />
+                  Start Live
+                </>
+              )}
+            </Button>
             <Button 
               variant="outline" 
               onClick={handleRefreshPrices}
-              disabled={refreshing}
+              disabled={refreshing || isLiveUpdates}
               data-testid="refresh-prices-btn"
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-              {refreshing ? 'Refreshing...' : 'Refresh Prices'}
+              {refreshing ? 'Refreshing...' : 'Refresh'}
             </Button>
             <Button variant="outline" onClick={syncDividendsToBudget}>
               Sync to Budget
@@ -371,24 +390,38 @@ const SharePortfolio = () => {
         </div>
 
         {/* Data Source Indicator */}
-        {lastRefreshed && (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            {isMockData ? (
-              <WifiOff className="h-4 w-4 text-amber-500" />
-            ) : (
-              <Wifi className="h-4 w-4 text-green-500" />
-            )}
-            <span>
-              {isMockData ? 'Simulated prices' : 'Live prices'} • 
-              Last updated: {lastRefreshed.toLocaleTimeString()}
-            </span>
-            {isMockData && (
-              <Badge variant="outline" className="text-amber-600 border-amber-300">
-                Demo Mode
-              </Badge>
-            )}
-          </div>
-        )}
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          {isLiveUpdates ? (
+            <>
+              <Radio className="h-4 w-4 text-green-500 animate-pulse" />
+              <span className="text-green-600 font-medium">Live updates active</span>
+              <span>• Updates every 30 seconds</span>
+              {lastRefreshed && <span>• Last: {lastRefreshed.toLocaleTimeString()}</span>}
+            </>
+          ) : lastRefreshed ? (
+            <>
+              {isMockData ? (
+                <WifiOff className="h-4 w-4 text-amber-500" />
+              ) : (
+                <Wifi className="h-4 w-4 text-green-500" />
+              )}
+              <span>
+                {isMockData ? 'Simulated prices' : 'Live prices'} • 
+                Last updated: {lastRefreshed.toLocaleTimeString()}
+              </span>
+            </>
+          ) : (
+            <>
+              <WifiOff className="h-4 w-4 text-gray-400" />
+              <span>Prices not refreshed yet</span>
+            </>
+          )}
+          {isMockData && !isLiveUpdates && (
+            <Badge variant="outline" className="text-amber-600 border-amber-300">
+              Demo Mode
+            </Badge>
+          )}
+        </div>
 
         {/* Summary Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
