@@ -179,13 +179,42 @@ Build an app that analyses all options for personal and business investment in A
 
 ## Latest Session Updates (December 2025 - Current)
 
-### Dual-Mode Architecture (December 2025 - LATEST)
+### Session Continuation (March 2026 - LATEST)
+
+- ✅ **Client Portal with JWT Authentication** (/client-portal)
+  - Email/password login form with registration option
+  - "Try Demo Account" button for testing
+  - JWT token-based authentication via backend API
+  - Read-only dashboard with 4 tabs: Summary, Reports, Goals, Adviser
+  - Logout functionality that clears session
+  - Adviser code field for linking to adviser on registration
+  - Backend endpoints: /api/client/register, /api/client/login, /api/client/me, /api/client/logout
+
+- ✅ **Practice Management Module** (/practice-management)
+  - **Dashboard**: KPIs (Urgent Tasks, Hours This Month, Billable Value, Outstanding), Weekly Hours chart, Time Breakdown pie chart
+  - **Tasks**: Task list with priority badges, status tracking, New Task dialog
+  - **Meetings**: Meeting scheduler with client selection, duration, location
+  - **Time Tracking**: Timer functionality, time entry logging, billable/non-billable hours
+  - **Billing**: Invoice management with status tracking (Draft, Sent, Paid, Overdue)
+  - **Compliance**: AFSL compliance audit trail, compliance records by client
+  - Backend endpoints: /api/practice/tasks, /api/practice/meetings, /api/practice/time-entries, /api/practice/invoices, /api/practice/compliance
+
+- ✅ **Mode Selector "Remember my choice" Enhancement**
+  - Checkbox to remember mode preference in localStorage
+  - Auto-redirect to remembered mode on app load
+  - Clear preference when checkbox is unchecked
+
+- ✅ **File Cleanup**
+  - Merged ClientPortal.jsx and ClientPortalSimple.jsx into ClientPortalMerged.jsx
+  - Deleted redundant client portal files
+
+### Dual-Mode Architecture (December 2025)
 
 - ✅ **Mode-Based Navigation System**
   - Mode selector dropdown in sidebar (desktop) and mobile slide-out menu
   - Three modes: Personal Mode, Adviser Mode, Client View
   - Personal Mode: 7 navigation groups (Overview, Planning, Property, Shares, Tax & CGT, Calculators, Data & Reports)
-  - Adviser Mode: 6 navigation groups (Adviser Hub, Client Tools, Analysis, Portfolios, Calculators, Reports)
+  - Adviser Mode: 7 navigation groups (Adviser Hub with Practice Management, Client Tools, Analysis, Portfolios, Calculators, Reports)
   - Client View: Redirects to standalone /client-portal page
   - localStorage persistence with 'app_mode' key
   - Mode Selector landing page at /mode-selector
@@ -195,9 +224,10 @@ Build an app that analyses all options for personal and business investment in A
   - Personal Use card with feature highlights
   - Adviser Portal card with "Pro" badge
   - Client Portal access link at bottom
+  - "Remember my choice" checkbox
   - Branded with Wheeler Financial theme
 
-### New Features Implemented (Latest - December 2025)
+### New Features Implemented (December 2025)
 
 - ✅ **Risk Profiler** (/risk-profiler)
   - 8-question ASIC/FSC aligned questionnaire
