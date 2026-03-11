@@ -667,6 +667,21 @@ const PortfolioProvider = ({ children }) => {
       updateBudget,
       setBudgetFrequency,
       
+      // Share Portfolio data
+      sharePortfolio,
+      setSharePortfolio,
+      addShare,
+      updateShare,
+      removeShare,
+      getSharesByOwnership,
+      getDividendsByOwnership,
+      getPortfolioValueByOwnership,
+      
+      // Company data
+      company,
+      setCompany,
+      updateCompany,
+      
       // Derived data helpers
       getPrimaryEarners,
       getTotalFamilyIncome,
