@@ -774,7 +774,7 @@ const PracticeManagement = () => {
                               <SelectValue placeholder="Select client" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="">Internal</SelectItem>
+                              <SelectItem value="internal">Internal</SelectItem>
                               {MOCK_CLIENTS.map(c => (
                                 <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                               ))}
