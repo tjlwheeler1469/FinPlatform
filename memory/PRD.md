@@ -254,4 +254,21 @@ Build an app that analyses all options for personal and business investment in A
   - Recommendations now color-coded: Red (High Risk), Amber (Medium Risk), Green (Low Risk)
   - Clickable recommendations navigate to relevant pages
   - View Details links for each recommendation
+- ✅ **Shared Family Data Model** (December 2025):
+  - Unified PortfolioContext with familyMembers, trust, budget data
+  - Changes sync automatically across Trust Distribution, Income Splitting, Budget
+  - Global Save button in sidebar (appears when hasUnsavedChanges=true)
+  - Data persists to localStorage on Save
+  - Reset to Defaults button available
+- ✅ **Family Overview Page** (/overview):
+  - Holistic view of Wheeler Family finances
+  - 12-Month Cashflow Projection chart (income bars, expense bars, cumulative savings line)
+  - Family members summary with tax calculations
+  - Trust distribution summary
+  - Monthly budget summary with top expenses
+  - Quick links to related pages
+- ✅ **Two-Person Tax Support**:
+  - Primary earner and spouse linked from Income Splitting
+  - Income data syncs with Household Budget
+  - Tax calculations update across all pages
 
