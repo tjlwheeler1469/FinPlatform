@@ -1,0 +1,145 @@
+{
+  "summary": "Tested Family Overview page, shared state, Save button, and quick links. Found critical issues: TrustDistributionAnalysis and HouseholdBudget pages do NOT use shared context - they have local state. IncomeSplitting has a bug showing $NaN for Base Income.",
+
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "IncomeSplitting.jsx",
+        "issue": "Base Income column shows '$NaN' for all family members - code references 'member.income' but context has 'taxableIncome'",
+        "selector": "[data-testid='family-table'] tbody tr td:nth-child(3)",
+        "priority": "HIGH",
+        "fix": "Line 370: Change 'member.income' to 'member.taxableIncome'"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "Family members sync between Income Splitting and Trust Distribution",
+        "issue": "TrustDistributionAnalysis.jsx does NOT use shared familyMembers from context - has its own local state (lines 142-147). Family members do NOT sync between pages.",
+        "affected_selectors": ["[data-testid='beneficiary-distributions']"],
+        "priority": "CRITICAL"
+      },
+      {
+        "flow": "Budget sync with shared context",
+        "issue": "HouseholdBudget.jsx does NOT use shared budget from context - has its own local state (lines 111-144). Budget changes do NOT sync with Family Overview.",
+        "affected_selectors": [],
+        "priority": "HIGH"
+      }
+    ],
+    "design_issues": []
+  },
+
+  "passed_tests": [
+    "Family Overview page (/overview) loads correctly with all sections",
+    "12-month Cashflow Projection chart displays with Income bars (green), Expenses bars (red), and Cumulative Savings line (gold)",
+    "Chart legend shows: Cumulative Savings, Expenses, Income",
+    "Year-End Projection, Annual Savings, and Savings Rate displayed below chart",
+    "Save All button in header works - saves to localStorage and shows success toast",
+    "Sidebar Save button appears when hasUnsavedChanges=true",
+    "Sidebar Save button saves changes and hides after saving",
+    "Unsaved Changes badge appears when changes are made",
+    "Last saved timestamp displays after saving",
+    "Reset button triggers unsaved changes state",
+    "Quick links navigate correctly to Income Splitting, Trust Analysis, Budget, Tax Analysis",
+    "Family Members summary shows all 4 members with income, tax, and net values",
+    "Trust Distribution summary shows trust name, income, and beneficiary percentages",
+    "Budget summary shows monthly income, expenses, and surplus",
+    "Family Overview uses shared familyMembers from context correctly"
+  ],
+
+  "test_report_links": [
+    "/app/test_reports/iteration_8.json"
+  ],
+
+  "action_items": [
+    "CRITICAL: Update TrustDistributionAnalysis.jsx to use shared familyMembers from context instead of local state",
+    "CRITICAL: Update HouseholdBudget.jsx to use shared budget from context instead of local state",
+    "HIGH: Fix IncomeSplitting.jsx line 370 - change 'member.income' to 'member.taxableIncome' to fix $NaN display"
+  ],
+
+  "critical_code_review_comments": [
+    "TrustDistributionAnalysis.jsx (line 135-147): Only uses 'portfolio' from context, has local 'beneficiaries' state that doesn't sync with familyMembers",
+    "HouseholdBudget.jsx (line 108-144): Only uses 'portfolio' from context, has local 'incomes', 'expenses', 'oneOffCosts' state that doesn't sync with shared budget",
+    "IncomeSplitting.jsx (line 370): References 'member.income' but familyMembers have 'taxableIncome' property - causes $NaN display",
+    "The shared context in App.js has familyMembers, trust, budget but TrustDistributionAnalysis and HouseholdBudget don't use them"
+  ],
+
+  "updated_files": [],
+
+  "success_rate": {
+    "backend": "N/A (frontend only testing)",
+    "frontend": "60% - Core features work but shared state sync is broken"
+  },
+
+  "seed_data_creation": "No seed data created - uses localStorage and default values",
+
+  "retest_needed": true,
+
+  "should_main_agent_self_test": false,
+
+  "context_for_next_testing_agent": "Family Overview page works correctly with 12-month cashflow chart. Save button in header and sidebar work. Quick links work. CRITICAL ISSUES: 1) TrustDistributionAnalysis.jsx has local beneficiaries state instead of using shared familyMembers - family members don't sync between pages. 2) HouseholdBudget.jsx has local state instead of using shared budget. 3) IncomeSplitting.jsx shows $NaN for Base Income due to wrong property name (income vs taxableIncome).",
+
+  "features_tested": {
+    "family_overview_page": {
+      "status": "WORKING",
+      "url": "/overview",
+      "components": [
+        "12-month Cashflow Projection chart with ComposedChart (BarChart + LineChart)",
+        "Summary cards (Total Family Income, Total Tax, Monthly Surplus, Net Worth)",
+        "Quick links to Income Splitting, Trust Analysis, Budget, Tax Analysis",
+        "Family Members summary with income/tax/net breakdown",
+        "Trust Distribution summary",
+        "Budget summary with income/expenses/surplus"
+      ]
+    },
+    "save_button_header": {
+      "status": "WORKING",
+      "features": [
+        "Save All button in header saves to localStorage",
+        "Shows success toast 'All changes saved successfully'",
+        "Displays 'Last saved' timestamp after saving",
+        "Button disabled when no unsaved changes"
+      ]
+    },
+    "save_button_sidebar": {
+      "status": "WORKING",
+      "features": [
+        "Appears when hasUnsavedChanges=true",
+        "Saves changes and hides after saving",
+        "Gold color button with Save icon"
+      ]
+    },
+    "12_month_cashflow_chart": {
+      "status": "WORKING",
+      "features": [
+        "Income bars (green)",
+        "Expenses bars (red)",
+        "Cumulative Savings line (gold)",
+        "Year-End Projection value",
+        "Annual Savings value",
+        "Savings Rate percentage"
+      ]
+    },
+    "quick_links_navigation": {
+      "status": "WORKING",
+      "links": [
+        "/income-splitting - Income Splitting",
+        "/trust-distributions - Trust Analysis",
+        "/budget - Budget",
+        "/tax-analysis - Tax Analysis"
+      ]
+    },
+    "family_members_sync": {
+      "status": "NOT WORKING",
+      "issue": "TrustDistributionAnalysis has local state, doesn't use shared familyMembers from context"
+    },
+    "budget_sync": {
+      "status": "NOT WORKING",
+      "issue": "HouseholdBudget has local state, doesn't use shared budget from context"
+    }
+  }
+}
