@@ -716,7 +716,7 @@ const AppRouter = () => {
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/overview" element={<FamilyOverview />} />
       <Route path="/budget" element={<HouseholdBudget />} />
-      <Route path="/tax-analysis" element={<TaxAnalysis />} />
+      <Route path="/tax-analysis" element={<TaxAnalysisSync />} />
       <Route path="/property-portfolio" element={<PropertyPortfolio />} />
       <Route path="/monte-carlo" element={<MonteCarloSimulation />} />
       <Route path="/loan-calculator" element={<LoanCalculator />} />
@@ -749,6 +749,8 @@ const AppRouter = () => {
       <Route path="/scenario-modeling" element={<AdvancedScenarioModeling />} />
       <Route path="/family-member/:memberId" element={<FamilyMemberProfile />} />
       <Route path="/family-wealth" element={<FamilyWealthDashboard />} />
+      <Route path="/lifecycle-planning" element={<LifecyclePlanning />} />
+      <Route path="/financial-advisor" element={<FinancialAdvisorChat />} />
     </Routes>
   );
 };
