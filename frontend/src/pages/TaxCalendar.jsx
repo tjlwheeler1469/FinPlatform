@@ -103,6 +103,12 @@ const TaxCalendar = () => {
   const [activeTab, setActiveTab] = useState("calendar");
   const [filterCategory, setFilterCategory] = useState("all");
   const [selectedYear, setSelectedYear] = useState("2024-25");
+  const [apiDeadlines, setApiDeadlines] = useState(null);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [notificationPrefs, setNotificationPrefs] = useState({
+    email: "",
+    reminderDays: 7
+  });
 
   // Financial years
   const financialYears = [
@@ -112,14 +118,33 @@ const TaxCalendar = () => {
     { value: "all", label: "All Years" }
   ];
 
+  // Fetch tax deadlines from API on mount
+  useEffect(() => {
+    const fetchDeadlines = async () => {
+      try {
+        const response = await axios.get(`${API}/notifications/tax-deadlines`);
+        setApiDeadlines(response.data);
+      } catch (error) {
+        console.error("Error fetching deadlines:", error);
+      }
+    };
+    fetchDeadlines();
+  }, []);
+
   // Load from localStorage
   useEffect(() => {
     const savedCustom = localStorage.getItem("taxCalendarEvents");
     const savedHidden = localStorage.getItem("taxCalendarHidden");
     const savedCompleted = localStorage.getItem("taxCalendarCompleted");
+    const savedNotifPrefs = localStorage.getItem("taxNotificationPrefs");
     if (savedCustom) setCustomEvents(JSON.parse(savedCustom));
     if (savedHidden) setHiddenEvents(JSON.parse(savedHidden));
     if (savedCompleted) setCompletedEvents(JSON.parse(savedCompleted));
+    if (savedNotifPrefs) {
+      const prefs = JSON.parse(savedNotifPrefs);
+      setNotificationPrefs(prefs);
+      setNotificationsEnabled(!!prefs.email);
+    }
   }, []);
 
   // Save to localStorage
