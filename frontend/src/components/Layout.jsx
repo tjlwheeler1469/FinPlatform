@@ -59,6 +59,7 @@ const navGroups = [
       { path: "/budget", label: "Budget", icon: Wallet, title: "Household Budget" },
       { path: "/trust-distributions", label: "Trust Analysis", icon: PieChart, title: "Trust Distribution Analysis" },
       { path: "/income-splitting", label: "Income Splitting", icon: Users, title: "Income Splitting" },
+      { path: "/scenario-modeling", label: "Scenario Modeling", icon: GitBranch, title: "Advanced Scenario Modeling" },
       { path: "/scenario-comparison", label: "Scenario Comparison", icon: Scale, title: "Scenario Comparison" },
     ]
   },
