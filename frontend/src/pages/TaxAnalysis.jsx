@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,13 +7,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
+import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { 
   Calculator, 
   DollarSign, 
   Percent,
   TrendingUp,
   Building2,
-  User
+  User,
+  Info,
+  ExternalLink,
+  BookOpen
 } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
@@ -40,6 +45,33 @@ const formatCurrency = (value) => {
     maximumFractionDigits: 0
   }).format(value);
 };
+
+// ATO Info Tooltip Component
+const ATOTooltip = ({ title, description, atoUrl }) => (
+  <TooltipProvider>
+    <UITooltip>
+      <TooltipTrigger asChild>
+        <button className="inline-flex items-center justify-center w-4 h-4 ml-1 rounded-full bg-muted hover:bg-muted/80">
+          <Info className="h-3 w-3 text-muted-foreground" />
+        </button>
+      </TooltipTrigger>
+      <TooltipContent className="max-w-xs p-3">
+        <p className="font-semibold text-sm mb-1">{title}</p>
+        <p className="text-xs text-muted-foreground mb-2">{description}</p>
+        {atoUrl && (
+          <a 
+            href={atoUrl} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-xs text-[#0F392B] hover:underline flex items-center gap-1"
+          >
+            ATO Reference <ExternalLink className="h-3 w-3" />
+          </a>
+        )}
+      </TooltipContent>
+    </UITooltip>
+  </TooltipProvider>
+);
 
 const TaxAnalysis = () => {
   const [entityType, setEntityType] = useState("personal");
