@@ -339,64 +339,65 @@ const ClientDashboard = ({ clientAuth, onLogout }) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-[#0F392B] text-white p-4 sticky top-0 z-50">
+      {/* Header - Mobile Responsive */}
+      <header className="bg-[#0F392B] text-white p-3 sm:p-4 sticky top-0 z-50">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-              <User className="h-5 w-5" />
+          <div className="flex items-center gap-2 sm:gap-4">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/20 flex items-center justify-center">
+              <User className="h-4 w-4 sm:h-5 sm:w-5" />
             </div>
             <div>
-              <h1 className="font-bold">{clientAuth?.name || client.name}</h1>
-              <p className="text-sm text-white/70">Client Portal</p>
+              <h1 className="font-bold text-sm sm:text-base">{clientAuth?.name || client.name}</h1>
+              <p className="text-xs sm:text-sm text-white/70 hidden sm:block">Client Portal</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <Badge className="bg-white/20 gap-1">
+          <div className="flex items-center gap-1 sm:gap-3">
+            <Badge className="bg-white/20 gap-1 text-xs hidden sm:flex">
               <Shield className="h-3 w-3" /> Secure
             </Badge>
             <Button 
               variant="ghost" 
               size="sm" 
-              className="text-white hover:bg-white/10" 
+              className="text-white hover:bg-white/10 text-xs sm:text-sm px-2 sm:px-3" 
               onClick={handleLogout}
               data-testid="client-logout-btn"
             >
-              <LogOut className="h-4 w-4 mr-2" /> Logout
+              <LogOut className="h-4 w-4 sm:mr-2" /> <span className="hidden sm:inline">Logout</span>
             </Button>
             <Button 
               variant="ghost" 
               size="sm" 
-              className="text-white hover:bg-white/10" 
+              className="text-white hover:bg-white/10 text-xs sm:text-sm px-2 sm:px-3" 
               onClick={exitPortal}
               data-testid="exit-portal-btn"
             >
-              Exit Portal
+              <span className="hidden sm:inline">Exit Portal</span>
+              <span className="sm:hidden">Exit</span>
             </Button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto p-6 space-y-6" data-testid="client-portal-dashboard">
-        {/* Greeting */}
-        <div className="flex items-center justify-between">
+      <main className="max-w-5xl mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6" data-testid="client-portal-dashboard">
+        {/* Greeting - Mobile Responsive */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div>
-            <h2 className="text-2xl font-bold flex items-center gap-2">
-              <greeting.icon className="h-6 w-6 text-[#D4AF37]" />
+            <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+              <greeting.icon className="h-5 w-5 sm:h-6 sm:w-6 text-[#D4AF37]" />
               {greeting.text}, {(clientAuth?.name || client.primaryContact).split(' ')[0]}
             </h2>
-            <p className="text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               {today.toLocaleDateString('en-AU', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
             </p>
           </div>
           <div className="flex items-center gap-2">
             {daysUntilReview <= 30 && (
-              <Badge className="bg-amber-100 text-amber-800 gap-1">
+              <Badge className="bg-amber-100 text-amber-800 gap-1 text-xs">
                 <Calendar className="h-3 w-3" />
                 Review in {daysUntilReview} days
               </Badge>
             )}
-            <Badge variant="outline" className="text-xs">Read-Only View</Badge>
+            <Badge variant="outline" className="text-xs">Read-Only</Badge>
           </div>
         </div>
 
