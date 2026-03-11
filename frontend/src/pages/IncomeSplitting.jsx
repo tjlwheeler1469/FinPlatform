@@ -121,7 +121,7 @@ const IncomeSplitting = () => {
     }));
   }, [trust.netIncome]);
 
-  // Distribution strategy
+  // Distribution strategy - based on trust beneficiaries
   const [distributions, setDistributions] = useState({});
   const [activeTab, setActiveTab] = useState("analysis");
   const [showAddMember, setShowAddMember] = useState(false);
@@ -129,18 +129,20 @@ const IncomeSplitting = () => {
   const [newMemberRelationship, setNewMemberRelationship] = useState("adult_child");
 
   useEffect(() => {
-    // Initialize distributions based on trust distribution percentages
-    const beneficiaries = familyMembers.filter(m => m.isTrustBeneficiary);
+    // Initialize distributions based on trust distribution percentages for ALL family members
     const totalSplittable = incomeSources.dividends + incomeSources.trustDistributions;
     
     const initial = {};
-    beneficiaries.forEach((m) => {
-      initial[m.id] = Math.round(totalSplittable * (m.trustDistribution / 100));
+    familyMembers.forEach((m) => {
+      // Use trust distribution if set, otherwise 0
+      initial[m.id] = m.isTrustBeneficiary && m.trustDistribution > 0 
+        ? Math.round(totalSplittable * (m.trustDistribution / 100))
+        : 0;
     });
     setDistributions(initial);
   }, [familyMembers, incomeSources.dividends, incomeSources.trustDistributions]);
 
-  // Handle adding new family member
+  // Handle adding new family member - syncs with Trust Distribution
   const handleAddMember = () => {
     if (!newMemberName.trim()) {
       toast.error("Please enter a name");
@@ -150,23 +152,37 @@ const IncomeSplitting = () => {
       name: newMemberName,
       relationship: newMemberRelationship,
       taxableIncome: 0,
-      isTrustBeneficiary: false,
+      salaryIncome: 0,
+      dividendIncome: 0,
+      rentalIncome: 0,
+      deductions: 0,
+      superBalance: 0,
+      isTrustBeneficiary: true, // Automatically make new members trust beneficiaries
       trustDistribution: 0
     });
     setNewMemberName("");
     setShowAddMember(false);
-    toast.success("Family member added - changes will sync across all pages");
+    toast.success("Family member added - synced to Trust Distribution Analysis");
   };
 
   // Handle removing family member
   const handleRemoveMember = (id) => {
     removeFamilyMember(id);
-    toast.success("Family member removed - changes will sync across all pages");
+    toast.success("Family member removed - synced across all modules");
   };
 
-  // Handle updating member income
+  // Handle updating member income - syncs with Tax Analysis
   const handleUpdateIncome = (id, income) => {
     updateFamilyMember(id, { taxableIncome: Number(income) });
+  };
+
+  // Toggle trust beneficiary status
+  const toggleBeneficiary = (id, isBeneficiary) => {
+    updateFamilyMember(id, { 
+      isTrustBeneficiary: isBeneficiary,
+      trustDistribution: isBeneficiary ? 0 : 0 // Reset distribution when toggling
+    });
+    toast.success(isBeneficiary ? "Added as trust beneficiary" : "Removed from trust beneficiaries");
   };
 
   // Calculate current scenario (no splitting)
