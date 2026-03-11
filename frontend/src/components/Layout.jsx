@@ -153,6 +153,15 @@ const Layout = ({ children }) => {
     }
   }, [location.pathname]);
 
+  // Prevent scroll jump on navigation - keep sidebar position stable
+  useEffect(() => {
+    // Get main content element and scroll it to top on route change
+    const mainContent = document.getElementById('main-content');
+    if (mainContent) {
+      mainContent.scrollTo(0, 0);
+    }
+  }, [location.pathname]);
+
   // Toggle group expansion
   const toggleGroup = (groupName) => {
     setExpandedGroups(prev => ({
