@@ -123,6 +123,10 @@ Build an app that analyses all options for personal and business investment in A
 - ✅ Superannuation guarantee calculator
 - ✅ Rental yield optimizer
 - ✅ Export to accounting software
+- ✅ Risk Profiler (ASIC/FSC aligned)
+- ✅ BAS Calculator
+- ✅ Multi-user Collaboration (Demo mode)
+- ✅ Statement of Advice Generator (RG 175 compliant)
 
 ### P2 - Medium Priority (Future)
 - Tax Deadline Notifications (Twilio/SendGrid) - Backend endpoints ready
