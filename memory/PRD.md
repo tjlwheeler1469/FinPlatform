@@ -180,6 +180,17 @@ Build an app that analyses all options for personal and business investment in A
   - Sync notice explains the Trust Distribution connection
   - Distribution percentages consistent between pages
 
+- ✅ **Family Member Profile** (/family-member/:memberId) - Consolidated view for each person
+  - Header with avatar, name, relationship badge, Trust Beneficiary badge, age
+  - Summary cards: Taxable Income, Tax Payable, Net Income, Super Balance, Total Wealth
+  - Income tab: All income sources (Salary, Dividend, Rental, Trust Distribution), deductions, pie chart
+  - Tax tab: Tax calculation (Income Tax, Medicare Levy), effective/marginal rates, optimization tips
+  - Investments tab: Personal share holdings, wealth composition pie chart
+  - Super tab: Current balance, annual SG (11.5%), 10-year projection chart, optimization strategies
+  - Edit Profile button for updating income and super data
+  - Related Pages links (Tax Analysis, Income Splitting, Trust Distribution, Share Portfolio)
+  - Accessible via eye button from Tax Analysis Sync page
+
 ## Previous Session (December 2025)
 - ✅ **Share Portfolio** (/share-portfolio) - Personal, joint, company ownership with dividends
 - ✅ **Calculation Methodology** (/calculation-methodology) - ATO/ASIC references for all calculations
