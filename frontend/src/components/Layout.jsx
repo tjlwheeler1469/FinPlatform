@@ -176,7 +176,7 @@ const Layout = ({ children }) => {
 
   // Preserve sidebar scroll position on navigation
   useEffect(() => {
-    // Use requestAnimationFrame to ensure DOM is ready before restoring scroll
+    // Use setTimeout with a small delay to ensure DOM is fully ready before restoring scroll
     const restoreScroll = () => {
       const sidebar = sidebarNavRef.current;
       if (sidebar && scrollPositionRef.current > 0) {
@@ -191,9 +191,12 @@ const Layout = ({ children }) => {
     }
     
     // Restore sidebar scroll after a small delay to ensure DOM is ready
-    requestAnimationFrame(() => {
+    // Using setTimeout with 20ms delay to fix timing race condition
+    const timeoutId = setTimeout(() => {
       requestAnimationFrame(restoreScroll);
-    });
+    }, 20);
+    
+    return () => clearTimeout(timeoutId);
   }, [location.pathname]);
 
   // Save sidebar scroll position on scroll
