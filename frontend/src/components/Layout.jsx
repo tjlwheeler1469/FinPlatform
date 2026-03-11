@@ -274,7 +274,11 @@ const Layout = ({ children }) => {
         )}
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto py-2 px-2">
+        <nav 
+          ref={sidebarNavRef}
+          onScroll={handleSidebarScroll}
+          className="flex-1 overflow-y-auto py-2 px-2"
+        >
           {navGroups.map((group) => (
             <div key={group.name} className="mb-1">
               {/* Group Header */}
