@@ -599,12 +599,23 @@ const PracticeManagement = () => {
           <TabsContent value="meetings" className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold">Scheduled Meetings</h2>
-              <Dialog open={showNewMeetingDialog} onOpenChange={setShowNewMeetingDialog}>
-                <DialogTrigger asChild>
-                  <Button className="bg-[#0F392B]" data-testid="new-meeting-btn">
-                    <Plus className="h-4 w-4 mr-2" /> Schedule Meeting
-                  </Button>
-                </DialogTrigger>
+              <div className="flex items-center gap-2">
+                <CalendarBulkExportButton 
+                  events={meetings.filter(m => m.status === "scheduled").map(m => ({
+                    title: m.title,
+                    description: `Meeting with ${getClientName(m.client_id)} - ${m.meeting_type}`,
+                    location: m.location || "",
+                    startTime: m.scheduled_at,
+                    endTime: new Date(new Date(m.scheduled_at).getTime() + m.duration_minutes * 60000).toISOString()
+                  }))}
+                  filename="wheeler_meetings.ics"
+                />
+                <Dialog open={showNewMeetingDialog} onOpenChange={setShowNewMeetingDialog}>
+                  <DialogTrigger asChild>
+                    <Button className="bg-[#0F392B]" data-testid="new-meeting-btn">
+                      <Plus className="h-4 w-4 mr-2" /> Schedule Meeting
+                    </Button>
+                  </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle>Schedule Meeting</DialogTitle>
