@@ -29,6 +29,11 @@ import FinancialRecommendations from "@/pages/FinancialRecommendations";
 import TaxCalendar from "@/pages/TaxCalendar";
 import FamilyOverview from "@/pages/FamilyOverview";
 import SharePortfolio from "@/pages/SharePortfolio";
+import CalculationMethodology from "@/pages/CalculationMethodology";
+import SuperannuationGuarantee from "@/pages/SuperannuationGuarantee";
+import RentalYieldOptimizer from "@/pages/RentalYieldOptimizer";
+import HoldingsPerformance from "@/pages/HoldingsPerformance";
+import ExportData from "@/pages/ExportData";
 
 // Portfolio Context for sharing data across components
 const PortfolioContext = createContext(null);
