@@ -742,6 +742,8 @@ const AppRouter = () => {
       <Route path="/sg-calculator" element={<SuperannuationGuarantee />} />
       <Route path="/rental-yield-optimizer" element={<RentalYieldOptimizer />} />
       <Route path="/export" element={<ExportData />} />
+      <Route path="/tax-analysis-sync" element={<TaxAnalysisSync />} />
+      <Route path="/scenario-modeling" element={<AdvancedScenarioModeling />} />
     </Routes>
   );
 };
