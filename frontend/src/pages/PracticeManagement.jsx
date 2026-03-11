@@ -485,10 +485,11 @@ const PracticeManagement = () => {
                   <form onSubmit={(e) => {
                     e.preventDefault();
                     const formData = new FormData(e.target);
+                    const clientId = formData.get("client_id");
                     addTask({
                       title: formData.get("title"),
                       description: formData.get("description"),
-                      client_id: formData.get("client_id") || null,
+                      client_id: clientId === "none" ? null : clientId,
                       due_date: formData.get("due_date"),
                       priority: formData.get("priority"),
                       status: "pending",
