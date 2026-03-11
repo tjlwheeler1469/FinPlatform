@@ -36,7 +36,9 @@ import {
   Target,
   Activity,
   GitBranch,
-  RefreshCw
+  RefreshCw,
+  Bot,
+  HeartPulse
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -52,12 +54,14 @@ const navGroups = [
       { path: "/overview", label: "Family Overview", icon: Eye, title: "Family Overview" },
       { path: "/family-wealth", label: "Wealth Dashboard", icon: TrendingUp, title: "Family Wealth Dashboard" },
       { path: "/recommendations", label: "Recommendations", icon: Lightbulb, title: "Financial Recommendations" },
+      { path: "/financial-advisor", label: "AI Advisor", icon: Bot, title: "AI Financial Advisor" },
     ]
   },
   {
     name: "Planning",
     items: [
       { path: "/budget", label: "Budget", icon: Wallet, title: "Household Budget" },
+      { path: "/lifecycle-planning", label: "Lifecycle Planning", icon: HeartPulse, title: "Lifecycle Planning" },
       { path: "/trust-distributions", label: "Trust Analysis", icon: PieChart, title: "Trust Distribution Analysis" },
       { path: "/income-splitting", label: "Income Splitting", icon: Users, title: "Income Splitting" },
       { path: "/scenario-modeling", label: "Scenario Modeling", icon: GitBranch, title: "Advanced Scenario Modeling" },
