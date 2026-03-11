@@ -125,6 +125,7 @@ const personalNavGroups = [
   {
     name: "Data & Reports",
     items: [
+      { path: "/documents", label: "Documents", icon: FileText, title: "Documents & Communications" },
       { path: "/bank-feeds", label: "Bank Feeds", icon: Landmark, title: "Bank Feeds" },
       { path: "/accounting-integrations", label: "Xero / MYOB", icon: Link2, title: "Accounting Integrations" },
       { path: "/data-import", label: "Import Data", icon: Upload, title: "Import Data" },
