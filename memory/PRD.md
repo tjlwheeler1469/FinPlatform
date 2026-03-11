@@ -179,6 +179,11 @@ Build an app that analyses all options for personal and business investment in A
 36. ~~Client Portal Authentication~~ ✅ DONE (March 2026) - JWT-based login/register with demo mode
 37. ~~Practice Management~~ ✅ DONE (March 2026) - Tasks, Meetings, Time Tracking, Billing, Compliance
 38. ~~Remember Mode Choice~~ ✅ DONE (March 2026) - Auto-redirect to preferred mode on app load
+39. ~~Live Price Updates~~ ✅ DONE (March 2026) - 30-second auto-refresh with simulated fluctuations
+40. ~~Notifications Panel~~ ✅ DONE (March 2026) - Mock notifications with preferences
+41. ~~Calendar Integration~~ ✅ DONE (March 2026) - Google/Outlook/Apple export with OAuth setup
+42. ~~Mobile Responsive~~ ✅ DONE (March 2026) - Client Portal and Practice Management optimized
+43. ~~Sidebar Scroll Fix~~ ✅ DONE (March 2026) - Improved scroll position persistence
 
 ## Latest Session Updates (December 2025 - Current)
 
