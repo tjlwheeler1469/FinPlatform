@@ -360,6 +360,9 @@ const Layout = ({ children }) => {
               <TrendingUp className="h-6 w-6 text-[#D4AF37]" />
             </Link>
           )}
+          {!sidebarCollapsed && (
+            <NotificationsPanel />
+          )}
         </div>
 
         {/* Save Button - Shows when there are unsaved changes */}
