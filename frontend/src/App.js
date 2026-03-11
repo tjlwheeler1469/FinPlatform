@@ -37,6 +37,7 @@ import HoldingsPerformance from "@/pages/HoldingsPerformance";
 import ExportData from "@/pages/ExportData";
 import AdvancedScenarioModeling from "@/pages/AdvancedScenarioModeling";
 import FamilyMemberProfile from "@/pages/FamilyMemberProfile";
+import FamilyWealthDashboard from "@/pages/FamilyWealthDashboard";
 
 // Portfolio Context for sharing data across components
 const PortfolioContext = createContext(null);
