@@ -49,6 +49,7 @@ import Copilot from "@/pages/Copilot";
 import DailyBriefing from "@/pages/DailyBriefing";
 import AdviserDashboard from "@/pages/AdviserDashboard";
 import ClientPortal from "@/pages/ClientPortal";
+import ModeSelector from "@/pages/ModeSelector";
 
 // Compliance Modal
 import { ComplianceModal } from "@/components/ComplianceDisclaimer";
