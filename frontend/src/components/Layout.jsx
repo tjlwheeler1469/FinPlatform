@@ -2,6 +2,8 @@ import { useRef, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import NotificationsPanel from "@/components/NotificationsPanel";
+import { useNotifications } from "@/context/NotificationsContext";
 import { 
   TrendingUp, 
   LayoutDashboard, 
@@ -48,6 +50,7 @@ import {
   UserPlus,
   ClipboardList,
   Sparkles,
+  Bell,
   Rocket,
   Sun,
   UserCircle,
