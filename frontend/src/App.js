@@ -39,6 +39,11 @@ import FamilyMemberProfile from "@/pages/FamilyMemberProfile";
 import FamilyWealthDashboard from "@/pages/FamilyWealthDashboard";
 import LifecyclePlanning from "@/pages/LifecyclePlanning";
 import FinancialAdvisorChat from "@/pages/FinancialAdvisorChat";
+import StrategicPlanning from "@/pages/StrategicPlanning";
+import DataImport from "@/pages/DataImport";
+
+// Compliance Modal
+import { ComplianceModal } from "@/components/ComplianceDisclaimer";
 
 // Portfolio Context for sharing data across components
 const PortfolioContext = createContext(null);
