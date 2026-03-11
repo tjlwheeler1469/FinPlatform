@@ -159,13 +159,69 @@ Build an app that analyses all options for personal and business investment in A
 20. ~~Real-time Stock Data Integration~~ ✅ DONE (December 2025) - Mock data (Alpha Vantage ready)
 21. ~~Lifecycle Planning~~ ✅ DONE (December 2025) - Retirement, Estate, Goals
 22. ~~AI Financial Advisor Chatbot~~ ✅ DONE (December 2025) - Demo mode (LLM ready)
-23. ~~Sidebar Scroll Fix~~ ✅ DONE (December 2025) - Using requestAnimationFrame
+23. ~~Sidebar Scroll Fix~~ ✅ DONE (December 2025) - Using requestAnimationFrame with retries
 24. ~~Bank Feeds (Plaid)~~ ✅ DONE (December 2025) - Sandbox mode with 8 AU banks
 25. ~~Xero/MYOB Direct API~~ ✅ DONE (December 2025) - OAuth sandbox with mock data
+26. ~~Risk Profiler~~ ✅ DONE (December 2025) - 8-question ASIC/FSC aligned questionnaire
+27. ~~BAS Calculator~~ ✅ DONE (December 2025) - GST/PAYG worksheet with Xero/MYOB import
+28. ~~Collaboration~~ ✅ DONE (December 2025) - Multi-user team management (demo mode)
+29. ~~Statement of Advice (SOA)~~ ✅ DONE (December 2025) - RG 175 compliant generator
 
 ## Latest Session Updates (December 2025 - Current)
 
-### New Features Implemented (Latest)
+### New Features Implemented (Latest - December 2025)
+
+- ✅ **Risk Profiler** (/risk-profiler)
+  - 8-question ASIC/FSC aligned questionnaire
+  - Risk categories: Investment Timeframe, Knowledge, Risk Tolerance, Return vs Security, Income Needs, Financial Stability, Portfolio Scenario, Loss Acceptance
+  - 5 Risk Profiles: Conservative, Moderately Conservative, Balanced, Growth, High Growth
+  - Score calculation (8-40 range), Risk Level (1-5)
+  - Asset allocation pie chart
+  - Risk profile radar chart analysis
+  - Export and Save Profile functionality
+  - localStorage persistence
+
+- ✅ **BAS Calculator** (/bas-calculator)
+  - GST Worksheet (G1-G20 fields matching ATO BAS form)
+  - PAYG Withholding (W1-W5 fields)
+  - PAYG Instalments (T7-T11 fields)
+  - Summary tab with lodgement-ready output
+  - Data import from Xero/MYOB (mock)
+  - Period selection (quarterly)
+  - Due date alerts with OVERDUE badge
+  - Export, Calculate, Print buttons
+  - Direct link to ATO Business Portal
+
+- ✅ **Collaboration** (/collaboration) - DEMO MODE
+  - Multi-user team management
+  - 5 Role types: Administrator, Financial Adviser, Accountant, Client, View Only
+  - Role permissions matrix (11 permissions)
+  - Activity log tracking
+  - Notes/comments system with resolved status
+  - Invite member functionality
+  - Online status indicators
+  - localStorage persistence
+
+- ✅ **Statement of Advice Generator** (/statement-of-advice)
+  - RG 175 (ASIC Regulatory Guide 175) compliant
+  - 8 SOA sections: Client Details, Goals & Objectives, Risk Profile, Current Situation, Recommendations, Projections, Fees & Disclosure, Authority to Proceed
+  - Document completion progress tracking
+  - Pre-filled with portfolio data
+  - Multiple goals and recommendations support
+  - Generates downloadable SOA text file
+  - Saved SOAs tab with export functionality
+  - localStorage persistence
+
+- ✅ **Navigation Updates**
+  - New "Adviser Tools" section with Collaboration and SOA Generator
+  - Risk Profiler added to Planning section
+  - BAS Calculator added to Tax & CGT section
+
+- ✅ **Code Cleanup**
+  - Deleted redundant files: LifecyclePlanning.jsx, AdvancedScenarioModeling.jsx, ScenarioComparison.jsx (consolidated into StrategicPlanning.jsx)
+  - Enhanced sidebar scroll preservation with multiple retry mechanism
+
+### Previous Features (This Session)
 
 - ✅ **Bank Feeds via Plaid** (/bank-feeds)
   - Sandbox mode with 8 Australian banks:
