@@ -50,19 +50,19 @@ import {
   Sparkles,
   Rocket,
   Sun,
-  UserCircle
+  UserCircle,
+  ArrowLeftRight
 } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { usePortfolio } from "@/App";
 
-// Grouped navigation structure
-const navGroups = [
+// Personal Mode Navigation
+const personalNavGroups = [
   {
     name: "Overview",
     items: [
-      { path: "/daily-briefing", label: "Daily Briefing", icon: Sun, title: "Daily Briefing", badge: "New" },
+      { path: "/daily-briefing", label: "Daily Briefing", icon: Sun, title: "Daily Briefing" },
       { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard, title: "Dashboard" },
       { path: "/overview", label: "Family Overview", icon: Eye, title: "Family Overview" },
       { path: "/family-wealth", label: "Wealth Dashboard", icon: TrendingUp, title: "Family Wealth Dashboard" },
@@ -71,8 +71,123 @@ const navGroups = [
     ]
   },
   {
-    name: "Get Started",
+    name: "Planning",
     items: [
+      { path: "/strategic-planning", label: "Strategic Planning", icon: HeartPulse, title: "Strategic Planning" },
+      { path: "/budget", label: "Budget", icon: Wallet, title: "Household Budget" },
+      { path: "/trust-distributions", label: "Trust Analysis", icon: PieChart, title: "Trust Distribution Analysis" },
+      { path: "/income-splitting", label: "Income Splitting", icon: Users, title: "Income Splitting" },
+      { path: "/risk-profiler", label: "Risk Profiler", icon: Shield, title: "Risk Profiler" },
+      { path: "/onboarding", label: "Setup Wizard", icon: Rocket, title: "Setup Wizard" },
+    ]
+  },
+  {
+    name: "Property",
+    items: [
+      { path: "/property-portfolio", label: "Properties", icon: Building2, title: "Property Portfolio" },
+      { path: "/property-comparison", label: "Property Comparison", icon: Home, title: "Property Comparison" },
+      { path: "/rental-yield-optimizer", label: "Yield Optimizer", icon: Target, title: "Rental Yield Optimizer" },
+    ]
+  },
+  {
+    name: "Shares",
+    items: [
+      { path: "/share-portfolio", label: "Share Portfolio", icon: LineChart, title: "Share Portfolio" },
+      { path: "/holdings-performance", label: "Performance", icon: Activity, title: "Holdings Performance" },
+    ]
+  },
+  {
+    name: "Tax & CGT",
+    items: [
+      { path: "/tax-analysis-sync", label: "Tax Analysis", icon: Calculator, title: "Tax Analysis (Synced)" },
+      { path: "/cgt", label: "CGT", icon: TrendingUp, title: "Capital Gains Tax" },
+      { path: "/tax-calendar", label: "Tax Calendar", icon: CalendarDays, title: "Tax Planning Calendar" },
+      { path: "/bas-calculator", label: "BAS Calculator", icon: FileCheck, title: "BAS Calculator" },
+      { path: "/historical-tax", label: "Tax History", icon: History, title: "Tax History" },
+      { path: "/tax-loss-harvesting", label: "Tax Harvesting", icon: Scissors, title: "Tax Loss Harvesting" },
+    ]
+  },
+  {
+    name: "Calculators",
+    items: [
+      { path: "/loan-calculator", label: "Loan", icon: Landmark, title: "Loan Calculator" },
+      { path: "/monte-carlo", label: "Monte Carlo", icon: BarChart3, title: "Monte Carlo Simulation" },
+      { path: "/division-7a", label: "Division 7A", icon: FileCheck, title: "Division 7A Calculator" },
+      { path: "/salary-packaging", label: "Salary Packaging", icon: Briefcase, title: "Salary Packaging" },
+      { path: "/dividend-reinvestment", label: "Dividends", icon: Repeat, title: "Dividend Reinvestment" },
+      { path: "/smsf-optimizer", label: "SMSF", icon: PiggyBank, title: "SMSF Optimizer" },
+      { path: "/sg-calculator", label: "SG Calculator", icon: Users, title: "Superannuation Guarantee" },
+    ]
+  },
+  {
+    name: "Data & Reports",
+    items: [
+      { path: "/bank-feeds", label: "Bank Feeds", icon: Landmark, title: "Bank Feeds" },
+      { path: "/accounting-integrations", label: "Xero / MYOB", icon: Link2, title: "Accounting Integrations" },
+      { path: "/data-import", label: "Import Data", icon: Upload, title: "Import Data" },
+      { path: "/export", label: "Export Data", icon: Download, title: "Export Data" },
+      { path: "/reports", label: "Reports", icon: FileText, title: "Reports" },
+      { path: "/scenarios", label: "Saved Scenarios", icon: FolderOpen, title: "Saved Scenarios" },
+      { path: "/calculation-methodology", label: "Methodology", icon: BookOpen, title: "Calculation Methodology" },
+    ]
+  }
+];
+
+// Adviser Mode Navigation
+const adviserNavGroups = [
+  {
+    name: "Adviser Hub",
+    items: [
+      { path: "/adviser-dashboard", label: "Client Overview", icon: Briefcase, title: "Adviser Dashboard" },
+      { path: "/collaboration", label: "Team", icon: UserPlus, title: "Collaboration" },
+      { path: "/statement-of-advice", label: "SOA Generator", icon: ClipboardList, title: "Statement of Advice" },
+    ]
+  },
+  {
+    name: "Client Tools",
+    items: [
+      { path: "/daily-briefing", label: "Daily Briefing", icon: Sun, title: "Daily Briefing" },
+      { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard, title: "Dashboard" },
+      { path: "/copilot", label: "AI Copilot", icon: Sparkles, title: "AI Copilot" },
+    ]
+  },
+  {
+    name: "Analysis",
+    items: [
+      { path: "/tax-analysis-sync", label: "Tax Analysis", icon: Calculator, title: "Tax Analysis" },
+      { path: "/cgt", label: "CGT", icon: TrendingUp, title: "Capital Gains Tax" },
+      { path: "/strategic-planning", label: "Strategic Planning", icon: HeartPulse, title: "Strategic Planning" },
+      { path: "/risk-profiler", label: "Risk Profiler", icon: Shield, title: "Risk Profiler" },
+    ]
+  },
+  {
+    name: "Portfolios",
+    items: [
+      { path: "/property-portfolio", label: "Properties", icon: Building2, title: "Property Portfolio" },
+      { path: "/share-portfolio", label: "Shares", icon: LineChart, title: "Share Portfolio" },
+      { path: "/budget", label: "Budget", icon: Wallet, title: "Budget" },
+    ]
+  },
+  {
+    name: "Calculators",
+    items: [
+      { path: "/loan-calculator", label: "Loan", icon: Landmark, title: "Loan Calculator" },
+      { path: "/bas-calculator", label: "BAS", icon: FileCheck, title: "BAS Calculator" },
+      { path: "/smsf-optimizer", label: "SMSF", icon: PiggyBank, title: "SMSF Optimizer" },
+      { path: "/division-7a", label: "Division 7A", icon: FileCheck, title: "Division 7A" },
+    ]
+  },
+  {
+    name: "Reports",
+    items: [
+      { path: "/reports", label: "Reports", icon: FileText, title: "Reports" },
+      { path: "/export", label: "Export", icon: Download, title: "Export" },
+    ]
+  }
+];
+
+// Keep old navGroups for backwards compatibility
+const navGroups = personalNavGroups;
       { path: "/onboarding", label: "Client Onboarding", icon: Rocket, title: "Client Onboarding" },
       { path: "/financial-advisor", label: "AI Advisor", icon: Bot, title: "AI Financial Advisor" },
     ]
