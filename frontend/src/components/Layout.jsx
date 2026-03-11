@@ -429,8 +429,9 @@ const Layout = ({ children }) => {
 
       {/* Main Content */}
       <main 
+        id="main-content"
         className={cn(
-          "flex-1 min-h-screen transition-all duration-300",
+          "flex-1 min-h-screen transition-all duration-300 overflow-y-auto",
           "pt-14 pb-20 lg:pt-0 lg:pb-0",
           sidebarCollapsed ? "lg:ml-16" : "lg:ml-56"
         )}
