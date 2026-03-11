@@ -52,6 +52,9 @@ import ClientPortalMerged from "@/pages/ClientPortalMerged";
 import ModeSelector from "@/pages/ModeSelector";
 import PracticeManagement from "@/pages/PracticeManagement";
 
+// Contexts
+import { NotificationsProvider } from "@/context/NotificationsContext";
+
 // Compliance Modal
 import { ComplianceModal } from "@/components/ComplianceDisclaimer";
 
