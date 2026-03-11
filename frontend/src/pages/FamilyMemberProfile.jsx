@@ -135,7 +135,7 @@ const FamilyMemberProfile = () => {
 
   // Get shares owned by this member (personal ownership)
   const memberShares = sharePortfolio.filter(s => 
-    s.ownership === 'personal' && s.ownerName === member.name
+    s.ownership === 'personal' && s.ownerId === member.id
   );
   const totalShareValue = memberShares.reduce((sum, s) => sum + (s.quantity * s.currentPrice), 0);
   const totalShareGain = memberShares.reduce((sum, s) => 
