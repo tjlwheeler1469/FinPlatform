@@ -186,11 +186,8 @@ const adviserNavGroups = [
   }
 ];
 
-// Keep old navGroups for backwards compatibility
-const navGroups = personalNavGroups;
-
-// Flatten for title lookup and mobile nav
-const allNavItems = navGroups.flatMap(group => group.items);
+// Flatten all nav items for title lookup
+const allNavItems = [...personalNavGroups, ...adviserNavGroups].flatMap(group => group.items);
 
 // Mobile bottom navigation - key features for quick access
 const mobileBottomNav = [
@@ -388,13 +385,42 @@ const Layout = ({ children }) => {
           </div>
         )}
 
+        {/* Mode Switcher */}
+        <div className="px-3 py-2 border-b border-white/10">
+          <Select value={appMode} onValueChange={switchMode}>
+            <SelectTrigger className="w-full bg-white/10 border-white/20 text-white">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="personal">
+                <div className="flex items-center gap-2">
+                  <UserCircle className="h-4 w-4" />
+                  Personal Mode
+                </div>
+              </SelectItem>
+              <SelectItem value="adviser">
+                <div className="flex items-center gap-2">
+                  <Briefcase className="h-4 w-4" />
+                  Adviser Mode
+                </div>
+              </SelectItem>
+              <SelectItem value="client">
+                <div className="flex items-center gap-2">
+                  <Eye className="h-4 w-4" />
+                  Client View
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         {/* Navigation */}
         <nav 
           ref={sidebarNavRef}
           onScroll={handleSidebarScroll}
           className="flex-1 overflow-y-auto py-2 px-2"
         >
-          {navGroups.map((group) => (
+          {activeNavGroups.map((group) => (
             <div key={group.name} className="mb-1">
               {/* Group Header */}
               {!sidebarCollapsed && (
@@ -501,7 +527,7 @@ const Layout = ({ children }) => {
           onClick={(e) => e.stopPropagation()}
         >
           <nav className="p-3 overflow-y-auto h-[calc(100%-56px)] pb-20">
-            {navGroups.map((group) => (
+            {activeNavGroups.map((group) => (
               <div key={group.name} className="mb-2">
                 <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-white/50">
                   {group.name}
