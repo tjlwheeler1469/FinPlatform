@@ -39,7 +39,10 @@ import {
   GitBranch,
   RefreshCw,
   Bot,
-  HeartPulse
+  HeartPulse,
+  Upload,
+  Database,
+  Link2
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
