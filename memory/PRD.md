@@ -138,9 +138,11 @@ Build an app that analyses all options for personal and business investment in A
 6. ~~Sidebar tab grouping~~ ✅ DONE
 7. ~~CGT multi-year records~~ ✅ DONE
 8. ~~Report risk colors with clickable links~~ ✅ DONE
-9. Advisor Connect - Book time with a financial advisor
-10. Export to accounting software
-11. Superannuation guarantee calculator
+9. ~~Shared family data model with Save button~~ ✅ DONE
+10. ~~Family Overview with 12-month cashflow~~ ✅ DONE
+11. Advisor Connect - Book time with a financial advisor
+12. Export to accounting software
+13. Superannuation guarantee calculator
 
 ## Completed This Session (March 2026)
 - ✅ Integrated Salary Packaging Calculator (/salary-packaging)
