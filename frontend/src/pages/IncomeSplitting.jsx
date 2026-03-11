@@ -359,21 +359,65 @@ const IncomeSplitting = () => {
               {/* Family Members Table */}
               <Card className="lg:col-span-2" data-testid="family-table">
                 <CardHeader>
-                  <CardTitle className="font-['Manrope']">Family Tax Analysis</CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="font-['Manrope']">Family Tax Analysis</CardTitle>
+                    <Button variant="outline" size="sm" onClick={() => setShowAddMember(!showAddMember)}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Member
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent>
+                  {/* Add Member Form */}
+                  {showAddMember && (
+                    <div className="mb-4 p-4 rounded-lg bg-muted/50 space-y-3">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                          <Label>Name</Label>
+                          <Input
+                            value={newMemberName}
+                            onChange={(e) => setNewMemberName(e.target.value)}
+                            placeholder="Enter name"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Relationship</Label>
+                          <select
+                            value={newMemberRelationship}
+                            onChange={(e) => setNewMemberRelationship(e.target.value)}
+                            className="w-full h-10 px-3 rounded-md border border-input bg-background"
+                          >
+                            <option value="spouse">Spouse</option>
+                            <option value="adult_child">Adult Child</option>
+                            <option value="parent">Parent</option>
+                            <option value="other">Other</option>
+                          </select>
+                        </div>
+                        <div className="flex items-end gap-2">
+                          <Button onClick={handleAddMember} className="bg-[#0F392B]">
+                            Add
+                          </Button>
+                          <Button variant="outline" onClick={() => setShowAddMember(false)}>
+                            Cancel
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b">
                           <th className="text-left p-3 font-semibold">Member</th>
                           <th className="text-left p-3 font-semibold">Relationship</th>
+                          <th className="text-center p-3 font-semibold">Trust Beneficiary</th>
                           <th className="text-right p-3 font-semibold">Base Income</th>
                           <th className="text-right p-3 font-semibold">Current Tax</th>
                           <th className="text-right p-3 font-semibold">Marginal Rate</th>
                           <th className="text-right p-3 font-semibold">Distributed</th>
                           <th className="text-right p-3 font-semibold">Optimized Tax</th>
-                          <th className="text-right p-3 font-semibold">New Marginal</th>
+                          <th className="text-right p-3 font-semibold">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -381,24 +425,43 @@ const IncomeSplitting = () => {
                           <tr key={member.id} className="border-b">
                             <td className="p-3 font-medium">{member.name}</td>
                             <td className="p-3">
-                              <Badge variant="outline" className="capitalize">{member.relationship.replace('_', ' ')}</Badge>
+                              <Badge variant="outline" className="capitalize">{(member.relationship || 'family').replace('_', ' ')}</Badge>
+                            </td>
+                            <td className="text-center p-3">
+                              <input
+                                type="checkbox"
+                                checked={member.isTrustBeneficiary || false}
+                                onChange={(e) => toggleBeneficiary(member.id, e.target.checked)}
+                                className="rounded"
+                              />
                             </td>
                             <td className="text-right p-3">{formatCurrency(member.taxableIncome || 0)}</td>
                             <td className="text-right p-3 text-destructive font-medium">
-                              {formatCurrency(currentScenario.taxes[i].tax)}
+                              {formatCurrency(currentScenario.taxes[i]?.tax || 0)}
                             </td>
-                            <td className="text-right p-3">{currentScenario.taxes[i].marginalRate.toFixed(0)}%</td>
+                            <td className="text-right p-3">{(currentScenario.taxes[i]?.marginalRate || 0).toFixed(0)}%</td>
                             <td className="text-right p-3 text-[#D4AF37] font-medium">
                               {formatCurrency(distributions[member.id] || 0)}
                             </td>
                             <td className="text-right p-3 text-[#10B981] font-medium">
-                              {formatCurrency(optimizedScenario.taxes[i].tax)}
+                              {formatCurrency(optimizedScenario.taxes[i]?.tax || 0)}
                             </td>
-                            <td className="text-right p-3">{optimizedScenario.taxes[i].marginalRate.toFixed(0)}%</td>
+                            <td className="text-right p-3">
+                              {familyMembers.length > 1 && (
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 text-destructive"
+                                  onClick={() => handleRemoveMember(member.id)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              )}
+                            </td>
                           </tr>
                         ))}
                         <tr className="bg-muted/30 font-semibold">
-                          <td className="p-3" colSpan={3}>Total</td>
+                          <td className="p-3" colSpan={4}>Total</td>
                           <td className="text-right p-3 text-destructive">{formatCurrency(currentScenario.totalTax)}</td>
                           <td className="p-3"></td>
                           <td className="text-right p-3 text-[#D4AF37]">
@@ -409,6 +472,17 @@ const IncomeSplitting = () => {
                         </tr>
                       </tbody>
                     </table>
+                  </div>
+                  
+                  {/* Sync Notice */}
+                  <div className="mt-4 p-3 rounded-lg bg-[#0F392B]/10 text-sm">
+                    <p className="flex items-center gap-2">
+                      <Users className="h-4 w-4 text-[#0F392B]" />
+                      <span>
+                        <strong>Synced with Trust Distribution Analysis:</strong> Toggle "Trust Beneficiary" to include members in trust distributions.
+                        Changes here automatically update the Trust Analysis page.
+                      </span>
+                    </p>
                   </div>
                 </CardContent>
               </Card>
