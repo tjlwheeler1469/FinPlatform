@@ -42,7 +42,10 @@ import {
   HeartPulse,
   Upload,
   Database,
-  Link2
+  Link2,
+  Shield,
+  UserPlus,
+  ClipboardList
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
