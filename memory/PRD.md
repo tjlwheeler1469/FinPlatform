@@ -149,8 +149,66 @@ Build an app that analyses all options for personal and business investment in A
 17. ~~ATO tooltips on Tax Analysis~~ ✅ DONE (December 2025)
 18. ~~Data Sync for Tax Analysis~~ ✅ DONE (December 2025) - Global data sync with add/delete
 19. ~~Advanced Scenario Modeling~~ ✅ DONE (December 2025) - What-if analysis with projections
+20. ~~Real-time Stock Data Integration~~ ✅ DONE (December 2025) - Mock data (Alpha Vantage ready)
+21. ~~Lifecycle Planning~~ ✅ DONE (December 2025) - Retirement, Estate, Goals
+22. ~~AI Financial Advisor Chatbot~~ ✅ DONE (December 2025) - Demo mode (LLM ready)
 
-## Latest Session Updates (December 2025)
+## Latest Session Updates (December 2025 - Current)
+
+### New Features Implemented
+
+- ✅ **Real-time Stock Price Refresh** (/share-portfolio)
+  - "Refresh Prices" button fetches mock ASX stock prices
+  - Demo Mode badge and "Simulated prices" indicator
+  - Ready for Alpha Vantage API integration (add ALPHA_VANTAGE_KEY to .env)
+  - Supports CBA, BHP, CSL, WBC, NAB, ANZ, WOW, TLS, VAS, and more
+  - Prices vary ±3% to simulate market movement
+
+- ✅ **Mock Property Valuations** (/api/property/get-valuations)
+  - Backend endpoint for suburb median-based valuations
+  - Sydney, Melbourne, Brisbane suburb data
+  - Property type and bedroom adjustments
+  - Annual growth estimates
+
+- ✅ **Lifecycle Planning** (/lifecycle-planning)
+  - **Retirement Tab**: 
+    - Year-by-year projection chart from current age to life expectancy
+    - Super at retirement calculation with salary sacrifice
+    - Sustainable income (4% rule) and income gap analysis
+    - Age pension eligibility and estimate
+    - Recommendations for maximizing super contributions
+  - **Estate Tab**:
+    - Estate value summary (assets + super)
+    - Beneficiary analysis with tax implications
+    - Super death benefits tax calculation for non-dependants
+    - Estate planning checklist (Will, Power of Attorney, Testamentary Trust)
+    - Critical recommendations for missing documents
+  - **Goals Tab**:
+    - Multiple financial goals with target amounts and dates
+    - Progress tracking with visual bars
+    - Required vs available monthly savings analysis
+    - Risk tolerance settings (conservative/moderate/aggressive)
+    - Goal prioritization and recommendations
+
+- ✅ **AI Financial Advisor Chatbot** (/financial-advisor)
+  - Demo Mode with pre-defined responses
+  - Topics: Tax, Super, Property, Dividends, Investing, Retirement, Debt
+  - Suggestion buttons for common questions
+  - Quick Topics sidebar for easy navigation
+  - Ready for LLM integration (add OPENAI_API_KEY, ANTHROPIC_API_KEY, or EMERGENT_LLM_KEY)
+  - Conversation ID for session tracking
+  - Disclaimer about general vs personal advice
+
+- ✅ **Navigation Updates**
+  - AI Advisor link added to Overview section
+  - Lifecycle Planning link added to Planning section
+  - Bot icon for AI Advisor, HeartPulse icon for Lifecycle Planning
+
+- ✅ **Cleanup**
+  - Deleted redundant /app/frontend/src/pages/TaxAnalysis.jsx (replaced by TaxAnalysisSync.jsx)
+  - Fixed /tax-analysis route to use TaxAnalysisSync component
+
+## Previous Session Updates (December 2025)
 - ✅ **Tax Analysis Sync** (/tax-analysis-sync) - Global data sync for consistent individuals
   - Family members synced across all modules (Income Splitting, Trust Distribution, Family Overview, Budget)
   - Add/Delete family members with sync toast notifications
