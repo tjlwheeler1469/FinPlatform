@@ -381,6 +381,11 @@ const TaxAnalysis = () => {
             <CardTitle className="font-['Manrope'] flex items-center gap-2">
               <TrendingUp className="h-5 w-5 text-[#D4AF37]" />
               Franking Credits Calculator
+              <ATOTooltip 
+                title="Dividend Imputation" 
+                description="Franking credits represent tax already paid by the company. You're entitled to a tax offset for these credits."
+                atoUrl="https://www.ato.gov.au/individuals-and-families/investments-and-assets/in-detail/investing-in-shares/dividends-and-shares/receiving-dividends"
+              />
             </CardTitle>
             <CardDescription>
               Calculate imputation credits for Australian dividends
@@ -389,7 +394,13 @@ const TaxAnalysis = () => {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="dividend">Dividend Amount</Label>
+                <Label htmlFor="dividend">
+                  Dividend Amount
+                  <ATOTooltip 
+                    title="Cash Dividend" 
+                    description="The actual cash amount received from the dividend payment."
+                  />
+                </Label>
                 <div className="relative">
                   <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -404,7 +415,13 @@ const TaxAnalysis = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="franking">Franking %</Label>
+                <Label htmlFor="franking">
+                  Franking %
+                  <ATOTooltip 
+                    title="Franking Percentage" 
+                    description="100% = fully franked (company paid full tax). 0% = unfranked. Check your dividend statement."
+                  />
+                </Label>
                 <div className="relative">
                   <Percent className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
