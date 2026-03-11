@@ -495,15 +495,18 @@ const Layout = ({ children }) => {
           <TrendingUp className="h-5 w-5 text-[#D4AF37]" />
           <span className="font-bold font-['Manrope'] text-sm">Wheeler Family</span>
         </Link>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="text-white hover:bg-white/10 h-10 w-10"
-          data-testid="mobile-menu-btn"
-        >
-          {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </Button>
+        <div className="flex items-center gap-1">
+          <NotificationsPanel />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="text-white hover:bg-white/10 h-10 w-10"
+            data-testid="mobile-menu-btn"
+          >
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
+        </div>
       </header>
 
       {/* Mobile Menu Overlay - Swipeable */}
