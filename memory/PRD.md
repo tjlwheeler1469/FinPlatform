@@ -178,6 +178,24 @@ Build an app that analyses all options for personal and business investment in A
 
 ## Latest Session Updates (December 2025 - Current)
 
+### Dual-Mode Architecture (December 2025 - LATEST)
+
+- ✅ **Mode-Based Navigation System**
+  - Mode selector dropdown in sidebar (desktop) and mobile slide-out menu
+  - Three modes: Personal Mode, Adviser Mode, Client View
+  - Personal Mode: 7 navigation groups (Overview, Planning, Property, Shares, Tax & CGT, Calculators, Data & Reports)
+  - Adviser Mode: 6 navigation groups (Adviser Hub, Client Tools, Analysis, Portfolios, Calculators, Reports)
+  - Client View: Redirects to standalone /client-portal page
+  - localStorage persistence with 'app_mode' key
+  - Mode Selector landing page at /mode-selector
+
+- ✅ **Mode Selector Page** (/mode-selector)
+  - Landing page for initial mode selection
+  - Personal Use card with feature highlights
+  - Adviser Portal card with "Pro" badge
+  - Client Portal access link at bottom
+  - Branded with Wheeler Financial theme
+
 ### New Features Implemented (Latest - December 2025)
 
 - ✅ **Risk Profiler** (/risk-profiler)
