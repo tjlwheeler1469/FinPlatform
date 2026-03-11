@@ -95,6 +95,9 @@ const SharePortfolio = () => {
 
   const [activeTab, setActiveTab] = useState("all");
   const [showAddShare, setShowAddShare] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [lastRefreshed, setLastRefreshed] = useState(null);
+  const [isMockData, setIsMockData] = useState(true);
   const [newShare, setNewShare] = useState({
     symbol: "",
     name: "",
