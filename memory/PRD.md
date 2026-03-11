@@ -141,12 +141,50 @@ Build an app that analyses all options for personal and business investment in A
 9. ~~Shared family data model with Save button~~ ✅ DONE
 10. ~~Family Overview with 12-month cashflow~~ ✅ DONE
 11. ~~Share Portfolio page~~ ✅ DONE (December 2025)
-12. Advisor Connect - Book time with a financial advisor
-13. Export to accounting software (CSV/PDF for Xero/MYOB)
-14. Superannuation guarantee calculator
-15. Data Sync for Tax Analysis - Ensure consistent individual data across modules
+12. ~~Export to accounting software (CSV/PDF for Xero/MYOB)~~ ✅ DONE (December 2025)
+13. ~~Superannuation guarantee calculator~~ ✅ DONE (December 2025)
+14. ~~Calculation Methodology with ATO references~~ ✅ DONE (December 2025)
+15. ~~Rental Yield Optimizer~~ ✅ DONE (December 2025)
+16. ~~Holdings Performance with benchmarks~~ ✅ DONE (December 2025)
+17. ~~ATO tooltips on Tax Analysis~~ ✅ DONE (December 2025)
+18. Data Sync for Tax Analysis - Ensure consistent individual data across modules (P1)
 
-## Completed This Session (March 2026)
+## Completed This Session (December 2025)
+- ✅ **Share Portfolio** (/share-portfolio) - Personal, joint, company ownership with dividends
+- ✅ **Calculation Methodology** (/calculation-methodology) - ATO/ASIC references for all calculations
+  - Income Tax 2024-25 (Stage 3 tax cuts)
+  - CGT discounts and calculation formulas
+  - Franking credits (imputation)
+  - Superannuation caps and Division 293
+  - Property depreciation and negative gearing
+  - Company tax rates and Division 7A
+- ✅ **Superannuation Guarantee Calculator** (/sg-calculator)
+  - 11.5% SG rate for 2024-25
+  - Add/remove multiple employees
+  - Quarterly breakdown with due dates
+  - Maximum contribution base ($62,500/quarter)
+  - SG Rate projection charts
+- ✅ **Rental Yield Optimizer** (/rental-yield-optimizer)
+  - Gross/net yield calculations
+  - Negative gearing tax benefit
+  - Optimization sliders (rent increase, expense reduction, principal paydown)
+  - Recommendations engine with priority levels
+- ✅ **Holdings Performance** (/holdings-performance)
+  - ASX 200 and S&P 500 benchmark comparisons
+  - Time range selection (3m, 6m, 1y, 2y)
+  - Sector allocation pie chart
+  - Best/worst performers
+  - Concentration risk metrics
+- ✅ **Export Data** (/export)
+  - Generic CSV export
+  - Xero format (Chart of Accounts import)
+  - MYOB format (Account list import)
+  - Text report export
+  - Section selection (Family, Shares, Budget, Properties, Trust, Company)
+- ✅ **ATO Tooltips on Tax Analysis** - Info icons with ATO references and external links
+- ✅ **Navigation Updates** - Added Yield Optimizer, Performance, SG Calculator, Export Data, Methodology
+
+## Previous Session (March 2026)
 - ✅ Integrated Salary Packaging Calculator (/salary-packaging)
 - ✅ Integrated Property Comparison Tool (/property-comparison)
 - ✅ Integrated Scenario Comparison View (/scenario-comparison)
