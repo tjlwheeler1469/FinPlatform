@@ -44,6 +44,8 @@ import BASCalculator from "@/pages/BASCalculator";
 import Collaboration from "@/pages/Collaboration";
 import RiskProfiler from "@/pages/RiskProfiler";
 import StatementOfAdvice from "@/pages/StatementOfAdvice";
+import ClientOnboarding from "@/pages/ClientOnboarding";
+import Copilot from "@/pages/Copilot";
 
 // Compliance Modal
 import { ComplianceModal } from "@/components/ComplianceDisclaimer";
