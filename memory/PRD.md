@@ -110,23 +110,29 @@ Build an app that analyses all options for personal and business investment in A
 - ✅ Historical tax comparison
 - ✅ SMSF contribution optimizer
 - ✅ Report generator
+- ✅ Real-time stock data integration (Mock - ready for Alpha Vantage)
+- ✅ Lifecycle Planning (Retirement, Estate, Goals)
+- ✅ AI Financial Advisor Chatbot (Demo - ready for LLM)
 
-### P1 - High Priority
-- ✅ Salary packaging calculator (March 2026)
-- ✅ Investment property comparison tool (March 2026)
-- ✅ Multi-scenario comparison view (March 2026)
-- ✅ Tax loss harvesting suggestions (March 2026)
-- ✅ Dividend reinvestment calculator (March 2026)
+### P1 - High Priority (All Done ✅)
+- ✅ Salary packaging calculator
+- ✅ Investment property comparison tool
+- ✅ Multi-scenario comparison view
+- ✅ Tax loss harvesting suggestions
+- ✅ Dividend reinvestment calculator
+- ✅ Superannuation guarantee calculator
+- ✅ Rental yield optimizer
+- ✅ Export to accounting software
 
 ### P2 - Medium Priority (Future)
-- Superannuation guarantee calculator
-- Rental yield optimizer
-- Export to accounting software
+- Tax Deadline Notifications (Twilio/SendGrid) - Backend endpoints ready
+- Full AI-powered chatbot (requires LLM API key)
+- Real-time stock prices (requires Alpha Vantage API key)
 
 ### P3 - Nice to Have
-- Tax planning calendar with due dates
-- Integration with bank feeds
-- Mobile app version
+- Tax planning calendar with due dates ✅ DONE
+- Bank Feeds integration (Plaid) - User opted out
+- Mobile app version ✅ DONE (responsive)
 - Share scenarios with advisors
 
 ## Next Tasks
