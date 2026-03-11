@@ -731,9 +731,15 @@ const PracticeManagement = () => {
                       )}
                     </div>
                     <div className="flex gap-2 mt-4">
-                      <Button variant="outline" size="sm" className="flex-1">
-                        <Edit className="h-4 w-4 mr-1" /> Edit
-                      </Button>
+                      <CalendarExportButton 
+                        event={{
+                          title: meeting.title,
+                          description: `Meeting with ${getClientName(meeting.client_id)} - ${meeting.meeting_type}`,
+                          location: meeting.location || "",
+                          startTime: meeting.scheduled_at,
+                          endTime: new Date(new Date(meeting.scheduled_at).getTime() + meeting.duration_minutes * 60000).toISOString()
+                        }}
+                      />
                       <Button variant="outline" size="sm" onClick={() => toggleTimer(meeting.client_id, meeting.title)}>
                         <Play className="h-4 w-4" />
                       </Button>
@@ -742,6 +748,9 @@ const PracticeManagement = () => {
                 </Card>
               ))}
             </div>
+
+            {/* Calendar Integration Settings */}
+            <CalendarIntegrationSettings />
           </TabsContent>
 
           {/* Time Tracking Tab */}
