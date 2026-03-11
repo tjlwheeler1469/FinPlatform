@@ -139,8 +139,9 @@ const adviserNavGroups = [
     name: "Adviser Hub",
     items: [
       { path: "/adviser-dashboard", label: "Client Overview", icon: Briefcase, title: "Adviser Dashboard" },
+      { path: "/practice-management", label: "Practice", icon: ClipboardList, title: "Practice Management" },
       { path: "/collaboration", label: "Team", icon: UserPlus, title: "Collaboration" },
-      { path: "/statement-of-advice", label: "SOA Generator", icon: ClipboardList, title: "Statement of Advice" },
+      { path: "/statement-of-advice", label: "SOA Generator", icon: FileText, title: "Statement of Advice" },
     ]
   },
   {
