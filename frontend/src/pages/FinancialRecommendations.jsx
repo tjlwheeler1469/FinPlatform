@@ -26,7 +26,9 @@ import {
   Zap
 } from "lucide-react";
 import { usePortfolio } from "@/App";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { ComplianceFooter, CalculatorDisclaimer } from "@/components/ComplianceDisclaimer";
 import {
   RadarChart,
   PolarGrid,
