@@ -236,6 +236,67 @@ const SharePortfolio = () => {
     }
   };
 
+  // Live price simulation - generates realistic price fluctuations
+  const simulatePriceChange = useCallback((currentPrice) => {
+    // More realistic distribution: smaller changes more likely
+    const volatility = 0.02; // 2% max change
+    const random = (Math.random() - 0.5) * 2; // -1 to 1
+    const change = random * volatility * currentPrice;
+    // Apply slight upward bias (market tends to go up long term)
+    const bias = currentPrice * 0.0002; // 0.02% upward bias
+    return Math.max(0.01, currentPrice + change + bias);
+  }, []);
+
+  // Update prices with simulated fluctuations
+  const updateLivePrices = useCallback(() => {
+    if (sharePortfolio.length === 0) return;
+    
+    sharePortfolio.forEach(share => {
+      const newPrice = parseFloat(simulatePriceChange(share.currentPrice).toFixed(2));
+      updateShare(share.id, { currentPrice: newPrice });
+    });
+    
+    setLastRefreshed(new Date());
+  }, [sharePortfolio, simulatePriceChange, updateShare]);
+
+  // Toggle live updates
+  const toggleLiveUpdates = useCallback(() => {
+    if (isLiveUpdates) {
+      // Stop live updates
+      if (liveUpdateInterval) {
+        clearInterval(liveUpdateInterval);
+        setLiveUpdateInterval(null);
+      }
+      setIsLiveUpdates(false);
+      toast.info("Live price updates paused");
+    } else {
+      // Start live updates every 30 seconds
+      updateLivePrices(); // Immediate update
+      const interval = setInterval(updateLivePrices, 30000);
+      setLiveUpdateInterval(interval);
+      setIsLiveUpdates(true);
+      toast.success("Live price updates started (updates every 30s)");
+    }
+  }, [isLiveUpdates, liveUpdateInterval, updateLivePrices]);
+
+  // Cleanup interval on unmount
+  useEffect(() => {
+    return () => {
+      if (liveUpdateInterval) {
+        clearInterval(liveUpdateInterval);
+      }
+    };
+  }, [liveUpdateInterval]);
+
+  // Format last updated time
+  const formatLastUpdate = () => {
+    if (!lastRefreshed) return 'Never';
+    const seconds = Math.floor((new Date() - lastRefreshed) / 1000);
+    if (seconds < 60) return `${seconds}s ago`;
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    return `${Math.floor(seconds / 3600)}h ago`;
+  };
+
   // Update budget with dividend income
   const syncDividendsToBudget = () => {
     // Calculate personal dividends (including 50% of joint)
