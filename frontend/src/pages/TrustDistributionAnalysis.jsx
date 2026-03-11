@@ -251,32 +251,6 @@ const TrustDistributionAnalysis = () => {
   // Distribution percentage total
   const totalPercentage = beneficiaries.reduce((sum, b) => sum + b.distribution, 0);
 
-  // Update distribution
-  const updateDistribution = (id, value) => {
-    setBeneficiaries(prev => prev.map(b => 
-      b.id === id ? { ...b, distribution: Math.max(0, Math.min(100, value)) } : b
-    ));
-  };
-
-  // Add beneficiary
-  const addBeneficiary = () => {
-    const newId = Math.max(...beneficiaries.map(b => b.id)) + 1;
-    setBeneficiaries(prev => [...prev, {
-      id: newId,
-      name: `Beneficiary ${newId}`,
-      type: "individual",
-      existingIncome: 0,
-      distribution: 0
-    }]);
-  };
-
-  // Remove beneficiary
-  const removeBeneficiary = (id) => {
-    if (beneficiaries.length > 1) {
-      setBeneficiaries(prev => prev.filter(b => b.id !== id));
-    }
-  };
-
   // Chart data
   const taxComparisonData = [
     { name: "No Split", tax: noSplitTax, fill: "#EF4444" },
