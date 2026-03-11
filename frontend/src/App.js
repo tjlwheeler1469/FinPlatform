@@ -774,6 +774,9 @@ const AppRouter = () => {
       <Route path="/statement-of-advice" element={<StatementOfAdvice />} />
       <Route path="/onboarding" element={<ClientOnboarding />} />
       <Route path="/copilot" element={<Copilot />} />
+      <Route path="/daily-briefing" element={<DailyBriefing />} />
+      <Route path="/adviser-dashboard" element={<AdviserDashboard />} />
+      <Route path="/client-portal" element={<ClientPortal />} />
     </Routes>
   );
 };
