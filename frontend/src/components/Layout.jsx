@@ -60,12 +60,10 @@ const navGroups = [
   {
     name: "Planning",
     items: [
+      { path: "/strategic-planning", label: "Strategic Planning", icon: HeartPulse, title: "Strategic Planning" },
       { path: "/budget", label: "Budget", icon: Wallet, title: "Household Budget" },
-      { path: "/lifecycle-planning", label: "Lifecycle Planning", icon: HeartPulse, title: "Lifecycle Planning" },
       { path: "/trust-distributions", label: "Trust Analysis", icon: PieChart, title: "Trust Distribution Analysis" },
       { path: "/income-splitting", label: "Income Splitting", icon: Users, title: "Income Splitting" },
-      { path: "/scenario-modeling", label: "Scenario Modeling", icon: GitBranch, title: "Advanced Scenario Modeling" },
-      { path: "/scenario-comparison", label: "Scenario Comparison", icon: Scale, title: "Scenario Comparison" },
     ]
   },
   {
@@ -106,11 +104,12 @@ const navGroups = [
     ]
   },
   {
-    name: "Reports",
+    name: "Data & Reports",
     items: [
+      { path: "/data-import", label: "Import Data", icon: RefreshCw, title: "Import Data" },
+      { path: "/export", label: "Export Data", icon: Download, title: "Export Data" },
       { path: "/reports", label: "Reports", icon: FileText, title: "Reports" },
       { path: "/scenarios", label: "Saved Scenarios", icon: FolderOpen, title: "Saved Scenarios" },
-      { path: "/export", label: "Export Data", icon: Download, title: "Export Data" },
       { path: "/calculation-methodology", label: "Methodology", icon: BookOpen, title: "Calculation Methodology" },
     ]
   }
