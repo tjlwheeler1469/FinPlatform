@@ -239,23 +239,23 @@ const PracticeManagement = () => {
 
   return (
     <Layout>
-      <div className="space-y-6" data-testid="practice-management-page">
-        {/* Header */}
-        <div className="flex items-center justify-between">
+      <div className="space-y-4 sm:space-y-6" data-testid="practice-management-page">
+        {/* Header - Mobile Responsive */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Practice Management</h1>
-            <p className="text-muted-foreground">Manage your practice operations, billing, and compliance</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Practice Management</h1>
+            <p className="text-sm text-muted-foreground hidden sm:block">Manage your practice operations, billing, and compliance</p>
           </div>
           <div className="flex items-center gap-2">
             {activeTimer ? (
-              <Button onClick={() => toggleTimer()} variant="destructive" className="gap-2">
+              <Button onClick={() => toggleTimer()} variant="destructive" className="gap-2" size="sm">
                 <Pause className="h-4 w-4" />
                 {formatTime(timerSeconds)}
               </Button>
             ) : (
-              <Button onClick={() => toggleTimer()} variant="outline" className="gap-2">
+              <Button onClick={() => toggleTimer()} variant="outline" className="gap-2" size="sm">
                 <Play className="h-4 w-4" />
-                Start Timer
+                <span className="hidden sm:inline">Start</span> Timer
               </Button>
             )}
           </div>
