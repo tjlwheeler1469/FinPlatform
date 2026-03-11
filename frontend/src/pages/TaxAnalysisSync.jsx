@@ -382,17 +382,29 @@ const TaxAnalysisSync = () => {
                               </Badge>
                             </div>
                           </div>
-                          {familyMembers.length > 1 && (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="text-destructive"
-                              onClick={() => handleRemoveMember(member.id)}
-                              data-testid={`remove-member-${index}`}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          )}
+                          <div className="flex items-center gap-1">
+                            <Link to={`/family-member/${member.id}`}>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-[#0F392B]"
+                                data-testid={`view-profile-${index}`}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </Link>
+                            {familyMembers.length > 1 && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-destructive"
+                                onClick={() => handleRemoveMember(member.id)}
+                                data-testid={`remove-member-${index}`}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
                         </div>
 
                         <div className="space-y-2">
