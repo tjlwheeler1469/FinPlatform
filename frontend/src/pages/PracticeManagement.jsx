@@ -697,8 +697,9 @@ const PracticeManagement = () => {
                       <Button type="submit" className="bg-[#0F392B]">Schedule</Button>
                     </DialogFooter>
                   </form>
-                </DialogContent>
-              </Dialog>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
