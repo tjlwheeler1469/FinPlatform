@@ -359,7 +359,12 @@ const Layout = ({ children }) => {
                     >
                       <item.icon className="h-4 w-4 flex-shrink-0" />
                       {!sidebarCollapsed && (
-                        <span className="text-sm font-medium truncate">{item.label}</span>
+                        <span className="text-sm font-medium truncate flex-1">{item.label}</span>
+                      )}
+                      {!sidebarCollapsed && item.badge && (
+                        <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-[#D4AF37] text-[#0F392B] rounded">
+                          {item.badge}
+                        </span>
                       )}
                     </Link>
                   ))}
