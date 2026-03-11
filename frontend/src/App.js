@@ -797,6 +797,7 @@ const AppRouter = () => {
       <Route path="/adviser-dashboard" element={<AdviserDashboard />} />
       <Route path="/client-portal" element={<ClientPortalMerged />} />
       <Route path="/practice-management" element={<PracticeManagement />} />
+      <Route path="/documents" element={<DocumentsCommunications />} />
     </Routes>
   );
 };
@@ -808,7 +809,9 @@ function App() {
         <PortfolioProvider>
           <NotificationsProvider>
             <ComplianceModal />
-            <AppRouter />
+            <Suspense fallback={<PageLoader />}>
+              <AppRouter />
+            </Suspense>
             <Toaster position="top-right" richColors />
           </NotificationsProvider>
         </PortfolioProvider>
