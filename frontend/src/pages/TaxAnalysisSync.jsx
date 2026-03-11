@@ -24,7 +24,8 @@ import {
   Trash2,
   Plus,
   Save,
-  RefreshCw
+  RefreshCw,
+  Eye
 } from "lucide-react";
 import { usePortfolio } from "@/App";
 import { toast } from "sonner";
