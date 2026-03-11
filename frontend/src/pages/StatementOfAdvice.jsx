@@ -402,7 +402,8 @@ This advice is provided by [${soaData.licenseeName || 'Licensee Name'}] (AFSL ${
             <Button 
               onClick={generateSOA} 
               className="bg-[#0F392B]"
-              disabled={generating || completionProgress < 70}
+              disabled={generating || completionProgress < 70 || !soaData.acknowledged}
+              title={!soaData.acknowledged ? "Please acknowledge compliance requirements" : ""}
             >
               {generating ? (
                 <><Clock className="h-4 w-4 mr-2 animate-spin" /> Generating...</>
