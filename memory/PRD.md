@@ -249,6 +249,37 @@ Build an app that analyses all options for personal and business investment in A
   - **Knowledge Base**: 20+ Australian financial concepts explained (franking credits, negative gearing, CGT, ETFs, super contributions, etc.)
   - **How-To Guides**: Step-by-step guidance for tax reduction, investing, retirement planning
 
+- ✅ **Daily Briefing** (/daily-briefing)
+  - Personalized greeting based on time of day
+  - 4 KPI cards: Net Worth, Shares, Property, Monthly Cashflow with change indicators
+  - Portfolio Performance (6 Months) area chart
+  - AI-Powered Recommendations with priority badges and action buttons
+  - Upcoming Deadlines (BAS, Tax Return, Super Contribution)
+  - Market Summary: ASX 200, AUD/USD, RBA Cash Rate
+  - Quick Actions: Ask AI Copilot, View Tax Analysis, Generate Report
+  - Refresh and dismiss functionality
+
+- ✅ **Adviser Dashboard** (/adviser-dashboard) - DEMO MODE
+  - Multi-client management with 5 mock clients
+  - 5 KPI cards: Total AUM, Total Clients, Urgent Tasks, Reviews Due, Avg Compliance
+  - 4 Tabs: Overview, Clients, Tasks, Compliance
+  - Overview: AUM by client bar chart, Client Distribution pie chart
+  - Clients: Searchable/filterable table with bulk selection
+  - Client types: Family, Trust, SMSF, Company
+  - Tasks: All client tasks sorted by priority (urgent, high, medium)
+  - Compliance: Status cards and compliance by client list
+  - AFSL Compliant badge
+
+- ✅ **Client Portal** (/client-portal) - DEMO MODE
+  - Simplified interface (no sidebar navigation)
+  - Custom header with "Secure" badge and "Exit Portal" button
+  - Greeting banner with Net Worth summary
+  - Action items alert
+  - 4 Tabs: Overview, Goals, Documents, My Adviser
+  - Goals: Progress tracking for Retirement Fund, Children's Education, Pay Off Mortgage
+  - Documents: Statement of Advice, Annual Review Report, Tax Planning Summary
+  - Adviser: Contact info, Recent Messages, Send Message functionality
+
 - ✅ **Navigation Updates**
   - New "Adviser Tools" section with Collaboration and SOA Generator
   - New "Get Started" section with Client Onboarding and AI Advisor
