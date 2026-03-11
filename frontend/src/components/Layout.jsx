@@ -526,7 +526,35 @@ const Layout = ({ children }) => {
           )}
           onClick={(e) => e.stopPropagation()}
         >
-          <nav className="p-3 overflow-y-auto h-[calc(100%-56px)] pb-20">
+          {/* Mobile Mode Switcher */}
+          <div className="px-3 py-3 border-b border-white/10">
+            <Select value={appMode} onValueChange={(val) => { switchMode(val); setMobileMenuOpen(false); }}>
+              <SelectTrigger className="w-full bg-white/10 border-white/20 text-white">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="personal">
+                  <div className="flex items-center gap-2">
+                    <UserCircle className="h-4 w-4" />
+                    Personal Mode
+                  </div>
+                </SelectItem>
+                <SelectItem value="adviser">
+                  <div className="flex items-center gap-2">
+                    <Briefcase className="h-4 w-4" />
+                    Adviser Mode
+                  </div>
+                </SelectItem>
+                <SelectItem value="client">
+                  <div className="flex items-center gap-2">
+                    <Eye className="h-4 w-4" />
+                    Client View
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <nav className="p-3 overflow-y-auto h-[calc(100%-110px)] pb-20">
             {activeNavGroups.map((group) => (
               <div key={group.name} className="mb-2">
                 <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-white/50">
