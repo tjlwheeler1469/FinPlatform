@@ -108,9 +108,11 @@ const navGroups = [
     ]
   },
   {
-    name: "Data & Reports",
+    name: "Data & Integrations",
     items: [
-      { path: "/data-import", label: "Import Data", icon: RefreshCw, title: "Import Data" },
+      { path: "/bank-feeds", label: "Bank Feeds", icon: Landmark, title: "Bank Feeds" },
+      { path: "/accounting-integrations", label: "Xero / MYOB", icon: Link2, title: "Accounting Integrations" },
+      { path: "/data-import", label: "Import Data", icon: Upload, title: "Import Data" },
       { path: "/export", label: "Export Data", icon: Download, title: "Export Data" },
       { path: "/reports", label: "Reports", icon: FileText, title: "Reports" },
       { path: "/scenarios", label: "Saved Scenarios", icon: FolderOpen, title: "Saved Scenarios" },
