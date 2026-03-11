@@ -736,7 +736,7 @@ const AppRouter = () => {
       <Route path="/reports" element={<ReportGenerator />} />
       <Route path="/salary-packaging" element={<SalaryPackaging />} />
       <Route path="/property-comparison" element={<PropertyComparison />} />
-      <Route path="/scenario-comparison" element={<ScenarioComparison />} />
+      <Route path="/scenario-comparison" element={<Navigate to="/strategic-planning" replace />} />
       <Route path="/tax-loss-harvesting" element={<TaxLossHarvesting />} />
       <Route path="/dividend-reinvestment" element={<DividendReinvestment />} />
       <Route path="/income-splitting" element={<IncomeSplitting />} />
@@ -751,11 +751,13 @@ const AppRouter = () => {
       <Route path="/rental-yield-optimizer" element={<RentalYieldOptimizer />} />
       <Route path="/export" element={<ExportData />} />
       <Route path="/tax-analysis-sync" element={<TaxAnalysisSync />} />
-      <Route path="/scenario-modeling" element={<AdvancedScenarioModeling />} />
+      <Route path="/scenario-modeling" element={<Navigate to="/strategic-planning" replace />} />
       <Route path="/family-member/:memberId" element={<FamilyMemberProfile />} />
       <Route path="/family-wealth" element={<FamilyWealthDashboard />} />
-      <Route path="/lifecycle-planning" element={<LifecyclePlanning />} />
+      <Route path="/lifecycle-planning" element={<Navigate to="/strategic-planning" replace />} />
       <Route path="/financial-advisor" element={<FinancialAdvisorChat />} />
+      <Route path="/strategic-planning" element={<StrategicPlanning />} />
+      <Route path="/data-import" element={<DataImport />} />
     </Routes>
   );
 };
@@ -765,6 +767,7 @@ function App() {
     <div className="App min-h-screen bg-background">
       <BrowserRouter>
         <PortfolioProvider>
+          <ComplianceModal />
           <AppRouter />
           <Toaster position="top-right" richColors />
         </PortfolioProvider>
