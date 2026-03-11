@@ -18,7 +18,6 @@ import SMSFOptimizer from "@/pages/SMSFOptimizer";
 import ReportGenerator from "@/pages/ReportGenerator";
 import SalaryPackaging from "@/pages/SalaryPackaging";
 import PropertyComparison from "@/pages/PropertyComparison";
-import ScenarioComparison from "@/pages/ScenarioComparison";
 import TaxLossHarvesting from "@/pages/TaxLossHarvesting";
 import DividendReinvestment from "@/pages/DividendReinvestment";
 import HouseholdBudget from "@/pages/HouseholdBudget";
