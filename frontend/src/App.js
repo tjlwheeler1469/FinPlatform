@@ -760,6 +760,8 @@ const AppRouter = () => {
       <Route path="/financial-advisor" element={<FinancialAdvisorChat />} />
       <Route path="/strategic-planning" element={<StrategicPlanning />} />
       <Route path="/data-import" element={<DataImport />} />
+      <Route path="/bank-feeds" element={<BankFeeds />} />
+      <Route path="/accounting-integrations" element={<AccountingIntegrations />} />
     </Routes>
   );
 };
