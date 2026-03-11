@@ -34,15 +34,17 @@ import SuperannuationGuarantee from "@/pages/SuperannuationGuarantee";
 import RentalYieldOptimizer from "@/pages/RentalYieldOptimizer";
 import HoldingsPerformance from "@/pages/HoldingsPerformance";
 import ExportData from "@/pages/ExportData";
-import AdvancedScenarioModeling from "@/pages/AdvancedScenarioModeling";
 import FamilyMemberProfile from "@/pages/FamilyMemberProfile";
 import FamilyWealthDashboard from "@/pages/FamilyWealthDashboard";
-import LifecyclePlanning from "@/pages/LifecyclePlanning";
 import FinancialAdvisorChat from "@/pages/FinancialAdvisorChat";
 import StrategicPlanning from "@/pages/StrategicPlanning";
 import DataImport from "@/pages/DataImport";
 import BankFeeds from "@/pages/BankFeeds";
 import AccountingIntegrations from "@/pages/AccountingIntegrations";
+import BASCalculator from "@/pages/BASCalculator";
+import Collaboration from "@/pages/Collaboration";
+import RiskProfiler from "@/pages/RiskProfiler";
+import StatementOfAdvice from "@/pages/StatementOfAdvice";
 
 // Compliance Modal
 import { ComplianceModal } from "@/components/ComplianceDisclaimer";
