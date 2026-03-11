@@ -365,9 +365,9 @@ const IncomeSplitting = () => {
                           <tr key={member.id} className="border-b">
                             <td className="p-3 font-medium">{member.name}</td>
                             <td className="p-3">
-                              <Badge variant="outline">{member.relationship}</Badge>
+                              <Badge variant="outline" className="capitalize">{member.relationship.replace('_', ' ')}</Badge>
                             </td>
-                            <td className="text-right p-3">{formatCurrency(member.income)}</td>
+                            <td className="text-right p-3">{formatCurrency(member.taxableIncome || 0)}</td>
                             <td className="text-right p-3 text-destructive font-medium">
                               {formatCurrency(currentScenario.taxes[i].tax)}
                             </td>
