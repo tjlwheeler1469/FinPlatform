@@ -81,7 +81,7 @@ const navGroups = [
   {
     name: "Tax & CGT",
     items: [
-      { path: "/tax-analysis", label: "Tax Analysis", icon: Calculator, title: "Tax Analysis" },
+      { path: "/tax-analysis-sync", label: "Tax Analysis", icon: Calculator, title: "Tax Analysis (Synced)" },
       { path: "/cgt", label: "CGT", icon: TrendingUp, title: "Capital Gains Tax" },
       { path: "/tax-calendar", label: "Tax Calendar", icon: CalendarDays, title: "Tax Planning Calendar" },
       { path: "/historical-tax", label: "Tax History", icon: History, title: "Tax History" },
