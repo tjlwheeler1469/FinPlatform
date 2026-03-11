@@ -616,7 +616,7 @@ const PracticeManagement = () => {
                       <Plus className="h-4 w-4 mr-2" /> Schedule Meeting
                     </Button>
                   </DialogTrigger>
-                <DialogContent>
+                  <DialogContent>
                   <DialogHeader>
                     <DialogTitle>Schedule Meeting</DialogTitle>
                     <DialogDescription>Add a new meeting to your calendar</DialogDescription>
