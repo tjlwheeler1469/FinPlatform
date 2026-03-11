@@ -392,6 +392,8 @@ const PortfolioProvider = ({ children }) => {
   const [familyMembers, setFamilyMembers] = useState(DEFAULT_FAMILY_MEMBERS);
   const [trust, setTrust] = useState(DEFAULT_TRUST);
   const [budget, setBudget] = useState(DEFAULT_BUDGET);
+  const [sharePortfolio, setSharePortfolio] = useState(DEFAULT_SHARE_PORTFOLIO);
+  const [company, setCompany] = useState(DEFAULT_COMPANY);
   
   // Track unsaved changes
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -407,6 +409,8 @@ const PortfolioProvider = ({ children }) => {
         if (parsed.trust) setTrust(parsed.trust);
         if (parsed.budget) setBudget(parsed.budget);
         if (parsed.portfolio) setPortfolio(parsed.portfolio);
+        if (parsed.sharePortfolio) setSharePortfolio(parsed.sharePortfolio);
+        if (parsed.company) setCompany(parsed.company);
         if (parsed.lastSaved) setLastSaved(parsed.lastSaved);
       } catch (e) {
         console.error("Error loading saved data:", e);
