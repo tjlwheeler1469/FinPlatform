@@ -188,80 +188,6 @@ const adviserNavGroups = [
 
 // Keep old navGroups for backwards compatibility
 const navGroups = personalNavGroups;
-      { path: "/onboarding", label: "Client Onboarding", icon: Rocket, title: "Client Onboarding" },
-      { path: "/financial-advisor", label: "AI Advisor", icon: Bot, title: "AI Financial Advisor" },
-    ]
-  },
-  {
-    name: "Planning",
-    items: [
-      { path: "/strategic-planning", label: "Strategic Planning", icon: HeartPulse, title: "Strategic Planning" },
-      { path: "/budget", label: "Budget", icon: Wallet, title: "Household Budget" },
-      { path: "/trust-distributions", label: "Trust Analysis", icon: PieChart, title: "Trust Distribution Analysis" },
-      { path: "/income-splitting", label: "Income Splitting", icon: Users, title: "Income Splitting" },
-      { path: "/risk-profiler", label: "Risk Profiler", icon: Shield, title: "Risk Profiler" },
-    ]
-  },
-  {
-    name: "Property",
-    items: [
-      { path: "/property-portfolio", label: "Properties", icon: Building2, title: "Property Portfolio" },
-      { path: "/property-comparison", label: "Property Comparison", icon: Home, title: "Property Comparison" },
-      { path: "/rental-yield-optimizer", label: "Yield Optimizer", icon: Target, title: "Rental Yield Optimizer" },
-    ]
-  },
-  {
-    name: "Shares",
-    items: [
-      { path: "/share-portfolio", label: "Share Portfolio", icon: LineChart, title: "Share Portfolio" },
-      { path: "/holdings-performance", label: "Performance", icon: Activity, title: "Holdings Performance" },
-    ]
-  },
-  {
-    name: "Tax & CGT",
-    items: [
-      { path: "/tax-analysis-sync", label: "Tax Analysis", icon: Calculator, title: "Tax Analysis (Synced)" },
-      { path: "/cgt", label: "CGT", icon: TrendingUp, title: "Capital Gains Tax" },
-      { path: "/tax-calendar", label: "Tax Calendar", icon: CalendarDays, title: "Tax Planning Calendar" },
-      { path: "/bas-calculator", label: "BAS Calculator", icon: FileCheck, title: "BAS Calculator" },
-      { path: "/historical-tax", label: "Tax History", icon: History, title: "Tax History" },
-      { path: "/tax-loss-harvesting", label: "Tax Harvesting", icon: Scissors, title: "Tax Loss Harvesting" },
-    ]
-  },
-  {
-    name: "Calculators",
-    items: [
-      { path: "/loan-calculator", label: "Loan", icon: Landmark, title: "Loan Calculator" },
-      { path: "/monte-carlo", label: "Monte Carlo", icon: BarChart3, title: "Monte Carlo Simulation" },
-      { path: "/division-7a", label: "Division 7A", icon: FileCheck, title: "Division 7A Calculator" },
-      { path: "/salary-packaging", label: "Salary Packaging", icon: Briefcase, title: "Salary Packaging" },
-      { path: "/dividend-reinvestment", label: "Dividends", icon: Repeat, title: "Dividend Reinvestment" },
-      { path: "/smsf-optimizer", label: "SMSF", icon: PiggyBank, title: "SMSF Optimizer" },
-      { path: "/sg-calculator", label: "SG Calculator", icon: Users, title: "Superannuation Guarantee" },
-    ]
-  },
-  {
-    name: "Adviser Tools",
-    items: [
-      { path: "/adviser-dashboard", label: "Adviser Dashboard", icon: Briefcase, title: "Adviser Dashboard", badge: "New" },
-      { path: "/client-portal", label: "Client Portal", icon: UserCircle, title: "Client Portal" },
-      { path: "/collaboration", label: "Collaboration", icon: UserPlus, title: "Collaboration" },
-      { path: "/statement-of-advice", label: "SOA Generator", icon: ClipboardList, title: "Statement of Advice" },
-    ]
-  },
-  {
-    name: "Data & Integrations",
-    items: [
-      { path: "/bank-feeds", label: "Bank Feeds", icon: Landmark, title: "Bank Feeds" },
-      { path: "/accounting-integrations", label: "Xero / MYOB", icon: Link2, title: "Accounting Integrations" },
-      { path: "/data-import", label: "Import Data", icon: Upload, title: "Import Data" },
-      { path: "/export", label: "Export Data", icon: Download, title: "Export Data" },
-      { path: "/reports", label: "Reports", icon: FileText, title: "Reports" },
-      { path: "/scenarios", label: "Saved Scenarios", icon: FolderOpen, title: "Saved Scenarios" },
-      { path: "/calculation-methodology", label: "Methodology", icon: BookOpen, title: "Calculation Methodology" },
-    ]
-  }
-];
 
 // Flatten for title lookup and mobile nav
 const allNavItems = navGroups.flatMap(group => group.items);
@@ -277,12 +203,17 @@ const mobileBottomNav = [
 
 const Layout = ({ children }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { hasUnsavedChanges, saveAllData } = usePortfolio();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [appMode, setAppMode] = useState(() => localStorage.getItem("app_mode") || "personal");
+  
+  // Get the right nav groups based on mode
+  const activeNavGroups = appMode === "adviser" ? adviserNavGroups : personalNavGroups;
+  
   const [expandedGroups, setExpandedGroups] = useState(() => {
-    // Expand all groups by default
-    return navGroups.reduce((acc, group) => {
+    return activeNavGroups.reduce((acc, group) => {
       acc[group.name] = true;
       return acc;
     }, {});
@@ -293,6 +224,26 @@ const Layout = ({ children }) => {
   // Ref for sidebar scroll position preservation
   const sidebarNavRef = useRef(null);
   const scrollPositionRef = useRef(0);
+
+  // Update expanded groups when mode changes
+  useEffect(() => {
+    setExpandedGroups(activeNavGroups.reduce((acc, group) => {
+      acc[group.name] = true;
+      return acc;
+    }, {}));
+  }, [appMode]);
+
+  const switchMode = (newMode) => {
+    setAppMode(newMode);
+    localStorage.setItem("app_mode", newMode);
+    if (newMode === "adviser") {
+      navigate("/adviser-dashboard");
+    } else if (newMode === "client") {
+      navigate("/client-portal");
+    } else {
+      navigate("/daily-briefing");
+    }
+  };
 
   // Fix page title on navigation
   useEffect(() => {
