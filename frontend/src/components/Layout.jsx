@@ -261,32 +261,33 @@ const Layout = ({ children }) => {
     // Save current scroll position before navigation
     const savedScrollPosition = scrollPositionRef.current;
     
-    // Use multiple attempts to restore scroll position with increasing delays
-    const restoreScroll = (attempts = 0) => {
-      const sidebar = sidebarNavRef.current;
-      if (sidebar && savedScrollPosition > 0) {
-        sidebar.scrollTop = savedScrollPosition;
-        // If scroll didn't apply and we have attempts left, try again
-        if (sidebar.scrollTop !== savedScrollPosition && attempts < 3) {
-          requestAnimationFrame(() => restoreScroll(attempts + 1));
-        }
-      }
-    };
-    
     // Scroll main content to top on route change
     const mainContent = document.getElementById('main-content');
     if (mainContent) {
       mainContent.scrollTo(0, 0);
     }
     
-    // Restore sidebar scroll with multiple timing strategies
-    // Immediate attempt
-    requestAnimationFrame(() => {
-      restoreScroll(0);
-      // Backup attempt after a delay
-      setTimeout(() => restoreScroll(0), 50);
-    });
-    
+    // Restore sidebar scroll position with robust retry mechanism
+    const sidebar = sidebarNavRef.current;
+    if (sidebar && savedScrollPosition > 0) {
+      // Immediate attempt
+      sidebar.scrollTop = savedScrollPosition;
+      
+      // Create a function that keeps trying until successful
+      let attempts = 0;
+      const maxAttempts = 10;
+      const intervalId = setInterval(() => {
+        if (sidebar.scrollTop === savedScrollPosition || attempts >= maxAttempts) {
+          clearInterval(intervalId);
+        } else {
+          sidebar.scrollTop = savedScrollPosition;
+          attempts++;
+        }
+      }, 50);
+      
+      // Cleanup
+      return () => clearInterval(intervalId);
+    }
   }, [location.pathname]);
 
   // Save sidebar scroll position on scroll
