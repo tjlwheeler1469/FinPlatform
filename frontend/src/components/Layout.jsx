@@ -94,6 +94,7 @@ const navGroups = [
       { path: "/salary-packaging", label: "Salary Packaging", icon: Briefcase, title: "Salary Packaging" },
       { path: "/dividend-reinvestment", label: "Dividends", icon: Repeat, title: "Dividend Reinvestment" },
       { path: "/smsf-optimizer", label: "SMSF", icon: PiggyBank, title: "SMSF Optimizer" },
+      { path: "/sg-calculator", label: "SG Calculator", icon: Users, title: "Superannuation Guarantee" },
     ]
   },
   {
@@ -101,6 +102,8 @@ const navGroups = [
     items: [
       { path: "/reports", label: "Reports", icon: FileText, title: "Reports" },
       { path: "/scenarios", label: "Saved Scenarios", icon: FolderOpen, title: "Saved Scenarios" },
+      { path: "/export", label: "Export Data", icon: Download, title: "Export Data" },
+      { path: "/calculation-methodology", label: "Methodology", icon: BookOpen, title: "Calculation Methodology" },
     ]
   }
 ];
