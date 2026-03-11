@@ -756,8 +756,9 @@ const PracticeManagement = () => {
                   <form onSubmit={(e) => {
                     e.preventDefault();
                     const formData = new FormData(e.target);
+                    const clientId = formData.get("client_id");
                     addTimeEntry({
-                      client_id: formData.get("client_id") || null,
+                      client_id: clientId === "internal" ? null : clientId,
                       date: formData.get("date"),
                       hours: parseFloat(formData.get("hours")),
                       description: formData.get("description"),
