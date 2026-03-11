@@ -164,18 +164,24 @@ const Layout = ({ children }) => {
 
   // Preserve sidebar scroll position on navigation
   useEffect(() => {
-    // Save current scroll position before navigation
-    const sidebar = sidebarNavRef.current;
-    if (sidebar) {
-      // Restore saved scroll position after render
-      sidebar.scrollTop = scrollPositionRef.current;
-    }
+    // Use requestAnimationFrame to ensure DOM is ready before restoring scroll
+    const restoreScroll = () => {
+      const sidebar = sidebarNavRef.current;
+      if (sidebar && scrollPositionRef.current > 0) {
+        sidebar.scrollTop = scrollPositionRef.current;
+      }
+    };
     
     // Scroll main content to top on route change
     const mainContent = document.getElementById('main-content');
     if (mainContent) {
       mainContent.scrollTo(0, 0);
     }
+    
+    // Restore sidebar scroll after a small delay to ensure DOM is ready
+    requestAnimationFrame(() => {
+      requestAnimationFrame(restoreScroll);
+    });
   }, [location.pathname]);
 
   // Save sidebar scroll position on scroll
