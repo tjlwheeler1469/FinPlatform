@@ -111,8 +111,127 @@ const DEFAULT_TRUST = {
   name: "Wheeler Family Trust",
   type: "discretionary",
   netIncome: 150000,
+  financialYear: "2024-25",
+  companyDividendsReceived: 0 // Dividends from company distributed to trust
+};
+
+// Default Company Structure
+const DEFAULT_COMPANY = {
+  name: "Wheeler Investments Pty Ltd",
+  abn: "12 345 678 901",
+  acn: "123 456 789",
+  isBaseRateEntity: true, // Under $50M aggregated turnover, 25% tax rate
+  taxRate: 0.25,
+  frankingAccountBalance: 45000,
+  retainedEarnings: 180000,
   financialYear: "2024-25"
 };
+
+// Default Share Portfolio with ownership types
+const DEFAULT_SHARE_PORTFOLIO = [
+  // Personal Holdings
+  { 
+    id: 1, 
+    symbol: "CBA", 
+    name: "Commonwealth Bank", 
+    ownership: "personal", 
+    ownerId: 1, // James Wheeler
+    quantity: 200, 
+    purchasePrice: 98.50, 
+    currentPrice: 118.50, 
+    purchaseDate: "2022-03-15",
+    dividendYield: 4.2,
+    frankingPercentage: 100,
+    sector: "Financials"
+  },
+  { 
+    id: 2, 
+    symbol: "BHP", 
+    name: "BHP Group", 
+    ownership: "personal",
+    ownerId: 1, // James Wheeler
+    quantity: 300, 
+    purchasePrice: 45.20, 
+    currentPrice: 42.80, 
+    purchaseDate: "2023-06-20",
+    dividendYield: 5.8,
+    frankingPercentage: 100,
+    sector: "Materials"
+  },
+  // Joint Holdings (50/50 James & Sarah)
+  { 
+    id: 3, 
+    symbol: "VAS", 
+    name: "Vanguard Australian Shares ETF", 
+    ownership: "joint",
+    ownerId: null, // Split between primary & spouse
+    quantity: 500, 
+    purchasePrice: 88.00, 
+    currentPrice: 96.50, 
+    purchaseDate: "2022-08-01",
+    dividendYield: 3.8,
+    frankingPercentage: 85,
+    sector: "ETF"
+  },
+  { 
+    id: 4, 
+    symbol: "CSL", 
+    name: "CSL Limited", 
+    ownership: "joint",
+    ownerId: null,
+    quantity: 50, 
+    purchasePrice: 285.00, 
+    currentPrice: 298.00, 
+    purchaseDate: "2024-01-10",
+    dividendYield: 1.2,
+    frankingPercentage: 100,
+    sector: "Healthcare"
+  },
+  // Company Holdings
+  { 
+    id: 5, 
+    symbol: "WBC", 
+    name: "Westpac Banking", 
+    ownership: "company",
+    ownerId: null,
+    quantity: 1000, 
+    purchasePrice: 22.50, 
+    currentPrice: 26.80, 
+    purchaseDate: "2023-02-15",
+    dividendYield: 5.2,
+    frankingPercentage: 100,
+    sector: "Financials"
+  },
+  { 
+    id: 6, 
+    symbol: "TLS", 
+    name: "Telstra Group", 
+    ownership: "company",
+    ownerId: null,
+    quantity: 2000, 
+    purchasePrice: 3.85, 
+    currentPrice: 4.05, 
+    purchaseDate: "2023-05-20",
+    dividendYield: 4.4,
+    frankingPercentage: 100,
+    sector: "Telecommunications"
+  },
+  // Spouse Personal Holdings
+  { 
+    id: 7, 
+    symbol: "WOW", 
+    name: "Woolworths Group", 
+    ownership: "personal",
+    ownerId: 2, // Sarah Wheeler
+    quantity: 150, 
+    purchasePrice: 36.50, 
+    currentPrice: 31.20, 
+    purchaseDate: "2023-09-10",
+    dividendYield: 3.5,
+    frankingPercentage: 100,
+    sector: "Consumer Staples"
+  }
+];
 
 // Default Household Budget
 const DEFAULT_BUDGET = {
