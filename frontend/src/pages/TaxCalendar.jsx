@@ -854,6 +854,8 @@ const TaxCalendar = () => {
             </Card>
           </div>
         )}
+
+        <ComplianceFooter />
       </div>
     </Layout>
   );
