@@ -125,6 +125,7 @@ const StatementOfAdvice = () => {
     licenseeName: "",
     licenseNumber: "",
     dateIssued: new Date().toISOString().split('T')[0],
+    acknowledged: false,
   });
 
   const [generating, setGenerating] = useState(false);
