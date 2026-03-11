@@ -163,7 +163,54 @@ Build an app that analyses all options for personal and business investment in A
 
 ### New Features Implemented
 
-- ✅ **Real-time Stock Price Refresh** (/share-portfolio)
+- ✅ **Real-time Stock Data Integration** ✅ DONE (December 2025) - Mock data (Alpha Vantage ready)
+21. ✅ **Lifecycle Planning** ✅ DONE (December 2025) - Retirement, Estate, Goals
+22. ✅ **AI Financial Advisor Chatbot** ✅ DONE (December 2025) - Demo mode (LLM ready)
+
+## Latest Session Updates (December 2025 - Current)
+
+### New Features Implemented
+
+- ✅ **AU Regulatory Compliance (ASIC/ATO/Corporations Act)**
+  - ComplianceModal shows on first visit with:
+    - ASIC Regulatory Guide 234 reference
+    - Corporations Act 2001 s911A reference
+    - ATO Tax Practitioner Guidelines reference
+    - Australian Consumer Law disclaimer
+  - ComplianceFooter on all calculator pages
+  - "General Information Only" disclaimers throughout
+  - Links to ASIC MoneySmart, ATO resources
+  - Acknowledgement persists in localStorage
+
+- ✅ **Strategic Planning** (/strategic-planning) - Combined Page
+  - Merged Lifecycle Planning, Scenario Modeling, and Scenario Comparison
+  - 4 main tabs: Lifecycle | Scenarios | Compare | What-If
+  - Lifecycle sub-tabs: Retirement, Estate, Goals
+  - Scenario builder with market assumptions
+  - Multi-scenario comparison charts
+  - Key insights and rankings
+
+- ✅ **Data Import** (/data-import)
+  - File-based import wizard (4 steps)
+  - Supports: CSV, Excel (.xlsx, .xls), Xero Export, MYOB Export
+  - Data types: Family Members, Properties, Share Holdings, Transactions
+  - Step-by-step Xero/MYOB export instructions included
+  - Download template functionality
+  - Field mapping and preview before import
+
+- ✅ **Financial Recommendations Clickable Actions**
+  - All recommendation actions now navigate to relevant pages
+  - "Rebalance portfolio" → Strategic Planning
+  - "Tax optimization" → Tax Analysis
+  - "Debt reduction" → Loan Calculator
+  - Uses React Router navigate() for proper SPA navigation
+
+- ✅ **Navigation Updates**
+  - Planning section: Strategic Planning replaces separate Lifecycle/Scenario pages
+  - Data & Reports section: Added Import Data link
+  - Old routes redirect: /lifecycle-planning, /scenario-modeling → /strategic-planning
+
+- ✅ **Real-time Stock Price Refresh** (`/share-portfolio`)
   - "Refresh Prices" button fetches mock ASX stock prices
   - Demo Mode badge and "Simulated prices" indicator
   - Ready for Alpha Vantage API integration (add ALPHA_VANTAGE_KEY to .env)
