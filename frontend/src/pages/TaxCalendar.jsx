@@ -6,11 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { 
   Calendar,
   ChevronLeft,
   ChevronRight,
   Bell,
+  BellRing,
   Plus,
   Trash2,
   AlertTriangle,
@@ -21,9 +24,17 @@ import {
   Building2,
   PiggyBank,
   Briefcase,
-  X
+  X,
+  RefreshCw,
+  Mail,
+  Phone
 } from "lucide-react";
 import { toast } from "sonner";
+import axios from "axios";
+import { ComplianceFooter } from "@/components/ComplianceDisclaimer";
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
 
 // Australian Tax Calendar Events for 2024-25 Financial Year
 const AUSTRALIAN_TAX_DATES = [
