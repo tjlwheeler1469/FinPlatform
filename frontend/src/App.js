@@ -46,6 +46,9 @@ import RiskProfiler from "@/pages/RiskProfiler";
 import StatementOfAdvice from "@/pages/StatementOfAdvice";
 import ClientOnboarding from "@/pages/ClientOnboarding";
 import Copilot from "@/pages/Copilot";
+import DailyBriefing from "@/pages/DailyBriefing";
+import AdviserDashboard from "@/pages/AdviserDashboard";
+import ClientPortal from "@/pages/ClientPortal";
 
 // Compliance Modal
 import { ComplianceModal } from "@/components/ComplianceDisclaimer";
