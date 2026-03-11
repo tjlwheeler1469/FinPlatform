@@ -63,6 +63,13 @@ const navGroups = [
       { path: "/overview", label: "Family Overview", icon: Eye, title: "Family Overview" },
       { path: "/family-wealth", label: "Wealth Dashboard", icon: TrendingUp, title: "Family Wealth Dashboard" },
       { path: "/recommendations", label: "Recommendations", icon: Lightbulb, title: "Financial Recommendations" },
+      { path: "/copilot", label: "AI Copilot", icon: Sparkles, title: "AI Copilot", badge: "New" },
+    ]
+  },
+  {
+    name: "Get Started",
+    items: [
+      { path: "/onboarding", label: "Client Onboarding", icon: Rocket, title: "Client Onboarding" },
       { path: "/financial-advisor", label: "AI Advisor", icon: Bot, title: "AI Financial Advisor" },
     ]
   },
