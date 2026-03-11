@@ -2832,6 +2832,583 @@ async def financial_advisor_chat(request: ChatMessage):
 
 # ==================== HEALTH CHECK ====================
 
+# ==================== CLIENT AUTHENTICATION ====================
+
+class ClientLoginRequest(BaseModel):
+    email: str
+    password: str
+
+class ClientRegisterRequest(BaseModel):
+    email: str
+    password: str
+    name: str
+    adviser_code: Optional[str] = None
+
+class ClientProfile(BaseModel):
+    client_id: str
+    email: str
+    name: str
+    adviser_id: Optional[str] = None
+    adviser_name: Optional[str] = None
+    created_at: str
+
+import hashlib
+import secrets
+
+def hash_password(password: str) -> str:
+    """Hash password with salt"""
+    salt = secrets.token_hex(16)
+    hashed = hashlib.pbkdf2_hmac('sha256', password.encode(), salt.encode(), 100000)
+    return f"{salt}:{hashed.hex()}"
+
+def verify_password(password: str, stored_hash: str) -> bool:
+    """Verify password against stored hash"""
+    try:
+        salt, hash_value = stored_hash.split(':')
+        hashed = hashlib.pbkdf2_hmac('sha256', password.encode(), salt.encode(), 100000)
+        return hashed.hex() == hash_value
+    except:
+        return False
+
+def generate_client_token() -> str:
+    """Generate a secure client token"""
+    return secrets.token_urlsafe(32)
+
+@api_router.post("/client/register")
+async def client_register(request: ClientRegisterRequest):
+    """Register a new client"""
+    # Check if client already exists
+    existing = await db.clients.find_one({"email": request.email}, {"_id": 0})
+    if existing:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    client_id = f"client_{uuid.uuid4().hex[:12]}"
+    password_hash = hash_password(request.password)
+    
+    # Find adviser by code if provided
+    adviser_id = None
+    adviser_name = None
+    if request.adviser_code:
+        adviser = await db.advisers.find_one({"adviser_code": request.adviser_code}, {"_id": 0})
+        if adviser:
+            adviser_id = adviser.get("adviser_id")
+            adviser_name = adviser.get("name")
+    
+    client_data = {
+        "client_id": client_id,
+        "email": request.email,
+        "name": request.name,
+        "password_hash": password_hash,
+        "adviser_id": adviser_id,
+        "adviser_name": adviser_name,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.clients.insert_one(client_data)
+    
+    # Generate token
+    token = generate_client_token()
+    expires_at = datetime.now(timezone.utc) + timedelta(days=7)
+    
+    session_data = {
+        "session_id": f"csess_{uuid.uuid4().hex[:16]}",
+        "client_id": client_id,
+        "token": token,
+        "expires_at": expires_at.isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.client_sessions.insert_one(session_data)
+    
+    return {
+        "client_id": client_id,
+        "email": request.email,
+        "name": request.name,
+        "token": token,
+        "adviser_name": adviser_name
+    }
+
+@api_router.post("/client/login")
+async def client_login(request: ClientLoginRequest, response: Response):
+    """Login a client"""
+    client_doc = await db.clients.find_one({"email": request.email}, {"_id": 0})
+    
+    if not client_doc:
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    
+    if not verify_password(request.password, client_doc.get("password_hash", "")):
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    
+    # Generate new token
+    token = generate_client_token()
+    expires_at = datetime.now(timezone.utc) + timedelta(days=7)
+    
+    session_data = {
+        "session_id": f"csess_{uuid.uuid4().hex[:16]}",
+        "client_id": client_doc["client_id"],
+        "token": token,
+        "expires_at": expires_at.isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.client_sessions.insert_one(session_data)
+    
+    # Set cookie
+    response.set_cookie(
+        key="client_token",
+        value=token,
+        httponly=True,
+        secure=True,
+        samesite="none",
+        path="/",
+        max_age=7 * 24 * 60 * 60
+    )
+    
+    return {
+        "client_id": client_doc["client_id"],
+        "email": client_doc["email"],
+        "name": client_doc["name"],
+        "token": token,
+        "adviser_name": client_doc.get("adviser_name")
+    }
+
+@api_router.get("/client/me")
+async def get_client_profile(request: Request):
+    """Get current client profile"""
+    token = request.cookies.get("client_token")
+    if not token:
+        auth_header = request.headers.get("Authorization")
+        if auth_header and auth_header.startswith("Bearer "):
+            token = auth_header.split(" ")[1]
+    
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    session = await db.client_sessions.find_one({"token": token}, {"_id": 0})
+    if not session:
+        raise HTTPException(status_code=401, detail="Invalid session")
+    
+    expires_at = datetime.fromisoformat(session["expires_at"])
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+    if expires_at < datetime.now(timezone.utc):
+        raise HTTPException(status_code=401, detail="Session expired")
+    
+    client_doc = await db.clients.find_one(
+        {"client_id": session["client_id"]},
+        {"_id": 0, "password_hash": 0}
+    )
+    
+    if not client_doc:
+        raise HTTPException(status_code=404, detail="Client not found")
+    
+    return client_doc
+
+@api_router.post("/client/logout")
+async def client_logout(request: Request, response: Response):
+    """Logout client"""
+    token = request.cookies.get("client_token")
+    if token:
+        await db.client_sessions.delete_one({"token": token})
+    
+    response.delete_cookie(key="client_token", path="/")
+    return {"message": "Logged out successfully"}
+
+# ==================== PRACTICE MANAGEMENT ====================
+
+class ClientNote(BaseModel):
+    note_id: str = Field(default_factory=lambda: f"note_{uuid.uuid4().hex[:12]}")
+    client_id: str
+    title: str
+    content: str
+    category: str = "general"  # general, meeting, call, email, compliance
+    is_private: bool = False
+    created_by: str
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class Meeting(BaseModel):
+    meeting_id: str = Field(default_factory=lambda: f"meet_{uuid.uuid4().hex[:12]}")
+    client_id: str
+    title: str
+    description: Optional[str] = None
+    scheduled_at: str
+    duration_minutes: int = 60
+    location: Optional[str] = None
+    meeting_type: str = "review"  # review, planning, onboarding, compliance
+    status: str = "scheduled"  # scheduled, completed, cancelled, rescheduled
+    notes: Optional[str] = None
+    created_by: str
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class Task(BaseModel):
+    task_id: str = Field(default_factory=lambda: f"task_{uuid.uuid4().hex[:12]}")
+    client_id: Optional[str] = None
+    title: str
+    description: Optional[str] = None
+    due_date: str
+    priority: str = "medium"  # low, medium, high, urgent
+    status: str = "pending"  # pending, in_progress, completed, cancelled
+    category: str = "general"  # general, compliance, review, follow_up
+    assigned_to: str
+    created_by: str
+    completed_at: Optional[str] = None
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class TimeEntry(BaseModel):
+    entry_id: str = Field(default_factory=lambda: f"time_{uuid.uuid4().hex[:12]}")
+    client_id: str
+    date: str
+    hours: float
+    description: str
+    activity_type: str = "consulting"  # consulting, research, admin, meeting, travel
+    is_billable: bool = True
+    hourly_rate: float = 0
+    created_by: str
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class Invoice(BaseModel):
+    invoice_id: str = Field(default_factory=lambda: f"inv_{uuid.uuid4().hex[:12]}")
+    invoice_number: str
+    client_id: str
+    issue_date: str
+    due_date: str
+    line_items: List[Dict[str, Any]]
+    subtotal: float
+    gst: float
+    total: float
+    status: str = "draft"  # draft, sent, paid, overdue, cancelled
+    notes: Optional[str] = None
+    created_by: str
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class ComplianceRecord(BaseModel):
+    record_id: str = Field(default_factory=lambda: f"comp_{uuid.uuid4().hex[:12]}")
+    client_id: str
+    record_type: str  # soa_review, fds_issued, risk_assessment, kyc_update, annual_review
+    description: str
+    completed_at: str
+    next_due: Optional[str] = None
+    documents: List[str] = []
+    created_by: str
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+# Client Notes Endpoints
+@api_router.post("/practice/notes")
+async def create_client_note(note: ClientNote, request: Request):
+    """Create a client note"""
+    user = await get_current_user(request)
+    note_data = note.model_dump()
+    note_data["created_by"] = user.user_id
+    await db.client_notes.insert_one(note_data)
+    return await db.client_notes.find_one({"note_id": note_data["note_id"]}, {"_id": 0})
+
+@api_router.get("/practice/notes/{client_id}")
+async def get_client_notes(client_id: str, request: Request):
+    """Get all notes for a client"""
+    await get_current_user(request)
+    notes = await db.client_notes.find(
+        {"client_id": client_id},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    return notes
+
+@api_router.delete("/practice/notes/{note_id}")
+async def delete_client_note(note_id: str, request: Request):
+    """Delete a client note"""
+    await get_current_user(request)
+    result = await db.client_notes.delete_one({"note_id": note_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Note not found")
+    return {"message": "Note deleted"}
+
+# Meeting Scheduler Endpoints
+@api_router.post("/practice/meetings")
+async def create_meeting(meeting: Meeting, request: Request):
+    """Create a meeting"""
+    user = await get_current_user(request)
+    meeting_data = meeting.model_dump()
+    meeting_data["created_by"] = user.user_id
+    await db.meetings.insert_one(meeting_data)
+    return await db.meetings.find_one({"meeting_id": meeting_data["meeting_id"]}, {"_id": 0})
+
+@api_router.get("/practice/meetings")
+async def get_meetings(request: Request, client_id: Optional[str] = None, status: Optional[str] = None):
+    """Get meetings with optional filters"""
+    await get_current_user(request)
+    query = {}
+    if client_id:
+        query["client_id"] = client_id
+    if status:
+        query["status"] = status
+    
+    meetings = await db.meetings.find(query, {"_id": 0}).sort("scheduled_at", 1).to_list(100)
+    return meetings
+
+@api_router.put("/practice/meetings/{meeting_id}")
+async def update_meeting(meeting_id: str, meeting: Meeting, request: Request):
+    """Update a meeting"""
+    await get_current_user(request)
+    meeting_data = meeting.model_dump()
+    meeting_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    result = await db.meetings.update_one(
+        {"meeting_id": meeting_id},
+        {"$set": meeting_data}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Meeting not found")
+    
+    return await db.meetings.find_one({"meeting_id": meeting_id}, {"_id": 0})
+
+# Task Tracking Endpoints
+@api_router.post("/practice/tasks")
+async def create_task(task: Task, request: Request):
+    """Create a task"""
+    user = await get_current_user(request)
+    task_data = task.model_dump()
+    task_data["created_by"] = user.user_id
+    await db.tasks.insert_one(task_data)
+    return await db.tasks.find_one({"task_id": task_data["task_id"]}, {"_id": 0})
+
+@api_router.get("/practice/tasks")
+async def get_tasks(
+    request: Request,
+    client_id: Optional[str] = None,
+    status: Optional[str] = None,
+    priority: Optional[str] = None
+):
+    """Get tasks with optional filters"""
+    await get_current_user(request)
+    query = {}
+    if client_id:
+        query["client_id"] = client_id
+    if status:
+        query["status"] = status
+    if priority:
+        query["priority"] = priority
+    
+    tasks = await db.tasks.find(query, {"_id": 0}).sort("due_date", 1).to_list(200)
+    return tasks
+
+@api_router.put("/practice/tasks/{task_id}")
+async def update_task(task_id: str, task: Task, request: Request):
+    """Update a task"""
+    await get_current_user(request)
+    task_data = task.model_dump()
+    task_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    if task_data.get("status") == "completed" and not task_data.get("completed_at"):
+        task_data["completed_at"] = datetime.now(timezone.utc).isoformat()
+    
+    result = await db.tasks.update_one(
+        {"task_id": task_id},
+        {"$set": task_data}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Task not found")
+    
+    return await db.tasks.find_one({"task_id": task_id}, {"_id": 0})
+
+# Time Tracking Endpoints
+@api_router.post("/practice/time-entries")
+async def create_time_entry(entry: TimeEntry, request: Request):
+    """Create a time entry"""
+    user = await get_current_user(request)
+    entry_data = entry.model_dump()
+    entry_data["created_by"] = user.user_id
+    await db.time_entries.insert_one(entry_data)
+    return await db.time_entries.find_one({"entry_id": entry_data["entry_id"]}, {"_id": 0})
+
+@api_router.get("/practice/time-entries")
+async def get_time_entries(
+    request: Request,
+    client_id: Optional[str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None
+):
+    """Get time entries with filters"""
+    await get_current_user(request)
+    query = {}
+    if client_id:
+        query["client_id"] = client_id
+    if start_date:
+        query["date"] = {"$gte": start_date}
+    if end_date:
+        if "date" in query:
+            query["date"]["$lte"] = end_date
+        else:
+            query["date"] = {"$lte": end_date}
+    
+    entries = await db.time_entries.find(query, {"_id": 0}).sort("date", -1).to_list(500)
+    
+    # Calculate totals
+    total_hours = sum(e.get("hours", 0) for e in entries)
+    billable_hours = sum(e.get("hours", 0) for e in entries if e.get("is_billable"))
+    total_value = sum(e.get("hours", 0) * e.get("hourly_rate", 0) for e in entries if e.get("is_billable"))
+    
+    return {
+        "entries": entries,
+        "summary": {
+            "total_entries": len(entries),
+            "total_hours": total_hours,
+            "billable_hours": billable_hours,
+            "non_billable_hours": total_hours - billable_hours,
+            "total_billable_value": total_value
+        }
+    }
+
+# Invoice Endpoints
+@api_router.post("/practice/invoices")
+async def create_invoice(invoice: Invoice, request: Request):
+    """Create an invoice"""
+    user = await get_current_user(request)
+    invoice_data = invoice.model_dump()
+    invoice_data["created_by"] = user.user_id
+    await db.invoices.insert_one(invoice_data)
+    return await db.invoices.find_one({"invoice_id": invoice_data["invoice_id"]}, {"_id": 0})
+
+@api_router.get("/practice/invoices")
+async def get_invoices(request: Request, client_id: Optional[str] = None, status: Optional[str] = None):
+    """Get invoices with optional filters"""
+    await get_current_user(request)
+    query = {}
+    if client_id:
+        query["client_id"] = client_id
+    if status:
+        query["status"] = status
+    
+    invoices = await db.invoices.find(query, {"_id": 0}).sort("issue_date", -1).to_list(200)
+    
+    # Calculate totals
+    total_invoiced = sum(i.get("total", 0) for i in invoices)
+    total_paid = sum(i.get("total", 0) for i in invoices if i.get("status") == "paid")
+    total_outstanding = sum(i.get("total", 0) for i in invoices if i.get("status") in ["sent", "overdue"])
+    
+    return {
+        "invoices": invoices,
+        "summary": {
+            "total_invoices": len(invoices),
+            "total_invoiced": total_invoiced,
+            "total_paid": total_paid,
+            "total_outstanding": total_outstanding
+        }
+    }
+
+@api_router.put("/practice/invoices/{invoice_id}/status")
+async def update_invoice_status(invoice_id: str, status: str, request: Request):
+    """Update invoice status"""
+    await get_current_user(request)
+    if status not in ["draft", "sent", "paid", "overdue", "cancelled"]:
+        raise HTTPException(status_code=400, detail="Invalid status")
+    
+    result = await db.invoices.update_one(
+        {"invoice_id": invoice_id},
+        {"$set": {"status": status, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Invoice not found")
+    
+    return await db.invoices.find_one({"invoice_id": invoice_id}, {"_id": 0})
+
+# Compliance Audit Trail
+@api_router.post("/practice/compliance")
+async def create_compliance_record(record: ComplianceRecord, request: Request):
+    """Create a compliance record"""
+    user = await get_current_user(request)
+    record_data = record.model_dump()
+    record_data["created_by"] = user.user_id
+    await db.compliance_records.insert_one(record_data)
+    return await db.compliance_records.find_one({"record_id": record_data["record_id"]}, {"_id": 0})
+
+@api_router.get("/practice/compliance/{client_id}")
+async def get_compliance_records(client_id: str, request: Request):
+    """Get compliance records for a client"""
+    await get_current_user(request)
+    records = await db.compliance_records.find(
+        {"client_id": client_id},
+        {"_id": 0}
+    ).sort("completed_at", -1).to_list(100)
+    
+    # Check for upcoming compliance items
+    today = datetime.now(timezone.utc).date().isoformat()
+    upcoming_items = [
+        r for r in records 
+        if r.get("next_due") and r.get("next_due") >= today
+    ]
+    overdue_items = [
+        r for r in records 
+        if r.get("next_due") and r.get("next_due") < today
+    ]
+    
+    return {
+        "records": records,
+        "summary": {
+            "total_records": len(records),
+            "upcoming_due": len(upcoming_items),
+            "overdue": len(overdue_items)
+        }
+    }
+
+# Practice Dashboard Summary
+@api_router.get("/practice/dashboard")
+async def get_practice_dashboard(request: Request):
+    """Get practice management dashboard summary"""
+    await get_current_user(request)
+    
+    today = datetime.now(timezone.utc).date().isoformat()
+    this_week = (datetime.now(timezone.utc) + timedelta(days=7)).date().isoformat()
+    
+    # Get upcoming meetings
+    upcoming_meetings = await db.meetings.find(
+        {"scheduled_at": {"$gte": today}, "status": "scheduled"},
+        {"_id": 0}
+    ).sort("scheduled_at", 1).to_list(10)
+    
+    # Get pending tasks
+    pending_tasks = await db.tasks.find(
+        {"status": {"$in": ["pending", "in_progress"]}},
+        {"_id": 0}
+    ).sort("due_date", 1).to_list(20)
+    
+    # Get urgent tasks (due this week)
+    urgent_tasks = [t for t in pending_tasks if t.get("due_date", "") <= this_week]
+    
+    # Get recent time entries
+    recent_time = await db.time_entries.find(
+        {},
+        {"_id": 0}
+    ).sort("date", -1).to_list(30)
+    
+    # Calculate this month's billing
+    month_start = datetime.now(timezone.utc).replace(day=1).date().isoformat()
+    monthly_entries = [e for e in recent_time if e.get("date", "") >= month_start]
+    monthly_hours = sum(e.get("hours", 0) for e in monthly_entries)
+    monthly_billable = sum(
+        e.get("hours", 0) * e.get("hourly_rate", 0) 
+        for e in monthly_entries if e.get("is_billable")
+    )
+    
+    # Get outstanding invoices
+    outstanding_invoices = await db.invoices.find(
+        {"status": {"$in": ["sent", "overdue"]}},
+        {"_id": 0}
+    ).to_list(50)
+    total_outstanding = sum(i.get("total", 0) for i in outstanding_invoices)
+    
+    return {
+        "upcoming_meetings": upcoming_meetings[:5],
+        "urgent_tasks": urgent_tasks[:10],
+        "pending_tasks_count": len(pending_tasks),
+        "billing_summary": {
+            "monthly_hours": monthly_hours,
+            "monthly_billable_value": monthly_billable,
+            "outstanding_invoices": len(outstanding_invoices),
+            "total_outstanding": total_outstanding
+        },
+        "recent_activity": {
+            "time_entries_this_month": len(monthly_entries)
+        }
+    }
+
 @api_router.get("/")
 async def root():
     return {"message": "Australian Investment Analyzer API", "version": "1.0.0"}
