@@ -182,6 +182,54 @@ const SharePortfolio = () => {
     toast.success("Share removed from portfolio");
   };
 
+  // Refresh stock prices from backend
+  const handleRefreshPrices = async () => {
+    if (sharePortfolio.length === 0) {
+      toast.error("No shares to refresh");
+      return;
+    }
+
+    setRefreshing(true);
+    try {
+      const symbols = sharePortfolio.map(s => s.symbol);
+      const response = await axios.post(`${API}/stocks/get-prices`, { symbols });
+      
+      const { prices, is_mock_data } = response.data;
+      setIsMockData(is_mock_data);
+      
+      // Update each share with new price
+      let updatedCount = 0;
+      prices.forEach(priceData => {
+        if (!priceData.error) {
+          const share = sharePortfolio.find(s => s.symbol === priceData.symbol);
+          if (share) {
+            updateShare(share.id, { 
+              currentPrice: priceData.price,
+              name: priceData.name || share.name,
+              sector: priceData.sector || share.sector
+            });
+            updatedCount++;
+          }
+        }
+      });
+
+      setLastRefreshed(new Date());
+      
+      if (is_mock_data) {
+        toast.success(`${updatedCount} prices updated (simulated data)`, {
+          description: "Add Alpha Vantage API key for real-time prices"
+        });
+      } else {
+        toast.success(`${updatedCount} prices updated from live data`);
+      }
+    } catch (error) {
+      console.error("Error refreshing prices:", error);
+      toast.error("Failed to refresh prices");
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   // Update budget with dividend income
   const syncDividendsToBudget = () => {
     // Calculate personal dividends (including 50% of joint)
