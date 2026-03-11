@@ -1,56 +1,69 @@
-import { useState, useEffect, createContext, useContext, useCallback } from "react";
+import { useState, useEffect, createContext, useContext, useCallback, lazy, Suspense } from "react";
 import "@/App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 
-// Pages
+// Loading component for lazy loaded pages
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="text-center">
+      <div className="w-8 h-8 border-4 border-[#0F392B] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+      <p className="text-muted-foreground">Loading...</p>
+    </div>
+  </div>
+);
+
+// Core pages (loaded immediately)
 import Dashboard from "@/pages/Dashboard";
-import TaxAnalysisSync from "@/pages/TaxAnalysisSync";
-import PropertyPortfolio from "@/pages/PropertyPortfolio";
-import MonteCarloSimulation from "@/pages/MonteCarloSimulation";
-import LoanCalculator from "@/pages/LoanCalculator";
-import SavedScenarios from "@/pages/SavedScenarios";
-import ScenarioBuilder from "@/pages/ScenarioBuilder";
-import CGT from "@/pages/CGT";
-import HistoricalTaxComparison from "@/pages/HistoricalTaxComparison";
-import SMSFOptimizer from "@/pages/SMSFOptimizer";
-import ReportGenerator from "@/pages/ReportGenerator";
-import SalaryPackaging from "@/pages/SalaryPackaging";
-import PropertyComparison from "@/pages/PropertyComparison";
-import TaxLossHarvesting from "@/pages/TaxLossHarvesting";
-import DividendReinvestment from "@/pages/DividendReinvestment";
-import HouseholdBudget from "@/pages/HouseholdBudget";
-import IncomeSplitting from "@/pages/IncomeSplitting";
-import Division7ACalculator from "@/pages/Division7ACalculator";
-import TrustDistributionAnalysis from "@/pages/TrustDistributionAnalysis";
-import FinancialRecommendations from "@/pages/FinancialRecommendations";
-import TaxCalendar from "@/pages/TaxCalendar";
-import FamilyOverview from "@/pages/FamilyOverview";
-import SharePortfolio from "@/pages/SharePortfolio";
-import CalculationMethodology from "@/pages/CalculationMethodology";
-import SuperannuationGuarantee from "@/pages/SuperannuationGuarantee";
-import RentalYieldOptimizer from "@/pages/RentalYieldOptimizer";
-import HoldingsPerformance from "@/pages/HoldingsPerformance";
-import ExportData from "@/pages/ExportData";
-import FamilyMemberProfile from "@/pages/FamilyMemberProfile";
-import FamilyWealthDashboard from "@/pages/FamilyWealthDashboard";
-import FinancialAdvisorChat from "@/pages/FinancialAdvisorChat";
-import StrategicPlanning from "@/pages/StrategicPlanning";
-import DataImport from "@/pages/DataImport";
-import BankFeeds from "@/pages/BankFeeds";
-import AccountingIntegrations from "@/pages/AccountingIntegrations";
-import BASCalculator from "@/pages/BASCalculator";
-import Collaboration from "@/pages/Collaboration";
-import RiskProfiler from "@/pages/RiskProfiler";
-import StatementOfAdvice from "@/pages/StatementOfAdvice";
-import ClientOnboarding from "@/pages/ClientOnboarding";
-import Copilot from "@/pages/Copilot";
-import DailyBriefing from "@/pages/DailyBriefing";
-import AdviserDashboard from "@/pages/AdviserDashboard";
-import ClientPortalMerged from "@/pages/ClientPortalMerged";
 import ModeSelector from "@/pages/ModeSelector";
-import PracticeManagement from "@/pages/PracticeManagement";
+
+// Lazy loaded pages (loaded on demand)
+const TaxAnalysisSync = lazy(() => import("@/pages/TaxAnalysisSync"));
+const PropertyPortfolio = lazy(() => import("@/pages/PropertyPortfolio"));
+const MonteCarloSimulation = lazy(() => import("@/pages/MonteCarloSimulation"));
+const LoanCalculator = lazy(() => import("@/pages/LoanCalculator"));
+const SavedScenarios = lazy(() => import("@/pages/SavedScenarios"));
+const ScenarioBuilder = lazy(() => import("@/pages/ScenarioBuilder"));
+const CGT = lazy(() => import("@/pages/CGT"));
+const HistoricalTaxComparison = lazy(() => import("@/pages/HistoricalTaxComparison"));
+const SMSFOptimizer = lazy(() => import("@/pages/SMSFOptimizer"));
+const ReportGenerator = lazy(() => import("@/pages/ReportGenerator"));
+const SalaryPackaging = lazy(() => import("@/pages/SalaryPackaging"));
+const PropertyComparison = lazy(() => import("@/pages/PropertyComparison"));
+const TaxLossHarvesting = lazy(() => import("@/pages/TaxLossHarvesting"));
+const DividendReinvestment = lazy(() => import("@/pages/DividendReinvestment"));
+const HouseholdBudget = lazy(() => import("@/pages/HouseholdBudget"));
+const IncomeSplitting = lazy(() => import("@/pages/IncomeSplitting"));
+const Division7ACalculator = lazy(() => import("@/pages/Division7ACalculator"));
+const TrustDistributionAnalysis = lazy(() => import("@/pages/TrustDistributionAnalysis"));
+const FinancialRecommendations = lazy(() => import("@/pages/FinancialRecommendations"));
+const TaxCalendar = lazy(() => import("@/pages/TaxCalendar"));
+const FamilyOverview = lazy(() => import("@/pages/FamilyOverview"));
+const SharePortfolio = lazy(() => import("@/pages/SharePortfolio"));
+const CalculationMethodology = lazy(() => import("@/pages/CalculationMethodology"));
+const SuperannuationGuarantee = lazy(() => import("@/pages/SuperannuationGuarantee"));
+const RentalYieldOptimizer = lazy(() => import("@/pages/RentalYieldOptimizer"));
+const HoldingsPerformance = lazy(() => import("@/pages/HoldingsPerformance"));
+const ExportData = lazy(() => import("@/pages/ExportData"));
+const FamilyMemberProfile = lazy(() => import("@/pages/FamilyMemberProfile"));
+const FamilyWealthDashboard = lazy(() => import("@/pages/FamilyWealthDashboard"));
+const FinancialAdvisorChat = lazy(() => import("@/pages/FinancialAdvisorChat"));
+const StrategicPlanning = lazy(() => import("@/pages/StrategicPlanning"));
+const DataImport = lazy(() => import("@/pages/DataImport"));
+const BankFeeds = lazy(() => import("@/pages/BankFeeds"));
+const AccountingIntegrations = lazy(() => import("@/pages/AccountingIntegrations"));
+const BASCalculator = lazy(() => import("@/pages/BASCalculator"));
+const Collaboration = lazy(() => import("@/pages/Collaboration"));
+const RiskProfiler = lazy(() => import("@/pages/RiskProfiler"));
+const StatementOfAdvice = lazy(() => import("@/pages/StatementOfAdvice"));
+const ClientOnboarding = lazy(() => import("@/pages/ClientOnboarding"));
+const Copilot = lazy(() => import("@/pages/Copilot"));
+const DailyBriefing = lazy(() => import("@/pages/DailyBriefing"));
+const AdviserDashboard = lazy(() => import("@/pages/AdviserDashboard"));
+const ClientPortalMerged = lazy(() => import("@/pages/ClientPortalMerged"));
+const PracticeManagement = lazy(() => import("@/pages/PracticeManagement"));
+const DocumentsCommunications = lazy(() => import("@/pages/DocumentsCommunications"));
 
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
