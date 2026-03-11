@@ -645,11 +645,11 @@ const TrustDistributionAnalysis = () => {
                   <BarChart data={effectiveRateData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis dataKey="name" />
-                    <YAxis tickFormatter={(v) => `${v}%`} />
+                    <YAxis tickFormatter={(v) => `${v}%`} domain={[0, 50]} />
                     <Tooltip formatter={(v) => `${v.toFixed(1)}%`} />
                     <Legend />
-                    <Bar dataKey="effectiveRate" name="Effective Rate on Dist." fill="#D4AF37" />
-                    <Bar dataKey="marginalRate" name="New Marginal Rate" fill="#0F392B" />
+                    <Bar dataKey="effectiveRate" name="Effective Rate on Dist." fill="#10B981" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="marginalRate" name="New Marginal Rate" fill="#EF4444" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </ChartContainer>
