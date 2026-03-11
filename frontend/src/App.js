@@ -41,6 +41,8 @@ import LifecyclePlanning from "@/pages/LifecyclePlanning";
 import FinancialAdvisorChat from "@/pages/FinancialAdvisorChat";
 import StrategicPlanning from "@/pages/StrategicPlanning";
 import DataImport from "@/pages/DataImport";
+import BankFeeds from "@/pages/BankFeeds";
+import AccountingIntegrations from "@/pages/AccountingIntegrations";
 
 // Compliance Modal
 import { ComplianceModal } from "@/components/ComplianceDisclaimer";
