@@ -172,6 +172,14 @@ Build an app that analyses all options for personal and business investment in A
   - Scenario Ranking and Key Insights
   - Year-by-Year Projection table
 
+- ✅ **Income Splitting ↔ Trust Analysis Sync** - Family members now match between pages
+  - Income Splitting shows "Trust Beneficiary" checkbox column
+  - Toggling checkbox adds/removes member from Trust Distribution Analysis
+  - Add Member creates beneficiary in both pages
+  - Delete Member removes from both pages
+  - Sync notice explains the Trust Distribution connection
+  - Distribution percentages consistent between pages
+
 ## Previous Session (December 2025)
 - ✅ **Share Portfolio** (/share-portfolio) - Personal, joint, company ownership with dividends
 - ✅ **Calculation Methodology** (/calculation-methodology) - ATO/ASIC references for all calculations
