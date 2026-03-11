@@ -172,6 +172,9 @@ Build an app that analyses all options for personal and business investment in A
 29. ~~Statement of Advice (SOA)~~ ✅ DONE (December 2025) - RG 175 compliant generator
 30. ~~Client Onboarding Wizard~~ ✅ DONE (December 2025) - 6-step guided onboarding with risk assessment and goals
 31. ~~AI Financial Copilot~~ ✅ DONE (December 2025) - Natural language command execution (demo mode)
+32. ~~Daily Briefing~~ ✅ DONE (December 2025) - Personalized daily summary with AI recommendations
+33. ~~Adviser Dashboard~~ ✅ DONE (December 2025) - Multi-client management with KPIs and compliance tracking
+34. ~~Client Portal~~ ✅ DONE (December 2025) - Simplified client view with goals and documents
 
 ## Latest Session Updates (December 2025 - Current)
 
