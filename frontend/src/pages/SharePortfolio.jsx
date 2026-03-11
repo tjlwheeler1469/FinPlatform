@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Layout from "@/components/Layout";
 import ChartContainer from "@/components/ChartContainer";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { 
   TrendingUp,
   TrendingDown,
@@ -27,7 +28,10 @@ import {
   AlertTriangle,
   RefreshCw,
   Wifi,
-  WifiOff
+  WifiOff,
+  Radio,
+  Pause,
+  Play
 } from "lucide-react";
 import { usePortfolio } from "@/App";
 import { toast } from "sonner";
