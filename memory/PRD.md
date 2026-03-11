@@ -170,6 +170,8 @@ Build an app that analyses all options for personal and business investment in A
 27. ~~BAS Calculator~~ ✅ DONE (December 2025) - GST/PAYG worksheet with Xero/MYOB import
 28. ~~Collaboration~~ ✅ DONE (December 2025) - Multi-user team management (demo mode)
 29. ~~Statement of Advice (SOA)~~ ✅ DONE (December 2025) - RG 175 compliant generator
+30. ~~Client Onboarding Wizard~~ ✅ DONE (December 2025) - 6-step guided onboarding with risk assessment and goals
+31. ~~AI Financial Copilot~~ ✅ DONE (December 2025) - Natural language command execution (demo mode)
 
 ## Latest Session Updates (December 2025 - Current)
 
