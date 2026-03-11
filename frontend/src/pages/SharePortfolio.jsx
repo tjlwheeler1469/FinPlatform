@@ -24,11 +24,18 @@ import {
   X,
   ArrowRight,
   CheckCircle,
-  AlertTriangle
+  AlertTriangle,
+  RefreshCw,
+  Wifi,
+  WifiOff
 } from "lucide-react";
 import { usePortfolio } from "@/App";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
+import axios from "axios";
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
 import {
   BarChart,
   Bar,
