@@ -102,6 +102,8 @@ const SharePortfolio = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [lastRefreshed, setLastRefreshed] = useState(null);
   const [isMockData, setIsMockData] = useState(true);
+  const [isLiveUpdates, setIsLiveUpdates] = useState(false);
+  const [liveUpdateInterval, setLiveUpdateInterval] = useState(null);
   const [newShare, setNewShare] = useState({
     symbol: "",
     name: "",
