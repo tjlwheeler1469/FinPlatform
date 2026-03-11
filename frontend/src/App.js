@@ -6,7 +6,6 @@ import { toast } from "sonner";
 
 // Pages
 import Dashboard from "@/pages/Dashboard";
-import TaxAnalysis from "@/pages/TaxAnalysis";
 import TaxAnalysisSync from "@/pages/TaxAnalysisSync";
 import PropertyPortfolio from "@/pages/PropertyPortfolio";
 import MonteCarloSimulation from "@/pages/MonteCarloSimulation";
@@ -38,6 +37,8 @@ import ExportData from "@/pages/ExportData";
 import AdvancedScenarioModeling from "@/pages/AdvancedScenarioModeling";
 import FamilyMemberProfile from "@/pages/FamilyMemberProfile";
 import FamilyWealthDashboard from "@/pages/FamilyWealthDashboard";
+import LifecyclePlanning from "@/pages/LifecyclePlanning";
+import FinancialAdvisorChat from "@/pages/FinancialAdvisorChat";
 
 // Portfolio Context for sharing data across components
 const PortfolioContext = createContext(null);
