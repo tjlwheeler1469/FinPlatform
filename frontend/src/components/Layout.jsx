@@ -71,6 +71,7 @@ const navGroups = [
       { path: "/budget", label: "Budget", icon: Wallet, title: "Household Budget" },
       { path: "/trust-distributions", label: "Trust Analysis", icon: PieChart, title: "Trust Distribution Analysis" },
       { path: "/income-splitting", label: "Income Splitting", icon: Users, title: "Income Splitting" },
+      { path: "/risk-profiler", label: "Risk Profiler", icon: Shield, title: "Risk Profiler" },
     ]
   },
   {
@@ -94,6 +95,7 @@ const navGroups = [
       { path: "/tax-analysis-sync", label: "Tax Analysis", icon: Calculator, title: "Tax Analysis (Synced)" },
       { path: "/cgt", label: "CGT", icon: TrendingUp, title: "Capital Gains Tax" },
       { path: "/tax-calendar", label: "Tax Calendar", icon: CalendarDays, title: "Tax Planning Calendar" },
+      { path: "/bas-calculator", label: "BAS Calculator", icon: FileCheck, title: "BAS Calculator" },
       { path: "/historical-tax", label: "Tax History", icon: History, title: "Tax History" },
       { path: "/tax-loss-harvesting", label: "Tax Harvesting", icon: Scissors, title: "Tax Loss Harvesting" },
     ]
@@ -108,6 +110,13 @@ const navGroups = [
       { path: "/dividend-reinvestment", label: "Dividends", icon: Repeat, title: "Dividend Reinvestment" },
       { path: "/smsf-optimizer", label: "SMSF", icon: PiggyBank, title: "SMSF Optimizer" },
       { path: "/sg-calculator", label: "SG Calculator", icon: Users, title: "Superannuation Guarantee" },
+    ]
+  },
+  {
+    name: "Adviser Tools",
+    items: [
+      { path: "/collaboration", label: "Collaboration", icon: UserPlus, title: "Collaboration" },
+      { path: "/statement-of-advice", label: "SOA Generator", icon: ClipboardList, title: "Statement of Advice" },
     ]
   },
   {
