@@ -745,6 +745,7 @@ const AppRouter = () => {
       <Route path="/export" element={<ExportData />} />
       <Route path="/tax-analysis-sync" element={<TaxAnalysisSync />} />
       <Route path="/scenario-modeling" element={<AdvancedScenarioModeling />} />
+      <Route path="/family-member/:memberId" element={<FamilyMemberProfile />} />
     </Routes>
   );
 };
