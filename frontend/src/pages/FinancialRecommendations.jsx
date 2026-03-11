@@ -728,7 +728,12 @@ const FinancialRecommendations = () => {
                             <div className="flex items-center gap-2">
                               <span className="text-sm font-medium" style={{ color: rec.color }}>{rec.impact}</span>
                             </div>
-                            <Button variant="outline" size="sm">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => handleActionClick(rec.action)}
+                              data-testid={`action-all-${rec.category}`}
+                            >
                               {rec.action}
                               <ArrowRight className="h-4 w-4 ml-1" />
                             </Button>
