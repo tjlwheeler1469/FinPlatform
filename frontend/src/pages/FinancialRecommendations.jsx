@@ -655,7 +655,13 @@ const FinancialRecommendations = () => {
                               <TrendingUp className="h-4 w-4 text-[#10B981]" />
                               <span className="text-sm font-medium text-[#10B981]">{rec.impact}</span>
                             </div>
-                            <Button variant="ghost" size="sm" className="text-[#0F392B]">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="text-[#0F392B]"
+                              onClick={() => handleActionClick(rec.action)}
+                              data-testid={`action-${rec.category}`}
+                            >
                               {rec.action}
                               <ArrowRight className="h-4 w-4 ml-1" />
                             </Button>
