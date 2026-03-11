@@ -216,8 +216,32 @@ Build an app that analyses all options for personal and business investment in A
   - Saved SOAs tab with export functionality
   - localStorage persistence
 
+- ✅ **Client Onboarding Wizard** (/onboarding)
+  - 6-step guided wizard: Welcome → Profile → Risk Assessment → Goals → Review → Complete
+  - 4-question condensed risk assessment with profile calculation
+  - Risk profiles: Conservative, Balanced, Growth, Aggressive
+  - Goal management (short-term and long-term)
+  - Financial snapshot with net worth calculation
+  - Quick SOA download on completion
+  - localStorage persistence
+  - Navigation to Copilot or Dashboard on completion
+
+- ✅ **AI Financial Copilot** (/copilot) - DEMO MODE
+  - Natural language command processing
+  - 15 intent categories: tax, scenario, cashflow, risk, stocks, property, super, bas, cgt, loan, soa, navigate, report, calculate, help
+  - Quick Actions panel with 6 preset commands
+  - Results panel showing charts and calculations
+  - Action buttons for navigation to detailed pages
+  - Commands: "Calculate my tax", "What if I sell all stocks?", "Show cashflow", etc.
+  - Tax calculations with effective rate and medicare
+  - Stock sell scenario with CGT (50% discount) calculation
+  - 12-month cashflow projection chart
+  - Chat interface with message history
+
 - ✅ **Navigation Updates**
   - New "Adviser Tools" section with Collaboration and SOA Generator
+  - New "Get Started" section with Client Onboarding and AI Advisor
+  - AI Copilot added to Overview section with "New" badge
   - Risk Profiler added to Planning section
   - BAS Calculator added to Tax & CGT section
 
