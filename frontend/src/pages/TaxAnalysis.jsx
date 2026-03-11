@@ -138,13 +138,26 @@ const TaxAnalysis = () => {
     <Layout>
       <div className="space-y-8" data-testid="tax-analysis-page">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
-            Tax Analysis
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Calculate Australian personal and company taxes for 2024-25
-          </p>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+              Tax Analysis
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Calculate Australian personal and company taxes for 2024-25
+              <ATOTooltip 
+                title="2024-25 Tax Rates" 
+                description="Stage 3 tax cuts applied. Rates effective 1 July 2024."
+                atoUrl="https://www.ato.gov.au/tax-rates-and-codes/tax-rates-australian-residents"
+              />
+            </p>
+          </div>
+          <Link to="/calculation-methodology">
+            <Button variant="outline" size="sm">
+              <BookOpen className="h-4 w-4 mr-2" />
+              View Methodology
+            </Button>
+          </Link>
         </div>
 
         {/* Main Content */}
@@ -171,7 +184,14 @@ const TaxAnalysis = () => {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="taxable-income">Taxable Income</Label>
+                  <Label htmlFor="taxable-income">
+                    Taxable Income
+                    <ATOTooltip 
+                      title="Taxable Income" 
+                      description="Total assessable income minus allowable deductions."
+                      atoUrl="https://www.ato.gov.au/individuals-and-families/income-deductions-offsets-and-records"
+                    />
+                  </Label>
                   <div className="relative">
                     <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
