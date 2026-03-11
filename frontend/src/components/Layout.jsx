@@ -45,7 +45,9 @@ import {
   Link2,
   Shield,
   UserPlus,
-  ClipboardList
+  ClipboardList,
+  Sparkles,
+  Rocket
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
