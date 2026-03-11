@@ -1,0 +1,152 @@
+{
+  "summary": "Tested mode selector dropdown and navigation features. All 7 features working correctly: Mode selector shows Personal/Adviser/Client options, Personal Mode shows 7 nav groups, Adviser Mode shows 6 nav groups, Client View redirects to /client-portal with standalone layout, Mode Selector page shows Personal Use and Adviser Portal cards, localStorage persistence works across page reloads, Mobile navigation includes mode selector with all options.",
+
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+
+  "passed_tests": [
+    "Mode selector dropdown found in sidebar",
+    "Mode selector shows 'Personal Mode' option",
+    "Mode selector shows 'Adviser Mode' option",
+    "Mode selector shows 'Client View' option",
+    "Personal Mode navigation group 'Overview' found",
+    "Personal Mode navigation group 'Planning' found",
+    "Personal Mode navigation group 'Property' found",
+    "Personal Mode navigation group 'Shares' found",
+    "Personal Mode navigation group 'Tax & CGT' found",
+    "Personal Mode navigation group 'Calculators' found",
+    "Personal Mode navigation group 'Data & Reports' found",
+    "Switching to Adviser Mode redirects to /adviser-dashboard",
+    "Adviser Mode navigation group 'Adviser Hub' found",
+    "Adviser Mode navigation group 'Client Tools' found",
+    "Adviser Mode navigation group 'Analysis' found",
+    "Adviser Mode navigation group 'Portfolios' found",
+    "Adviser Mode navigation group 'Calculators' found",
+    "Adviser Mode navigation group 'Reports' found",
+    "Switching to Client View redirects to /client-portal",
+    "Client Portal has standalone layout (no sidebar)",
+    "Client Portal page has data-testid='client-portal-page'",
+    "Client Portal has 'Exit Portal' button",
+    "Mode Selector page (/mode-selector) loads correctly",
+    "Mode Selector shows 'Personal Use' card",
+    "Mode Selector shows 'Adviser Portal' card with 'Pro' badge",
+    "Mode Selector shows 'Enter Personal Mode' button",
+    "Mode Selector shows 'Enter Adviser Mode' button",
+    "Mode Selector shows 'Are you a client? Access your Client Portal' link",
+    "Clicking Personal Use card redirects to /daily-briefing",
+    "localStorage app_mode set to 'personal' after selecting Personal Use",
+    "localStorage persistence: Adviser Mode persists after page reload",
+    "localStorage persistence: Personal Mode persists after page reload",
+    "Mobile menu button (data-testid='mobile-menu-btn') found",
+    "Mobile menu shows mode selector dropdown",
+    "Mobile mode selector shows 'Personal Mode' option",
+    "Mobile mode selector shows 'Adviser Mode' option",
+    "Mobile mode selector shows 'Client View' option",
+    "Mobile mode switch to Adviser Mode works correctly",
+    "Mobile Adviser Mode shows 'Adviser Hub' nav group",
+    "Mobile Adviser Mode shows 'Client Tools' nav group",
+    "Mobile Adviser Mode shows 'Analysis' nav group",
+    "Mobile Adviser Mode shows 'Portfolios' nav group",
+    "Mobile Adviser Mode shows 'Calculators' nav group",
+    "Mobile Adviser Mode shows 'Reports' nav group",
+    "Mobile Client Portal has standalone layout (no mobile menu button)",
+    "Mobile Client Portal has 'Exit Portal' button"
+  ],
+
+  "test_report_links": [],
+
+  "action_items": [],
+
+  "critical_code_review_comments": [
+    "Layout.jsx properly implements mode switching with activeNavGroups based on appMode state",
+    "Mode selector dropdown correctly placed in both desktop sidebar and mobile slide-out menu",
+    "switchMode function properly updates localStorage and navigates to appropriate routes",
+    "Personal mode shows 7 navigation groups: Overview, Planning, Property, Shares, Tax & CGT, Calculators, Data & Reports",
+    "Adviser mode shows 6 navigation groups: Adviser Hub, Client Tools, Analysis, Portfolios, Calculators, Reports",
+    "Client View correctly redirects to /client-portal with standalone layout (no Layout wrapper)",
+    "ModeSelector.jsx provides clean landing page with Personal Use and Adviser Portal cards",
+    "localStorage persistence implemented correctly with 'app_mode' key"
+  ],
+
+  "updated_files": [],
+
+  "success_rate": {
+    "backend": "N/A (frontend-only testing)",
+    "frontend": "100% (All 7 features working correctly)"
+  },
+
+  "seed_data_creation": "No seed data created - uses mock data defined in components",
+
+  "retest_needed": false,
+
+  "should_main_agent_self_test": false,
+
+  "context_for_next_testing_agent": "Tested mode selector and navigation features. Mode selector dropdown in sidebar shows 3 options: Personal Mode, Adviser Mode, Client View. Personal Mode shows 7 nav groups (Overview, Planning, Property, Shares, Tax & CGT, Calculators, Data & Reports). Adviser Mode shows 6 nav groups (Adviser Hub, Client Tools, Analysis, Portfolios, Calculators, Reports). Client View redirects to /client-portal with standalone layout (no sidebar). Mode Selector page at /mode-selector shows Personal Use and Adviser Portal cards. localStorage key 'app_mode' persists mode selection across page reloads. Mobile navigation includes mode selector in slide-out menu with all 3 options working correctly.",
+
+  "mocked_apis": {
+    "All data": "MOCKED - All client data in AdviserDashboard and ClientPortal is mocked within the components",
+    "Navigation": "No backend APIs required for navigation testing"
+  },
+
+  "features_tested": {
+    "mode_selector_dropdown": {
+      "status": "WORKING",
+      "tests": [
+        "Desktop sidebar mode selector shows all 3 options",
+        "Mobile menu mode selector shows all 3 options",
+        "Switching modes updates navigation groups correctly",
+        "Switching modes navigates to appropriate routes"
+      ]
+    },
+    "personal_mode_navigation": {
+      "status": "WORKING",
+      "nav_groups": ["Overview", "Planning", "Property", "Shares", "Tax & CGT", "Calculators", "Data & Reports"]
+    },
+    "adviser_mode_navigation": {
+      "status": "WORKING",
+      "nav_groups": ["Adviser Hub", "Client Tools", "Analysis", "Portfolios", "Calculators", "Reports"]
+    },
+    "client_view_mode": {
+      "status": "WORKING",
+      "tests": [
+        "Redirects to /client-portal",
+        "Standalone layout (no sidebar)",
+        "Exit Portal button present"
+      ]
+    },
+    "mode_selector_page": {
+      "status": "WORKING",
+      "tests": [
+        "Personal Use card with features list",
+        "Adviser Portal card with Pro badge",
+        "Client Portal link at bottom",
+        "Clicking cards sets localStorage and navigates"
+      ]
+    },
+    "navigation_persistence": {
+      "status": "WORKING",
+      "tests": [
+        "localStorage 'app_mode' key stores current mode",
+        "Mode persists after page reload",
+        "Switching modes updates localStorage immediately"
+      ]
+    },
+    "mobile_navigation": {
+      "status": "WORKING",
+      "tests": [
+        "Mode selector in mobile slide-out menu",
+        "All 3 mode options available",
+        "Mode switching works from mobile menu",
+        "Navigation groups update based on mode"
+      ]
+    }
+  }
+}
