@@ -5751,7 +5751,10 @@ async def sync_portfolio(household_id: str):
 # AI Advice Generation - Uses multi-LLM approach
 @api_router.post("/ai/generate-advice")
 async def generate_ai_advice(request: AIAdviceRequest):
-    """Generate AI-powered financial advice using multiple LLMs"""
+    """Generate AI-powered financial advice using multiple LLMs with fallback"""
+    import os
+    from dotenv import load_dotenv
+    load_dotenv()
     
     # Build context for AI
     context = request.context
@@ -5774,75 +5777,207 @@ async def generate_ai_advice(request: AIAdviceRequest):
         "goals": [{"name": g.get("name"), "target": g.get("target_amount"), "progress": g.get("progress_percent")} for g in goals] if goals else []
     }
     
-    # Generate AI advice (mock response - in production would call actual LLMs)
-    # This demonstrates the structure of multi-LLM advice
-    ai_response = {
-        "advice_id": f"ai_adv_{uuid.uuid4().hex[:12]}",
-        "household_id": household_id,
-        "generated_at": datetime.now(timezone.utc).isoformat(),
-        "question": question,
-        "advice_type": request.advice_type,
-        "analysis": {
-            "financial_health": "Strong",
-            "key_strengths": [
-                "Healthy net worth of $1.98M",
-                "Diversified investment portfolio",
-                "Good savings rate"
-            ],
-            "areas_for_improvement": [
-                "Debt-to-asset ratio could be improved",
-                "Superannuation contributions below optimal",
-                "Emergency fund slightly below 6 months"
-            ]
-        },
-        "recommendations": [
-            {
-                "rank": 1,
-                "title": "Maximize Superannuation Contributions",
-                "description": "You have unused concessional contribution cap. Consider salary sacrificing an additional $8,500 per year.",
-                "impact": "+$1,870/year in tax savings",
-                "impact_amount": 1870,
-                "timeframe": "Immediate",
-                "confidence": 0.95,
-                "rationale": "At your marginal tax rate of 37%, contributions to super are taxed at only 15%, creating an immediate 22% tax benefit."
-            },
-            {
-                "rank": 2,
-                "title": "Implement Debt Recycling Strategy",
-                "description": "Convert a portion of non-deductible home loan debt to deductible investment debt.",
-                "impact": "+$4,200/year in tax benefits",
-                "impact_amount": 4200,
-                "timeframe": "1-3 months",
-                "confidence": 0.88,
-                "rationale": "With $942K in property debt and a strong investment portfolio, debt recycling can convert non-deductible interest to tax-deductible."
-            },
-            {
-                "rank": 3,
-                "title": "Rebalance to Growth Assets",
-                "description": "Your cash allocation is slightly high. Consider deploying $50,000 to diversified ETFs.",
-                "impact": "+$2,500/year expected returns",
-                "impact_amount": 2500,
-                "timeframe": "1-2 weeks",
-                "confidence": 0.82,
-                "rationale": "Excess cash beyond 6 months emergency fund earns low returns. Long-term growth assets historically outperform by 4-5% annually."
-            }
-        ],
-        "retirement_outlook": {
-            "current_trajectory": "On track to retire at 60 with $3.2M",
-            "success_probability": "91%",
-            "recommendation": "Maintain current savings rate. Consider increasing super contributions for additional tax efficiency."
-        },
-        "disclaimers": [
-            "This advice is general in nature and does not take into account your complete financial situation.",
-            "Past performance is not a reliable indicator of future performance.",
-            "Consider seeking personal financial advice before making investment decisions."
-        ],
-        "llm_metadata": {
-            "models_used": ["analysis_engine_v2", "recommendation_engine_v1"],
-            "confidence_score": 0.89,
-            "processing_time_ms": 1250
+    # Get API key
+    api_key = os.environ.get("EMERGENT_LLM_KEY")
+    
+    # Build the prompt for AI
+    system_prompt = """You are an expert Australian financial advisor AI. You provide personalized, actionable financial advice based on client data.
+
+Your responses must be in valid JSON format with this exact structure:
+{
+    "analysis": {
+        "financial_health": "Strong/Moderate/Needs Attention",
+        "key_strengths": ["strength1", "strength2", "strength3"],
+        "areas_for_improvement": ["area1", "area2", "area3"]
+    },
+    "recommendations": [
+        {
+            "rank": 1,
+            "title": "Action Title",
+            "description": "Detailed description of the action",
+            "impact": "+$X,XXX/year description",
+            "impact_amount": 1000,
+            "timeframe": "Immediate/1-3 months/6-12 months",
+            "confidence": 0.95,
+            "rationale": "Why this action is recommended"
         }
+    ],
+    "retirement_outlook": {
+        "current_trajectory": "Description of retirement path",
+        "success_probability": "XX%",
+        "recommendation": "Specific retirement advice"
     }
+}
+
+Important Australian financial context:
+- Super concessional cap is $30,000/year
+- Super is taxed at 15% vs marginal rates up to 45%
+- Franking credits provide tax benefits for Australian dividends
+- Negative gearing allows tax deductions on investment property losses
+- CGT discount of 50% applies to assets held over 12 months"""
+
+    user_prompt = f"""Based on this client's financial situation, answer their question: "{question}"
+
+Client Financial Profile:
+- Age: {financial_context['age']} years old
+- Target Retirement Age: {financial_context['retirement_age']}
+- Net Worth: ${financial_context['net_worth']:,}
+- Total Assets: ${financial_context['total_assets']:,}
+- Total Debt: ${financial_context['total_debt']:,}
+- Annual Income: ${financial_context['annual_income']:,}
+- Risk Profile: {financial_context['risk_profile']}
+- Goals: {json.dumps(financial_context['goals']) if financial_context['goals'] else 'Not specified'}
+
+Provide 3-5 specific, actionable recommendations ranked by impact. Include dollar amounts where possible."""
+
+    # Try multiple LLM providers with fallback
+    llm_providers = [
+        ("openai", "gpt-4o"),
+        ("anthropic", "claude-sonnet-4-5-20250929"),
+        ("gemini", "gemini-2.5-flash")
+    ]
+    
+    ai_response_text = None
+    model_used = None
+    start_time = datetime.now(timezone.utc)
+    
+    for provider, model in llm_providers:
+        try:
+            from emergentintegrations.llm.chat import LlmChat, UserMessage
+            
+            chat = LlmChat(
+                api_key=api_key,
+                session_id=f"financial_advice_{household_id}_{uuid.uuid4().hex[:8]}",
+                system_message=system_prompt
+            ).with_model(provider, model)
+            
+            user_message = UserMessage(text=user_prompt)
+            ai_response_text = await chat.send_message(user_message)
+            model_used = f"{provider}/{model}"
+            break
+        except Exception as e:
+            print(f"LLM provider {provider}/{model} failed: {str(e)}")
+            continue
+    
+    processing_time = (datetime.now(timezone.utc) - start_time).total_seconds() * 1000
+    
+    # Parse AI response or use fallback
+    if ai_response_text:
+        try:
+            # Try to extract JSON from the response
+            import re
+            json_match = re.search(r'\{[\s\S]*\}', ai_response_text)
+            if json_match:
+                parsed_response = json.loads(json_match.group())
+            else:
+                parsed_response = None
+        except json.JSONDecodeError:
+            parsed_response = None
+    else:
+        parsed_response = None
+    
+    # Build final response
+    if parsed_response and "recommendations" in parsed_response:
+        ai_response = {
+            "advice_id": f"ai_adv_{uuid.uuid4().hex[:12]}",
+            "household_id": household_id,
+            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "question": question,
+            "advice_type": request.advice_type,
+            "analysis": parsed_response.get("analysis", {
+                "financial_health": "Strong",
+                "key_strengths": ["Healthy net worth", "Diversified portfolio", "Good savings rate"],
+                "areas_for_improvement": ["Optimize super contributions", "Review debt structure"]
+            }),
+            "recommendations": parsed_response.get("recommendations", []),
+            "retirement_outlook": parsed_response.get("retirement_outlook", {
+                "current_trajectory": f"On track to retire at {financial_context['retirement_age']}",
+                "success_probability": "85%",
+                "recommendation": "Maintain current trajectory while optimizing tax efficiency."
+            }),
+            "disclaimers": [
+                "This advice is general in nature and does not take into account your complete financial situation.",
+                "Past performance is not a reliable indicator of future performance.",
+                "Consider seeking personal financial advice before making investment decisions.",
+                "Australian tax laws may change. Consult a tax professional for current advice."
+            ],
+            "llm_metadata": {
+                "models_used": [model_used] if model_used else ["fallback"],
+                "confidence_score": 0.89,
+                "processing_time_ms": round(processing_time, 0),
+                "is_live_ai": True if model_used else False
+            }
+        }
+    else:
+        # Fallback response if AI fails
+        ai_response = {
+            "advice_id": f"ai_adv_{uuid.uuid4().hex[:12]}",
+            "household_id": household_id,
+            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "question": question,
+            "advice_type": request.advice_type,
+            "analysis": {
+                "financial_health": "Strong",
+                "key_strengths": [
+                    f"Healthy net worth of ${financial_context['net_worth']:,}",
+                    "Diversified investment portfolio",
+                    "Good savings rate"
+                ],
+                "areas_for_improvement": [
+                    "Superannuation contributions could be optimized",
+                    "Debt-to-asset ratio review recommended",
+                    "Emergency fund assessment needed"
+                ]
+            },
+            "recommendations": [
+                {
+                    "rank": 1,
+                    "title": "Maximize Superannuation Contributions",
+                    "description": "Consider salary sacrificing to use remaining concessional cap of $30,000.",
+                    "impact": "+$2,000/year in tax savings",
+                    "impact_amount": 2000,
+                    "timeframe": "Immediate",
+                    "confidence": 0.92,
+                    "rationale": "Super contributions taxed at 15% vs your marginal rate creates immediate tax benefit."
+                },
+                {
+                    "rank": 2,
+                    "title": "Review Debt Structure",
+                    "description": "Explore debt recycling to convert non-deductible debt to deductible investment debt.",
+                    "impact": "+$3,500/year in tax benefits",
+                    "impact_amount": 3500,
+                    "timeframe": "1-3 months",
+                    "confidence": 0.85,
+                    "rationale": "Interest on investment loans is tax-deductible, reducing effective borrowing cost."
+                },
+                {
+                    "rank": 3,
+                    "title": "Optimize Cash Holdings",
+                    "description": "Deploy excess cash above emergency fund to growth investments.",
+                    "impact": "+$2,000/year expected returns",
+                    "impact_amount": 2000,
+                    "timeframe": "1-2 weeks",
+                    "confidence": 0.80,
+                    "rationale": "Long-term growth assets historically outperform cash by 4-5% annually."
+                }
+            ],
+            "retirement_outlook": {
+                "current_trajectory": f"On track to retire at {financial_context['retirement_age']} with approximately ${financial_context['net_worth'] * 1.5:,.0f}",
+                "success_probability": "88%",
+                "recommendation": "Maintain current savings trajectory. Consider increasing super contributions for tax efficiency."
+            },
+            "disclaimers": [
+                "This advice is general in nature and does not take into account your complete financial situation.",
+                "Past performance is not a reliable indicator of future performance.",
+                "Consider seeking personal financial advice before making investment decisions."
+            ],
+            "llm_metadata": {
+                "models_used": ["fallback_engine"],
+                "confidence_score": 0.85,
+                "processing_time_ms": round(processing_time, 0),
+                "is_live_ai": False
+            }
+        }
     
     # Store the AI advice (exclude _id to let MongoDB generate it)
     advice_to_store = {k: v for k, v in ai_response.items() if k != "_id"}
