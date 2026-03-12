@@ -242,6 +242,36 @@ const Dashboard = () => {
           </Card>
         </div>
 
+        {/* Quick Actions Widget */}
+        <Card data-testid="quick-actions">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Zap className="h-5 w-5 text-[#D4A84C]" />
+              Quick Actions
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
+              {QUICK_ACTIONS.map((action) => {
+                const Icon = action.icon;
+                return (
+                  <button
+                    key={action.id}
+                    onClick={() => navigate(action.path)}
+                    className="flex flex-col items-center gap-1.5 p-3 rounded-lg hover:bg-muted transition-colors group"
+                    data-testid={`quick-action-${action.id}`}
+                  >
+                    <div className={`w-10 h-10 rounded-lg ${action.color} text-white flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground">{action.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Asset Allocation */}
