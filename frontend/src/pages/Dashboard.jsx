@@ -54,7 +54,7 @@ const formatPercent = (value) => {
   return `${value.toFixed(1)}%`;
 };
 
-const COLORS = ['#0F392B', '#D4AF37', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'];
+const COLORS = ['#1a2744', '#D4A84C', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'];
 
 const Dashboard = () => {
   const navigate = useNavigate();
