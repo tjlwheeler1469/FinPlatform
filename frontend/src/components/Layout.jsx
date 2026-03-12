@@ -477,7 +477,7 @@ const Layout = ({ children }) => {
                   onClick={() => toggleGroup(group.name)}
                   className={cn(
                     "w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition-colors",
-                    isGroupActive(group) ? "text-[#D4AF37]" : "text-white/50 hover:text-white/70"
+                    isGroupActive(group) ? "text-[#D4A84C]" : "text-white/50 hover:text-white/70"
                   )}
                 >
                   <span className="flex items-center gap-2">
@@ -496,7 +496,7 @@ const Layout = ({ children }) => {
                 <div 
                   className={cn(
                     "flex items-center justify-center p-2 mb-1 rounded-lg cursor-pointer",
-                    isGroupActive(group) ? "text-[#D4AF37]" : "text-white/50 hover:text-white/70"
+                    isGroupActive(group) ? "text-[#D4A84C]" : "text-white/50 hover:text-white/70"
                   )}
                   onClick={() => toggleGroup(group.name)}
                   title={group.name}
@@ -516,7 +516,7 @@ const Layout = ({ children }) => {
                       className={cn(
                         "flex items-center gap-3 px-3 py-2 rounded-lg mb-0.5 transition-colors",
                         location.pathname === item.path
-                          ? "bg-white/20 text-white"
+                          ? "bg-[#D4A84C]/20 text-[#D4A84C]"
                           : "text-white/70 hover:bg-white/10 hover:text-white"
                       )}
                       title={sidebarCollapsed ? item.label : undefined}
@@ -526,7 +526,7 @@ const Layout = ({ children }) => {
                         <span className="text-sm font-medium truncate flex-1">{item.label}</span>
                       )}
                       {!sidebarCollapsed && item.badge && (
-                        <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-[#D4AF37] text-[#0F392B] rounded">
+                        <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-[#D4A84C] text-[#1a2744] rounded">
                           {item.badge}
                         </span>
                       )}
