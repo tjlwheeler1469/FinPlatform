@@ -1377,3 +1377,36 @@ Fixed 21 linting errors in `/app/backend/server.py`:
 - Modular imports: Working
 - New persistence endpoints: Working with demo data fallback
 
+## Session Update: March 2026 - Navigation Simplification
+
+### ✅ COMPLETED: UX Navigation Restructure
+
+**Before:** 7+ navigation groups with 40+ scattered pages
+**After:** 6 clean sections following SaaS best practices
+
+**New Navigation Structure:**
+
+| Section | Icon | Contents |
+|---------|------|----------|
+| **Dashboard** | 📊 | Overview, Daily Briefing, Recommendations, Health Score |
+| **Finances** | 💰 | Net Worth, Trend, Property, Shares, Performance, Accounts, Cashflow |
+| **Planning** | 🎯 | Life Timeline, Goals, Strategy, AI Advisor, Debt, Insurance, Risk, Scenarios |
+| **Reports** | 📄 | Tax Analysis, CGT, Calendar, History, Generate Reports, Documents, Import/Export |
+| **Calculators** | 🔢 | Loan, Monte Carlo, SMSF, Super, Salary, Dividends, Tax Harvesting, BAS, Division 7A, Comparisons |
+| **Settings** | ⚙️ | Security, Bank Feeds, Integrations, Methodology, Setup |
+
+**Adviser Mode:** Adds "Clients" section (CRM, Practice, Team, SOA)
+
+**Key UX Improvements:**
+- Section headers now have icons for visual clarity
+- Mobile bottom nav simplified to 5 key items
+- Progressive disclosure - details inside sections
+- Default landing page is Dashboard
+- Unified structure between Personal/Adviser modes
+
+### Testing Results
+- Navigation tests: 100% (30/30 passed)
+- All routes accessible
+- Mode switching works
+- Section icons display correctly
+
