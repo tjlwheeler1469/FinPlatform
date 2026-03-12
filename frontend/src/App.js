@@ -778,7 +778,7 @@ const AppRouter = () => {
       <Route path="/reports" element={<ReportGenerator />} />
       <Route path="/salary-packaging" element={<SalaryPackaging />} />
       <Route path="/property-comparison" element={<PropertyComparison />} />
-      <Route path="/scenario-comparison" element={<Navigate to="/strategic-planning" replace />} />
+      <Route path="/scenario-comparison" element={<Suspense fallback={<PageLoader />}><ScenarioComparison /></Suspense>} />
       <Route path="/tax-loss-harvesting" element={<TaxLossHarvesting />} />
       <Route path="/dividend-reinvestment" element={<DividendReinvestment />} />
       <Route path="/income-splitting" element={<IncomeSplitting />} />
