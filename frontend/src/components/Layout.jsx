@@ -410,7 +410,7 @@ const Layout = ({ children }) => {
           <div className="px-3 py-2 border-b border-white/10">
             <Button 
               onClick={saveAllData}
-              className="w-full bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-[#0F392B] font-semibold"
+              className="w-full bg-[#D4A84C] hover:bg-[#D4A84C]/90 text-[#1a2744] font-semibold"
               size="sm"
               data-testid="sidebar-save-btn"
             >
@@ -423,7 +423,7 @@ const Layout = ({ children }) => {
           <div className="px-2 py-2 border-b border-white/10">
             <Button 
               onClick={saveAllData}
-              className="w-full bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-[#0F392B]"
+              className="w-full bg-[#D4A84C] hover:bg-[#D4A84C]/90 text-[#1a2744]"
               size="icon"
               title="Save Changes"
             >
