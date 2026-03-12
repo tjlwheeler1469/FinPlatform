@@ -104,12 +104,13 @@ const personalNavGroups = [
     items: [
       { path: "/life-timeline", label: "Life Timeline", icon: Clock, title: "Life Timeline Planning" },
       { path: "/goal-tracker", label: "Goals", icon: Target, title: "Goal Progress Tracker" },
+      { path: "/scenario-comparison", label: "Scenario Compare", icon: BarChart3, title: "Scenario Comparison" },
       { path: "/strategic-planning", label: "Strategy", icon: HeartPulse, title: "Strategic Planning" },
       { path: "/ai-advisor", label: "AI Advisor", icon: Sparkles, title: "AI Financial Advisor" },
       { path: "/debt-paydown", label: "Debt Paydown", icon: CreditCard, title: "Debt Paydown Strategy" },
       { path: "/insurance-gap", label: "Insurance", icon: Shield, title: "Insurance Gap Analysis" },
       { path: "/risk-profiler", label: "Risk Profile", icon: Shield, title: "Risk Profiler" },
-      { path: "/scenarios", label: "Scenarios", icon: FolderOpen, title: "Saved Scenarios" },
+      { path: "/scenarios", label: "Saved Scenarios", icon: FolderOpen, title: "Saved Scenarios" },
     ]
   },
   {
