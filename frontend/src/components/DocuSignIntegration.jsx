@@ -339,30 +339,11 @@ const DocuSignIntegration = ({ onSignatureComplete }) => {
       }
     }
   };
-        
-        return {
-          ...req,
-          status: allSigned ? "completed" : "partially_signed",
-          completed_at: allSigned ? new Date().toISOString() : null,
-          signatures: [...req.signatures, newSignature]
-        };
-      }
-      return req;
-    });
-
-    setSignatureRequests(updatedRequests);
-    setShowSignDialog(false);
-    toast.success("Document signed successfully!");
-    
-    if (onSignatureComplete) {
-      onSignatureComplete(selectedRequest);
-    }
-  };
 
   // Resend expired request
   const resendRequest = (requestId) => {
     setSignatureRequests(signatureRequests.map(req => 
-      req.id === requestId 
+      (req.request_id || req.id) === requestId 
         ? { ...req, status: "pending", sent_at: new Date().toISOString() }
         : req
     ));
@@ -372,7 +353,7 @@ const DocuSignIntegration = ({ onSignatureComplete }) => {
   // Cancel request
   const cancelRequest = (requestId) => {
     setSignatureRequests(signatureRequests.map(req => 
-      req.id === requestId 
+      (req.request_id || req.id) === requestId 
         ? { ...req, status: "cancelled" }
         : req
     ));
