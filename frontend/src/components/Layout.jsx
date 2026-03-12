@@ -97,6 +97,7 @@ const personalNavGroups = [
     items: [
       { path: "/share-portfolio", label: "Share Portfolio", icon: LineChart, title: "Share Portfolio" },
       { path: "/holdings-performance", label: "Performance", icon: Activity, title: "Holdings Performance" },
+      { path: "/portfolio-rebalancing", label: "Rebalancing", icon: ArrowLeftRight, title: "Portfolio Rebalancing" },
     ]
   },
   {
