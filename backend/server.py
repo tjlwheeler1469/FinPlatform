@@ -3599,6 +3599,634 @@ async def disable_mfa(data: Dict[str, Any]):
     
     return {"success": False, "message": "Invalid MFA code"}
 
+# ==================== IMPORT/EXPORT API ====================
+
+# Template for client data import
+CLIENT_IMPORT_TEMPLATE = {
+    "personal": {
+        "title": "", "first_name": "", "middle_name": "", "last_name": "",
+        "date_of_birth": "", "gender": "", "marital_status": "", "citizenship": "",
+        "tax_file_number": "", "address_street": "", "address_suburb": "",
+        "address_state": "", "address_postcode": "", "phone_mobile": "",
+        "phone_home": "", "email": ""
+    },
+    "employment": {
+        "employment_status": "", "occupation": "", "employer_name": "",
+        "years_employed": 0, "salary_gross": 0, "bonus_commission": 0,
+        "other_income": 0, "rental_income": 0, "dividend_income": 0
+    },
+    "assets": {
+        "cash_bank": 0, "term_deposits": 0, "shares_managed_funds": 0,
+        "superannuation": 0, "investment_property": 0, "home_residence": 0,
+        "motor_vehicles": 0, "household_contents": 0, "other_assets": 0
+    },
+    "liabilities": {
+        "home_loan": 0, "investment_loan": 0, "car_loan": 0,
+        "personal_loan": 0, "credit_cards": 0, "hecs_help": 0, "other_debts": 0
+    },
+    "insurance": {
+        "life_insurance": 0, "tpd_insurance": 0, "income_protection": 0,
+        "trauma_insurance": 0, "health_insurance": "", "has_will": False
+    },
+    "goals": {
+        "retirement_age": 65, "retirement_income": 0
+    }
+}
+
+ADVISER_IMPORT_TEMPLATE = {
+    "adviser_id": "",
+    "first_name": "", "last_name": "", "email": "", "phone": "",
+    "afsl_number": "", "authorised_representative_number": "",
+    "practice_name": "", "practice_address": "",
+    "specializations": [], "qualifications": []
+}
+
+def flatten_dict(d, parent_key='', sep='_'):
+    """Flatten a nested dictionary"""
+    items = []
+    for k, v in d.items():
+        new_key = f"{parent_key}{sep}{k}" if parent_key else k
+        if isinstance(v, dict):
+            items.extend(flatten_dict(v, new_key, sep=sep).items())
+        else:
+            items.append((new_key, v))
+    return dict(items)
+
+def unflatten_dict(d, sep='_'):
+    """Unflatten a dictionary back to nested structure"""
+    result = {}
+    for key, value in d.items():
+        parts = key.split(sep)
+        current = result
+        for part in parts[:-1]:
+            if part not in current:
+                current[part] = {}
+            current = current[part]
+        current[parts[-1]] = value
+    return result
+
+@api_router.get("/import/template/{data_type}")
+async def get_import_template(data_type: str, format: str = "json"):
+    """Get import template for client or adviser data"""
+    if data_type == "client":
+        template = CLIENT_IMPORT_TEMPLATE
+    elif data_type == "adviser":
+        template = ADVISER_IMPORT_TEMPLATE
+    else:
+        raise HTTPException(status_code=400, detail="Invalid data_type. Use 'client' or 'adviser'")
+    
+    if format == "json":
+        return {"template": template, "data_type": data_type}
+    
+    elif format == "csv":
+        # Flatten the template for CSV
+        flat_template = flatten_dict(template) if data_type == "client" else template
+        df = pd.DataFrame([flat_template])
+        output = StringIO()
+        df.to_csv(output, index=False)
+        output.seek(0)
+        return StreamingResponse(
+            iter([output.getvalue()]),
+            media_type="text/csv",
+            headers={"Content-Disposition": f"attachment; filename={data_type}_template.csv"}
+        )
+    
+    elif format == "xlsx":
+        flat_template = flatten_dict(template) if data_type == "client" else template
+        df = pd.DataFrame([flat_template])
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, sheet_name=data_type.capitalize())
+        output.seek(0)
+        return StreamingResponse(
+            output,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": f"attachment; filename={data_type}_template.xlsx"}
+        )
+    
+    raise HTTPException(status_code=400, detail="Invalid format. Use 'json', 'csv', or 'xlsx'")
+
+@api_router.post("/import/clients")
+async def import_clients(file: UploadFile = File(...)):
+    """Import client data from CSV, JSON, or Excel file"""
+    filename = file.filename.lower()
+    content = await file.read()
+    
+    try:
+        if filename.endswith('.json'):
+            data = json.loads(content.decode('utf-8'))
+            if isinstance(data, dict):
+                data = [data]
+        
+        elif filename.endswith('.csv'):
+            df = pd.read_csv(BytesIO(content))
+            df = df.fillna('')
+            data = df.to_dict(orient='records')
+            # Unflatten CSV data
+            data = [unflatten_dict(record) for record in data]
+        
+        elif filename.endswith(('.xlsx', '.xls')):
+            df = pd.read_excel(BytesIO(content))
+            df = df.fillna('')
+            data = df.to_dict(orient='records')
+            # Unflatten Excel data
+            data = [unflatten_dict(record) for record in data]
+        
+        else:
+            raise HTTPException(status_code=400, detail="Unsupported file format. Use .json, .csv, or .xlsx")
+        
+        # Process and save each client
+        imported = 0
+        errors = []
+        
+        for i, client_data in enumerate(data):
+            try:
+                # Generate client_id if not provided
+                client_id = client_data.get('client_id') or f"client_{uuid.uuid4().hex[:8]}"
+                
+                # Prepare fact-find data
+                factfind = {
+                    "client_id": client_id,
+                    "data": client_data,
+                    "progress": 0,
+                    "status": "imported",
+                    "created_at": datetime.now(timezone.utc).isoformat(),
+                    "updated_at": datetime.now(timezone.utc).isoformat(),
+                    "import_source": filename
+                }
+                
+                # Calculate progress based on filled fields
+                flat_data = flatten_dict(client_data)
+                filled_fields = sum(1 for v in flat_data.values() if v and v != 0)
+                total_fields = len(flat_data)
+                factfind["progress"] = int((filled_fields / total_fields) * 100) if total_fields > 0 else 0
+                
+                # Save to MongoDB
+                await db.factfinds.update_one(
+                    {"client_id": client_id},
+                    {"$set": factfind},
+                    upsert=True
+                )
+                imported += 1
+                
+            except Exception as e:
+                errors.append({"row": i + 1, "error": str(e)})
+        
+        return {
+            "success": True,
+            "imported": imported,
+            "total": len(data),
+            "errors": errors
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error processing file: {str(e)}")
+
+@api_router.post("/import/advisers")
+async def import_advisers(file: UploadFile = File(...)):
+    """Import adviser data from CSV, JSON, or Excel file"""
+    filename = file.filename.lower()
+    content = await file.read()
+    
+    try:
+        if filename.endswith('.json'):
+            data = json.loads(content.decode('utf-8'))
+            if isinstance(data, dict):
+                data = [data]
+        
+        elif filename.endswith('.csv'):
+            df = pd.read_csv(BytesIO(content))
+            df = df.fillna('')
+            data = df.to_dict(orient='records')
+        
+        elif filename.endswith(('.xlsx', '.xls')):
+            df = pd.read_excel(BytesIO(content))
+            df = df.fillna('')
+            data = df.to_dict(orient='records')
+        
+        else:
+            raise HTTPException(status_code=400, detail="Unsupported file format. Use .json, .csv, or .xlsx")
+        
+        # Process and save each adviser
+        imported = 0
+        errors = []
+        
+        for i, adviser_data in enumerate(data):
+            try:
+                adviser_id = adviser_data.get('adviser_id') or f"adv_{uuid.uuid4().hex[:8]}"
+                adviser_data['adviser_id'] = adviser_id
+                adviser_data['created_at'] = datetime.now(timezone.utc).isoformat()
+                adviser_data['updated_at'] = datetime.now(timezone.utc).isoformat()
+                adviser_data['import_source'] = filename
+                
+                await db.advisers.update_one(
+                    {"adviser_id": adviser_id},
+                    {"$set": adviser_data},
+                    upsert=True
+                )
+                imported += 1
+                
+            except Exception as e:
+                errors.append({"row": i + 1, "error": str(e)})
+        
+        return {
+            "success": True,
+            "imported": imported,
+            "total": len(data),
+            "errors": errors
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error processing file: {str(e)}")
+
+@api_router.get("/export/clients")
+async def export_clients(format: str = "json", client_ids: Optional[str] = None):
+    """Export client data to CSV, JSON, or Excel file"""
+    # Build query
+    query = {}
+    if client_ids:
+        ids = [id.strip() for id in client_ids.split(',')]
+        query = {"client_id": {"$in": ids}}
+    
+    # Get data from MongoDB
+    factfinds = await db.factfinds.find(query, {"_id": 0}).to_list(1000)
+    
+    if not factfinds:
+        raise HTTPException(status_code=404, detail="No client data found")
+    
+    # Extract client data
+    clients = []
+    for ff in factfinds:
+        client = ff.get('data', {})
+        client['client_id'] = ff.get('client_id')
+        client['progress'] = ff.get('progress', 0)
+        client['status'] = ff.get('status', 'unknown')
+        clients.append(client)
+    
+    if format == "json":
+        return {"clients": clients, "total": len(clients)}
+    
+    elif format == "csv":
+        # Flatten nested data for CSV
+        flat_clients = [flatten_dict(c) for c in clients]
+        df = pd.DataFrame(flat_clients)
+        output = StringIO()
+        df.to_csv(output, index=False)
+        output.seek(0)
+        return StreamingResponse(
+            iter([output.getvalue()]),
+            media_type="text/csv",
+            headers={"Content-Disposition": f"attachment; filename=clients_export_{datetime.now().strftime('%Y%m%d')}.csv"}
+        )
+    
+    elif format == "xlsx":
+        flat_clients = [flatten_dict(c) for c in clients]
+        df = pd.DataFrame(flat_clients)
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, sheet_name='Clients')
+        output.seek(0)
+        return StreamingResponse(
+            output,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": f"attachment; filename=clients_export_{datetime.now().strftime('%Y%m%d')}.xlsx"}
+        )
+    
+    raise HTTPException(status_code=400, detail="Invalid format. Use 'json', 'csv', or 'xlsx'")
+
+@api_router.get("/export/advisers")
+async def export_advisers(format: str = "json"):
+    """Export adviser data to CSV, JSON, or Excel file"""
+    advisers = await db.advisers.find({}, {"_id": 0}).to_list(1000)
+    
+    if not advisers:
+        raise HTTPException(status_code=404, detail="No adviser data found")
+    
+    if format == "json":
+        return {"advisers": advisers, "total": len(advisers)}
+    
+    elif format == "csv":
+        df = pd.DataFrame(advisers)
+        output = StringIO()
+        df.to_csv(output, index=False)
+        output.seek(0)
+        return StreamingResponse(
+            iter([output.getvalue()]),
+            media_type="text/csv",
+            headers={"Content-Disposition": f"attachment; filename=advisers_export_{datetime.now().strftime('%Y%m%d')}.csv"}
+        )
+    
+    elif format == "xlsx":
+        df = pd.DataFrame(advisers)
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, sheet_name='Advisers')
+        output.seek(0)
+        return StreamingResponse(
+            output,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": f"attachment; filename=advisers_export_{datetime.now().strftime('%Y%m%d')}.xlsx"}
+        )
+    
+    raise HTTPException(status_code=400, detail="Invalid format. Use 'json', 'csv', or 'xlsx'")
+
+@api_router.get("/advisers")
+async def list_advisers():
+    """List all advisers"""
+    advisers = await db.advisers.find({}, {"_id": 0}).to_list(100)
+    return {"advisers": advisers, "total": len(advisers)}
+
+@api_router.get("/advisers/{adviser_id}")
+async def get_adviser(adviser_id: str):
+    """Get adviser details"""
+    adviser = await db.advisers.find_one({"adviser_id": adviser_id}, {"_id": 0})
+    if not adviser:
+        raise HTTPException(status_code=404, detail="Adviser not found")
+    return adviser
+
+# ==================== STRATEGIC PLANNING - INVESTMENT ANALYSIS ====================
+
+# Tax rates by structure
+TAX_STRUCTURES = {
+    "personal": {
+        "name": "Personal/Joint",
+        "income_tax_brackets": [
+            {"threshold": 18200, "rate": 0},
+            {"threshold": 45000, "rate": 0.19},
+            {"threshold": 120000, "rate": 0.325},
+            {"threshold": 180000, "rate": 0.37},
+            {"threshold": float('inf'), "rate": 0.45}
+        ],
+        "cgt_discount": 0.50,  # 50% discount if held > 12 months
+        "medicare_levy": 0.02,
+        "franking_credit_refundable": True
+    },
+    "company": {
+        "name": "Company",
+        "flat_tax_rate": 0.25,  # Base rate entity
+        "cgt_discount": 0,  # No CGT discount for companies
+        "retained_earnings_tax": 0.25,
+        "dividend_distribution_franking": 0.25,
+        "franking_credit_refundable": False
+    },
+    "trust": {
+        "name": "Family Trust",
+        "distribution_flexibility": True,
+        "streaming_allowed": True,
+        "cgt_discount": 0.50,  # If distributed to individuals
+        "income_tax": "distributed_to_beneficiaries",
+        "franking_credit_refundable": True  # If distributed to individuals
+    },
+    "smsf": {
+        "name": "SMSF",
+        "accumulation_tax_rate": 0.15,
+        "pension_phase_tax_rate": 0,
+        "cgt_discount": 0.333,  # 1/3 discount (effectively 10% tax)
+        "contribution_caps": {
+            "concessional": 27500,
+            "non_concessional": 110000
+        }
+    }
+}
+
+# Asset class expected returns and characteristics
+ASSET_CLASSES = {
+    "au_shares": {
+        "name": "Australian Shares",
+        "expected_return": 0.08,  # 8% average
+        "volatility": 0.18,
+        "dividend_yield": 0.04,
+        "franking_rate": 0.70,  # 70% of dividends are franked
+        "growth_component": 0.04,
+        "income_component": 0.04
+    },
+    "international_shares": {
+        "name": "International Shares",
+        "expected_return": 0.09,
+        "volatility": 0.20,
+        "dividend_yield": 0.02,
+        "franking_rate": 0,  # No franking on international
+        "growth_component": 0.07,
+        "income_component": 0.02,
+        "currency_risk": True
+    },
+    "property": {
+        "name": "Property",
+        "expected_return": 0.07,
+        "volatility": 0.12,
+        "rental_yield": 0.035,
+        "growth_component": 0.035,
+        "income_component": 0.035,
+        "depreciation_benefits": True,
+        "negative_gearing_eligible": True
+    },
+    "crypto": {
+        "name": "Cryptocurrency",
+        "expected_return": 0.15,  # Higher expected return
+        "volatility": 0.80,  # Very high volatility
+        "dividend_yield": 0,
+        "growth_component": 0.15,
+        "income_component": 0,
+        "cgt_asset": True,
+        "no_franking": True
+    },
+    "bonds": {
+        "name": "Bonds/Fixed Interest",
+        "expected_return": 0.045,
+        "volatility": 0.05,
+        "interest_yield": 0.045,
+        "growth_component": 0,
+        "income_component": 0.045
+    },
+    "cash": {
+        "name": "Cash/Term Deposits",
+        "expected_return": 0.04,
+        "volatility": 0.01,
+        "interest_yield": 0.04,
+        "growth_component": 0,
+        "income_component": 0.04
+    }
+}
+
+def calculate_personal_tax(income: float) -> float:
+    """Calculate personal income tax"""
+    tax = 0
+    prev_threshold = 0
+    for bracket in TAX_STRUCTURES["personal"]["income_tax_brackets"]:
+        if income > bracket["threshold"]:
+            tax += (bracket["threshold"] - prev_threshold) * bracket["rate"]
+            prev_threshold = bracket["threshold"]
+        else:
+            tax += (income - prev_threshold) * bracket["rate"]
+            break
+    # Add Medicare levy
+    tax += income * TAX_STRUCTURES["personal"]["medicare_levy"]
+    return tax
+
+def calculate_investment_outcome(
+    investment_amount: float,
+    asset_class: str,
+    holding_period_years: int,
+    tax_structure: str,
+    marginal_tax_rate: float = 0.37
+) -> Dict[str, Any]:
+    """Calculate investment outcome for a given asset class and tax structure"""
+    
+    asset = ASSET_CLASSES.get(asset_class)
+    if not asset:
+        return {"error": "Invalid asset class"}
+    
+    structure = TAX_STRUCTURES.get(tax_structure)
+    if not structure:
+        return {"error": "Invalid tax structure"}
+    
+    # Calculate gross returns
+    growth_return = investment_amount * ((1 + asset["growth_component"]) ** holding_period_years - 1)
+    income_return = investment_amount * asset.get("income_component", 0) * holding_period_years
+    
+    total_gross = growth_return + income_return
+    ending_value = investment_amount + total_gross
+    
+    # Calculate taxes based on structure
+    if tax_structure == "personal":
+        # Income tax on dividends/interest
+        franking_credits = income_return * asset.get("franking_rate", 0) * 0.30 / 0.70
+        taxable_income = income_return + franking_credits
+        income_tax = taxable_income * marginal_tax_rate - franking_credits
+        
+        # CGT on growth
+        if holding_period_years >= 1:
+            cgt_discount = structure["cgt_discount"]
+        else:
+            cgt_discount = 0
+        taxable_gain = growth_return * (1 - cgt_discount)
+        cgt = taxable_gain * marginal_tax_rate
+        
+        total_tax = max(0, income_tax) + cgt
+        
+    elif tax_structure == "company":
+        # Flat tax on all income
+        total_tax = total_gross * structure["flat_tax_rate"]
+        
+    elif tax_structure == "trust":
+        # Distributed to beneficiaries - assume distributed to individual at marginal rate
+        franking_credits = income_return * asset.get("franking_rate", 0) * 0.30 / 0.70
+        taxable_income = income_return + franking_credits
+        income_tax = taxable_income * marginal_tax_rate - franking_credits
+        
+        # CGT with discount if distributed to individuals
+        if holding_period_years >= 1:
+            cgt_discount = structure["cgt_discount"]
+        else:
+            cgt_discount = 0
+        taxable_gain = growth_return * (1 - cgt_discount)
+        cgt = taxable_gain * marginal_tax_rate
+        
+        total_tax = max(0, income_tax) + cgt
+        
+    elif tax_structure == "smsf":
+        # SMSF rates
+        income_tax = income_return * structure["accumulation_tax_rate"]
+        
+        if holding_period_years >= 1:
+            # 1/3 CGT discount
+            taxable_gain = growth_return * (1 - structure["cgt_discount"])
+        else:
+            taxable_gain = growth_return
+        cgt = taxable_gain * structure["accumulation_tax_rate"]
+        
+        total_tax = income_tax + cgt
+    else:
+        total_tax = 0
+    
+    after_tax_return = total_gross - total_tax
+    after_tax_value = investment_amount + after_tax_return
+    
+    return {
+        "asset_class": asset["name"],
+        "tax_structure": structure["name"],
+        "investment_amount": investment_amount,
+        "holding_period_years": holding_period_years,
+        "gross_return": round(total_gross, 2),
+        "growth_return": round(growth_return, 2),
+        "income_return": round(income_return, 2),
+        "total_tax": round(total_tax, 2),
+        "after_tax_return": round(after_tax_return, 2),
+        "ending_value_gross": round(ending_value, 2),
+        "ending_value_after_tax": round(after_tax_value, 2),
+        "effective_tax_rate": round((total_tax / total_gross * 100) if total_gross > 0 else 0, 2),
+        "annualized_return_gross": round((((ending_value / investment_amount) ** (1/holding_period_years)) - 1) * 100, 2),
+        "annualized_return_after_tax": round((((after_tax_value / investment_amount) ** (1/holding_period_years)) - 1) * 100, 2)
+    }
+
+@api_router.post("/strategic/investment-comparison")
+async def compare_investments(data: Dict[str, Any]):
+    """Compare investment outcomes across asset classes and tax structures"""
+    investment_amount = data.get("investment_amount", 100000)
+    holding_period = data.get("holding_period_years", 10)
+    marginal_tax_rate = data.get("marginal_tax_rate", 0.37)
+    asset_classes = data.get("asset_classes", list(ASSET_CLASSES.keys()))
+    tax_structures = data.get("tax_structures", list(TAX_STRUCTURES.keys()))
+    
+    results = []
+    
+    for asset_class in asset_classes:
+        for tax_structure in tax_structures:
+            outcome = calculate_investment_outcome(
+                investment_amount,
+                asset_class,
+                holding_period,
+                tax_structure,
+                marginal_tax_rate
+            )
+            if "error" not in outcome:
+                results.append(outcome)
+    
+    # Sort by after-tax return
+    results.sort(key=lambda x: x["after_tax_return"], reverse=True)
+    
+    # Find best option per asset class
+    best_by_asset = {}
+    for result in results:
+        asset = result["asset_class"]
+        if asset not in best_by_asset:
+            best_by_asset[asset] = result
+        elif result["after_tax_return"] > best_by_asset[asset]["after_tax_return"]:
+            best_by_asset[asset] = result
+    
+    # Find best option per structure
+    best_by_structure = {}
+    for result in results:
+        structure = result["tax_structure"]
+        if structure not in best_by_structure:
+            best_by_structure[structure] = result
+        elif result["after_tax_return"] > best_by_structure[structure]["after_tax_return"]:
+            best_by_structure[structure] = result
+    
+    return {
+        "parameters": {
+            "investment_amount": investment_amount,
+            "holding_period_years": holding_period,
+            "marginal_tax_rate": marginal_tax_rate
+        },
+        "all_results": results,
+        "best_overall": results[0] if results else None,
+        "best_by_asset_class": best_by_asset,
+        "best_by_tax_structure": best_by_structure,
+        "asset_classes": ASSET_CLASSES,
+        "tax_structures": TAX_STRUCTURES
+    }
+
+@api_router.get("/strategic/tax-structures")
+async def get_tax_structures():
+    """Get available tax structures and their characteristics"""
+    return {"tax_structures": TAX_STRUCTURES}
+
+@api_router.get("/strategic/asset-classes")
+async def get_asset_classes():
+    """Get available asset classes and their characteristics"""
+    return {"asset_classes": ASSET_CLASSES}
+
 @api_router.get("/")
 async def root():
     return {"message": "Australian Investment Analyzer API", "version": "1.0.0"}
