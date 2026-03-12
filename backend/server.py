@@ -4242,6 +4242,658 @@ async def get_asset_classes():
     """Get available asset classes and their characteristics"""
     return {"asset_classes": ASSET_CLASSES}
 
+# ==================== PHASE 1: DECISION ENGINE APIs ====================
+
+class FinancialProfileInput(BaseModel):
+    """Input for financial health and retirement calculations"""
+    age: int = 45
+    retirement_age: int = 65
+    current_income: float = 185000
+    annual_expenses: float = 120000
+    total_assets: float = 2920000
+    total_debt: float = 942000
+    super_balance: float = 580000
+    investment_portfolio: float = 545000  # shares + ETFs + bonds
+    cash_savings: float = 225000  # cash + term deposits
+    property_value: float = 1570000
+    property_debt: float = 942000
+    savings_rate: float = 0.15  # percentage of income saved
+    risk_tolerance: str = "moderate"  # conservative, moderate, aggressive
+    retirement_income_target: float = 80000  # annual target in retirement
+
+class LifeEventInput(BaseModel):
+    """Input for life timeline events"""
+    event_type: str  # retirement, house_purchase, children_education, etc.
+    target_age: int
+    target_amount: float
+    priority: str = "high"  # high, medium, low
+    description: str = ""
+
+class LifeTimelineInput(BaseModel):
+    """Input for life timeline planning"""
+    current_age: int = 45
+    life_expectancy: int = 90
+    events: List[LifeEventInput] = []
+    current_assets: float = 2920000
+    current_debt: float = 942000
+    annual_income: float = 185000
+    annual_savings: float = 50000
+    expected_return: float = 0.07
+    inflation_rate: float = 0.025
+
+def calculate_financial_health_score(profile: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Calculate Financial Health Score (0-100) across 6 dimensions:
+    1. Savings Rate (0-20 points)
+    2. Debt Management (0-20 points)
+    3. Investment Diversification (0-15 points)
+    4. Retirement Readiness (0-20 points)
+    5. Emergency Fund (0-10 points)
+    6. Tax Efficiency (0-15 points)
+    """
+    scores = {}
+    recommendations = []
+    
+    # 1. Savings Rate Score (0-20)
+    savings_rate = profile.get("savings_rate", 0)
+    if savings_rate >= 0.20:
+        scores["savings_rate"] = 20
+    elif savings_rate >= 0.15:
+        scores["savings_rate"] = 16
+    elif savings_rate >= 0.10:
+        scores["savings_rate"] = 12
+    elif savings_rate >= 0.05:
+        scores["savings_rate"] = 8
+    else:
+        scores["savings_rate"] = 4
+        recommendations.append({
+            "category": "savings_rate",
+            "action": "Increase savings rate to at least 15%",
+            "impact": f"+${(0.15 - savings_rate) * profile.get('current_income', 0):,.0f}/year potential savings",
+            "priority": "high"
+        })
+    
+    # 2. Debt Management Score (0-20)
+    total_assets = profile.get("total_assets", 1)
+    total_debt = profile.get("total_debt", 0)
+    debt_to_asset_ratio = total_debt / total_assets if total_assets > 0 else 1
+    
+    if debt_to_asset_ratio <= 0.20:
+        scores["debt_management"] = 20
+    elif debt_to_asset_ratio <= 0.35:
+        scores["debt_management"] = 16
+    elif debt_to_asset_ratio <= 0.50:
+        scores["debt_management"] = 12
+    elif debt_to_asset_ratio <= 0.65:
+        scores["debt_management"] = 8
+    else:
+        scores["debt_management"] = 4
+        recommendations.append({
+            "category": "debt_management",
+            "action": "Consider debt reduction strategy",
+            "impact": f"Reduce debt-to-asset ratio from {debt_to_asset_ratio*100:.0f}% to under 50%",
+            "priority": "high"
+        })
+    
+    # 3. Investment Diversification Score (0-15)
+    investment_portfolio = profile.get("investment_portfolio", 0)
+    property_value = profile.get("property_value", 0)
+    super_balance = profile.get("super_balance", 0)
+    cash = profile.get("cash_savings", 0)
+    
+    total_investable = investment_portfolio + property_value + super_balance + cash
+    if total_investable > 0:
+        property_pct = property_value / total_investable
+        super_pct = super_balance / total_investable
+        investment_pct = investment_portfolio / total_investable
+        cash_pct = cash / total_investable
+        
+        # Check for over-concentration
+        max_allocation = max(property_pct, super_pct, investment_pct)
+        if max_allocation <= 0.40:
+            scores["diversification"] = 15
+        elif max_allocation <= 0.50:
+            scores["diversification"] = 12
+        elif max_allocation <= 0.60:
+            scores["diversification"] = 9
+        else:
+            scores["diversification"] = 6
+            recommendations.append({
+                "category": "diversification",
+                "action": "Rebalance portfolio - single asset class over 60%",
+                "impact": "Reduced risk through diversification",
+                "priority": "medium"
+            })
+    else:
+        scores["diversification"] = 0
+    
+    # 4. Retirement Readiness Score (0-20)
+    age = profile.get("age", 45)
+    retirement_age = profile.get("retirement_age", 65)
+    years_to_retirement = max(0, retirement_age - age)
+    retirement_target = profile.get("retirement_income_target", 80000) * 25  # 4% rule
+    
+    # Project super balance at retirement
+    annual_super_contribution = profile.get("current_income", 0) * 0.115  # SG rate
+    projected_super = super_balance
+    for _ in range(years_to_retirement):
+        projected_super = projected_super * 1.07 + annual_super_contribution
+    
+    retirement_funded_pct = min(1.0, projected_super / retirement_target) if retirement_target > 0 else 0
+    
+    if retirement_funded_pct >= 1.0:
+        scores["retirement_readiness"] = 20
+    elif retirement_funded_pct >= 0.85:
+        scores["retirement_readiness"] = 16
+    elif retirement_funded_pct >= 0.70:
+        scores["retirement_readiness"] = 12
+    elif retirement_funded_pct >= 0.50:
+        scores["retirement_readiness"] = 8
+    else:
+        scores["retirement_readiness"] = 4
+        gap = retirement_target - projected_super
+        recommendations.append({
+            "category": "retirement_readiness",
+            "action": "Increase super contributions",
+            "impact": f"Close ${gap:,.0f} retirement gap",
+            "priority": "high"
+        })
+    
+    # 5. Emergency Fund Score (0-10)
+    monthly_expenses = profile.get("annual_expenses", 120000) / 12
+    emergency_fund_months = cash / monthly_expenses if monthly_expenses > 0 else 0
+    
+    if emergency_fund_months >= 6:
+        scores["emergency_fund"] = 10
+    elif emergency_fund_months >= 3:
+        scores["emergency_fund"] = 7
+    elif emergency_fund_months >= 1:
+        scores["emergency_fund"] = 4
+    else:
+        scores["emergency_fund"] = 2
+        recommendations.append({
+            "category": "emergency_fund",
+            "action": "Build emergency fund to 6 months expenses",
+            "impact": f"Target ${monthly_expenses * 6:,.0f} in accessible savings",
+            "priority": "medium"
+        })
+    
+    # 6. Tax Efficiency Score (0-15)
+    # Based on utilization of tax-advantaged accounts and strategies
+    super_to_income_ratio = super_balance / profile.get("current_income", 1)
+    if super_to_income_ratio >= 3.0:
+        scores["tax_efficiency"] = 15
+    elif super_to_income_ratio >= 2.0:
+        scores["tax_efficiency"] = 12
+    elif super_to_income_ratio >= 1.0:
+        scores["tax_efficiency"] = 9
+    else:
+        scores["tax_efficiency"] = 6
+        recommendations.append({
+            "category": "tax_efficiency",
+            "action": "Maximize concessional super contributions",
+            "impact": "Up to $6,375/year tax savings at 37% marginal rate",
+            "priority": "medium"
+        })
+    
+    total_score = sum(scores.values())
+    
+    # Determine health status
+    if total_score >= 85:
+        status = "Excellent"
+        status_color = "green"
+    elif total_score >= 70:
+        status = "Good"
+        status_color = "blue"
+    elif total_score >= 55:
+        status = "Fair"
+        status_color = "yellow"
+    else:
+        status = "Needs Attention"
+        status_color = "red"
+    
+    return {
+        "total_score": total_score,
+        "max_score": 100,
+        "status": status,
+        "status_color": status_color,
+        "dimensions": {
+            "savings_rate": {"score": scores["savings_rate"], "max": 20, "label": "Savings Rate"},
+            "debt_management": {"score": scores["debt_management"], "max": 20, "label": "Debt Management"},
+            "diversification": {"score": scores["diversification"], "max": 15, "label": "Diversification"},
+            "retirement_readiness": {"score": scores["retirement_readiness"], "max": 20, "label": "Retirement Ready"},
+            "emergency_fund": {"score": scores["emergency_fund"], "max": 10, "label": "Emergency Fund"},
+            "tax_efficiency": {"score": scores["tax_efficiency"], "max": 15, "label": "Tax Efficiency"}
+        },
+        "recommendations": recommendations,
+        "metrics": {
+            "debt_to_asset_ratio": round(debt_to_asset_ratio * 100, 1),
+            "savings_rate": round(savings_rate * 100, 1),
+            "emergency_fund_months": round(emergency_fund_months, 1),
+            "retirement_funded_pct": round(retirement_funded_pct * 100, 1),
+            "projected_super_at_retirement": round(projected_super, 0),
+            "years_to_retirement": years_to_retirement
+        }
+    }
+
+def calculate_retirement_probability(profile: Dict[str, Any], simulations: int = 5000) -> Dict[str, Any]:
+    """
+    Calculate retirement success probability using Monte Carlo simulation.
+    Success = portfolio lasts through retirement without running out.
+    """
+    age = profile.get("age", 45)
+    retirement_age = profile.get("retirement_age", 65)
+    life_expectancy = profile.get("life_expectancy", 90)
+    
+    years_to_retirement = max(0, retirement_age - age)
+    years_in_retirement = max(0, life_expectancy - retirement_age)
+    
+    # Current balances
+    super_balance = profile.get("super_balance", 580000)
+    investment_portfolio = profile.get("investment_portfolio", 545000)
+    cash_savings = profile.get("cash_savings", 225000)
+    
+    # Annual contributions until retirement
+    annual_super_contribution = profile.get("current_income", 185000) * 0.115
+    annual_savings = profile.get("annual_savings", 50000)
+    
+    # Retirement income needs
+    retirement_income_target = profile.get("retirement_income_target", 80000)
+    inflation_rate = profile.get("inflation_rate", 0.025)
+    
+    # Market assumptions
+    expected_return = profile.get("expected_return", 0.07)
+    volatility = profile.get("volatility", 0.15)
+    
+    np.random.seed(42)
+    
+    success_count = 0
+    final_balances = []
+    shortfall_ages = []
+    
+    for _ in range(simulations):
+        # Phase 1: Accumulation (to retirement)
+        portfolio_value = super_balance + investment_portfolio + cash_savings
+        
+        for year in range(years_to_retirement):
+            annual_return = np.random.normal(expected_return, volatility)
+            portfolio_value = portfolio_value * (1 + annual_return) + annual_super_contribution + annual_savings
+        
+        # Phase 2: Retirement (drawdown)
+        retirement_portfolio = portfolio_value
+        adjusted_income_need = retirement_income_target * ((1 + inflation_rate) ** years_to_retirement)
+        
+        success = True
+        final_age = life_expectancy
+        
+        for year in range(years_in_retirement):
+            # Adjust income need for inflation
+            current_income_need = adjusted_income_need * ((1 + inflation_rate) ** year)
+            
+            # Apply return and withdraw
+            annual_return = np.random.normal(expected_return * 0.8, volatility * 0.9)  # Lower return/risk in retirement
+            retirement_portfolio = retirement_portfolio * (1 + annual_return) - current_income_need
+            
+            if retirement_portfolio <= 0:
+                success = False
+                final_age = retirement_age + year
+                shortfall_ages.append(final_age)
+                break
+        
+        if success:
+            success_count += 1
+            final_balances.append(retirement_portfolio)
+    
+    success_probability = (success_count / simulations) * 100
+    
+    # Calculate percentiles for successful scenarios
+    if final_balances:
+        median_final = np.median(final_balances)
+        p10_final = np.percentile(final_balances, 10)
+        p90_final = np.percentile(final_balances, 90)
+    else:
+        median_final = 0
+        p10_final = 0
+        p90_final = 0
+    
+    # Calculate average shortfall age for failed scenarios
+    avg_shortfall_age = np.mean(shortfall_ages) if shortfall_ages else None
+    
+    # Determine status
+    if success_probability >= 90:
+        status = "On Track"
+        status_color = "green"
+        recommendation = "Your retirement plan is well-funded. Consider optimizing for tax efficiency."
+    elif success_probability >= 75:
+        status = "Good Progress"
+        status_color = "blue"
+        recommendation = "You're making good progress. Consider increasing contributions to reach 90%+ confidence."
+    elif success_probability >= 60:
+        status = "Needs Attention"
+        status_color = "yellow"
+        recommendation = "Consider increasing savings rate or adjusting retirement age/income targets."
+    else:
+        status = "At Risk"
+        status_color = "red"
+        recommendation = "Significant changes needed. Review retirement age, income target, or savings rate."
+    
+    return {
+        "success_probability": round(success_probability, 1),
+        "target_probability": 85,
+        "status": status,
+        "status_color": status_color,
+        "recommendation": recommendation,
+        "simulations_run": simulations,
+        "parameters": {
+            "current_age": age,
+            "retirement_age": retirement_age,
+            "life_expectancy": life_expectancy,
+            "years_to_retirement": years_to_retirement,
+            "years_in_retirement": years_in_retirement,
+            "retirement_income_target": retirement_income_target,
+            "current_portfolio": round(super_balance + investment_portfolio + cash_savings, 0)
+        },
+        "projections": {
+            "median_final_balance": round(median_final, 0),
+            "p10_final_balance": round(p10_final, 0),
+            "p90_final_balance": round(p90_final, 0),
+            "avg_shortfall_age": round(avg_shortfall_age, 0) if avg_shortfall_age else None,
+            "scenarios_successful": success_count,
+            "scenarios_failed": simulations - success_count
+        }
+    }
+
+def generate_top_actions(profile: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """
+    Generate top 3-5 prioritized actions with dollar impact.
+    """
+    actions = []
+    
+    age = profile.get("age", 45)
+    current_income = profile.get("current_income", 185000)
+    super_balance = profile.get("super_balance", 580000)
+    savings_rate = profile.get("savings_rate", 0.15)
+    total_debt = profile.get("total_debt", 942000)
+    property_debt = profile.get("property_debt", 942000)
+    cash_savings = profile.get("cash_savings", 225000)
+    annual_expenses = profile.get("annual_expenses", 120000)
+    
+    # Calculate marginal tax rate
+    if current_income > 190000:
+        marginal_rate = 0.45
+    elif current_income > 135000:
+        marginal_rate = 0.37
+    elif current_income > 45000:
+        marginal_rate = 0.30
+    else:
+        marginal_rate = 0.19
+    
+    # Action 1: Maximize Super Contributions
+    concessional_cap = 30000
+    current_employer_contribution = current_income * 0.115
+    unused_cap = concessional_cap - current_employer_contribution
+    if unused_cap > 0:
+        tax_savings = unused_cap * (marginal_rate - 0.15)
+        actions.append({
+            "rank": 1,
+            "title": "Maximize Super Contributions",
+            "description": f"Salary sacrifice ${unused_cap:,.0f} to use remaining concessional cap",
+            "impact_amount": tax_savings,
+            "impact_text": f"+${tax_savings:,.0f}/year tax savings",
+            "impact_type": "tax_savings",
+            "effort": "low",
+            "timeframe": "immediate",
+            "category": "superannuation"
+        })
+    
+    # Action 2: Debt Recycling (if significant non-deductible debt)
+    if cash_savings > 50000 and property_debt > 0:
+        debt_recycle_amount = min(cash_savings * 0.5, property_debt * 0.1)
+        interest_rate = 0.065
+        tax_benefit = debt_recycle_amount * interest_rate * marginal_rate
+        actions.append({
+            "rank": 2,
+            "title": "Implement Debt Recycling",
+            "description": f"Convert ${debt_recycle_amount:,.0f} to deductible investment debt",
+            "impact_amount": tax_benefit,
+            "impact_text": f"+${tax_benefit:,.0f}/year tax benefit",
+            "impact_type": "tax_savings",
+            "effort": "medium",
+            "timeframe": "1-3 months",
+            "category": "debt_optimization"
+        })
+    
+    # Action 3: Increase Savings Rate
+    if savings_rate < 0.20:
+        increase = 0.05
+        new_savings = current_income * increase
+        compound_benefit = new_savings * ((1.07 ** 20 - 1) / 0.07)  # 20 year compound
+        actions.append({
+            "rank": 3,
+            "title": "Increase Savings Rate by 5%",
+            "description": f"Boost annual savings by ${new_savings:,.0f}",
+            "impact_amount": compound_benefit,
+            "impact_text": f"+${compound_benefit:,.0f} over 20 years",
+            "impact_type": "wealth_building",
+            "effort": "medium",
+            "timeframe": "ongoing",
+            "category": "savings"
+        })
+    
+    # Action 4: Portfolio Rebalancing
+    investment_portfolio = profile.get("investment_portfolio", 545000)
+    if investment_portfolio > 100000:
+        rebalance_benefit = investment_portfolio * 0.005  # Estimated 0.5% improvement
+        actions.append({
+            "rank": 4,
+            "title": "Rebalance Investment Portfolio",
+            "description": "Optimize asset allocation for risk-adjusted returns",
+            "impact_amount": rebalance_benefit,
+            "impact_text": f"+${rebalance_benefit:,.0f}/year expected improvement",
+            "impact_type": "returns",
+            "effort": "low",
+            "timeframe": "1 week",
+            "category": "investments"
+        })
+    
+    # Action 5: Emergency Fund Optimization
+    monthly_expenses = annual_expenses / 12
+    ideal_emergency = monthly_expenses * 6
+    if cash_savings > ideal_emergency * 1.5:
+        excess_cash = cash_savings - ideal_emergency
+        opportunity_cost = excess_cash * 0.04  # Difference between savings and investment returns
+        actions.append({
+            "rank": 5,
+            "title": "Deploy Excess Cash",
+            "description": f"Invest ${excess_cash:,.0f} excess emergency funds",
+            "impact_amount": opportunity_cost,
+            "impact_text": f"+${opportunity_cost:,.0f}/year potential returns",
+            "impact_type": "opportunity",
+            "effort": "low",
+            "timeframe": "immediate",
+            "category": "cash_management"
+        })
+    
+    # Sort by impact amount and return top 5
+    actions.sort(key=lambda x: x["impact_amount"], reverse=True)
+    
+    # Re-rank after sorting
+    for i, action in enumerate(actions[:5]):
+        action["rank"] = i + 1
+    
+    return actions[:5]
+
+def calculate_life_timeline(timeline: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Calculate life timeline projections with events and milestones.
+    """
+    current_age = timeline.get("current_age", 45)
+    life_expectancy = timeline.get("life_expectancy", 90)
+    events = timeline.get("events", [])
+    current_assets = timeline.get("current_assets", 2920000)
+    current_debt = timeline.get("current_debt", 942000)
+    annual_income = timeline.get("annual_income", 185000)
+    annual_savings = timeline.get("annual_savings", 50000)
+    expected_return = timeline.get("expected_return", 0.07)
+    inflation_rate = timeline.get("inflation_rate", 0.025)
+    
+    # Generate year-by-year projection
+    projections = []
+    net_worth = current_assets - current_debt
+    portfolio_value = current_assets
+    debt_remaining = current_debt
+    
+    # Default events if none provided
+    if not events:
+        events = [
+            {"event_type": "mortgage_paid", "target_age": 60, "target_amount": 0, "description": "Mortgage Paid Off"},
+            {"event_type": "retirement", "target_age": 65, "target_amount": 0, "description": "Retirement"},
+            {"event_type": "children_education", "target_age": 52, "target_amount": 100000, "description": "Children's University"},
+        ]
+    
+    # Calculate projections for each year
+    for age in range(current_age, life_expectancy + 1):
+        year_events = [e for e in events if e.get("target_age") == age]
+        
+        # Apply returns and savings
+        if age < 65:  # Working years
+            portfolio_value = portfolio_value * (1 + expected_return) + annual_savings
+            debt_remaining = max(0, debt_remaining - 50000)  # Assume $50k/year debt repayment
+        else:  # Retirement years
+            withdrawal = 80000 * ((1 + inflation_rate) ** (age - 65))
+            portfolio_value = portfolio_value * (1 + expected_return * 0.8) - withdrawal
+            debt_remaining = 0
+        
+        # Subtract event costs
+        for event in year_events:
+            portfolio_value -= event.get("target_amount", 0)
+        
+        net_worth = portfolio_value - debt_remaining
+        
+        projections.append({
+            "age": age,
+            "year": 2024 + (age - current_age),
+            "net_worth": round(max(0, net_worth), 0),
+            "portfolio_value": round(max(0, portfolio_value), 0),
+            "debt_remaining": round(max(0, debt_remaining), 0),
+            "events": [e.get("description", e.get("event_type")) for e in year_events],
+            "is_retirement": age >= 65,
+            "is_milestone": len(year_events) > 0
+        })
+    
+    # Calculate key milestones
+    milestones = []
+    
+    # Find mortgage payoff
+    mortgage_payoff = next((p for p in projections if p["debt_remaining"] == 0), None)
+    if mortgage_payoff:
+        milestones.append({
+            "type": "mortgage_paid",
+            "age": mortgage_payoff["age"],
+            "year": mortgage_payoff["year"],
+            "description": "Mortgage Paid Off",
+            "net_worth_at_milestone": mortgage_payoff["net_worth"]
+        })
+    
+    # Retirement milestone
+    retirement_proj = next((p for p in projections if p["age"] == 65), None)
+    if retirement_proj:
+        milestones.append({
+            "type": "retirement",
+            "age": 65,
+            "year": retirement_proj["year"],
+            "description": "Retirement",
+            "net_worth_at_milestone": retirement_proj["net_worth"]
+        })
+    
+    # Peak net worth
+    peak = max(projections, key=lambda x: x["net_worth"])
+    milestones.append({
+        "type": "peak_wealth",
+        "age": peak["age"],
+        "year": peak["year"],
+        "description": "Peak Net Worth",
+        "net_worth_at_milestone": peak["net_worth"]
+    })
+    
+    # Custom events
+    for event in events:
+        event_proj = next((p for p in projections if p["age"] == event.get("target_age")), None)
+        if event_proj and event.get("event_type") not in ["mortgage_paid", "retirement"]:
+            milestones.append({
+                "type": event.get("event_type"),
+                "age": event.get("target_age"),
+                "year": event_proj["year"],
+                "description": event.get("description", event.get("event_type")),
+                "cost": event.get("target_amount", 0),
+                "net_worth_at_milestone": event_proj["net_worth"]
+            })
+    
+    milestones.sort(key=lambda x: x["age"])
+    
+    return {
+        "current_age": current_age,
+        "life_expectancy": life_expectancy,
+        "projections": projections,
+        "milestones": milestones,
+        "summary": {
+            "current_net_worth": round(current_assets - current_debt, 0),
+            "projected_retirement_net_worth": retirement_proj["net_worth"] if retirement_proj else 0,
+            "peak_net_worth": peak["net_worth"],
+            "peak_age": peak["age"],
+            "years_until_retirement": max(0, 65 - current_age),
+            "total_events": len(events)
+        }
+    }
+
+@api_router.post("/decision-engine/health-score")
+async def get_financial_health_score(profile: FinancialProfileInput):
+    """Calculate comprehensive Financial Health Score (0-100)"""
+    return calculate_financial_health_score(profile.model_dump())
+
+@api_router.post("/decision-engine/retirement-probability")
+async def get_retirement_probability(profile: FinancialProfileInput, simulations: int = 5000):
+    """Calculate retirement success probability via Monte Carlo simulation"""
+    profile_dict = profile.model_dump()
+    profile_dict["life_expectancy"] = 90
+    profile_dict["annual_savings"] = profile.current_income * profile.savings_rate
+    profile_dict["volatility"] = 0.15 if profile.risk_tolerance == "moderate" else (0.10 if profile.risk_tolerance == "conservative" else 0.20)
+    return calculate_retirement_probability(profile_dict, simulations)
+
+@api_router.post("/decision-engine/top-actions")
+async def get_top_actions(profile: FinancialProfileInput):
+    """Generate top prioritized actions with dollar impact"""
+    return {
+        "actions": generate_top_actions(profile.model_dump()),
+        "generated_at": datetime.now(timezone.utc).isoformat()
+    }
+
+@api_router.post("/decision-engine/life-timeline")
+async def get_life_timeline(timeline: LifeTimelineInput):
+    """Calculate life timeline with events and milestones"""
+    timeline_dict = timeline.model_dump()
+    timeline_dict["events"] = [e.model_dump() if hasattr(e, 'model_dump') else e for e in timeline.events]
+    return calculate_life_timeline(timeline_dict)
+
+@api_router.post("/decision-engine/complete-analysis")
+async def get_complete_decision_analysis(profile: FinancialProfileInput):
+    """Get complete decision engine analysis: health score, retirement probability, and top actions"""
+    profile_dict = profile.model_dump()
+    profile_dict["life_expectancy"] = 90
+    profile_dict["annual_savings"] = profile.current_income * profile.savings_rate
+    profile_dict["volatility"] = 0.15 if profile.risk_tolerance == "moderate" else (0.10 if profile.risk_tolerance == "conservative" else 0.20)
+    
+    health_score = calculate_financial_health_score(profile_dict)
+    retirement_prob = calculate_retirement_probability(profile_dict, 3000)
+    top_actions = generate_top_actions(profile_dict)
+    
+    return {
+        "health_score": health_score,
+        "retirement_probability": retirement_prob,
+        "top_actions": top_actions,
+        "generated_at": datetime.now(timezone.utc).isoformat()
+    }
+
 @api_router.get("/")
 async def root():
     return {"message": "Australian Investment Analyzer API", "version": "1.0.0"}
