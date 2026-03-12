@@ -6345,6 +6345,58 @@ async def root():
 async def health_check():
     return {"status": "healthy", "timestamp": datetime.now(timezone.utc).isoformat()}
 
+# ==================== SECURE DATA FEEDS (AU Regulatory Compliant) ====================
+
+try:
+    from services.data_feeds import get_data_feed_service
+    from services.encryption import get_encryption_service
+    
+    @api_router.get("/feeds/cdr/accounts/{customer_id}")
+    async def get_cdr_bank_accounts(customer_id: str):
+        """Get CDR-compliant bank account data (Open Banking)"""
+        service = get_data_feed_service()
+        return service.get_cdr_accounts(customer_id)
+    
+    @api_router.get("/feeds/cdr/transactions/{account_id}")
+    async def get_cdr_transactions(account_id: str, days: int = 90):
+        """Get CDR-compliant transaction data"""
+        service = get_data_feed_service()
+        return service.get_cdr_transactions(account_id, days)
+    
+    @api_router.get("/feeds/super/{member_number}")
+    async def get_super_balance(member_number: str):
+        """Get superannuation fund balance and allocation"""
+        service = get_data_feed_service()
+        return service.get_super_balance(member_number)
+    
+    @api_router.get("/feeds/asx/prices")
+    async def get_asx_prices(symbols: Optional[str] = None):
+        """Get ASX stock prices"""
+        service = get_data_feed_service()
+        symbol_list = symbols.split(",") if symbols else None
+        return service.get_asx_prices(symbol_list)
+    
+    @api_router.get("/feeds/property/valuation")
+    async def get_property_valuation(address: str):
+        """Get property valuation estimate"""
+        service = get_data_feed_service()
+        return service.get_property_valuation(address)
+    
+    @api_router.get("/security/compliance")
+    async def get_compliance_report():
+        """Get security and compliance status report"""
+        service = get_data_feed_service()
+        return service.get_compliance_report()
+    
+    @api_router.get("/security/encryption-info")
+    async def get_encryption_info():
+        """Get encryption configuration info"""
+        service = get_encryption_service()
+        return service.get_compliance_info()
+
+except ImportError as e:
+    logger.warning(f"Data feeds service not available: {e}")
+
 # Include the router in the main app
 app.include_router(api_router)
 
