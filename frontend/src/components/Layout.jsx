@@ -232,13 +232,13 @@ const adviserNavGroups = [
 // Flatten all nav items for title lookup
 const allNavItems = [...personalNavGroups, ...adviserNavGroups].flatMap(group => group.items);
 
-// Mobile bottom navigation - key features for quick access
+// Mobile bottom navigation - simplified to match new 5-tab structure
 const mobileBottomNav = [
-  { path: "/dashboard", label: "Home", icon: LayoutDashboard },
-  { path: "/recommendations", label: "Advice", icon: Lightbulb },
-  { path: "/tax-calendar", label: "Calendar", icon: CalendarDays },
-  { path: "/budget", label: "Budget", icon: Wallet },
+  { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { path: "/family-wealth", label: "Finances", icon: Wallet },
+  { path: "/life-timeline", label: "Planning", icon: Target },
   { path: "/reports", label: "Reports", icon: FileText },
+  { path: "/loan-calculator", label: "Calc", icon: Calculator },
 ];
 
 const Layout = ({ children }) => {
