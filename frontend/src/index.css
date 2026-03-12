@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -12,8 +12,8 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'Manrope', sans-serif;
-    letter-spacing: -0.025em;
+    font-family: 'Playfair Display', Georgia, serif;
+    letter-spacing: -0.01em;
 }
 
 code, .font-mono {
@@ -22,27 +22,27 @@ code, .font-mono {
 
 @layer base {
     :root {
-        /* Swiss Eco-Fintech Light Theme */
-        --background: 210 20% 98%;
-        --foreground: 160 43% 15%;
+        /* Halcyon Wealth Inspired Light Theme - Navy & Gold */
+        --background: 220 25% 97%;
+        --foreground: 220 50% 15%;
         
         --card: 0 0% 100%;
-        --card-foreground: 160 43% 15%;
+        --card-foreground: 220 50% 15%;
         
         --popover: 0 0% 100%;
-        --popover-foreground: 160 43% 15%;
+        --popover-foreground: 220 50% 15%;
         
-        --primary: 160 57% 15%;
+        --primary: 220 60% 20%;
         --primary-foreground: 0 0% 98%;
         
-        --secondary: 43 72% 53%;
-        --secondary-foreground: 160 43% 15%;
+        --secondary: 43 85% 50%;
+        --secondary-foreground: 220 50% 15%;
         
-        --muted: 210 20% 96%;
-        --muted-foreground: 215 16% 47%;
+        --muted: 220 20% 94%;
+        --muted-foreground: 220 15% 45%;
         
-        --accent: 43 72% 53%;
-        --accent-foreground: 160 43% 15%;
+        --accent: 43 85% 50%;
+        --accent-foreground: 220 50% 15%;
         
         --destructive: 0 84% 60%;
         --destructive-foreground: 0 0% 98%;
@@ -56,41 +56,46 @@ code, .font-mono {
         --info: 217 91% 60%;
         --info-foreground: 0 0% 98%;
         
-        --border: 214 32% 91%;
-        --input: 214 32% 91%;
-        --ring: 160 57% 15%;
+        --border: 220 20% 88%;
+        --input: 220 20% 88%;
+        --ring: 220 60% 20%;
         
-        --chart-1: 160 57% 15%;
-        --chart-2: 43 72% 53%;
-        --chart-3: 160 84% 39%;
-        --chart-4: 217 91% 60%;
-        --chart-5: 38 92% 50%;
+        --chart-1: 220 60% 25%;
+        --chart-2: 43 85% 50%;
+        --chart-3: 160 70% 40%;
+        --chart-4: 200 80% 55%;
+        --chart-5: 280 60% 55%;
         
         --radius: 0.5rem;
+        
+        /* Halcyon brand colors */
+        --halcyon-navy: 220 60% 18%;
+        --halcyon-gold: 43 85% 50%;
+        --halcyon-light-gold: 43 70% 70%;
     }
     
     .dark {
-        /* Deep Charcoal Dark Theme */
-        --background: 0 0% 4%;
+        /* Halcyon Wealth Dark Theme - Deep Navy */
+        --background: 220 50% 8%;
         --foreground: 0 0% 98%;
         
-        --card: 0 0% 7%;
+        --card: 220 45% 12%;
         --card-foreground: 0 0% 98%;
         
-        --popover: 0 0% 7%;
+        --popover: 220 45% 12%;
         --popover-foreground: 0 0% 98%;
         
-        --primary: 43 72% 53%;
-        --primary-foreground: 0 0% 4%;
+        --primary: 43 85% 55%;
+        --primary-foreground: 220 50% 8%;
         
-        --secondary: 160 57% 25%;
+        --secondary: 220 50% 25%;
         --secondary-foreground: 0 0% 98%;
         
-        --muted: 0 0% 15%;
-        --muted-foreground: 0 0% 64%;
+        --muted: 220 40% 18%;
+        --muted-foreground: 220 15% 65%;
         
-        --accent: 43 72% 53%;
-        --accent-foreground: 0 0% 4%;
+        --accent: 43 85% 55%;
+        --accent-foreground: 220 50% 8%;
         
         --destructive: 0 62% 30%;
         --destructive-foreground: 0 0% 98%;
