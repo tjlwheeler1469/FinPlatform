@@ -19,10 +19,27 @@ import json
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+# Import from modular structure
+from db import db, client
+from services.tax_constants import (
+    HISTORICAL_TAX_BRACKETS,
+    PERSONAL_TAX_BRACKETS_2024_25,
+    PERSONAL_TAX_BRACKETS_2025_26,
+    HISTORICAL_COMPANY_RATES,
+    COMPANY_TAX_RATE_BASE,
+    COMPANY_TAX_RATE_FULL,
+    MEDICARE_LEVY_RATE,
+    MEDICARE_LEVY_THRESHOLD,
+    CGT_DISCOUNT_INDIVIDUAL,
+    CGT_DISCOUNT_SMSF,
+    SMSF_CONCESSIONAL_CAP,
+    SMSF_NON_CONCESSIONAL_CAP,
+    SMSF_BRING_FORWARD_CAP,
+    SMSF_TOTAL_SUPER_BALANCE_LIMIT,
+    SMSF_TAX_RATE,
+    SMSF_PENSION_TAX_RATE,
+    DIV_293_THRESHOLD,
+)
 
 # Create the main app
 app = FastAPI(title="Australian Investment Analyzer")
