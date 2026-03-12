@@ -30,6 +30,7 @@ import {
  */
 
 const STORAGE_KEY = "wheeler_compliance_acknowledged";
+const STORAGE_KEY_V2 = "halcyon_compliance_v2";  // New versioned key for better tracking
 
 // Compliance disclaimer content
 const COMPLIANCE_CONTENT = {
@@ -45,7 +46,7 @@ const COMPLIANCE_CONTENT = {
     {
       icon: Scale,
       title: "No Financial Services License",
-      content: `Wheeler Family Portfolio is not licensed to provide personal financial product advice under the Corporations Act 2001 (Cth). This tool should not be used as a substitute for professional financial advice from a licensed financial adviser (AFSL holder).`,
+      content: `Halcyon Wealth Platform is not licensed to provide personal financial product advice under the Corporations Act 2001 (Cth). This tool should not be used as a substitute for professional financial advice from a licensed financial adviser (AFSL holder).`,
       reference: "Corporations Act 2001 s911A"
     },
     {
@@ -75,22 +76,40 @@ const COMPLIANCE_CONTENT = {
   ]
 };
 
+// Check if user has already acknowledged compliance
+const hasUserAcknowledged = () => {
+  try {
+    return localStorage.getItem(STORAGE_KEY) || 
+           localStorage.getItem(STORAGE_KEY_V2) || 
+           sessionStorage.getItem('compliance_session');
+  } catch {
+    return false;
+  }
+};
+
+// Set acknowledgement in both localStorage and sessionStorage for reliability
+const setAcknowledgement = () => {
+  try {
+    const timestamp = new Date().toISOString();
+    localStorage.setItem(STORAGE_KEY, timestamp);
+    localStorage.setItem(STORAGE_KEY_V2, timestamp);
+    sessionStorage.setItem('compliance_session', timestamp);
+  } catch (e) {
+    console.warn('Could not persist compliance acknowledgement:', e);
+  }
+};
+
 // Modal component shown on first visit
 export const ComplianceModal = ({ onAccept }) => {
   const [acknowledged, setAcknowledged] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(() => !hasUserAcknowledged());
 
-  useEffect(() => {
-    // Check if user has already acknowledged
-    const hasAcknowledged = localStorage.getItem(STORAGE_KEY);
-    if (!hasAcknowledged) {
-      setOpen(true);
-    }
-  }, []);
+  // Don't render anything if already acknowledged
+  if (!open) return null;
 
   const handleAccept = () => {
     if (acknowledged) {
-      localStorage.setItem(STORAGE_KEY, new Date().toISOString());
+      setAcknowledgement();
       setOpen(false);
       onAccept?.();
     }
