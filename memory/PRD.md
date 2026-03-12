@@ -1118,3 +1118,151 @@ Build an app that analyses all options for personal and business investment in A
 - Frontend: 100% (all features working)
 - Test file: /app/backend/tests/test_decision_engine.py
 - Report: /app/test_reports/iteration_27.json
+
+## Phase 2: Adviser Workflow & Compliance - COMPLETED (December 2025)
+
+### 1. Client CRM (/client-crm)
+- **Households Management**: View, create, search client households
+- **3 Sample Households**: Wheeler ($1.98M), Chen ($1.23M), Patel ($3.1M)
+- **Service Levels**: Standard, Premium, VIP
+- **Household Details**: Members, contact info, financial summary, tags
+- **Notes System**: Add notes (meeting, call, email, advice types)
+- **API Endpoints**:
+  - GET /api/crm/households - List all households
+  - GET /api/crm/households/{id} - Get specific household
+  - POST /api/crm/households - Create household
+  - GET /api/crm/notes/{household_id} - Get notes
+  - POST /api/crm/notes - Add note
+
+### 2. Task Management
+- **Task List**: View all tasks with priority, status, due dates
+- **Task Categories**: General, Compliance, Review, Follow Up
+- **Priority Levels**: Low, Medium, High, Urgent
+- **Status Tracking**: Pending, In Progress, Completed
+- **API Endpoints**:
+  - GET /api/crm/tasks - List tasks
+  - POST /api/crm/tasks - Create task
+  - PUT /api/crm/tasks/{id} - Update task status
+
+### 3. Meeting Management
+- **Meeting Types**: Review, Initial, Strategy, Compliance
+- **Locations**: Office, Video, Phone, Client Home
+- **Attendees Tracking**: Multiple attendees per meeting
+- **Agenda & Notes**: Meeting preparation and summary
+- **API Endpoints**:
+  - GET /api/crm/meetings - List meetings
+  - POST /api/crm/meetings - Schedule meeting
+
+### 4. Compliance Layer
+- **Audit Trail**: All actions logged for compliance
+- **Risk Assessment**: Questionnaire-based risk profiling
+- **KYC/AML Tracking**: Compliance status per action
+- **API Endpoints**:
+  - GET /api/compliance/audit-log - View audit trail
+  - POST /api/compliance/audit-log - Add audit entry
+  - GET /api/compliance/risk-assessment/{household_id} - Get risk profile
+  - POST /api/compliance/risk-assessment - Submit assessment
+
+### 5. Advice Workflow
+- **Workflow Stages**: Draft → Pending Review → Approved → Sent → Acknowledged
+- **Suitability Confirmation**: Compliance checkbox before sending
+- **API Endpoints**:
+  - GET /api/advice/records - List advice records
+  - POST /api/advice/create - Create advice record
+  - PUT /api/advice/{id}/workflow - Progress through stages
+
+### 6. Goal Tracker (/goal-tracker)
+- **4 Default Goals**: Retirement, Education, House, Emergency Fund
+- **Progress Tracking**: Current amount, target, monthly contribution
+- **Visual Progress**: Progress bars and comparison chart
+- **Add Goal Dialog**: Create new goals with type, amount, priority
+- **API Endpoints**:
+  - GET /api/goals/{household_id} - Get goals
+  - POST /api/goals - Create goal
+  - PUT /api/goals/{id} - Update goal progress
+
+## Phase 3: AI & Portfolio Aggregation - COMPLETED (December 2025)
+
+### 1. AI Financial Advisor (/ai-advisor)
+- **Multi-LLM Architecture**: Designed for OpenAI, Claude, Gemini integration
+- **Question Input**: Free-form questions with context
+- **Quick Questions**: Pre-built common financial questions
+- **AI Analysis Output**:
+  - Key Strengths
+  - Areas for Improvement
+  - Retirement Outlook with success probability
+- **AI Recommendations**: Ranked actions with:
+  - Title, description, impact amount
+  - Confidence score (0-100%)
+  - Timeframe
+  - Rationale
+- **Advice History**: View past AI sessions
+- **Disclaimers**: Regulatory compliance notices
+- **API Endpoints**:
+  - POST /api/ai/generate-advice - Generate AI advice
+  - GET /api/ai/advice-history/{household_id} - View history
+- **NOTE**: Currently returns MOCK LLM responses. Ready for real LLM integration.
+
+### 2. Portfolio Aggregator (/portfolio-aggregator)
+- **Open Banking Mock**: Simulated account connections
+- **9 Connected Accounts**:
+  - Bank: 3 accounts (Everyday, Savings, Term Deposit)
+  - Super: 2 accounts (Michael, Sarah)
+  - Brokerage: 2 accounts (Shares, ETFs with holdings)
+  - Mortgage: 2 accounts (Sydney, Melbourne properties)
+- **Summary Metrics**:
+  - Total Assets: $2,920,000
+  - Total Liabilities: $942,000
+  - Net Worth: $1,978,000
+- **Asset Allocation**: Pie chart with breakdown
+- **Monthly Snapshot**: Income, Expenses, Savings Rate
+- **Sync Functionality**: Refresh all account data
+- **API Endpoints**:
+  - GET /api/portfolio/aggregated/{household_id} - Get aggregated data
+  - POST /api/portfolio/connect-account - Connect new account
+  - POST /api/portfolio/sync/{household_id} - Sync all accounts
+- **NOTE**: Uses MOCK Open Banking data. Ready for real API integration.
+
+### 3. Enterprise Features
+- **Practice Overview**: Multi-adviser dashboard
+- **Client Engagement Tracking**: Login streak, activity feed
+- **Weekly Summary**: Portfolio performance, goal progress
+- **API Endpoints**:
+  - GET /api/enterprise/practice-overview - Practice-wide metrics
+  - GET /api/client-portal/engagement/{household_id} - Engagement data
+  - GET /api/client-portal/weekly-summary/{household_id} - Weekly report
+
+## Testing Results
+- Phase 1: 100% (25/25 tests)
+- Phase 2: 100% (33/33 tests)
+- Phase 3: 100% (included in Phase 2 tests)
+- All frontend pages: Working
+
+## Complete Feature Summary
+
+### Decision Engine (Phase 1)
+- ✅ Financial Health Score (0-100)
+- ✅ Retirement Success Probability (Monte Carlo)
+- ✅ Top Actions with $ Impact
+- ✅ Life Timeline Planning
+
+### Adviser Workflow (Phase 2)
+- ✅ Client CRM (households, notes)
+- ✅ Task Management
+- ✅ Meeting Management
+- ✅ Compliance Audit Trail
+- ✅ Risk Assessment
+- ✅ Advice Workflow
+- ✅ Goal Tracker
+
+### AI & Integration (Phase 3)
+- ✅ AI Financial Advisor (mock LLM)
+- ✅ Portfolio Aggregator (mock Open Banking)
+- ✅ Client Engagement Tracking
+- ✅ Enterprise Practice Overview
+
+## What's Still MOCKED
+1. **AI Advice Generation**: Returns mock recommendations (ready for real LLM integration)
+2. **Open Banking/Portfolio Aggregation**: Returns mock account data (ready for real API)
+3. **Authentication**: Uses compliance modal (ready for real auth)
+4. **Some portfolio data**: In App.js context
