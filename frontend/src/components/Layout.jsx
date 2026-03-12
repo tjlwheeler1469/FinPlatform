@@ -281,7 +281,7 @@ const Layout = ({ children }) => {
     } else if (newMode === "client") {
       navigate("/client-portal");
     } else {
-      navigate("/daily-briefing");
+      navigate("/dashboard");
     }
   };
 
