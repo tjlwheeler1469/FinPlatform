@@ -70,6 +70,10 @@ const DataImportExportPage = lazy(() => import("@/pages/DataImportExportPage"));
 const InvestmentComparison = lazy(() => import("@/pages/InvestmentComparison"));
 const DecisionDashboard = lazy(() => import("@/pages/DecisionDashboard"));
 const LifeTimeline = lazy(() => import("@/pages/LifeTimeline"));
+const ClientCRM = lazy(() => import("@/pages/ClientCRM"));
+const GoalTracker = lazy(() => import("@/pages/GoalTracker"));
+const AIAdvisor = lazy(() => import("@/pages/AIAdvisor"));
+const PortfolioAggregator = lazy(() => import("@/pages/PortfolioAggregator"));
 
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
