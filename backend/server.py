@@ -5844,8 +5844,9 @@ async def generate_ai_advice(request: AIAdviceRequest):
         }
     }
     
-    # Store the AI advice
-    await db.ai_advice.insert_one({**ai_response, "_id": None})
+    # Store the AI advice (exclude _id to let MongoDB generate it)
+    advice_to_store = {k: v for k, v in ai_response.items() if k != "_id"}
+    await db.ai_advice.insert_one(advice_to_store)
     
     return ai_response
 
