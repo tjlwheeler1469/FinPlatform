@@ -40,12 +40,16 @@ import {
   TrendingUp,
   BarChart3,
   Download,
-  Settings
+  Settings,
+  Zap,
+  Activity
 } from "lucide-react";
 import { toast } from "sonner";
 import ChartContainer from "@/components/ChartContainer";
 import { CalendarExportButton, CalendarBulkExportButton } from "@/components/CalendarIntegration";
 import CalendarIntegrationSettings from "@/components/CalendarIntegration";
+import WorkflowAutomation from "@/components/WorkflowAutomation";
+import ComplianceAuditTools from "@/components/ComplianceAuditTools";
 import {
   BarChart,
   Bar,
