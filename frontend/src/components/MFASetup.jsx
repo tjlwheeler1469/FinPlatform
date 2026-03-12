@@ -80,11 +80,43 @@ const MFASetup = ({ userId, userEmail, onMFAEnabled, onMFADisabled }) => {
   const [newSecret, setNewSecret] = useState("");
   const [newBackupCodes, setNewBackupCodes] = useState([]);
   const [disableCode, setDisableCode] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
-  // Save to localStorage
+  // Load MFA status from MongoDB on mount
   useEffect(() => {
-    localStorage.setItem(`wheeler_mfa_${userId || 'user'}`, JSON.stringify(mfaStatus));
-  }, [mfaStatus, userId]);
+    const loadMFAStatus = async () => {
+      if (!userId) {
+        setIsLoading(false);
+        return;
+      }
+      
+      try {
+        const response = await fetch(`${API_URL}/api/mfa/${userId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setMfaStatus(data);
+        }
+      } catch (error) {
+        console.error("Error loading MFA status:", error);
+        // Fall back to localStorage
+        const saved = localStorage.getItem(`wheeler_mfa_${userId}`);
+        if (saved) {
+          setMfaStatus(JSON.parse(saved));
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadMFAStatus();
+  }, [userId]);
+
+  // Also keep localStorage as backup
+  useEffect(() => {
+    if (!isLoading) {
+      localStorage.setItem(`wheeler_mfa_${userId || 'user'}`, JSON.stringify(mfaStatus));
+    }
+  }, [mfaStatus, userId, isLoading]);
 
   // Start MFA setup
   const startSetup = () => {
@@ -95,13 +127,14 @@ const MFASetup = ({ userId, userEmail, onMFAEnabled, onMFADisabled }) => {
     setShowSetupDialog(true);
   };
 
-  // Complete MFA setup
-  const completeMFASetup = () => {
+  // Complete MFA setup - save to MongoDB
+  const completeMFASetup = async () => {
     if (!verifyTOTP(verificationCode)) {
       toast.error("Invalid verification code. Please enter a valid 6-digit code.");
       return;
     }
 
+    setIsSaving(true);
     const updatedStatus = {
       enabled: true,
       method: "totp",
@@ -111,38 +144,87 @@ const MFASetup = ({ userId, userEmail, onMFAEnabled, onMFADisabled }) => {
       last_used: null
     };
     
-    setMfaStatus(updatedStatus);
-    setShowSetupDialog(false);
-    setShowBackupCodes(true);
-    toast.success("Two-factor authentication enabled!");
-    
-    if (onMFAEnabled) {
-      onMFAEnabled(updatedStatus);
+    try {
+      const response = await fetch(`${API_URL}/api/mfa/setup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_id: userId || "default_user",
+          ...updatedStatus
+        })
+      });
+
+      if (response.ok) {
+        setMfaStatus(updatedStatus);
+        setShowSetupDialog(false);
+        setShowBackupCodes(true);
+        toast.success("Two-factor authentication enabled!", {
+          description: "Saved to MongoDB"
+        });
+        
+        if (onMFAEnabled) {
+          onMFAEnabled(updatedStatus);
+        }
+      } else {
+        throw new Error("Failed to save");
+      }
+    } catch (error) {
+      console.error("Error saving MFA:", error);
+      // Still enable locally
+      setMfaStatus(updatedStatus);
+      setShowSetupDialog(false);
+      setShowBackupCodes(true);
+      toast.success("Two-factor authentication enabled locally");
+      
+      if (onMFAEnabled) {
+        onMFAEnabled(updatedStatus);
+      }
+    } finally {
+      setIsSaving(false);
     }
   };
 
-  // Disable MFA
-  const disableMFA = () => {
+  // Disable MFA - save to MongoDB
+  const disableMFA = async () => {
     if (!verifyTOTP(disableCode)) {
       toast.error("Invalid verification code");
       return;
     }
 
-    setMfaStatus({
-      enabled: false,
-      method: null,
-      secret: null,
-      backup_codes: [],
-      setup_at: null,
-      last_used: null
-    });
-    
-    setShowDisableDialog(false);
-    setDisableCode("");
-    toast.success("Two-factor authentication disabled");
-    
-    if (onMFADisabled) {
-      onMFADisabled();
+    setIsSaving(true);
+    try {
+      const response = await fetch(`${API_URL}/api/mfa/disable`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_id: userId || "default_user",
+          code: disableCode
+        })
+      });
+
+      const disabledStatus = {
+        enabled: false,
+        method: null,
+        secret: null,
+        backup_codes: [],
+        setup_at: null,
+        last_used: null
+      };
+      
+      setMfaStatus(disabledStatus);
+      setShowDisableDialog(false);
+      setDisableCode("");
+      toast.success("Two-factor authentication disabled", {
+        description: response.ok ? "Saved to MongoDB" : "Saved locally"
+      });
+      
+      if (onMFADisabled) {
+        onMFADisabled();
+      }
+    } catch (error) {
+      console.error("Error disabling MFA:", error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -153,11 +235,24 @@ const MFASetup = ({ userId, userEmail, onMFAEnabled, onMFADisabled }) => {
   };
 
   // Regenerate backup codes
-  const regenerateBackupCodes = () => {
+  const regenerateBackupCodes = async () => {
     const codes = generateBackupCodes();
-    setMfaStatus(prev => ({
-      ...prev,
-      backup_codes: codes
+    const updatedStatus = { ...mfaStatus, backup_codes: codes };
+    
+    try {
+      await fetch(`${API_URL}/api/mfa/setup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_id: userId || "default_user",
+          ...updatedStatus
+        })
+      });
+    } catch (error) {
+      console.error("Error saving backup codes:", error);
+    }
+    
+    setMfaStatus(updatedStatus);
     }));
     toast.success("New backup codes generated");
     setShowBackupCodes(true);
