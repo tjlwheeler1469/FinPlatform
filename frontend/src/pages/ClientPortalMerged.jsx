@@ -779,6 +779,25 @@ const ClientDashboard = ({ clientAuth, onLogout }) => {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* E-Signature Tab */}
+          <TabsContent value="esign" className="space-y-6">
+            <DocuSignIntegration 
+              onSignatureComplete={(request) => {
+                toast.success(`Document signed: ${request.document_name}`);
+              }}
+            />
+          </TabsContent>
+
+          {/* Digital Onboarding Tab */}
+          <TabsContent value="onboarding" className="space-y-6">
+            <DigitalOnboarding 
+              clientId={clientAuth?.id || "client_wheeler"}
+              onComplete={(data) => {
+                toast.success("Fact-find completed successfully!");
+              }}
+            />
+          </TabsContent>
         </Tabs>
 
         {/* Footer */}
