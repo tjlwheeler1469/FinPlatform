@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -12,16 +12,10 @@ import {
   PiggyBank, 
   Calculator,
   ArrowRight,
-  DollarSign,
-  Percent,
   BarChart3,
   Lightbulb,
   AlertCircle,
   CheckCircle,
-  Home,
-  Landmark,
-  Briefcase,
-  Zap,
   Target,
   Shield,
   CreditCard,
@@ -29,7 +23,15 @@ import {
   Sparkles,
   RefreshCw,
   FileText,
-  Link2
+  Zap,
+  GraduationCap,
+  Plane,
+  Home,
+  Heart,
+  TrendingUpIcon,
+  Activity,
+  ChevronRight,
+  Wallet
 } from "lucide-react";
 import { usePortfolio } from "@/App";
 import ChartContainer from "@/components/ChartContainer";
@@ -37,6 +39,8 @@ import axios from "axios";
 import {
   AreaChart,
   Area,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -59,50 +63,127 @@ const formatCurrency = (value) => {
   }).format(value);
 };
 
-const formatPercent = (value) => {
-  return `${value.toFixed(1)}%`;
+const formatCompact = (value) => {
+  if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
+  if (value >= 1000) return `$${(value / 1000).toFixed(0)}K`;
+  return `$${value}`;
 };
 
 const COLORS = ['#1a2744', '#D4A84C', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'];
 
-// Quick Actions configuration
-const QUICK_ACTIONS = [
-  { id: 'health-score', label: 'Health Score', icon: Zap, path: '/decision-engine', color: 'bg-amber-500' },
-  { id: 'goals', label: 'Goals', icon: Target, path: '/goal-tracker', color: 'bg-green-500' },
-  { id: 'ai-advice', label: 'AI Advisor', icon: Sparkles, path: '/ai-advisor', color: 'bg-purple-500' },
-  { id: 'tax', label: 'Tax Analysis', icon: Calculator, path: '/tax-analysis-sync', color: 'bg-blue-500' },
-  { id: 'debt', label: 'Debt Plan', icon: CreditCard, path: '/debt-paydown', color: 'bg-red-500' },
-  { id: 'insurance', label: 'Insurance', icon: Shield, path: '/insurance-gap', color: 'bg-teal-500' },
-  { id: 'timeline', label: 'Life Plan', icon: Clock, path: '/life-timeline', color: 'bg-indigo-500' },
-  { id: 'reports', label: 'Reports', icon: FileText, path: '/reports', color: 'bg-slate-500' },
+// Goal icons mapping
+const GOAL_ICONS = {
+  retirement: PiggyBank,
+  house: Home,
+  education: GraduationCap,
+  travel: Plane,
+  emergency: Shield,
+  investment: TrendingUp,
+  debt: CreditCard,
+  default: Target
+};
+
+// Top Actions with $ Impact
+const TOP_ACTIONS = [
+  {
+    id: 1,
+    title: "Increase super contributions",
+    description: "Salary sacrifice $500/month",
+    impact: "+$520,000",
+    impactLabel: "at retirement",
+    priority: "high",
+    icon: PiggyBank,
+    color: "text-green-600",
+    bgColor: "bg-green-50"
+  },
+  {
+    id: 2,
+    title: "Refinance mortgage",
+    description: "Switch to 5.89% rate",
+    impact: "-$78,000",
+    impactLabel: "interest saved",
+    priority: "high",
+    icon: Home,
+    color: "text-blue-600",
+    bgColor: "bg-blue-50"
+  },
+  {
+    id: 3,
+    title: "Increase emergency fund",
+    description: "Build to 6 months expenses",
+    impact: "+$45,000",
+    impactLabel: "security buffer",
+    priority: "medium",
+    icon: Shield,
+    color: "text-amber-600",
+    bgColor: "bg-amber-50"
+  },
+  {
+    id: 4,
+    title: "Maximize franking credits",
+    description: "Rebalance to dividend stocks",
+    impact: "+$8,400",
+    impactLabel: "tax refund/year",
+    priority: "medium",
+    icon: Calculator,
+    color: "text-purple-600",
+    bgColor: "bg-purple-50"
+  }
+];
+
+// Sample goals data
+const GOALS_DATA = [
+  { id: 1, name: "Retirement at 60", target: 3500000, current: 2520000, progress: 72, icon: "retirement", onTrack: true },
+  { id: 2, name: "Kids Education Fund", target: 200000, current: 182000, progress: 91, icon: "education", onTrack: true },
+  { id: 3, name: "House Upgrade", target: 500000, current: 245000, progress: 49, icon: "house", onTrack: false },
+  { id: 4, name: "Europe Trip 2026", target: 35000, current: 28000, progress: 80, icon: "travel", onTrack: true }
 ];
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { portfolio, recommendations } = usePortfolio();
-  const [taxRates, setTaxRates] = useState(null);
   const [monteCarloData, setMonteCarloData] = useState(null);
+  const [healthScore, setHealthScore] = useState(null);
+  const [netWorthHistory, setNetWorthHistory] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [taxRatesRes, monteCarloRes] = await Promise.all([
-          axios.get(`${API}/tax-rates`),
+        const [monteCarloRes, healthRes, netWorthRes] = await Promise.all([
           axios.post(`${API}/analyze/monte-carlo`, null, {
             params: {
-              initial_value: portfolio.investments.shares_value + portfolio.investments.etf_value,
-              expected_return: 0.08,
-              volatility: 0.15,
-              years: 10,
+              initial_value: portfolio.summary.netWorth,
+              expected_return: 0.07,
+              volatility: 0.12,
+              years: 25,
               simulations: 1000
             }
-          })
+          }),
+          axios.post(`${API}/decision/health-score`, {
+            age: 45,
+            current_income: portfolio.personal.taxableIncome,
+            annual_expenses: 120000,
+            total_assets: portfolio.summary.totalAssets,
+            total_debt: portfolio.summary.totalDebt,
+            super_balance: portfolio.investments.smsf_balance,
+            emergency_fund: 75000,
+            investment_portfolio: portfolio.investments.shares_value + portfolio.investments.etf_value,
+            property_value: portfolio.investments.properties.reduce((sum, p) => sum + p.value, 0),
+            savings_rate: 0.15,
+            retirement_age: 60,
+            desired_retirement_income: 100000
+          }),
+          axios.get(`${API}/trends/net-worth/wheeler`)
         ]);
-        setTaxRates(taxRatesRes.data);
+        
         setMonteCarloData(monteCarloRes.data);
+        setHealthScore(healthRes.data);
+        setNetWorthHistory(netWorthRes.data.history?.slice(-12) || []);
       } catch (error) {
         console.error("Error fetching data:", error);
+        // Set default values on error
+        setHealthScore({ score: 82, grade: "B+", retirement_probability: 81 });
       } finally {
         setLoading(false);
       }
@@ -111,187 +192,400 @@ const Dashboard = () => {
     fetchData();
   }, [portfolio]);
 
+  // Calculate retirement probability from Monte Carlo
+  const retirementProbability = monteCarloData?.success_probability || 81;
+  const retirementTarget = 3500000;
+  const projectedRetirement = monteCarloData?.percentile_projections?.p50?.[24] || 4200000;
+
   // Asset allocation for pie chart
   const assetAllocation = [
-    { name: "Cash & Deposits", value: portfolio.investments.cash_savings + portfolio.investments.term_deposit_amount, color: COLORS[0] },
-    { name: "Shares", value: portfolio.investments.shares_value, color: COLORS[1] },
-    { name: "ETFs", value: portfolio.investments.etf_value, color: COLORS[2] },
-    { name: "Bonds", value: portfolio.investments.bonds_value, color: COLORS[3] },
-    { name: "Property", value: portfolio.investments.properties.reduce((sum, p) => sum + p.value, 0), color: COLORS[4] },
-    { name: "Super", value: portfolio.investments.smsf_balance, color: COLORS[5] }
+    { name: "Property", value: portfolio.investments.properties.reduce((sum, p) => sum + p.value, 0), color: COLORS[0] },
+    { name: "Super", value: portfolio.investments.smsf_balance, color: COLORS[1] },
+    { name: "Shares", value: portfolio.investments.shares_value, color: COLORS[2] },
+    { name: "ETFs", value: portfolio.investments.etf_value, color: COLORS[3] },
+    { name: "Cash", value: portfolio.investments.cash_savings + portfolio.investments.term_deposit_amount, color: COLORS[4] },
   ].filter(a => a.value > 0);
 
-  // Projection chart data
-  const projectionData = monteCarloData?.percentile_projections 
-    ? monteCarloData.percentile_projections.years.map((year, i) => ({
-        year: `Year ${year}`,
-        median: monteCarloData.percentile_projections.p50[i],
-        p25: monteCarloData.percentile_projections.p25[i],
-        p75: monteCarloData.percentile_projections.p75[i]
+  // Net worth chart data
+  const netWorthChartData = netWorthHistory.length > 0 
+    ? netWorthHistory.map(h => ({
+        month: h.date?.substring(5) || h.month,
+        value: h.net_worth
       }))
-    : [];
+    : Array.from({ length: 12 }, (_, i) => ({
+        month: `M${i + 1}`,
+        value: portfolio.summary.netWorth * (0.88 + (i * 0.01))
+      }));
 
-  const priorityColors = {
-    high: "bg-red-500",
-    medium: "bg-[#D4A84C]",
-    low: "bg-blue-500"
-  };
-
-  const typeIcons = {
-    tax_optimization: Calculator,
-    property: Building2,
-    diversification: BarChart3,
-    super: PiggyBank,
-    cgt: TrendingUp,
-    debt: Landmark
-  };
+  // Cashflow data (simplified)
+  const monthlyIncome = portfolio.personal.taxableIncome / 12;
+  const monthlyExpenses = 10000;
+  const monthlySavings = monthlyIncome - monthlyExpenses;
+  const savingsRate = (monthlySavings / monthlyIncome) * 100;
 
   return (
     <Layout>
-      <div className="space-y-8" data-testid="dashboard">
-        {/* Welcome Header */}
+      <div className="space-y-6" data-testid="dashboard">
+        {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-foreground">
-              Welcome back
+              Financial Command Center
             </h1>
             <p className="text-muted-foreground mt-1">
-              {formatCurrency(portfolio.personal.taxableIncome)} combined income • 2 investment properties
+              Your complete financial picture at a glance
             </p>
           </div>
-          <Button 
-            data-testid="create-scenario-btn"
-            onClick={() => navigate("/scenario-builder")}
-            className="bg-[#1a2744] hover:bg-[#1a2744]/90"
-          >
-            <Calculator className="h-4 w-4 mr-2" />
-            Run Analysis
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline"
+              onClick={() => navigate("/scenarios")}
+            >
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Scenarios
+            </Button>
+            <Button 
+              data-testid="ai-advisor-btn"
+              onClick={() => navigate("/ai-advisor")}
+              className="bg-[#1a2744] hover:bg-[#1a2744]/90"
+            >
+              <Sparkles className="h-4 w-4 mr-2" />
+              AI Advisor
+            </Button>
+          </div>
         </div>
 
-        {/* Net Worth Summary */}
+        {/* Row 1: Key Metrics - The 4 Questions */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="bg-gradient-to-br from-[#1a2744] to-[#1a2744]/80 text-white border-none">
-            <CardContent className="p-6">
-              <p className="text-sm text-white/80">Net Worth</p>
-              <p className="text-3xl font-bold mt-1">
+          {/* Net Worth */}
+          <Card className="bg-gradient-to-br from-[#1a2744] to-[#1a2744]/80 text-white border-none cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/family-wealth')}>
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm text-white/70">Net Worth</p>
+                <Wallet className="h-5 w-5 text-[#D4A84C]" />
+              </div>
+              <p className="text-3xl font-bold">
                 {formatCurrency(portfolio.summary.netWorth)}
               </p>
               <div className="flex items-center gap-1 mt-2 text-[#D4A84C]">
                 <TrendingUp className="h-4 w-4" />
-                <span className="text-sm">+12.4% this year</span>
+                <span className="text-sm font-medium">+12.4% YTD</span>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Total Assets</p>
-                  <p className="text-2xl font-bold mt-1">
-                    {formatCurrency(portfolio.summary.totalAssets)}
-                  </p>
-                </div>
-                <div className="w-12 h-12 rounded-lg bg-[#10B981]/10 flex items-center justify-center">
-                  <TrendingUp className="h-6 w-6 text-[#10B981]" />
-                </div>
+          {/* Monthly Cashflow */}
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/budget')}>
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm text-muted-foreground">Monthly Cashflow</p>
+                <Activity className="h-5 w-5 text-green-500" />
+              </div>
+              <p className="text-3xl font-bold text-green-600">
+                +{formatCurrency(monthlySavings)}
+              </p>
+              <div className="flex items-center gap-2 mt-2">
+                <Progress value={savingsRate} className="h-2 flex-1" />
+                <span className="text-sm text-muted-foreground">{savingsRate.toFixed(0)}% saved</span>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Total Debt</p>
-                  <p className="text-2xl font-bold mt-1">
-                    {formatCurrency(portfolio.summary.totalDebt)}
-                  </p>
-                </div>
-                <div className="w-12 h-12 rounded-lg bg-destructive/10 flex items-center justify-center">
-                  <TrendingDown className="h-6 w-6 text-destructive" />
-                </div>
+          {/* Goal Progress */}
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/goal-tracker')}>
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm text-muted-foreground">Goal Progress</p>
+                <Target className="h-5 w-5 text-blue-500" />
               </div>
-              <div className="mt-2">
-                <Progress value={(portfolio.summary.totalDebt / portfolio.summary.totalAssets) * 100} className="h-2" />
-                <p className="text-xs text-muted-foreground mt-1">
-                  {((portfolio.summary.totalDebt / portfolio.summary.totalAssets) * 100).toFixed(0)}% debt ratio
-                </p>
+              <p className="text-3xl font-bold">
+                {GOALS_DATA.filter(g => g.onTrack).length}/{GOALS_DATA.length}
+              </p>
+              <p className="text-sm text-muted-foreground mt-1">goals on track</p>
+              <div className="flex gap-1 mt-2">
+                {GOALS_DATA.map(g => (
+                  <div 
+                    key={g.id} 
+                    className={`h-2 flex-1 rounded-full ${g.onTrack ? 'bg-green-500' : 'bg-amber-500'}`}
+                  />
+                ))}
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Est. Tax (2024-25)</p>
-                  <p className="text-2xl font-bold  mt-1">
-                    {formatCurrency(portfolio.summary.totalTax)}
-                  </p>
-                </div>
-                <div className="w-12 h-12 rounded-lg bg-[#D4A84C]/10 flex items-center justify-center">
-                  <Calculator className="h-6 w-6 text-[#D4A84C]" />
-                </div>
+          {/* Retirement Probability */}
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/monte-carlo')}>
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm text-muted-foreground">Retirement Success</p>
+                <PiggyBank className="h-5 w-5 text-purple-500" />
+              </div>
+              <div className="flex items-baseline gap-2">
+                <p className="text-3xl font-bold">{retirementProbability}%</p>
+                <Badge variant={retirementProbability >= 80 ? "default" : "secondary"} className={retirementProbability >= 80 ? "bg-green-500" : "bg-amber-500"}>
+                  {retirementProbability >= 80 ? "On Track" : "Review"}
+                </Badge>
               </div>
               <p className="text-xs text-muted-foreground mt-2">
-                Effective rate: {((portfolio.summary.totalTax / portfolio.summary.annualIncome) * 100).toFixed(1)}%
+                Monte Carlo: {retirementProbability}% chance of {formatCompact(retirementTarget)} by 60
               </p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Quick Actions Widget */}
-        <Card data-testid="quick-actions">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Zap className="h-5 w-5 text-[#D4A84C]" />
-              Quick Actions
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
-              {QUICK_ACTIONS.map((action) => {
-                const Icon = action.icon;
-                return (
-                  <button
-                    key={action.id}
-                    onClick={() => navigate(action.path)}
-                    className="flex flex-col items-center gap-1.5 p-3 rounded-lg hover:bg-muted transition-colors group"
-                    data-testid={`quick-action-${action.id}`}
-                  >
-                    <div className={`w-10 h-10 rounded-lg ${action.color} text-white flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground">{action.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
+        {/* Row 2: Financial Health Score + Top Actions */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Financial Health Score */}
+          <Card className="lg:col-span-1">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Zap className="h-5 w-5 text-[#D4A84C]" />
+                Financial Health
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-center py-4">
+                <div className="relative">
+                  <svg className="w-32 h-32 transform -rotate-90">
+                    <circle
+                      cx="64"
+                      cy="64"
+                      r="56"
+                      stroke="currentColor"
+                      strokeWidth="12"
+                      fill="none"
+                      className="text-muted/20"
+                    />
+                    <circle
+                      cx="64"
+                      cy="64"
+                      r="56"
+                      stroke="currentColor"
+                      strokeWidth="12"
+                      fill="none"
+                      strokeDasharray={`${(healthScore?.score || 82) * 3.52} 352`}
+                      className="text-[#D4A84C]"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-4xl font-bold">{healthScore?.score || 82}</span>
+                    <span className="text-sm text-muted-foreground">/100</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-2 mt-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Savings Rate</span>
+                  <span className="font-medium text-green-600">15% ✓</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Debt Ratio</span>
+                  <span className="font-medium text-green-600">32% ✓</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Emergency Fund</span>
+                  <span className="font-medium text-amber-600">4.2mo ⚠</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Retirement Ready</span>
+                  <span className="font-medium text-green-600">{retirementProbability}% ✓</span>
+                </div>
+              </div>
+              
+              <Button 
+                variant="outline" 
+                className="w-full mt-4"
+                onClick={() => navigate('/decision-engine')}
+              >
+                View Full Analysis
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            </CardContent>
+          </Card>
 
-        {/* Main Content Grid */}
+          {/* Top Actions with Impact */}
+          <Card className="lg:col-span-2">
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Lightbulb className="h-5 w-5 text-[#D4A84C]" />
+                  Top Actions
+                </CardTitle>
+                <Button variant="ghost" size="sm" onClick={() => navigate('/ai-advisor')}>
+                  Get AI Advice
+                  <Sparkles className="h-4 w-4 ml-1" />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {TOP_ACTIONS.map((action, index) => {
+                  const Icon = action.icon;
+                  return (
+                    <div 
+                      key={action.id}
+                      className="flex items-center gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer group"
+                      onClick={() => navigate('/decision-engine')}
+                    >
+                      <div className={`w-10 h-10 rounded-lg ${action.bgColor} flex items-center justify-center flex-shrink-0`}>
+                        <Icon className={`h-5 w-5 ${action.color}`} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium truncate">{action.title}</p>
+                          {index === 0 && (
+                            <Badge className="bg-red-500 text-white text-[10px]">HIGH IMPACT</Badge>
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground truncate">{action.description}</p>
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <p className={`font-bold ${action.impact.startsWith('+') ? 'text-green-600' : 'text-blue-600'}`}>
+                          {action.impact}
+                        </p>
+                        <p className="text-xs text-muted-foreground">{action.impactLabel}</p>
+                      </div>
+                      <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Row 3: Goals + Net Worth Chart */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Goal Progress Bars */}
+          <Card>
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Target className="h-5 w-5 text-[#D4A84C]" />
+                  Goal Progress
+                </CardTitle>
+                <Button variant="ghost" size="sm" onClick={() => navigate('/goal-tracker')}>
+                  Manage Goals
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {GOALS_DATA.map((goal) => {
+                  const GoalIcon = GOAL_ICONS[goal.icon] || GOAL_ICONS.default;
+                  return (
+                    <div key={goal.id} className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <GoalIcon className="h-4 w-4 text-muted-foreground" />
+                          <span className="font-medium text-sm">{goal.name}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-bold">{goal.progress}%</span>
+                          {goal.onTrack ? (
+                            <CheckCircle className="h-4 w-4 text-green-500" />
+                          ) : (
+                            <AlertCircle className="h-4 w-4 text-amber-500" />
+                          )}
+                        </div>
+                      </div>
+                      <div className="relative">
+                        <Progress 
+                          value={goal.progress} 
+                          className="h-3"
+                        />
+                        <div className="flex justify-between mt-1 text-xs text-muted-foreground">
+                          <span>{formatCompact(goal.current)}</span>
+                          <span>{formatCompact(goal.target)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Net Worth Chart */}
+          <Card>
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <TrendingUp className="h-5 w-5 text-[#D4A84C]" />
+                  Net Worth Trend
+                </CardTitle>
+                <Button variant="ghost" size="sm" onClick={() => navigate('/net-worth-trend')}>
+                  Full History
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer height={200}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={netWorthChartData}>
+                    <defs>
+                      <linearGradient id="netWorthGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#1a2744" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#1a2744" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis 
+                      dataKey="month" 
+                      tick={{ fontSize: 12 }}
+                      stroke="hsl(var(--muted-foreground))"
+                    />
+                    <YAxis 
+                      tickFormatter={(v) => formatCompact(v)}
+                      tick={{ fontSize: 12 }}
+                      stroke="hsl(var(--muted-foreground))"
+                    />
+                    <Tooltip 
+                      formatter={(value) => [formatCurrency(value), "Net Worth"]}
+                      contentStyle={{
+                        backgroundColor: 'hsl(var(--card))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px'
+                      }}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="value" 
+                      stroke="#1a2744" 
+                      strokeWidth={2}
+                      fill="url(#netWorthGradient)" 
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Row 4: Asset Allocation + Recommendations */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Asset Allocation */}
-          <Card data-testid="asset-allocation">
-            <CardHeader>
-              <CardTitle className=" flex items-center gap-2">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-lg">
                 <BarChart3 className="h-5 w-5 text-[#D4A84C]" />
                 Asset Allocation
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ChartContainer height={200}>
+              <ChartContainer height={180}>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={assetAllocation}
                       cx="50%"
                       cy="50%"
-                      innerRadius={50}
-                      outerRadius={80}
+                      innerRadius={45}
+                      outerRadius={70}
                       paddingAngle={2}
                       dataKey="value"
                     >
@@ -310,296 +604,70 @@ const Dashboard = () => {
                   </PieChart>
                 </ResponsiveContainer>
               </ChartContainer>
-              <div className="grid grid-cols-2 gap-2 mt-4">
-                {assetAllocation.map((item) => (
-                  <div key={item.name} className="flex items-center gap-2 text-sm">
-                    <div 
-                      className="w-3 h-3 rounded-full flex-shrink-0" 
-                      style={{ backgroundColor: item.color }}
-                    />
-                    <span className="text-muted-foreground truncate">{item.name}</span>
+              
+              <div className="space-y-2 mt-2">
+                {assetAllocation.slice(0, 4).map((asset, i) => (
+                  <div key={i} className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: asset.color }} />
+                      <span className="text-muted-foreground">{asset.name}</span>
+                    </div>
+                    <span className="font-medium">{formatCompact(asset.value)}</span>
                   </div>
                 ))}
               </div>
             </CardContent>
           </Card>
 
-          {/* Investment Projection */}
-          <Card className="lg:col-span-2" data-testid="projection-chart">
-            <CardHeader>
-              <CardTitle className=" flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-[#10B981]" />
-                10-Year Investment Projection
-              </CardTitle>
-              <CardDescription>
-                Monte Carlo simulation • Shares & ETFs portfolio
-              </CardDescription>
+          {/* Quick Recommendations */}
+          <Card className="lg:col-span-2">
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Sparkles className="h-5 w-5 text-[#D4A84C]" />
+                  AI Insights
+                </CardTitle>
+                <Badge variant="outline" className="text-purple-600 border-purple-200">
+                  Powered by GPT-4
+                </Badge>
+              </div>
             </CardHeader>
             <CardContent>
-              <ChartContainer height={250}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={projectionData}>
-                    <defs>
-                      <linearGradient id="colorMedian" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#1a2744" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#1a2744" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis dataKey="year" stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                    <YAxis 
-                      stroke="hsl(var(--muted-foreground))" 
-                      fontSize={12}
-                      tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
-                    />
-                    <Tooltip 
-                      contentStyle={{
-                        backgroundColor: 'hsl(var(--card))',
-                        border: '1px solid hsl(var(--border))',
-                        borderRadius: '8px'
-                      }}
-                      formatter={(value) => [formatCurrency(value), '']}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="p75"
-                      stroke="transparent"
-                      fill="#D4A84C"
-                      fillOpacity={0.2}
-                      name="75th Percentile"
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="median"
-                      stroke="#1a2744"
-                      strokeWidth={2}
-                      fill="url(#colorMedian)"
-                      name="Median"
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="p25"
-                      stroke="transparent"
-                      fill="#1a2744"
-                      fillOpacity={0.1}
-                      name="25th Percentile"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </ChartContainer>
-              {monteCarloData && (
-                <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t">
-                  <div className="text-center">
-                    <p className="text-sm text-muted-foreground">Median at Year 10</p>
-                    <p className="text-lg font-bold text-[#1a2744]">
-                      {formatCurrency(monteCarloData.final_value_median)}
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm text-muted-foreground">Probability of Loss</p>
-                    <p className="text-lg font-bold text-destructive">
-                      {monteCarloData.probability_of_loss.toFixed(1)}%
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm text-muted-foreground">Probability to Double</p>
-                    <p className="text-lg font-bold text-[#10B981]">
-                      {monteCarloData.probability_double.toFixed(1)}%
-                    </p>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Properties Overview */}
-        <Card data-testid="properties-overview">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle className=" flex items-center gap-2">
-                <Building2 className="h-5 w-5 text-[#D4A84C]" />
-                Property Portfolio
-              </CardTitle>
-              <CardDescription>{portfolio.investments.properties.length} investment properties</CardDescription>
-            </div>
-            <Button variant="outline" size="sm" onClick={() => navigate("/property-portfolio")}>
-              View Details
-              <ArrowRight className="h-4 w-4 ml-2" />
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {portfolio.investments.properties.map((property) => {
-                const annualInterest = property.mortgage_amount * (property.mortgage_rate / 100);
-                const netRental = property.rental_income - annualInterest - property.annual_expenses;
-                const isNegativelyGeared = netRental < 0;
-                
-                return (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {recommendations?.slice(0, 4).map((rec, index) => (
                   <div 
-                    key={property.property_id}
-                    className="p-4 rounded-lg border border-border"
+                    key={index}
+                    className="p-3 rounded-lg border bg-card hover:bg-muted/30 transition-colors cursor-pointer"
+                    onClick={() => navigate('/ai-advisor')}
                   >
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-[#1a2744]/10 flex items-center justify-center">
-                          <Home className="h-5 w-5 text-[#1a2744]" />
-                        </div>
-                        <div>
-                          <p className="font-semibold">{property.name}</p>
-                          <p className="text-sm text-muted-foreground">{formatCurrency(property.value)}</p>
-                        </div>
-                      </div>
-                      <Badge variant={isNegativelyGeared ? "secondary" : "default"} className={isNegativelyGeared ? "bg-[#D4A84C]/10 text-[#D4A84C]" : "bg-[#10B981]/10 text-[#10B981]"}>
-                        {isNegativelyGeared ? "Negative Geared" : "Positive"}
-                      </Badge>
-                    </div>
-                    <div className="grid grid-cols-3 gap-2 text-sm">
-                      <div>
-                        <p className="text-muted-foreground">Rent p.a.</p>
-                        <p className="font-semibold text-[#10B981]">{formatCurrency(property.rental_income)}</p>
-                      </div>
-                      <div>
-                        <p className="text-muted-foreground">Mortgage</p>
-                        <p className="font-semibold">{property.mortgage_rate}%</p>
-                      </div>
-                      <div>
-                        <p className="text-muted-foreground">Net Cash Flow</p>
-                        <p className={`font-semibold ${netRental >= 0 ? 'text-[#10B981]' : 'text-destructive'}`}>
-                          {formatCurrency(netRental)}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Investment Recommendations */}
-        <Card data-testid="recommendations">
-          <CardHeader>
-            <CardTitle className=" flex items-center gap-2">
-              <Lightbulb className="h-5 w-5 text-[#D4A84C]" />
-              Investment Recommendations
-            </CardTitle>
-            <CardDescription>Personalized suggestions based on your portfolio</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {recommendations.map((rec) => {
-                const Icon = typeIcons[rec.type] || Lightbulb;
-                return (
-                  <div 
-                    key={rec.id}
-                    className="p-4 rounded-lg border border-border hover:border-[#1a2744]/30 transition-colors"
-                    data-testid={`recommendation-${rec.id}`}
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                        rec.priority === 'high' ? 'bg-red-500/10' : 
-                        rec.priority === 'medium' ? 'bg-[#D4A84C]/10' : 'bg-blue-500/10'
+                    <div className="flex items-start gap-3">
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                        rec.priority === 'high' ? 'bg-red-100 text-red-600' :
+                        rec.priority === 'medium' ? 'bg-amber-100 text-amber-600' :
+                        'bg-blue-100 text-blue-600'
                       }`}>
-                        <Icon className={`h-5 w-5 ${
-                          rec.priority === 'high' ? 'text-red-500' : 
-                          rec.priority === 'medium' ? 'text-[#D4A84C]' : 'text-blue-500'
-                        }`} />
+                        {rec.type === 'tax_optimization' ? <Calculator className="h-4 w-4" /> :
+                         rec.type === 'property' ? <Building2 className="h-4 w-4" /> :
+                         rec.type === 'super' ? <PiggyBank className="h-4 w-4" /> :
+                         <Lightbulb className="h-4 w-4" />}
                       </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-semibold">{rec.title}</h4>
-                          <Badge variant="outline" className={`text-xs ${
-                            rec.priority === 'high' ? 'border-red-500 text-red-500' : 
-                            rec.priority === 'medium' ? 'border-[#D4A84C] text-[#D4A84C]' : 'border-blue-500 text-blue-500'
-                          }`}>
-                            {rec.priority}
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-muted-foreground mb-2">{rec.description}</p>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-[#10B981]">{rec.impact}</span>
-                          </div>
-                          <Button variant="ghost" size="sm" className="text-[#1a2744]">
-                            {rec.action}
-                            <ArrowRight className="h-4 w-4 ml-1" />
-                          </Button>
-                        </div>
+                      <div className="min-w-0">
+                        <p className="font-medium text-sm line-clamp-1">{rec.title}</p>
+                        <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">{rec.description}</p>
                       </div>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Quick Actions */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-          <Card 
-            className="cursor-pointer card-hover" 
-            onClick={() => navigate("/tax-analysis")}
-            data-testid="quick-tax-analysis"
-          >
-            <CardContent className="p-4 text-center">
-              <Calculator className="h-8 w-8 mx-auto mb-2 text-[#1a2744]" />
-              <p className="font-medium text-sm">Tax Analysis</p>
-            </CardContent>
-          </Card>
-
-          <Card 
-            className="cursor-pointer card-hover" 
-            onClick={() => navigate("/cgt-calculator")}
-            data-testid="quick-cgt"
-          >
-            <CardContent className="p-4 text-center">
-              <TrendingUp className="h-8 w-8 mx-auto mb-2 text-[#D4A84C]" />
-              <p className="font-medium text-sm">CGT Calculator</p>
-            </CardContent>
-          </Card>
-
-          <Card 
-            className="cursor-pointer card-hover" 
-            onClick={() => navigate("/property-portfolio")}
-            data-testid="quick-property"
-          >
-            <CardContent className="p-4 text-center">
-              <Building2 className="h-8 w-8 mx-auto mb-2 text-[#10B981]" />
-              <p className="font-medium text-sm">Properties</p>
-            </CardContent>
-          </Card>
-
-          <Card 
-            className="cursor-pointer card-hover" 
-            onClick={() => navigate("/smsf-optimizer")}
-            data-testid="quick-smsf"
-          >
-            <CardContent className="p-4 text-center">
-              <PiggyBank className="h-8 w-8 mx-auto mb-2 text-[#8B5CF6]" />
-              <p className="font-medium text-sm">SMSF</p>
-            </CardContent>
-          </Card>
-
-          <Card 
-            className="cursor-pointer card-hover" 
-            onClick={() => navigate("/monte-carlo")}
-            data-testid="quick-monte-carlo"
-          >
-            <CardContent className="p-4 text-center">
-              <BarChart3 className="h-8 w-8 mx-auto mb-2 text-[#3B82F6]" />
-              <p className="font-medium text-sm">Projections</p>
-            </CardContent>
-          </Card>
-
-          <Card 
-            className="cursor-pointer card-hover" 
-            onClick={() => navigate("/loan-calculator")}
-            data-testid="quick-loan"
-          >
-            <CardContent className="p-4 text-center">
-              <Landmark className="h-8 w-8 mx-auto mb-2 text-[#EC4899]" />
-              <p className="font-medium text-sm">Loans</p>
+                ))}
+              </div>
+              
+              <Button 
+                variant="outline" 
+                className="w-full mt-4"
+                onClick={() => navigate('/ai-advisor')}
+              >
+                Get Personalized AI Advice
+                <Sparkles className="h-4 w-4 ml-2" />
+              </Button>
             </CardContent>
           </Card>
         </div>
