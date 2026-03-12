@@ -54,7 +54,9 @@ import {
   Rocket,
   Sun,
   UserCircle,
-  ArrowLeftRight
+  ArrowLeftRight,
+  Clock,
+  Zap
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
