@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -31,9 +31,13 @@ import {
   PiggyBank,
   TrendingUp,
   AlertCircle,
-  Clock
+  Clock,
+  Loader2,
+  Database
 } from "lucide-react";
 import { toast } from "sonner";
+
+const API_URL = process.env.REACT_APP_BACKEND_URL || "";
 
 // Fact-Find Sections
 const FACT_FIND_SECTIONS = [
