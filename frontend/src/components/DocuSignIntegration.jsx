@@ -32,9 +32,13 @@ import {
   X,
   ExternalLink,
   ChevronRight,
-  ChevronLeft
+  ChevronLeft,
+  Loader2,
+  Database
 } from "lucide-react";
 import { toast } from "sonner";
+
+const API_URL = process.env.REACT_APP_BACKEND_URL || "";
 
 // Document Templates
 const DOCUMENT_TEMPLATES = [
