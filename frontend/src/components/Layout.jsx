@@ -750,6 +750,12 @@ const Layout = ({ children }) => {
           </div>
         </div>
       </main>
+
+      {/* Command Palette */}
+      <CommandPalette 
+        open={commandPaletteOpen} 
+        onOpenChange={setCommandPaletteOpen} 
+      />
     </div>
   );
 };
