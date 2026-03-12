@@ -4220,7 +4220,14 @@ async def compare_investments(data: Dict[str, Any]):
 @api_router.get("/strategic/tax-structures")
 async def get_tax_structures():
     """Get available tax structures and their characteristics"""
-    return {"tax_structures": TAX_STRUCTURES}
+    # Make a copy and replace float('inf') with None for JSON serialization
+    import copy
+    tax_structures_json = copy.deepcopy(TAX_STRUCTURES)
+    if "personal" in tax_structures_json and "income_tax_brackets" in tax_structures_json["personal"]:
+        for bracket in tax_structures_json["personal"]["income_tax_brackets"]:
+            if bracket.get("threshold") == float('inf'):
+                bracket["threshold"] = None
+    return {"tax_structures": tax_structures_json}
 
 @api_router.get("/strategic/asset-classes")
 async def get_asset_classes():
