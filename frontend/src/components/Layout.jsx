@@ -422,6 +422,34 @@ const Layout = ({ children }) => {
           )}
         </div>
 
+        {/* Search / Command Palette Button */}
+        {!sidebarCollapsed && (
+          <div className="px-3 py-2 border-b border-white/10">
+            <button
+              onClick={() => setCommandPaletteOpen(true)}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-white/60 text-sm"
+              data-testid="search-btn"
+            >
+              <Search className="h-4 w-4" />
+              <span className="flex-1 text-left">Search...</span>
+              <kbd className="hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border border-white/20 bg-white/5 px-1.5 font-mono text-[10px] font-medium">
+                ⌘K
+              </kbd>
+            </button>
+          </div>
+        )}
+        {sidebarCollapsed && (
+          <div className="px-2 py-2 border-b border-white/10">
+            <button
+              onClick={() => setCommandPaletteOpen(true)}
+              className="w-full flex items-center justify-center p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-white/60"
+              title="Search (⌘K)"
+            >
+              <Search className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+
         {/* Save Button - Shows when there are unsaved changes */}
         {hasUnsavedChanges && !sidebarCollapsed && (
           <div className="px-3 py-2 border-b border-white/10">
