@@ -26,9 +26,13 @@ import {
   Unlock,
   QrCode,
   Eye,
-  EyeOff
+  EyeOff,
+  Loader2,
+  Database
 } from "lucide-react";
 import { toast } from "sonner";
+
+const API_URL = process.env.REACT_APP_BACKEND_URL || "";
 
 // Generate mock TOTP secret
 const generateSecret = () => {
@@ -58,16 +62,14 @@ const verifyTOTP = (code) => {
 };
 
 const MFASetup = ({ userId, userEmail, onMFAEnabled, onMFADisabled }) => {
-  const [mfaStatus, setMfaStatus] = useState(() => {
-    const saved = localStorage.getItem(`wheeler_mfa_${userId || 'user'}`);
-    return saved ? JSON.parse(saved) : {
-      enabled: false,
-      method: null,
-      secret: null,
-      backup_codes: [],
-      setup_at: null,
-      last_used: null
-    };
+  const [isLoading, setIsLoading] = useState(true);
+  const [mfaStatus, setMfaStatus] = useState({
+    enabled: false,
+    method: null,
+    secret: null,
+    backup_codes: [],
+    setup_at: null,
+    last_used: null
   });
   
   const [showSetupDialog, setShowSetupDialog] = useState(false);
