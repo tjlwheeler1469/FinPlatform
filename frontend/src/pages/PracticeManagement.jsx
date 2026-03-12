@@ -1017,6 +1017,36 @@ const PracticeManagement = () => {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* Workflow Automation Tab */}
+          <TabsContent value="workflows" className="space-y-6">
+            <WorkflowAutomation 
+              onTaskCreated={(taskData) => {
+                const newTask = {
+                  ...taskData,
+                  task_id: `task_${Date.now()}`,
+                  status: "pending",
+                  assigned_to: "self",
+                  created_at: new Date().toISOString()
+                };
+                setTasks([...tasks, newTask]);
+                toast.success("Task created from workflow");
+              }}
+              onReminderSet={(reminderData) => {
+                toast.success(`Reminder set: ${reminderData.title}`);
+              }}
+            />
+          </TabsContent>
+
+          {/* Audit & KYC/AML Tab */}
+          <TabsContent value="audit" className="space-y-6">
+            <ComplianceAuditTools 
+              clientId={null}
+              onComplianceUpdate={(data) => {
+                toast.success("Compliance record updated");
+              }}
+            />
+          </TabsContent>
         </Tabs>
       </div>
     </Layout>
