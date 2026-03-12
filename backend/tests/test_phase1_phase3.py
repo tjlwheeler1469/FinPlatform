@@ -216,8 +216,11 @@ class TestExistingPages:
         assert response.status_code == 200
         data = response.json()
         
-        assert isinstance(data, list)
-        print(f"✓ CRM Tasks: {len(data)} tasks")
+        # API returns {"tasks": [...], "total": N}
+        assert "tasks" in data
+        tasks = data["tasks"]
+        assert isinstance(tasks, list)
+        print(f"✓ CRM Tasks: {len(tasks)} tasks")
     
     def test_crm_meetings(self):
         """Test CRM meetings endpoint"""
