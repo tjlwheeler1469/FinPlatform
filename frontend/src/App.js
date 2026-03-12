@@ -74,6 +74,10 @@ const ClientCRM = lazy(() => import("@/pages/ClientCRM"));
 const GoalTracker = lazy(() => import("@/pages/GoalTracker"));
 const AIAdvisor = lazy(() => import("@/pages/AIAdvisor"));
 const PortfolioAggregator = lazy(() => import("@/pages/PortfolioAggregator"));
+const NetWorthTrend = lazy(() => import("@/pages/NetWorthTrend"));
+const InsuranceGapAnalysis = lazy(() => import("@/pages/InsuranceGapAnalysis"));
+const DebtPaydownPlanner = lazy(() => import("@/pages/DebtPaydownPlanner"));
+const RevenueBilling = lazy(() => import("@/pages/RevenueBilling"));
 
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
