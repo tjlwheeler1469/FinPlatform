@@ -407,16 +407,45 @@ const DigitalOnboarding = ({ clientId, onComplete }) => {
     return Math.round(sections.reduce((a, b) => a + b, 0) / sections.length);
   };
 
-  // Save fact-find
+  // Save fact-find to MongoDB
   const saveFactFind = async () => {
     setIsSaving(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    toast.success("Fact-find saved successfully");
-    setIsSaving(false);
     
-    if (onComplete && overallProgress() >= 80) {
-      onComplete(factFindData);
+    try {
+      const progress = overallProgress();
+      const status = progress >= 100 ? "completed" : progress >= 80 ? "pending_review" : "in_progress";
+      
+      const response = await fetch(`${API_URL}/api/factfind`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          client_id: clientId || "new_client",
+          data: factFindData,
+          progress: progress,
+          status: status
+        })
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        setLastSaved(new Date().toISOString());
+        toast.success("Fact-find saved to database", {
+          description: `Progress: ${progress}%`
+        });
+        
+        if (onComplete && progress >= 80) {
+          onComplete(factFindData);
+        }
+      } else {
+        throw new Error("Failed to save");
+      }
+    } catch (error) {
+      console.error("Error saving fact-find:", error);
+      toast.error("Failed to save to database", {
+        description: "Data saved locally as backup"
+      });
+    } finally {
+      setIsSaving(false);
     }
   };
 
