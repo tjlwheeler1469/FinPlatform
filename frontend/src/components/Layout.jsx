@@ -263,10 +263,24 @@ const Layout = ({ children }) => {
   });
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   
   // Ref for sidebar scroll position preservation
   const sidebarNavRef = useRef(null);
   const scrollPositionRef = useRef(0);
+
+  // Command palette keyboard shortcut (Cmd+K or Ctrl+K)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setCommandPaletteOpen(true);
+      }
+    };
+    
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   // Update expanded groups when mode changes
   useEffect(() => {
@@ -292,9 +306,9 @@ const Layout = ({ children }) => {
   useEffect(() => {
     const currentNav = allNavItems.find(item => item.path === location.pathname);
     if (currentNav) {
-      document.title = `${currentNav.title} | Wheeler Family Portfolio`;
+      document.title = `${currentNav.title} | Halcyon Wealth`;
     } else {
-      document.title = "Wheeler Family Portfolio";
+      document.title = "Halcyon Wealth";
     }
   }, [location.pathname]);
 
