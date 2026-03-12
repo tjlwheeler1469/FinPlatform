@@ -190,6 +190,12 @@ const adviserNavGroups = [
       { path: "/reports", label: "Reports", icon: FileText, title: "Reports" },
       { path: "/export", label: "Export", icon: Download, title: "Export" },
     ]
+  },
+  {
+    name: "Settings",
+    items: [
+      { path: "/security", label: "Security", icon: Shield, title: "Security Settings" },
+    ]
   }
 ];
 
