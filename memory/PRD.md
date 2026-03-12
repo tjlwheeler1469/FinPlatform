@@ -212,6 +212,13 @@ Build an app that analyses all options for personal and business investment in A
   - Session management
   - Activity audit log
 
+- ✅ **Database Migration** (March 2026)
+  - Fact-find data persisted to MongoDB
+  - E-signature requests persisted to MongoDB
+  - MFA settings persisted to MongoDB
+  - localStorage kept as fallback
+  - MongoDB badge displayed in UI components
+
 ## Latest Session Updates (March 2026 - Current)
 
 ### Phase 1: Adviser Portal Core Enhancements (March 2026 - COMPLETE)
