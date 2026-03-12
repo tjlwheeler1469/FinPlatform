@@ -467,7 +467,9 @@ const Layout = ({ children }) => {
           onScroll={handleSidebarScroll}
           className="flex-1 overflow-y-auto py-2 px-2"
         >
-          {activeNavGroups.map((group) => (
+          {activeNavGroups.map((group) => {
+            const GroupIcon = group.icon;
+            return (
             <div key={group.name} className="mb-1">
               {/* Group Header */}
               {!sidebarCollapsed && (
@@ -478,12 +480,29 @@ const Layout = ({ children }) => {
                     isGroupActive(group) ? "text-[#D4AF37]" : "text-white/50 hover:text-white/70"
                   )}
                 >
-                  {group.name}
+                  <span className="flex items-center gap-2">
+                    {GroupIcon && <GroupIcon className="h-3.5 w-3.5" />}
+                    {group.name}
+                  </span>
                   <ChevronDown className={cn(
                     "h-3 w-3 transition-transform",
                     expandedGroups[group.name] ? "rotate-0" : "-rotate-90"
                   )} />
                 </button>
+              )}
+              
+              {/* Collapsed mode - show group icon */}
+              {sidebarCollapsed && GroupIcon && (
+                <div 
+                  className={cn(
+                    "flex items-center justify-center p-2 mb-1 rounded-lg cursor-pointer",
+                    isGroupActive(group) ? "text-[#D4AF37]" : "text-white/50 hover:text-white/70"
+                  )}
+                  onClick={() => toggleGroup(group.name)}
+                  title={group.name}
+                >
+                  <GroupIcon className="h-5 w-5" />
+                </div>
               )}
               
               {/* Group Items */}
@@ -516,7 +535,7 @@ const Layout = ({ children }) => {
                 </div>
               )}
             </div>
-          ))}
+          )})}
         </nav>
 
         {/* Collapse Toggle */}
