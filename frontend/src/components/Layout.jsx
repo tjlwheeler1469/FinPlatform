@@ -163,6 +163,7 @@ const adviserNavGroups = [
       { path: "/tax-analysis-sync", label: "Tax Analysis", icon: Calculator, title: "Tax Analysis" },
       { path: "/cgt", label: "CGT", icon: TrendingUp, title: "Capital Gains Tax" },
       { path: "/strategic-planning", label: "Strategic Planning", icon: HeartPulse, title: "Strategic Planning" },
+      { path: "/investment-comparison", label: "Investment Compare", icon: Scale, title: "Investment Structure Comparison" },
       { path: "/risk-profiler", label: "Risk Profiler", icon: Shield, title: "Risk Profiler" },
     ]
   },
