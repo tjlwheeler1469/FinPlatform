@@ -188,10 +188,75 @@ Build an app that analyses all options for personal and business investment in A
 45. ~~Document Manager~~ ✅ DONE (March 2026) - Document center with search, filter, star, archive
 46. ~~Client Messaging~~ ✅ DONE (March 2026) - Email-style inbox with compose, reply, folders
 47. ~~Lazy Loading~~ ✅ DONE (March 2026) - React.lazy for 40+ pages, reduced bundle size
+48. ~~Phase 1: Workflow Automation~~ ✅ DONE (March 2026) - 4 workflow templates with client management
+49. ~~Phase 1: Portfolio Rebalancing~~ ✅ DONE (March 2026) - 5 risk profiles, drift analysis, trade suggestions
+50. ~~Phase 1: Compliance Audit Tools~~ ✅ DONE (March 2026) - Activity logging, KYC/AML checklists, AFSL compliance
 
-## Latest Session Updates (December 2025 - Current)
+## Latest Session Updates (March 2026 - Current)
 
-### Session Continuation (March 2026 - LATEST)
+### Phase 1: Adviser Portal Core Enhancements (March 2026 - LATEST)
+
+- ✅ **Portfolio Rebalancing** (/portfolio-rebalancing)
+  - 4 tabs: Analysis, Target Allocation, Rebalancing Trades, Settings
+  - 5 Risk Profiles: Conservative, Moderately Conservative, Balanced, Growth, High Growth
+  - Custom target allocation sliders with 100% normalization
+  - Current vs Target allocation comparison (bar chart)
+  - Allocation Radar chart visualization
+  - Drift Analysis with asset class breakdown and action recommendations
+  - Rebalancing Trades with CGT impact estimates
+  - Tax-aware rebalancing toggle
+  - Include Superannuation toggle
+  - Rebalancing Threshold slider (1-15%)
+  - Export Plan button (JSON export)
+  - Alert banner shows when rebalancing is recommended
+
+- ✅ **Workflow Automation** (Practice Management - Automation tab)
+  - Start Workflow dialog with template and client selection
+  - 4 Workflow Templates:
+    - New Client Onboarding (7 steps, 14 days)
+    - Annual Review Sequence (5 steps, 30 days)
+    - Compliance Check (4 steps, 7 days)
+    - Meeting Follow-up (4 steps, 14 days)
+  - Active Workflows dashboard with progress tracking
+  - Pause/Resume/Cancel workflow controls
+  - Complete step button advances workflow
+  - Auto-creates tasks and reminders based on workflow steps
+  - 5 Automation Rules:
+    - Auto-assign new client onboarding
+    - Meeting reminders (configurable days before)
+    - Overdue task alerts (configurable days)
+    - Auto follow-up (configurable days of inactivity)
+    - Compliance check interval (30/60/90/180/365 days)
+  - Workflows and rules persisted to localStorage
+
+- ✅ **Compliance Audit Tools** (Practice Management - Audit tab)
+  - 3 sub-tabs: Audit Log, KYC/AML Checklist, Compliance Status
+  - **Audit Log**:
+    - Activity timeline with timestamps and user attribution
+    - 5 activity categories: Document, Meeting, Compliance, Transaction, Communication
+    - Search and category filter
+    - Log Activity dialog to add new entries
+    - Export audit log (JSON)
+  - **KYC/AML Checklist**:
+    - Client selector dropdown
+    - 14 verification items across 5 categories:
+      - Identity (ID verified, Address verified)
+      - AML (PEP check, Sanctions check, Source of funds, Beneficial ownership)
+      - Risk (Risk assessment, Risk profile questionnaire)
+      - Compliance (SOA issued, SOA acknowledged, FDS issued, Consent obtained)
+      - Entity (Trust deed, Company extract)
+    - Mandatory item badges
+    - Completion percentage with progress bar
+    - Checkbox toggles with timestamp tracking
+  - **Compliance Status**:
+    - All clients overview with KYC completion and risk levels
+    - AFSL Compliance Summary: Fully Compliant, In Progress, Needs Attention, Audit Entries
+  - All data persisted to localStorage
+
+- ✅ **Navigation Updates**
+  - Portfolio Rebalancing added to Shares section in sidebar
+  - ArrowLeftRight icon for Rebalancing nav item
+  - Practice Management tabs expanded to 8: Dashboard, Tasks, Meetings, Time, Billing, Automation, Audit, Compliance
 
 - ✅ **PDF Report Generation** (jsPDF with autoTable)
   - Portfolio Summary - Single page with financial overview, asset allocation, top holdings
