@@ -184,6 +184,10 @@ Build an app that analyses all options for personal and business investment in A
 41. ~~Calendar Integration~~ ✅ DONE (March 2026) - Google/Outlook/Apple export with OAuth setup
 42. ~~Mobile Responsive~~ ✅ DONE (March 2026) - Client Portal and Practice Management optimized
 43. ~~Sidebar Scroll Fix~~ ✅ DONE (March 2026) - Improved scroll position persistence
+44. ~~PDF Report Generation~~ ✅ DONE (March 2026) - Portfolio Summary, SOA, Tax Summary with jsPDF
+45. ~~Document Manager~~ ✅ DONE (March 2026) - Document center with search, filter, star, archive
+46. ~~Client Messaging~~ ✅ DONE (March 2026) - Email-style inbox with compose, reply, folders
+47. ~~Lazy Loading~~ ✅ DONE (March 2026) - React.lazy for 40+ pages, reduced bundle size
 
 ## Latest Session Updates (December 2025 - Current)
 
