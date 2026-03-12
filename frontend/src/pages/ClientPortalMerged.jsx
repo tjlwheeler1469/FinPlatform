@@ -455,18 +455,24 @@ const ClientDashboard = ({ clientAuth, onLogout }) => {
 
         {/* Main Content Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="bg-white border">
+          <TabsList className="bg-white border grid grid-cols-3 sm:grid-cols-6 w-full">
             <TabsTrigger value="summary" data-testid="tab-summary">
-              <Home className="h-4 w-4 mr-1" /> Summary
+              <Home className="h-4 w-4 mr-1" /> <span className="hidden sm:inline">Summary</span>
             </TabsTrigger>
             <TabsTrigger value="reports" data-testid="tab-reports">
-              <FileText className="h-4 w-4 mr-1" /> Reports
+              <FileText className="h-4 w-4 mr-1" /> <span className="hidden sm:inline">Reports</span>
             </TabsTrigger>
             <TabsTrigger value="goals" data-testid="tab-goals">
-              <Target className="h-4 w-4 mr-1" /> Goals
+              <Target className="h-4 w-4 mr-1" /> <span className="hidden sm:inline">Goals</span>
+            </TabsTrigger>
+            <TabsTrigger value="esign" data-testid="tab-esign">
+              <FileSignature className="h-4 w-4 mr-1" /> <span className="hidden sm:inline">E-Sign</span>
+            </TabsTrigger>
+            <TabsTrigger value="onboarding" data-testid="tab-onboarding">
+              <ClipboardList className="h-4 w-4 mr-1" /> <span className="hidden sm:inline">Onboarding</span>
             </TabsTrigger>
             <TabsTrigger value="contact" data-testid="tab-contact">
-              <User className="h-4 w-4 mr-1" /> Adviser
+              <User className="h-4 w-4 mr-1" /> <span className="hidden sm:inline">Adviser</span>
             </TabsTrigger>
           </TabsList>
 
