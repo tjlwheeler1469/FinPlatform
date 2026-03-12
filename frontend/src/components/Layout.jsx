@@ -383,7 +383,7 @@ const Layout = ({ children }) => {
       {/* Left Sidebar - Desktop */}
       <aside 
         className={cn(
-          "hidden lg:flex flex-col fixed left-0 top-0 h-full bg-[#0F392B] text-white transition-all duration-300 z-50",
+          "hidden lg:flex flex-col fixed left-0 top-0 h-full bg-[#1a2744] text-white transition-all duration-300 z-50",
           sidebarCollapsed ? "w-16" : "w-56"
         )}
       >
@@ -391,13 +391,13 @@ const Layout = ({ children }) => {
         <div className="h-16 flex items-center justify-between px-4 border-b border-white/10">
           {!sidebarCollapsed && (
             <Link to="/dashboard" className="flex items-center gap-2">
-              <TrendingUp className="h-6 w-6 text-[#D4AF37]" />
-              <span className="font-bold font-['Manrope'] text-sm">Wheeler Family</span>
+              <TrendingUp className="h-6 w-6 text-[#D4A84C]" />
+              <span className="font-bold font-serif text-sm tracking-wide">Halcyon Wealth</span>
             </Link>
           )}
           {sidebarCollapsed && (
             <Link to="/dashboard" className="mx-auto">
-              <TrendingUp className="h-6 w-6 text-[#D4AF37]" />
+              <TrendingUp className="h-6 w-6 text-[#D4A84C]" />
             </Link>
           )}
           {!sidebarCollapsed && (
