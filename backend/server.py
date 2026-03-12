@@ -5762,7 +5762,7 @@ async def generate_ai_advice(request: AIAdviceRequest):
     question = request.question or "What are the top financial actions I should take?"
     
     # Get household data for context
-    household = await db.households.find_one({"household_id": household_id}, {"_id": 0})
+    _ = await db.households.find_one({"household_id": household_id}, {"_id": 0})  # household - available for future context
     goals = await db.goals.find({"household_id": household_id}, {"_id": 0}).to_list(10)
     
     # Prepare financial context
