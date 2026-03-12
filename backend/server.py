@@ -1,5 +1,5 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Request, Response, Depends, UploadFile, File
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi import FastAPI, APIRouter, HTTPException, Request, Response, UploadFile, File
+from fastapi.responses import StreamingResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -2560,7 +2560,7 @@ async def calculate_estate_plan(request: EstateplanRequest):
         recommendations.append({
             "priority": "high",
             "message": "Review super beneficiary nominations",
-            "reason": f"Non-dependant beneficiaries may pay up to 17% tax on taxable super components"
+            "reason": "Non-dependant beneficiaries may pay up to 17% tax on taxable super components"
         })
     
     return {
