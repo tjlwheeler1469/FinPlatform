@@ -1038,3 +1038,83 @@ Build an app that analyses all options for personal and business investment in A
 - ✅ Backend: 100% (13/13 tests passed) - iteration_26.json
 - ✅ Frontend: 100% (all features working)
 - Test files: /app/test_reports/iteration_26.json, /app/backend/tests/test_strategic_import_export.py
+
+## Phase 1: Decision Engine - COMPLETED (December 2025)
+
+### 1. Financial Health Score (0-100)
+- **API**: POST /api/decision-engine/health-score
+- **6 Dimensions** (each with max score):
+  - Savings Rate (0-20): Based on income vs expenses ratio
+  - Debt Management (0-20): Debt-to-asset ratio analysis
+  - Diversification (0-15): Portfolio concentration check
+  - Retirement Readiness (0-20): Super projections vs target
+  - Emergency Fund (0-10): Cash vs 6-month expenses
+  - Tax Efficiency (0-15): Super utilization analysis
+- **Status Levels**: Excellent (85+), Good (70+), Fair (55+), Needs Attention (<55)
+- **Auto-generated recommendations** when score is low
+
+### 2. Retirement Success Probability
+- **API**: POST /api/decision-engine/retirement-probability
+- **Monte Carlo Simulation**: 5000 iterations
+- **Two-phase modeling**:
+  - Phase 1: Accumulation (working years) - contributions + returns
+  - Phase 2: Drawdown (retirement) - withdrawals + inflation adjustment
+- **Outputs**:
+  - Success probability %
+  - Median/P10/P90 final balances
+  - Status (On Track, Good Progress, Needs Attention, At Risk)
+  - Actionable recommendation
+
+### 3. Top Actions Engine
+- **API**: POST /api/decision-engine/top-actions
+- **5 Priority Actions** with dollar impact:
+  1. Maximize Super Contributions (tax savings)
+  2. Debt Recycling (tax benefit)
+  3. Increase Savings Rate (compound growth)
+  4. Portfolio Rebalancing (returns optimization)
+  5. Deploy Excess Cash (opportunity cost)
+- **Ranked by impact amount**
+- **Effort levels**: Easy, Medium, Complex
+- **Timeframes**: Immediate, 1-3 months, Ongoing
+
+### 4. Life Timeline Planning
+- **API**: POST /api/decision-engine/life-timeline
+- **Interactive Sliders**:
+  - Current Age
+  - Retirement Age (55-75)
+  - Life Expectancy (75-100)
+  - Annual Savings
+  - Expected Return (3-12%)
+- **Year-by-year projections** with:
+  - Net worth
+  - Portfolio value
+  - Debt remaining
+  - Event markers
+- **Life Events System**:
+  - Add/remove events
+  - Event types: House purchase, Education, Travel, Car, Wedding, Retirement
+  - Cost tracking
+  - Priority levels
+- **Milestones** auto-detected: Mortgage payoff, Retirement, Peak wealth
+
+### 5. Combined Analysis
+- **API**: POST /api/decision-engine/complete-analysis
+- Returns all metrics in one call for dashboard efficiency
+
+### Frontend Pages
+- **/decision-engine** (DecisionDashboard.jsx):
+  - Health Score with radar chart
+  - Retirement probability with progress
+  - Top 3 Actions clickable cards
+  - Tabs: Overview, Actions, Detailed Metrics
+- **/life-timeline** (LifeTimeline.jsx):
+  - Interactive parameter sliders
+  - Net worth projection area chart
+  - Milestones timeline view
+  - Life events management
+
+### Testing
+- Backend: 100% (25/25 tests passed)
+- Frontend: 100% (all features working)
+- Test file: /app/backend/tests/test_decision_engine.py
+- Report: /app/test_reports/iteration_27.json
