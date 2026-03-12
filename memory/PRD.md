@@ -1332,4 +1332,48 @@ Fixed 21 linting errors in `/app/backend/server.py`:
 
 ### Test Reports Created
 - `/app/test_reports/iteration_29.json` - Final 4 screens verification
+- `/app/test_reports/iteration_30.json` - Backend refactoring and persistence endpoints
+
+## Session Update: March 2026 - Backend Refactoring & Persistence
+
+### ✅ COMPLETED: Backend Modular Architecture
+
+**New Directory Structure:**
+```
+/app/backend/
+├── db/
+│   └── __init__.py          # MongoDB connection (db, client)
+├── models/
+│   └── __init__.py          # All Pydantic models extracted
+├── services/
+│   ├── __init__.py          # Service exports
+│   └── tax_constants.py     # All AU tax rates and brackets
+├── routes/                   # Ready for route extraction
+│   └── __init__.py
+└── server.py                 # Main app, now imports from modules
+```
+
+### ✅ COMPLETED: New Persistence API Endpoints
+
+**Net Worth History:**
+- `GET /api/trends/net-worth/{household_id}` - Historical net worth data
+- `POST /api/trends/net-worth/snapshot` - Save net worth snapshot
+
+**Debt Management:**
+- `GET /api/planning/debts/{household_id}` - List all debts
+- `POST /api/planning/debts` - Save/update debt item
+- `DELETE /api/planning/debts/{debt_id}` - Delete debt
+
+**Insurance Coverage:**
+- `GET /api/planning/insurance/{household_id}` - List insurance policies
+- `POST /api/planning/insurance` - Save/update coverage
+
+**Revenue Tracking:**
+- `GET /api/billing/revenue/{adviser_id}` - Revenue history for advisers
+
+### Testing Results
+- Backend: 100% (19/19 tests)
+- Frontend: 100% (8 pages verified)
+- Modular imports: Working
+- New persistence endpoints: Working with demo data fallback
 
