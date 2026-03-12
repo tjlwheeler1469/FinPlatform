@@ -20,7 +20,16 @@ import {
   CheckCircle,
   Home,
   Landmark,
-  Briefcase
+  Briefcase,
+  Zap,
+  Target,
+  Shield,
+  CreditCard,
+  Clock,
+  Sparkles,
+  RefreshCw,
+  FileText,
+  Link2
 } from "lucide-react";
 import { usePortfolio } from "@/App";
 import ChartContainer from "@/components/ChartContainer";
@@ -55,6 +64,18 @@ const formatPercent = (value) => {
 };
 
 const COLORS = ['#1a2744', '#D4A84C', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'];
+
+// Quick Actions configuration
+const QUICK_ACTIONS = [
+  { id: 'health-score', label: 'Health Score', icon: Zap, path: '/decision-engine', color: 'bg-amber-500' },
+  { id: 'goals', label: 'Goals', icon: Target, path: '/goal-tracker', color: 'bg-green-500' },
+  { id: 'ai-advice', label: 'AI Advisor', icon: Sparkles, path: '/ai-advisor', color: 'bg-purple-500' },
+  { id: 'tax', label: 'Tax Analysis', icon: Calculator, path: '/tax-analysis-sync', color: 'bg-blue-500' },
+  { id: 'debt', label: 'Debt Plan', icon: CreditCard, path: '/debt-paydown', color: 'bg-red-500' },
+  { id: 'insurance', label: 'Insurance', icon: Shield, path: '/insurance-gap', color: 'bg-teal-500' },
+  { id: 'timeline', label: 'Life Plan', icon: Clock, path: '/life-timeline', color: 'bg-indigo-500' },
+  { id: 'reports', label: 'Reports', icon: FileText, path: '/reports', color: 'bg-slate-500' },
+];
 
 const Dashboard = () => {
   const navigate = useNavigate();
