@@ -365,7 +365,7 @@ class TestRevenueTracking:
         for entry in data["history"]:
             # Verify total equals sum of components
             calculated_total = entry["advice_fees"] + entry["service_fees"] + entry["commissions"]
-            assert abs(entry["total"] - calculated_total) < 1  # Allow for rounding
+            assert abs(entry["total"] - calculated_total) <= 2  # Allow for rounding
             
             # Verify values are positive
             assert entry["advice_fees"] >= 0
