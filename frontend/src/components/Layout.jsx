@@ -150,6 +150,7 @@ const adviserNavGroups = [
     name: "Adviser Hub",
     items: [
       { path: "/adviser-dashboard", label: "Client Overview", icon: Briefcase, title: "Adviser Dashboard" },
+      { path: "/client-crm", label: "Client CRM", icon: Users, title: "Client Relationship Management" },
       { path: "/practice-management", label: "Practice", icon: ClipboardList, title: "Practice Management" },
       { path: "/collaboration", label: "Team", icon: UserPlus, title: "Collaboration" },
       { path: "/statement-of-advice", label: "SOA Generator", icon: FileText, title: "Statement of Advice" },
@@ -160,9 +161,10 @@ const adviserNavGroups = [
     items: [
       { path: "/decision-engine", label: "Decision Engine", icon: Zap, title: "Decision Engine" },
       { path: "/life-timeline", label: "Life Timeline", icon: Clock, title: "Life Timeline Planning" },
+      { path: "/goal-tracker", label: "Goal Tracker", icon: Target, title: "Goal Progress Tracker" },
+      { path: "/ai-advisor", label: "AI Advisor", icon: Sparkles, title: "AI Financial Advisor" },
       { path: "/daily-briefing", label: "Daily Briefing", icon: Sun, title: "Daily Briefing" },
       { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard, title: "Dashboard" },
-      { path: "/copilot", label: "AI Copilot", icon: Sparkles, title: "AI Copilot" },
     ]
   },
   {
@@ -172,6 +174,7 @@ const adviserNavGroups = [
       { path: "/cgt", label: "CGT", icon: TrendingUp, title: "Capital Gains Tax" },
       { path: "/strategic-planning", label: "Strategic Planning", icon: HeartPulse, title: "Strategic Planning" },
       { path: "/investment-comparison", label: "Investment Compare", icon: Scale, title: "Investment Structure Comparison" },
+      { path: "/portfolio-aggregator", label: "Portfolio Aggregator", icon: Wallet, title: "Portfolio Aggregation" },
       { path: "/risk-profiler", label: "Risk Profiler", icon: Shield, title: "Risk Profiler" },
     ]
   },
