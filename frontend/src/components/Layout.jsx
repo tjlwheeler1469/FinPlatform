@@ -665,17 +665,17 @@ const Layout = ({ children }) => {
                 className={cn(
                   "flex flex-col items-center justify-center gap-0.5 transition-all active:scale-95",
                   isActive 
-                    ? "text-[#0F392B]" 
+                    ? "text-[#1a2744]" 
                     : "text-muted-foreground"
                 )}
               >
                 <div className={cn(
                   "p-1.5 rounded-xl transition-colors",
-                  isActive && "bg-[#0F392B]/10"
+                  isActive && "bg-[#D4A84C]/20"
                 )}>
                   <item.icon className={cn(
                     "h-5 w-5 transition-all",
-                    isActive && "scale-110"
+                    isActive && "scale-110 text-[#D4A84C]"
                   )} />
                 </div>
                 <span className={cn(
