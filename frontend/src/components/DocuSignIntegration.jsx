@@ -494,8 +494,13 @@ const DocuSignIntegration = ({ onSignatureComplete }) => {
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowSendDialog(false)}>Cancel</Button>
-              <Button onClick={sendSignatureRequest} className="bg-[#0F392B]" data-testid="confirm-send-btn">
-                <Send className="h-4 w-4 mr-2" /> Send Request
+              <Button onClick={sendSignatureRequest} className="bg-[#0F392B]" data-testid="confirm-send-btn" disabled={isSending}>
+                {isSending ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4 mr-2" />
+                )}
+                {isSending ? "Sending..." : "Send Request"}
               </Button>
             </DialogFooter>
           </DialogContent>
