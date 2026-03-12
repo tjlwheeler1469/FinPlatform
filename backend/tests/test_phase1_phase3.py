@@ -198,14 +198,17 @@ class TestExistingPages:
         assert response.status_code == 200
         data = response.json()
         
-        assert isinstance(data, list)
-        assert len(data) >= 3  # Wheeler, Chen, Patel
+        # API returns {"households": [...], "total": N}
+        assert "households" in data
+        households = data["households"]
+        assert isinstance(households, list)
+        assert len(households) >= 3  # Wheeler, Chen, Patel
         
         # Verify household structure
-        household_names = [h["name"] for h in data]
+        household_names = [h["name"] for h in households]
         assert "Wheeler Family" in household_names
         
-        print(f"✓ CRM Households: {len(data)} households")
+        print(f"✓ CRM Households: {len(households)} households")
     
     def test_crm_tasks(self):
         """Test CRM tasks endpoint"""
