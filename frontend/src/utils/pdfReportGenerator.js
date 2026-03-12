@@ -159,7 +159,7 @@ export const generatePortfolioSummaryPDF = (data) => {
     ['Total', formatCurrency(totalAssets), '100%']
   ];
   
-  doc.autoTable({
+  const allocTable = autoTable(doc, {
     startY: y,
     head: [allocations[0]],
     body: allocations.slice(1),
@@ -193,7 +193,7 @@ export const generatePortfolioSummaryPDF = (data) => {
       (s.gain >= 0 ? '+' : '') + s.gain.toFixed(1) + '%'
     ]);
     
-    doc.autoTable({
+    autoTable(doc, {
       startY: y,
       head: [['Symbol', 'Name', 'Qty', 'Price', 'Value', 'Gain/Loss']],
       body: shareRows,
@@ -294,7 +294,7 @@ export const generateSOAPDF = (data) => {
   
   const goalRows = defaultGoals.map(g => [g.name, formatCurrency(g.target), g.deadline]);
   
-  doc.autoTable({
+  autoTable(doc, {
     startY: y,
     head: [['Goal', 'Target Amount', 'Target Date']],
     body: goalRows,
@@ -352,7 +352,7 @@ export const generateSOAPDF = (data) => {
     ['Implementation Fee', formatCurrency(fees.implementation || 500)]
   ];
   
-  doc.autoTable({
+  autoTable(doc, {
     startY: y,
     head: [['Fee Type', 'Amount']],
     body: feeRows,
@@ -403,7 +403,7 @@ export const generateTaxSummaryPDF = (data) => {
     ['Total Assessable Income', formatCurrency(income.total || 255000)]
   ];
   
-  doc.autoTable({
+  autoTable(doc, {
     startY: y,
     body: incomeItems,
     theme: 'plain',
@@ -435,7 +435,7 @@ export const generateTaxSummaryPDF = (data) => {
     ['Total Deductions', formatCurrency(deductions.total || 39800)]
   ];
   
-  doc.autoTable({
+  autoTable(doc, {
     startY: y,
     body: deductionItems,
     theme: 'plain',
@@ -468,7 +468,7 @@ export const generateTaxSummaryPDF = (data) => {
       e.discount ? 'Yes' : 'No'
     ]);
     
-    doc.autoTable({
+    autoTable(doc, {
       startY: y,
       head: [['Asset', 'Date', 'Proceeds', 'Cost Base', 'Gain/Loss', '50% Discount']],
       body: cgtRows,
@@ -492,7 +492,7 @@ export const generateTaxSummaryPDF = (data) => {
     ['Estimated Refund/Payable', formatCurrency((taxPayable || 62547) + Math.round((income.total || 255000) * 0.02) - 55000)]
   ];
   
-  doc.autoTable({
+  autoTable(doc, {
     startY: y,
     body: taxSummary,
     theme: 'plain',
