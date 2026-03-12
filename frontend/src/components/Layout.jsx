@@ -552,10 +552,10 @@ const Layout = ({ children }) => {
       </aside>
 
       {/* Mobile Header */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-[#0F392B] text-white z-50 flex items-center justify-between px-4 safe-area-inset-top">
+      <header className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-[#1a2744] text-white z-50 flex items-center justify-between px-4 safe-area-inset-top">
         <Link to="/dashboard" className="flex items-center gap-2">
-          <TrendingUp className="h-5 w-5 text-[#D4AF37]" />
-          <span className="font-bold font-['Manrope'] text-sm">Wheeler Family</span>
+          <TrendingUp className="h-5 w-5 text-[#D4A84C]" />
+          <span className="font-bold font-serif text-sm tracking-wide">Halcyon Wealth</span>
         </Link>
         <div className="flex items-center gap-1">
           <NotificationsPanel />
@@ -590,7 +590,7 @@ const Layout = ({ children }) => {
         {/* Slide-out Menu */}
         <div 
           className={cn(
-            "absolute left-0 top-0 w-72 h-full bg-[#0F392B] text-white pt-14 transition-transform duration-300 ease-out",
+            "absolute left-0 top-0 w-72 h-full bg-[#1a2744] text-white pt-14 transition-transform duration-300 ease-out",
             mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
           )}
           onClick={(e) => e.stopPropagation()}
