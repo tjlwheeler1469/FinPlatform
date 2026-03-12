@@ -91,7 +91,7 @@ class SecureDataFeedService:
         """
         random.seed(hash(customer_id) % 2**32)
         
-        bank = random.choice(CDR_BANKS)
+        _ = random.choice(CDR_BANKS)  # Bank selection for seed consistency
         num_accounts = random.randint(2, 5)
         
         accounts = []
