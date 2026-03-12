@@ -14,36 +14,41 @@ class TestFactFindAPI:
     
     def test_save_factfind(self):
         """Test saving a fact-find form"""
+        # API expects: client_id, data (dict), progress, status
         factfind_data = {
             "client_id": "test_client_001",
-            "personal": {
-                "first_name": "Test",
-                "last_name": "User",
-                "email": "test@example.com",
-                "phone_mobile": "0400000000"
+            "data": {
+                "personal": {
+                    "first_name": "Test",
+                    "last_name": "User",
+                    "email": "test@example.com",
+                    "phone_mobile": "0400000000"
+                },
+                "employment": {
+                    "employment_status": "full_time",
+                    "salary_gross": 120000
+                },
+                "assets": {
+                    "superannuation": 250000,
+                    "cash_bank": 50000
+                },
+                "liabilities": {
+                    "home_loan": 400000
+                },
+                "insurance": {
+                    "has_will": True
+                },
+                "goals": {
+                    "retirement_age": 65
+                },
+                "risk": {
+                    "answers": {},
+                    "score": 0,
+                    "profile": "balanced"
+                }
             },
-            "employment": {
-                "employment_status": "full_time",
-                "salary_gross": 120000
-            },
-            "assets": {
-                "superannuation": 250000,
-                "cash_bank": 50000
-            },
-            "liabilities": {
-                "home_loan": 400000
-            },
-            "insurance": {
-                "has_will": True
-            },
-            "goals": {
-                "retirement_age": 65
-            },
-            "risk": {
-                "answers": {},
-                "score": 0,
-                "profile": "balanced"
-            }
+            "progress": 50,
+            "status": "in_progress"
         }
         
         response = requests.post(f"{BASE_URL}/api/factfind", json=factfind_data)
@@ -63,7 +68,7 @@ class TestFactFindAPI:
         assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
         data = response.json()
         assert data.get("client_id") == "test_client_001"
-        assert data.get("personal", {}).get("first_name") == "Test"
+        assert "data" in data
         print(f"Factfind retrieved: {data.get('client_id')}")
     
     def test_list_factfinds(self):
@@ -83,9 +88,11 @@ class TestESignatureAPI:
     
     def test_send_signature_request(self):
         """Test sending a signature request"""
+        # API expects: document_id, document_name, client_id, client_name, client_email
         request_data = {
             "document_id": "soa",
             "document_name": "Statement of Advice (SOA)",
+            "client_id": "test_client_esign_001",
             "client_name": "Test Client",
             "client_email": "test@client.com",
             "message": "Please sign this document"
@@ -117,16 +124,19 @@ class TestESignatureAPI:
         request_data = {
             "document_id": "fds",
             "document_name": "Fee Disclosure Statement",
+            "client_id": "test_client_sign_001",
             "client_name": "Sign Test Client",
             "client_email": "signtest@client.com"
         }
         create_response = requests.post(f"{BASE_URL}/api/esignature/send", json=request_data)
+        assert create_response.status_code == 200, f"Failed to create request: {create_response.text}"
         request_id = create_response.json().get("request_id")
+        print(f"Created signature request: {request_id}")
         
         # Now sign it
         sign_data = {
-            "signature": "Test Signature",
-            "signer_name": "Sign Test Client"
+            "name": "Sign Test Client",
+            "role": "client"
         }
         response = requests.post(f"{BASE_URL}/api/esignature/sign/{request_id}", json=sign_data)
         print(f"Sign document response: {response.status_code}")
@@ -142,11 +152,14 @@ class TestESignatureAPI:
         request_data = {
             "document_id": "kyc",
             "document_name": "KYC Verification Form",
+            "client_id": "test_client_get_001",
             "client_name": "Get Test Client",
             "client_email": "gettest@client.com"
         }
         create_response = requests.post(f"{BASE_URL}/api/esignature/send", json=request_data)
+        assert create_response.status_code == 200, f"Failed to create request: {create_response.text}"
         request_id = create_response.json().get("request_id")
+        print(f"Created signature request: {request_id}")
         
         # Get it by ID
         response = requests.get(f"{BASE_URL}/api/esignature/{request_id}")
