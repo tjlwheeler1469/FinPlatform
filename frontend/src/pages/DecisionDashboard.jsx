@@ -170,8 +170,8 @@ const DecisionDashboard = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground flex items-center gap-3">
-              <Sparkles className="h-8 w-8 text-[#D4AF37]" />
+            <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
+              <Sparkles className="h-8 w-8 text-[#D4A84C]" />
               Decision Engine
             </h1>
             <p className="text-muted-foreground mt-1">
