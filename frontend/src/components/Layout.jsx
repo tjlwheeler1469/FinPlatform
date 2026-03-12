@@ -188,8 +188,8 @@ const adviserNavGroups = [
     name: "Reports",
     items: [
       { path: "/documents", label: "Documents", icon: FileText, title: "Documents & Communications" },
+      { path: "/data-import-export", label: "Import / Export", icon: Database, title: "Data Import & Export" },
       { path: "/reports", label: "Reports", icon: FileText, title: "Reports" },
-      { path: "/export", label: "Export", icon: Download, title: "Export" },
     ]
   },
   {
