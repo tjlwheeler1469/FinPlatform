@@ -93,7 +93,7 @@ const calculateTax = (income) => {
   return Math.round(tax);
 };
 
-const COLORS = ['#0F392B', '#D4AF37', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'];
+const COLORS = ['#1a2744', '#D4A84C', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'];
 
 const defaultScenario = {
   id: Date.now(),
@@ -430,7 +430,7 @@ const StrategicPlanning = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+            <h1 className="text-3xl font-bold  text-foreground">
               Strategic Planning
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -454,7 +454,7 @@ const StrategicPlanning = () => {
         </div>
 
         {/* Current Position Summary */}
-        <Card className="bg-[#0F392B] text-white">
+        <Card className="bg-[#1a2744] text-white">
           <CardContent className="p-4">
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <div>
@@ -471,7 +471,7 @@ const StrategicPlanning = () => {
               </div>
               <div>
                 <p className="text-white/70 text-xs">Annual Income</p>
-                <p className="text-xl font-bold text-[#D4AF37]">{formatCurrency(currentIncome.totalIncome)}</p>
+                <p className="text-xl font-bold text-[#D4A84C]">{formatCurrency(currentIncome.totalIncome)}</p>
               </div>
               <div>
                 <p className="text-white/70 text-xs">Annual Tax</p>
@@ -557,7 +557,7 @@ const StrategicPlanning = () => {
                         <Label className="text-xs">Salary Sacrifice (Annual)</Label>
                         <Input type="number" value={retirementPlan.salary_sacrifice} onChange={e => setRetirementPlan({...retirementPlan, salary_sacrifice: Number(e.target.value)})} />
                       </div>
-                      <Button onClick={calculateRetirement} className="w-full bg-[#0F392B]" disabled={loading}>
+                      <Button onClick={calculateRetirement} className="w-full bg-[#1a2744]" disabled={loading}>
                         <Calculator className="h-4 w-4 mr-2" />
                         {loading ? "Calculating..." : "Calculate"}
                       </Button>
@@ -568,7 +568,7 @@ const StrategicPlanning = () => {
                     {retirementResult ? (
                       <>
                         <div className="grid grid-cols-4 gap-3">
-                          <Card className="bg-[#0F392B] text-white">
+                          <Card className="bg-[#1a2744] text-white">
                             <CardContent className="p-3">
                               <p className="text-xs text-white/70">At Retirement</p>
                               <p className="text-lg font-bold">{formatCurrency(retirementResult.summary.total_at_retirement)}</p>
@@ -604,7 +604,7 @@ const StrategicPlanning = () => {
                                   <XAxis dataKey="age" stroke="hsl(var(--muted-foreground))" fontSize={10} />
                                   <YAxis tickFormatter={(v) => `$${(v/1000000).toFixed(1)}M`} stroke="hsl(var(--muted-foreground))" fontSize={10} />
                                   <Tooltip formatter={(v) => formatCurrency(v)} labelFormatter={(v) => `Age ${v}`} />
-                                  <Area type="monotone" dataKey="balance" stroke="#0F392B" fill="#0F392B" fillOpacity={0.3} />
+                                  <Area type="monotone" dataKey="balance" stroke="#1a2744" fill="#1a2744" fillOpacity={0.3} />
                                 </AreaChart>
                               </ResponsiveContainer>
                             </ChartContainer>
@@ -655,7 +655,7 @@ const StrategicPlanning = () => {
                           <Switch checked={estatePlan.has_testamentary_trust} onCheckedChange={(v) => setEstatePlan({...estatePlan, has_testamentary_trust: v})} />
                         </div>
                       </div>
-                      <Button onClick={calculateEstate} className="w-full bg-[#0F392B]" disabled={loading}>
+                      <Button onClick={calculateEstate} className="w-full bg-[#1a2744]" disabled={loading}>
                         <Calculator className="h-4 w-4 mr-2" />
                         {loading ? "Analyzing..." : "Analyze"}
                       </Button>
@@ -666,7 +666,7 @@ const StrategicPlanning = () => {
                     {estateResult ? (
                       <>
                         <div className="grid grid-cols-3 gap-3">
-                          <Card className="bg-[#0F392B] text-white">
+                          <Card className="bg-[#1a2744] text-white">
                             <CardContent className="p-3">
                               <p className="text-xs text-white/70">Total Estate</p>
                               <p className="text-lg font-bold">{formatCurrency(estateResult.estate_summary.total_estate_value)}</p>
@@ -675,7 +675,7 @@ const StrategicPlanning = () => {
                           <Card>
                             <CardContent className="p-3">
                               <p className="text-xs text-muted-foreground">Super Component</p>
-                              <p className="text-lg font-bold text-[#D4AF37]">{formatCurrency(estateResult.estate_summary.total_super)}</p>
+                              <p className="text-lg font-bold text-[#D4A84C]">{formatCurrency(estateResult.estate_summary.total_super)}</p>
                             </CardContent>
                           </Card>
                           <Card>
@@ -757,7 +757,7 @@ const StrategicPlanning = () => {
                             <div><Label className="text-[10px]">Monthly</Label><Input type="number" value={goal.monthly_contribution} onChange={e => updateGoal(index, 'monthly_contribution', Number(e.target.value))} className="h-8 text-sm" /></div>
                           </div>
                           <div className="mt-2 h-2 bg-muted rounded-full overflow-hidden">
-                            <div className="h-full bg-[#0F392B]" style={{ width: `${Math.min(100, (goal.current_savings / goal.target_amount) * 100)}%` }} />
+                            <div className="h-full bg-[#1a2744]" style={{ width: `${Math.min(100, (goal.current_savings / goal.target_amount) * 100)}%` }} />
                           </div>
                         </CardContent>
                       </Card>
@@ -785,7 +785,7 @@ const StrategicPlanning = () => {
                             </SelectContent>
                           </Select>
                         </div>
-                        <Button onClick={calculateGoals} className="w-full bg-[#0F392B]" disabled={loading}>
+                        <Button onClick={calculateGoals} className="w-full bg-[#1a2744]" disabled={loading}>
                           <Calculator className="h-4 w-4 mr-2" />
                           {loading ? "Analyzing..." : "Analyze Goals"}
                         </Button>
@@ -836,7 +836,7 @@ const StrategicPlanning = () => {
                     <div 
                       key={scenario.id}
                       className={`p-2 rounded-lg border cursor-pointer transition-colors ${
-                        activeScenarioId === scenario.id ? 'border-[#0F392B] bg-[#0F392B]/5' : 'hover:bg-muted/50'
+                        activeScenarioId === scenario.id ? 'border-[#1a2744] bg-[#1a2744]/5' : 'hover:bg-muted/50'
                       }`}
                       onClick={() => setActiveScenarioId(scenario.id)}
                     >
@@ -892,9 +892,9 @@ const StrategicPlanning = () => {
                   </div>
 
                   {/* Adjustments */}
-                  <div className="p-3 rounded-lg bg-[#D4AF37]/10">
+                  <div className="p-3 rounded-lg bg-[#D4A84C]/10">
                     <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
-                      <Target className="h-4 w-4 text-[#D4AF37]" /> Strategic Adjustments
+                      <Target className="h-4 w-4 text-[#D4A84C]" /> Strategic Adjustments
                     </h4>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
@@ -937,8 +937,8 @@ const StrategicPlanning = () => {
                             <YAxis tickFormatter={(v) => `$${(v/1000000).toFixed(1)}M`} stroke="hsl(var(--muted-foreground))" fontSize={10} />
                             <Tooltip formatter={(v) => formatCurrency(v)} />
                             <Legend />
-                            <Area type="monotone" dataKey="propertyValue" name="Property" stackId="1" fill="#0F392B" stroke="#0F392B" />
-                            <Area type="monotone" dataKey="shareValue" name="Shares" stackId="1" fill="#D4AF37" stroke="#D4AF37" />
+                            <Area type="monotone" dataKey="propertyValue" name="Property" stackId="1" fill="#1a2744" stroke="#1a2744" />
+                            <Area type="monotone" dataKey="shareValue" name="Shares" stackId="1" fill="#D4A84C" stroke="#D4A84C" />
                             <Area type="monotone" dataKey="superBalance" name="Super" stackId="1" fill="#10B981" stroke="#10B981" />
                           </AreaChart>
                         </ResponsiveContainer>
@@ -1024,7 +1024,7 @@ const StrategicPlanning = () => {
                   {scenarioOutcomes.sort((a, b) => b.finalNetWorth - a.finalNetWorth).map((outcome, i) => (
                     <div key={outcome.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                       <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${i === 0 ? 'bg-[#D4AF37]' : i === 1 ? 'bg-gray-400' : 'bg-amber-700'}`}>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${i === 0 ? 'bg-[#D4A84C]' : i === 1 ? 'bg-gray-400' : 'bg-amber-700'}`}>
                           {i + 1}
                         </div>
                         <div>
@@ -1045,7 +1045,7 @@ const StrategicPlanning = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Lightbulb className="h-5 w-5 text-[#D4AF37]" /> Key Insights
+                  <Lightbulb className="h-5 w-5 text-[#D4A84C]" /> Key Insights
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -1061,8 +1061,8 @@ const StrategicPlanning = () => {
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-start gap-3 p-3 rounded-lg bg-[#D4AF37]/10">
-                      <TrendingUp className="h-5 w-5 text-[#D4AF37] flex-shrink-0" />
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-[#D4A84C]/10">
+                      <TrendingUp className="h-5 w-5 text-[#D4A84C] flex-shrink-0" />
                       <div>
                         <p className="font-medium">Difference</p>
                         <p className="text-sm text-muted-foreground">

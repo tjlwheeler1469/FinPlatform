@@ -62,7 +62,7 @@ const formatCurrency = (value) => {
   }).format(value);
 };
 
-const COLORS = ['#0F392B', '#D4AF37', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#EF4444'];
+const COLORS = ['#1a2744', '#D4A84C', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#EF4444'];
 
 const FinancialRecommendations = () => {
   const { portfolio } = usePortfolio();
@@ -193,7 +193,7 @@ const FinancialRecommendations = () => {
         metric: debtToAssetRatio,
         target: 30,
         icon: Scale,
-        color: "#D4AF37"
+        color: "#D4A84C"
       });
     } else {
       recommendations.push({
@@ -238,7 +238,7 @@ const FinancialRecommendations = () => {
         metric: sharpeRatio * 100,
         target: 50,
         icon: Target,
-        color: "#D4AF37"
+        color: "#D4A84C"
       });
     } else {
       recommendations.push({
@@ -283,7 +283,7 @@ const FinancialRecommendations = () => {
         metric: diversificationScore,
         target: 70,
         icon: BarChart3,
-        color: "#D4AF37"
+        color: "#D4A84C"
       });
     } else {
       recommendations.push({
@@ -328,7 +328,7 @@ const FinancialRecommendations = () => {
         metric: liquidityRatio,
         target: 30,
         icon: Zap,
-        color: "#D4AF37"
+        color: "#D4A84C"
       });
     } else {
       recommendations.push({
@@ -359,7 +359,7 @@ const FinancialRecommendations = () => {
         metric: 100 - effectiveTaxRate,
         target: 70,
         icon: Calculator,
-        color: "#D4AF37"
+        color: "#D4A84C"
       });
     } else {
       recommendations.push({
@@ -437,7 +437,7 @@ const FinancialRecommendations = () => {
   // Priority breakdown for pie chart
   const priorityData = [
     { name: 'High Priority', value: highPriorityCount, color: '#EF4444' },
-    { name: 'Medium Priority', value: mediumPriorityCount, color: '#D4AF37' },
+    { name: 'Medium Priority', value: mediumPriorityCount, color: '#D4A84C' },
     { name: 'Low Priority', value: recommendations.length - highPriorityCount - mediumPriorityCount, color: '#10B981' }
   ].filter(d => d.value > 0);
 
@@ -447,7 +447,7 @@ const FinancialRecommendations = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+            <h1 className="text-3xl font-bold  text-foreground">
               Financial Recommendations
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -461,7 +461,7 @@ const FinancialRecommendations = () => {
               </Badge>
             )}
             {mediumPriorityCount > 0 && (
-              <Badge className="bg-[#D4AF37] px-3 py-1">
+              <Badge className="bg-[#D4A84C] px-3 py-1">
                 {mediumPriorityCount} Medium Priority
               </Badge>
             )}
@@ -473,12 +473,12 @@ const FinancialRecommendations = () => {
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-[#0F392B]/10 flex items-center justify-center">
-                  <Scale className="h-5 w-5 text-[#0F392B]" />
+                <div className="w-10 h-10 rounded-lg bg-[#1a2744]/10 flex items-center justify-center">
+                  <Scale className="h-5 w-5 text-[#1a2744]" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Debt/Asset Ratio</p>
-                  <p className={`text-xl font-bold ${debtToAssetRatio > 50 ? 'text-destructive' : debtToAssetRatio > 30 ? 'text-[#D4AF37]' : 'text-[#10B981]'}`}>
+                  <p className={`text-xl font-bold ${debtToAssetRatio > 50 ? 'text-destructive' : debtToAssetRatio > 30 ? 'text-[#D4A84C]' : 'text-[#10B981]'}`}>
                     {debtToAssetRatio.toFixed(0)}%
                   </p>
                 </div>
@@ -489,12 +489,12 @@ const FinancialRecommendations = () => {
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-[#D4AF37]/10 flex items-center justify-center">
-                  <Target className="h-5 w-5 text-[#D4AF37]" />
+                <div className="w-10 h-10 rounded-lg bg-[#D4A84C]/10 flex items-center justify-center">
+                  <Target className="h-5 w-5 text-[#D4A84C]" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Sharpe Ratio</p>
-                  <p className={`text-xl font-bold ${sharpeRatio < 0.3 ? 'text-destructive' : sharpeRatio < 0.5 ? 'text-[#D4AF37]' : 'text-[#10B981]'}`}>
+                  <p className={`text-xl font-bold ${sharpeRatio < 0.3 ? 'text-destructive' : sharpeRatio < 0.5 ? 'text-[#D4A84C]' : 'text-[#10B981]'}`}>
                     {sharpeRatio.toFixed(2)}
                   </p>
                 </div>
@@ -510,7 +510,7 @@ const FinancialRecommendations = () => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Diversification</p>
-                  <p className={`text-xl font-bold ${diversificationScore < 50 ? 'text-destructive' : diversificationScore < 70 ? 'text-[#D4AF37]' : 'text-[#10B981]'}`}>
+                  <p className={`text-xl font-bold ${diversificationScore < 50 ? 'text-destructive' : diversificationScore < 70 ? 'text-[#D4A84C]' : 'text-[#10B981]'}`}>
                     {diversificationScore.toFixed(0)}%
                   </p>
                 </div>
@@ -548,7 +548,7 @@ const FinancialRecommendations = () => {
               {/* Portfolio Health Radar */}
               <Card data-testid="portfolio-health-radar">
                 <CardHeader>
-                  <CardTitle className="font-['Manrope']">Portfolio Health Score</CardTitle>
+                  <CardTitle className="">Portfolio Health Score</CardTitle>
                   <CardDescription>Multi-dimensional analysis of your financial position</CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -561,8 +561,8 @@ const FinancialRecommendations = () => {
                         <Radar
                           name="Score"
                           dataKey="A"
-                          stroke="#0F392B"
-                          fill="#0F392B"
+                          stroke="#1a2744"
+                          fill="#1a2744"
                           fillOpacity={0.3}
                         />
                         <Tooltip />
@@ -575,7 +575,7 @@ const FinancialRecommendations = () => {
               {/* Priority Distribution */}
               <Card data-testid="priority-distribution">
                 <CardHeader>
-                  <CardTitle className="font-['Manrope']">Action Priority Distribution</CardTitle>
+                  <CardTitle className="">Action Priority Distribution</CardTitle>
                   <CardDescription>Breakdown of recommendation priorities</CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -618,8 +618,8 @@ const FinancialRecommendations = () => {
             {/* Top 3 Recommendations */}
             <Card data-testid="top-recommendations">
               <CardHeader>
-                <CardTitle className="font-['Manrope'] flex items-center gap-2">
-                  <Lightbulb className="h-5 w-5 text-[#D4AF37]" />
+                <CardTitle className=" flex items-center gap-2">
+                  <Lightbulb className="h-5 w-5 text-[#D4A84C]" />
                   Top Recommendations
                 </CardTitle>
               </CardHeader>
@@ -629,7 +629,7 @@ const FinancialRecommendations = () => {
                   return (
                     <div 
                       key={rec.id}
-                      className="p-4 rounded-lg border hover:border-[#0F392B]/30 transition-colors"
+                      className="p-4 rounded-lg border hover:border-[#1a2744]/30 transition-colors"
                     >
                       <div className="flex items-start gap-4">
                         <div 
@@ -658,7 +658,7 @@ const FinancialRecommendations = () => {
                             <Button 
                               variant="ghost" 
                               size="sm" 
-                              className="text-[#0F392B]"
+                              className="text-[#1a2744]"
                               onClick={() => handleActionClick(rec.action)}
                               data-testid={`action-${rec.category}`}
                             >
@@ -679,7 +679,7 @@ const FinancialRecommendations = () => {
           <TabsContent value="recommendations" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="font-['Manrope']">All Recommendations</CardTitle>
+                <CardTitle className="">All Recommendations</CardTitle>
                 <CardDescription>
                   {recommendations.length} personalized recommendations based on your portfolio
                 </CardDescription>
@@ -753,8 +753,8 @@ const FinancialRecommendations = () => {
               {/* Debt Metrics */}
               <Card data-testid="debt-metrics">
                 <CardHeader>
-                  <CardTitle className="font-['Manrope'] flex items-center gap-2">
-                    <Scale className="h-5 w-5 text-[#0F392B]" />
+                  <CardTitle className=" flex items-center gap-2">
+                    <Scale className="h-5 w-5 text-[#1a2744]" />
                     Debt Metrics
                   </CardTitle>
                 </CardHeader>
@@ -791,8 +791,8 @@ const FinancialRecommendations = () => {
               {/* Risk Metrics */}
               <Card data-testid="risk-metrics">
                 <CardHeader>
-                  <CardTitle className="font-['Manrope'] flex items-center gap-2">
-                    <Target className="h-5 w-5 text-[#D4AF37]" />
+                  <CardTitle className=" flex items-center gap-2">
+                    <Target className="h-5 w-5 text-[#D4A84C]" />
                     Risk Metrics
                   </CardTitle>
                 </CardHeader>
@@ -804,7 +804,7 @@ const FinancialRecommendations = () => {
                     </div>
                     <div className="p-3 rounded-lg bg-muted/50">
                       <p className="text-sm text-muted-foreground">Volatility</p>
-                      <p className="text-2xl font-bold text-[#D4AF37]">{portfolioVolatility}%</p>
+                      <p className="text-2xl font-bold text-[#D4A84C]">{portfolioVolatility}%</p>
                     </div>
                     <div className="p-3 rounded-lg bg-muted/50">
                       <p className="text-sm text-muted-foreground">Sharpe Ratio</p>
@@ -816,7 +816,7 @@ const FinancialRecommendations = () => {
                     </div>
                   </div>
                   {monteCarloData && (
-                    <div className="p-3 rounded-lg bg-[#0F392B]/5">
+                    <div className="p-3 rounded-lg bg-[#1a2744]/5">
                       <p className="text-sm font-medium mb-2">10-Year Monte Carlo Results</p>
                       <div className="grid grid-cols-2 gap-2 text-sm">
                         <div>
@@ -836,7 +836,7 @@ const FinancialRecommendations = () => {
               {/* Asset Composition */}
               <Card data-testid="asset-composition">
                 <CardHeader>
-                  <CardTitle className="font-['Manrope'] flex items-center gap-2">
+                  <CardTitle className=" flex items-center gap-2">
                     <BarChart3 className="h-5 w-5 text-[#10B981]" />
                     Asset Composition
                   </CardTitle>
@@ -868,7 +868,7 @@ const FinancialRecommendations = () => {
               {/* Tax Efficiency */}
               <Card data-testid="tax-efficiency">
                 <CardHeader>
-                  <CardTitle className="font-['Manrope'] flex items-center gap-2">
+                  <CardTitle className=" flex items-center gap-2">
                     <Calculator className="h-5 w-5 text-[#3B82F6]" />
                     Tax Efficiency
                   </CardTitle>

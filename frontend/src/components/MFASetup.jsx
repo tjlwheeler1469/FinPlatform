@@ -266,7 +266,7 @@ const MFASetup = ({ userId, userEmail, onMFAEnabled, onMFADisabled }) => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-12">
-        <Loader2 className="h-8 w-8 animate-spin text-[#0F392B]" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#1a2744]" />
         <span className="ml-2">Loading MFA status...</span>
       </div>
     );
@@ -304,7 +304,7 @@ const MFASetup = ({ userId, userEmail, onMFAEnabled, onMFADisabled }) => {
               </div>
             </div>
             {!mfaStatus.enabled ? (
-              <Button onClick={startSetup} className="bg-[#0F392B]" data-testid="enable-mfa-btn">
+              <Button onClick={startSetup} className="bg-[#1a2744]" data-testid="enable-mfa-btn">
                 <Shield className="h-4 w-4 mr-2" /> Enable 2FA
               </Button>
             ) : (
@@ -361,7 +361,7 @@ const MFASetup = ({ userId, userEmail, onMFAEnabled, onMFADisabled }) => {
       <Card>
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
-            <Shield className="h-5 w-5 text-[#D4AF37]" />
+            <Shield className="h-5 w-5 text-[#D4A84C]" />
             Security Recommendations
           </CardTitle>
         </CardHeader>
@@ -414,7 +414,7 @@ const MFASetup = ({ userId, userEmail, onMFAEnabled, onMFADisabled }) => {
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-[#D4AF37]" />
+              <Shield className="h-5 w-5 text-[#D4A84C]" />
               Set Up Two-Factor Authentication
             </DialogTitle>
             <DialogDescription>
@@ -425,9 +425,9 @@ const MFASetup = ({ userId, userEmail, onMFAEnabled, onMFADisabled }) => {
           {setupStep === 0 && (
             <div className="space-y-4 py-4">
               <div className="text-center">
-                <div className="w-48 h-48 mx-auto bg-white border-4 border-[#0F392B] rounded-lg flex items-center justify-center">
+                <div className="w-48 h-48 mx-auto bg-white border-4 border-[#1a2744] rounded-lg flex items-center justify-center">
                   <div className="text-center">
-                    <QrCode className="h-16 w-16 text-[#0F392B] mx-auto mb-2" />
+                    <QrCode className="h-16 w-16 text-[#1a2744] mx-auto mb-2" />
                     <p className="text-xs text-muted-foreground">Mock QR Code</p>
                     <p className="text-xs text-muted-foreground">(Scan with app)</p>
                   </div>
@@ -447,7 +447,7 @@ const MFASetup = ({ userId, userEmail, onMFAEnabled, onMFADisabled }) => {
                 </div>
               </div>
               
-              <Button onClick={() => setSetupStep(1)} className="w-full bg-[#0F392B]">
+              <Button onClick={() => setSetupStep(1)} className="w-full bg-[#1a2744]">
                 Next: Verify Setup
               </Button>
             </div>
@@ -456,7 +456,7 @@ const MFASetup = ({ userId, userEmail, onMFAEnabled, onMFADisabled }) => {
           {setupStep === 1 && (
             <div className="space-y-4 py-4">
               <div className="text-center">
-                <Smartphone className="h-12 w-12 text-[#D4AF37] mx-auto mb-2" />
+                <Smartphone className="h-12 w-12 text-[#D4A84C] mx-auto mb-2" />
                 <p className="font-medium">Enter Verification Code</p>
                 <p className="text-sm text-muted-foreground">
                   Enter the 6-digit code from your authenticator app
@@ -480,7 +480,7 @@ const MFASetup = ({ userId, userEmail, onMFAEnabled, onMFADisabled }) => {
                 <Button variant="outline" onClick={() => setSetupStep(0)} className="flex-1">
                   Back
                 </Button>
-                <Button onClick={completeMFASetup} className="flex-1 bg-[#0F392B]" data-testid="verify-mfa-btn">
+                <Button onClick={completeMFASetup} className="flex-1 bg-[#1a2744]" data-testid="verify-mfa-btn">
                   <CheckCircle className="h-4 w-4 mr-2" /> Verify & Enable
                 </Button>
               </div>
@@ -539,7 +539,7 @@ const MFASetup = ({ userId, userEmail, onMFAEnabled, onMFADisabled }) => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Key className="h-5 w-5 text-[#D4AF37]" />
+              <Key className="h-5 w-5 text-[#D4A84C]" />
               Backup Codes
             </DialogTitle>
             <DialogDescription>
@@ -582,7 +582,7 @@ const MFASetup = ({ userId, userEmail, onMFAEnabled, onMFADisabled }) => {
           </div>
           
           <DialogFooter>
-            <Button onClick={() => setShowBackupCodes(false)} className="bg-[#0F392B]">Done</Button>
+            <Button onClick={() => setShowBackupCodes(false)} className="bg-[#1a2744]">Done</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

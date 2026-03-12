@@ -115,7 +115,7 @@ const MOCK_COMPLIANCE = [
   { record_id: "comp_4", client_id: "client_3", record_type: "fds_issued", description: "Fee Disclosure Statement issued", completed_at: "2024-09-01", next_due: "2025-09-01", created_at: "2024-09-01" },
 ];
 
-const COLORS = ['#0F392B', '#10B981', '#3B82F6', '#D4AF37', '#EF4444'];
+const COLORS = ['#1a2744', '#10B981', '#3B82F6', '#D4A84C', '#EF4444'];
 
 const PracticeManagement = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -337,7 +337,7 @@ const PracticeManagement = () => {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base flex items-center gap-2">
-                    <Calendar className="h-5 w-5 text-[#D4AF37]" />
+                    <Calendar className="h-5 w-5 text-[#D4A84C]" />
                     Upcoming Meetings
                   </CardTitle>
                 </CardHeader>
@@ -364,7 +364,7 @@ const PracticeManagement = () => {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base flex items-center gap-2">
-                    <ClipboardList className="h-5 w-5 text-[#D4AF37]" />
+                    <ClipboardList className="h-5 w-5 text-[#D4A84C]" />
                     Priority Tasks
                   </CardTitle>
                 </CardHeader>
@@ -405,7 +405,7 @@ const PracticeManagement = () => {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base flex items-center gap-2">
-                    <BarChart3 className="h-5 w-5 text-[#D4AF37]" />
+                    <BarChart3 className="h-5 w-5 text-[#D4A84C]" />
                     Weekly Hours
                   </CardTitle>
                 </CardHeader>
@@ -417,7 +417,7 @@ const PracticeManagement = () => {
                         <XAxis dataKey="day" />
                         <YAxis />
                         <Tooltip />
-                        <Bar dataKey="hours" fill="#0F392B" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="hours" fill="#1a2744" radius={[4, 4, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   </ChartContainer>
@@ -428,7 +428,7 @@ const PracticeManagement = () => {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base flex items-center gap-2">
-                    <Timer className="h-5 w-5 text-[#D4AF37]" />
+                    <Timer className="h-5 w-5 text-[#D4A84C]" />
                     Time Breakdown
                   </CardTitle>
                 </CardHeader>
@@ -487,7 +487,7 @@ const PracticeManagement = () => {
               </div>
               <Dialog open={showNewTaskDialog} onOpenChange={setShowNewTaskDialog}>
                 <DialogTrigger asChild>
-                  <Button className="bg-[#0F392B]" data-testid="new-task-btn">
+                  <Button className="bg-[#1a2744]" data-testid="new-task-btn">
                     <Plus className="h-4 w-4 mr-2" /> New Task
                   </Button>
                 </DialogTrigger>
@@ -556,7 +556,7 @@ const PracticeManagement = () => {
                     </div>
                     <DialogFooter>
                       <Button type="button" variant="outline" onClick={() => setShowNewTaskDialog(false)}>Cancel</Button>
-                      <Button type="submit" className="bg-[#0F392B]">Create Task</Button>
+                      <Button type="submit" className="bg-[#1a2744]">Create Task</Button>
                     </DialogFooter>
                   </form>
                 </DialogContent>
@@ -622,7 +622,7 @@ const PracticeManagement = () => {
                 />
                 <Dialog open={showNewMeetingDialog} onOpenChange={setShowNewMeetingDialog}>
                   <DialogTrigger asChild>
-                    <Button className="bg-[#0F392B]" data-testid="new-meeting-btn">
+                    <Button className="bg-[#1a2744]" data-testid="new-meeting-btn">
                       <Plus className="h-4 w-4 mr-2" /> Schedule Meeting
                     </Button>
                   </DialogTrigger>
@@ -704,7 +704,7 @@ const PracticeManagement = () => {
                     </div>
                     <DialogFooter>
                       <Button type="button" variant="outline" onClick={() => setShowNewMeetingDialog(false)}>Cancel</Button>
-                      <Button type="submit" className="bg-[#0F392B]">Schedule</Button>
+                      <Button type="submit" className="bg-[#1a2744]">Schedule</Button>
                     </DialogFooter>
                   </form>
                   </DialogContent>
@@ -779,7 +779,7 @@ const PracticeManagement = () => {
               </div>
               <Dialog open={showNewTimeDialog} onOpenChange={setShowNewTimeDialog}>
                 <DialogTrigger asChild>
-                  <Button className="bg-[#0F392B]" data-testid="new-time-entry-btn">
+                  <Button className="bg-[#1a2744]" data-testid="new-time-entry-btn">
                     <Plus className="h-4 w-4 mr-2" /> Log Time
                   </Button>
                 </DialogTrigger>
@@ -863,7 +863,7 @@ const PracticeManagement = () => {
                     </div>
                     <DialogFooter>
                       <Button type="button" variant="outline" onClick={() => setShowNewTimeDialog(false)}>Cancel</Button>
-                      <Button type="submit" className="bg-[#0F392B]">Log Time</Button>
+                      <Button type="submit" className="bg-[#1a2744]">Log Time</Button>
                     </DialogFooter>
                   </form>
                 </DialogContent>
@@ -933,7 +933,7 @@ const PracticeManagement = () => {
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-base">Invoices</CardTitle>
-                  <Button className="bg-[#0F392B]">
+                  <Button className="bg-[#1a2744]">
                     <Plus className="h-4 w-4 mr-2" /> Create Invoice
                   </Button>
                 </div>
@@ -971,7 +971,7 @@ const PracticeManagement = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Shield className="h-5 w-5 text-[#D4AF37]" />
+                  <Shield className="h-5 w-5 text-[#D4A84C]" />
                   Compliance Audit Trail
                 </CardTitle>
                 <CardDescription>Track regulatory requirements and compliance activities</CardDescription>
@@ -981,8 +981,8 @@ const PracticeManagement = () => {
                   {compliance.map(record => (
                     <div key={record.record_id} className="flex items-center justify-between p-4 border rounded-lg">
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-full bg-[#0F392B]/10 flex items-center justify-center">
-                          <Shield className="h-5 w-5 text-[#0F392B]" />
+                        <div className="w-10 h-10 rounded-full bg-[#1a2744]/10 flex items-center justify-center">
+                          <Shield className="h-5 w-5 text-[#1a2744]" />
                         </div>
                         <div>
                           <p className="font-medium">{record.description}</p>
@@ -1005,7 +1005,7 @@ const PracticeManagement = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-l-4 border-l-[#D4AF37]">
+            <Card className="border-l-4 border-l-[#D4A84C]">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>

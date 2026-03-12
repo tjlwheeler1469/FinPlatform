@@ -91,7 +91,7 @@ const getMarginalRate = (income) => {
   return 0;
 };
 
-const COLORS = ['#0F392B', '#D4AF37', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'];
+const COLORS = ['#1a2744', '#D4A84C', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'];
 
 const IncomeSplitting = () => {
   const { 
@@ -258,7 +258,7 @@ const IncomeSplitting = () => {
       <div className="space-y-6" data-testid="income-splitting-page">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+          <h1 className="text-3xl font-bold  text-foreground">
             Income Splitting Strategies
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -280,7 +280,7 @@ const IncomeSplitting = () => {
               <p className="text-2xl font-bold text-[#10B981]">{formatCurrency(optimizedScenario.totalTax)}</p>
             </CardContent>
           </Card>
-          <Card className="bg-[#0F392B] text-white">
+          <Card className="bg-[#1a2744] text-white">
             <CardContent className="p-4">
               <p className="text-sm text-white/80">Potential Savings</p>
               <p className="text-2xl font-bold">{formatCurrency(taxSavings)}</p>
@@ -289,7 +289,7 @@ const IncomeSplitting = () => {
           <Card>
             <CardContent className="p-4">
               <p className="text-sm text-muted-foreground">Splittable Income</p>
-              <p className="text-2xl font-bold text-[#D4AF37]">
+              <p className="text-2xl font-bold text-[#D4A84C]">
                 {formatCurrency(incomeSources.dividends + incomeSources.trustDistributions)}
               </p>
             </CardContent>
@@ -309,7 +309,7 @@ const IncomeSplitting = () => {
               {/* Tax Comparison Chart */}
               <Card data-testid="tax-comparison-chart">
                 <CardHeader>
-                  <CardTitle className="font-['Manrope']">Total Family Tax Comparison</CardTitle>
+                  <CardTitle className="">Total Family Tax Comparison</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ChartContainer height={250}>
@@ -337,7 +337,7 @@ const IncomeSplitting = () => {
               {/* Per Member Comparison */}
               <Card data-testid="member-comparison">
                 <CardHeader>
-                  <CardTitle className="font-['Manrope']">Tax by Family Member</CardTitle>
+                  <CardTitle className="">Tax by Family Member</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ChartContainer height={250}>
@@ -360,7 +360,7 @@ const IncomeSplitting = () => {
               <Card className="lg:col-span-2" data-testid="family-table">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle className="font-['Manrope']">Family Tax Analysis</CardTitle>
+                    <CardTitle className="">Family Tax Analysis</CardTitle>
                     <Button variant="outline" size="sm" onClick={() => setShowAddMember(!showAddMember)}>
                       <Plus className="h-4 w-4 mr-2" />
                       Add Member
@@ -394,7 +394,7 @@ const IncomeSplitting = () => {
                           </select>
                         </div>
                         <div className="flex items-end gap-2">
-                          <Button onClick={handleAddMember} className="bg-[#0F392B]">
+                          <Button onClick={handleAddMember} className="bg-[#1a2744]">
                             Add
                           </Button>
                           <Button variant="outline" onClick={() => setShowAddMember(false)}>
@@ -440,7 +440,7 @@ const IncomeSplitting = () => {
                               {formatCurrency(currentScenario.taxes[i]?.tax || 0)}
                             </td>
                             <td className="text-right p-3">{(currentScenario.taxes[i]?.marginalRate || 0).toFixed(0)}%</td>
-                            <td className="text-right p-3 text-[#D4AF37] font-medium">
+                            <td className="text-right p-3 text-[#D4A84C] font-medium">
                               {formatCurrency(distributions[member.id] || 0)}
                             </td>
                             <td className="text-right p-3 text-[#10B981] font-medium">
@@ -464,7 +464,7 @@ const IncomeSplitting = () => {
                           <td className="p-3" colSpan={4}>Total</td>
                           <td className="text-right p-3 text-destructive">{formatCurrency(currentScenario.totalTax)}</td>
                           <td className="p-3"></td>
-                          <td className="text-right p-3 text-[#D4AF37]">
+                          <td className="text-right p-3 text-[#D4A84C]">
                             {formatCurrency(Object.values(distributions).reduce((a, b) => a + b, 0))}
                           </td>
                           <td className="text-right p-3 text-[#10B981]">{formatCurrency(optimizedScenario.totalTax)}</td>
@@ -475,9 +475,9 @@ const IncomeSplitting = () => {
                   </div>
                   
                   {/* Sync Notice */}
-                  <div className="mt-4 p-3 rounded-lg bg-[#0F392B]/10 text-sm">
+                  <div className="mt-4 p-3 rounded-lg bg-[#1a2744]/10 text-sm">
                     <p className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-[#0F392B]" />
+                      <Users className="h-4 w-4 text-[#1a2744]" />
                       <span>
                         <strong>Synced with Trust Distribution Analysis:</strong> Toggle "Trust Beneficiary" to include members in trust distributions.
                         Changes here automatically update the Trust Analysis page.
@@ -495,7 +495,7 @@ const IncomeSplitting = () => {
               {/* Distribution Controls */}
               <Card className="lg:col-span-2" data-testid="distribution-controls">
                 <CardHeader>
-                  <CardTitle className="font-['Manrope']">Distribute Income</CardTitle>
+                  <CardTitle className="">Distribute Income</CardTitle>
                   <CardDescription>
                     Allocate dividends and trust distributions to family members in lower tax brackets
                   </CardDescription>
@@ -519,7 +519,7 @@ const IncomeSplitting = () => {
                       </div>
                       <div>
                         <p className="text-xs text-muted-foreground">Total Splittable</p>
-                        <p className="font-bold text-[#D4AF37]">
+                        <p className="font-bold text-[#D4A84C]">
                           {formatCurrency(incomeSources.dividends + incomeSources.trustDistributions)}
                         </p>
                       </div>
@@ -544,7 +544,7 @@ const IncomeSplitting = () => {
                             </p>
                           </div>
                           <div className="text-right">
-                            <p className="text-lg font-bold text-[#D4AF37]">{formatCurrency(currentDist)}</p>
+                            <p className="text-lg font-bold text-[#D4A84C]">{formatCurrency(currentDist)}</p>
                             <p className="text-xs text-muted-foreground">distributed</p>
                           </div>
                         </div>
@@ -577,7 +577,7 @@ const IncomeSplitting = () => {
               {/* Distribution Summary */}
               <Card data-testid="distribution-summary">
                 <CardHeader>
-                  <CardTitle className="font-['Manrope']">Distribution Summary</CardTitle>
+                  <CardTitle className="">Distribution Summary</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {distributionPieData.length > 0 && (
@@ -614,7 +614,7 @@ const IncomeSplitting = () => {
                     ))}
                   </div>
 
-                  <div className="p-4 rounded-lg bg-[#0F392B] text-white mt-4">
+                  <div className="p-4 rounded-lg bg-[#1a2744] text-white mt-4">
                     <p className="text-sm text-white/80">Your Tax Savings</p>
                     <p className="text-2xl font-bold">{formatCurrency(taxSavings)}</p>
                     <p className="text-xs text-white/60 mt-1">per year</p>
@@ -630,8 +630,8 @@ const IncomeSplitting = () => {
               {/* Trust Distributions */}
               <Card data-testid="trust-strategy">
                 <CardHeader>
-                  <CardTitle className="font-['Manrope'] flex items-center gap-2">
-                    <Shield className="h-5 w-5 text-[#0F392B]" />
+                  <CardTitle className=" flex items-center gap-2">
+                    <Shield className="h-5 w-5 text-[#1a2744]" />
                     Family Trust Distributions
                   </CardTitle>
                 </CardHeader>
@@ -675,8 +675,8 @@ const IncomeSplitting = () => {
               {/* Dividend Streaming */}
               <Card data-testid="dividend-strategy">
                 <CardHeader>
-                  <CardTitle className="font-['Manrope'] flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5 text-[#D4AF37]" />
+                  <CardTitle className=" flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5 text-[#D4A84C]" />
                     Dividend Streaming
                   </CardTitle>
                 </CardHeader>
@@ -711,7 +711,7 @@ const IncomeSplitting = () => {
               {/* Company Structure */}
               <Card data-testid="company-strategy">
                 <CardHeader>
-                  <CardTitle className="font-['Manrope'] flex items-center gap-2">
+                  <CardTitle className=" flex items-center gap-2">
                     <Building2 className="h-5 w-5 text-[#3B82F6]" />
                     Company & Trust Combination
                   </CardTitle>
@@ -747,8 +747,8 @@ const IncomeSplitting = () => {
               {/* Recommendations */}
               <Card data-testid="recommendations">
                 <CardHeader>
-                  <CardTitle className="font-['Manrope'] flex items-center gap-2">
-                    <Lightbulb className="h-5 w-5 text-[#D4AF37]" />
+                  <CardTitle className=" flex items-center gap-2">
+                    <Lightbulb className="h-5 w-5 text-[#D4A84C]" />
                     Your Recommendations
                   </CardTitle>
                 </CardHeader>
@@ -760,8 +760,8 @@ const IncomeSplitting = () => {
                       trust income to lower-taxed family members to save {formatCurrency(taxSavings)} annually
                     </p>
                   </div>
-                  <div className="flex items-start gap-2 p-3 rounded-lg bg-[#D4AF37]/10">
-                    <ArrowRight className="h-5 w-5 text-[#D4AF37] flex-shrink-0 mt-0.5" />
+                  <div className="flex items-start gap-2 p-3 rounded-lg bg-[#D4A84C]/10">
+                    <ArrowRight className="h-5 w-5 text-[#D4A84C] flex-shrink-0 mt-0.5" />
                     <p className="text-sm">
                       <strong>Consider:</strong> Restructure share ownership through a family trust 
                       to enable flexible dividend streaming

@@ -402,7 +402,7 @@ const ExportData = () => {
       <div className="space-y-6" data-testid="export-data-page">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+          <h1 className="text-3xl font-bold  text-foreground">
             Export Data
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -422,13 +422,13 @@ const ExportData = () => {
                 {/* Family Members */}
                 <div 
                   className={`p-4 rounded-lg border cursor-pointer transition-colors ${
-                    selectedSections.familyMembers ? 'border-[#0F392B] bg-[#0F392B]/5' : 'border-border'
+                    selectedSections.familyMembers ? 'border-[#1a2744] bg-[#1a2744]/5' : 'border-border'
                   }`}
                   onClick={() => toggleSection('familyMembers')}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <Users className="h-5 w-5 text-[#0F392B]" />
+                      <Users className="h-5 w-5 text-[#1a2744]" />
                       <div>
                         <p className="font-medium">Family Members</p>
                         <p className="text-xs text-muted-foreground">{familyMembers.length} members</p>
@@ -441,13 +441,13 @@ const ExportData = () => {
                 {/* Shares */}
                 <div 
                   className={`p-4 rounded-lg border cursor-pointer transition-colors ${
-                    selectedSections.shares ? 'border-[#0F392B] bg-[#0F392B]/5' : 'border-border'
+                    selectedSections.shares ? 'border-[#1a2744] bg-[#1a2744]/5' : 'border-border'
                   }`}
                   onClick={() => toggleSection('shares')}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <TrendingUp className="h-5 w-5 text-[#D4AF37]" />
+                      <TrendingUp className="h-5 w-5 text-[#D4A84C]" />
                       <div>
                         <p className="font-medium">Share Portfolio</p>
                         <p className="text-xs text-muted-foreground">{sharePortfolio.length} holdings</p>
@@ -460,7 +460,7 @@ const ExportData = () => {
                 {/* Budget */}
                 <div 
                   className={`p-4 rounded-lg border cursor-pointer transition-colors ${
-                    selectedSections.budget ? 'border-[#0F392B] bg-[#0F392B]/5' : 'border-border'
+                    selectedSections.budget ? 'border-[#1a2744] bg-[#1a2744]/5' : 'border-border'
                   }`}
                   onClick={() => toggleSection('budget')}
                 >
@@ -479,7 +479,7 @@ const ExportData = () => {
                 {/* Properties */}
                 <div 
                   className={`p-4 rounded-lg border cursor-pointer transition-colors ${
-                    selectedSections.properties ? 'border-[#0F392B] bg-[#0F392B]/5' : 'border-border'
+                    selectedSections.properties ? 'border-[#1a2744] bg-[#1a2744]/5' : 'border-border'
                   }`}
                   onClick={() => toggleSection('properties')}
                 >
@@ -500,7 +500,7 @@ const ExportData = () => {
                 {/* Trust */}
                 <div 
                   className={`p-4 rounded-lg border cursor-pointer transition-colors ${
-                    selectedSections.trust ? 'border-[#0F392B] bg-[#0F392B]/5' : 'border-border'
+                    selectedSections.trust ? 'border-[#1a2744] bg-[#1a2744]/5' : 'border-border'
                   }`}
                   onClick={() => toggleSection('trust')}
                 >
@@ -519,7 +519,7 @@ const ExportData = () => {
                 {/* Company */}
                 <div 
                   className={`p-4 rounded-lg border cursor-pointer transition-colors ${
-                    selectedSections.company ? 'border-[#0F392B] bg-[#0F392B]/5' : 'border-border'
+                    selectedSections.company ? 'border-[#1a2744] bg-[#1a2744]/5' : 'border-border'
                   }`}
                   onClick={() => toggleSection('company')}
                 >
@@ -616,7 +616,7 @@ const ExportData = () => {
 
               {isExporting && (
                 <div className="flex items-center justify-center py-4">
-                  <Loader2 className="h-6 w-6 animate-spin text-[#0F392B]" />
+                  <Loader2 className="h-6 w-6 animate-spin text-[#1a2744]" />
                   <span className="ml-2">Exporting...</span>
                 </div>
               )}

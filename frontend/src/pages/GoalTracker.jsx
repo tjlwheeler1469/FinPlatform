@@ -53,7 +53,7 @@ const formatCurrency = (value) => {
 };
 
 const GOAL_TYPES = [
-  { value: "retirement", label: "Retirement", icon: Target, color: "#0F392B" },
+  { value: "retirement", label: "Retirement", icon: Target, color: "#1a2744" },
   { value: "house", label: "Property", icon: Home, color: "#3B82F6" },
   { value: "education", label: "Education", icon: GraduationCap, color: "#8B5CF6" },
   { value: "travel", label: "Travel", icon: Plane, color: "#EC4899" },
@@ -158,7 +158,7 @@ const GoalTracker = () => {
     return (
       <Layout>
         <div className="flex items-center justify-center min-h-[60vh]">
-          <RefreshCw className="h-8 w-8 animate-spin text-[#0F392B]" />
+          <RefreshCw className="h-8 w-8 animate-spin text-[#1a2744]" />
         </div>
       </Layout>
     );
@@ -170,8 +170,8 @@ const GoalTracker = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground flex items-center gap-3">
-              <Target className="h-8 w-8 text-[#D4AF37]" />
+            <h1 className="text-3xl font-bold  text-foreground flex items-center gap-3">
+              <Target className="h-8 w-8 text-[#D4A84C]" />
               Goal Tracker
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -180,7 +180,7 @@ const GoalTracker = () => {
           </div>
           <Dialog open={newGoalOpen} onOpenChange={setNewGoalOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-[#0F392B]" data-testid="new-goal-btn">
+              <Button className="bg-[#1a2744]" data-testid="new-goal-btn">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Goal
               </Button>
@@ -260,7 +260,7 @@ const GoalTracker = () => {
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setNewGoalOpen(false)}>Cancel</Button>
-                <Button onClick={handleAddGoal} className="bg-[#0F392B]">Create Goal</Button>
+                <Button onClick={handleAddGoal} className="bg-[#1a2744]">Create Goal</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -275,7 +275,7 @@ const GoalTracker = () => {
                   <p className="text-sm text-muted-foreground">Total Goals</p>
                   <p className="text-2xl font-bold">{goals.length}</p>
                 </div>
-                <Target className="h-8 w-8 text-[#0F392B]" />
+                <Target className="h-8 w-8 text-[#1a2744]" />
               </div>
             </CardContent>
           </Card>
@@ -286,7 +286,7 @@ const GoalTracker = () => {
                   <p className="text-sm text-muted-foreground">Total Target</p>
                   <p className="text-2xl font-bold">{formatCurrency(totalTarget)}</p>
                 </div>
-                <DollarSign className="h-8 w-8 text-[#D4AF37]" />
+                <DollarSign className="h-8 w-8 text-[#D4A84C]" />
               </div>
             </CardContent>
           </Card>

@@ -79,7 +79,7 @@ const AUSTRALIAN_TAX_DATES = [
 const CATEGORY_CONFIG = {
   bas: { label: "BAS", color: "#3B82F6", icon: FileText },
   super: { label: "Super", color: "#10B981", icon: PiggyBank },
-  payg: { label: "PAYG", color: "#D4AF37", icon: DollarSign },
+  payg: { label: "PAYG", color: "#D4A84C", icon: DollarSign },
   "tax-return": { label: "Tax Return", color: "#8B5CF6", icon: FileText },
   fbt: { label: "FBT", color: "#EC4899", icon: Briefcase },
   important: { label: "Important", color: "#EF4444", icon: AlertTriangle },
@@ -341,7 +341,7 @@ const TaxCalendar = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+            <h1 className="text-3xl font-bold  text-foreground">
               Tax Planning Calendar
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -350,7 +350,7 @@ const TaxCalendar = () => {
           </div>
           <Button 
             onClick={() => setShowAddEvent(true)}
-            className="bg-[#0F392B] hover:bg-[#0F392B]/90"
+            className="bg-[#1a2744] hover:bg-[#1a2744]/90"
             data-testid="add-event-btn"
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -379,8 +379,8 @@ const TaxCalendar = () => {
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-[#D4AF37]/10 flex items-center justify-center">
-                  <Clock className="h-5 w-5 text-[#D4AF37]" />
+                <div className="w-10 h-10 rounded-lg bg-[#D4A84C]/10 flex items-center justify-center">
+                  <Clock className="h-5 w-5 text-[#D4A84C]" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Next 7 Days</p>
@@ -475,13 +475,13 @@ const TaxCalendar = () => {
                           className={`
                             min-h-[80px] p-1 border rounded-lg cursor-pointer transition-colors
                             ${!date ? 'bg-muted/30' : 'hover:bg-muted/50'}
-                            ${isToday(date) ? 'border-[#0F392B] border-2' : 'border-border'}
-                            ${isSelected ? 'bg-[#0F392B]/10' : ''}
+                            ${isToday(date) ? 'border-[#1a2744] border-2' : 'border-border'}
+                            ${isSelected ? 'bg-[#1a2744]/10' : ''}
                           `}
                         >
                           {date && (
                             <>
-                              <div className={`text-sm font-medium mb-1 ${isToday(date) ? 'text-[#0F392B]' : ''}`}>
+                              <div className={`text-sm font-medium mb-1 ${isToday(date) ? 'text-[#1a2744]' : ''}`}>
                                 {date.getDate()}
                               </div>
                               <div className="space-y-0.5">
@@ -515,7 +515,7 @@ const TaxCalendar = () => {
               {/* Selected Date Events / Upcoming */}
               <Card data-testid="selected-events">
                 <CardHeader>
-                  <CardTitle className="font-['Manrope']">
+                  <CardTitle className="">
                     {selectedDate 
                       ? formatDate(selectedDate.toISOString().split("T")[0])
                       : "Upcoming Deadlines"
@@ -595,7 +595,7 @@ const TaxCalendar = () => {
               {overdueEvents.length > 0 && (
                 <Card className="md:col-span-2 bg-destructive/5 border-destructive/20">
                   <CardHeader>
-                    <CardTitle className="font-['Manrope'] flex items-center gap-2 text-destructive">
+                    <CardTitle className=" flex items-center gap-2 text-destructive">
                       <AlertTriangle className="h-5 w-5" />
                       Overdue Items
                     </CardTitle>
@@ -628,8 +628,8 @@ const TaxCalendar = () => {
               {/* Next 7 Days */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="font-['Manrope'] flex items-center gap-2">
-                    <Clock className="h-5 w-5 text-[#D4AF37]" />
+                  <CardTitle className=" flex items-center gap-2">
+                    <Clock className="h-5 w-5 text-[#D4A84C]" />
                     Next 7 Days
                   </CardTitle>
                 </CardHeader>
@@ -668,7 +668,7 @@ const TaxCalendar = () => {
               {/* Next 30 Days */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="font-['Manrope'] flex items-center gap-2">
+                  <CardTitle className=" flex items-center gap-2">
                     <Calendar className="h-5 w-5 text-[#10B981]" />
                     Next 30 Days
                   </CardTitle>
@@ -713,7 +713,7 @@ const TaxCalendar = () => {
                 variant={filterCategory === "all" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setFilterCategory("all")}
-                className={filterCategory === "all" ? "bg-[#0F392B]" : ""}
+                className={filterCategory === "all" ? "bg-[#1a2744]" : ""}
               >
                 All
               </Button>
@@ -732,7 +732,7 @@ const TaxCalendar = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle className="font-['Manrope']">All Tax Events</CardTitle>
+                <CardTitle className="">All Tax Events</CardTitle>
                 <CardDescription>
                   {filterCategory === "all" ? allEvents.length : allEvents.filter(e => e.category === filterCategory).length} events
                 </CardDescription>
@@ -769,7 +769,7 @@ const TaxCalendar = () => {
                           </div>
                           <div className="text-right flex-shrink-0">
                             <p className="text-sm font-medium">{formatDate(event.date)}</p>
-                            <p className={`text-xs ${isPast ? 'text-destructive' : days <= 7 ? 'text-[#D4AF37]' : 'text-muted-foreground'}`}>
+                            <p className={`text-xs ${isPast ? 'text-destructive' : days <= 7 ? 'text-[#D4A84C]' : 'text-muted-foreground'}`}>
                               {isPast ? `${Math.abs(days)} days ago` : days === 0 ? "Today" : `${days} days`}
                             </p>
                           </div>
@@ -797,7 +797,7 @@ const TaxCalendar = () => {
             <Card className="w-full max-w-md" onClick={e => e.stopPropagation()}>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className="font-['Manrope']">Add Custom Event</CardTitle>
+                  <CardTitle className="">Add Custom Event</CardTitle>
                   <Button variant="ghost" size="icon" onClick={() => setShowAddEvent(false)}>
                     <X className="h-4 w-4" />
                   </Button>
@@ -844,7 +844,7 @@ const TaxCalendar = () => {
                 </div>
                 <Button 
                   onClick={handleAddEvent}
-                  className="w-full bg-[#0F392B] hover:bg-[#0F392B]/90"
+                  className="w-full bg-[#1a2744] hover:bg-[#1a2744]/90"
                   data-testid="save-event-btn"
                 >
                   <Plus className="h-4 w-4 mr-2" />

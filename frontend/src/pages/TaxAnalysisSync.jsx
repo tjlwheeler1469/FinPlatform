@@ -69,7 +69,7 @@ const ATOTooltip = ({ title, description, atoUrl }) => (
             href={atoUrl} 
             target="_blank" 
             rel="noopener noreferrer"
-            className="text-xs text-[#0F392B] hover:underline flex items-center gap-1"
+            className="text-xs text-[#1a2744] hover:underline flex items-center gap-1"
           >
             ATO Reference <ExternalLink className="h-3 w-3" />
           </a>
@@ -138,7 +138,7 @@ const calculateTax = (income) => {
   };
 };
 
-const COLORS = ['#0F392B', '#D4AF37', '#10B981', '#3B82F6', '#8B5CF6'];
+const COLORS = ['#1a2744', '#D4A84C', '#10B981', '#3B82F6', '#8B5CF6'];
 
 const TaxAnalysisSync = () => {
   const { 
@@ -248,7 +248,7 @@ const TaxAnalysisSync = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+            <h1 className="text-3xl font-bold  text-foreground">
               Tax Analysis
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -268,7 +268,7 @@ const TaxAnalysisSync = () => {
               </Button>
             </Link>
             {hasUnsavedChanges && (
-              <Button onClick={saveAllData} className="bg-[#0F392B]" size="sm">
+              <Button onClick={saveAllData} className="bg-[#1a2744]" size="sm">
                 <Save className="h-4 w-4 mr-2" />
                 Save Changes
               </Button>
@@ -278,7 +278,7 @@ const TaxAnalysisSync = () => {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="bg-[#0F392B] text-white">
+          <Card className="bg-[#1a2744] text-white">
             <CardContent className="p-4">
               <p className="text-sm text-white/70">Family Members</p>
               <p className="text-2xl font-bold">{familyMembers.length}</p>
@@ -351,7 +351,7 @@ const TaxAnalysisSync = () => {
                         data-testid="new-member-name"
                       />
                     </div>
-                    <Button onClick={handleAddMember} className="bg-[#0F392B]" data-testid="confirm-add-member">
+                    <Button onClick={handleAddMember} className="bg-[#1a2744]" data-testid="confirm-add-member">
                       Add
                     </Button>
                     <Button variant="outline" onClick={() => setShowAddMember(false)}>
@@ -372,7 +372,7 @@ const TaxAnalysisSync = () => {
                       <div className="space-y-4">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-[#0F392B] text-white flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-full bg-[#1a2744] text-white flex items-center justify-center">
                               <User className="h-5 w-5" />
                             </div>
                             <div>
@@ -387,7 +387,7 @@ const TaxAnalysisSync = () => {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="text-[#0F392B]"
+                                className="text-[#1a2744]"
                                 data-testid={`view-profile-${index}`}
                               >
                                 <Eye className="h-4 w-4" />
@@ -450,10 +450,10 @@ const TaxAnalysisSync = () => {
                           </div>
                         </div>
                         
-                        <div className="flex items-center justify-between p-3 rounded-lg bg-[#D4AF37]/10 border border-[#D4AF37]/30">
+                        <div className="flex items-center justify-between p-3 rounded-lg bg-[#D4A84C]/10 border border-[#D4A84C]/30">
                           <div>
                             <p className="text-xs text-muted-foreground">Effective Rate</p>
-                            <p className="text-xl font-bold text-[#D4AF37]">{member.effectiveRate.toFixed(1)}%</p>
+                            <p className="text-xl font-bold text-[#D4A84C]">{member.effectiveRate.toFixed(1)}%</p>
                           </div>
                           <div className="text-right">
                             <p className="text-xs text-muted-foreground">Marginal Rate</p>
@@ -483,7 +483,7 @@ const TaxAnalysisSync = () => {
             </div>
 
             {/* Family Total */}
-            <Card className="bg-[#0F392B] text-white">
+            <Card className="bg-[#1a2744] text-white">
               <CardContent className="p-6">
                 <div className="grid grid-cols-3 gap-6 text-center">
                   <div>
@@ -561,7 +561,7 @@ const TaxAnalysisSync = () => {
                   <CardTitle>Tax Result</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="p-4 rounded-lg bg-[#0F392B] text-white">
+                  <div className="p-4 rounded-lg bg-[#1a2744] text-white">
                     <p className="text-sm text-white/70">Company Tax ({companyTax.rate}%)</p>
                     <p className="text-3xl font-bold">{formatCurrency(companyTax.tax)}</p>
                   </div>
@@ -571,9 +571,9 @@ const TaxAnalysisSync = () => {
                       <p className="text-sm text-muted-foreground">Net Profit</p>
                       <p className="text-xl font-bold text-[#10B981]">{formatCurrency(companyTax.netProfit)}</p>
                     </div>
-                    <div className="p-4 rounded-lg bg-[#D4AF37]/10">
+                    <div className="p-4 rounded-lg bg-[#D4A84C]/10">
                       <p className="text-sm text-muted-foreground">Franking Credits</p>
-                      <p className="text-xl font-bold text-[#D4AF37]">{formatCurrency(companyTax.franking)}</p>
+                      <p className="text-xl font-bold text-[#D4A84C]">{formatCurrency(companyTax.franking)}</p>
                     </div>
                   </div>
 
@@ -592,7 +592,7 @@ const TaxAnalysisSync = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="p-4 rounded-lg bg-[#0F392B] text-white">
+                  <div className="p-4 rounded-lg bg-[#1a2744] text-white">
                     <p className="text-sm text-white/70">Base Rate Entities</p>
                     <p className="text-4xl font-bold">25%</p>
                     <p className="text-sm text-white/60 mt-2">Turnover {"<"} $50M, ≤80% passive income</p>
@@ -624,7 +624,7 @@ const TaxAnalysisSync = () => {
                         <YAxis tickFormatter={(v) => `$${(v/1000).toFixed(0)}k`} stroke="hsl(var(--muted-foreground))" />
                         <Tooltip formatter={(v) => formatCurrency(v)} />
                         <Legend />
-                        <Bar dataKey="income" name="Income" fill="#0F392B" />
+                        <Bar dataKey="income" name="Income" fill="#1a2744" />
                         <Bar dataKey="tax" name="Tax" fill="#EF4444" />
                         <Bar dataKey="net" name="Net" fill="#10B981" />
                       </BarChart>
@@ -702,7 +702,7 @@ const TaxAnalysisSync = () => {
                         <tr key={member.id} className="border-b">
                           <td className="p-3">
                             <div className="flex items-center gap-2">
-                              <User className="h-4 w-4 text-[#0F392B]" />
+                              <User className="h-4 w-4 text-[#1a2744]" />
                               {member.name}
                             </div>
                           </td>
@@ -712,10 +712,10 @@ const TaxAnalysisSync = () => {
                           <td className="text-right p-3 text-[#10B981]">{formatCurrency(member.netIncome)}</td>
                         </tr>
                       ))}
-                      <tr className="border-b bg-[#D4AF37]/10">
+                      <tr className="border-b bg-[#D4A84C]/10">
                         <td className="p-3">
                           <div className="flex items-center gap-2">
-                            <Building2 className="h-4 w-4 text-[#D4AF37]" />
+                            <Building2 className="h-4 w-4 text-[#D4A84C]" />
                             {company.name || "Company"}
                           </div>
                         </td>
@@ -766,10 +766,10 @@ const TaxAnalysisSync = () => {
               </Card>
 
               {/* Data Sync Notice */}
-              <Card className="bg-[#0F392B] text-white">
+              <Card className="bg-[#1a2744] text-white">
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
-                    <RefreshCw className="h-8 w-8 text-[#D4AF37]" />
+                    <RefreshCw className="h-8 w-8 text-[#D4A84C]" />
                     <div>
                       <h3 className="font-semibold text-lg">Data Sync Enabled</h3>
                       <p className="text-white/80 mt-2 text-sm">

@@ -57,7 +57,7 @@ const DEMO_HOLDINGS = [
   { symbol: "VGS", name: "Vanguard Intl Shares ETF", purchase_price: 108.50, current_price: 102.30, quantity: 150, purchase_date: "2023-11-20", asset_type: "etf" }
 ];
 
-const COLORS = ['#EF4444', '#10B981', '#D4AF37', '#3B82F6'];
+const COLORS = ['#EF4444', '#10B981', '#D4A84C', '#3B82F6'];
 
 const TaxLossHarvesting = () => {
   const { portfolio } = usePortfolio();
@@ -134,7 +134,7 @@ const TaxLossHarvesting = () => {
       <div className="space-y-8" data-testid="tax-loss-harvesting-page">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+          <h1 className="text-3xl font-bold  text-foreground">
             Tax Loss Harvesting
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -146,7 +146,7 @@ const TaxLossHarvesting = () => {
           {/* Input Section */}
           <Card className="lg:col-span-1" data-testid="harvesting-inputs">
             <CardHeader>
-              <CardTitle className="font-['Manrope']">Analysis Settings</CardTitle>
+              <CardTitle className="">Analysis Settings</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Realized Gains */}
@@ -269,7 +269,7 @@ const TaxLossHarvesting = () => {
 
               <Button 
                 onClick={analyzeHarvesting}
-                className="w-full bg-[#0F392B] hover:bg-[#0F392B]/90"
+                className="w-full bg-[#1a2744] hover:bg-[#1a2744]/90"
                 disabled={loading}
                 data-testid="analyze-btn"
               >
@@ -285,7 +285,7 @@ const TaxLossHarvesting = () => {
               <>
                 {/* Summary Cards */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <Card className="bg-[#0F392B] text-white">
+                  <Card className="bg-[#1a2744] text-white">
                     <CardContent className="p-4">
                       <p className="text-sm text-white/80">Potential Tax Savings</p>
                       <p className="text-xl font-bold">
@@ -324,7 +324,7 @@ const TaxLossHarvesting = () => {
                   {/* Gains vs Losses Pie */}
                   <Card data-testid="gains-losses-chart">
                     <CardHeader>
-                      <CardTitle className="font-['Manrope']">Unrealized Position</CardTitle>
+                      <CardTitle className="">Unrealized Position</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="h-[200px]">
@@ -360,7 +360,7 @@ const TaxLossHarvesting = () => {
                   {/* Tax Impact */}
                   <Card data-testid="tax-impact">
                     <CardHeader>
-                      <CardTitle className="font-['Manrope']">Tax Impact</CardTitle>
+                      <CardTitle className="">Tax Impact</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
@@ -391,8 +391,8 @@ const TaxLossHarvesting = () => {
                 {result.opportunities.length > 0 && (
                   <Card data-testid="opportunities-table">
                     <CardHeader>
-                      <CardTitle className="font-['Manrope'] flex items-center gap-2">
-                        <Scissors className="h-5 w-5 text-[#D4AF37]" />
+                      <CardTitle className=" flex items-center gap-2">
+                        <Scissors className="h-5 w-5 text-[#D4A84C]" />
                         Harvesting Opportunities
                       </CardTitle>
                       <CardDescription>Holdings with unrealized losses to consider selling</CardDescription>
@@ -429,7 +429,7 @@ const TaxLossHarvesting = () => {
                                   {formatCurrency(opp.tax_benefit)}
                                 </td>
                                 <td className="text-center p-3">
-                                  <Badge className="bg-[#D4AF37]/10 text-[#D4AF37]">
+                                  <Badge className="bg-[#D4A84C]/10 text-[#D4A84C]">
                                     Harvest
                                   </Badge>
                                 </td>
@@ -443,12 +443,12 @@ const TaxLossHarvesting = () => {
                 )}
 
                 {/* Wash Sale Warning */}
-                <Card className="border-[#D4AF37]">
+                <Card className="border-[#D4A84C]">
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">
-                      <AlertTriangle className="h-5 w-5 text-[#D4AF37] flex-shrink-0 mt-0.5" />
+                      <AlertTriangle className="h-5 w-5 text-[#D4A84C] flex-shrink-0 mt-0.5" />
                       <div>
-                        <p className="font-semibold text-[#D4AF37]">Wash Sale Rule</p>
+                        <p className="font-semibold text-[#D4A84C]">Wash Sale Rule</p>
                         <p className="text-sm text-muted-foreground mt-1">
                           If you sell a security at a loss and buy the same or a "substantially identical" 
                           security within 30 days before or after the sale, the ATO may disallow the loss for 
@@ -462,8 +462,8 @@ const TaxLossHarvesting = () => {
                 {/* Recommendations */}
                 <Card data-testid="recommendations">
                   <CardHeader>
-                    <CardTitle className="font-['Manrope'] flex items-center gap-2">
-                      <Lightbulb className="h-5 w-5 text-[#D4AF37]" />
+                    <CardTitle className=" flex items-center gap-2">
+                      <Lightbulb className="h-5 w-5 text-[#D4A84C]" />
                       Recommendations
                     </CardTitle>
                   </CardHeader>

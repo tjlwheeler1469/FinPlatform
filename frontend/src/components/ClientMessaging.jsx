@@ -281,7 +281,7 @@ const ClientMessaging = ({ userRole = 'client', userName = 'James Wheeler' }) =>
         <div className="p-4 border-b">
           <Dialog open={showComposeDialog} onOpenChange={setShowComposeDialog}>
             <DialogTrigger asChild>
-              <Button className="w-full bg-[#0F392B]" data-testid="compose-message-btn">
+              <Button className="w-full bg-[#1a2744]" data-testid="compose-message-btn">
                 <Plus className="h-4 w-4 mr-2" /> Compose
               </Button>
             </DialogTrigger>
@@ -325,7 +325,7 @@ const ClientMessaging = ({ userRole = 'client', userName = 'James Wheeler' }) =>
                 <Button variant="outline" onClick={() => { setShowComposeDialog(false); setReplyTo(null); setNewMessage({ subject: '', body: '' }); }}>
                   Cancel
                 </Button>
-                <Button onClick={sendMessage} className="bg-[#0F392B]">
+                <Button onClick={sendMessage} className="bg-[#1a2744]">
                   <Send className="h-4 w-4 mr-2" /> Send
                 </Button>
               </DialogFooter>
@@ -337,20 +337,20 @@ const ClientMessaging = ({ userRole = 'client', userName = 'James Wheeler' }) =>
           <button
             onClick={() => { setActiveFolder('inbox'); setSelectedMessage(null); }}
             className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-left ${
-              activeFolder === 'inbox' ? 'bg-[#0F392B]/10 text-[#0F392B]' : 'hover:bg-muted'
+              activeFolder === 'inbox' ? 'bg-[#1a2744]/10 text-[#1a2744]' : 'hover:bg-muted'
             }`}
           >
             <span className="flex items-center gap-2">
               <Inbox className="h-4 w-4" /> Inbox
             </span>
             {unreadCount > 0 && (
-              <Badge className="bg-[#0F392B]">{unreadCount}</Badge>
+              <Badge className="bg-[#1a2744]">{unreadCount}</Badge>
             )}
           </button>
           <button
             onClick={() => { setActiveFolder('starred'); setSelectedMessage(null); }}
             className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-left ${
-              activeFolder === 'starred' ? 'bg-[#0F392B]/10 text-[#0F392B]' : 'hover:bg-muted'
+              activeFolder === 'starred' ? 'bg-[#1a2744]/10 text-[#1a2744]' : 'hover:bg-muted'
             }`}
           >
             <span className="flex items-center gap-2">
@@ -363,7 +363,7 @@ const ClientMessaging = ({ userRole = 'client', userName = 'James Wheeler' }) =>
           <button
             onClick={() => { setActiveFolder('sent'); setSelectedMessage(null); }}
             className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left ${
-              activeFolder === 'sent' ? 'bg-[#0F392B]/10 text-[#0F392B]' : 'hover:bg-muted'
+              activeFolder === 'sent' ? 'bg-[#1a2744]/10 text-[#1a2744]' : 'hover:bg-muted'
             }`}
           >
             <Send className="h-4 w-4" /> Sent
@@ -371,7 +371,7 @@ const ClientMessaging = ({ userRole = 'client', userName = 'James Wheeler' }) =>
           <button
             onClick={() => { setActiveFolder('archive'); setSelectedMessage(null); }}
             className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left ${
-              activeFolder === 'archive' ? 'bg-[#0F392B]/10 text-[#0F392B]' : 'hover:bg-muted'
+              activeFolder === 'archive' ? 'bg-[#1a2744]/10 text-[#1a2744]' : 'hover:bg-muted'
             }`}
           >
             <Archive className="h-4 w-4" /> Archive
@@ -404,13 +404,13 @@ const ClientMessaging = ({ userRole = 'client', userName = 'James Wheeler' }) =>
                 key={msg.id}
                 onClick={() => openMessage(msg)}
                 className={`p-3 border-b cursor-pointer hover:bg-muted/50 ${
-                  selectedMessage?.id === msg.id ? 'bg-[#0F392B]/5' : ''
+                  selectedMessage?.id === msg.id ? 'bg-[#1a2744]/5' : ''
                 } ${!msg.read ? 'bg-blue-50' : ''}`}
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">
                     <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-[#0F392B] text-white text-xs">
+                      <AvatarFallback className="bg-[#1a2744] text-white text-xs">
                         {msg.from.name.split(' ').map(n => n[0]).join('')}
                       </AvatarFallback>
                     </Avatar>
@@ -429,9 +429,9 @@ const ClientMessaging = ({ userRole = 'client', userName = 'James Wheeler' }) =>
                     </span>
                     <button onClick={(e) => toggleStar(msg.id, e)}>
                       {msg.starred ? (
-                        <Star className="h-4 w-4 text-[#D4AF37] fill-[#D4AF37]" />
+                        <Star className="h-4 w-4 text-[#D4A84C] fill-[#D4A84C]" />
                       ) : (
-                        <Star className="h-4 w-4 text-gray-300 hover:text-[#D4AF37]" />
+                        <Star className="h-4 w-4 text-gray-300 hover:text-[#D4A84C]" />
                       )}
                     </button>
                   </div>
@@ -479,7 +479,7 @@ const ClientMessaging = ({ userRole = 'client', userName = 'James Wheeler' }) =>
                 <h2 className="text-xl font-semibold mb-4">{selectedMessage.subject}</h2>
                 <div className="flex items-start gap-4 mb-6">
                   <Avatar className="h-10 w-10">
-                    <AvatarFallback className="bg-[#0F392B] text-white">
+                    <AvatarFallback className="bg-[#1a2744] text-white">
                       {selectedMessage.from.name.split(' ').map(n => n[0]).join('')}
                     </AvatarFallback>
                   </Avatar>

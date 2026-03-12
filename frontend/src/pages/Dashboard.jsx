@@ -112,7 +112,7 @@ const Dashboard = () => {
 
   const priorityColors = {
     high: "bg-red-500",
-    medium: "bg-[#D4AF37]",
+    medium: "bg-[#D4A84C]",
     low: "bg-blue-500"
   };
 
@@ -206,12 +206,12 @@ const Dashboard = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Est. Tax (2024-25)</p>
-                  <p className="text-2xl font-bold font-['Manrope'] mt-1">
+                  <p className="text-2xl font-bold  mt-1">
                     {formatCurrency(portfolio.summary.totalTax)}
                   </p>
                 </div>
-                <div className="w-12 h-12 rounded-lg bg-[#D4AF37]/10 flex items-center justify-center">
-                  <Calculator className="h-6 w-6 text-[#D4AF37]" />
+                <div className="w-12 h-12 rounded-lg bg-[#D4A84C]/10 flex items-center justify-center">
+                  <Calculator className="h-6 w-6 text-[#D4A84C]" />
                 </div>
               </div>
               <p className="text-xs text-muted-foreground mt-2">
@@ -226,8 +226,8 @@ const Dashboard = () => {
           {/* Asset Allocation */}
           <Card data-testid="asset-allocation">
             <CardHeader>
-              <CardTitle className="font-['Manrope'] flex items-center gap-2">
-                <BarChart3 className="h-5 w-5 text-[#D4AF37]" />
+              <CardTitle className=" flex items-center gap-2">
+                <BarChart3 className="h-5 w-5 text-[#D4A84C]" />
                 Asset Allocation
               </CardTitle>
             </CardHeader>
@@ -276,7 +276,7 @@ const Dashboard = () => {
           {/* Investment Projection */}
           <Card className="lg:col-span-2" data-testid="projection-chart">
             <CardHeader>
-              <CardTitle className="font-['Manrope'] flex items-center gap-2">
+              <CardTitle className=" flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-[#10B981]" />
                 10-Year Investment Projection
               </CardTitle>
@@ -290,8 +290,8 @@ const Dashboard = () => {
                   <AreaChart data={projectionData}>
                     <defs>
                       <linearGradient id="colorMedian" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#0F392B" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#0F392B" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="#1a2744" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#1a2744" stopOpacity={0}/>
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -313,14 +313,14 @@ const Dashboard = () => {
                       type="monotone"
                       dataKey="p75"
                       stroke="transparent"
-                      fill="#D4AF37"
+                      fill="#D4A84C"
                       fillOpacity={0.2}
                       name="75th Percentile"
                     />
                     <Area
                       type="monotone"
                       dataKey="median"
-                      stroke="#0F392B"
+                      stroke="#1a2744"
                       strokeWidth={2}
                       fill="url(#colorMedian)"
                       name="Median"
@@ -329,7 +329,7 @@ const Dashboard = () => {
                       type="monotone"
                       dataKey="p25"
                       stroke="transparent"
-                      fill="#0F392B"
+                      fill="#1a2744"
                       fillOpacity={0.1}
                       name="25th Percentile"
                     />
@@ -340,7 +340,7 @@ const Dashboard = () => {
                 <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t">
                   <div className="text-center">
                     <p className="text-sm text-muted-foreground">Median at Year 10</p>
-                    <p className="text-lg font-bold text-[#0F392B]">
+                    <p className="text-lg font-bold text-[#1a2744]">
                       {formatCurrency(monteCarloData.final_value_median)}
                     </p>
                   </div>
@@ -366,8 +366,8 @@ const Dashboard = () => {
         <Card data-testid="properties-overview">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <CardTitle className="font-['Manrope'] flex items-center gap-2">
-                <Building2 className="h-5 w-5 text-[#D4AF37]" />
+              <CardTitle className=" flex items-center gap-2">
+                <Building2 className="h-5 w-5 text-[#D4A84C]" />
                 Property Portfolio
               </CardTitle>
               <CardDescription>{portfolio.investments.properties.length} investment properties</CardDescription>
@@ -391,15 +391,15 @@ const Dashboard = () => {
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-[#0F392B]/10 flex items-center justify-center">
-                          <Home className="h-5 w-5 text-[#0F392B]" />
+                        <div className="w-10 h-10 rounded-lg bg-[#1a2744]/10 flex items-center justify-center">
+                          <Home className="h-5 w-5 text-[#1a2744]" />
                         </div>
                         <div>
                           <p className="font-semibold">{property.name}</p>
                           <p className="text-sm text-muted-foreground">{formatCurrency(property.value)}</p>
                         </div>
                       </div>
-                      <Badge variant={isNegativelyGeared ? "secondary" : "default"} className={isNegativelyGeared ? "bg-[#D4AF37]/10 text-[#D4AF37]" : "bg-[#10B981]/10 text-[#10B981]"}>
+                      <Badge variant={isNegativelyGeared ? "secondary" : "default"} className={isNegativelyGeared ? "bg-[#D4A84C]/10 text-[#D4A84C]" : "bg-[#10B981]/10 text-[#10B981]"}>
                         {isNegativelyGeared ? "Negative Geared" : "Positive"}
                       </Badge>
                     </div>
@@ -429,8 +429,8 @@ const Dashboard = () => {
         {/* Investment Recommendations */}
         <Card data-testid="recommendations">
           <CardHeader>
-            <CardTitle className="font-['Manrope'] flex items-center gap-2">
-              <Lightbulb className="h-5 w-5 text-[#D4AF37]" />
+            <CardTitle className=" flex items-center gap-2">
+              <Lightbulb className="h-5 w-5 text-[#D4A84C]" />
               Investment Recommendations
             </CardTitle>
             <CardDescription>Personalized suggestions based on your portfolio</CardDescription>
@@ -442,17 +442,17 @@ const Dashboard = () => {
                 return (
                   <div 
                     key={rec.id}
-                    className="p-4 rounded-lg border border-border hover:border-[#0F392B]/30 transition-colors"
+                    className="p-4 rounded-lg border border-border hover:border-[#1a2744]/30 transition-colors"
                     data-testid={`recommendation-${rec.id}`}
                   >
                     <div className="flex items-start gap-4">
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
                         rec.priority === 'high' ? 'bg-red-500/10' : 
-                        rec.priority === 'medium' ? 'bg-[#D4AF37]/10' : 'bg-blue-500/10'
+                        rec.priority === 'medium' ? 'bg-[#D4A84C]/10' : 'bg-blue-500/10'
                       }`}>
                         <Icon className={`h-5 w-5 ${
                           rec.priority === 'high' ? 'text-red-500' : 
-                          rec.priority === 'medium' ? 'text-[#D4AF37]' : 'text-blue-500'
+                          rec.priority === 'medium' ? 'text-[#D4A84C]' : 'text-blue-500'
                         }`} />
                       </div>
                       <div className="flex-1">
@@ -460,7 +460,7 @@ const Dashboard = () => {
                           <h4 className="font-semibold">{rec.title}</h4>
                           <Badge variant="outline" className={`text-xs ${
                             rec.priority === 'high' ? 'border-red-500 text-red-500' : 
-                            rec.priority === 'medium' ? 'border-[#D4AF37] text-[#D4AF37]' : 'border-blue-500 text-blue-500'
+                            rec.priority === 'medium' ? 'border-[#D4A84C] text-[#D4A84C]' : 'border-blue-500 text-blue-500'
                           }`}>
                             {rec.priority}
                           </Badge>
@@ -470,7 +470,7 @@ const Dashboard = () => {
                           <div className="flex items-center gap-2">
                             <span className="text-sm font-medium text-[#10B981]">{rec.impact}</span>
                           </div>
-                          <Button variant="ghost" size="sm" className="text-[#0F392B]">
+                          <Button variant="ghost" size="sm" className="text-[#1a2744]">
                             {rec.action}
                             <ArrowRight className="h-4 w-4 ml-1" />
                           </Button>
@@ -492,7 +492,7 @@ const Dashboard = () => {
             data-testid="quick-tax-analysis"
           >
             <CardContent className="p-4 text-center">
-              <Calculator className="h-8 w-8 mx-auto mb-2 text-[#0F392B]" />
+              <Calculator className="h-8 w-8 mx-auto mb-2 text-[#1a2744]" />
               <p className="font-medium text-sm">Tax Analysis</p>
             </CardContent>
           </Card>
@@ -503,7 +503,7 @@ const Dashboard = () => {
             data-testid="quick-cgt"
           >
             <CardContent className="p-4 text-center">
-              <TrendingUp className="h-8 w-8 mx-auto mb-2 text-[#D4AF37]" />
+              <TrendingUp className="h-8 w-8 mx-auto mb-2 text-[#D4A84C]" />
               <p className="font-medium text-sm">CGT Calculator</p>
             </CardContent>
           </Card>

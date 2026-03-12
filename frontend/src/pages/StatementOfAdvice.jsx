@@ -387,7 +387,7 @@ This advice is provided by [${soaData.licenseeName || 'Licensee Name'}] (AFSL ${
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+            <h1 className="text-3xl font-bold  text-foreground">
               Statement of Advice
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -401,7 +401,7 @@ This advice is provided by [${soaData.licenseeName || 'Licensee Name'}] (AFSL ${
             </Badge>
             <Button 
               onClick={generateSOA} 
-              className="bg-[#0F392B]"
+              className="bg-[#1a2744]"
               disabled={generating || completionProgress < 70 || !soaData.acknowledged}
               title={!soaData.acknowledged ? "Please acknowledge compliance requirements" : ""}
             >
@@ -486,7 +486,7 @@ This advice is provided by [${soaData.licenseeName || 'Licensee Name'}] (AFSL ${
                           onClick={() => setActiveSection(section.id)}
                           className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
                             activeSection === section.id
-                              ? "bg-[#0F392B] text-white"
+                              ? "bg-[#1a2744] text-white"
                               : "hover:bg-muted"
                           }`}
                         >
@@ -791,7 +791,7 @@ This advice is provided by [${soaData.licenseeName || 'Licensee Name'}] (AFSL ${
                       <div className="p-4 bg-muted/50 rounded-lg">
                         <div className="flex justify-between">
                           <span className="font-medium">Net Worth</span>
-                          <span className="font-bold text-[#0F392B]">
+                          <span className="font-bold text-[#1a2744]">
                             {formatCurrency(soaData.totalAssets - soaData.totalLiabilities)}
                           </span>
                         </div>
@@ -914,13 +914,13 @@ This advice is provided by [${soaData.licenseeName || 'Licensee Name'}] (AFSL ${
                         <div className="grid grid-cols-3 gap-4">
                           <div className="p-3 bg-white rounded border">
                             <p className="text-xs text-muted-foreground">10-Year Net Worth</p>
-                            <p className="text-lg font-bold text-[#0F392B]">
+                            <p className="text-lg font-bold text-[#1a2744]">
                               {formatCurrency((soaData.totalAssets - soaData.totalLiabilities) * 1.8)}
                             </p>
                           </div>
                           <div className="p-3 bg-white rounded border">
                             <p className="text-xs text-muted-foreground">Retirement Balance</p>
-                            <p className="text-lg font-bold text-[#0F392B]">
+                            <p className="text-lg font-bold text-[#1a2744]">
                               {formatCurrency((soaData.totalAssets - soaData.totalLiabilities) * 2.5)}
                             </p>
                           </div>
@@ -1069,8 +1069,8 @@ This advice is provided by [${soaData.licenseeName || 'Licensee Name'}] (AFSL ${
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-full bg-[#0F392B]/10 flex items-center justify-center">
-                            <FileText className="h-5 w-5 text-[#0F392B]" />
+                          <div className="w-10 h-10 rounded-full bg-[#1a2744]/10 flex items-center justify-center">
+                            <FileText className="h-5 w-5 text-[#1a2744]" />
                           </div>
                           <div>
                             <p className="font-semibold">{soa.clientName}</p>
@@ -1147,7 +1147,7 @@ export const SOAModal = ({ open, onClose, clientData }) => {
               Cancel
             </Button>
             <Button 
-              className="flex-1 bg-[#0F392B]"
+              className="flex-1 bg-[#1a2744]"
               onClick={() => {
                 window.location.href = "/statement-of-advice";
               }}

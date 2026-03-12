@@ -228,7 +228,7 @@ const BankFeeds = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+            <h1 className="text-3xl font-bold  text-foreground">
               Bank Feeds
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -250,7 +250,7 @@ const BankFeeds = () => {
                 {syncing ? 'Syncing...' : 'Sync All'}
               </Button>
             )}
-            <Button onClick={() => setShowLinkModal(true)} className="bg-[#0F392B]">
+            <Button onClick={() => setShowLinkModal(true)} className="bg-[#1a2744]">
               <Plus className="h-4 w-4 mr-2" /> Connect Bank
             </Button>
           </div>
@@ -283,7 +283,7 @@ const BankFeeds = () => {
         {/* Summary Cards */}
         {connectedAccounts.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card className="bg-[#0F392B] text-white">
+            <Card className="bg-[#1a2744] text-white">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <p className="text-sm text-white/70">Total Balance</p>
@@ -304,13 +304,13 @@ const BankFeeds = () => {
             <Card>
               <CardContent className="p-4">
                 <p className="text-sm text-muted-foreground">Connected Banks</p>
-                <p className="text-2xl font-bold text-[#0F392B]">{Object.keys(bankGroups).length}</p>
+                <p className="text-2xl font-bold text-[#1a2744]">{Object.keys(bankGroups).length}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4">
                 <p className="text-sm text-muted-foreground">Total Accounts</p>
-                <p className="text-2xl font-bold text-[#D4AF37]">{connectedAccounts.length}</p>
+                <p className="text-2xl font-bold text-[#D4A84C]">{connectedAccounts.length}</p>
               </CardContent>
             </Card>
             <Card>
@@ -342,7 +342,7 @@ const BankFeeds = () => {
                 <p className="text-muted-foreground mb-6">
                   Connect your bank accounts to automatically import transactions and balances
                 </p>
-                <Button onClick={() => setShowLinkModal(true)} className="bg-[#0F392B]">
+                <Button onClick={() => setShowLinkModal(true)} className="bg-[#1a2744]">
                   <Link2 className="h-4 w-4 mr-2" /> Connect Your First Bank
                 </Button>
               </Card>
@@ -353,7 +353,7 @@ const BankFeeds = () => {
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <Building2 className="h-5 w-5 text-[#0F392B]" />
+                          <Building2 className="h-5 w-5 text-[#1a2744]" />
                           <CardTitle className="text-base">{bankName}</CardTitle>
                         </div>
                         <Badge variant="outline" className="text-[#10B981] border-[#10B981]">
@@ -485,7 +485,7 @@ const BankFeeds = () => {
               <CardContent className="space-y-3">
                 {isConnecting ? (
                   <div className="py-12 text-center">
-                    <RefreshCw className="h-12 w-12 mx-auto animate-spin text-[#0F392B] mb-4" />
+                    <RefreshCw className="h-12 w-12 mx-auto animate-spin text-[#1a2744] mb-4" />
                     <p className="font-medium">Connecting to {selectedBank?.name}...</p>
                     <p className="text-sm text-muted-foreground mt-2">
                       This is a sandbox simulation

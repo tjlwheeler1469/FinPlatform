@@ -255,7 +255,7 @@ const ReportGenerator = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+            <h1 className="text-3xl font-bold  text-foreground">
               Report Generator
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -274,7 +274,7 @@ const ReportGenerator = () => {
               </Button>
               <Button 
                 onClick={downloadReport}
-                className="bg-[#0F392B] hover:bg-[#0F392B]/90"
+                className="bg-[#1a2744] hover:bg-[#1a2744]/90"
                 data-testid="download-btn"
               >
                 <Download className="h-4 w-4 mr-2" />
@@ -288,7 +288,7 @@ const ReportGenerator = () => {
           {/* Scenario Selection */}
           <Card className="lg:col-span-1" data-testid="scenario-selection">
             <CardHeader>
-              <CardTitle className="font-['Manrope']">Select Scenario</CardTitle>
+              <CardTitle className="">Select Scenario</CardTitle>
               <CardDescription>Choose a scenario to generate report</CardDescription>
             </CardHeader>
             <CardContent>
@@ -298,8 +298,8 @@ const ReportGenerator = () => {
                     key={scenario.scenario_id}
                     className={`p-4 rounded-lg border cursor-pointer transition-colors ${
                       selectedScenario?.scenario_id === scenario.scenario_id
-                        ? 'border-[#0F392B] bg-[#0F392B]/5'
-                        : 'border-border hover:border-[#0F392B]/50'
+                        ? 'border-[#1a2744] bg-[#1a2744]/5'
+                        : 'border-border hover:border-[#1a2744]/50'
                     }`}
                     onClick={() => generateReport(scenario)}
                     data-testid={`scenario-${scenario.scenario_id}`}
@@ -307,12 +307,12 @@ const ReportGenerator = () => {
                     <div className="flex items-center gap-3">
                       <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
                         scenario.entity_type === 'company' 
-                          ? 'bg-[#D4AF37]/10' 
-                          : 'bg-[#0F392B]/10'
+                          ? 'bg-[#D4A84C]/10' 
+                          : 'bg-[#1a2744]/10'
                       }`}>
                         {scenario.entity_type === 'company' 
-                          ? <Building2 className="h-4 w-4 text-[#D4AF37]" />
-                          : <DollarSign className="h-4 w-4 text-[#0F392B]" />
+                          ? <Building2 className="h-4 w-4 text-[#D4A84C]" />
+                          : <DollarSign className="h-4 w-4 text-[#1a2744]" />
                         }
                       </div>
                       <div>
@@ -331,21 +331,21 @@ const ReportGenerator = () => {
           {/* Report Preview */}
           <Card className="lg:col-span-2 print:col-span-3" data-testid="report-preview">
             <CardHeader>
-              <CardTitle className="font-['Manrope']">Report Preview</CardTitle>
+              <CardTitle className="">Report Preview</CardTitle>
             </CardHeader>
             <CardContent>
               {loading ? (
                 <div className="h-[500px] flex items-center justify-center">
                   <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0F392B] mx-auto mb-4"></div>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1a2744] mx-auto mb-4"></div>
                     <p className="text-muted-foreground">Generating report...</p>
                   </div>
                 </div>
               ) : reportData ? (
                 <div className="space-y-6 print:space-y-4" id="report-content">
                   {/* Report Header */}
-                  <div className="p-6 rounded-lg bg-[#0F392B] text-white print:bg-gray-100 print:text-black">
-                    <h2 className="text-2xl font-bold font-['Manrope']">{reportData.report_title}</h2>
+                  <div className="p-6 rounded-lg bg-[#1a2744] text-white print:bg-gray-100 print:text-black">
+                    <h2 className="text-2xl font-bold ">{reportData.report_title}</h2>
                     <div className="flex items-center gap-2 mt-2 text-white/80 print:text-gray-600">
                       <Calendar className="h-4 w-4" />
                       <span className="text-sm">Generated: {formatDate(reportData.generated_at)}</span>
@@ -355,12 +355,12 @@ const ReportGenerator = () => {
                   {/* Report Sections */}
                   {reportData.sections.map((section, index) => (
                     <div key={index} className="p-4 rounded-lg border border-border">
-                      <h3 className="text-lg font-semibold font-['Manrope'] mb-4 flex items-center gap-2">
-                        {section.title === 'Executive Summary' && <PieChart className="h-5 w-5 text-[#0F392B]" />}
+                      <h3 className="text-lg font-semibold  mb-4 flex items-center gap-2">
+                        {section.title === 'Executive Summary' && <PieChart className="h-5 w-5 text-[#1a2744]" />}
                         {section.title === 'Income Breakdown' && <DollarSign className="h-5 w-5 text-[#10B981]" />}
-                        {section.title === 'Tax Analysis' && <FileText className="h-5 w-5 text-[#D4AF37]" />}
+                        {section.title === 'Tax Analysis' && <FileText className="h-5 w-5 text-[#D4A84C]" />}
                         {section.title === 'Property Portfolio' && <Building2 className="h-5 w-5 text-[#3B82F6]" />}
-                        {section.title === 'Investment Projections' && <TrendingUp className="h-5 w-5 text-[#0F392B]" />}
+                        {section.title === 'Investment Projections' && <TrendingUp className="h-5 w-5 text-[#1a2744]" />}
                         {section.title}
                       </h3>
 
@@ -462,7 +462,7 @@ const ReportGenerator = () => {
                                         <td className="text-right p-2 text-destructive">
                                           {formatCurrency(section.data.percentile_projections.p10?.[i] || 0)}
                                         </td>
-                                        <td className="text-right p-2 text-[#D4AF37]">
+                                        <td className="text-right p-2 text-[#D4A84C]">
                                           {formatCurrency(section.data.percentile_projections.p25?.[i] || 0)}
                                         </td>
                                         <td className="text-right p-2 font-semibold">
@@ -471,7 +471,7 @@ const ReportGenerator = () => {
                                         <td className="text-right p-2 text-[#10B981]">
                                           {formatCurrency(section.data.percentile_projections.p75?.[i] || 0)}
                                         </td>
-                                        <td className="text-right p-2 text-[#0F392B]">
+                                        <td className="text-right p-2 text-[#1a2744]">
                                           {formatCurrency(section.data.percentile_projections.p90?.[i] || 0)}
                                         </td>
                                       </tr>
@@ -546,9 +546,9 @@ const ReportGenerator = () => {
 
                   {/* Financial Recommendations */}
                   {reportData && (
-                    <div className="p-4 rounded-lg border border-[#0F392B] bg-[#0F392B]/5">
-                      <h3 className="text-lg font-semibold font-['Manrope'] mb-4 flex items-center gap-2">
-                        <Lightbulb className="h-5 w-5 text-[#D4AF37]" />
+                    <div className="p-4 rounded-lg border border-[#1a2744] bg-[#1a2744]/5">
+                      <h3 className="text-lg font-semibold  mb-4 flex items-center gap-2">
+                        <Lightbulb className="h-5 w-5 text-[#D4A84C]" />
                         Recommended Next Steps
                       </h3>
                       
@@ -583,7 +583,7 @@ const ReportGenerator = () => {
                           } else if (debtRatio > 40) {
                             recommendations.push({
                               priority: "Medium",
-                              color: "#D4AF37",
+                              color: "#D4A84C",
                               icon: "🟡",
                               title: "Monitor Debt Levels",
                               detail: `Debt ratio of ${debtRatio.toFixed(0)}% is manageable but review loan terms. Consider accelerating mortgage payments if rates rise.`,
@@ -614,7 +614,7 @@ const ReportGenerator = () => {
                           } else if (riskAdjustedReturn < 0.6) {
                             recommendations.push({
                               priority: "Medium",
-                              color: "#D4AF37",
+                              color: "#D4A84C",
                               icon: "🟡",
                               title: "Rebalance Portfolio",
                               detail: `Risk-adjusted return of ${(riskAdjustedReturn * 100).toFixed(0)}% is moderate. Review asset allocation to optimize the risk/reward balance.`,
@@ -635,7 +635,7 @@ const ReportGenerator = () => {
                           if (effectiveRate > 35) {
                             recommendations.push({
                               priority: "High",
-                              color: "#D4AF37",
+                              color: "#D4A84C",
                               icon: "🟡",
                               title: "Tax Optimization Opportunity",
                               detail: `Effective tax rate of ${effectiveRate.toFixed(1)}% is high. Consider salary sacrifice, trust distributions, or maximizing deductions.`,
@@ -706,7 +706,7 @@ const ReportGenerator = () => {
                                 </div>
                                 <p className="text-sm text-muted-foreground">{rec.detail}</p>
                                 {rec.link && (
-                                  <div className="mt-2 flex items-center text-sm font-medium text-[#0F392B]">
+                                  <div className="mt-2 flex items-center text-sm font-medium text-[#1a2744]">
                                     View Details <ArrowRight className="h-4 w-4 ml-1" />
                                   </div>
                                 )}

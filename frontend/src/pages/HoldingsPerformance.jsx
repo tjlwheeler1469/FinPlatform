@@ -95,7 +95,7 @@ const generateHistoricalData = (shares, months = 12) => {
   return data;
 };
 
-const COLORS = ['#0F392B', '#D4AF37', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'];
+const COLORS = ['#1a2744', '#D4A84C', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'];
 
 const HoldingsPerformance = () => {
   const { sharePortfolio, getPortfolioValueByOwnership, getDividendsByOwnership, familyMembers, company } = usePortfolio();
@@ -176,7 +176,7 @@ const HoldingsPerformance = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+            <h1 className="text-3xl font-bold  text-foreground">
               Holdings Performance
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -209,7 +209,7 @@ const HoldingsPerformance = () => {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <Card className="bg-[#0F392B] text-white">
+          <Card className="bg-[#1a2744] text-white">
             <CardContent className="p-4">
               <p className="text-sm text-white/70">Total Value</p>
               <p className="text-2xl font-bold">{formatCurrency(totalValue)}</p>
@@ -227,11 +227,11 @@ const HoldingsPerformance = () => {
               </p>
             </CardContent>
           </Card>
-          <Card className="bg-[#D4AF37]/10 border-[#D4AF37]">
+          <Card className="bg-[#D4A84C]/10 border-[#D4A84C]">
             <CardContent className="p-4">
               <p className="text-sm text-muted-foreground">Annual Dividends</p>
-              <p className="text-2xl font-bold text-[#D4AF37]">{formatCurrency(totalDividendIncome)}</p>
-              <p className="text-xs text-[#D4AF37]">{dividendYield.toFixed(2)}% yield</p>
+              <p className="text-2xl font-bold text-[#D4A84C]">{formatCurrency(totalDividendIncome)}</p>
+              <p className="text-xs text-[#D4A84C]">{dividendYield.toFixed(2)}% yield</p>
             </CardContent>
           </Card>
           <Card>
@@ -286,7 +286,7 @@ const HoldingsPerformance = () => {
                     type="monotone" 
                     dataKey="portfolioReturn" 
                     name="Portfolio" 
-                    stroke="#0F392B" 
+                    stroke="#1a2744" 
                     strokeWidth={3}
                     dot={false}
                   />
@@ -294,7 +294,7 @@ const HoldingsPerformance = () => {
                     type="monotone" 
                     dataKey={`${benchmark}Return`} 
                     name={benchmark === "asx200" ? "ASX 200" : "S&P 500"} 
-                    stroke="#D4AF37" 
+                    stroke="#D4A84C" 
                     strokeWidth={2}
                     strokeDasharray="5 5"
                     dot={false}
@@ -391,7 +391,7 @@ const HoldingsPerformance = () => {
               
               {/* Dividend Champions */}
               <div className="pt-2 border-t">
-                <p className="text-sm font-medium mb-2 text-[#D4AF37]">Top Dividend Payers</p>
+                <p className="text-sm font-medium mb-2 text-[#D4A84C]">Top Dividend Payers</p>
                 {stockPerformance
                   .sort((a, b) => b.dividendYield - a.dividendYield)
                   .slice(0, 3)
@@ -491,7 +491,7 @@ const HoldingsPerformance = () => {
                       <td className={`text-right p-3 font-medium ${stock.returnPct >= 0 ? 'text-[#10B981]' : 'text-destructive'}`}>
                         {formatPercent(stock.returnPct)}
                       </td>
-                      <td className="text-right p-3 text-[#D4AF37]">{stock.dividendYield.toFixed(1)}%</td>
+                      <td className="text-right p-3 text-[#D4A84C]">{stock.dividendYield.toFixed(1)}%</td>
                       <td className={`text-right p-3 font-bold ${stock.totalReturn >= 0 ? 'text-[#10B981]' : 'text-destructive'}`}>
                         {formatPercent(stock.totalReturn)}
                       </td>

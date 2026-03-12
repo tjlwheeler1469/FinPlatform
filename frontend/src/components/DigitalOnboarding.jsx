@@ -479,7 +479,7 @@ const DigitalOnboarding = ({ clientId, onComplete }) => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-12">
-        <Loader2 className="h-8 w-8 animate-spin text-[#0F392B]" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#1a2744]" />
         <span className="ml-2">Loading fact-find data...</span>
       </div>
     );
@@ -491,7 +491,7 @@ const DigitalOnboarding = ({ clientId, onComplete }) => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold flex items-center gap-2">
-            <FileText className="h-5 w-5 text-[#D4AF37]" />
+            <FileText className="h-5 w-5 text-[#D4A84C]" />
             Client Fact-Find
           </h2>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -504,7 +504,7 @@ const DigitalOnboarding = ({ clientId, onComplete }) => {
         <div className="flex items-center gap-4">
           <div className="text-right">
             <p className="text-sm text-muted-foreground">Overall Progress</p>
-            <p className="text-xl font-bold text-[#0F392B]">{overallProgress()}%</p>
+            <p className="text-xl font-bold text-[#1a2744]">{overallProgress()}%</p>
             {lastSaved && (
               <p className="text-xs text-muted-foreground">
                 Last saved: {new Date(lastSaved).toLocaleTimeString()}
@@ -514,7 +514,7 @@ const DigitalOnboarding = ({ clientId, onComplete }) => {
           <Button 
             onClick={saveFactFind} 
             disabled={isSaving}
-            className="bg-[#0F392B]"
+            className="bg-[#1a2744]"
             data-testid="save-factfind-btn"
           >
             {isSaving ? (
@@ -539,7 +539,7 @@ const DigitalOnboarding = ({ clientId, onComplete }) => {
             <Button
               key={section.id}
               variant={activeSection === section.id ? "default" : "outline"}
-              className={`flex-shrink-0 ${activeSection === section.id ? "bg-[#0F392B]" : ""}`}
+              className={`flex-shrink-0 ${activeSection === section.id ? "bg-[#1a2744]" : ""}`}
               onClick={() => setActiveSection(section.id)}
               data-testid={`section-${section.id}`}
             >
@@ -556,7 +556,7 @@ const DigitalOnboarding = ({ clientId, onComplete }) => {
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <User className="h-5 w-5 text-[#D4AF37]" />
+              <User className="h-5 w-5 text-[#D4A84C]" />
               Personal Details
             </CardTitle>
           </CardHeader>
@@ -746,7 +746,7 @@ const DigitalOnboarding = ({ clientId, onComplete }) => {
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <Briefcase className="h-5 w-5 text-[#D4AF37]" />
+              <Briefcase className="h-5 w-5 text-[#D4A84C]" />
               Employment & Income
             </CardTitle>
           </CardHeader>
@@ -853,7 +853,7 @@ const DigitalOnboarding = ({ clientId, onComplete }) => {
 
             <div className="p-4 bg-muted rounded-lg">
               <p className="text-sm font-medium">Total Annual Income</p>
-              <p className="text-2xl font-bold text-[#0F392B]">
+              <p className="text-2xl font-bold text-[#1a2744]">
                 {formatCurrency(
                   (factFindData.employment.salary_gross || 0) +
                   (factFindData.employment.bonus_commission || 0) +
@@ -873,7 +873,7 @@ const DigitalOnboarding = ({ clientId, onComplete }) => {
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <Building2 className="h-5 w-5 text-[#D4AF37]" />
+              <Building2 className="h-5 w-5 text-[#D4A84C]" />
               Assets
             </CardTitle>
           </CardHeader>
@@ -982,7 +982,7 @@ const DigitalOnboarding = ({ clientId, onComplete }) => {
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-[#D4AF37]" />
+              <DollarSign className="h-5 w-5 text-[#D4A84C]" />
               Liabilities
             </CardTitle>
           </CardHeader>
@@ -1071,7 +1071,7 @@ const DigitalOnboarding = ({ clientId, onComplete }) => {
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <Shield className="h-5 w-5 text-[#D4AF37]" />
+              <Shield className="h-5 w-5 text-[#D4A84C]" />
               Insurance & Estate Planning
             </CardTitle>
           </CardHeader>
@@ -1170,7 +1170,7 @@ const DigitalOnboarding = ({ clientId, onComplete }) => {
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <Target className="h-5 w-5 text-[#D4AF37]" />
+              <Target className="h-5 w-5 text-[#D4A84C]" />
               Goals & Objectives
             </CardTitle>
           </CardHeader>
@@ -1285,7 +1285,7 @@ const DigitalOnboarding = ({ clientId, onComplete }) => {
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-[#D4AF37]" />
+              <TrendingUp className="h-5 w-5 text-[#D4A84C]" />
               Risk Profile Assessment
             </CardTitle>
             <CardDescription>
@@ -1316,7 +1316,7 @@ const DigitalOnboarding = ({ clientId, onComplete }) => {
 
             {/* Risk Profile Result */}
             {Object.keys(factFindData.risk.answers).length === RISK_QUESTIONS.length && (
-              <Card className="bg-[#0F392B] text-white">
+              <Card className="bg-[#1a2744] text-white">
                 <CardContent className="p-6">
                   <div className="text-center">
                     <p className="text-sm text-white/80 mb-2">Your Risk Profile</p>
@@ -1353,7 +1353,7 @@ const DigitalOnboarding = ({ clientId, onComplete }) => {
               saveFactFind();
             }
           }}
-          className="bg-[#0F392B]"
+          className="bg-[#1a2744]"
         >
           {activeSection === FACT_FIND_SECTIONS[FACT_FIND_SECTIONS.length - 1].id ? (
             <>Complete <CheckCircle className="h-4 w-4 ml-2" /></>

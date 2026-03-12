@@ -64,7 +64,7 @@ const formatPercent = (value) => {
   return `${value.toFixed(1)}%`;
 };
 
-const COLORS = ['#0F392B', '#D4AF37', '#3B82F6', '#10B981', '#EF4444', '#8B5CF6'];
+const COLORS = ['#1a2744', '#D4A84C', '#3B82F6', '#10B981', '#EF4444', '#8B5CF6'];
 
 // Risk profile target allocations
 const RISK_PROFILES = {
@@ -303,8 +303,8 @@ const PortfolioRebalancing = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground flex items-center gap-2">
-              <Scale className="h-8 w-8 text-[#D4AF37]" />
+            <h1 className="text-3xl font-bold  text-foreground flex items-center gap-2">
+              <Scale className="h-8 w-8 text-[#D4A84C]" />
               Portfolio Rebalancing
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -340,7 +340,7 @@ const PortfolioRebalancing = () => {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="bg-[#0F392B] text-white">
+          <Card className="bg-[#1a2744] text-white">
             <CardContent className="p-4">
               <p className="text-sm text-white/80">Total Portfolio</p>
               <p className="text-2xl font-bold">{formatCurrency(currentAllocation.total)}</p>
@@ -363,7 +363,7 @@ const PortfolioRebalancing = () => {
           <Card>
             <CardContent className="p-4">
               <p className="text-sm text-muted-foreground">Trades Suggested</p>
-              <p className="text-2xl font-bold text-[#D4AF37]">{suggestedTrades.length}</p>
+              <p className="text-2xl font-bold text-[#D4A84C]">{suggestedTrades.length}</p>
             </CardContent>
           </Card>
         </div>
@@ -393,8 +393,8 @@ const PortfolioRebalancing = () => {
                         <YAxis dataKey="name" type="category" width={80} />
                         <Tooltip formatter={(v) => formatPercent(v)} />
                         <Legend />
-                        <Bar dataKey="current" fill="#0F392B" name="Current" radius={[0, 4, 4, 0]} />
-                        <Bar dataKey="target" fill="#D4AF37" name="Target" radius={[0, 4, 4, 0]} />
+                        <Bar dataKey="current" fill="#1a2744" name="Current" radius={[0, 4, 4, 0]} />
+                        <Bar dataKey="target" fill="#D4A84C" name="Target" radius={[0, 4, 4, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   </ChartContainer>
@@ -413,8 +413,8 @@ const PortfolioRebalancing = () => {
                         <PolarGrid />
                         <PolarAngleAxis dataKey="subject" />
                         <PolarRadiusAxis angle={30} domain={[0, 50]} />
-                        <Radar name="Current" dataKey="current" stroke="#0F392B" fill="#0F392B" fillOpacity={0.5} />
-                        <Radar name="Target" dataKey="target" stroke="#D4AF37" fill="#D4AF37" fillOpacity={0.3} />
+                        <Radar name="Current" dataKey="current" stroke="#1a2744" fill="#1a2744" fillOpacity={0.5} />
+                        <Radar name="Target" dataKey="target" stroke="#D4A84C" fill="#D4A84C" fillOpacity={0.3} />
                         <Legend />
                       </RadarChart>
                     </ResponsiveContainer>
@@ -494,7 +494,7 @@ const PortfolioRebalancing = () => {
               <Card className="lg:col-span-2">
                 <CardHeader>
                   <CardTitle className="text-base flex items-center gap-2">
-                    <Target className="h-5 w-5 text-[#D4AF37]" />
+                    <Target className="h-5 w-5 text-[#D4A84C]" />
                     Target Allocation Profile
                   </CardTitle>
                   <CardDescription>Select a risk profile or customize your allocation</CardDescription>
@@ -518,7 +518,7 @@ const PortfolioRebalancing = () => {
                         <div
                           key={key}
                           className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                            selectedProfile === key ? 'border-[#0F392B] bg-[#0F392B]/5' : 'hover:border-muted-foreground'
+                            selectedProfile === key ? 'border-[#1a2744] bg-[#1a2744]/5' : 'hover:border-muted-foreground'
                           }`}
                           onClick={() => setSelectedProfile(key)}
                           data-testid={`profile-${key}`}
@@ -526,7 +526,7 @@ const PortfolioRebalancing = () => {
                           <div className="flex items-center justify-between mb-2">
                             <p className="font-semibold">{profile.name}</p>
                             {selectedProfile === key && (
-                              <CheckCircle className="h-5 w-5 text-[#0F392B]" />
+                              <CheckCircle className="h-5 w-5 text-[#1a2744]" />
                             )}
                           </div>
                           <p className="text-sm text-muted-foreground mb-2">{profile.description}</p>
@@ -632,7 +632,7 @@ const PortfolioRebalancing = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
-                  <ArrowUpDown className="h-5 w-5 text-[#D4AF37]" />
+                  <ArrowUpDown className="h-5 w-5 text-[#D4A84C]" />
                   Suggested Rebalancing Trades
                 </CardTitle>
                 <CardDescription>
@@ -736,7 +736,7 @@ const PortfolioRebalancing = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Calculator className="h-5 w-5 text-[#D4AF37]" />
+                  <Calculator className="h-5 w-5 text-[#D4A84C]" />
                   Rebalancing Settings
                 </CardTitle>
               </CardHeader>
@@ -788,7 +788,7 @@ const PortfolioRebalancing = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Shield className="h-5 w-5 text-[#D4AF37]" />
+                  <Shield className="h-5 w-5 text-[#D4A84C]" />
                   Risk Profile Guidelines
                 </CardTitle>
               </CardHeader>

@@ -60,7 +60,7 @@ const formatCurrency = (value) => {
 };
 
 const EVENT_TYPES = [
-  { value: "house_purchase", label: "Buy Property", icon: Home, color: "#0F392B" },
+  { value: "house_purchase", label: "Buy Property", icon: Home, color: "#1a2744" },
   { value: "house_upgrade", label: "Upgrade Home", icon: Building2, color: "#3B82F6" },
   { value: "children_education", label: "Children's Education", icon: GraduationCap, color: "#8B5CF6" },
   { value: "major_travel", label: "Major Travel", icon: Plane, color: "#EC4899" },
@@ -181,7 +181,7 @@ const LifeTimeline = () => {
       return (
         <div className="bg-white p-3 border rounded-lg shadow-lg">
           <p className="font-bold">Age {data.age} ({data.year})</p>
-          <p className="text-[#0F392B]">Net Worth: {formatCurrency(data.net_worth)}</p>
+          <p className="text-[#1a2744]">Net Worth: {formatCurrency(data.net_worth)}</p>
           <p className="text-muted-foreground">Portfolio: {formatCurrency(data.portfolio_value)}</p>
           {data.debt_remaining > 0 && (
             <p className="text-red-500">Debt: {formatCurrency(data.debt_remaining)}</p>
@@ -190,7 +190,7 @@ const LifeTimeline = () => {
             <div className="mt-2 pt-2 border-t">
               <p className="font-semibold text-sm">Events:</p>
               {data.events.map((e, i) => (
-                <p key={i} className="text-sm text-[#D4AF37]">• {e}</p>
+                <p key={i} className="text-sm text-[#D4A84C]">• {e}</p>
               ))}
             </div>
           )}
@@ -206,8 +206,8 @@ const LifeTimeline = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground flex items-center gap-3">
-              <Clock className="h-8 w-8 text-[#D4AF37]" />
+            <h1 className="text-3xl font-bold  text-foreground flex items-center gap-3">
+              <Clock className="h-8 w-8 text-[#D4A84C]" />
               Life Timeline
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -293,7 +293,7 @@ const LifeTimeline = () => {
                 </div>
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setNewEventOpen(false)}>Cancel</Button>
-                  <Button onClick={handleAddEvent} className="bg-[#0F392B]">Add Event</Button>
+                  <Button onClick={handleAddEvent} className="bg-[#1a2744]">Add Event</Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -308,7 +308,7 @@ const LifeTimeline = () => {
         <Card>
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-[#D4AF37]" />
+              <Sparkles className="h-5 w-5 text-[#D4A84C]" />
               Adjust Your Timeline
             </CardTitle>
             <CardDescription>
@@ -397,7 +397,7 @@ const LifeTimeline = () => {
               <Card>
                 <CardContent className="pt-6">
                   <p className="text-sm text-muted-foreground">At Retirement (Age {retirementAge})</p>
-                  <p className="text-2xl font-bold text-[#0F392B]">
+                  <p className="text-2xl font-bold text-[#1a2744]">
                     {formatCurrency(timelineData?.summary?.projected_retirement_net_worth || 0)}
                   </p>
                 </CardContent>
@@ -405,7 +405,7 @@ const LifeTimeline = () => {
               <Card>
                 <CardContent className="pt-6">
                   <p className="text-sm text-muted-foreground">Peak Net Worth</p>
-                  <p className="text-2xl font-bold text-[#D4AF37]">
+                  <p className="text-2xl font-bold text-[#D4A84C]">
                     {formatCurrency(timelineData?.summary?.peak_net_worth || 0)}
                   </p>
                   <p className="text-xs text-muted-foreground">at age {timelineData?.summary?.peak_age}</p>
@@ -432,7 +432,7 @@ const LifeTimeline = () => {
               <CardContent>
                 {loading ? (
                   <div className="flex items-center justify-center h-[400px]">
-                    <RefreshCw className="h-8 w-8 animate-spin text-[#0F392B]" />
+                    <RefreshCw className="h-8 w-8 animate-spin text-[#1a2744]" />
                   </div>
                 ) : (
                   <ChartContainer height={400}>
@@ -440,8 +440,8 @@ const LifeTimeline = () => {
                       <AreaChart data={timelineData?.projections || []}>
                         <defs>
                           <linearGradient id="netWorthGradient" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#0F392B" stopOpacity={0.3}/>
-                            <stop offset="95%" stopColor="#0F392B" stopOpacity={0}/>
+                            <stop offset="5%" stopColor="#1a2744" stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor="#1a2744" stopOpacity={0}/>
                           </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
@@ -458,16 +458,16 @@ const LifeTimeline = () => {
                         {/* Retirement reference line */}
                         <ReferenceLine 
                           x={retirementAge} 
-                          stroke="#D4AF37" 
+                          stroke="#D4A84C" 
                           strokeDasharray="5 5"
-                          label={{ value: 'Retirement', fill: '#D4AF37', fontSize: 12 }}
+                          label={{ value: 'Retirement', fill: '#D4A84C', fontSize: 12 }}
                         />
                         
                         <Area
                           type="monotone"
                           dataKey="net_worth"
                           name="Net Worth"
-                          stroke="#0F392B"
+                          stroke="#1a2744"
                           fill="url(#netWorthGradient)"
                           strokeWidth={2}
                         />
@@ -479,7 +479,7 @@ const LifeTimeline = () => {
                             x={milestone.age}
                             y={milestone.net_worth}
                             r={8}
-                            fill="#D4AF37"
+                            fill="#D4A84C"
                             stroke="#fff"
                             strokeWidth={2}
                           />
@@ -504,7 +504,7 @@ const LifeTimeline = () => {
               <CardContent>
                 <div className="relative">
                   {/* Timeline line */}
-                  <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#0F392B] to-[#D4AF37]" />
+                  <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#1a2744] to-[#D4A84C]" />
                   
                   <div className="space-y-6">
                     {timelineData?.milestones?.map((milestone, index) => {
@@ -526,7 +526,7 @@ const LifeTimeline = () => {
                               </div>
                               <div className="text-right">
                                 <p className="text-sm text-muted-foreground">Net Worth</p>
-                                <p className="text-xl font-bold text-[#0F392B]">
+                                <p className="text-xl font-bold text-[#1a2744]">
                                   {formatCurrency(milestone.net_worth_at_milestone)}
                                 </p>
                                 {milestone.cost > 0 && (

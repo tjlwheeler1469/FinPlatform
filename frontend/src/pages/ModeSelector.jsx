@@ -53,13 +53,13 @@ const ModeSelector = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0F392B] to-[#1a5c45] flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-[#1a2744] to-[#1a5c45] flex items-center justify-center p-6">
       <div className="max-w-4xl w-full">
         {/* Header */}
         <div className="text-center mb-10">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="w-14 h-14 rounded-xl bg-[#D4AF37] flex items-center justify-center">
-              <Sparkles className="h-8 w-8 text-[#0F392B]" />
+            <div className="w-14 h-14 rounded-xl bg-[#D4A84C] flex items-center justify-center">
+              <Sparkles className="h-8 w-8 text-[#1a2744]" />
             </div>
           </div>
           <h1 className="text-4xl font-bold text-white mb-2">Wheeler Financial</h1>
@@ -71,8 +71,8 @@ const ModeSelector = () => {
           {/* Personal Use */}
           <Card className="hover:shadow-xl transition-shadow cursor-pointer group" onClick={() => selectMode("personal", "/daily-briefing")} data-testid="personal-mode-card">
             <CardHeader className="pb-4">
-              <div className="w-16 h-16 rounded-2xl bg-[#0F392B]/10 flex items-center justify-center mb-4 group-hover:bg-[#0F392B]/20 transition-colors">
-                <User className="h-8 w-8 text-[#0F392B]" />
+              <div className="w-16 h-16 rounded-2xl bg-[#1a2744]/10 flex items-center justify-center mb-4 group-hover:bg-[#1a2744]/20 transition-colors">
+                <User className="h-8 w-8 text-[#1a2744]" />
               </div>
               <CardTitle className="text-2xl">Personal Use</CardTitle>
               <CardDescription className="text-base">
@@ -94,7 +94,7 @@ const ModeSelector = () => {
                   Tax analysis & CGT tracking
                 </div>
               </div>
-              <Button className="w-full bg-[#0F392B] group-hover:bg-[#0F392B]/90" data-testid="enter-personal-btn">
+              <Button className="w-full bg-[#1a2744] group-hover:bg-[#1a2744]/90" data-testid="enter-personal-btn">
                 Enter Personal Mode <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </CardContent>
@@ -103,12 +103,12 @@ const ModeSelector = () => {
           {/* Adviser Use */}
           <Card className="hover:shadow-xl transition-shadow cursor-pointer group" onClick={() => selectMode("adviser", "/adviser-dashboard")} data-testid="adviser-mode-card">
             <CardHeader className="pb-4">
-              <div className="w-16 h-16 rounded-2xl bg-[#D4AF37]/10 flex items-center justify-center mb-4 group-hover:bg-[#D4AF37]/20 transition-colors">
-                <Briefcase className="h-8 w-8 text-[#D4AF37]" />
+              <div className="w-16 h-16 rounded-2xl bg-[#D4A84C]/10 flex items-center justify-center mb-4 group-hover:bg-[#D4A84C]/20 transition-colors">
+                <Briefcase className="h-8 w-8 text-[#D4A84C]" />
               </div>
               <div className="flex items-center gap-2">
                 <CardTitle className="text-2xl">Adviser Portal</CardTitle>
-                <Badge className="bg-[#D4AF37] text-[#0F392B]">Pro</Badge>
+                <Badge className="bg-[#D4A84C] text-[#1a2744]">Pro</Badge>
               </div>
               <CardDescription className="text-base">
                 Manage multiple clients with full access to their accounts
@@ -117,19 +117,19 @@ const ModeSelector = () => {
             <CardContent>
               <div className="space-y-3 mb-6">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Users className="h-4 w-4 text-[#D4AF37]" />
+                  <Users className="h-4 w-4 text-[#D4A84C]" />
                   Multi-client management
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Eye className="h-4 w-4 text-[#D4AF37]" />
+                  <Eye className="h-4 w-4 text-[#D4A84C]" />
                   Drill into client accounts
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Shield className="h-4 w-4 text-[#D4AF37]" />
+                  <Shield className="h-4 w-4 text-[#D4A84C]" />
                   AFSL compliance tools
                 </div>
               </div>
-              <Button className="w-full bg-[#D4AF37] text-[#0F392B] hover:bg-[#D4AF37]/90" data-testid="enter-adviser-btn">
+              <Button className="w-full bg-[#D4A84C] text-[#1a2744] hover:bg-[#D4A84C]/90" data-testid="enter-adviser-btn">
                 Enter Adviser Mode <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </CardContent>
@@ -147,7 +147,7 @@ const ModeSelector = () => {
                 clearRememberedChoice();
               }
             }}
-            className="border-white/50 data-[state=checked]:bg-[#D4AF37] data-[state=checked]:border-[#D4AF37]"
+            className="border-white/50 data-[state=checked]:bg-[#D4A84C] data-[state=checked]:border-[#D4A84C]"
             data-testid="remember-choice-checkbox"
           />
           <Label htmlFor="remember" className="text-white/70 text-sm cursor-pointer" onClick={(e) => e.stopPropagation()}>

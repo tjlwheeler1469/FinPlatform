@@ -116,8 +116,8 @@ const FamilyOverview = () => {
 
   // Quick links
   const quickLinks = [
-    { path: "/income-splitting", label: "Income Splitting", icon: Users, color: "#0F392B" },
-    { path: "/trust-distributions", label: "Trust Analysis", icon: Shield, color: "#D4AF37" },
+    { path: "/income-splitting", label: "Income Splitting", icon: Users, color: "#1a2744" },
+    { path: "/trust-distributions", label: "Trust Analysis", icon: Shield, color: "#D4A84C" },
     { path: "/budget", label: "Budget", icon: Wallet, color: "#10B981" },
     { path: "/tax-analysis", label: "Tax Analysis", icon: DollarSign, color: "#3B82F6" }
   ];
@@ -128,7 +128,7 @@ const FamilyOverview = () => {
         {/* Header with Save Button */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+            <h1 className="text-3xl font-bold  text-foreground">
               Family Overview
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -153,7 +153,7 @@ const FamilyOverview = () => {
             </Button>
             <Button 
               onClick={saveAllData} 
-              className="bg-[#0F392B] hover:bg-[#0F392B]/90"
+              className="bg-[#1a2744] hover:bg-[#1a2744]/90"
               disabled={!hasUnsavedChanges}
               data-testid="save-btn"
             >
@@ -167,7 +167,7 @@ const FamilyOverview = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {quickLinks.map(link => (
             <Link key={link.path} to={link.path}>
-              <Card className="hover:border-[#0F392B]/30 transition-colors cursor-pointer">
+              <Card className="hover:border-[#1a2744]/30 transition-colors cursor-pointer">
                 <CardContent className="p-4 flex items-center gap-3">
                   <div 
                     className="w-10 h-10 rounded-lg flex items-center justify-center"
@@ -189,7 +189,7 @@ const FamilyOverview = () => {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="bg-[#0F392B] text-white">
+          <Card className="bg-[#1a2744] text-white">
             <CardContent className="p-4">
               <p className="text-sm text-white/80">Total Family Income</p>
               <p className="text-2xl font-bold">{formatCurrency(totalFamilyIncome)}</p>
@@ -215,7 +215,7 @@ const FamilyOverview = () => {
           <Card>
             <CardContent className="p-4">
               <p className="text-sm text-muted-foreground">Net Worth</p>
-              <p className="text-2xl font-bold text-[#D4AF37]">{formatCurrency(portfolio.summary.netWorth)}</p>
+              <p className="text-2xl font-bold text-[#D4A84C]">{formatCurrency(portfolio.summary.netWorth)}</p>
               <p className="text-xs text-muted-foreground mt-1">{formatCurrency(portfolio.summary.totalDebt)} debt</p>
             </CardContent>
           </Card>
@@ -225,7 +225,7 @@ const FamilyOverview = () => {
           {/* 12-Month Cashflow Projection */}
           <Card className="lg:col-span-2" data-testid="cashflow-projection">
             <CardHeader>
-              <CardTitle className="font-['Manrope'] flex items-center gap-2">
+              <CardTitle className=" flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-[#10B981]" />
                 12-Month Cashflow Projection
               </CardTitle>
@@ -264,9 +264,9 @@ const FamilyOverview = () => {
                       type="monotone" 
                       dataKey="cumulativeSavings" 
                       name="Cumulative Savings"
-                      stroke="#D4AF37" 
+                      stroke="#D4A84C" 
                       strokeWidth={3}
-                      dot={{ fill: '#D4AF37' }}
+                      dot={{ fill: '#D4A84C' }}
                     />
                   </ComposedChart>
                 </ResponsiveContainer>
@@ -276,7 +276,7 @@ const FamilyOverview = () => {
               <div className="grid grid-cols-3 gap-4 mt-4 p-4 rounded-lg bg-muted/50">
                 <div className="text-center">
                   <p className="text-sm text-muted-foreground">Year-End Projection</p>
-                  <p className="text-xl font-bold text-[#D4AF37]">
+                  <p className="text-xl font-bold text-[#D4A84C]">
                     {formatCurrency(cashflowProjection[11]?.cumulativeSavings || 0)}
                   </p>
                 </div>
@@ -297,8 +297,8 @@ const FamilyOverview = () => {
           {/* Family Members Summary */}
           <Card data-testid="family-members-summary">
             <CardHeader>
-              <CardTitle className="font-['Manrope'] flex items-center gap-2">
-                <Users className="h-5 w-5 text-[#0F392B]" />
+              <CardTitle className=" flex items-center gap-2">
+                <Users className="h-5 w-5 text-[#1a2744]" />
                 Family Members
               </CardTitle>
             </CardHeader>
@@ -312,7 +312,7 @@ const FamilyOverview = () => {
                         {member.relationship.replace('_', ' ')}
                       </Badge>
                       {member.isTrustBeneficiary && (
-                        <Badge className="bg-[#D4AF37]/10 text-[#D4AF37] text-xs">
+                        <Badge className="bg-[#D4A84C]/10 text-[#D4A84C] text-xs">
                           Trust {member.trustDistribution}%
                         </Badge>
                       )}
@@ -349,7 +349,7 @@ const FamilyOverview = () => {
           {/* Family Income Breakdown Chart */}
           <Card data-testid="family-income-chart">
             <CardHeader>
-              <CardTitle className="font-['Manrope'] flex items-center gap-2">
+              <CardTitle className=" flex items-center gap-2">
                 <DollarSign className="h-5 w-5 text-[#10B981]" />
                 Income by Member
               </CardTitle>
@@ -363,7 +363,7 @@ const FamilyOverview = () => {
                     <YAxis type="category" dataKey="name" width={60} />
                     <Tooltip formatter={(v) => formatCurrency(v)} />
                     <Legend />
-                    <Bar dataKey="income" name="Gross Income" fill="#0F392B" stackId="a" />
+                    <Bar dataKey="income" name="Gross Income" fill="#1a2744" stackId="a" />
                     <Bar dataKey="tax" name="Tax" fill="#EF4444" stackId="b" />
                   </BarChart>
                 </ResponsiveContainer>
@@ -374,13 +374,13 @@ const FamilyOverview = () => {
           {/* Trust Distribution Summary */}
           <Card data-testid="trust-summary">
             <CardHeader>
-              <CardTitle className="font-['Manrope'] flex items-center gap-2">
-                <Shield className="h-5 w-5 text-[#D4AF37]" />
+              <CardTitle className=" flex items-center gap-2">
+                <Shield className="h-5 w-5 text-[#D4A84C]" />
                 Trust Distribution
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="p-4 rounded-lg bg-[#0F392B] text-white">
+              <div className="p-4 rounded-lg bg-[#1a2744] text-white">
                 <p className="text-sm text-white/80">{trust.name}</p>
                 <p className="text-2xl font-bold">{formatCurrency(trust.netIncome)}</p>
                 <p className="text-xs text-white/60">FY {trust.financialYear}</p>
@@ -421,7 +421,7 @@ const FamilyOverview = () => {
           {/* Monthly Budget Summary */}
           <Card data-testid="budget-summary">
             <CardHeader>
-              <CardTitle className="font-['Manrope'] flex items-center gap-2">
+              <CardTitle className=" flex items-center gap-2">
                 <Wallet className="h-5 w-5 text-[#3B82F6]" />
                 Monthly Budget
               </CardTitle>
@@ -436,9 +436,9 @@ const FamilyOverview = () => {
                   <p className="text-xs text-muted-foreground">Expenses</p>
                   <p className="text-lg font-bold text-destructive">{formatCurrency(monthlyCashflow.expenses)}</p>
                 </div>
-                <div className={`p-3 rounded-lg text-center ${monthlyCashflow.surplus >= 0 ? 'bg-[#D4AF37]/10' : 'bg-destructive/10'}`}>
+                <div className={`p-3 rounded-lg text-center ${monthlyCashflow.surplus >= 0 ? 'bg-[#D4A84C]/10' : 'bg-destructive/10'}`}>
                   <p className="text-xs text-muted-foreground">Surplus</p>
-                  <p className={`text-lg font-bold ${monthlyCashflow.surplus >= 0 ? 'text-[#D4AF37]' : 'text-destructive'}`}>
+                  <p className={`text-lg font-bold ${monthlyCashflow.surplus >= 0 ? 'text-[#D4A84C]' : 'text-destructive'}`}>
                     {formatCurrency(monthlyCashflow.surplus)}
                   </p>
                 </div>

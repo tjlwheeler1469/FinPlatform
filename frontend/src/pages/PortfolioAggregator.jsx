@@ -62,7 +62,7 @@ const formatDateTime = (dateStr) => {
   });
 };
 
-const COLORS = ['#0F392B', '#D4AF37', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'];
+const COLORS = ['#1a2744', '#D4A84C', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'];
 
 const getAccountIcon = (type) => {
   switch (type) {
@@ -78,7 +78,7 @@ const getAccountColor = (type) => {
   switch (type) {
     case "bank": return "#3B82F6";
     case "super": return "#10B981";
-    case "brokerage": return "#D4AF37";
+    case "brokerage": return "#D4A84C";
     case "mortgage": return "#EF4444";
     default: return "#6366F1";
   }
@@ -144,7 +144,7 @@ const PortfolioAggregator = () => {
     return (
       <Layout>
         <div className="flex items-center justify-center min-h-[60vh]">
-          <RefreshCw className="h-8 w-8 animate-spin text-[#0F392B]" />
+          <RefreshCw className="h-8 w-8 animate-spin text-[#1a2744]" />
         </div>
       </Layout>
     );
@@ -156,8 +156,8 @@ const PortfolioAggregator = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground flex items-center gap-3">
-              <Wallet className="h-8 w-8 text-[#D4AF37]" />
+            <h1 className="text-3xl font-bold  text-foreground flex items-center gap-3">
+              <Wallet className="h-8 w-8 text-[#D4A84C]" />
               Portfolio Aggregator
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -172,7 +172,7 @@ const PortfolioAggregator = () => {
             <Button 
               onClick={handleSync}
               disabled={syncing}
-              className="bg-[#0F392B]"
+              className="bg-[#1a2744]"
               data-testid="sync-btn"
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${syncing ? 'animate-spin' : ''}`} />
@@ -209,16 +209,16 @@ const PortfolioAggregator = () => {
               </div>
             </CardContent>
           </Card>
-          <Card className="border-2 border-[#0F392B] bg-[#0F392B]/5">
+          <Card className="border-2 border-[#1a2744] bg-[#1a2744]/5">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-[#0F392B]">Net Worth</p>
-                  <p className="text-2xl font-bold text-[#0F392B]">
+                  <p className="text-sm text-[#1a2744]">Net Worth</p>
+                  <p className="text-2xl font-bold text-[#1a2744]">
                     {formatCurrency(portfolioData?.net_worth || 0)}
                   </p>
                 </div>
-                <DollarSign className="h-8 w-8 text-[#0F392B]" />
+                <DollarSign className="h-8 w-8 text-[#1a2744]" />
               </div>
             </CardContent>
           </Card>
@@ -301,10 +301,10 @@ const PortfolioAggregator = () => {
                     </div>
                   </div>
                   
-                  <div className="p-4 bg-[#0F392B]/5 rounded-lg">
+                  <div className="p-4 bg-[#1a2744]/5 rounded-lg">
                     <div className="flex items-center justify-between mb-2">
                       <p className="text-sm">Monthly Savings</p>
-                      <p className="text-xl font-bold text-[#0F392B]">
+                      <p className="text-xl font-bold text-[#1a2744]">
                         {formatCurrency(portfolioData?.monthly_snapshot?.savings || 0)}
                       </p>
                     </div>

@@ -160,7 +160,7 @@ const RISK_PROFILES = {
   },
   balanced: {
     name: "Balanced",
-    color: "#D4AF37",
+    color: "#D4A84C",
     minScore: 23,
     maxScore: 28,
     description: "You seek a balance between growth and security, accepting moderate volatility for better returns.",
@@ -298,7 +298,7 @@ Individual circumstances vary. Consult a licensed financial adviser before makin
     color: key === 'cash' ? '#6B7280' : 
            key === 'fixedIncome' ? '#3B82F6' : 
            key === 'property' ? '#10B981' : 
-           key === 'australianShares' ? '#0F392B' : '#D4AF37'
+           key === 'australianShares' ? '#1a2744' : '#D4A84C'
   }));
 
   const radarData = [
@@ -318,7 +318,7 @@ Individual circumstances vary. Consult a licensed financial adviser before makin
         <div className="space-y-6" data-testid="risk-profiler-results">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold font-['Manrope']">Your Risk Profile</h1>
+              <h1 className="text-3xl font-bold ">Your Risk Profile</h1>
               <p className="text-muted-foreground mt-1">Based on your responses to 8 questions</p>
             </div>
             <div className="flex gap-2">
@@ -328,7 +328,7 @@ Individual circumstances vary. Consult a licensed financial adviser before makin
               <Button variant="outline" onClick={exportProfile}>
                 <Download className="h-4 w-4 mr-2" /> Export
               </Button>
-              <Button onClick={saveProfile} className="bg-[#0F392B]">
+              <Button onClick={saveProfile} className="bg-[#1a2744]">
                 <CheckCircle className="h-4 w-4 mr-2" /> Save Profile
               </Button>
             </div>
@@ -490,7 +490,7 @@ Individual circumstances vary. Consult a licensed financial adviser before makin
     <Layout>
       <div className="space-y-6" data-testid="risk-profiler-page">
         <div>
-          <h1 className="text-3xl font-bold font-['Manrope']">Risk Profiler</h1>
+          <h1 className="text-3xl font-bold ">Risk Profiler</h1>
           <p className="text-muted-foreground mt-1">
             Answer 8 questions to determine your investment risk profile
           </p>
@@ -526,7 +526,7 @@ Individual circumstances vary. Consult a licensed financial adviser before makin
                   key={option.value}
                   className={`flex items-center space-x-3 p-4 rounded-lg border cursor-pointer transition-all ${
                     answers[question.id] === option.value 
-                      ? 'border-[#0F392B] bg-[#0F392B]/5' 
+                      ? 'border-[#1a2744] bg-[#1a2744]/5' 
                       : 'hover:bg-muted/50'
                   }`}
                   onClick={() => handleAnswer(question.id, option.value)}
@@ -553,7 +553,7 @@ Individual circumstances vary. Consult a licensed financial adviser before makin
           <Button 
             onClick={nextQuestion}
             disabled={!answers[question.id]}
-            className="bg-[#0F392B]"
+            className="bg-[#1a2744]"
           >
             {currentQuestion === totalQuestions - 1 ? (
               <>See Results <CheckCircle className="h-4 w-4 ml-2" /></>

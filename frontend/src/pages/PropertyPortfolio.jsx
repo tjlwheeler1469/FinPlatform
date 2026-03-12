@@ -125,7 +125,7 @@ const PropertyPortfolio = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+            <h1 className="text-3xl font-bold  text-foreground">
               Property Portfolio
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -173,7 +173,7 @@ const PropertyPortfolio = () => {
             <Card key={index} data-testid={`property-card-${index}`}>
               <CardHeader className="flex flex-row items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-[#0F392B] flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-lg bg-[#1a2744] flex items-center justify-center">
                     <Home className="h-5 w-5 text-white" />
                   </div>
                   <div>
@@ -315,7 +315,7 @@ const PropertyPortfolio = () => {
         {/* Analyze Button */}
         <Button 
           onClick={analyzePortfolio}
-          className="w-full bg-[#0F392B] hover:bg-[#0F392B]/90"
+          className="w-full bg-[#1a2744] hover:bg-[#1a2744]/90"
           disabled={loading}
           data-testid="analyze-portfolio-btn"
         >
@@ -345,7 +345,7 @@ const PropertyPortfolio = () => {
               <Card>
                 <CardContent className="p-4">
                   <p className="text-sm text-muted-foreground">Total Deductions</p>
-                  <p className="text-xl font-bold text-[#D4AF37]">
+                  <p className="text-xl font-bold text-[#D4A84C]">
                     {formatCurrency(totalSummary.totalDeductions)}
                   </p>
                 </CardContent>
@@ -358,7 +358,7 @@ const PropertyPortfolio = () => {
                   </p>
                 </CardContent>
               </Card>
-              <Card className="bg-[#0F392B] text-white">
+              <Card className="bg-[#1a2744] text-white">
                 <CardContent className="p-4">
                   <p className="text-sm text-white/80">Net Cash Flow</p>
                   <p className={`text-xl font-bold ${totalSummary.totalCashFlow >= 0 ? 'text-[#10B981]' : 'text-red-400'}`}>
@@ -371,7 +371,7 @@ const PropertyPortfolio = () => {
             {/* Chart */}
             <Card data-testid="portfolio-chart">
               <CardHeader>
-                <CardTitle className="font-['Manrope']">Portfolio Comparison</CardTitle>
+                <CardTitle className="">Portfolio Comparison</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="h-[300px]">
@@ -393,8 +393,8 @@ const PropertyPortfolio = () => {
                       />
                       <Legend />
                       <Bar dataKey="rental" fill="#10B981" name="Rental Income" />
-                      <Bar dataKey="deductions" fill="#D4AF37" name="Deductions" />
-                      <Bar dataKey="cashFlow" fill="#0F392B" name="Cash Flow" />
+                      <Bar dataKey="deductions" fill="#D4A84C" name="Deductions" />
+                      <Bar dataKey="cashFlow" fill="#1a2744" name="Cash Flow" />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -408,16 +408,16 @@ const PropertyPortfolio = () => {
                   <CardHeader>
                     <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                        analysis.is_negatively_geared ? 'bg-[#D4AF37]/10' : 'bg-[#10B981]/10'
+                        analysis.is_negatively_geared ? 'bg-[#D4A84C]/10' : 'bg-[#10B981]/10'
                       }`}>
                         {analysis.is_negatively_geared 
-                          ? <TrendingDown className="h-5 w-5 text-[#D4AF37]" />
+                          ? <TrendingDown className="h-5 w-5 text-[#D4A84C]" />
                           : <TrendingUp className="h-5 w-5 text-[#10B981]" />
                         }
                       </div>
                       <div>
                         <CardTitle className="text-lg">{analysis.property_name}</CardTitle>
-                        <p className={`text-sm ${analysis.is_negatively_geared ? 'text-[#D4AF37]' : 'text-[#10B981]'}`}>
+                        <p className={`text-sm ${analysis.is_negatively_geared ? 'text-[#D4A84C]' : 'text-[#10B981]'}`}>
                           {analysis.is_negatively_geared ? 'Negatively Geared' : 'Positively Geared'}
                         </p>
                       </div>
@@ -454,14 +454,14 @@ const PropertyPortfolio = () => {
                         </span>
                       </div>
                       {analysis.is_negatively_geared && (
-                        <div className="flex justify-between p-3 rounded-lg bg-[#D4AF37]/10">
+                        <div className="flex justify-between p-3 rounded-lg bg-[#D4A84C]/10">
                           <span className="font-medium">Tax Benefit</span>
-                          <span className="font-bold text-[#D4AF37]">
+                          <span className="font-bold text-[#D4A84C]">
                             +{formatCurrency(analysis.annual_tax_benefit)}
                           </span>
                         </div>
                       )}
-                      <div className="flex justify-between p-3 rounded-lg bg-[#0F392B] text-white">
+                      <div className="flex justify-between p-3 rounded-lg bg-[#1a2744] text-white">
                         <span className="font-medium">After-Tax Cash Flow</span>
                         <span className="font-bold">
                           {formatCurrency(analysis.cash_flow_after_tax)}

@@ -156,7 +156,7 @@ const DecisionDashboard = () => {
       <Layout>
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
-            <RefreshCw className="h-8 w-8 animate-spin mx-auto text-[#0F392B]" />
+            <RefreshCw className="h-8 w-8 animate-spin mx-auto text-[#1a2744]" />
             <p className="mt-4 text-muted-foreground">Analyzing your financial position...</p>
           </div>
         </div>
@@ -248,13 +248,13 @@ const DecisionDashboard = () => {
           </Card>
 
           {/* Top Action Impact */}
-          <Card className="border-2 border-[#D4AF37] bg-[#D4AF37]/5">
+          <Card className="border-2 border-[#D4A84C] bg-[#D4A84C]/5">
             <CardContent className="pt-6">
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Top Action Impact</p>
                   <div className="flex items-baseline gap-2 mt-1">
-                    <span className="text-4xl font-bold text-[#0F392B]" data-testid="top-action-impact">
+                    <span className="text-4xl font-bold text-[#1a2744]" data-testid="top-action-impact">
                       {analysisData?.top_actions?.[0]?.impact_text?.split(' ')[0] || '$0'}
                     </span>
                   </div>
@@ -263,7 +263,7 @@ const DecisionDashboard = () => {
                   </p>
                 </div>
                 <div className="h-16 w-16">
-                  <Zap className="h-full w-full text-[#D4AF37]" />
+                  <Zap className="h-full w-full text-[#D4A84C]" />
                 </div>
               </div>
             </CardContent>
@@ -285,7 +285,7 @@ const DecisionDashboard = () => {
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
-                    <BarChart3 className="h-5 w-5 text-[#D4AF37]" />
+                    <BarChart3 className="h-5 w-5 text-[#D4A84C]" />
                     Financial Health Breakdown
                   </CardTitle>
                 </CardHeader>
@@ -299,8 +299,8 @@ const DecisionDashboard = () => {
                         <Radar
                           name="Score"
                           dataKey="score"
-                          stroke="#0F392B"
-                          fill="#0F392B"
+                          stroke="#1a2744"
+                          fill="#1a2744"
                           fillOpacity={0.5}
                         />
                       </RadarChart>
@@ -313,7 +313,7 @@ const DecisionDashboard = () => {
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
-                    <Zap className="h-5 w-5 text-[#D4AF37]" />
+                    <Zap className="h-5 w-5 text-[#D4A84C]" />
                     Top 3 Actions
                   </CardTitle>
                   <CardDescription>What you should do next</CardDescription>
@@ -327,7 +327,7 @@ const DecisionDashboard = () => {
                       data-testid={`action-${index}`}
                     >
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white ${
-                        index === 0 ? 'bg-[#0F392B]' : index === 1 ? 'bg-[#D4AF37]' : 'bg-blue-500'
+                        index === 0 ? 'bg-[#1a2744]' : index === 1 ? 'bg-[#D4A84C]' : 'bg-blue-500'
                       }`}>
                         {action.rank}
                       </div>
@@ -337,7 +337,7 @@ const DecisionDashboard = () => {
                           {getEffortBadge(action.effort)}
                         </div>
                         <p className="text-sm text-muted-foreground mt-1">{action.description}</p>
-                        <p className="text-sm font-bold text-[#0F392B] mt-2">{action.impact_text}</p>
+                        <p className="text-sm font-bold text-[#1a2744] mt-2">{action.impact_text}</p>
                       </div>
                       <ChevronRight className="h-5 w-5 text-muted-foreground" />
                     </div>
@@ -357,7 +357,7 @@ const DecisionDashboard = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <Target className="h-5 w-5 text-[#D4AF37]" />
+                  <Target className="h-5 w-5 text-[#D4A84C]" />
                   Retirement Readiness
                 </CardTitle>
               </CardHeader>
@@ -377,7 +377,7 @@ const DecisionDashboard = () => {
                   </div>
                   <div className="text-center">
                     <p className="text-sm text-muted-foreground">Projected at Retirement</p>
-                    <p className="text-3xl font-bold mt-1 text-[#0F392B]">
+                    <p className="text-3xl font-bold mt-1 text-[#1a2744]">
                       {formatCurrency(analysisData?.retirement_probability?.projections?.median_final_balance || 0)}
                     </p>
                   </div>
@@ -419,12 +419,12 @@ const DecisionDashboard = () => {
                 {analysisData?.top_actions?.map((action, index) => (
                   <div 
                     key={action.rank}
-                    className="flex items-start gap-4 p-4 border rounded-lg hover:border-[#0F392B] hover:bg-muted/50 cursor-pointer transition-all"
+                    className="flex items-start gap-4 p-4 border rounded-lg hover:border-[#1a2744] hover:bg-muted/50 cursor-pointer transition-all"
                     onClick={() => navigate(ACTION_LINKS[action.category] || "/dashboard")}
                     data-testid={`full-action-${index}`}
                   >
                     <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-white text-lg ${
-                      index === 0 ? 'bg-[#0F392B]' : index === 1 ? 'bg-[#D4AF37]' : 'bg-blue-500'
+                      index === 0 ? 'bg-[#1a2744]' : index === 1 ? 'bg-[#D4A84C]' : 'bg-blue-500'
                     }`}>
                       {action.rank}
                     </div>
@@ -437,8 +437,8 @@ const DecisionDashboard = () => {
                       <p className="text-muted-foreground">{action.description}</p>
                       <div className="flex items-center gap-4 mt-3">
                         <div className="flex items-center gap-2">
-                          <DollarSign className="h-4 w-4 text-[#0F392B]" />
-                          <span className="font-bold text-[#0F392B]">{action.impact_text}</span>
+                          <DollarSign className="h-4 w-4 text-[#1a2744]" />
+                          <span className="font-bold text-[#1a2744]">{action.impact_text}</span>
                         </div>
                         <Badge variant="secondary">{action.category.replace('_', ' ')}</Badge>
                       </div>
@@ -504,9 +504,9 @@ const DecisionDashboard = () => {
                         {analysisData?.health_score?.metrics?.retirement_funded_pct}%
                       </p>
                     </div>
-                    <div className="p-4 bg-[#0F392B]/5 rounded-lg col-span-2">
+                    <div className="p-4 bg-[#1a2744]/5 rounded-lg col-span-2">
                       <p className="text-sm text-muted-foreground">Projected Super at 65</p>
-                      <p className="text-3xl font-bold text-[#0F392B]">
+                      <p className="text-3xl font-bold text-[#1a2744]">
                         {formatCurrency(analysisData?.health_score?.metrics?.projected_super_at_retirement || 0)}
                       </p>
                     </div>
@@ -538,7 +538,7 @@ const DecisionDashboard = () => {
         </Tabs>
 
         {/* Bottom CTA */}
-        <Card className="bg-[#0F392B] text-white">
+        <Card className="bg-[#1a2744] text-white">
           <CardContent className="pt-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
@@ -558,7 +558,7 @@ const DecisionDashboard = () => {
                   Life Timeline
                 </Button>
                 <Button 
-                  className="bg-[#D4AF37] text-[#0F392B] hover:bg-[#D4AF37]/90"
+                  className="bg-[#D4A84C] text-[#1a2744] hover:bg-[#D4A84C]/90"
                   onClick={() => navigate("/scenario-builder")}
                 >
                   <Calculator className="h-4 w-4 mr-2" />

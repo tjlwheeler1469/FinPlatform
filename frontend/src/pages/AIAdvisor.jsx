@@ -137,15 +137,15 @@ const AIAdvisor = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground flex items-center gap-3">
-              <Brain className="h-8 w-8 text-[#D4AF37]" />
+            <h1 className="text-3xl font-bold  text-foreground flex items-center gap-3">
+              <Brain className="h-8 w-8 text-[#D4A84C]" />
               AI Financial Advisor
             </h1>
             <p className="text-muted-foreground mt-1">
               Get personalized financial advice powered by AI
             </p>
           </div>
-          <Badge className="bg-[#0F392B] text-white">
+          <Badge className="bg-[#1a2744] text-white">
             <Sparkles className="h-3 w-3 mr-1" />
             Multi-LLM Powered
           </Badge>
@@ -188,7 +188,7 @@ const AIAdvisor = () => {
                   <Button 
                     onClick={() => handleAskQuestion()}
                     disabled={loading || !question.trim()}
-                    className="bg-[#0F392B]"
+                    className="bg-[#1a2744]"
                     data-testid="ask-btn"
                   >
                     {loading ? (
@@ -229,7 +229,7 @@ const AIAdvisor = () => {
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg flex items-center gap-2">
-                        <Lightbulb className="h-5 w-5 text-[#D4AF37]" />
+                        <Lightbulb className="h-5 w-5 text-[#D4A84C]" />
                         AI Analysis
                       </CardTitle>
                       <Badge variant="outline" className={getConfidenceColor(advice.llm_metadata?.confidence_score || 0.85)}>
@@ -273,7 +273,7 @@ const AIAdvisor = () => {
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
-                      <Zap className="h-5 w-5 text-[#D4AF37]" />
+                      <Zap className="h-5 w-5 text-[#D4A84C]" />
                       AI Recommendations
                     </CardTitle>
                   </CardHeader>
@@ -285,7 +285,7 @@ const AIAdvisor = () => {
                         onClick={() => navigate("/decision-engine")}
                       >
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white ${
-                          idx === 0 ? 'bg-[#0F392B]' : idx === 1 ? 'bg-[#D4AF37]' : 'bg-blue-500'
+                          idx === 0 ? 'bg-[#1a2744]' : idx === 1 ? 'bg-[#D4A84C]' : 'bg-blue-500'
                         }`}>
                           {rec.rank}
                         </div>
@@ -377,13 +377,13 @@ const AIAdvisor = () => {
         </Tabs>
 
         {/* Context Card */}
-        <Card className="border-[#0F392B]/20 bg-[#0F392B]/5">
+        <Card className="border-[#1a2744]/20 bg-[#1a2744]/5">
           <CardContent className="pt-6">
             <div className="flex items-start gap-3">
-              <Brain className="h-5 w-5 text-[#0F392B] flex-shrink-0 mt-0.5" />
+              <Brain className="h-5 w-5 text-[#1a2744] flex-shrink-0 mt-0.5" />
               <div>
-                <p className="font-semibold text-[#0F392B]">About AI Financial Advisor</p>
-                <p className="text-sm text-[#0F392B]/70 mt-1">
+                <p className="font-semibold text-[#1a2744]">About AI Financial Advisor</p>
+                <p className="text-sm text-[#1a2744]/70 mt-1">
                   Our AI advisor uses your complete financial profile to generate personalized recommendations.
                   It analyzes your assets, liabilities, income, goals, and risk tolerance to provide 
                   actionable insights. The advice is generated using multiple AI models for accuracy and 

@@ -277,11 +277,11 @@ const DailyBriefing = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#D4AF37] to-[#0F392B] flex items-center justify-center">
+            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#D4A84C] to-[#1a2744] flex items-center justify-center">
               <greeting.icon className="h-7 w-7 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold font-['Manrope']">
+              <h1 className="text-3xl font-bold ">
                 {greeting.text}, {userName}
               </h1>
               <p className="text-muted-foreground">
@@ -301,7 +301,7 @@ const DailyBriefing = () => {
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="bg-gradient-to-br from-[#0F392B] to-[#1a5c45] text-white">
+          <Card className="bg-gradient-to-br from-[#1a2744] to-[#1a5c45] text-white">
             <CardContent className="p-4">
               <p className="text-white/70 text-sm">Net Worth</p>
               <p className="text-2xl font-bold">{formatCurrency(netWorth)}</p>
@@ -355,7 +355,7 @@ const DailyBriefing = () => {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <LineChart className="h-5 w-5 text-[#D4AF37]" />
+                  <LineChart className="h-5 w-5 text-[#D4A84C]" />
                   Portfolio Performance (6 Months)
                 </CardTitle>
               </CardHeader>
@@ -365,15 +365,15 @@ const DailyBriefing = () => {
                     <AreaChart data={performanceData}>
                       <defs>
                         <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#0F392B" stopOpacity={0.3}/>
-                          <stop offset="95%" stopColor="#0F392B" stopOpacity={0}/>
+                          <stop offset="5%" stopColor="#1a2744" stopOpacity={0.3}/>
+                          <stop offset="95%" stopColor="#1a2744" stopOpacity={0}/>
                         </linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
                       <XAxis dataKey="month" tick={{ fontSize: 12 }} />
                       <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `$${(v/1000000).toFixed(1)}M`} />
                       <Tooltip formatter={(v) => formatCurrency(v)} />
-                      <Area type="monotone" dataKey="value" stroke="#0F392B" strokeWidth={2} fill="url(#colorValue)" />
+                      <Area type="monotone" dataKey="value" stroke="#1a2744" strokeWidth={2} fill="url(#colorValue)" />
                     </AreaChart>
                   </ResponsiveContainer>
                 </ChartContainer>
@@ -384,7 +384,7 @@ const DailyBriefing = () => {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-[#D4AF37]" />
+                  <Sparkles className="h-5 w-5 text-[#D4A84C]" />
                   AI-Powered Recommendations
                 </CardTitle>
                 <CardDescription>Personalized actions based on your portfolio analysis</CardDescription>
@@ -431,7 +431,7 @@ const DailyBriefing = () => {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-[#D4AF37]" />
+                  <Calendar className="h-5 w-5 text-[#D4A84C]" />
                   Upcoming Deadlines
                 </CardTitle>
               </CardHeader>
@@ -474,7 +474,7 @@ const DailyBriefing = () => {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-[#D4AF37]" />
+                  <TrendingUp className="h-5 w-5 text-[#D4A84C]" />
                   Market Summary
                 </CardTitle>
               </CardHeader>
@@ -511,7 +511,7 @@ const DailyBriefing = () => {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <Zap className="h-5 w-5 text-[#D4AF37]" />
+                  <Zap className="h-5 w-5 text-[#D4A84C]" />
                   Quick Actions
                 </CardTitle>
               </CardHeader>

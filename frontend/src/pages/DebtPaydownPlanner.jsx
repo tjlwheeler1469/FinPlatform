@@ -223,8 +223,8 @@ const DebtPaydownPlanner = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground flex items-center gap-3">
-              <TrendingDown className="h-8 w-8 text-[#D4AF37]" />
+            <h1 className="text-3xl font-bold  text-foreground flex items-center gap-3">
+              <TrendingDown className="h-8 w-8 text-[#D4A84C]" />
               Debt Paydown Planner
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -235,14 +235,14 @@ const DebtPaydownPlanner = () => {
             <Button
               variant={strategy === "avalanche" ? "default" : "outline"}
               onClick={() => setStrategy("avalanche")}
-              className={strategy === "avalanche" ? "bg-[#0F392B]" : ""}
+              className={strategy === "avalanche" ? "bg-[#1a2744]" : ""}
             >
               Avalanche
             </Button>
             <Button
               variant={strategy === "snowball" ? "default" : "outline"}
               onClick={() => setStrategy("snowball")}
-              className={strategy === "snowball" ? "bg-[#0F392B]" : ""}
+              className={strategy === "snowball" ? "bg-[#1a2744]" : ""}
             >
               Snowball
             </Button>
@@ -272,10 +272,10 @@ const DebtPaydownPlanner = () => {
               <p className="text-2xl font-bold text-orange-600">{formatCurrency(result.totalInterest)}</p>
             </CardContent>
           </Card>
-          <Card className="border-2 border-[#0F392B] bg-[#0F392B]/5">
+          <Card className="border-2 border-[#1a2744] bg-[#1a2744]/5">
             <CardContent className="pt-6">
-              <p className="text-sm text-[#0F392B]">Monthly Payment</p>
-              <p className="text-2xl font-bold text-[#0F392B]">{formatCurrency(totalMinimum + extraBudget)}</p>
+              <p className="text-sm text-[#1a2744]">Monthly Payment</p>
+              <p className="text-2xl font-bold text-[#1a2744]">{formatCurrency(totalMinimum + extraBudget)}</p>
             </CardContent>
           </Card>
         </div>
@@ -284,7 +284,7 @@ const DebtPaydownPlanner = () => {
         <Card>
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
-              <Zap className="h-5 w-5 text-[#D4AF37]" />
+              <Zap className="h-5 w-5 text-[#D4A84C]" />
               Extra Monthly Payment
             </CardTitle>
             <CardDescription>
@@ -294,7 +294,7 @@ const DebtPaydownPlanner = () => {
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center gap-4">
-                <span className="text-2xl font-bold text-[#0F392B]">{formatCurrency(extraBudget)}</span>
+                <span className="text-2xl font-bold text-[#1a2744]">{formatCurrency(extraBudget)}</span>
                 <span className="text-muted-foreground">/ month extra</span>
               </div>
               <Slider
@@ -371,12 +371,12 @@ const DebtPaydownPlanner = () => {
                 return (
                   <div 
                     key={debt.id}
-                    className={`p-4 border rounded-lg ${index === 0 ? 'border-[#0F392B] bg-[#0F392B]/5' : ''}`}
+                    className={`p-4 border rounded-lg ${index === 0 ? 'border-[#1a2744] bg-[#1a2744]/5' : ''}`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                          index === 0 ? 'bg-[#0F392B] text-white' : 'bg-muted'
+                          index === 0 ? 'bg-[#1a2744] text-white' : 'bg-muted'
                         }`}>
                           <Icon className="h-5 w-5" />
                         </div>
@@ -395,7 +395,7 @@ const DebtPaydownPlanner = () => {
                       </div>
                     </div>
                     {index === 0 && (
-                      <Badge className="mt-2 bg-[#D4AF37]">
+                      <Badge className="mt-2 bg-[#D4A84C]">
                         <Target className="h-3 w-3 mr-1" />
                         Focus debt - gets extra payments
                       </Badge>

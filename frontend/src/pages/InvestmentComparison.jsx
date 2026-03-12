@@ -63,18 +63,18 @@ const formatCurrency = (value) => {
 const formatPercent = (value) => `${value.toFixed(1)}%`;
 
 const COLORS = {
-  au_shares: '#0F392B',
+  au_shares: '#1a2744',
   international_shares: '#3B82F6',
-  property: '#D4AF37',
+  property: '#D4A84C',
   crypto: '#F59E0B',
   bonds: '#6366F1',
   cash: '#10B981'
 };
 
 const STRUCTURE_COLORS = {
-  personal: '#0F392B',
+  personal: '#1a2744',
   company: '#3B82F6',
-  trust: '#D4AF37',
+  trust: '#D4A84C',
   smsf: '#10B981'
 };
 
@@ -234,8 +234,8 @@ const InvestmentComparison = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground flex items-center gap-2">
-              <Scale className="h-8 w-8 text-[#D4AF37]" />
+            <h1 className="text-3xl font-bold  text-foreground flex items-center gap-2">
+              <Scale className="h-8 w-8 text-[#D4A84C]" />
               Investment Structure Comparison
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -245,7 +245,7 @@ const InvestmentComparison = () => {
           <Button 
             onClick={runComparison} 
             disabled={isLoading}
-            className="bg-[#0F392B]"
+            className="bg-[#1a2744]"
             data-testid="run-comparison-btn"
           >
             {isLoading ? (
@@ -261,7 +261,7 @@ const InvestmentComparison = () => {
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <Calculator className="h-5 w-5 text-[#D4AF37]" />
+              <Calculator className="h-5 w-5 text-[#D4A84C]" />
               Investment Parameters
             </CardTitle>
           </CardHeader>
@@ -318,7 +318,7 @@ const InvestmentComparison = () => {
                     key={key}
                     className={`p-3 border rounded-lg cursor-pointer transition-colors ${
                       selectedAssets.includes(key) 
-                        ? "border-[#0F392B] bg-[#0F392B]/5" 
+                        ? "border-[#1a2744] bg-[#1a2744]/5" 
                         : "border-muted hover:border-muted-foreground"
                     }`}
                     onClick={() => toggleAsset(key)}
@@ -346,7 +346,7 @@ const InvestmentComparison = () => {
                     key={key}
                     className={`p-3 border rounded-lg cursor-pointer transition-colors ${
                       selectedStructures.includes(key)
-                        ? "border-[#D4AF37] bg-[#D4AF37]/5"
+                        ? "border-[#D4A84C] bg-[#D4A84C]/5"
                         : "border-muted hover:border-muted-foreground"
                     }`}
                     onClick={() => toggleStructure(key)}
@@ -376,14 +376,14 @@ const InvestmentComparison = () => {
             <TabsContent value="comparison" className="space-y-6">
               {/* Best Overall */}
               {results.best_overall && (
-                <Alert className="border-[#D4AF37] bg-[#D4AF37]/10">
-                  <Award className="h-5 w-5 text-[#D4AF37]" />
-                  <AlertTitle className="text-[#D4AF37]">Best Overall Option</AlertTitle>
+                <Alert className="border-[#D4A84C] bg-[#D4A84C]/10">
+                  <Award className="h-5 w-5 text-[#D4A84C]" />
+                  <AlertTitle className="text-[#D4A84C]">Best Overall Option</AlertTitle>
                   <AlertDescription>
                     <span className="font-semibold">{results.best_overall.asset_class}</span> in a{" "}
                     <span className="font-semibold">{results.best_overall.tax_structure}</span> structure
                     yields the highest after-tax return of{" "}
-                    <span className="font-bold text-[#0F392B]">
+                    <span className="font-bold text-[#1a2744]">
                       {formatCurrency(results.best_overall.after_tax_return)}
                     </span>
                     {" "}({formatPercent(results.best_overall.annualized_return_after_tax)} p.a.)
@@ -434,7 +434,7 @@ const InvestmentComparison = () => {
                         <Tooltip formatter={(v) => formatCurrency(v)} />
                         <Bar 
                           dataKey="avg_after_tax_return" 
-                          fill="#D4AF37" 
+                          fill="#D4A84C" 
                           radius={[4, 4, 0, 0]}
                           name="Avg After-Tax Return"
                         />
@@ -452,7 +452,7 @@ const InvestmentComparison = () => {
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-base flex items-center gap-2">
-                      <TrendingUp className="h-5 w-5 text-[#D4AF37]" />
+                      <TrendingUp className="h-5 w-5 text-[#D4A84C]" />
                       Best Structure per Asset Class
                     </CardTitle>
                   </CardHeader>
@@ -472,7 +472,7 @@ const InvestmentComparison = () => {
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-[#0F392B]">
+                          <p className="font-bold text-[#1a2744]">
                             {formatCurrency(result.after_tax_return)}
                           </p>
                           <p className="text-xs text-muted-foreground">
@@ -488,7 +488,7 @@ const InvestmentComparison = () => {
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-base flex items-center gap-2">
-                      <Briefcase className="h-5 w-5 text-[#D4AF37]" />
+                      <Briefcase className="h-5 w-5 text-[#D4A84C]" />
                       Best Asset per Tax Structure
                     </CardTitle>
                   </CardHeader>
@@ -508,7 +508,7 @@ const InvestmentComparison = () => {
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-[#0F392B]">
+                          <p className="font-bold text-[#1a2744]">
                             {formatCurrency(result.after_tax_return)}
                           </p>
                           <p className="text-xs text-muted-foreground">
@@ -537,12 +537,12 @@ const InvestmentComparison = () => {
                       <div 
                         key={`${result.asset_class}-${result.tax_structure}`}
                         className={`flex items-center justify-between p-4 border rounded-lg ${
-                          index === 0 ? "border-[#D4AF37] bg-[#D4AF37]/5" : ""
+                          index === 0 ? "border-[#D4A84C] bg-[#D4A84C]/5" : ""
                         }`}
                       >
                         <div className="flex items-center gap-4">
                           <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
-                            index === 0 ? "bg-[#D4AF37] text-white" : "bg-muted"
+                            index === 0 ? "bg-[#D4A84C] text-white" : "bg-muted"
                           }`}>
                             {index + 1}
                           </div>
@@ -562,7 +562,7 @@ const InvestmentComparison = () => {
                           </div>
                           <div>
                             <p className="text-xs text-muted-foreground">After-Tax Return</p>
-                            <p className="font-bold text-[#0F392B]">{formatCurrency(result.after_tax_return)}</p>
+                            <p className="font-bold text-[#1a2744]">{formatCurrency(result.after_tax_return)}</p>
                           </div>
                           <div>
                             <p className="text-xs text-muted-foreground">Effective Tax</p>

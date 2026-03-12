@@ -85,7 +85,7 @@ const calculateTax = (income) => {
   return Math.round(tax);
 };
 
-const COLORS = ['#0F392B', '#D4AF37', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#F59E0B', '#6366F1'];
+const COLORS = ['#1a2744', '#D4A84C', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#F59E0B', '#6366F1'];
 
 const FamilyWealthDashboard = () => {
   const { 
@@ -288,8 +288,8 @@ const FamilyWealthDashboard = () => {
 
   // Wealth composition chart data
   const wealthComposition = [
-    { name: 'Property Equity', value: familyWealth.propertyEquity, color: '#0F392B' },
-    { name: 'Shares', value: familyWealth.shareValue, color: '#D4AF37' },
+    { name: 'Property Equity', value: familyWealth.propertyEquity, color: '#1a2744' },
+    { name: 'Shares', value: familyWealth.shareValue, color: '#D4A84C' },
     { name: 'Superannuation', value: familyWealth.totalSuper, color: '#10B981' },
     { name: 'Cash & TD', value: familyWealth.cash + familyWealth.termDeposit, color: '#3B82F6' },
     { name: 'Trust Assets', value: familyWealth.trustAssets, color: '#8B5CF6' },
@@ -298,8 +298,8 @@ const FamilyWealthDashboard = () => {
 
   // Tax savings breakdown
   const taxSavingsData = [
-    { name: 'Income Splitting', value: taxSavings.incomeSplitting, color: '#0F392B' },
-    { name: 'Trust Distributions', value: taxSavings.trustDistribution, color: '#D4AF37' },
+    { name: 'Income Splitting', value: taxSavings.incomeSplitting, color: '#1a2744' },
+    { name: 'Trust Distributions', value: taxSavings.trustDistribution, color: '#D4A84C' },
     { name: 'Super Contributions', value: taxSavings.superContributions, color: '#10B981' },
     { name: 'Franking Credits', value: taxSavings.frankingCredits, color: '#3B82F6' },
     { name: 'Negative Gearing', value: taxSavings.negativeGearing, color: '#8B5CF6' }
@@ -348,7 +348,7 @@ const FamilyWealthDashboard = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+            <h1 className="text-3xl font-bold  text-foreground">
               Family Wealth Dashboard
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -364,7 +364,7 @@ const FamilyWealthDashboard = () => {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <Card className="bg-[#0F392B] text-white col-span-2 md:col-span-1">
+          <Card className="bg-[#1a2744] text-white col-span-2 md:col-span-1">
             <CardContent className="p-4">
               <p className="text-sm text-white/70">Total Net Worth</p>
               <p className="text-3xl font-bold">{formatCurrency(familyWealth.netWorth)}</p>
@@ -389,10 +389,10 @@ const FamilyWealthDashboard = () => {
               <p className="text-2xl font-bold text-[#10B981]">{formatCurrency(taxSavings.total)}</p>
             </CardContent>
           </Card>
-          <Card className="bg-[#D4AF37]/10 border-[#D4AF37]/30">
+          <Card className="bg-[#D4A84C]/10 border-[#D4A84C]/30">
             <CardContent className="p-4">
               <p className="text-sm text-muted-foreground">Total Super</p>
-              <p className="text-2xl font-bold text-[#D4AF37]">{formatCurrency(familyWealth.totalSuper)}</p>
+              <p className="text-2xl font-bold text-[#D4A84C]">{formatCurrency(familyWealth.totalSuper)}</p>
             </CardContent>
           </Card>
         </div>
@@ -464,8 +464,8 @@ const FamilyWealthDashboard = () => {
                         <YAxis dataKey="name" type="category" width={80} />
                         <Tooltip formatter={(v) => formatCurrency(v)} />
                         <Legend />
-                        <Bar dataKey="super" name="Super" stackId="a" fill="#D4AF37" />
-                        <Bar dataKey="shares" name="Shares" stackId="a" fill="#0F392B" />
+                        <Bar dataKey="super" name="Super" stackId="a" fill="#D4A84C" />
+                        <Bar dataKey="shares" name="Shares" stackId="a" fill="#1a2744" />
                       </BarChart>
                     </ResponsiveContainer>
                   </ChartContainer>
@@ -474,7 +474,7 @@ const FamilyWealthDashboard = () => {
                       <Link key={i} to={`/family-member/${familyMembers.find(fm => fm.name === m.name)?.id}`}>
                         <div className="flex items-center justify-between p-2 rounded hover:bg-muted/50 cursor-pointer">
                           <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-[#0F392B] text-white flex items-center justify-center text-sm">
+                            <div className="w-8 h-8 rounded-full bg-[#1a2744] text-white flex items-center justify-center text-sm">
                               {m.name.charAt(0)}
                             </div>
                             <div>
@@ -523,8 +523,8 @@ const FamilyWealthDashboard = () => {
                       <YAxis tickFormatter={(v) => `$${(v/1000000).toFixed(1)}M`} stroke="hsl(var(--muted-foreground))" />
                       <Tooltip formatter={(v) => formatCurrency(v)} />
                       <Legend />
-                      <Area type="monotone" dataKey="wealth" name="Non-Super Wealth" stackId="1" fill="#0F392B" stroke="#0F392B" />
-                      <Area type="monotone" dataKey="super" name="Superannuation" stackId="1" fill="#D4AF37" stroke="#D4AF37" />
+                      <Area type="monotone" dataKey="wealth" name="Non-Super Wealth" stackId="1" fill="#1a2744" stroke="#1a2744" />
+                      <Area type="monotone" dataKey="super" name="Superannuation" stackId="1" fill="#D4A84C" stroke="#D4A84C" />
                     </AreaChart>
                   </ResponsiveContainer>
                 </ChartContainer>
@@ -533,9 +533,9 @@ const FamilyWealthDashboard = () => {
                     <p className="text-sm text-muted-foreground">Today</p>
                     <p className="text-xl font-bold">{formatCurrency(familyWealth.netWorth + familyWealth.totalSuper)}</p>
                   </div>
-                  <div className="p-3 rounded-lg bg-[#D4AF37]/10 text-center">
+                  <div className="p-3 rounded-lg bg-[#D4A84C]/10 text-center">
                     <p className="text-sm text-muted-foreground">In {Math.floor(projectionYears/2)} Years</p>
-                    <p className="text-xl font-bold text-[#D4AF37]">
+                    <p className="text-xl font-bold text-[#D4A84C]">
                       {formatCurrency(wealthProjection[Math.floor(projectionYears/2)]?.total || 0)}
                     </p>
                   </div>
@@ -606,15 +606,15 @@ const FamilyWealthDashboard = () => {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Lightbulb className="h-5 w-5 text-[#D4AF37]" />
+                    <Lightbulb className="h-5 w-5 text-[#D4A84C]" />
                     Active Tax Strategies
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {taxSavings.incomeSplitting > 0 && (
-                    <div className="p-3 rounded-lg bg-[#0F392B]/10 border border-[#0F392B]/20">
+                    <div className="p-3 rounded-lg bg-[#1a2744]/10 border border-[#1a2744]/20">
                       <div className="flex items-start gap-3">
-                        <CheckCircle className="h-5 w-5 text-[#0F392B] mt-0.5" />
+                        <CheckCircle className="h-5 w-5 text-[#1a2744] mt-0.5" />
                         <div>
                           <p className="font-medium">Income Splitting</p>
                           <p className="text-sm text-muted-foreground">
@@ -626,9 +626,9 @@ const FamilyWealthDashboard = () => {
                   )}
                   
                   {taxSavings.trustDistribution > 0 && (
-                    <div className="p-3 rounded-lg bg-[#D4AF37]/10 border border-[#D4AF37]/20">
+                    <div className="p-3 rounded-lg bg-[#D4A84C]/10 border border-[#D4A84C]/20">
                       <div className="flex items-start gap-3">
-                        <CheckCircle className="h-5 w-5 text-[#D4AF37] mt-0.5" />
+                        <CheckCircle className="h-5 w-5 text-[#D4A84C] mt-0.5" />
                         <div>
                           <p className="font-medium">Family Trust Distributions</p>
                           <p className="text-sm text-muted-foreground">
@@ -688,7 +688,7 @@ const FamilyWealthDashboard = () => {
           {/* Wealth Transfer Tab */}
           <TabsContent value="transfer" className="space-y-6">
             {/* Estate Summary */}
-            <Card className="bg-gradient-to-r from-[#0F392B] to-[#1a5c45] text-white">
+            <Card className="bg-gradient-to-r from-[#1a2744] to-[#1a5c45] text-white">
               <CardContent className="p-6">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                   <div>
@@ -697,7 +697,7 @@ const FamilyWealthDashboard = () => {
                   </div>
                   <div>
                     <p className="text-white/70 text-sm">Projected at Age {estateTransferAge}</p>
-                    <p className="text-3xl font-bold text-[#D4AF37]">{formatCurrency(wealthTransfer.totalEstateValue)}</p>
+                    <p className="text-3xl font-bold text-[#D4A84C]">{formatCurrency(wealthTransfer.totalEstateValue)}</p>
                   </div>
                   <div>
                     <p className="text-white/70 text-sm">Years to Transfer</p>
@@ -771,7 +771,7 @@ const FamilyWealthDashboard = () => {
               <Card className="lg:col-span-2">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Gift className="h-5 w-5 text-[#D4AF37]" />
+                    <Gift className="h-5 w-5 text-[#D4A84C]" />
                     Wealth Transfer Strategies
                   </CardTitle>
                   <CardDescription>Recommendations for inter-generational wealth transfer</CardDescription>
@@ -781,17 +781,17 @@ const FamilyWealthDashboard = () => {
                     <div 
                       key={i}
                       className={`p-4 rounded-lg border ${
-                        strategy.priority === 'High' ? 'bg-[#0F392B]/5 border-[#0F392B]/20' :
-                        strategy.priority === 'Medium' ? 'bg-[#D4AF37]/5 border-[#D4AF37]/20' :
+                        strategy.priority === 'High' ? 'bg-[#1a2744]/5 border-[#1a2744]/20' :
+                        strategy.priority === 'Medium' ? 'bg-[#D4A84C]/5 border-[#D4A84C]/20' :
                         'bg-muted/50 border-border'
                       }`}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex items-start gap-3">
                           {strategy.priority === 'High' ? (
-                            <Target className="h-5 w-5 text-[#0F392B] mt-0.5" />
+                            <Target className="h-5 w-5 text-[#1a2744] mt-0.5" />
                           ) : strategy.priority === 'Medium' ? (
-                            <Lightbulb className="h-5 w-5 text-[#D4AF37] mt-0.5" />
+                            <Lightbulb className="h-5 w-5 text-[#D4A84C] mt-0.5" />
                           ) : (
                             <Info className="h-5 w-5 text-muted-foreground mt-0.5" />
                           )}
@@ -822,10 +822,10 @@ const FamilyWealthDashboard = () => {
                     .filter(m => m.relationship === 'adult_child' || m.relationship === 'child')
                     .map((member, i) => (
                       <Link key={i} to={`/family-member/${member.id}`}>
-                        <Card className="hover:border-[#0F392B] transition-colors cursor-pointer">
+                        <Card className="hover:border-[#1a2744] transition-colors cursor-pointer">
                           <CardContent className="p-4">
                             <div className="flex items-center gap-3">
-                              <div className="w-12 h-12 rounded-full bg-[#D4AF37] text-[#0F392B] flex items-center justify-center text-xl font-bold">
+                              <div className="w-12 h-12 rounded-full bg-[#D4A84C] text-[#1a2744] flex items-center justify-center text-xl font-bold">
                                 {member.name.charAt(0)}
                               </div>
                               <div>

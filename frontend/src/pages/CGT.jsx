@@ -102,7 +102,7 @@ const DEMO_CGT_EVENTS = [
   { id: 6, symbol: "VAS", name: "Vanguard Aus Shares ETF", quantity: 100, sale_price: 98.40, sale_date: "2024-12-10", brokerage: 9.95, parcel_id: 5, purchase_price: 92.00, purchase_date: "2022-08-01", purchase_brokerage: 3.32 }
 ];
 
-const COLORS = ['#10B981', '#EF4444', '#D4AF37', '#3B82F6', '#8B5CF6'];
+const COLORS = ['#10B981', '#EF4444', '#D4A84C', '#3B82F6', '#8B5CF6'];
 
 const CGT = () => {
   const [activeTab, setActiveTab] = useState("events");
@@ -265,7 +265,7 @@ const CGT = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">Capital Gains Tax</h1>
+            <h1 className="text-3xl font-bold  text-foreground">Capital Gains Tax</h1>
             <p className="text-muted-foreground mt-1">Track CGT events, calculate tax, and manage holdings</p>
           </div>
           <div className="flex items-center gap-2">
@@ -298,10 +298,10 @@ const CGT = () => {
               <p className="text-xs text-muted-foreground mt-1">Available to offset</p>
             </CardContent>
           </Card>
-          <Card className={netPosition >= 0 ? "bg-[#D4AF37]/10 border-[#D4AF37]/20" : "bg-[#3B82F6]/10 border-[#3B82F6]/20"}>
+          <Card className={netPosition >= 0 ? "bg-[#D4A84C]/10 border-[#D4A84C]/20" : "bg-[#3B82F6]/10 border-[#3B82F6]/20"}>
             <CardContent className="p-4">
               <p className="text-sm text-muted-foreground">Net Position</p>
-              <p className={`text-2xl font-bold ${netPosition >= 0 ? 'text-[#D4AF37]' : 'text-[#3B82F6]'}`}>{formatCurrency(netPosition)}</p>
+              <p className={`text-2xl font-bold ${netPosition >= 0 ? 'text-[#D4A84C]' : 'text-[#3B82F6]'}`}>{formatCurrency(netPosition)}</p>
               <p className="text-xs text-muted-foreground mt-1">{selectedYear === "all" ? "All years" : `FY ${selectedYear}`}</p>
             </CardContent>
           </Card>
@@ -326,7 +326,7 @@ const CGT = () => {
           <TabsContent value="events" className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold">CGT Events</h3>
-              <Button onClick={() => setShowAddSale(true)} className="bg-[#0F392B]" data-testid="add-sale-btn">
+              <Button onClick={() => setShowAddSale(true)} className="bg-[#1a2744]" data-testid="add-sale-btn">
                 <Plus className="h-4 w-4 mr-2" /> Record Sale
               </Button>
             </div>
@@ -336,7 +336,7 @@ const CGT = () => {
                 <Card><CardContent className="p-8 text-center text-muted-foreground">No CGT events for {selectedYear === "all" ? "any year" : `FY ${selectedYear}`}</CardContent></Card>
               ) : (
                 processedEvents.map(event => (
-                  <Card key={event.id} className="hover:border-[#0F392B]/30 transition-colors">
+                  <Card key={event.id} className="hover:border-[#1a2744]/30 transition-colors">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
@@ -347,7 +347,7 @@ const CGT = () => {
                             <div className="flex items-center gap-2">
                               <p className="font-semibold">{event.symbol}</p>
                               <Badge variant="outline">{event.quantity} shares</Badge>
-                              {event.is_discount_eligible && <Badge className="bg-[#D4AF37]/10 text-[#D4AF37] border-[#D4AF37]/20">50% Discount</Badge>}
+                              {event.is_discount_eligible && <Badge className="bg-[#D4A84C]/10 text-[#D4A84C] border-[#D4A84C]/20">50% Discount</Badge>}
                             </div>
                             <p className="text-sm text-muted-foreground">{event.name} • Sold {formatDate(event.sale_date)}</p>
                             <p className="text-xs text-muted-foreground">Held {event.days_held} days • FY {event.financial_year}</p>
@@ -378,7 +378,7 @@ const CGT = () => {
           <TabsContent value="holdings" className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold">Share Parcels</h3>
-              <Button onClick={() => setShowAddParcel(true)} className="bg-[#0F392B]" data-testid="add-parcel-btn">
+              <Button onClick={() => setShowAddParcel(true)} className="bg-[#1a2744]" data-testid="add-parcel-btn">
                 <Plus className="h-4 w-4 mr-2" /> Add Parcel
               </Button>
             </div>
@@ -413,7 +413,7 @@ const CGT = () => {
           <TabsContent value="summary" className="space-y-6">
             <Card data-testid="multi-year-summary">
               <CardHeader>
-                <CardTitle className="font-['Manrope']">Multi-Year CGT Summary</CardTitle>
+                <CardTitle className="">Multi-Year CGT Summary</CardTitle>
                 <CardDescription>Capital gains and losses across financial years</CardDescription>
               </CardHeader>
               <CardContent>
@@ -441,7 +441,7 @@ const CGT = () => {
                       <div className="flex items-center gap-4 text-sm">
                         <span className="text-[#10B981]">+{formatCurrency(year.gains)}</span>
                         <span className="text-destructive">-{formatCurrency(year.losses)}</span>
-                        <span className={`font-semibold ${year.net >= 0 ? 'text-[#D4AF37]' : 'text-[#3B82F6]'}`}>
+                        <span className={`font-semibold ${year.net >= 0 ? 'text-[#D4A84C]' : 'text-[#3B82F6]'}`}>
                           Net: {formatCurrency(year.net)}
                         </span>
                       </div>
@@ -454,7 +454,7 @@ const CGT = () => {
             {/* Carried Forward Losses */}
             <Card>
               <CardHeader>
-                <CardTitle className="font-['Manrope']">Loss Carry Forward</CardTitle>
+                <CardTitle className="">Loss Carry Forward</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground mb-4">
@@ -475,7 +475,7 @@ const CGT = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle className="font-['Manrope']">CGT Calculator</CardTitle>
+                  <CardTitle className="">CGT Calculator</CardTitle>
                   <CardDescription>Calculate CGT on property, shares, and other assets</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -525,16 +525,16 @@ const CGT = () => {
                       <Input type="number" value={sellingCosts} onChange={(e) => setSellingCosts(Number(e.target.value))} />
                     </div>
                   </div>
-                  <Button onClick={calculateCGT} className="w-full bg-[#0F392B]" disabled={calcLoading}>
+                  <Button onClick={calculateCGT} className="w-full bg-[#1a2744]" disabled={calcLoading}>
                     <Calculator className="h-4 w-4 mr-2" /> Calculate CGT
                   </Button>
                 </CardContent>
               </Card>
 
               {calcResult && (
-                <Card className="bg-[#0F392B] text-white">
+                <Card className="bg-[#1a2744] text-white">
                   <CardHeader>
-                    <CardTitle className="font-['Manrope'] text-white">CGT Result</CardTitle>
+                    <CardTitle className=" text-white">CGT Result</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
@@ -547,9 +547,9 @@ const CGT = () => {
                         <p className="text-xl font-bold">{formatCurrency(calcResult.taxable_gain)}</p>
                       </div>
                     </div>
-                    <div className="p-4 rounded-lg bg-[#D4AF37]/20">
+                    <div className="p-4 rounded-lg bg-[#D4A84C]/20">
                       <p className="text-sm text-white/70">Estimated Tax</p>
-                      <p className="text-3xl font-bold text-[#D4AF37]">{formatCurrency(calcResult.estimated_tax)}</p>
+                      <p className="text-3xl font-bold text-[#D4A84C]">{formatCurrency(calcResult.estimated_tax)}</p>
                     </div>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between"><span className="text-white/70">Cost Base</span><span>{formatCurrency(calcResult.cost_base)}</span></div>
@@ -584,7 +584,7 @@ const CGT = () => {
                   <div className="space-y-2"><Label>Purchase Date</Label><Input type="date" value={newParcel.purchase_date} onChange={e => setNewParcel({...newParcel, purchase_date: e.target.value})} /></div>
                 </div>
                 <div className="space-y-2"><Label>Brokerage</Label><Input type="number" value={newParcel.brokerage} onChange={e => setNewParcel({...newParcel, brokerage: e.target.value})} /></div>
-                <Button onClick={handleAddParcel} className="w-full bg-[#0F392B]">Add Parcel</Button>
+                <Button onClick={handleAddParcel} className="w-full bg-[#1a2744]">Add Parcel</Button>
               </CardContent>
             </Card>
           </div>
@@ -620,7 +620,7 @@ const CGT = () => {
                   <div className="space-y-2"><Label>Sale Date</Label><Input type="date" value={newSale.sale_date} onChange={e => setNewSale({...newSale, sale_date: e.target.value})} /></div>
                   <div className="space-y-2"><Label>Brokerage</Label><Input type="number" value={newSale.brokerage} onChange={e => setNewSale({...newSale, brokerage: e.target.value})} /></div>
                 </div>
-                <Button onClick={handleAddSale} className="w-full bg-[#0F392B]">Record Sale</Button>
+                <Button onClick={handleAddSale} className="w-full bg-[#1a2744]">Record Sale</Button>
               </CardContent>
             </Card>
           </div>

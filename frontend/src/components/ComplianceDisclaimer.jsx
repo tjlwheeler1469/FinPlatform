@@ -101,7 +101,7 @@ export const ComplianceModal = ({ onAccept }) => {
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" onPointerDownOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
-            <Shield className="h-6 w-6 text-[#0F392B]" />
+            <Shield className="h-6 w-6 text-[#1a2744]" />
             {COMPLIANCE_CONTENT.title}
           </DialogTitle>
           <DialogDescription className="text-base">
@@ -113,7 +113,7 @@ export const ComplianceModal = ({ onAccept }) => {
           {COMPLIANCE_CONTENT.sections.map((section, index) => (
             <div key={index} className="p-4 rounded-lg bg-muted/50 border">
               <div className="flex items-start gap-3">
-                <section.icon className="h-5 w-5 text-[#0F392B] flex-shrink-0 mt-0.5" />
+                <section.icon className="h-5 w-5 text-[#1a2744] flex-shrink-0 mt-0.5" />
                 <div>
                   <h4 className="font-semibold text-sm">{section.title}</h4>
                   <p className="text-sm text-muted-foreground mt-1">{section.content}</p>
@@ -144,7 +144,7 @@ export const ComplianceModal = ({ onAccept }) => {
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs text-[#0F392B] hover:underline"
+                className="inline-flex items-center gap-1 text-xs text-[#1a2744] hover:underline"
               >
                 {link.name}
                 <ExternalLink className="h-3 w-3" />
@@ -167,7 +167,7 @@ export const ComplianceModal = ({ onAccept }) => {
           <Button 
             onClick={handleAccept} 
             disabled={!acknowledged}
-            className="bg-[#0F392B] hover:bg-[#0F392B]/90"
+            className="bg-[#1a2744] hover:bg-[#1a2744]/90"
           >
             I Understand & Accept
           </Button>
@@ -195,7 +195,7 @@ export const ComplianceFooter = ({ className = "" }) => {
           href="https://moneysmart.gov.au" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="text-[#0F392B] hover:underline inline-flex items-center gap-1"
+          className="text-[#1a2744] hover:underline inline-flex items-center gap-1"
         >
           ASIC MoneySmart
           <ExternalLink className="h-3 w-3" />
@@ -234,7 +234,7 @@ export const ATOReference = ({ section, description }) => {
       href={`https://www.ato.gov.au/search?q=${encodeURIComponent(section)}`}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-1 text-xs text-[#0F392B] hover:underline"
+      className="inline-flex items-center gap-1 text-xs text-[#1a2744] hover:underline"
       title={description}
     >
       <FileText className="h-3 w-3" />

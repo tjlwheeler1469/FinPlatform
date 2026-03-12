@@ -49,7 +49,7 @@ const formatCurrency = (value) => {
   }).format(value);
 };
 
-const COLORS = ['#0F392B', '#D4AF37', '#10B981', '#3B82F6', '#8B5CF6'];
+const COLORS = ['#1a2744', '#D4A84C', '#10B981', '#3B82F6', '#8B5CF6'];
 
 const PropertyComparison = () => {
   const { portfolio } = usePortfolio();
@@ -136,7 +136,7 @@ const PropertyComparison = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+            <h1 className="text-3xl font-bold  text-foreground">
               Property Comparison
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -278,7 +278,7 @@ const PropertyComparison = () => {
 
         <Button 
           onClick={compareProperties}
-          className="w-full bg-[#0F392B] hover:bg-[#0F392B]/90"
+          className="w-full bg-[#1a2744] hover:bg-[#1a2744]/90"
           disabled={loading}
           data-testid="compare-btn"
         >
@@ -291,10 +291,10 @@ const PropertyComparison = () => {
           <>
             {/* Best For Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card className="bg-[#0F392B] text-white">
+              <Card className="bg-[#1a2744] text-white">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 mb-2">
-                    <Award className="h-5 w-5 text-[#D4AF37]" />
+                    <Award className="h-5 w-5 text-[#D4A84C]" />
                     <p className="text-sm text-white/80">Best for Yield</p>
                   </div>
                   <p className="text-xl font-bold">{result.recommendations.best_for_yield}</p>
@@ -309,7 +309,7 @@ const PropertyComparison = () => {
                   <p className="text-xl font-bold">{result.recommendations.best_for_cash_flow}</p>
                 </CardContent>
               </Card>
-              <Card className="bg-[#D4AF37] text-[#0F392B]">
+              <Card className="bg-[#D4A84C] text-[#1a2744]">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <TrendingUp className="h-5 w-5" />
@@ -323,7 +323,7 @@ const PropertyComparison = () => {
             {/* Comparison Table */}
             <Card data-testid="comparison-table">
               <CardHeader>
-                <CardTitle className="font-['Manrope']">Detailed Comparison</CardTitle>
+                <CardTitle className="">Detailed Comparison</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="overflow-x-auto">
@@ -377,7 +377,7 @@ const PropertyComparison = () => {
                       <tr className="border-b">
                         <td className="p-3 text-muted-foreground">Tax Benefit</td>
                         {result.comparisons.map((c, i) => (
-                          <td key={i} className="text-right p-3 font-medium text-[#D4AF37]">{formatCurrency(c.cash_flow.tax_benefit)}</td>
+                          <td key={i} className="text-right p-3 font-medium text-[#D4A84C]">{formatCurrency(c.cash_flow.tax_benefit)}</td>
                         ))}
                       </tr>
                       <tr className="border-b">
@@ -408,7 +408,7 @@ const PropertyComparison = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card data-testid="yield-chart">
                 <CardHeader>
-                  <CardTitle className="font-['Manrope']">Yield Comparison</CardTitle>
+                  <CardTitle className="">Yield Comparison</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="h-[300px]">
@@ -419,8 +419,8 @@ const PropertyComparison = () => {
                         <YAxis tickFormatter={(v) => `${v}%`} stroke="hsl(var(--muted-foreground))" />
                         <Tooltip formatter={(v) => `${v}%`} />
                         <Legend />
-                        <Bar dataKey="grossYield" fill="#0F392B" name="Gross Yield" />
-                        <Bar dataKey="netYield" fill="#D4AF37" name="Net Yield" />
+                        <Bar dataKey="grossYield" fill="#1a2744" name="Gross Yield" />
+                        <Bar dataKey="netYield" fill="#D4A84C" name="Net Yield" />
                         <Bar dataKey="returnOnEquity" fill="#10B981" name="ROE" />
                       </BarChart>
                     </ResponsiveContainer>
@@ -430,7 +430,7 @@ const PropertyComparison = () => {
 
               <Card data-testid="radar-chart">
                 <CardHeader>
-                  <CardTitle className="font-['Manrope']">Property Scores</CardTitle>
+                  <CardTitle className="">Property Scores</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="h-[300px]">
@@ -465,7 +465,7 @@ const PropertyComparison = () => {
             {/* Summary */}
             <Card data-testid="portfolio-summary">
               <CardHeader>
-                <CardTitle className="font-['Manrope']">Portfolio Summary</CardTitle>
+                <CardTitle className="">Portfolio Summary</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

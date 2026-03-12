@@ -256,7 +256,7 @@ const ComplianceAuditTools = ({ clientId, onComplianceUpdate }) => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold flex items-center gap-2">
-            <Shield className="h-5 w-5 text-[#D4AF37]" />
+            <Shield className="h-5 w-5 text-[#D4A84C]" />
             Compliance & Audit Tools
           </h2>
           <p className="text-sm text-muted-foreground">Activity logging, KYC/AML checklists, and compliance tracking</p>
@@ -323,7 +323,7 @@ const ComplianceAuditTools = ({ clientId, onComplianceUpdate }) => {
             </Button>
             <Dialog open={showNewActivity} onOpenChange={setShowNewActivity}>
               <DialogTrigger asChild>
-                <Button className="bg-[#0F392B]" data-testid="new-activity-btn">
+                <Button className="bg-[#1a2744]" data-testid="new-activity-btn">
                   <Plus className="h-4 w-4 mr-2" /> Log Activity
                 </Button>
               </DialogTrigger>
@@ -360,7 +360,7 @@ const ComplianceAuditTools = ({ clientId, onComplianceUpdate }) => {
                 </div>
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setShowNewActivity(false)}>Cancel</Button>
-                  <Button onClick={handleAddActivity} className="bg-[#0F392B]">Log Activity</Button>
+                  <Button onClick={handleAddActivity} className="bg-[#1a2744]">Log Activity</Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -442,7 +442,7 @@ const ComplianceAuditTools = ({ clientId, onComplianceUpdate }) => {
                       className={`h-full rounded-full transition-all ${
                         getKycCompletion(selectedClient) === 100 
                           ? 'bg-green-500' 
-                          : 'bg-[#0F392B]'
+                          : 'bg-[#1a2744]'
                       }`}
                       style={{ width: `${getKycCompletion(selectedClient)}%` }}
                     />
@@ -459,11 +459,11 @@ const ComplianceAuditTools = ({ clientId, onComplianceUpdate }) => {
                   <Card key={category}>
                     <CardHeader className="pb-2">
                       <CardTitle className="text-base capitalize flex items-center gap-2">
-                        {category === 'identity' && <User className="h-4 w-4 text-[#D4AF37]" />}
-                        {category === 'aml' && <Shield className="h-4 w-4 text-[#D4AF37]" />}
-                        {category === 'risk' && <AlertTriangle className="h-4 w-4 text-[#D4AF37]" />}
-                        {category === 'compliance' && <FileCheck className="h-4 w-4 text-[#D4AF37]" />}
-                        {category === 'entity' && <Building2 className="h-4 w-4 text-[#D4AF37]" />}
+                        {category === 'identity' && <User className="h-4 w-4 text-[#D4A84C]" />}
+                        {category === 'aml' && <Shield className="h-4 w-4 text-[#D4A84C]" />}
+                        {category === 'risk' && <AlertTriangle className="h-4 w-4 text-[#D4A84C]" />}
+                        {category === 'compliance' && <FileCheck className="h-4 w-4 text-[#D4A84C]" />}
+                        {category === 'entity' && <Building2 className="h-4 w-4 text-[#D4A84C]" />}
                         {category.replace('_', ' ')} Verification
                       </CardTitle>
                     </CardHeader>
@@ -550,8 +550,8 @@ const ComplianceAuditTools = ({ clientId, onComplianceUpdate }) => {
                       data-testid={`compliance-status-${client.id}`}
                     >
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-full bg-[#0F392B]/10 flex items-center justify-center">
-                          <User className="h-5 w-5 text-[#0F392B]" />
+                        <div className="w-10 h-10 rounded-full bg-[#1a2744]/10 flex items-center justify-center">
+                          <User className="h-5 w-5 text-[#1a2744]" />
                         </div>
                         <div>
                           <p className="font-semibold">{client.name}</p>
@@ -570,7 +570,7 @@ const ComplianceAuditTools = ({ clientId, onComplianceUpdate }) => {
                             <div className="w-20 h-2 bg-muted rounded-full overflow-hidden">
                               <div 
                                 className={`h-full rounded-full ${
-                                  completion === 100 ? 'bg-green-500' : 'bg-[#0F392B]'
+                                  completion === 100 ? 'bg-green-500' : 'bg-[#1a2744]'
                                 }`}
                                 style={{ width: `${completion}%` }}
                               />
@@ -594,10 +594,10 @@ const ComplianceAuditTools = ({ clientId, onComplianceUpdate }) => {
           </Card>
 
           {/* AFSL Compliance Summary */}
-          <Card className="border-[#D4AF37]">
+          <Card className="border-[#D4A84C]">
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
-                <Shield className="h-5 w-5 text-[#D4AF37]" />
+                <Shield className="h-5 w-5 text-[#D4A84C]" />
                 AFSL Compliance Summary
               </CardTitle>
             </CardHeader>

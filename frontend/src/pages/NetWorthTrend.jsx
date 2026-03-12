@@ -133,8 +133,8 @@ const NetWorthTrend = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground flex items-center gap-3">
-              <TrendingUp className="h-8 w-8 text-[#D4AF37]" />
+            <h1 className="text-3xl font-bold  text-foreground flex items-center gap-3">
+              <TrendingUp className="h-8 w-8 text-[#D4A84C]" />
               Net Worth Trend
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -167,10 +167,10 @@ const NetWorthTrend = () => {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="border-2 border-[#0F392B] bg-[#0F392B]/5">
+          <Card className="border-2 border-[#1a2744] bg-[#1a2744]/5">
             <CardContent className="pt-6">
               <p className="text-sm text-muted-foreground">Current Net Worth</p>
-              <p className="text-3xl font-bold text-[#0F392B]" data-testid="current-net-worth">
+              <p className="text-3xl font-bold text-[#1a2744]" data-testid="current-net-worth">
                 {formatCurrency(currentNetWorth)}
               </p>
             </CardContent>
@@ -228,8 +228,8 @@ const NetWorthTrend = () => {
                   <AreaChart data={historicalData}>
                     <defs>
                       <linearGradient id="netWorthGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#0F392B" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#0F392B" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="#1a2744" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#1a2744" stopOpacity={0}/>
                       </linearGradient>
                       <linearGradient id="assetsGradient" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#10B981" stopOpacity={0.3}/>
@@ -253,7 +253,7 @@ const NetWorthTrend = () => {
                       type="monotone"
                       dataKey="netWorth"
                       name="Net Worth"
-                      stroke="#0F392B"
+                      stroke="#1a2744"
                       fill="url(#netWorthGradient)"
                       strokeWidth={2}
                     />
@@ -267,7 +267,7 @@ const NetWorthTrend = () => {
                     <Legend />
                     <Line type="monotone" dataKey="assets" name="Total Assets" stroke="#10B981" strokeWidth={2} dot={false} />
                     <Line type="monotone" dataKey="liabilities" name="Liabilities" stroke="#EF4444" strokeWidth={2} dot={false} />
-                    <Line type="monotone" dataKey="netWorth" name="Net Worth" stroke="#0F392B" strokeWidth={3} dot={false} />
+                    <Line type="monotone" dataKey="netWorth" name="Net Worth" stroke="#1a2744" strokeWidth={3} dot={false} />
                   </LineChart>
                 )}
               </ResponsiveContainer>

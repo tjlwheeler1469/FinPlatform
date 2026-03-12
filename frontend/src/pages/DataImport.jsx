@@ -354,7 +354,7 @@ const DataImport = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+            <h1 className="text-3xl font-bold  text-foreground">
               Import Data
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -374,14 +374,14 @@ const DataImport = () => {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="font-['Manrope']">Import Wizard</CardTitle>
+                <CardTitle className="">Import Wizard</CardTitle>
                 <CardDescription>Follow the steps to import your data</CardDescription>
               </div>
               <div className="flex items-center gap-2">
                 {["upload", "map", "preview", "complete"].map((step, i) => (
                   <div key={step} className="flex items-center">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                      activeTab === step ? 'bg-[#0F392B] text-white' :
+                      activeTab === step ? 'bg-[#1a2744] text-white' :
                       ["upload", "map", "preview", "complete"].indexOf(activeTab) > i ? 'bg-[#10B981] text-white' :
                       'bg-muted text-muted-foreground'
                     }`}>
@@ -418,8 +418,8 @@ const DataImport = () => {
                           key={key}
                           className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
                             selectedDataType === key 
-                              ? 'border-[#0F392B] bg-[#0F392B]/5' 
-                              : 'border-border hover:border-[#0F392B]/50'
+                              ? 'border-[#1a2744] bg-[#1a2744]/5' 
+                              : 'border-border hover:border-[#1a2744]/50'
                           }`}
                           onClick={() => setSelectedDataType(key)}
                         >
@@ -450,8 +450,8 @@ const DataImport = () => {
                           key={format.id}
                           className={`p-3 rounded-lg border cursor-pointer transition-all ${
                             selectedFormat === format.id 
-                              ? 'border-[#0F392B] bg-[#0F392B]/5' 
-                              : 'border-border hover:border-[#0F392B]/50'
+                              ? 'border-[#1a2744] bg-[#1a2744]/5' 
+                              : 'border-border hover:border-[#1a2744]/50'
                           }`}
                           onClick={() => setSelectedFormat(format.id)}
                         >
@@ -466,7 +466,7 @@ const DataImport = () => {
 
                     {/* Drop Zone */}
                     <div 
-                      className="border-2 border-dashed rounded-lg p-8 text-center hover:border-[#0F392B]/50 transition-colors cursor-pointer"
+                      className="border-2 border-dashed rounded-lg p-8 text-center hover:border-[#1a2744]/50 transition-colors cursor-pointer"
                       onClick={() => fileInputRef.current?.click()}
                     >
                       <input
@@ -585,7 +585,7 @@ const DataImport = () => {
                   </Button>
                   <Button 
                     onClick={() => setActiveTab("preview")}
-                    className="bg-[#0F392B]"
+                    className="bg-[#1a2744]"
                   >
                     Preview Data
                     <ArrowRight className="h-4 w-4 ml-2" />
@@ -660,7 +660,7 @@ const DataImport = () => {
                   </Button>
                   <Button 
                     onClick={handleImport}
-                    className="bg-[#0F392B]"
+                    className="bg-[#1a2744]"
                     disabled={importing}
                   >
                     {importing ? (
@@ -726,7 +726,7 @@ const DataImport = () => {
                   <Button variant="outline" onClick={resetImport}>
                     Import More Data
                   </Button>
-                  <Button className="bg-[#0F392B]" onClick={() => window.location.href = '/dashboard'}>
+                  <Button className="bg-[#1a2744]" onClick={() => window.location.href = '/dashboard'}>
                     Go to Dashboard
                   </Button>
                 </div>

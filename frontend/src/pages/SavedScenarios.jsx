@@ -140,7 +140,7 @@ const SavedScenarios = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+            <h1 className="text-3xl font-bold  text-foreground">
               Saved Scenarios
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -149,7 +149,7 @@ const SavedScenarios = () => {
           </div>
           <Button 
             onClick={() => navigate("/scenario-builder")}
-            className="bg-[#0F392B] hover:bg-[#0F392B]/90"
+            className="bg-[#1a2744] hover:bg-[#1a2744]/90"
             data-testid="new-scenario-btn"
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -205,12 +205,12 @@ const SavedScenarios = () => {
                     <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                         scenario.entity_type === 'company' 
-                          ? 'bg-[#D4AF37]/10' 
-                          : 'bg-[#0F392B]/10'
+                          ? 'bg-[#D4A84C]/10' 
+                          : 'bg-[#1a2744]/10'
                       }`}>
                         {scenario.entity_type === 'company' 
-                          ? <Building2 className="h-5 w-5 text-[#D4AF37]" />
-                          : <User className="h-5 w-5 text-[#0F392B]" />
+                          ? <Building2 className="h-5 w-5 text-[#D4A84C]" />
+                          : <User className="h-5 w-5 text-[#1a2744]" />
                         }
                       </div>
                       <div>

@@ -133,7 +133,7 @@ const FinancialAdvisorChat = () => {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+              <h1 className="text-3xl font-bold  text-foreground">
                 AI Financial Advisor
               </h1>
               <Badge variant={aiEnabled ? "default" : "secondary"} className={aiEnabled ? "bg-[#10B981]" : ""}>
@@ -154,11 +154,11 @@ const FinancialAdvisorChat = () => {
           <Card className="lg:col-span-3 flex flex-col h-[600px]">
             <CardHeader className="pb-2">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-[#0F392B] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full bg-[#1a2744] flex items-center justify-center">
                   <Bot className="h-4 w-4 text-white" />
                 </div>
                 <div>
-                  <CardTitle className="text-base font-['Manrope']">Financial Advisor</CardTitle>
+                  <CardTitle className="text-base ">Financial Advisor</CardTitle>
                   <CardDescription className="text-xs">
                     {aiEnabled ? "Powered by AI" : "Using pre-defined responses"}
                   </CardDescription>
@@ -172,14 +172,14 @@ const FinancialAdvisorChat = () => {
                 {messages.map((message, index) => (
                   <div key={index} className={`flex gap-3 ${message.role === "user" ? "justify-end" : ""}`}>
                     {message.role === "assistant" && (
-                      <div className="w-8 h-8 rounded-full bg-[#0F392B] flex items-center justify-center flex-shrink-0">
+                      <div className="w-8 h-8 rounded-full bg-[#1a2744] flex items-center justify-center flex-shrink-0">
                         <Bot className="h-4 w-4 text-white" />
                       </div>
                     )}
                     <div className={`max-w-[80%] ${message.role === "user" ? "order-first" : ""}`}>
                       <div className={`rounded-lg p-3 ${
                         message.role === "user" 
-                          ? "bg-[#0F392B] text-white" 
+                          ? "bg-[#1a2744] text-white" 
                           : "bg-muted"
                       }`}>
                         <p className="whitespace-pre-wrap">{message.content}</p>
@@ -205,7 +205,7 @@ const FinancialAdvisorChat = () => {
                       )}
                     </div>
                     {message.role === "user" && (
-                      <div className="w-8 h-8 rounded-full bg-[#D4AF37] flex items-center justify-center flex-shrink-0">
+                      <div className="w-8 h-8 rounded-full bg-[#D4A84C] flex items-center justify-center flex-shrink-0">
                         <User className="h-4 w-4 text-white" />
                       </div>
                     )}
@@ -214,7 +214,7 @@ const FinancialAdvisorChat = () => {
                 
                 {loading && (
                   <div className="flex gap-3">
-                    <div className="w-8 h-8 rounded-full bg-[#0F392B] flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-full bg-[#1a2744] flex items-center justify-center">
                       <Bot className="h-4 w-4 text-white" />
                     </div>
                     <div className="bg-muted rounded-lg p-3">
@@ -243,7 +243,7 @@ const FinancialAdvisorChat = () => {
                 <Button 
                   onClick={() => sendMessage()} 
                   disabled={loading || !input.trim()}
-                  className="bg-[#0F392B]"
+                  className="bg-[#1a2744]"
                   data-testid="send-message-btn"
                 >
                   <Send className="h-4 w-4" />
@@ -257,7 +257,7 @@ const FinancialAdvisorChat = () => {
             {/* Quick Topics */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-base font-['Manrope']">Quick Topics</CardTitle>
+                <CardTitle className="text-base ">Quick Topics</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 {topics.map((topic, i) => (

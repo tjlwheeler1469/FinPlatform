@@ -196,7 +196,7 @@ const RentalYieldOptimizer = () => {
       <div className="space-y-6" data-testid="rental-yield-optimizer-page">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+          <h1 className="text-3xl font-bold  text-foreground">
             Rental Yield Optimizer
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -206,7 +206,7 @@ const RentalYieldOptimizer = () => {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="bg-[#0F392B] text-white">
+          <Card className="bg-[#1a2744] text-white">
             <CardContent className="p-4">
               <p className="text-sm text-white/70">Gross Yield</p>
               <p className="text-2xl font-bold">{formatPercent(grossYield)}</p>
@@ -222,10 +222,10 @@ const RentalYieldOptimizer = () => {
               <p className="text-xs text-muted-foreground">After expenses</p>
             </CardContent>
           </Card>
-          <Card className={isNegativelyGeared ? "bg-[#D4AF37]/10 border-[#D4AF37]" : ""}>
+          <Card className={isNegativelyGeared ? "bg-[#D4A84C]/10 border-[#D4A84C]" : ""}>
             <CardContent className="p-4">
               <p className="text-sm text-muted-foreground">Tax Benefit</p>
-              <p className="text-2xl font-bold text-[#D4AF37]">{formatCurrency(taxBenefit)}</p>
+              <p className="text-2xl font-bold text-[#D4A84C]">{formatCurrency(taxBenefit)}</p>
               <p className="text-xs text-muted-foreground">{isNegativelyGeared ? "Negatively geared" : "Positively geared"}</p>
             </CardContent>
           </Card>
@@ -367,7 +367,7 @@ const RentalYieldOptimizer = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Target className="h-5 w-5 text-[#D4AF37]" />
+                <Target className="h-5 w-5 text-[#D4A84C]" />
                 Optimize Returns
               </CardTitle>
               <CardDescription>Adjust scenarios to see impact</CardDescription>
@@ -422,7 +422,7 @@ const RentalYieldOptimizer = () => {
               </div>
 
               {/* Optimized Results */}
-              <div className="p-4 rounded-lg bg-[#0F392B] text-white">
+              <div className="p-4 rounded-lg bg-[#1a2744] text-white">
                 <h4 className="font-semibold mb-3">Optimized Results</h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
@@ -439,7 +439,7 @@ const RentalYieldOptimizer = () => {
                   </div>
                   <div className="border-t border-white/20 pt-2 mt-2">
                     <div className="flex justify-between">
-                      <span className="text-[#D4AF37]">Annual Improvement</span>
+                      <span className="text-[#D4A84C]">Annual Improvement</span>
                       <span className={`font-bold ${improvement >= 0 ? 'text-[#10B981]' : 'text-red-400'}`}>
                         {improvement >= 0 ? '+' : ''}{formatCurrency(improvement)}
                       </span>
@@ -517,7 +517,7 @@ const RentalYieldOptimizer = () => {
                     <YAxis tickFormatter={(v) => `$${(v/1000).toFixed(0)}k`} stroke="hsl(var(--muted-foreground))" />
                     <Tooltip formatter={(v) => formatCurrency(v)} />
                     <Legend />
-                    <Bar dataKey="current" name="Current" fill="#0F392B" />
+                    <Bar dataKey="current" name="Current" fill="#1a2744" />
                     <Bar dataKey="optimized" name="Optimized" fill="#10B981" />
                   </BarChart>
                 </ResponsiveContainer>
@@ -552,9 +552,9 @@ const RentalYieldOptimizer = () => {
                   <span>Other Expenses</span>
                   <span className="font-semibold text-destructive">-{formatCurrency(annualExpenses)}</span>
                 </div>
-                <div className="flex justify-between p-2 rounded bg-[#D4AF37]/10">
+                <div className="flex justify-between p-2 rounded bg-[#D4A84C]/10">
                   <span>Depreciation (non-cash)</span>
-                  <span className="font-semibold text-[#D4AF37]">-{formatCurrency(depreciation)}</span>
+                  <span className="font-semibold text-[#D4A84C]">-{formatCurrency(depreciation)}</span>
                 </div>
                 <div className="border-t pt-2">
                   <div className="flex justify-between p-2 rounded bg-muted">
@@ -565,12 +565,12 @@ const RentalYieldOptimizer = () => {
                   </div>
                 </div>
                 {isNegativelyGeared && (
-                  <div className="flex justify-between p-2 rounded bg-[#D4AF37]/10 border border-[#D4AF37]">
+                  <div className="flex justify-between p-2 rounded bg-[#D4A84C]/10 border border-[#D4A84C]">
                     <span className="font-semibold">Tax Benefit</span>
-                    <span className="font-bold text-[#D4AF37]">+{formatCurrency(taxBenefit)}</span>
+                    <span className="font-bold text-[#D4A84C]">+{formatCurrency(taxBenefit)}</span>
                   </div>
                 )}
-                <div className="flex justify-between p-3 rounded bg-[#0F392B] text-white">
+                <div className="flex justify-between p-3 rounded bg-[#1a2744] text-white">
                   <span className="font-semibold">After-Tax Cash Flow</span>
                   <span className="font-bold">{formatCurrency(afterTaxCashflow)}</span>
                 </div>

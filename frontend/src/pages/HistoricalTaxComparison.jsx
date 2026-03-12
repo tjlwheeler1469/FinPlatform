@@ -100,7 +100,7 @@ const HistoricalTaxComparison = () => {
       <div className="space-y-8" data-testid="historical-tax-page">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+          <h1 className="text-3xl font-bold  text-foreground">
             Historical Tax Comparison
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -111,7 +111,7 @@ const HistoricalTaxComparison = () => {
         {/* Calculator */}
         <Card data-testid="tax-comparison-calculator">
           <CardHeader>
-            <CardTitle className="font-['Manrope']">Compare Your Tax</CardTitle>
+            <CardTitle className="">Compare Your Tax</CardTitle>
             <CardDescription>
               See how tax changes affect your take-home pay
             </CardDescription>
@@ -147,7 +147,7 @@ const HistoricalTaxComparison = () => {
               </div>
               <Button 
                 onClick={compareRates}
-                className="bg-[#0F392B] hover:bg-[#0F392B]/90"
+                className="bg-[#1a2744] hover:bg-[#1a2744]/90"
                 disabled={loading}
                 data-testid="compare-btn"
               >
@@ -162,7 +162,7 @@ const HistoricalTaxComparison = () => {
         {comparison && (
           <>
             {/* Stage 3 Savings Highlight */}
-            <Card className="bg-gradient-to-r from-[#0F392B] to-[#0F392B]/80 text-white" data-testid="savings-highlight">
+            <Card className="bg-gradient-to-r from-[#1a2744] to-[#1a2744]/80 text-white" data-testid="savings-highlight">
               <CardContent className="p-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
                   <div>
@@ -177,16 +177,16 @@ const HistoricalTaxComparison = () => {
                         {formatCurrency(comparison.comparisons[1]?.total_tax || 0)}
                       </p>
                     </div>
-                    <ArrowRight className="h-6 w-6 text-[#D4AF37]" />
+                    <ArrowRight className="h-6 w-6 text-[#D4A84C]" />
                     <div className="text-center">
                       <p className="text-white/60 text-sm">2024-25</p>
-                      <p className="text-xl font-semibold text-[#D4AF37]">
+                      <p className="text-xl font-semibold text-[#D4A84C]">
                         {formatCurrency(comparison.comparisons[0]?.total_tax || 0)}
                       </p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <Badge className="bg-[#D4AF37] text-[#0F392B] text-lg px-4 py-2">
+                    <Badge className="bg-[#D4A84C] text-[#1a2744] text-lg px-4 py-2">
                       {comparison.savings_percentage.toFixed(1)}% Less Tax
                     </Badge>
                   </div>
@@ -199,7 +199,7 @@ const HistoricalTaxComparison = () => {
               {/* Tax by Year Chart */}
               <Card data-testid="tax-chart">
                 <CardHeader>
-                  <CardTitle className="font-['Manrope']">Tax Payable by Year</CardTitle>
+                  <CardTitle className="">Tax Payable by Year</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="h-[300px]">
@@ -219,7 +219,7 @@ const HistoricalTaxComparison = () => {
                             borderRadius: '8px'
                           }}
                         />
-                        <Bar dataKey="tax" fill="#0F392B" name="Tax Payable" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="tax" fill="#1a2744" name="Tax Payable" radius={[4, 4, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -229,7 +229,7 @@ const HistoricalTaxComparison = () => {
               {/* Effective Rate Chart */}
               <Card data-testid="rate-chart">
                 <CardHeader>
-                  <CardTitle className="font-['Manrope']">Effective Tax Rate</CardTitle>
+                  <CardTitle className="">Effective Tax Rate</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="h-[300px]">
@@ -252,9 +252,9 @@ const HistoricalTaxComparison = () => {
                         <Line 
                           type="monotone" 
                           dataKey="effectiveRate" 
-                          stroke="#D4AF37" 
+                          stroke="#D4A84C" 
                           strokeWidth={3}
-                          dot={{ fill: '#D4AF37', r: 6 }}
+                          dot={{ fill: '#D4A84C', r: 6 }}
                           name="Effective Rate"
                         />
                       </LineChart>
@@ -267,7 +267,7 @@ const HistoricalTaxComparison = () => {
             {/* Detailed Comparison Table */}
             <Card data-testid="comparison-table">
               <CardHeader>
-                <CardTitle className="font-['Manrope']">Year-by-Year Breakdown</CardTitle>
+                <CardTitle className="">Year-by-Year Breakdown</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="overflow-x-auto">
@@ -284,12 +284,12 @@ const HistoricalTaxComparison = () => {
                     </thead>
                     <tbody>
                       {comparison.comparisons.map((c, index) => (
-                        <tr key={c.year} className={`border-b ${index === 0 ? 'bg-[#0F392B]/5' : ''}`}>
+                        <tr key={c.year} className={`border-b ${index === 0 ? 'bg-[#1a2744]/5' : ''}`}>
                           <td className="p-3">
                             <div className="flex items-center gap-2">
                               {c.year}
                               {index === 0 && (
-                                <Badge className="bg-[#D4AF37] text-[#0F392B]">Current</Badge>
+                                <Badge className="bg-[#D4A84C] text-[#1a2744]">Current</Badge>
                               )}
                             </div>
                             <p className="text-xs text-muted-foreground">{c.description}</p>
@@ -315,7 +315,7 @@ const HistoricalTaxComparison = () => {
         {historicalRates && (
           <Card data-testid="brackets-reference">
             <CardHeader>
-              <CardTitle className="font-['Manrope']">Tax Bracket Changes</CardTitle>
+              <CardTitle className="">Tax Bracket Changes</CardTitle>
               <CardDescription>
                 How marginal rates have changed over time
               </CardDescription>

@@ -59,8 +59,8 @@ const formatCurrency = (value) => {
 };
 
 const EXPENSE_CATEGORIES = [
-  { id: "mortgage", label: "Mortgage/Rent", icon: Home, color: "#0F392B" },
-  { id: "utilities", label: "Utilities", icon: Zap, color: "#D4AF37" },
+  { id: "mortgage", label: "Mortgage/Rent", icon: Home, color: "#1a2744" },
+  { id: "utilities", label: "Utilities", icon: Zap, color: "#D4A84C" },
   { id: "groceries", label: "Groceries", icon: Utensils, color: "#10B981" },
   { id: "transport", label: "Transport/Car", icon: Car, color: "#3B82F6" },
   { id: "phone_internet", label: "Phone/Internet", icon: Phone, color: "#8B5CF6" },
@@ -240,7 +240,7 @@ const HouseholdBudget = () => {
       <div className="space-y-6" data-testid="household-budget-page">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+          <h1 className="text-3xl font-bold  text-foreground">
             Household Budget
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -268,7 +268,7 @@ const HouseholdBudget = () => {
               <p className="text-2xl font-bold">{formatCurrency(totalMonthlyExpenses)}</p>
             </CardContent>
           </Card>
-          <Card className="bg-[#D4AF37] text-white">
+          <Card className="bg-[#D4A84C] text-white">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-1">
                 <Calendar className="h-4 w-4" />
@@ -277,7 +277,7 @@ const HouseholdBudget = () => {
               <p className="text-2xl font-bold">{formatCurrency(totalAnnualOneOff)}</p>
             </CardContent>
           </Card>
-          <Card className={monthlySurplus >= 0 ? "bg-[#0F392B] text-white" : "bg-destructive text-white"}>
+          <Card className={monthlySurplus >= 0 ? "bg-[#1a2744] text-white" : "bg-destructive text-white"}>
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-1">
                 {monthlySurplus >= 0 ? <CheckCircle className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
@@ -303,7 +303,7 @@ const HouseholdBudget = () => {
               {/* Expense Breakdown Pie */}
               <Card data-testid="expense-breakdown">
                 <CardHeader>
-                  <CardTitle className="font-['Manrope']">Monthly Expense Breakdown</CardTitle>
+                  <CardTitle className="">Monthly Expense Breakdown</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="h-[300px] min-h-[300px]">
@@ -333,7 +333,7 @@ const HouseholdBudget = () => {
               {/* Monthly Cashflow */}
               <Card data-testid="monthly-cashflow">
                 <CardHeader>
-                  <CardTitle className="font-['Manrope']">12-Month Cashflow Projection</CardTitle>
+                  <CardTitle className="">12-Month Cashflow Projection</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="h-[300px] min-h-[300px]">
@@ -346,7 +346,7 @@ const HouseholdBudget = () => {
                         <Legend />
                         <Bar dataKey="income" fill="#10B981" name="Income" />
                         <Bar dataKey="expenses" fill="#EF4444" name="Regular" />
-                        <Bar dataKey="oneOff" fill="#D4AF37" name="One-Off" />
+                        <Bar dataKey="oneOff" fill="#D4A84C" name="One-Off" />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -356,7 +356,7 @@ const HouseholdBudget = () => {
               {/* Cumulative Savings */}
               <Card className="lg:col-span-2" data-testid="cumulative-savings">
                 <CardHeader>
-                  <CardTitle className="font-['Manrope']">Cumulative Savings Projection</CardTitle>
+                  <CardTitle className="">Cumulative Savings Projection</CardTitle>
                   <CardDescription>
                     Projected annual savings: {formatCurrency(cumulativeSavings[11]?.cumulative || 0)}
                   </CardDescription>
@@ -373,8 +373,8 @@ const HouseholdBudget = () => {
                           type="monotone" 
                           dataKey="cumulative" 
                           name="Cumulative Savings"
-                          stroke="#0F392B" 
-                          fill="#0F392B" 
+                          stroke="#1a2744" 
+                          fill="#1a2744" 
                           fillOpacity={0.3}
                         />
                       </AreaChart>
@@ -390,7 +390,7 @@ const HouseholdBudget = () => {
             <Card data-testid="income-section">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className="font-['Manrope']">Income Sources</CardTitle>
+                  <CardTitle className="">Income Sources</CardTitle>
                   <Button variant="outline" size="sm" onClick={addIncome}>
                     <Plus className="h-4 w-4 mr-2" />
                     Add Income
@@ -452,7 +452,7 @@ const HouseholdBudget = () => {
             <Card data-testid="expenses-section">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className="font-['Manrope']">Regular Expenses</CardTitle>
+                  <CardTitle className="">Regular Expenses</CardTitle>
                   <Button variant="outline" size="sm" onClick={addExpense}>
                     <Plus className="h-4 w-4 mr-2" />
                     Add Expense
@@ -535,7 +535,7 @@ const HouseholdBudget = () => {
             <Card data-testid="oneoff-section">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className="font-['Manrope']">One-Off Costs</CardTitle>
+                  <CardTitle className="">One-Off Costs</CardTitle>
                   <Button variant="outline" size="sm" onClick={addOneOff}>
                     <Plus className="h-4 w-4 mr-2" />
                     Add One-Off
@@ -553,8 +553,8 @@ const HouseholdBudget = () => {
                     
                     return (
                       <div key={cost.id} className="flex items-center gap-3 p-3 rounded-lg border">
-                        <div className="w-10 h-10 rounded-lg bg-[#D4AF37]/10 flex items-center justify-center">
-                          <Icon className="h-5 w-5 text-[#D4AF37]" />
+                        <div className="w-10 h-10 rounded-lg bg-[#D4A84C]/10 flex items-center justify-center">
+                          <Icon className="h-5 w-5 text-[#D4A84C]" />
                         </div>
                         <div className="flex-1 grid grid-cols-4 gap-3">
                           <Select 
@@ -616,11 +616,11 @@ const HouseholdBudget = () => {
                         <div 
                           key={idx}
                           className={`p-2 rounded-lg text-center ${
-                            monthTotal > 0 ? 'bg-[#D4AF37]/10' : 'bg-muted/50'
+                            monthTotal > 0 ? 'bg-[#D4A84C]/10' : 'bg-muted/50'
                           }`}
                         >
                           <p className="text-xs text-muted-foreground">{month.slice(0, 3)}</p>
-                          <p className={`text-sm font-semibold ${monthTotal > 0 ? 'text-[#D4AF37]' : ''}`}>
+                          <p className={`text-sm font-semibold ${monthTotal > 0 ? 'text-[#D4A84C]' : ''}`}>
                             {monthTotal > 0 ? formatCurrency(monthTotal) : '-'}
                           </p>
                         </div>
@@ -629,9 +629,9 @@ const HouseholdBudget = () => {
                   </div>
                 </div>
 
-                <div className="mt-4 p-4 rounded-lg bg-[#D4AF37]/10 flex justify-between items-center">
+                <div className="mt-4 p-4 rounded-lg bg-[#D4A84C]/10 flex justify-between items-center">
                   <span className="font-semibold">Total Annual One-Offs</span>
-                  <span className="text-xl font-bold text-[#D4AF37]">{formatCurrency(totalAnnualOneOff)}</span>
+                  <span className="text-xl font-bold text-[#D4A84C]">{formatCurrency(totalAnnualOneOff)}</span>
                 </div>
               </CardContent>
             </Card>
@@ -652,11 +652,11 @@ const HouseholdBudget = () => {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">One-Off Costs</p>
-                <p className="text-xl font-bold text-[#D4AF37]">{formatCurrency(totalAnnualOneOff)}</p>
+                <p className="text-xl font-bold text-[#D4A84C]">{formatCurrency(totalAnnualOneOff)}</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Annual Surplus</p>
-                <p className={`text-xl font-bold ${annualSurplus >= 0 ? 'text-[#0F392B]' : 'text-destructive'}`}>
+                <p className={`text-xl font-bold ${annualSurplus >= 0 ? 'text-[#1a2744]' : 'text-destructive'}`}>
                   {formatCurrency(annualSurplus)}
                 </p>
               </div>

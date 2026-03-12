@@ -106,7 +106,7 @@ const SMSFOptimizer = () => {
       <div className="space-y-8" data-testid="smsf-optimizer-page">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+          <h1 className="text-3xl font-bold  text-foreground">
             SMSF Contribution Optimizer
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -118,7 +118,7 @@ const SMSFOptimizer = () => {
           {/* Input Section */}
           <Card className="lg:col-span-1" data-testid="smsf-inputs">
             <CardHeader>
-              <CardTitle className="font-['Manrope']">Your Details</CardTitle>
+              <CardTitle className="">Your Details</CardTitle>
               <CardDescription>Enter your current situation</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -233,7 +233,7 @@ const SMSFOptimizer = () => {
 
               <Button 
                 onClick={calculateStrategy}
-                className="w-full bg-[#0F392B] hover:bg-[#0F392B]/90"
+                className="w-full bg-[#1a2744] hover:bg-[#1a2744]/90"
                 disabled={loading}
                 data-testid="calculate-smsf-btn"
               >
@@ -269,7 +269,7 @@ const SMSFOptimizer = () => {
                       <p className="text-xl font-bold">{result.tax_analysis.marginal_tax_rate}%</p>
                     </CardContent>
                   </Card>
-                  <Card className="bg-[#0F392B] text-white">
+                  <Card className="bg-[#1a2744] text-white">
                     <CardContent className="p-4">
                       <p className="text-sm text-white/80">Projected at 67</p>
                       <p className="text-xl font-bold">
@@ -282,7 +282,7 @@ const SMSFOptimizer = () => {
                 {/* Contribution Cap Progress */}
                 <Card data-testid="cap-progress">
                   <CardHeader>
-                    <CardTitle className="font-['Manrope']">Concessional Cap Usage</CardTitle>
+                    <CardTitle className="">Concessional Cap Usage</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
@@ -318,9 +318,9 @@ const SMSFOptimizer = () => {
                     </div>
 
                     {result.caps.bring_forward_available && (
-                      <div className="p-3 rounded-lg bg-[#D4AF37]/10 border border-[#D4AF37]/30">
+                      <div className="p-3 rounded-lg bg-[#D4A84C]/10 border border-[#D4A84C]/30">
                         <div className="flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-[#D4AF37]" />
+                          <CheckCircle className="h-4 w-4 text-[#D4A84C]" />
                           <p className="font-medium text-sm">Bring Forward Available</p>
                         </div>
                         <p className="text-sm text-muted-foreground mt-1">
@@ -334,7 +334,7 @@ const SMSFOptimizer = () => {
                 {/* Projection Chart */}
                 <Card data-testid="projection-chart">
                   <CardHeader>
-                    <CardTitle className="font-['Manrope']">Balance Projection to Retirement</CardTitle>
+                    <CardTitle className="">Balance Projection to Retirement</CardTitle>
                     <CardDescription>
                       Assuming {result.projections.assumed_growth_rate}% annual return
                     </CardDescription>
@@ -345,8 +345,8 @@ const SMSFOptimizer = () => {
                         <AreaChart data={projectionData}>
                           <defs>
                             <linearGradient id="colorBalance" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#0F392B" stopOpacity={0.3}/>
-                              <stop offset="95%" stopColor="#0F392B" stopOpacity={0}/>
+                              <stop offset="5%" stopColor="#1a2744" stopOpacity={0.3}/>
+                              <stop offset="95%" stopColor="#1a2744" stopOpacity={0}/>
                             </linearGradient>
                           </defs>
                           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -366,7 +366,7 @@ const SMSFOptimizer = () => {
                           <Area
                             type="monotone"
                             dataKey="balance"
-                            stroke="#0F392B"
+                            stroke="#1a2744"
                             strokeWidth={2}
                             fill="url(#colorBalance)"
                             name="Super Balance"
@@ -380,7 +380,7 @@ const SMSFOptimizer = () => {
                 {/* Tax Analysis */}
                 <Card data-testid="tax-analysis">
                   <CardHeader>
-                    <CardTitle className="font-['Manrope']">Tax Analysis</CardTitle>
+                    <CardTitle className="">Tax Analysis</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -408,7 +408,7 @@ const SMSFOptimizer = () => {
                           }
                         </p>
                       </div>
-                      <div className="p-3 rounded-lg bg-[#0F392B] text-white">
+                      <div className="p-3 rounded-lg bg-[#1a2744] text-white">
                         <p className="text-sm text-white/80">Net Tax Benefit</p>
                         <p className="text-lg font-bold">
                           {formatCurrency(result.tax_analysis.total_tax_benefit)}
@@ -421,8 +421,8 @@ const SMSFOptimizer = () => {
                 {/* Recommendations */}
                 <Card data-testid="recommendations">
                   <CardHeader>
-                    <CardTitle className="font-['Manrope'] flex items-center gap-2">
-                      <Lightbulb className="h-5 w-5 text-[#D4AF37]" />
+                    <CardTitle className=" flex items-center gap-2">
+                      <Lightbulb className="h-5 w-5 text-[#D4A84C]" />
                       Recommendations
                     </CardTitle>
                   </CardHeader>
@@ -460,10 +460,10 @@ const SMSFOptimizer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card data-testid="concessional-info">
             <CardHeader>
-              <CardTitle className="text-lg font-['Manrope']">Concessional Cap</CardTitle>
+              <CardTitle className="text-lg ">Concessional Cap</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-[#0F392B] mb-2">$30,000</div>
+              <div className="text-3xl font-bold text-[#1a2744] mb-2">$30,000</div>
               <p className="text-sm text-muted-foreground">
                 Annual limit for pre-tax contributions including employer super, 
                 salary sacrifice, and personal deductible contributions. Taxed at 15%.
@@ -473,10 +473,10 @@ const SMSFOptimizer = () => {
 
           <Card data-testid="nonconcessional-info">
             <CardHeader>
-              <CardTitle className="text-lg font-['Manrope']">Non-Concessional Cap</CardTitle>
+              <CardTitle className="text-lg ">Non-Concessional Cap</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-[#D4AF37] mb-2">$120,000</div>
+              <div className="text-3xl font-bold text-[#D4A84C] mb-2">$120,000</div>
               <p className="text-sm text-muted-foreground">
                 Annual limit for after-tax contributions. Can bring forward up to 
                 3 years ($360,000) if under 75 and TSB under $1.9M.
@@ -486,7 +486,7 @@ const SMSFOptimizer = () => {
 
           <Card data-testid="div293-info">
             <CardHeader>
-              <CardTitle className="text-lg font-['Manrope']">Division 293</CardTitle>
+              <CardTitle className="text-lg ">Division 293</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-destructive mb-2">$250,000</div>

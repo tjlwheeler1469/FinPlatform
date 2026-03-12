@@ -242,14 +242,14 @@ const WorkflowAutomation = ({ onTaskCreated, onReminderSet }) => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold flex items-center gap-2">
-            <Zap className="h-5 w-5 text-[#D4AF37]" />
+            <Zap className="h-5 w-5 text-[#D4A84C]" />
             Workflow Automation
           </h2>
           <p className="text-sm text-muted-foreground">Automate client tasks, reminders, and follow-ups</p>
         </div>
         <Dialog open={showNewWorkflow} onOpenChange={setShowNewWorkflow}>
           <DialogTrigger asChild>
-            <Button className="bg-[#0F392B]" data-testid="new-workflow-btn">
+            <Button className="bg-[#1a2744]" data-testid="new-workflow-btn">
               <Plus className="h-4 w-4 mr-2" /> Start Workflow
             </Button>
           </DialogTrigger>
@@ -287,7 +287,7 @@ const WorkflowAutomation = ({ onTaskCreated, onReminderSet }) => {
                     <div className="space-y-1">
                       {WORKFLOW_TEMPLATES.find(t => t.id === selectedTemplate)?.steps.map((step, i) => (
                         <div key={i} className="text-xs flex items-center gap-2 text-muted-foreground">
-                          <div className="w-5 h-5 rounded-full bg-[#0F392B]/10 flex items-center justify-center text-[10px] font-bold">
+                          <div className="w-5 h-5 rounded-full bg-[#1a2744]/10 flex items-center justify-center text-[10px] font-bold">
                             {i + 1}
                           </div>
                           <span>{step.title}</span>
@@ -315,7 +315,7 @@ const WorkflowAutomation = ({ onTaskCreated, onReminderSet }) => {
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowNewWorkflow(false)}>Cancel</Button>
-              <Button onClick={startWorkflow} className="bg-[#0F392B]" data-testid="start-workflow-btn">
+              <Button onClick={startWorkflow} className="bg-[#1a2744]" data-testid="start-workflow-btn">
                 <Play className="h-4 w-4 mr-2" /> Start Workflow
               </Button>
             </DialogFooter>
@@ -413,7 +413,7 @@ const WorkflowAutomation = ({ onTaskCreated, onReminderSet }) => {
                     </div>
                     <div className="h-2 bg-muted rounded-full overflow-hidden">
                       <div 
-                        className="h-full bg-[#0F392B] rounded-full transition-all"
+                        className="h-full bg-[#1a2744] rounded-full transition-all"
                         style={{ width: `${(workflow.current_step / workflow.total_steps) * 100}%` }}
                       />
                     </div>
@@ -423,7 +423,7 @@ const WorkflowAutomation = ({ onTaskCreated, onReminderSet }) => {
                   {workflow.current_step < workflow.total_steps && (
                     <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-[#D4AF37] flex items-center justify-center text-white font-bold text-sm">
+                        <div className="w-8 h-8 rounded-full bg-[#D4A84C] flex items-center justify-center text-white font-bold text-sm">
                           {workflow.current_step + 1}
                         </div>
                         <div>
@@ -461,7 +461,7 @@ const WorkflowAutomation = ({ onTaskCreated, onReminderSet }) => {
       <Card>
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
-            <Settings className="h-5 w-5 text-[#D4AF37]" />
+            <Settings className="h-5 w-5 text-[#D4A84C]" />
             Automation Rules
           </CardTitle>
           <CardDescription>Configure automatic triggers and actions</CardDescription>

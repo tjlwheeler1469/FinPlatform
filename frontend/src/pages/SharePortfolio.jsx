@@ -68,8 +68,8 @@ const formatPercent = (value) => {
 };
 
 const COLORS = {
-  personal: '#0F392B',
-  joint: '#D4AF37',
+  personal: '#1a2744',
+  joint: '#D4A84C',
   company: '#3B82F6'
 };
 
@@ -344,7 +344,7 @@ const SharePortfolio = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+            <h1 className="text-3xl font-bold  text-foreground">
               Share Portfolio
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -383,7 +383,7 @@ const SharePortfolio = () => {
             <Button variant="outline" onClick={syncDividendsToBudget}>
               Sync to Budget
             </Button>
-            <Button onClick={() => setShowAddShare(true)} className="bg-[#0F392B]" data-testid="add-share-btn">
+            <Button onClick={() => setShowAddShare(true)} className="bg-[#1a2744]" data-testid="add-share-btn">
               <Plus className="h-4 w-4 mr-2" /> Add Holding
             </Button>
           </div>
@@ -425,7 +425,7 @@ const SharePortfolio = () => {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="bg-[#0F392B] text-white">
+          <Card className="bg-[#1a2744] text-white">
             <CardContent className="p-4">
               <p className="text-sm text-white/80">Total Value</p>
               <p className="text-2xl font-bold">{formatCurrency(totalCurrentValue)}</p>
@@ -446,7 +446,7 @@ const SharePortfolio = () => {
           <Card>
             <CardContent className="p-4">
               <p className="text-sm text-muted-foreground">Annual Dividends</p>
-              <p className="text-2xl font-bold text-[#D4AF37]">{formatCurrency(totalDividendIncome)}</p>
+              <p className="text-2xl font-bold text-[#D4A84C]">{formatCurrency(totalDividendIncome)}</p>
               <p className="text-xs text-muted-foreground mt-1">
                 {((totalDividendIncome / totalCurrentValue) * 100).toFixed(1)}% yield
               </p>
@@ -502,7 +502,7 @@ const SharePortfolio = () => {
                     const owner = share.ownerId ? familyMembers.find(m => m.id === share.ownerId) : null;
                     
                     return (
-                      <Card key={share.id} className="hover:border-[#0F392B]/30 transition-colors">
+                      <Card key={share.id} className="hover:border-[#1a2744]/30 transition-colors">
                         <CardContent className="p-4">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4">
@@ -539,7 +539,7 @@ const SharePortfolio = () => {
                                 <p className={`text-sm font-medium ${gainLoss >= 0 ? 'text-[#10B981]' : 'text-destructive'}`}>
                                   {gainLoss >= 0 ? '+' : ''}{formatCurrency(gainLoss)} ({formatPercent(gainLossPercent)})
                                 </p>
-                                <p className="text-xs text-[#D4AF37]">
+                                <p className="text-xs text-[#D4A84C]">
                                   {formatCurrency(annualDividend)}/yr ({share.dividendYield}%)
                                 </p>
                               </div>
@@ -565,7 +565,7 @@ const SharePortfolio = () => {
                 {/* Ownership Distribution */}
                 <Card data-testid="ownership-distribution">
                   <CardHeader>
-                    <CardTitle className="font-['Manrope'] text-base">Ownership Distribution</CardTitle>
+                    <CardTitle className=" text-base">Ownership Distribution</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ChartContainer height={200}>
@@ -604,21 +604,21 @@ const SharePortfolio = () => {
                 {/* Dividend Summary */}
                 <Card data-testid="dividend-summary">
                   <CardHeader>
-                    <CardTitle className="font-['Manrope'] text-base">Annual Dividends</CardTitle>
+                    <CardTitle className=" text-base">Annual Dividends</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    <div className="p-3 rounded-lg bg-[#0F392B]/5">
+                    <div className="p-3 rounded-lg bg-[#1a2744]/5">
                       <div className="flex items-center gap-2 mb-2">
-                        <User className="h-4 w-4 text-[#0F392B]" />
+                        <User className="h-4 w-4 text-[#1a2744]" />
                         <span className="font-medium text-sm">Personal</span>
                       </div>
                       <p className="text-lg font-bold">
                         {formatCurrency(Object.values(dividends.personal).reduce((sum, d) => sum + d.gross, 0))}
                       </p>
                     </div>
-                    <div className="p-3 rounded-lg bg-[#D4AF37]/10">
+                    <div className="p-3 rounded-lg bg-[#D4A84C]/10">
                       <div className="flex items-center gap-2 mb-2">
-                        <Users className="h-4 w-4 text-[#D4AF37]" />
+                        <Users className="h-4 w-4 text-[#D4A84C]" />
                         <span className="font-medium text-sm">Joint (50% each)</span>
                       </div>
                       <p className="text-lg font-bold">{formatCurrency(dividends.joint.gross)}</p>
@@ -637,7 +637,7 @@ const SharePortfolio = () => {
                 {dividends.company.gross > 0 && (
                   <Card data-testid="company-distribution">
                     <CardHeader>
-                      <CardTitle className="font-['Manrope'] text-base flex items-center gap-2">
+                      <CardTitle className=" text-base flex items-center gap-2">
                         <Briefcase className="h-4 w-4" />
                         Company Dividend Distribution
                       </CardTitle>
@@ -854,7 +854,7 @@ const SharePortfolio = () => {
                   </Select>
                 </div>
                 
-                <Button onClick={handleAddShare} className="w-full bg-[#0F392B]">
+                <Button onClick={handleAddShare} className="w-full bg-[#1a2744]">
                   <Plus className="h-4 w-4 mr-2" /> Add Holding
                 </Button>
               </CardContent>

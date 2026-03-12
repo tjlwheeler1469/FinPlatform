@@ -763,8 +763,8 @@ const Copilot = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] flex items-center gap-2">
-              <Sparkles className="h-8 w-8 text-[#D4AF37]" />
+            <h1 className="text-3xl font-bold  flex items-center gap-2">
+              <Sparkles className="h-8 w-8 text-[#D4A84C]" />
               Financial Copilot
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -790,7 +790,7 @@ const Copilot = () => {
               </SelectContent>
             </Select>
             <Badge variant="outline" className="gap-1">
-              <Zap className="h-3 w-3 text-[#D4AF37]" />
+              <Zap className="h-3 w-3 text-[#D4A84C]" />
               {t.demoMode}
             </Badge>
           </div>
@@ -801,7 +801,7 @@ const Copilot = () => {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
-                <Bell className="h-4 w-4 text-[#D4AF37]" />
+                <Bell className="h-4 w-4 text-[#D4A84C]" />
                 {t.smartAlerts}
                 <Badge variant="secondary">{smartAlerts.length}</Badge>
               </CardTitle>
@@ -863,7 +863,7 @@ const Copilot = () => {
                       <div className={`max-w-[85%] ${msg.type === 'user' ? 'order-1' : ''}`}>
                         <div className={`flex items-start gap-2 ${msg.type === 'user' ? 'flex-row-reverse' : ''}`}>
                           <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                            msg.type === 'user' ? 'bg-[#0F392B]' : 'bg-[#D4AF37]'
+                            msg.type === 'user' ? 'bg-[#1a2744]' : 'bg-[#D4A84C]'
                           }`}>
                             {msg.type === 'user' ? (
                               <User className="h-4 w-4 text-white" />
@@ -873,7 +873,7 @@ const Copilot = () => {
                           </div>
                           <div className={`p-3 rounded-lg ${
                             msg.type === 'user' 
-                              ? 'bg-[#0F392B] text-white' 
+                              ? 'bg-[#1a2744] text-white' 
                               : 'bg-muted'
                           }`}>
                             <p className="text-sm whitespace-pre-line">{msg.content}</p>
@@ -895,7 +895,7 @@ const Copilot = () => {
                   {isProcessing && (
                     <div className="flex justify-start">
                       <div className="flex items-start gap-2">
-                        <div className="w-8 h-8 rounded-full bg-[#D4AF37] flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-full bg-[#D4A84C] flex items-center justify-center">
                           <Bot className="h-4 w-4 text-white" />
                         </div>
                         <div className="p-3 rounded-lg bg-muted">
@@ -919,7 +919,7 @@ const Copilot = () => {
                     className="flex-1"
                     disabled={isProcessing}
                   />
-                  <Button onClick={handleSend} disabled={isProcessing || !input.trim()} className="bg-[#0F392B]">
+                  <Button onClick={handleSend} disabled={isProcessing || !input.trim()} className="bg-[#1a2744]">
                     <Send className="h-4 w-4" />
                   </Button>
                 </div>
@@ -933,7 +933,7 @@ const Copilot = () => {
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Zap className="h-4 w-4 text-[#D4AF37]" />
+                  <Zap className="h-4 w-4 text-[#D4A84C]" />
                   {t.quickActions}
                 </CardTitle>
               </CardHeader>
@@ -954,7 +954,7 @@ const Copilot = () => {
 
             {/* Results Panel */}
             {activeResult && (
-              <Card className="border-t-4 border-t-[#D4AF37]">
+              <Card className="border-t-4 border-t-[#D4A84C]">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base flex items-center justify-between">
                     <span className="flex items-center gap-2">
@@ -979,10 +979,10 @@ const Copilot = () => {
                           <p className="font-bold text-red-600">{formatCurrency(activeResult.data.tax)}</p>
                         </div>
                       </div>
-                      <div className="p-3 bg-[#0F392B]/5 rounded">
+                      <div className="p-3 bg-[#1a2744]/5 rounded">
                         <div className="flex justify-between text-sm">
                           <span>Net Income</span>
-                          <span className="font-bold text-[#0F392B]">{formatCurrency(activeResult.data.netIncome)}</span>
+                          <span className="font-bold text-[#1a2744]">{formatCurrency(activeResult.data.netIncome)}</span>
                         </div>
                         <div className="flex justify-between text-xs text-muted-foreground mt-1">
                           <span>Effective Rate</span>
@@ -1010,10 +1010,10 @@ const Copilot = () => {
                           {formatCurrency(Math.abs(activeResult.data.capitalGain))}
                         </p>
                       </div>
-                      <div className="p-3 bg-[#0F392B]/5 rounded">
+                      <div className="p-3 bg-[#1a2744]/5 rounded">
                         <div className="flex justify-between text-sm">
                           <span>Net Proceeds</span>
-                          <span className="font-bold text-[#0F392B]">{formatCurrency(activeResult.data.netProceeds)}</span>
+                          <span className="font-bold text-[#1a2744]">{formatCurrency(activeResult.data.netProceeds)}</span>
                         </div>
                       </div>
                     </div>
@@ -1030,7 +1030,7 @@ const Copilot = () => {
                           <p className="text-[10px] text-muted-foreground">Expenses</p>
                           <p className="font-bold text-red-600 text-sm">{formatCurrency(activeResult.data.expenses)}</p>
                         </div>
-                        <div className={`p-2 rounded text-center ${activeResult.data.surplus >= 0 ? 'bg-[#0F392B]/10' : 'bg-amber-50'}`}>
+                        <div className={`p-2 rounded text-center ${activeResult.data.surplus >= 0 ? 'bg-[#1a2744]/10' : 'bg-amber-50'}`}>
                           <p className="text-[10px] text-muted-foreground">Surplus</p>
                           <p className="font-bold text-sm">{formatCurrency(activeResult.data.surplus)}</p>
                         </div>
@@ -1042,7 +1042,7 @@ const Copilot = () => {
                             <XAxis dataKey="month" tick={{ fontSize: 9 }} />
                             <YAxis tick={{ fontSize: 9 }} tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} />
                             <Tooltip formatter={(v) => formatCurrency(v)} />
-                            <Area type="monotone" dataKey="cumulative" stroke="#0F392B" fill="#0F392B" fillOpacity={0.3} />
+                            <Area type="monotone" dataKey="cumulative" stroke="#1a2744" fill="#1a2744" fillOpacity={0.3} />
                           </AreaChart>
                         </ResponsiveContainer>
                       </ChartContainer>

@@ -241,7 +241,7 @@ Note: This is a calculation only. Lodge via ATO Business Portal or through your 
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+            <h1 className="text-3xl font-bold  text-foreground">
               BAS Calculator
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -264,7 +264,7 @@ Note: This is a calculation only. Lodge via ATO Business Portal or through your 
             <Button variant="outline" onClick={exportBAS}>
               <Download className="h-4 w-4 mr-2" /> Export
             </Button>
-            <Button onClick={calculateBAS} className="bg-[#0F392B]" disabled={calculating}>
+            <Button onClick={calculateBAS} className="bg-[#1a2744]" disabled={calculating}>
               {calculating ? (
                 <><RefreshCw className="h-4 w-4 mr-2 animate-spin" /> Calculating...</>
               ) : (
@@ -358,7 +358,7 @@ Note: This is a calculation only. Lodge via ATO Business Portal or through your 
 
         {/* Summary Cards */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <Card className="bg-[#0F392B] text-white">
+          <Card className="bg-[#1a2744] text-white">
             <CardContent className="p-4">
               <p className="text-xs text-white/70">GST on Sales</p>
               <p className="text-xl font-bold">{formatCurrency(gstOnSales)}</p>
@@ -407,7 +407,7 @@ Note: This is a calculation only. Lodge via ATO Business Portal or through your 
               {/* GST on Sales */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base text-[#0F392B]">GST on Sales</CardTitle>
+                  <CardTitle className="text-base text-[#1a2744]">GST on Sales</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {[
@@ -524,7 +524,7 @@ Note: This is a calculation only. Lodge via ATO Business Portal or through your 
                 ))}
                 <div className="pt-4 border-t">
                   <div className="grid grid-cols-12 gap-4 items-center bg-muted p-3 rounded">
-                    <Badge className="col-span-1 justify-center bg-[#0F392B]">W5</Badge>
+                    <Badge className="col-span-1 justify-center bg-[#1a2744]">W5</Badge>
                     <span className="col-span-7 font-semibold">Total amounts withheld</span>
                     <span className="col-span-4 text-right font-bold text-lg">{formatCurrency(basData.W5)}</span>
                   </div>
@@ -568,7 +568,7 @@ Note: This is a calculation only. Lodge via ATO Business Portal or through your 
                 </div>
                 <div className="pt-4 border-t">
                   <div className="grid grid-cols-12 gap-4 items-center bg-muted p-3 rounded">
-                    <Badge className="col-span-1 justify-center bg-[#D4AF37]">T9</Badge>
+                    <Badge className="col-span-1 justify-center bg-[#D4A84C]">T9</Badge>
                     <span className="col-span-7 font-semibold">PAYG instalment (T7 × T8%)</span>
                     <span className="col-span-4 text-right font-bold text-lg">{formatCurrency(basData.T9)}</span>
                   </div>
@@ -658,7 +658,7 @@ Note: This is a calculation only. Lodge via ATO Business Portal or through your 
                       rel="noopener noreferrer"
                       className="flex-1"
                     >
-                      <Button className="w-full bg-[#0F392B]">
+                      <Button className="w-full bg-[#1a2744]">
                         <Send className="h-4 w-4 mr-2" /> Lodge via ATO
                         <ExternalLink className="h-3 w-3 ml-1" />
                       </Button>

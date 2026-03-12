@@ -81,12 +81,12 @@ const LandingPage = () => {
         <div className="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-12 py-20">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             <div className="lg:col-span-7 text-white">
-              <p className="text-[#D4AF37] font-medium mb-4 tracking-wide uppercase text-sm animate-fade-in">
+              <p className="text-[#D4A84C] font-medium mb-4 tracking-wide uppercase text-sm animate-fade-in">
                 Australian Investment Analysis
               </p>
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight animate-fade-in stagger-1 font-['Manrope']">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight animate-fade-in stagger-1 ">
                 Optimize Your
-                <span className="text-[#D4AF37] block">Wealth Strategy</span>
+                <span className="text-[#D4A84C] block">Wealth Strategy</span>
               </h1>
               <p className="text-lg md:text-xl text-white/80 mb-8 max-w-xl animate-fade-in stagger-2">
                 Comprehensive investment analysis for personal and business portfolios. 
@@ -97,7 +97,7 @@ const LandingPage = () => {
                 <Button 
                   data-testid="get-started-btn"
                   onClick={login}
-                  className="bg-[#D4AF37] text-[#0F392B] hover:bg-[#D4AF37]/90 text-lg px-8 py-6 font-semibold"
+                  className="bg-[#D4A84C] text-[#1a2744] hover:bg-[#D4A84C]/90 text-lg px-8 py-6 font-semibold"
                 >
                   Get Started Free
                   <ChevronRight className="ml-2 h-5 w-5" />
@@ -115,14 +115,14 @@ const LandingPage = () => {
             <div className="lg:col-span-5 animate-fade-in stagger-4">
               <Card className="bg-white/10 backdrop-blur-md border-white/20">
                 <CardContent className="p-6">
-                  <h3 className="text-white font-semibold mb-4 font-['Manrope']">Investment Types Covered</h3>
+                  <h3 className="text-white font-semibold mb-4 ">Investment Types Covered</h3>
                   <div className="space-y-3">
                     {investmentTypes.map((type, index) => (
                       <div 
                         key={type.name}
                         className="flex items-center gap-3 text-white/90 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
                       >
-                        <type.icon className="h-5 w-5 text-[#D4AF37]" />
+                        <type.icon className="h-5 w-5 text-[#D4A84C]" />
                         <span>{type.name}</span>
                       </div>
                     ))}
@@ -138,7 +138,7 @@ const LandingPage = () => {
       <section className="py-20 px-6 md:px-12 bg-background">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 font-['Manrope'] text-foreground">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4  text-foreground">
               Powerful Analysis Tools
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -154,10 +154,10 @@ const LandingPage = () => {
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <CardContent className="p-6">
-                  <div className="w-12 h-12 rounded-lg bg-[#0F392B] flex items-center justify-center mb-4">
-                    <feature.icon className="h-6 w-6 text-[#D4AF37]" />
+                  <div className="w-12 h-12 rounded-lg bg-[#1a2744] flex items-center justify-center mb-4">
+                    <feature.icon className="h-6 w-6 text-[#D4A84C]" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-2 font-['Manrope'] text-foreground">
+                  <h3 className="text-xl font-semibold mb-2  text-foreground">
                     {feature.title}
                   </h3>
                   <p className="text-muted-foreground">
@@ -175,7 +175,7 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-6 font-['Manrope'] text-foreground">
+              <h2 className="text-3xl md:text-4xl font-bold mb-6  text-foreground">
                 Updated for 2024-25 Tax Year
               </h2>
               <p className="text-lg text-muted-foreground mb-6">
@@ -224,8 +224,8 @@ const LandingPage = () => {
                 alt="Australian Finance"
                 className="rounded-lg shadow-xl"
               />
-              <div className="absolute -bottom-6 -left-6 bg-[#0F392B] text-white p-4 rounded-lg shadow-lg">
-                <p className="text-3xl font-bold font-['Manrope']">$18,200</p>
+              <div className="absolute -bottom-6 -left-6 bg-[#1a2744] text-white p-4 rounded-lg shadow-lg">
+                <p className="text-3xl font-bold ">$18,200</p>
                 <p className="text-sm text-white/80">Tax-Free Threshold</p>
               </div>
             </div>
@@ -234,9 +234,9 @@ const LandingPage = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-6 md:px-12 bg-[#0F392B]">
+      <section className="py-20 px-6 md:px-12 bg-[#1a2744]">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6 font-['Manrope'] text-white">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6  text-white">
             Start Optimizing Your Investments Today
           </h2>
           <p className="text-lg text-white/80 mb-8">
@@ -245,7 +245,7 @@ const LandingPage = () => {
           <Button 
             data-testid="cta-get-started-btn"
             onClick={login}
-            className="bg-[#D4AF37] text-[#0F392B] hover:bg-[#D4AF37]/90 text-lg px-10 py-6 font-semibold"
+            className="bg-[#D4A84C] text-[#1a2744] hover:bg-[#D4A84C]/90 text-lg px-10 py-6 font-semibold"
           >
             Get Started Free
             <ChevronRight className="ml-2 h-5 w-5" />
@@ -257,8 +257,8 @@ const LandingPage = () => {
       <footer className="py-8 px-6 md:px-12 bg-background border-t border-border">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2">
-            <TrendingUp className="h-6 w-6 text-[#0F392B]" />
-            <span className="font-bold font-['Manrope'] text-foreground">WealthOptimizer AU</span>
+            <TrendingUp className="h-6 w-6 text-[#1a2744]" />
+            <span className="font-bold  text-foreground">WealthOptimizer AU</span>
           </div>
           <p className="text-sm text-muted-foreground">
             © 2024 WealthOptimizer. Australian tax calculations for informational purposes only.

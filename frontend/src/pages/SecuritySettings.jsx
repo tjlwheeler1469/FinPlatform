@@ -129,8 +129,8 @@ const SecuritySettings = () => {
       <div className="space-y-6" data-testid="security-settings-page">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold font-['Manrope'] text-foreground flex items-center gap-2">
-            <Shield className="h-8 w-8 text-[#D4AF37]" />
+          <h1 className="text-3xl font-bold  text-foreground flex items-center gap-2">
+            <Shield className="h-8 w-8 text-[#D4A84C]" />
             Security Settings
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -162,7 +162,7 @@ const SecuritySettings = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Key className="h-5 w-5 text-[#D4AF37]" />
+                  <Key className="h-5 w-5 text-[#D4A84C]" />
                   Change Password
                 </CardTitle>
                 <CardDescription>
@@ -251,7 +251,7 @@ const SecuritySettings = () => {
                   </ul>
                 </div>
 
-                <Button onClick={handlePasswordChange} className="bg-[#0F392B]" data-testid="change-password-btn">
+                <Button onClick={handlePasswordChange} className="bg-[#1a2744]" data-testid="change-password-btn">
                   <Lock className="h-4 w-4 mr-2" /> Change Password
                 </Button>
               </CardContent>
@@ -265,7 +265,7 @@ const SecuritySettings = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="text-base flex items-center gap-2">
-                      <Smartphone className="h-5 w-5 text-[#D4AF37]" />
+                      <Smartphone className="h-5 w-5 text-[#D4A84C]" />
                       Active Sessions
                     </CardTitle>
                     <CardDescription>
@@ -330,7 +330,7 @@ const SecuritySettings = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Activity className="h-5 w-5 text-[#D4AF37]" />
+                  <Activity className="h-5 w-5 text-[#D4A84C]" />
                   Security Activity Log
                 </CardTitle>
                 <CardDescription>
@@ -382,7 +382,7 @@ const SecuritySettings = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Shield className="h-5 w-5 text-[#D4AF37]" />
+                  <Shield className="h-5 w-5 text-[#D4A84C]" />
                   Security Preferences
                 </CardTitle>
                 <CardDescription>
@@ -455,7 +455,7 @@ const SecuritySettings = () => {
 
                 <Button 
                   onClick={() => toast.success("Preferences saved")} 
-                  className="bg-[#0F392B]"
+                  className="bg-[#1a2744]"
                 >
                   Save Preferences
                 </Button>

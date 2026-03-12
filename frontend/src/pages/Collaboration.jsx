@@ -42,7 +42,7 @@ const USER_ROLES = {
   },
   adviser: {
     name: "Financial Adviser",
-    color: "#0F392B",
+    color: "#1a2744",
     permissions: ["view", "edit", "share", "export", "add_notes", "generate_soa"]
   },
   accountant: {
@@ -230,7 +230,7 @@ const Collaboration = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+            <h1 className="text-3xl font-bold  text-foreground">
               Collaboration
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -242,7 +242,7 @@ const Collaboration = () => {
               <span className="w-2 h-2 bg-[#10B981] rounded-full mr-2 animate-pulse" />
               {onlineCount} Online
             </Badge>
-            <Button onClick={() => setShowInvite(true)} className="bg-[#0F392B]">
+            <Button onClick={() => setShowInvite(true)} className="bg-[#1a2744]">
               <UserPlus className="h-4 w-4 mr-2" /> Invite Member
             </Button>
           </div>
@@ -358,7 +358,7 @@ const Collaboration = () => {
                         )}
                         
                         {member.id === currentUser.id && (
-                          <Badge className="bg-[#0F392B]">You</Badge>
+                          <Badge className="bg-[#1a2744]">You</Badge>
                         )}
                       </div>
                     </div>
@@ -445,7 +445,7 @@ const Collaboration = () => {
                       onChange={(e) => setNewComment({ ...newComment, text: e.target.value })}
                     />
                   </div>
-                  <Button onClick={handleAddComment} className="bg-[#0F392B]">
+                  <Button onClick={handleAddComment} className="bg-[#1a2744]">
                     <Send className="h-4 w-4 mr-2" /> Add Note
                   </Button>
                 </div>
@@ -459,7 +459,7 @@ const Collaboration = () => {
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-3">
                         <Avatar className="h-8 w-8">
-                          <AvatarFallback className="text-xs bg-[#0F392B] text-white">
+                          <AvatarFallback className="text-xs bg-[#1a2744] text-white">
                             {comment.avatar}
                           </AvatarFallback>
                         </Avatar>
@@ -575,7 +575,7 @@ const Collaboration = () => {
                   <Button variant="outline" className="flex-1" onClick={() => setShowInvite(false)}>
                     Cancel
                   </Button>
-                  <Button className="flex-1 bg-[#0F392B]" onClick={handleInvite}>
+                  <Button className="flex-1 bg-[#1a2744]" onClick={handleInvite}>
                     <Send className="h-4 w-4 mr-2" /> Send Invite
                   </Button>
                 </div>

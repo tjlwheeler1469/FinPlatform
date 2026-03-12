@@ -162,7 +162,7 @@ const SuperannuationGuarantee = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+            <h1 className="text-3xl font-bold  text-foreground">
               Superannuation Guarantee Calculator
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -184,7 +184,7 @@ const SuperannuationGuarantee = () => {
         </div>
 
         {/* Current Rate Info */}
-        <Card className="bg-[#0F392B] text-white">
+        <Card className="bg-[#1a2744] text-white">
           <CardContent className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div>
@@ -197,7 +197,7 @@ const SuperannuationGuarantee = () => {
               </div>
               <div>
                 <p className="text-white/70 text-sm">Total Quarterly SG</p>
-                <p className="text-3xl font-bold text-[#D4AF37]">{formatCurrency(totalQuarterlySG)}</p>
+                <p className="text-3xl font-bold text-[#D4A84C]">{formatCurrency(totalQuarterlySG)}</p>
               </div>
               <div>
                 <p className="text-white/70 text-sm">Total Annual SG</p>
@@ -227,7 +227,7 @@ const SuperannuationGuarantee = () => {
                     {/* Input Section */}
                     <div className="space-y-4">
                       <div className="flex items-center gap-2">
-                        <div className="w-10 h-10 rounded-lg bg-[#0F392B] flex items-center justify-center text-white">
+                        <div className="w-10 h-10 rounded-lg bg-[#1a2744] flex items-center justify-center text-white">
                           <Users className="h-5 w-5" />
                         </div>
                         <Input
@@ -289,7 +289,7 @@ const SuperannuationGuarantee = () => {
                       ) : (
                         <div className="space-y-4">
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            <div className="p-3 rounded-lg bg-[#0F392B]/10">
+                            <div className="p-3 rounded-lg bg-[#1a2744]/10">
                               <p className="text-xs text-muted-foreground">Quarterly SG</p>
                               <p className="text-lg font-bold">{formatCurrency(calc.quarterlySG)}</p>
                             </div>
@@ -374,7 +374,7 @@ const SuperannuationGuarantee = () => {
                       <YAxis tickFormatter={(v) => `$${(v/1000)}k`} stroke="hsl(var(--muted-foreground))" />
                       <Tooltip formatter={(v) => formatCurrency(v)} />
                       <Legend />
-                      <Bar dataKey="sg" name="Annual SG" fill="#0F392B" />
+                      <Bar dataKey="sg" name="Annual SG" fill="#1a2744" />
                     </BarChart>
                   </ResponsiveContainer>
                 </ChartContainer>
@@ -396,8 +396,8 @@ const SuperannuationGuarantee = () => {
                       <YAxis yAxisId="right" orientation="right" tickFormatter={(v) => `${v}%`} stroke="hsl(var(--muted-foreground))" domain={[11, 13]} />
                       <Tooltip formatter={(v, name) => name === 'rate' ? `${v}%` : formatCurrency(v)} />
                       <Legend />
-                      <Line yAxisId="left" type="monotone" dataKey="totalSG" name="Total SG" stroke="#0F392B" strokeWidth={2} />
-                      <Line yAxisId="right" type="monotone" dataKey="rate" name="SG Rate" stroke="#D4AF37" strokeWidth={2} strokeDasharray="5 5" />
+                      <Line yAxisId="left" type="monotone" dataKey="totalSG" name="Total SG" stroke="#1a2744" strokeWidth={2} />
+                      <Line yAxisId="right" type="monotone" dataKey="rate" name="SG Rate" stroke="#D4A84C" strokeWidth={2} strokeDasharray="5 5" />
                     </LineChart>
                   </ResponsiveContainer>
                 </ChartContainer>
@@ -410,7 +410,7 @@ const SuperannuationGuarantee = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-[#D4AF37]" />
+              <Calendar className="h-5 w-5 text-[#D4A84C]" />
               Payment Due Dates & Penalties
             </CardTitle>
           </CardHeader>
@@ -470,7 +470,7 @@ const SuperannuationGuarantee = () => {
                   href="https://www.ato.gov.au/businesses-and-organisations/super-for-employers/paying-super-contributions/how-much-super-to-pay" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-sm text-[#0F392B] hover:underline flex items-center gap-1"
+                  className="text-sm text-[#1a2744] hover:underline flex items-center gap-1"
                 >
                   How much super to pay <ExternalLink className="h-3 w-3" />
                 </a>

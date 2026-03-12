@@ -233,7 +233,7 @@ const DocumentManager = ({ clientId = null, compact = false }) => {
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-base flex items-center gap-2">
-              <FileText className="h-5 w-5 text-[#D4AF37]" />
+              <FileText className="h-5 w-5 text-[#D4A84C]" />
               Recent Documents
             </CardTitle>
             <Dialog open={showGenerateDialog} onOpenChange={setShowGenerateDialog}>
@@ -307,7 +307,7 @@ const DocumentManager = ({ clientId = null, compact = false }) => {
         </div>
         <Dialog open={showGenerateDialog} onOpenChange={setShowGenerateDialog}>
           <DialogTrigger asChild>
-            <Button className="bg-[#0F392B]" data-testid="generate-report-btn">
+            <Button className="bg-[#1a2744]" data-testid="generate-report-btn">
               <FilePlus className="h-4 w-4 mr-2" /> Generate Report
             </Button>
           </DialogTrigger>
@@ -425,7 +425,7 @@ const DocumentManager = ({ clientId = null, compact = false }) => {
                       <div>
                         <div className="flex items-center gap-2">
                           <p className="font-medium">{doc.name}</p>
-                          {doc.starred && <Star className="h-4 w-4 text-[#D4AF37] fill-[#D4AF37]" />}
+                          {doc.starred && <Star className="h-4 w-4 text-[#D4A84C] fill-[#D4A84C]" />}
                           {doc.status === 'draft' && <Badge variant="outline">Draft</Badge>}
                           {doc.status === 'archived' && <Badge variant="secondary">Archived</Badge>}
                         </div>

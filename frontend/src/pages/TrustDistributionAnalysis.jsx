@@ -129,7 +129,7 @@ const getMarginalRate = (income) => {
   return 0;
 };
 
-const COLORS = ['#0F392B', '#D4AF37', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'];
+const COLORS = ['#1a2744', '#D4A84C', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'];
 
 const TrustDistributionAnalysis = () => {
   const { 
@@ -285,7 +285,7 @@ const TrustDistributionAnalysis = () => {
       <div className="space-y-6" data-testid="trust-distribution-page">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+          <h1 className="text-3xl font-bold  text-foreground">
             Trust Distribution Analysis
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -295,7 +295,7 @@ const TrustDistributionAnalysis = () => {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="bg-[#0F392B] text-white">
+          <Card className="bg-[#1a2744] text-white">
             <CardContent className="p-4">
               <p className="text-sm text-white/80">Trust Income</p>
               <p className="text-2xl font-bold">{formatCurrency(trustIncome)}</p>
@@ -316,7 +316,7 @@ const TrustDistributionAnalysis = () => {
           <Card>
             <CardContent className="p-4">
               <p className="text-sm text-muted-foreground">Distribution %</p>
-              <p className={`text-2xl font-bold ${totalPercentage === 100 ? 'text-[#10B981]' : totalPercentage > 100 ? 'text-destructive' : 'text-[#D4AF37]'}`}>
+              <p className={`text-2xl font-bold ${totalPercentage === 100 ? 'text-[#10B981]' : totalPercentage > 100 ? 'text-destructive' : 'text-[#D4A84C]'}`}>
                 {totalPercentage}%
               </p>
             </CardContent>
@@ -337,9 +337,9 @@ const TrustDistributionAnalysis = () => {
 
         {/* Undistributed warning */}
         {undistributed > 0 && totalPercentage < 100 && (
-          <Card className="bg-[#D4AF37]/10 border-[#D4AF37]/20">
+          <Card className="bg-[#D4A84C]/10 border-[#D4A84C]/20">
             <CardContent className="p-4 flex items-center gap-3">
-              <AlertTriangle className="h-5 w-5 text-[#D4AF37]" />
+              <AlertTriangle className="h-5 w-5 text-[#D4A84C]" />
               <p className="text-sm">
                 <strong>{formatCurrency(undistributed)}</strong> will remain undistributed and taxed at 47% ({formatCurrency(undistributedTax)} tax). 
                 Consider distributing to beneficiaries in lower tax brackets.
@@ -352,8 +352,8 @@ const TrustDistributionAnalysis = () => {
           {/* Trust Configuration */}
           <Card className="lg:col-span-1" data-testid="trust-config">
             <CardHeader>
-              <CardTitle className="font-['Manrope'] flex items-center gap-2">
-                <Shield className="h-5 w-5 text-[#0F392B]" />
+              <CardTitle className=" flex items-center gap-2">
+                <Shield className="h-5 w-5 text-[#1a2744]" />
                 Trust Configuration
               </CardTitle>
             </CardHeader>
@@ -432,8 +432,8 @@ const TrustDistributionAnalysis = () => {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="font-['Manrope'] flex items-center gap-2">
-                    <Users className="h-5 w-5 text-[#D4AF37]" />
+                  <CardTitle className=" flex items-center gap-2">
+                    <Users className="h-5 w-5 text-[#D4A84C]" />
                     Beneficiary Tax Impact
                   </CardTitle>
                   <CardDescription>
@@ -494,7 +494,7 @@ const TrustDistributionAnalysis = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span>Distribution: <strong>{result.distribution}%</strong></span>
-                      <span className="text-[#D4AF37] font-semibold">{formatCurrency(result.distributionAmount)}</span>
+                      <span className="text-[#D4A84C] font-semibold">{formatCurrency(result.distributionAmount)}</span>
                     </div>
                     <Slider
                       value={[result.distribution]}
@@ -517,7 +517,7 @@ const TrustDistributionAnalysis = () => {
                   <div className="grid grid-cols-4 gap-3 p-3 rounded-lg bg-muted/50">
                     <div className="text-center">
                       <p className="text-xs text-muted-foreground">Distribution</p>
-                      <p className="font-semibold text-[#D4AF37]">{formatCurrency(result.distributionAmount)}</p>
+                      <p className="font-semibold text-[#D4A84C]">{formatCurrency(result.distributionAmount)}</p>
                     </div>
                     <div className="text-center">
                       <p className="text-xs text-muted-foreground">Tax on Dist.</p>
@@ -535,7 +535,7 @@ const TrustDistributionAnalysis = () => {
 
                   {/* Detailed Tax Breakdown */}
                   {showDetailed === result.id && (
-                    <div className="mt-4 p-4 rounded-lg bg-[#0F392B]/5 space-y-3">
+                    <div className="mt-4 p-4 rounded-lg bg-[#1a2744]/5 space-y-3">
                       <h5 className="font-semibold flex items-center gap-2">
                         <Calculator className="h-4 w-4" />
                         Tax Bracket Breakdown
@@ -564,7 +564,7 @@ const TrustDistributionAnalysis = () => {
                           </tr>
                           <tr className="font-semibold">
                             <td className="p-2" colSpan={3}>Tax Attributable to Distribution</td>
-                            <td className="text-right p-2 text-[#D4AF37]">{formatCurrency(result.distributionTax)}</td>
+                            <td className="text-right p-2 text-[#D4A84C]">{formatCurrency(result.distributionTax)}</td>
                           </tr>
                         </tbody>
                       </table>
@@ -574,7 +574,7 @@ const TrustDistributionAnalysis = () => {
               ))}
 
               {/* Totals */}
-              <div className="p-4 rounded-lg bg-[#0F392B] text-white">
+              <div className="p-4 rounded-lg bg-[#1a2744] text-white">
                 <div className="grid grid-cols-4 gap-4">
                   <div className="text-center">
                     <p className="text-sm text-white/80">Total Distributed</p>
@@ -590,7 +590,7 @@ const TrustDistributionAnalysis = () => {
                   </div>
                   <div className="text-center">
                     <p className="text-sm text-white/80">Total Tax</p>
-                    <p className="text-xl font-bold text-[#D4AF37]">{formatCurrency(combinedTax)}</p>
+                    <p className="text-xl font-bold text-[#D4A84C]">{formatCurrency(combinedTax)}</p>
                   </div>
                 </div>
               </div>
@@ -603,7 +603,7 @@ const TrustDistributionAnalysis = () => {
           {/* Tax Comparison Chart */}
           <Card data-testid="tax-comparison">
             <CardHeader>
-              <CardTitle className="font-['Manrope']">Tax Comparison</CardTitle>
+              <CardTitle className="">Tax Comparison</CardTitle>
               <CardDescription>
                 Splitting vs all income to highest earner
               </CardDescription>
@@ -634,7 +634,7 @@ const TrustDistributionAnalysis = () => {
           {/* Effective Rate Comparison */}
           <Card data-testid="effective-rate-comparison">
             <CardHeader>
-              <CardTitle className="font-['Manrope']">Effective Rates by Beneficiary</CardTitle>
+              <CardTitle className="">Effective Rates by Beneficiary</CardTitle>
               <CardDescription>
                 Tax rate on distribution vs marginal rate
               </CardDescription>
@@ -660,8 +660,8 @@ const TrustDistributionAnalysis = () => {
         {/* Recommendations */}
         <Card data-testid="recommendations">
           <CardHeader>
-            <CardTitle className="font-['Manrope'] flex items-center gap-2">
-              <Lightbulb className="h-5 w-5 text-[#D4AF37]" />
+            <CardTitle className=" flex items-center gap-2">
+              <Lightbulb className="h-5 w-5 text-[#D4A84C]" />
               Distribution Recommendations
             </CardTitle>
           </CardHeader>
@@ -700,12 +700,12 @@ const TrustDistributionAnalysis = () => {
                 <div 
                   key={`${i}-${j}`} 
                   className={`flex items-start gap-3 p-3 rounded-lg ${
-                    rec.type === 'success' ? 'bg-[#10B981]/10' : 'bg-[#D4AF37]/10'
+                    rec.type === 'success' ? 'bg-[#10B981]/10' : 'bg-[#D4A84C]/10'
                   }`}
                 >
                   {rec.type === 'success' 
                     ? <CheckCircle className="h-5 w-5 text-[#10B981] flex-shrink-0" />
-                    : <AlertTriangle className="h-5 w-5 text-[#D4AF37] flex-shrink-0" />
+                    : <AlertTriangle className="h-5 w-5 text-[#D4A84C] flex-shrink-0" />
                   }
                   <p className="text-sm">{rec.text}</p>
                 </div>
@@ -726,7 +726,7 @@ const TrustDistributionAnalysis = () => {
             {/* General strategies */}
             <Separator />
             <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-              <Lightbulb className="h-5 w-5 text-[#D4AF37] flex-shrink-0" />
+              <Lightbulb className="h-5 w-5 text-[#D4A84C] flex-shrink-0" />
               <div className="text-sm">
                 <p className="font-semibold mb-1">Optimization Strategy</p>
                 <p className="text-muted-foreground">

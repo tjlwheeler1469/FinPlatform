@@ -91,7 +91,7 @@ const calculateTax = (income) => {
   return { tax: Math.round(tax), medicare: Math.round(medicare), total: Math.round(total), effectiveRate, marginalRate };
 };
 
-const COLORS = ['#0F392B', '#D4AF37', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'];
+const COLORS = ['#1a2744', '#D4A84C', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'];
 
 const FamilyMemberProfile = () => {
   const { memberId } = useParams();
@@ -163,8 +163,8 @@ const FamilyMemberProfile = () => {
 
   // Income breakdown data
   const incomeBreakdown = [
-    { name: 'Salary', value: member.salaryIncome || 0, color: '#0F392B' },
-    { name: 'Dividends', value: member.dividendIncome || annualDividends || 0, color: '#D4AF37' },
+    { name: 'Salary', value: member.salaryIncome || 0, color: '#1a2744' },
+    { name: 'Dividends', value: member.dividendIncome || annualDividends || 0, color: '#D4A84C' },
     { name: 'Rental', value: member.rentalIncome || 0, color: '#10B981' },
     { name: 'Trust', value: trustDistribution, color: '#3B82F6' },
     { name: 'Other', value: (member.taxableIncome || 0) - (member.salaryIncome || 0) - (member.dividendIncome || 0) - (member.rentalIncome || 0) - trustDistribution, color: '#8B5CF6' }
@@ -172,8 +172,8 @@ const FamilyMemberProfile = () => {
 
   // Wealth composition
   const wealthComposition = [
-    { name: 'Superannuation', value: superBalance, color: '#0F392B' },
-    { name: 'Shares', value: totalShareValue, color: '#D4AF37' },
+    { name: 'Superannuation', value: superBalance, color: '#1a2744' },
+    { name: 'Shares', value: totalShareValue, color: '#D4A84C' },
     { name: 'Cash', value: 0, color: '#10B981' } // Would need personal cash tracking
   ].filter(item => item.value > 0);
 
@@ -221,17 +221,17 @@ const FamilyMemberProfile = () => {
               <ArrowLeft className="h-4 w-4" />
             </Button>
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-full bg-[#0F392B] text-white flex items-center justify-center text-2xl font-bold">
+              <div className="w-16 h-16 rounded-full bg-[#1a2744] text-white flex items-center justify-center text-2xl font-bold">
                 {member.name.charAt(0)}
               </div>
               <div>
-                <h1 className="text-3xl font-bold font-['Manrope']">{member.name}</h1>
+                <h1 className="text-3xl font-bold ">{member.name}</h1>
                 <div className="flex items-center gap-2 mt-1">
                   <Badge variant="outline" className="capitalize">
                     {(member.relationship || 'family').replace('_', ' ')}
                   </Badge>
                   {member.isTrustBeneficiary && (
-                    <Badge className="bg-[#D4AF37] text-[#0F392B]">Trust Beneficiary</Badge>
+                    <Badge className="bg-[#D4A84C] text-[#1a2744]">Trust Beneficiary</Badge>
                   )}
                   {age && <Badge variant="secondary">Age {age}</Badge>}
                 </div>
@@ -242,7 +242,7 @@ const FamilyMemberProfile = () => {
             {isEditing ? (
               <>
                 <Button variant="outline" onClick={() => setIsEditing(false)}>Cancel</Button>
-                <Button onClick={handleSave} className="bg-[#0F392B]">
+                <Button onClick={handleSave} className="bg-[#1a2744]">
                   <Save className="h-4 w-4 mr-2" />
                   Save Changes
                 </Button>
@@ -258,7 +258,7 @@ const FamilyMemberProfile = () => {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <Card className="bg-[#0F392B] text-white">
+          <Card className="bg-[#1a2744] text-white">
             <CardContent className="p-4">
               <p className="text-sm text-white/70">Taxable Income</p>
               <p className="text-2xl font-bold">{formatCurrency(member.taxableIncome || 0)}</p>
@@ -277,10 +277,10 @@ const FamilyMemberProfile = () => {
               <p className="text-2xl font-bold text-[#10B981]">{formatCurrency(netIncome)}</p>
             </CardContent>
           </Card>
-          <Card className="bg-[#D4AF37]/10 border-[#D4AF37]/30">
+          <Card className="bg-[#D4A84C]/10 border-[#D4A84C]/30">
             <CardContent className="p-4">
               <p className="text-sm text-muted-foreground">Super Balance</p>
-              <p className="text-2xl font-bold text-[#D4AF37]">{formatCurrency(superBalance)}</p>
+              <p className="text-2xl font-bold text-[#D4A84C]">{formatCurrency(superBalance)}</p>
             </CardContent>
           </Card>
           <Card>
@@ -306,7 +306,7 @@ const FamilyMemberProfile = () => {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <DollarSign className="h-5 w-5 text-[#0F392B]" />
+                    <DollarSign className="h-5 w-5 text-[#1a2744]" />
                     Income Sources
                   </CardTitle>
                 </CardHeader>
@@ -348,16 +348,16 @@ const FamilyMemberProfile = () => {
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      <div className="flex justify-between p-3 rounded-lg bg-[#0F392B]/10">
+                      <div className="flex justify-between p-3 rounded-lg bg-[#1a2744]/10">
                         <div className="flex items-center gap-2">
-                          <Briefcase className="h-4 w-4 text-[#0F392B]" />
+                          <Briefcase className="h-4 w-4 text-[#1a2744]" />
                           <span>Salary Income</span>
                         </div>
                         <span className="font-semibold">{formatCurrency(member.salaryIncome || 0)}</span>
                       </div>
-                      <div className="flex justify-between p-3 rounded-lg bg-[#D4AF37]/10">
+                      <div className="flex justify-between p-3 rounded-lg bg-[#D4A84C]/10">
                         <div className="flex items-center gap-2">
-                          <LineChart className="h-4 w-4 text-[#D4AF37]" />
+                          <LineChart className="h-4 w-4 text-[#D4A84C]" />
                           <span>Dividend Income</span>
                         </div>
                         <span className="font-semibold">{formatCurrency(member.dividendIncome || annualDividends || 0)}</span>
@@ -383,7 +383,7 @@ const FamilyMemberProfile = () => {
                         <span className="font-semibold text-destructive">-{formatCurrency(member.deductions || 0)}</span>
                       </div>
                       <div className="border-t pt-3">
-                        <div className="flex justify-between p-3 rounded-lg bg-[#0F392B] text-white">
+                        <div className="flex justify-between p-3 rounded-lg bg-[#1a2744] text-white">
                           <span className="font-semibold">Taxable Income</span>
                           <span className="font-bold">{formatCurrency(member.taxableIncome || 0)}</span>
                         </div>
@@ -470,11 +470,11 @@ const FamilyMemberProfile = () => {
                     </div>
                   </div>
 
-                  <div className="p-4 rounded-lg bg-[#D4AF37]/10 border border-[#D4AF37]/30">
+                  <div className="p-4 rounded-lg bg-[#D4A84C]/10 border border-[#D4A84C]/30">
                     <div className="flex justify-between items-center">
                       <div>
                         <p className="text-sm text-muted-foreground">Effective Tax Rate</p>
-                        <p className="text-3xl font-bold text-[#D4AF37]">{taxCalc.effectiveRate.toFixed(1)}%</p>
+                        <p className="text-3xl font-bold text-[#D4A84C]">{taxCalc.effectiveRate.toFixed(1)}%</p>
                       </div>
                       <div className="text-right">
                         <p className="text-sm text-muted-foreground">Marginal Rate</p>
@@ -501,7 +501,7 @@ const FamilyMemberProfile = () => {
                         <YAxis tickFormatter={(v) => `$${(v/1000).toFixed(0)}k`} stroke="hsl(var(--muted-foreground))" />
                         <Tooltip formatter={(v) => formatCurrency(v)} />
                         <Legend />
-                        <Bar dataKey="gross" name="Gross Income" fill="#0F392B" />
+                        <Bar dataKey="gross" name="Gross Income" fill="#1a2744" />
                         <Bar dataKey="tax" name="Tax" fill="#EF4444" />
                         <Bar dataKey="net" name="Net Income" fill="#10B981" />
                       </BarChart>
@@ -515,7 +515,7 @@ const FamilyMemberProfile = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Target className="h-5 w-5 text-[#D4AF37]" />
+                  <Target className="h-5 w-5 text-[#D4A84C]" />
                   Tax Optimization Opportunities
                 </CardTitle>
               </CardHeader>
@@ -536,9 +536,9 @@ const FamilyMemberProfile = () => {
                     </div>
                   )}
                   {member.isTrustBeneficiary && (
-                    <div className="p-4 rounded-lg bg-[#D4AF37]/10 border border-[#D4AF37]/30">
+                    <div className="p-4 rounded-lg bg-[#D4A84C]/10 border border-[#D4A84C]/30">
                       <div className="flex items-start gap-3">
-                        <CheckCircle className="h-5 w-5 text-[#D4AF37] mt-0.5" />
+                        <CheckCircle className="h-5 w-5 text-[#D4A84C] mt-0.5" />
                         <div>
                           <p className="font-medium">Trust Distribution</p>
                           <p className="text-sm text-muted-foreground">
@@ -573,7 +573,7 @@ const FamilyMemberProfile = () => {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <LineChart className="h-5 w-5 text-[#D4AF37]" />
+                    <LineChart className="h-5 w-5 text-[#D4A84C]" />
                     Share Holdings
                   </CardTitle>
                   <CardDescription>Personal share portfolio</CardDescription>
@@ -608,7 +608,7 @@ const FamilyMemberProfile = () => {
                         );
                       })}
                       <div className="pt-3 border-t">
-                        <div className="flex justify-between p-3 rounded-lg bg-[#0F392B] text-white">
+                        <div className="flex justify-between p-3 rounded-lg bg-[#1a2744] text-white">
                           <span>Total Value</span>
                           <span className="font-bold">{formatCurrency(totalShareValue)}</span>
                         </div>
@@ -620,7 +620,7 @@ const FamilyMemberProfile = () => {
                         </div>
                         <div className="flex justify-between p-2">
                           <span className="text-sm text-muted-foreground">Annual Dividends</span>
-                          <span className="font-medium text-[#D4AF37]">{formatCurrency(annualDividends)}</span>
+                          <span className="font-medium text-[#D4A84C]">{formatCurrency(annualDividends)}</span>
                         </div>
                       </div>
                     </div>
@@ -699,7 +699,7 @@ const FamilyMemberProfile = () => {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <PiggyBank className="h-5 w-5 text-[#D4AF37]" />
+                    <PiggyBank className="h-5 w-5 text-[#D4A84C]" />
                     Superannuation
                   </CardTitle>
                 </CardHeader>
@@ -717,9 +717,9 @@ const FamilyMemberProfile = () => {
                     </div>
                   ) : (
                     <>
-                      <div className="p-4 rounded-lg bg-[#D4AF37]/10 border border-[#D4AF37]/30">
+                      <div className="p-4 rounded-lg bg-[#D4A84C]/10 border border-[#D4A84C]/30">
                         <p className="text-sm text-muted-foreground">Current Balance</p>
-                        <p className="text-3xl font-bold text-[#D4AF37]">{formatCurrency(superBalance)}</p>
+                        <p className="text-3xl font-bold text-[#D4A84C]">{formatCurrency(superBalance)}</p>
                       </div>
 
                       <div className="grid grid-cols-2 gap-4">
@@ -733,11 +733,11 @@ const FamilyMemberProfile = () => {
                         </div>
                       </div>
 
-                      <div className="p-3 rounded-lg bg-[#0F392B]/10">
+                      <div className="p-3 rounded-lg bg-[#1a2744]/10">
                         <div className="flex justify-between items-center">
                           <div>
                             <p className="text-sm text-muted-foreground">Projected Balance (10 years)</p>
-                            <p className="text-2xl font-bold text-[#0F392B]">
+                            <p className="text-2xl font-bold text-[#1a2744]">
                               {formatCurrency(superProjection[10]?.balance || 0)}
                             </p>
                           </div>
@@ -770,8 +770,8 @@ const FamilyMemberProfile = () => {
                           type="monotone" 
                           dataKey="balance" 
                           name="Super Balance"
-                          stroke="#D4AF37" 
-                          fill="#D4AF37" 
+                          stroke="#D4A84C" 
+                          fill="#D4A84C" 
                           fillOpacity={0.3}
                         />
                       </AreaChart>
@@ -795,7 +795,7 @@ const FamilyMemberProfile = () => {
                       Tax saving: {formatCurrency((Math.min(30000, (member.salaryIncome || 0) * 0.1)) * (taxCalc.marginalRate - 15) / 100)} potential.
                     </p>
                   </div>
-                  <div className="p-4 rounded-lg bg-[#D4AF37]/10">
+                  <div className="p-4 rounded-lg bg-[#D4A84C]/10">
                     <h4 className="font-semibold mb-2">Spouse Contribution</h4>
                     <p className="text-sm text-muted-foreground">
                       Contribute to spouse's super for up to $540 tax offset if spouse earns under $40,000.

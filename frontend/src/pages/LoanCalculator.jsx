@@ -98,7 +98,7 @@ const LoanCalculator = () => {
       <div className="space-y-8" data-testid="loan-calculator-page">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+          <h1 className="text-3xl font-bold  text-foreground">
             Loan Calculator
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -111,7 +111,7 @@ const LoanCalculator = () => {
           {/* Inputs */}
           <Card data-testid="loan-inputs">
             <CardHeader>
-              <CardTitle className="font-['Manrope']">Loan Details</CardTitle>
+              <CardTitle className="">Loan Details</CardTitle>
               <CardDescription>Enter your loan parameters</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -135,7 +135,7 @@ const LoanCalculator = () => {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <Label>Interest Rate</Label>
-                  <span className="text-sm font-semibold text-[#D4AF37]">{interestRate}%</span>
+                  <span className="text-sm font-semibold text-[#D4A84C]">{interestRate}%</span>
                 </div>
                 <Slider
                   value={[interestRate]}
@@ -167,7 +167,7 @@ const LoanCalculator = () => {
 
               <Button 
                 onClick={calculateLoan}
-                className="w-full bg-[#0F392B] hover:bg-[#0F392B]/90"
+                className="w-full bg-[#1a2744] hover:bg-[#1a2744]/90"
                 disabled={loading}
                 data-testid="calculate-loan-btn"
               >
@@ -180,14 +180,14 @@ const LoanCalculator = () => {
           {/* Results */}
           <Card className="lg:col-span-2" data-testid="loan-results">
             <CardHeader>
-              <CardTitle className="font-['Manrope']">Repayment Summary</CardTitle>
+              <CardTitle className="">Repayment Summary</CardTitle>
             </CardHeader>
             <CardContent>
               {result ? (
                 <div className="space-y-6">
                   {/* Key Stats */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="p-4 rounded-lg bg-[#0F392B] text-white">
+                    <div className="p-4 rounded-lg bg-[#1a2744] text-white">
                       <p className="text-sm text-white/80">Monthly Payment</p>
                       <p className="text-xl font-bold">{formatCurrency(result.monthly_payment)}</p>
                     </div>
@@ -195,9 +195,9 @@ const LoanCalculator = () => {
                       <p className="text-sm text-muted-foreground">Annual Payment</p>
                       <p className="text-xl font-bold">{formatCurrency(result.annual_payment)}</p>
                     </div>
-                    <div className="p-4 rounded-lg bg-[#D4AF37]/10">
+                    <div className="p-4 rounded-lg bg-[#D4A84C]/10">
                       <p className="text-sm text-muted-foreground">Total Interest</p>
-                      <p className="text-xl font-bold text-[#D4AF37]">{formatCurrency(result.total_interest)}</p>
+                      <p className="text-xl font-bold text-[#D4A84C]">{formatCurrency(result.total_interest)}</p>
                     </div>
                     <div className="p-4 rounded-lg bg-muted">
                       <p className="text-sm text-muted-foreground">Total Repayment</p>
@@ -239,7 +239,7 @@ const LoanCalculator = () => {
         {result && (
           <Card data-testid="rate-scenarios">
             <CardHeader>
-              <CardTitle className="font-['Manrope']">Variable Rate Scenarios</CardTitle>
+              <CardTitle className="">Variable Rate Scenarios</CardTitle>
               <CardDescription>
                 See how rate changes affect your repayments
               </CardDescription>
@@ -253,7 +253,7 @@ const LoanCalculator = () => {
                       key={index}
                       className={`p-4 rounded-lg border ${
                         scenario.rate_change === 0 
-                          ? 'border-[#0F392B] bg-[#0F392B]/5' 
+                          ? 'border-[#1a2744] bg-[#1a2744]/5' 
                           : 'border-border'
                       }`}
                       data-testid={`scenario-${index}`}
@@ -265,7 +265,7 @@ const LoanCalculator = () => {
                           ) : scenario.rate_change < 0 ? (
                             <TrendingDown className="h-5 w-5 text-[#10B981]" />
                           ) : (
-                            <Percent className="h-5 w-5 text-[#0F392B]" />
+                            <Percent className="h-5 w-5 text-[#1a2744]" />
                           )}
                           <div>
                             <p className="font-semibold">
@@ -315,7 +315,7 @@ const LoanCalculator = () => {
                         }}
                       />
                       <Legend />
-                      <Bar dataKey="monthlyPayment" fill="#0F392B" name="Monthly Payment" />
+                      <Bar dataKey="monthlyPayment" fill="#1a2744" name="Monthly Payment" />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -327,8 +327,8 @@ const LoanCalculator = () => {
         {/* Debt to Equity Calculator */}
         <Card data-testid="debt-equity-calculator">
           <CardHeader>
-            <CardTitle className="font-['Manrope'] flex items-center gap-2">
-              <PiggyBank className="h-5 w-5 text-[#D4AF37]" />
+            <CardTitle className=" flex items-center gap-2">
+              <PiggyBank className="h-5 w-5 text-[#D4A84C]" />
               Debt to Equity Ratio
             </CardTitle>
             <CardDescription>
@@ -370,7 +370,7 @@ const LoanCalculator = () => {
               <div className="flex items-end">
                 <Button 
                   onClick={calculateDebtEquity}
-                  className="w-full bg-[#D4AF37] text-[#0F392B] hover:bg-[#D4AF37]/90"
+                  className="w-full bg-[#D4A84C] text-[#1a2744] hover:bg-[#D4A84C]/90"
                   data-testid="calculate-debt-equity-btn"
                 >
                   Calculate Ratio
@@ -378,7 +378,7 @@ const LoanCalculator = () => {
               </div>
 
               {debtEquityResult && (
-                <div className="p-4 rounded-lg bg-[#0F392B] text-white">
+                <div className="p-4 rounded-lg bg-[#1a2744] text-white">
                   <p className="text-sm text-white/80">Debt to Equity</p>
                   <p className="text-2xl font-bold">
                     {debtEquityResult.debt_to_equity_ratio === Infinity 
@@ -425,7 +425,7 @@ const LoanCalculator = () => {
         {/* Info Section */}
         <Card data-testid="loan-info">
           <CardHeader>
-            <CardTitle className="font-['Manrope']">Understanding Loan Metrics</CardTitle>
+            <CardTitle className="">Understanding Loan Metrics</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-muted-foreground">

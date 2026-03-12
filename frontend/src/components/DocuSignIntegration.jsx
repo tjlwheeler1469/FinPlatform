@@ -399,7 +399,7 @@ const DocuSignIntegration = ({ onSignatureComplete }) => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-12">
-        <Loader2 className="h-8 w-8 animate-spin text-[#0F392B]" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#1a2744]" />
         <span className="ml-2">Loading signature requests...</span>
       </div>
     );
@@ -411,7 +411,7 @@ const DocuSignIntegration = ({ onSignatureComplete }) => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold flex items-center gap-2">
-            <FileSignature className="h-5 w-5 text-[#D4AF37]" />
+            <FileSignature className="h-5 w-5 text-[#D4A84C]" />
             E-Signature Management
           </h2>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -423,7 +423,7 @@ const DocuSignIntegration = ({ onSignatureComplete }) => {
         </div>
         <Dialog open={showSendDialog} onOpenChange={setShowSendDialog}>
           <DialogTrigger asChild>
-            <Button className="bg-[#0F392B]" data-testid="send-signature-btn">
+            <Button className="bg-[#1a2744]" data-testid="send-signature-btn">
               <Send className="h-4 w-4 mr-2" /> Send for Signature
             </Button>
           </DialogTrigger>
@@ -494,7 +494,7 @@ const DocuSignIntegration = ({ onSignatureComplete }) => {
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowSendDialog(false)}>Cancel</Button>
-              <Button onClick={sendSignatureRequest} className="bg-[#0F392B]" data-testid="confirm-send-btn" disabled={isSending}>
+              <Button onClick={sendSignatureRequest} className="bg-[#1a2744]" data-testid="confirm-send-btn" disabled={isSending}>
                 {isSending ? (
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 ) : (
@@ -559,8 +559,8 @@ const DocuSignIntegration = ({ onSignatureComplete }) => {
                 data-testid={`signature-request-${request.id}`}
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-[#0F392B]/10 flex items-center justify-center">
-                    <FileText className="h-5 w-5 text-[#0F392B]" />
+                  <div className="w-10 h-10 rounded-lg bg-[#1a2744]/10 flex items-center justify-center">
+                    <FileText className="h-5 w-5 text-[#1a2744]" />
                   </div>
                   <div>
                     <p className="font-semibold">{request.document_name}</p>
@@ -625,7 +625,7 @@ const DocuSignIntegration = ({ onSignatureComplete }) => {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <FileSignature className="h-5 w-5 text-[#D4AF37]" />
+              <FileSignature className="h-5 w-5 text-[#D4A84C]" />
               Sign Document
             </DialogTitle>
             <DialogDescription>
@@ -679,10 +679,10 @@ const DocuSignIntegration = ({ onSignatureComplete }) => {
               </div>
               
               {signatureData && (
-                <Card className="bg-[#FFFEF0] border-[#D4AF37]">
+                <Card className="bg-[#FFFEF0] border-[#D4A84C]">
                   <CardContent className="p-4 text-center">
                     <p className="text-xs text-muted-foreground mb-2">Signature Preview</p>
-                    <p className="text-3xl font-['Satisfy'] italic text-[#0F392B]">{signatureData}</p>
+                    <p className="text-3xl font-['Satisfy'] italic text-[#1a2744]">{signatureData}</p>
                   </CardContent>
                 </Card>
               )}
@@ -691,7 +691,7 @@ const DocuSignIntegration = ({ onSignatureComplete }) => {
                 <Button variant="outline" onClick={() => setSigningStep(0)} className="flex-1">
                   <ChevronLeft className="h-4 w-4 mr-2" /> Back
                 </Button>
-                <Button onClick={completeSigning} className="flex-1 bg-[#0F392B]" data-testid="complete-signature-btn">
+                <Button onClick={completeSigning} className="flex-1 bg-[#1a2744]" data-testid="complete-signature-btn">
                   <CheckCircle className="h-4 w-4 mr-2" /> Complete Signature
                 </Button>
               </div>

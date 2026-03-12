@@ -547,7 +547,7 @@ const ScenarioBuilder = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+            <h1 className="text-3xl font-bold  text-foreground">
               {isEditing ? "Edit Scenario" : "New Scenario"}
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -567,7 +567,7 @@ const ScenarioBuilder = () => {
             <Button 
               onClick={saveScenario}
               disabled={saving}
-              className="bg-[#0F392B] hover:bg-[#0F392B]/90"
+              className="bg-[#1a2744] hover:bg-[#1a2744]/90"
               data-testid="save-btn"
             >
               <Save className="h-4 w-4 mr-2" />
@@ -595,7 +595,7 @@ const ScenarioBuilder = () => {
                   <Button
                     variant={entityType === "personal" ? "default" : "outline"}
                     onClick={() => setEntityType("personal")}
-                    className={entityType === "personal" ? "bg-[#0F392B]" : ""}
+                    className={entityType === "personal" ? "bg-[#1a2744]" : ""}
                     data-testid="type-personal"
                   >
                     <Users className="h-4 w-4 mr-2" />
@@ -604,7 +604,7 @@ const ScenarioBuilder = () => {
                   <Button
                     variant={entityType === "company" ? "default" : "outline"}
                     onClick={() => setEntityType("company")}
-                    className={entityType === "company" ? "bg-[#0F392B]" : ""}
+                    className={entityType === "company" ? "bg-[#1a2744]" : ""}
                     data-testid="type-company"
                   >
                     <Briefcase className="h-4 w-4 mr-2" />
@@ -613,7 +613,7 @@ const ScenarioBuilder = () => {
                   <Button
                     variant={entityType === "trust" ? "default" : "outline"}
                     onClick={() => setEntityType("trust")}
-                    className={entityType === "trust" ? "bg-[#0F392B]" : ""}
+                    className={entityType === "trust" ? "bg-[#1a2744]" : ""}
                     data-testid="type-trust"
                   >
                     <Shield className="h-4 w-4 mr-2" />
@@ -664,7 +664,7 @@ const ScenarioBuilder = () => {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="font-['Manrope']">Personal Information</CardTitle>
+                    <CardTitle className="">Personal Information</CardTitle>
                     <CardDescription>
                       Add up to 2 people (e.g., yourself and spouse/partner)
                     </CardDescription>
@@ -682,7 +682,7 @@ const ScenarioBuilder = () => {
                   <div key={person.id} className="p-4 rounded-lg border space-y-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-[#0F392B] text-white flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-full bg-[#1a2744] text-white flex items-center justify-center">
                           <User className="h-5 w-5" />
                         </div>
                         <div>
@@ -774,9 +774,9 @@ const ScenarioBuilder = () => {
                 ))}
 
                 {/* Total Summary */}
-                <div className="p-4 rounded-lg bg-[#0F392B]/5 flex justify-between items-center">
+                <div className="p-4 rounded-lg bg-[#1a2744]/5 flex justify-between items-center">
                   <span className="font-semibold">Combined Personal Income</span>
-                  <span className="text-xl font-bold text-[#0F392B]">{formatCurrency(totalPersonalIncome)}</span>
+                  <span className="text-xl font-bold text-[#1a2744]">{formatCurrency(totalPersonalIncome)}</span>
                 </div>
               </CardContent>
             </Card>
@@ -789,7 +789,7 @@ const ScenarioBuilder = () => {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle className="font-['Manrope']">Company Structures</CardTitle>
+                      <CardTitle className="">Company Structures</CardTitle>
                       <CardDescription>
                         Add multiple companies for analysis (e.g., operating company, holding company)
                       </CardDescription>
@@ -815,10 +815,10 @@ const ScenarioBuilder = () => {
                       <div key={company.id} className="p-4 rounded-lg border space-y-4">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-[#D4AF37]/20 flex items-center justify-center">
-                              <Building2 className="h-5 w-5 text-[#D4AF37]" />
+                            <div className="w-10 h-10 rounded-lg bg-[#D4A84C]/20 flex items-center justify-center">
+                              <Building2 className="h-5 w-5 text-[#D4A84C]" />
                             </div>
-                            <Badge className="bg-[#D4AF37]/10 text-[#D4AF37]">Company {index + 1}</Badge>
+                            <Badge className="bg-[#D4A84C]/10 text-[#D4A84C]">Company {index + 1}</Badge>
                           </div>
                           <Button 
                             variant="ghost" 
@@ -919,7 +919,7 @@ const ScenarioBuilder = () => {
                           </div>
                           <div className="p-3 rounded-lg bg-muted/50">
                             <p className="text-sm text-muted-foreground">Estimated Company Tax</p>
-                            <p className="text-lg font-bold text-[#D4AF37]">
+                            <p className="text-lg font-bold text-[#D4A84C]">
                               {formatCurrency(company.taxable_income * (company.is_base_rate_entity ? 0.25 : 0.30))}
                             </p>
                           </div>
@@ -929,9 +929,9 @@ const ScenarioBuilder = () => {
                   )}
 
                   {companies.length > 0 && (
-                    <div className="p-4 rounded-lg bg-[#D4AF37]/10 flex justify-between items-center">
+                    <div className="p-4 rounded-lg bg-[#D4A84C]/10 flex justify-between items-center">
                       <span className="font-semibold">Total Company Income</span>
-                      <span className="text-xl font-bold text-[#D4AF37]">{formatCurrency(totalCompanyIncome)}</span>
+                      <span className="text-xl font-bold text-[#D4A84C]">{formatCurrency(totalCompanyIncome)}</span>
                     </div>
                   )}
                 </CardContent>
@@ -946,7 +946,7 @@ const ScenarioBuilder = () => {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle className="font-['Manrope']">Trust Structures</CardTitle>
+                      <CardTitle className="">Trust Structures</CardTitle>
                       <CardDescription>
                         Configure family trusts and discretionary trusts with beneficiary distributions
                       </CardDescription>
@@ -972,10 +972,10 @@ const ScenarioBuilder = () => {
                       <div key={trust.id} className="p-4 rounded-lg border space-y-4">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-[#0F392B]/20 flex items-center justify-center">
-                              <Shield className="h-5 w-5 text-[#0F392B]" />
+                            <div className="w-10 h-10 rounded-lg bg-[#1a2744]/20 flex items-center justify-center">
+                              <Shield className="h-5 w-5 text-[#1a2744]" />
                             </div>
-                            <Badge className="bg-[#0F392B]/10 text-[#0F392B]">Trust {index + 1}</Badge>
+                            <Badge className="bg-[#1a2744]/10 text-[#1a2744]">Trust {index + 1}</Badge>
                           </div>
                           <Button 
                             variant="ghost" 
@@ -1071,8 +1071,8 @@ const ScenarioBuilder = () => {
                           <div className="space-y-2">
                             {trust.beneficiaries?.map((ben, bIndex) => (
                               <div key={ben.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                                <div className="w-8 h-8 rounded-full bg-[#D4AF37]/20 flex items-center justify-center">
-                                  <User className="h-4 w-4 text-[#D4AF37]" />
+                                <div className="w-8 h-8 rounded-full bg-[#D4A84C]/20 flex items-center justify-center">
+                                  <User className="h-4 w-4 text-[#D4A84C]" />
                                 </div>
                                 <Input
                                   value={ben.name}
@@ -1112,18 +1112,18 @@ const ScenarioBuilder = () => {
                           </div>
 
                           {/* Distribution Summary */}
-                          <div className="mt-3 p-3 rounded-lg bg-[#0F392B]/5 flex justify-between items-center">
+                          <div className="mt-3 p-3 rounded-lg bg-[#1a2744]/5 flex justify-between items-center">
                             <span className="text-sm text-muted-foreground">
                               Total Distribution: {trust.beneficiaries?.reduce((sum, b) => sum + (b.distribution_percentage || 0), 0)}%
                             </span>
-                            <span className="font-semibold text-[#0F392B]">
+                            <span className="font-semibold text-[#1a2744]">
                               {formatCurrency(trust.net_income)} to distribute
                             </span>
                           </div>
                         </div>
 
                         {/* Trust Tax Note */}
-                        <div className="p-3 rounded-lg bg-[#D4AF37]/10">
+                        <div className="p-3 rounded-lg bg-[#D4A84C]/10">
                           <p className="text-sm text-muted-foreground">
                             <strong>Note:</strong> Trusts don't pay tax directly. Income is distributed to beneficiaries 
                             who are taxed at their individual marginal rates. Undistributed income is taxed at 47%.
@@ -1134,9 +1134,9 @@ const ScenarioBuilder = () => {
                   )}
 
                   {trusts.length > 0 && (
-                    <div className="p-4 rounded-lg bg-[#0F392B]/10 flex justify-between items-center">
+                    <div className="p-4 rounded-lg bg-[#1a2744]/10 flex justify-between items-center">
                       <span className="font-semibold">Total Trust Income</span>
-                      <span className="text-xl font-bold text-[#0F392B]">{formatCurrency(totalTrustIncome)}</span>
+                      <span className="text-xl font-bold text-[#1a2744]">{formatCurrency(totalTrustIncome)}</span>
                     </div>
                   )}
                 </CardContent>
@@ -1150,7 +1150,7 @@ const ScenarioBuilder = () => {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="font-['Manrope']">Investment Properties</CardTitle>
+                    <CardTitle className="">Investment Properties</CardTitle>
                     <CardDescription>
                       Add properties and assign ownership to individuals or companies
                     </CardDescription>
@@ -1300,7 +1300,7 @@ const ScenarioBuilder = () => {
           <TabsContent value="investments" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle className="font-['Manrope']">Investment Portfolio</CardTitle>
+                <CardTitle className="">Investment Portfolio</CardTitle>
                 <CardDescription>Cash, shares, bonds, ETFs and superannuation</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -1378,7 +1378,7 @@ const ScenarioBuilder = () => {
                   {/* Bonds & Super */}
                   <div className="space-y-4">
                     <h4 className="font-semibold flex items-center gap-2">
-                      <PiggyBank className="h-4 w-4 text-[#D4AF37]" />
+                      <PiggyBank className="h-4 w-4 text-[#D4A84C]" />
                       Bonds & Super
                     </h4>
                     <div className="space-y-3">
@@ -1423,7 +1423,7 @@ const ScenarioBuilder = () => {
           <TabsContent value="expenses" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle className="font-['Manrope']">Deductible Expenses</CardTitle>
+                <CardTitle className="">Deductible Expenses</CardTitle>
                 <CardDescription>Expenses that may be tax deductible</CardDescription>
               </CardHeader>
               <CardContent>
@@ -1522,7 +1522,7 @@ const ScenarioBuilder = () => {
         {analysisResult && (
           <Card className="border-[#10B981]">
             <CardHeader>
-              <CardTitle className="font-['Manrope'] flex items-center gap-2">
+              <CardTitle className=" flex items-center gap-2">
                 <Calculator className="h-5 w-5 text-[#10B981]" />
                 Analysis Results
               </CardTitle>
@@ -1549,7 +1549,7 @@ const ScenarioBuilder = () => {
                 </div>
                 <div className="p-4 rounded-lg bg-muted/50">
                   <p className="text-sm text-muted-foreground">Projected (Median)</p>
-                  <p className="text-xl font-bold text-[#0F392B]">
+                  <p className="text-xl font-bold text-[#1a2744]">
                     {formatCurrency(analysisResult.monte_carlo?.median_outcome || 0)}
                   </p>
                 </div>
@@ -1557,7 +1557,7 @@ const ScenarioBuilder = () => {
               <div className="mt-4 flex justify-end">
                 <Button 
                   onClick={() => navigate("/reports")}
-                  className="bg-[#0F392B] hover:bg-[#0F392B]/90"
+                  className="bg-[#1a2744] hover:bg-[#1a2744]/90"
                 >
                   View Full Report
                   <ArrowRight className="h-4 w-4 ml-2" />

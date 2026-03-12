@@ -209,8 +209,8 @@ const ClientCRM = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground flex items-center gap-3">
-              <Users className="h-8 w-8 text-[#D4AF37]" />
+            <h1 className="text-3xl font-bold  text-foreground flex items-center gap-3">
+              <Users className="h-8 w-8 text-[#D4A84C]" />
               Client CRM
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -279,11 +279,11 @@ const ClientCRM = () => {
                 </div>
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setNewTaskOpen(false)}>Cancel</Button>
-                  <Button onClick={handleAddTask} className="bg-[#0F392B]">Create Task</Button>
+                  <Button onClick={handleAddTask} className="bg-[#1a2744]">Create Task</Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-            <Button className="bg-[#0F392B]" data-testid="new-client-btn">
+            <Button className="bg-[#1a2744]" data-testid="new-client-btn">
               <UserPlus className="h-4 w-4 mr-2" />
               New Client
             </Button>
@@ -299,7 +299,7 @@ const ClientCRM = () => {
                   <p className="text-sm text-muted-foreground">Total Clients</p>
                   <p className="text-2xl font-bold">{households.length}</p>
                 </div>
-                <Users className="h-8 w-8 text-[#0F392B]" />
+                <Users className="h-8 w-8 text-[#1a2744]" />
               </div>
             </CardContent>
           </Card>
@@ -310,7 +310,7 @@ const ClientCRM = () => {
                   <p className="text-sm text-muted-foreground">Total AUM</p>
                   <p className="text-2xl font-bold">{formatCurrency(households.reduce((sum, h) => sum + (h.total_assets || 0), 0))}</p>
                 </div>
-                <DollarSign className="h-8 w-8 text-[#D4AF37]" />
+                <DollarSign className="h-8 w-8 text-[#D4A84C]" />
               </div>
             </CardContent>
           </Card>
@@ -361,7 +361,7 @@ const ClientCRM = () => {
                   key={household.household_id}
                   className={`p-3 border rounded-lg cursor-pointer transition-colors ${
                     selectedHousehold?.household_id === household.household_id 
-                      ? 'border-[#0F392B] bg-[#0F392B]/5' 
+                      ? 'border-[#1a2744] bg-[#1a2744]/5' 
                       : 'hover:bg-muted/50'
                   }`}
                   onClick={() => setSelectedHousehold(household)}
@@ -427,7 +427,7 @@ const ClientCRM = () => {
                       <div className="grid grid-cols-3 gap-4 mt-4">
                         <div className="p-4 bg-muted/50 rounded-lg">
                           <p className="text-sm text-muted-foreground">Total Assets</p>
-                          <p className="text-xl font-bold text-[#0F392B]">{formatCurrency(selectedHousehold.total_assets)}</p>
+                          <p className="text-xl font-bold text-[#1a2744]">{formatCurrency(selectedHousehold.total_assets)}</p>
                         </div>
                         <div className="p-4 bg-muted/50 rounded-lg">
                           <p className="text-sm text-muted-foreground">Total Debt</p>
@@ -511,7 +511,7 @@ const ClientCRM = () => {
                             </div>
                             <DialogFooter>
                               <Button variant="outline" onClick={() => setNewNoteOpen(false)}>Cancel</Button>
-                              <Button onClick={handleAddNote} className="bg-[#0F392B]">Add Note</Button>
+                              <Button onClick={handleAddNote} className="bg-[#1a2744]">Add Note</Button>
                             </DialogFooter>
                           </DialogContent>
                         </Dialog>
@@ -576,7 +576,7 @@ const ClientCRM = () => {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <ClipboardList className="h-5 w-5 text-[#D4AF37]" />
+                <ClipboardList className="h-5 w-5 text-[#D4A84C]" />
                 All Tasks
               </CardTitle>
             </CardHeader>
@@ -605,7 +605,7 @@ const ClientCRM = () => {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-[#D4AF37]" />
+                <Calendar className="h-5 w-5 text-[#D4A84C]" />
                 Upcoming Meetings
               </CardTitle>
             </CardHeader>

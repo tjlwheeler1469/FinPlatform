@@ -184,7 +184,7 @@ const DataImportExport = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold flex items-center gap-2">
-            <Database className="h-5 w-5 text-[#D4AF37]" />
+            <Database className="h-5 w-5 text-[#D4A84C]" />
             Data Import / Export
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -215,13 +215,13 @@ const DataImportExport = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div
                   className={`p-4 border-2 rounded-lg cursor-pointer transition-colors ${
-                    importType === "client" ? "border-[#0F392B] bg-[#0F392B]/5" : "border-muted hover:border-muted-foreground"
+                    importType === "client" ? "border-[#1a2744] bg-[#1a2744]/5" : "border-muted hover:border-muted-foreground"
                   }`}
                   onClick={() => setImportType("client")}
                   data-testid="import-type-client"
                 >
                   <div className="flex items-center gap-3">
-                    <Users className={`h-6 w-6 ${importType === "client" ? "text-[#0F392B]" : "text-muted-foreground"}`} />
+                    <Users className={`h-6 w-6 ${importType === "client" ? "text-[#1a2744]" : "text-muted-foreground"}`} />
                     <div>
                       <p className="font-semibold">Client Data</p>
                       <p className="text-sm text-muted-foreground">Personal info, assets, liabilities, goals</p>
@@ -230,13 +230,13 @@ const DataImportExport = () => {
                 </div>
                 <div
                   className={`p-4 border-2 rounded-lg cursor-pointer transition-colors ${
-                    importType === "adviser" ? "border-[#0F392B] bg-[#0F392B]/5" : "border-muted hover:border-muted-foreground"
+                    importType === "adviser" ? "border-[#1a2744] bg-[#1a2744]/5" : "border-muted hover:border-muted-foreground"
                   }`}
                   onClick={() => setImportType("adviser")}
                   data-testid="import-type-adviser"
                 >
                   <div className="flex items-center gap-3">
-                    <Briefcase className={`h-6 w-6 ${importType === "adviser" ? "text-[#0F392B]" : "text-muted-foreground"}`} />
+                    <Briefcase className={`h-6 w-6 ${importType === "adviser" ? "text-[#1a2744]" : "text-muted-foreground"}`} />
                     <div>
                       <p className="font-semibold">Adviser Data</p>
                       <p className="text-sm text-muted-foreground">Practice info, credentials, AFSL details</p>
@@ -277,7 +277,7 @@ const DataImportExport = () => {
             <CardContent className="space-y-4">
               <div
                 className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
-                  selectedFile ? "border-[#0F392B] bg-[#0F392B]/5" : "border-muted hover:border-muted-foreground"
+                  selectedFile ? "border-[#1a2744] bg-[#1a2744]/5" : "border-muted hover:border-muted-foreground"
                 }`}
                 onClick={() => fileInputRef.current?.click()}
               >
@@ -325,7 +325,7 @@ const DataImportExport = () => {
               <Button
                 onClick={uploadFile}
                 disabled={!selectedFile || isUploading}
-                className="w-full bg-[#0F392B]"
+                className="w-full bg-[#1a2744]"
                 data-testid="upload-btn"
               >
                 {isUploading ? (
@@ -380,7 +380,7 @@ const DataImportExport = () => {
                   <div
                     key={format}
                     className={`p-4 border-2 rounded-lg cursor-pointer transition-colors flex-1 text-center ${
-                      exportFormat === format ? "border-[#0F392B] bg-[#0F392B]/5" : "border-muted hover:border-muted-foreground"
+                      exportFormat === format ? "border-[#1a2744] bg-[#1a2744]/5" : "border-muted hover:border-muted-foreground"
                     }`}
                     onClick={() => setExportFormat(format)}
                   >
@@ -398,7 +398,7 @@ const DataImportExport = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Users className="h-5 w-5 text-[#D4AF37]" />
+                  <Users className="h-5 w-5 text-[#D4A84C]" />
                   Export Client Data
                 </CardTitle>
                 <CardDescription>Export all client fact-find data</CardDescription>
@@ -407,7 +407,7 @@ const DataImportExport = () => {
                 <Button
                   onClick={() => exportData("client")}
                   disabled={isExporting}
-                  className="w-full bg-[#0F392B]"
+                  className="w-full bg-[#1a2744]"
                   data-testid="export-clients-btn"
                 >
                   {isExporting ? (
@@ -423,7 +423,7 @@ const DataImportExport = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Briefcase className="h-5 w-5 text-[#D4AF37]" />
+                  <Briefcase className="h-5 w-5 text-[#D4A84C]" />
                   Export Adviser Data
                 </CardTitle>
                 <CardDescription>Export all adviser information</CardDescription>
@@ -432,7 +432,7 @@ const DataImportExport = () => {
                 <Button
                   onClick={() => exportData("adviser")}
                   disabled={isExporting}
-                  className="w-full bg-[#0F392B]"
+                  className="w-full bg-[#1a2744]"
                   data-testid="export-advisers-btn"
                 >
                   {isExporting ? (

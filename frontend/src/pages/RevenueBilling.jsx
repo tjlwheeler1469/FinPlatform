@@ -50,7 +50,7 @@ const formatCurrency = (value) => {
   }).format(value);
 };
 
-const COLORS = ['#0F392B', '#D4AF37', '#10B981', '#3B82F6', '#8B5CF6'];
+const COLORS = ['#1a2744', '#D4A84C', '#10B981', '#3B82F6', '#8B5CF6'];
 
 // Generate mock revenue data
 const generateRevenueData = () => {
@@ -88,8 +88,8 @@ const generateClientRevenue = () => [
 
 // Revenue by service type
 const revenueByService = [
-  { name: "Financial Planning", value: 450000, color: "#0F392B" },
-  { name: "Investment Mgmt", value: 380000, color: "#D4AF37" },
+  { name: "Financial Planning", value: 450000, color: "#1a2744" },
+  { name: "Investment Mgmt", value: 380000, color: "#D4A84C" },
   { name: "Insurance", value: 150000, color: "#10B981" },
   { name: "SMSF Admin", value: 120000, color: "#3B82F6" },
   { name: "Other", value: 100000, color: "#8B5CF6" }
@@ -151,8 +151,8 @@ const RevenueBilling = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground flex items-center gap-3">
-              <DollarSign className="h-8 w-8 text-[#D4AF37]" />
+            <h1 className="text-3xl font-bold  text-foreground flex items-center gap-3">
+              <DollarSign className="h-8 w-8 text-[#D4A84C]" />
               Revenue & Billing
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -179,18 +179,18 @@ const RevenueBilling = () => {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="border-2 border-[#0F392B] bg-[#0F392B]/5">
+          <Card className="border-2 border-[#1a2744] bg-[#1a2744]/5">
             <CardContent className="pt-6">
-              <p className="text-sm text-[#0F392B]">Total AUM</p>
-              <p className="text-2xl font-bold text-[#0F392B]" data-testid="total-aum">
+              <p className="text-sm text-[#1a2744]">Total AUM</p>
+              <p className="text-2xl font-bold text-[#1a2744]" data-testid="total-aum">
                 {formatCurrency(practiceData?.total_aum || totalAUM)}
               </p>
               <p className="text-sm text-muted-foreground">{totalClients} clients</p>
             </CardContent>
           </Card>
-          <Card className="border-2 border-[#D4AF37] bg-[#D4AF37]/5">
+          <Card className="border-2 border-[#D4A84C] bg-[#D4A84C]/5">
             <CardContent className="pt-6">
-              <p className="text-sm text-[#D4AF37]">YTD Revenue</p>
+              <p className="text-sm text-[#D4A84C]">YTD Revenue</p>
               <p className="text-2xl font-bold">{formatCurrency(totalRevenue)}</p>
               <p className="text-sm text-muted-foreground">
                 Avg {formatCurrency(avgMonthlyRevenue)}/mo
@@ -230,12 +230,12 @@ const RevenueBilling = () => {
                 <AreaChart data={revenueData}>
                   <defs>
                     <linearGradient id="feesGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#0F392B" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#0F392B" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#1a2744" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#1a2744" stopOpacity={0}/>
                     </linearGradient>
                     <linearGradient id="commissionsGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#D4AF37" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#D4AF37" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#D4A84C" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#D4A84C" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
@@ -248,7 +248,7 @@ const RevenueBilling = () => {
                     dataKey="fees"
                     name="Fees"
                     stackId="1"
-                    stroke="#0F392B"
+                    stroke="#1a2744"
                     fill="url(#feesGradient)"
                   />
                   <Area
@@ -256,7 +256,7 @@ const RevenueBilling = () => {
                     dataKey="commissions"
                     name="Commissions"
                     stackId="1"
-                    stroke="#D4AF37"
+                    stroke="#D4A84C"
                     fill="url(#commissionsGradient)"
                   />
                   <Area
@@ -279,7 +279,7 @@ const RevenueBilling = () => {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <PieChart className="h-5 w-5 text-[#D4AF37]" />
+                <PieChart className="h-5 w-5 text-[#D4A84C]" />
                 Revenue by Service
               </CardTitle>
             </CardHeader>
@@ -312,7 +312,7 @@ const RevenueBilling = () => {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <Users className="h-5 w-5 text-[#D4AF37]" />
+                <Users className="h-5 w-5 text-[#D4A84C]" />
                 Top Clients by Revenue
               </CardTitle>
             </CardHeader>
@@ -337,7 +337,7 @@ const RevenueBilling = () => {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-[#0F392B]">{formatCurrency(client.fees)}</p>
+                      <p className="font-bold text-[#1a2744]">{formatCurrency(client.fees)}</p>
                       <p className="text-xs text-muted-foreground">annual fees</p>
                     </div>
                   </div>
@@ -351,7 +351,7 @@ const RevenueBilling = () => {
         <Card>
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
-              <Receipt className="h-5 w-5 text-[#D4AF37]" />
+              <Receipt className="h-5 w-5 text-[#D4A84C]" />
               Recent Invoices
             </CardTitle>
           </CardHeader>
@@ -403,7 +403,7 @@ const RevenueBilling = () => {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <Briefcase className="h-5 w-5 text-[#D4AF37]" />
+                <Briefcase className="h-5 w-5 text-[#D4A84C]" />
                 Adviser Performance
               </CardTitle>
             </CardHeader>
@@ -430,7 +430,7 @@ const RevenueBilling = () => {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-sm text-muted-foreground">Est. Revenue</span>
-                        <span className="font-semibold text-[#0F392B]">{formatCurrency(adviser.aum * 0.01)}</span>
+                        <span className="font-semibold text-[#1a2744]">{formatCurrency(adviser.aum * 0.01)}</span>
                       </div>
                     </div>
                   </div>

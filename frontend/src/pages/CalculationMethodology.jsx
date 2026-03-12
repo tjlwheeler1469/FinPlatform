@@ -21,9 +21,9 @@ const ATOReference = ({ title, url, description }) => (
     href={url} 
     target="_blank" 
     rel="noopener noreferrer"
-    className="flex items-start gap-3 p-3 rounded-lg border hover:border-[#0F392B] hover:bg-[#0F392B]/5 transition-colors"
+    className="flex items-start gap-3 p-3 rounded-lg border hover:border-[#1a2744] hover:bg-[#1a2744]/5 transition-colors"
   >
-    <ExternalLink className="h-4 w-4 text-[#0F392B] mt-1 flex-shrink-0" />
+    <ExternalLink className="h-4 w-4 text-[#1a2744] mt-1 flex-shrink-0" />
     <div>
       <p className="font-medium text-sm">{title}</p>
       <p className="text-xs text-muted-foreground mt-1">{description}</p>
@@ -32,7 +32,7 @@ const ATOReference = ({ title, url, description }) => (
 );
 
 const FormulaCard = ({ title, formula, explanation, atoRef }) => (
-  <Card className="border-l-4 border-l-[#0F392B]">
+  <Card className="border-l-4 border-l-[#1a2744]">
     <CardContent className="p-4">
       <h4 className="font-semibold text-sm mb-2">{title}</h4>
       <div className="bg-muted/50 p-3 rounded font-mono text-sm mb-3">
@@ -42,7 +42,7 @@ const FormulaCard = ({ title, formula, explanation, atoRef }) => (
       {atoRef && (
         <div className="mt-3 pt-3 border-t">
           <p className="text-xs text-muted-foreground mb-1">ATO Reference:</p>
-          <a href={atoRef.url} target="_blank" rel="noopener noreferrer" className="text-xs text-[#0F392B] hover:underline flex items-center gap-1">
+          <a href={atoRef.url} target="_blank" rel="noopener noreferrer" className="text-xs text-[#1a2744] hover:underline flex items-center gap-1">
             {atoRef.title} <ExternalLink className="h-3 w-3" />
           </a>
         </div>
@@ -57,7 +57,7 @@ const CalculationMethodology = () => {
       <div className="space-y-8" data-testid="calculation-methodology-page">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+          <h1 className="text-3xl font-bold  text-foreground">
             Calculation Methodology
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -66,11 +66,11 @@ const CalculationMethodology = () => {
         </div>
 
         {/* Compliance Notice */}
-        <Card className="bg-[#0F392B] text-white">
+        <Card className="bg-[#1a2744] text-white">
           <CardContent className="p-6">
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
-                <Scale className="h-6 w-6 text-[#D4AF37]" />
+                <Scale className="h-6 w-6 text-[#D4A84C]" />
               </div>
               <div>
                 <h3 className="font-semibold text-lg">Regulatory Compliance</h3>
@@ -99,7 +99,7 @@ const CalculationMethodology = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <DollarSign className="h-5 w-5 text-[#0F392B]" />
+                  <DollarSign className="h-5 w-5 text-[#1a2744]" />
                   Personal Income Tax 2024-25
                 </CardTitle>
                 <CardDescription>
@@ -199,7 +199,7 @@ const CalculationMethodology = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-[#D4AF37]" />
+                  <TrendingUp className="h-5 w-5 text-[#D4A84C]" />
                   Capital Gains Tax (CGT)
                 </CardTitle>
                 <CardDescription>
@@ -303,7 +303,7 @@ const CalculationMethodology = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Percent className="h-5 w-5 text-[#D4AF37]" />
+                  <Percent className="h-5 w-5 text-[#D4A84C]" />
                   Franking Credits (Imputation)
                 </CardTitle>
                 <CardDescription>
@@ -364,7 +364,7 @@ const CalculationMethodology = () => {
                 </div>
 
                 {/* Example */}
-                <Card className="bg-[#D4AF37]/10 border-[#D4AF37]">
+                <Card className="bg-[#D4A84C]/10 border-[#D4A84C]">
                   <CardContent className="p-4">
                     <h4 className="font-semibold mb-2">Example Calculation</h4>
                     <div className="text-sm space-y-1">
@@ -555,7 +555,7 @@ const CalculationMethodology = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Building2 className="h-5 w-5 text-[#0F392B]" />
+                  <Building2 className="h-5 w-5 text-[#1a2744]" />
                   Company Tax
                 </CardTitle>
                 <CardDescription>

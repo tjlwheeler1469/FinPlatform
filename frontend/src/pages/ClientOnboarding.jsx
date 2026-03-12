@@ -103,7 +103,7 @@ const RISK_QUESTIONS = [
 // Risk Profiles
 const RISK_PROFILES = {
   conservative: { name: "Conservative", color: "#3B82F6", allocation: { defensive: 70, growth: 30 }, expectedReturn: "3-5%" },
-  balanced: { name: "Balanced", color: "#D4AF37", allocation: { defensive: 40, growth: 60 }, expectedReturn: "5-7%" },
+  balanced: { name: "Balanced", color: "#D4A84C", allocation: { defensive: 40, growth: 60 }, expectedReturn: "5-7%" },
   growth: { name: "Growth", color: "#10B981", allocation: { defensive: 20, growth: 80 }, expectedReturn: "7-10%" },
   aggressive: { name: "Aggressive", color: "#EF4444", allocation: { defensive: 5, growth: 95 }, expectedReturn: "8-12%" },
 };
@@ -290,11 +290,11 @@ This is a summary only. For a full Statement of Advice, visit the SOA Generator.
               {STEPS.map((step, index) => (
                 <div 
                   key={step.id}
-                  className={`flex flex-col items-center ${index <= currentStep ? 'text-[#0F392B]' : 'text-muted-foreground'}`}
+                  className={`flex flex-col items-center ${index <= currentStep ? 'text-[#1a2744]' : 'text-muted-foreground'}`}
                 >
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 ${
                     index < currentStep ? 'bg-[#10B981] text-white' :
-                    index === currentStep ? 'bg-[#0F392B] text-white' :
+                    index === currentStep ? 'bg-[#1a2744] text-white' :
                     'bg-muted'
                   }`}>
                     {index < currentStep ? <CheckCircle className="h-4 w-4" /> : <step.icon className="h-4 w-4" />}
@@ -308,9 +308,9 @@ This is a summary only. For a full Statement of Advice, visit the SOA Generator.
 
         {/* Step Content */}
         {STEPS[currentStep].id === "welcome" && (
-          <Card className="border-t-4 border-t-[#D4AF37]">
+          <Card className="border-t-4 border-t-[#D4A84C]">
             <CardContent className="p-8 text-center">
-              <Sparkles className="h-16 w-16 mx-auto text-[#D4AF37] mb-4" />
+              <Sparkles className="h-16 w-16 mx-auto text-[#D4A84C] mb-4" />
               <h1 className="text-3xl font-bold mb-4">Welcome to Your Financial Journey</h1>
               <p className="text-muted-foreground max-w-2xl mx-auto mb-6">
                 In the next few minutes, we'll help you understand your risk profile, set financial goals, 
@@ -328,12 +328,12 @@ This is a summary only. For a full Statement of Advice, visit the SOA Generator.
                   <p className="text-xs text-muted-foreground">Short & long term</p>
                 </div>
                 <div className="p-4 bg-muted/50 rounded-lg">
-                  <FileText className="h-8 w-8 mx-auto text-[#D4AF37] mb-2" />
+                  <FileText className="h-8 w-8 mx-auto text-[#D4A84C] mb-2" />
                   <p className="text-sm font-medium">Get Your SOA</p>
                   <p className="text-xs text-muted-foreground">Personalized advice</p>
                 </div>
               </div>
-              <Button onClick={nextStep} size="lg" className="bg-[#0F392B]">
+              <Button onClick={nextStep} size="lg" className="bg-[#1a2744]">
                 Let's Get Started <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </CardContent>
@@ -448,7 +448,7 @@ This is a summary only. For a full Statement of Advice, visit the SOA Generator.
                           key={opt.value}
                           className={`flex items-center space-x-3 p-3 rounded-lg border cursor-pointer transition-all ${
                             onboardingData.riskAnswers[q.id] === opt.value 
-                              ? 'border-[#0F392B] bg-[#0F392B]/5' 
+                              ? 'border-[#1a2744] bg-[#1a2744]/5' 
                               : 'hover:bg-muted/50'
                           }`}
                           onClick={() => handleRiskAnswer(q.id, opt.value)}
@@ -593,7 +593,7 @@ This is a summary only. For a full Statement of Advice, visit the SOA Generator.
                           <SelectItem value="long">Long (5+y)</SelectItem>
                         </SelectContent>
                       </Select>
-                      <Button onClick={addGoal} size="icon" className="bg-[#0F392B]">+</Button>
+                      <Button onClick={addGoal} size="icon" className="bg-[#1a2744]">+</Button>
                     </div>
                   </div>
                 </div>
@@ -674,10 +674,10 @@ This is a summary only. For a full Statement of Advice, visit the SOA Generator.
                     />
                   </div>
                 </div>
-                <div className="p-4 bg-[#0F392B]/5 rounded-lg">
+                <div className="p-4 bg-[#1a2744]/5 rounded-lg">
                   <div className="flex justify-between">
                     <span className="font-medium">Estimated Net Worth</span>
-                    <span className="font-bold text-[#0F392B]">
+                    <span className="font-bold text-[#1a2744]">
                       {formatCurrency(onboardingData.estimatedAssets - onboardingData.estimatedLiabilities)}
                     </span>
                   </div>
@@ -752,7 +752,7 @@ This is a summary only. For a full Statement of Advice, visit the SOA Generator.
                     </div>
                     <div>
                       <p className="text-xs text-muted-foreground">Net Worth</p>
-                      <p className="font-bold text-[#0F392B]">{formatCurrency(onboardingData.estimatedAssets - onboardingData.estimatedLiabilities)}</p>
+                      <p className="font-bold text-[#1a2744]">{formatCurrency(onboardingData.estimatedAssets - onboardingData.estimatedLiabilities)}</p>
                     </div>
                   </div>
                 </div>
@@ -761,7 +761,7 @@ This is a summary only. For a full Statement of Advice, visit the SOA Generator.
                   <Button variant="outline" className="flex-1" onClick={generateQuickSOA}>
                     <Download className="h-4 w-4 mr-2" /> Download Quick SOA
                   </Button>
-                  <Button className="flex-1 bg-[#0F392B]" onClick={() => navigate("/statement-of-advice")}>
+                  <Button className="flex-1 bg-[#1a2744]" onClick={() => navigate("/statement-of-advice")}>
                     <FileText className="h-4 w-4 mr-2" /> Open Full SOA Builder
                   </Button>
                 </div>
@@ -783,7 +783,7 @@ This is a summary only. For a full Statement of Advice, visit the SOA Generator.
                 <Button variant="outline" onClick={() => navigate("/dashboard")}>
                   Go to Dashboard
                 </Button>
-                <Button className="bg-[#0F392B]" onClick={() => navigate("/copilot")}>
+                <Button className="bg-[#1a2744]" onClick={() => navigate("/copilot")}>
                   <Sparkles className="h-4 w-4 mr-2" /> Talk to Copilot
                 </Button>
               </div>
@@ -802,7 +802,7 @@ This is a summary only. For a full Statement of Advice, visit the SOA Generator.
                 Complete Onboarding <CheckCircle className="h-4 w-4 ml-2" />
               </Button>
             ) : (
-              <Button onClick={nextStep} disabled={!canProceed()} className="bg-[#0F392B]">
+              <Button onClick={nextStep} disabled={!canProceed()} className="bg-[#1a2744]">
                 Continue <ChevronRight className="h-4 w-4 ml-2" />
               </Button>
             )}

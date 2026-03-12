@@ -186,7 +186,7 @@ const CalendarIntegrationSettings = () => {
     <Card>
       <CardHeader>
         <CardTitle className="text-base flex items-center gap-2">
-          <Link2 className="h-5 w-5 text-[#D4AF37]" />
+          <Link2 className="h-5 w-5 text-[#D4A84C]" />
           Calendar Integrations
         </CardTitle>
         <CardDescription>
@@ -311,7 +311,7 @@ const CalendarIntegrationSettings = () => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowSetupDialog(false)}>Cancel</Button>
-            <Button onClick={handleSaveApiKey} className="bg-[#0F392B]">Save Client ID</Button>
+            <Button onClick={handleSaveApiKey} className="bg-[#1a2744]">Save Client ID</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

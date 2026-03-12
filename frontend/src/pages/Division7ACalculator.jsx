@@ -133,7 +133,7 @@ const Division7ACalculator = () => {
       <div className="space-y-6" data-testid="div7a-calculator-page">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+          <h1 className="text-3xl font-bold  text-foreground">
             Division 7A Loan Calculator
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -154,7 +154,7 @@ const Division7ACalculator = () => {
               {/* Input Section */}
               <Card className="lg:col-span-1" data-testid="div7a-inputs">
                 <CardHeader>
-                  <CardTitle className="font-['Manrope']">Loan Details</CardTitle>
+                  <CardTitle className="">Loan Details</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-5">
                   <div className="space-y-2">
@@ -226,7 +226,7 @@ const Division7ACalculator = () => {
 
                   <Button 
                     onClick={calculateDiv7ALoan}
-                    className="w-full bg-[#0F392B] hover:bg-[#0F392B]/90"
+                    className="w-full bg-[#1a2744] hover:bg-[#1a2744]/90"
                     data-testid="calculate-btn"
                   >
                     <Calculator className="h-4 w-4 mr-2" />
@@ -268,7 +268,7 @@ const Division7ACalculator = () => {
                       <Card>
                         <CardContent className="p-4">
                           <p className="text-sm text-muted-foreground">Minimum Annual Repayment</p>
-                          <p className="text-xl font-bold text-[#0F392B]">
+                          <p className="text-xl font-bold text-[#1a2744]">
                             {formatCurrency(result.annual_minimum_repayment)}
                           </p>
                         </CardContent>
@@ -302,7 +302,7 @@ const Division7ACalculator = () => {
                     {/* Loan Balance Chart */}
                     <Card data-testid="balance-chart">
                       <CardHeader>
-                        <CardTitle className="font-['Manrope']">Loan Balance Over Time</CardTitle>
+                        <CardTitle className="">Loan Balance Over Time</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="h-[300px] min-h-[300px]">
@@ -315,8 +315,8 @@ const Division7ACalculator = () => {
                               <Area 
                                 type="monotone" 
                                 dataKey="balance" 
-                                stroke="#0F392B" 
-                                fill="#0F392B" 
+                                stroke="#1a2744" 
+                                fill="#1a2744" 
                                 fillOpacity={0.3}
                                 name="Loan Balance"
                               />
@@ -329,7 +329,7 @@ const Division7ACalculator = () => {
                     {/* Payment Breakdown */}
                     <Card data-testid="payment-breakdown">
                       <CardHeader>
-                        <CardTitle className="font-['Manrope']">Annual Payment Breakdown</CardTitle>
+                        <CardTitle className="">Annual Payment Breakdown</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="h-[250px] min-h-[250px]">
@@ -340,8 +340,8 @@ const Division7ACalculator = () => {
                               <YAxis tickFormatter={(v) => `$${(v/1000).toFixed(0)}k`} stroke="hsl(var(--muted-foreground))" />
                               <Tooltip formatter={(v) => formatCurrency(v)} />
                               <Legend />
-                              <Bar dataKey="principal" name="Principal" fill="#0F392B" stackId="a" />
-                              <Bar dataKey="interest" name="Interest" fill="#D4AF37" stackId="a" />
+                              <Bar dataKey="principal" name="Principal" fill="#1a2744" stackId="a" />
+                              <Bar dataKey="interest" name="Interest" fill="#D4A84C" stackId="a" />
                             </BarChart>
                           </ResponsiveContainer>
                         </div>
@@ -350,10 +350,10 @@ const Division7ACalculator = () => {
 
                     {/* Action Required */}
                     {!result.is_compliant && (
-                      <Card className="border-[#D4AF37]">
+                      <Card className="border-[#D4A84C]">
                         <CardHeader>
-                          <CardTitle className="font-['Manrope'] flex items-center gap-2">
-                            <Lightbulb className="h-5 w-5 text-[#D4AF37]" />
+                          <CardTitle className=" flex items-center gap-2">
+                            <Lightbulb className="h-5 w-5 text-[#D4A84C]" />
                             Action Required
                           </CardTitle>
                         </CardHeader>
@@ -400,7 +400,7 @@ const Division7ACalculator = () => {
             {result ? (
               <Card data-testid="amortization-schedule">
                 <CardHeader>
-                  <CardTitle className="font-['Manrope']">Amortization Schedule</CardTitle>
+                  <CardTitle className="">Amortization Schedule</CardTitle>
                   <CardDescription>
                     {result.loan_term} year repayment schedule at {result.benchmark_rate}% interest
                   </CardDescription>
@@ -423,10 +423,10 @@ const Division7ACalculator = () => {
                           <tr key={row.year} className="border-b">
                             <td className="p-3 font-medium">Year {row.year}</td>
                             <td className="text-right p-3">{formatCurrency(row.opening_balance)}</td>
-                            <td className="text-right p-3 font-medium text-[#0F392B]">
+                            <td className="text-right p-3 font-medium text-[#1a2744]">
                               {formatCurrency(row.minimum_repayment)}
                             </td>
-                            <td className="text-right p-3 text-[#D4AF37]">
+                            <td className="text-right p-3 text-[#D4A84C]">
                               {formatCurrency(row.interest_component)}
                             </td>
                             <td className="text-right p-3">{formatCurrency(row.principal_component)}</td>
@@ -435,8 +435,8 @@ const Division7ACalculator = () => {
                         ))}
                         <tr className="bg-muted/30 font-semibold">
                           <td className="p-3" colSpan={2}>Total</td>
-                          <td className="text-right p-3 text-[#0F392B]">{formatCurrency(result.total_repayments)}</td>
-                          <td className="text-right p-3 text-[#D4AF37]">{formatCurrency(result.total_interest)}</td>
+                          <td className="text-right p-3 text-[#1a2744]">{formatCurrency(result.total_repayments)}</td>
+                          <td className="text-right p-3 text-[#D4A84C]">{formatCurrency(result.total_interest)}</td>
                           <td className="text-right p-3">{formatCurrency(result.loan_amount)}</td>
                           <td className="p-3"></td>
                         </tr>
@@ -457,7 +457,7 @@ const Division7ACalculator = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle className="font-['Manrope']">What is Division 7A?</CardTitle>
+                  <CardTitle className="">What is Division 7A?</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3 text-sm text-muted-foreground">
                   <p>
@@ -474,7 +474,7 @@ const Division7ACalculator = () => {
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="font-['Manrope']">Complying Loan Requirements</CardTitle>
+                  <CardTitle className="">Complying Loan Requirements</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   <div className="flex items-start gap-2">
@@ -498,13 +498,13 @@ const Division7ACalculator = () => {
 
               <Card className="md:col-span-2">
                 <CardHeader>
-                  <CardTitle className="font-['Manrope']">Key Dates & Rates</CardTitle>
+                  <CardTitle className="">Key Dates & Rates</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="p-3 rounded-lg bg-muted/50">
                       <p className="text-xs text-muted-foreground">2024-25 Benchmark Rate</p>
-                      <p className="text-lg font-bold text-[#0F392B]">{DIV7A_BENCHMARK_RATE}%</p>
+                      <p className="text-lg font-bold text-[#1a2744]">{DIV7A_BENCHMARK_RATE}%</p>
                     </div>
                     <div className="p-3 rounded-lg bg-muted/50">
                       <p className="text-xs text-muted-foreground">Unsecured Term</p>

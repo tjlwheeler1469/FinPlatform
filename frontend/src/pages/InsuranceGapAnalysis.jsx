@@ -187,8 +187,8 @@ const InsuranceGapAnalysis = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] text-foreground flex items-center gap-3">
-              <Shield className="h-8 w-8 text-[#D4AF37]" />
+            <h1 className="text-3xl font-bold  text-foreground flex items-center gap-3">
+              <Shield className="h-8 w-8 text-[#D4A84C]" />
               Insurance Gap Analysis
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -209,7 +209,7 @@ const InsuranceGapAnalysis = () => {
         <Card>
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
-              <Calculator className="h-5 w-5 text-[#D4AF37]" />
+              <Calculator className="h-5 w-5 text-[#D4A84C]" />
               Your Situation
             </CardTitle>
             <CardDescription>Adjust these values to get personalized recommendations</CardDescription>
@@ -289,8 +289,8 @@ const InsuranceGapAnalysis = () => {
                   <YAxis dataKey="name" type="category" width={80} />
                   <Tooltip formatter={(v) => formatCurrency(v)} />
                   <Legend />
-                  <Bar dataKey="current" name="Current Coverage" fill="#0F392B" />
-                  <Bar dataKey="recommended" name="Recommended" fill="#D4AF37" />
+                  <Bar dataKey="current" name="Current Coverage" fill="#1a2744" />
+                  <Bar dataKey="recommended" name="Recommended" fill="#D4A84C" />
                 </BarChart>
               </ResponsiveContainer>
             </ChartContainer>
@@ -398,13 +398,13 @@ const InsuranceGapAnalysis = () => {
         </div>
 
         {/* Recommendations Summary */}
-        <Card className="border-[#0F392B] bg-[#0F392B]/5">
+        <Card className="border-[#1a2744] bg-[#1a2744]/5">
           <CardContent className="pt-6">
             <div className="flex items-start gap-3">
-              <Info className="h-5 w-5 text-[#0F392B] flex-shrink-0 mt-0.5" />
+              <Info className="h-5 w-5 text-[#1a2744] flex-shrink-0 mt-0.5" />
               <div>
-                <p className="font-semibold text-[#0F392B]">Insurance Recommendations</p>
-                <ul className="text-sm text-[#0F392B]/80 mt-2 space-y-2">
+                <p className="font-semibold text-[#1a2744]">Insurance Recommendations</p>
+                <ul className="text-sm text-[#1a2744]/80 mt-2 space-y-2">
                   {overallScore < 80 && (
                     <li>• Your overall protection score is {overallScore}/100. Consider reviewing your coverage.</li>
                   )}

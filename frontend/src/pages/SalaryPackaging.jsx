@@ -59,7 +59,7 @@ const PACKAGING_ITEMS = [
   { type: "work_related_items", label: "Work-Related Items", icon: Briefcase, fbt_exempt: true },
 ];
 
-const COLORS = ['#0F392B', '#D4AF37', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'];
+const COLORS = ['#1a2744', '#D4A84C', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'];
 
 const SalaryPackaging = () => {
   const [grossSalary, setGrossSalary] = useState(150000);
@@ -115,7 +115,7 @@ const SalaryPackaging = () => {
 
   const pieData = result ? [
     { name: "FBT Exempt", value: result.total_fbt_exempt, color: "#10B981" },
-    { name: "FBT Liable", value: result.total_fbt_liable, color: "#D4AF37" }
+    { name: "FBT Liable", value: result.total_fbt_liable, color: "#D4A84C" }
   ].filter(d => d.value > 0) : [];
 
   return (
@@ -123,7 +123,7 @@ const SalaryPackaging = () => {
       <div className="space-y-8" data-testid="salary-packaging-page">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+          <h1 className="text-3xl font-bold  text-foreground">
             Salary Packaging Calculator
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -135,7 +135,7 @@ const SalaryPackaging = () => {
           {/* Input Section */}
           <Card className="lg:col-span-1" data-testid="packaging-inputs">
             <CardHeader>
-              <CardTitle className="font-['Manrope']">Your Details</CardTitle>
+              <CardTitle className="">Your Details</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Gross Salary */}
@@ -260,7 +260,7 @@ const SalaryPackaging = () => {
 
               <Button 
                 onClick={calculatePackaging}
-                className="w-full bg-[#0F392B] hover:bg-[#0F392B]/90"
+                className="w-full bg-[#1a2744] hover:bg-[#1a2744]/90"
                 disabled={loading}
                 data-testid="calculate-btn"
               >
@@ -276,7 +276,7 @@ const SalaryPackaging = () => {
               <>
                 {/* Summary Cards */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <Card className="bg-[#0F392B] text-white">
+                  <Card className="bg-[#1a2744] text-white">
                     <CardContent className="p-4">
                       <p className="text-sm text-white/80">Net Benefit</p>
                       <p className="text-xl font-bold">
@@ -295,7 +295,7 @@ const SalaryPackaging = () => {
                   <Card>
                     <CardContent className="p-4">
                       <p className="text-sm text-muted-foreground">FBT Payable</p>
-                      <p className="text-xl font-bold text-[#D4AF37]">
+                      <p className="text-xl font-bold text-[#D4A84C]">
                         {formatCurrency(result.fbt_payable)}
                       </p>
                     </CardContent>
@@ -314,7 +314,7 @@ const SalaryPackaging = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <Card data-testid="breakdown-chart">
                     <CardHeader>
-                      <CardTitle className="font-['Manrope']">Item Breakdown</CardTitle>
+                      <CardTitle className="">Item Breakdown</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="h-[250px]">
@@ -324,8 +324,8 @@ const SalaryPackaging = () => {
                             <XAxis type="number" tickFormatter={(v) => `$${(v/1000).toFixed(0)}k`} />
                             <YAxis dataKey="name" type="category" width={120} tick={{ fontSize: 11 }} />
                             <Tooltip formatter={(v) => formatCurrency(v)} />
-                            <Bar dataKey="amount" fill="#0F392B" name="Amount" />
-                            <Bar dataKey="fbt" fill="#D4AF37" name="FBT" />
+                            <Bar dataKey="amount" fill="#1a2744" name="Amount" />
+                            <Bar dataKey="fbt" fill="#D4A84C" name="FBT" />
                           </BarChart>
                         </ResponsiveContainer>
                       </div>
@@ -334,7 +334,7 @@ const SalaryPackaging = () => {
 
                   <Card data-testid="fbt-split">
                     <CardHeader>
-                      <CardTitle className="font-['Manrope']">FBT Status</CardTitle>
+                      <CardTitle className="">FBT Status</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="h-[200px]">
@@ -371,7 +371,7 @@ const SalaryPackaging = () => {
                 {/* Item Details */}
                 <Card data-testid="item-details">
                   <CardHeader>
-                    <CardTitle className="font-['Manrope']">Item Analysis</CardTitle>
+                    <CardTitle className="">Item Analysis</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
@@ -386,10 +386,10 @@ const SalaryPackaging = () => {
                           >
                             <div className="flex items-center gap-3">
                               <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                                item.is_fbt_exempt ? 'bg-[#10B981]/10' : 'bg-[#D4AF37]/10'
+                                item.is_fbt_exempt ? 'bg-[#10B981]/10' : 'bg-[#D4A84C]/10'
                               }`}>
                                 <Icon className={`h-5 w-5 ${
-                                  item.is_fbt_exempt ? 'text-[#10B981]' : 'text-[#D4AF37]'
+                                  item.is_fbt_exempt ? 'text-[#10B981]' : 'text-[#D4A84C]'
                                 }`} />
                               </div>
                               <div>
@@ -407,7 +407,7 @@ const SalaryPackaging = () => {
                                 </Badge>
                               ) : (
                                 <div>
-                                  <Badge variant="outline" className="text-[#D4AF37] border-[#D4AF37]">
+                                  <Badge variant="outline" className="text-[#D4A84C] border-[#D4A84C]">
                                     FBT: {formatCurrency(item.fbt_payable)}
                                   </Badge>
                                 </div>
@@ -423,8 +423,8 @@ const SalaryPackaging = () => {
                 {/* Recommendations */}
                 <Card data-testid="recommendations">
                   <CardHeader>
-                    <CardTitle className="font-['Manrope'] flex items-center gap-2">
-                      <Lightbulb className="h-5 w-5 text-[#D4AF37]" />
+                    <CardTitle className=" flex items-center gap-2">
+                      <Lightbulb className="h-5 w-5 text-[#D4A84C]" />
                       Recommendations
                     </CardTitle>
                   </CardHeader>
@@ -459,7 +459,7 @@ const SalaryPackaging = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg font-['Manrope']">FBT Exempt Items</CardTitle>
+              <CardTitle className="text-lg ">FBT Exempt Items</CardTitle>
             </CardHeader>
             <CardContent className="text-sm text-muted-foreground">
               <ul className="space-y-2">
@@ -481,7 +481,7 @@ const SalaryPackaging = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg font-['Manrope']">NFP FBT Caps</CardTitle>
+              <CardTitle className="text-lg ">NFP FBT Caps</CardTitle>
             </CardHeader>
             <CardContent className="text-sm text-muted-foreground">
               <ul className="space-y-2">
@@ -494,10 +494,10 @@ const SalaryPackaging = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg font-['Manrope']">FBT Rate 2024-25</CardTitle>
+              <CardTitle className="text-lg ">FBT Rate 2024-25</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-[#0F392B] mb-2">47%</div>
+              <div className="text-3xl font-bold text-[#1a2744] mb-2">47%</div>
               <p className="text-sm text-muted-foreground">
                 FBT is paid by the employer but often passed to employee via reduced salary.
               </p>

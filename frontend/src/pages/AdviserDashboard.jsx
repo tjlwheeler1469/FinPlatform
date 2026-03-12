@@ -186,7 +186,7 @@ const MOCK_CLIENTS = [
   },
 ];
 
-const COLORS = ['#0F392B', '#10B981', '#3B82F6', '#D4AF37', '#EF4444'];
+const COLORS = ['#1a2744', '#10B981', '#3B82F6', '#D4A84C', '#EF4444'];
 
 const AdviserDashboard = () => {
   const navigate = useNavigate();
@@ -277,8 +277,8 @@ const AdviserDashboard = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold font-['Manrope'] flex items-center gap-2">
-              <Briefcase className="h-8 w-8 text-[#D4AF37]" />
+            <h1 className="text-3xl font-bold  flex items-center gap-2">
+              <Briefcase className="h-8 w-8 text-[#D4A84C]" />
               Adviser Dashboard
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -290,7 +290,7 @@ const AdviserDashboard = () => {
               <Shield className="h-3 w-3 text-green-600" />
               AFSL Compliant
             </Badge>
-            <Button className="bg-[#0F392B]">
+            <Button className="bg-[#1a2744]">
               <UserPlus className="h-4 w-4 mr-2" /> Add Client
             </Button>
           </div>
@@ -302,7 +302,7 @@ const AdviserDashboard = () => {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <p className="text-sm text-muted-foreground">Total AUM</p>
-                <DollarSign className="h-4 w-4 text-[#D4AF37]" />
+                <DollarSign className="h-4 w-4 text-[#D4A84C]" />
               </div>
               <p className="text-2xl font-bold">{formatCurrency(totalAUM)}</p>
               <p className="text-xs text-green-600 flex items-center gap-1 mt-1">
@@ -314,7 +314,7 @@ const AdviserDashboard = () => {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <p className="text-sm text-muted-foreground">Total Clients</p>
-                <Users className="h-4 w-4 text-[#D4AF37]" />
+                <Users className="h-4 w-4 text-[#D4A84C]" />
               </div>
               <p className="text-2xl font-bold">{totalClients}</p>
               <p className="text-xs text-muted-foreground mt-1">{activeClients} active</p>
@@ -387,7 +387,7 @@ const AdviserDashboard = () => {
                         <XAxis type="number" tickFormatter={(v) => `$${(v/1000000).toFixed(1)}M`} />
                         <YAxis type="category" dataKey="name" width={80} />
                         <Tooltip formatter={(v) => formatCurrency(v)} />
-                        <Bar dataKey="value" fill="#0F392B" radius={[0, 4, 4, 0]} />
+                        <Bar dataKey="value" fill="#1a2744" radius={[0, 4, 4, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   </ChartContainer>
@@ -443,7 +443,7 @@ const AdviserDashboard = () => {
                   {clients.filter(c => c.alerts > 0 || c.status === "review").slice(0, 4).map(client => (
                     <div key={client.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-[#0F392B] text-white flex items-center justify-center font-bold">
+                        <div className="w-10 h-10 rounded-full bg-[#1a2744] text-white flex items-center justify-center font-bold">
                           {client.name.charAt(0)}
                         </div>
                         <div>
@@ -552,7 +552,7 @@ const AdviserDashboard = () => {
                           </td>
                           <td className="p-3">
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-full bg-[#0F392B] text-white flex items-center justify-center text-sm font-bold">
+                              <div className="w-8 h-8 rounded-full bg-[#1a2744] text-white flex items-center justify-center text-sm font-bold">
                                 {client.name.charAt(0)}
                               </div>
                               <div>
@@ -697,7 +697,7 @@ const AdviserDashboard = () => {
                   {clients.map(client => (
                     <div key={client.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-[#0F392B] text-white flex items-center justify-center font-bold">
+                        <div className="w-10 h-10 rounded-full bg-[#1a2744] text-white flex items-center justify-center font-bold">
                           {client.name.charAt(0)}
                         </div>
                         <div>

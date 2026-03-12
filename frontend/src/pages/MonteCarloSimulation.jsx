@@ -95,7 +95,7 @@ const MonteCarloSimulation = () => {
       <div className="space-y-8" data-testid="monte-carlo-page">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+          <h1 className="text-3xl font-bold  text-foreground">
             Monte Carlo Simulation
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -107,7 +107,7 @@ const MonteCarloSimulation = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Card className="lg:col-span-1" data-testid="simulation-inputs">
             <CardHeader>
-              <CardTitle className="font-['Manrope']">Simulation Parameters</CardTitle>
+              <CardTitle className="">Simulation Parameters</CardTitle>
               <CardDescription>
                 Configure your investment scenario
               </CardDescription>
@@ -150,7 +150,7 @@ const MonteCarloSimulation = () => {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <Label>Volatility (Risk)</Label>
-                  <span className="text-sm font-semibold text-[#D4AF37]">{volatility}%</span>
+                  <span className="text-sm font-semibold text-[#D4A84C]">{volatility}%</span>
                 </div>
                 <Slider
                   value={[volatility]}
@@ -216,7 +216,7 @@ const MonteCarloSimulation = () => {
 
               <Button 
                 onClick={runSimulation}
-                className="w-full bg-[#0F392B] hover:bg-[#0F392B]/90"
+                className="w-full bg-[#1a2744] hover:bg-[#1a2744]/90"
                 disabled={loading}
                 data-testid="run-simulation-btn"
               >
@@ -229,7 +229,7 @@ const MonteCarloSimulation = () => {
           {/* Results */}
           <Card className="lg:col-span-2" data-testid="simulation-results">
             <CardHeader>
-              <CardTitle className="font-['Manrope']">Projection Results</CardTitle>
+              <CardTitle className="">Projection Results</CardTitle>
               <CardDescription>
                 {result ? `${result.num_simulations} simulations over ${result.simulation_years} years` : "Run a simulation to see results"}
               </CardDescription>
@@ -239,7 +239,7 @@ const MonteCarloSimulation = () => {
                 <div className="space-y-6">
                   {/* Summary Stats */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="p-4 rounded-lg bg-[#0F392B] text-white">
+                    <div className="p-4 rounded-lg bg-[#1a2744] text-white">
                       <p className="text-sm text-white/80">Median Outcome</p>
                       <p className="text-xl font-bold">{formatCurrency(result.final_value_median)}</p>
                     </div>
@@ -267,8 +267,8 @@ const MonteCarloSimulation = () => {
                             <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
                           </linearGradient>
                           <linearGradient id="colorP50" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#0F392B" stopOpacity={0.5}/>
-                            <stop offset="95%" stopColor="#0F392B" stopOpacity={0.1}/>
+                            <stop offset="5%" stopColor="#1a2744" stopOpacity={0.5}/>
+                            <stop offset="95%" stopColor="#1a2744" stopOpacity={0.1}/>
                           </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -286,7 +286,7 @@ const MonteCarloSimulation = () => {
                           }}
                           formatter={(value) => [formatCurrency(value), '']}
                         />
-                        <ReferenceLine y={initialValue} stroke="#D4AF37" strokeDasharray="5 5" />
+                        <ReferenceLine y={initialValue} stroke="#D4A84C" strokeDasharray="5 5" />
                         <Area
                           type="monotone"
                           dataKey="p90"
@@ -305,7 +305,7 @@ const MonteCarloSimulation = () => {
                         <Area
                           type="monotone"
                           dataKey="p50"
-                          stroke="#0F392B"
+                          stroke="#1a2744"
                           strokeWidth={2}
                           fill="url(#colorP50)"
                           name="Median"
@@ -313,7 +313,7 @@ const MonteCarloSimulation = () => {
                         <Area
                           type="monotone"
                           dataKey="p25"
-                          stroke="#D4AF37"
+                          stroke="#D4A84C"
                           strokeOpacity={0.5}
                           fill="transparent"
                           name="25th Percentile"
@@ -336,7 +336,7 @@ const MonteCarloSimulation = () => {
                       <span>90th Percentile (Optimistic)</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-[#0F392B]" />
+                      <div className="w-3 h-3 rounded-full bg-[#1a2744]" />
                       <span>50th Percentile (Median)</span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -344,7 +344,7 @@ const MonteCarloSimulation = () => {
                       <span>10th Percentile (Conservative)</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-3 h-0.5 bg-[#D4AF37]" />
+                      <div className="w-3 h-0.5 bg-[#D4A84C]" />
                       <span>Initial Investment</span>
                     </div>
                   </div>
@@ -392,12 +392,12 @@ const MonteCarloSimulation = () => {
             <Card data-testid="double-probability-card">
               <CardContent className="p-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-[#D4AF37]/10 flex items-center justify-center">
-                    <TrendingUp className="h-6 w-6 text-[#D4AF37]" />
+                  <div className="w-12 h-12 rounded-lg bg-[#D4A84C]/10 flex items-center justify-center">
+                    <TrendingUp className="h-6 w-6 text-[#D4A84C]" />
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Probability to Double</p>
-                    <p className="text-2xl font-bold text-[#D4AF37]">
+                    <p className="text-2xl font-bold text-[#D4A84C]">
                       {result.probability_double.toFixed(1)}%
                     </p>
                   </div>
@@ -426,7 +426,7 @@ const MonteCarloSimulation = () => {
         {/* Explanation */}
         <Card data-testid="explanation-card">
           <CardHeader>
-            <CardTitle className="font-['Manrope']">Understanding Monte Carlo Simulations</CardTitle>
+            <CardTitle className="">Understanding Monte Carlo Simulations</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-muted-foreground">

@@ -124,7 +124,7 @@ const DividendReinvestment = () => {
       <div className="space-y-8" data-testid="dividend-reinvestment-page">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold font-['Manrope'] text-foreground">
+          <h1 className="text-3xl font-bold  text-foreground">
             Dividend Reinvestment Calculator
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -136,7 +136,7 @@ const DividendReinvestment = () => {
           {/* Input Section */}
           <Card className="lg:col-span-1" data-testid="drip-inputs">
             <CardHeader>
-              <CardTitle className="font-['Manrope']">Investment Parameters</CardTitle>
+              <CardTitle className="">Investment Parameters</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Initial Investment */}
@@ -286,7 +286,7 @@ const DividendReinvestment = () => {
 
               <Button 
                 onClick={calculateReinvestment}
-                className="w-full bg-[#0F392B] hover:bg-[#0F392B]/90"
+                className="w-full bg-[#1a2744] hover:bg-[#1a2744]/90"
                 disabled={loading}
                 data-testid="calculate-btn"
               >
@@ -302,7 +302,7 @@ const DividendReinvestment = () => {
               <>
                 {/* Summary Cards */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <Card className="bg-[#0F392B] text-white">
+                  <Card className="bg-[#1a2744] text-white">
                     <CardContent className="p-4">
                       <div className="flex items-center gap-2 mb-1">
                         <Repeat className="h-4 w-4" />
@@ -338,7 +338,7 @@ const DividendReinvestment = () => {
                   <Card>
                     <CardContent className="p-4">
                       <p className="text-sm text-muted-foreground">Reinvest CAGR</p>
-                      <p className="text-xl font-bold text-[#D4AF37]">
+                      <p className="text-xl font-bold text-[#D4A84C]">
                         {result.comparison.reinvest_cagr}%
                       </p>
                       <p className="text-xs text-muted-foreground">
@@ -360,7 +360,7 @@ const DividendReinvestment = () => {
                     {/* Main Comparison Chart */}
                     <Card data-testid="comparison-chart">
                       <CardHeader>
-                        <CardTitle className="font-['Manrope']">Wealth Comparison</CardTitle>
+                        <CardTitle className="">Wealth Comparison</CardTitle>
                         <CardDescription>Reinvest vs Cash dividends over {years} years</CardDescription>
                       </CardHeader>
                       <CardContent>
@@ -383,16 +383,16 @@ const DividendReinvestment = () => {
                                 type="monotone" 
                                 dataKey="reinvest" 
                                 name="Reinvest Dividends"
-                                stroke="#0F392B" 
-                                fill="#0F392B" 
+                                stroke="#1a2744" 
+                                fill="#1a2744" 
                                 fillOpacity={0.3}
                               />
                               <Area 
                                 type="monotone" 
                                 dataKey="cash" 
                                 name="Take Cash"
-                                stroke="#D4AF37" 
-                                fill="#D4AF37" 
+                                stroke="#D4A84C" 
+                                fill="#D4A84C" 
                                 fillOpacity={0.3}
                               />
                             </AreaChart>
@@ -406,7 +406,7 @@ const DividendReinvestment = () => {
                     {/* Growth Chart */}
                     <Card data-testid="growth-chart">
                       <CardHeader>
-                        <CardTitle className="font-['Manrope']">Portfolio Growth</CardTitle>
+                        <CardTitle className="">Portfolio Growth</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="h-[350px]">
@@ -427,7 +427,7 @@ const DividendReinvestment = () => {
                                 type="monotone" 
                                 dataKey="reinvest" 
                                 name="With Reinvestment"
-                                stroke="#0F392B" 
+                                stroke="#1a2744" 
                                 strokeWidth={3}
                                 dot={false}
                               />
@@ -435,7 +435,7 @@ const DividendReinvestment = () => {
                                 type="monotone" 
                                 dataKey="cash" 
                                 name="Cash Strategy"
-                                stroke="#D4AF37" 
+                                stroke="#D4A84C" 
                                 strokeWidth={3}
                                 dot={false}
                                 strokeDasharray="5 5"
@@ -451,7 +451,7 @@ const DividendReinvestment = () => {
                     {/* Dividend Chart */}
                     <Card data-testid="dividend-chart">
                       <CardHeader>
-                        <CardTitle className="font-['Manrope']">Annual Dividends</CardTitle>
+                        <CardTitle className="">Annual Dividends</CardTitle>
                         <CardDescription>Dividend amounts growing over time</CardDescription>
                       </CardHeader>
                       <CardContent>
@@ -466,8 +466,8 @@ const DividendReinvestment = () => {
                               />
                               <Tooltip formatter={(v) => formatCurrency(v)} />
                               <Legend />
-                              <Bar dataKey="reinvestDividend" name="Reinvest (Larger Base)" fill="#0F392B" />
-                              <Bar dataKey="cashDividend" name="Cash (Net Received)" fill="#D4AF37" />
+                              <Bar dataKey="reinvestDividend" name="Reinvest (Larger Base)" fill="#1a2744" />
+                              <Bar dataKey="cashDividend" name="Cash (Net Received)" fill="#D4A84C" />
                             </BarChart>
                           </ResponsiveContainer>
                         </div>
@@ -479,7 +479,7 @@ const DividendReinvestment = () => {
                 {/* Final Comparison Table */}
                 <Card data-testid="final-comparison">
                   <CardHeader>
-                    <CardTitle className="font-['Manrope']">Final Comparison at Year {years}</CardTitle>
+                    <CardTitle className="">Final Comparison at Year {years}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="overflow-x-auto">
@@ -489,13 +489,13 @@ const DividendReinvestment = () => {
                             <th className="text-left p-3 font-semibold">Metric</th>
                             <th className="text-right p-3 font-semibold">
                               <div className="flex items-center justify-end gap-2">
-                                <Repeat className="h-4 w-4 text-[#0F392B]" />
+                                <Repeat className="h-4 w-4 text-[#1a2744]" />
                                 Reinvest
                               </div>
                             </th>
                             <th className="text-right p-3 font-semibold">
                               <div className="flex items-center justify-end gap-2">
-                                <Banknote className="h-4 w-4 text-[#D4AF37]" />
+                                <Banknote className="h-4 w-4 text-[#D4A84C]" />
                                 Take Cash
                               </div>
                             </th>
@@ -550,8 +550,8 @@ const DividendReinvestment = () => {
                 {/* Recommendations */}
                 <Card data-testid="recommendations">
                   <CardHeader>
-                    <CardTitle className="font-['Manrope'] flex items-center gap-2">
-                      <Lightbulb className="h-5 w-5 text-[#D4AF37]" />
+                    <CardTitle className=" flex items-center gap-2">
+                      <Lightbulb className="h-5 w-5 text-[#D4A84C]" />
                       Insights
                     </CardTitle>
                   </CardHeader>
@@ -588,8 +588,8 @@ const DividendReinvestment = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg font-['Manrope'] flex items-center gap-2">
-                <Info className="h-5 w-5 text-[#0F392B]" />
+              <CardTitle className="text-lg  flex items-center gap-2">
+                <Info className="h-5 w-5 text-[#1a2744]" />
                 What is DRIP?
               </CardTitle>
             </CardHeader>
@@ -604,7 +604,7 @@ const DividendReinvestment = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg font-['Manrope'] flex items-center gap-2">
+              <CardTitle className="text-lg  flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-[#10B981]" />
                 Compounding Power
               </CardTitle>
@@ -620,8 +620,8 @@ const DividendReinvestment = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg font-['Manrope'] flex items-center gap-2">
-                <Banknote className="h-5 w-5 text-[#D4AF37]" />
+              <CardTitle className="text-lg  flex items-center gap-2">
+                <Banknote className="h-5 w-5 text-[#D4A84C]" />
                 When to Take Cash
               </CardTitle>
             </CardHeader>
