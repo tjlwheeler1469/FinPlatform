@@ -3409,6 +3409,193 @@ async def get_practice_dashboard(request: Request):
         }
     }
 
+# ==================== FACT-FIND & DIGITAL ONBOARDING ====================
+
+class FactFindData(BaseModel):
+    client_id: str
+    data: Dict[str, Any]
+    progress: int = 0
+    status: str = "in_progress"  # in_progress, completed, pending_review
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+@api_router.post("/factfind")
+async def save_factfind(factfind: FactFindData):
+    """Save or update client fact-find data"""
+    factfind_dict = factfind.dict()
+    factfind_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
+    factfind_dict["created_at"] = factfind_dict["created_at"].isoformat() if isinstance(factfind_dict["created_at"], datetime) else factfind_dict["created_at"]
+    
+    # Upsert - update if exists, insert if not
+    result = await db.factfinds.update_one(
+        {"client_id": factfind.client_id},
+        {"$set": factfind_dict},
+        upsert=True
+    )
+    
+    return {"success": True, "client_id": factfind.client_id, "modified": result.modified_count > 0}
+
+@api_router.get("/factfind/{client_id}")
+async def get_factfind(client_id: str):
+    """Get client fact-find data"""
+    factfind = await db.factfinds.find_one({"client_id": client_id}, {"_id": 0})
+    if not factfind:
+        raise HTTPException(status_code=404, detail="Fact-find not found")
+    return factfind
+
+@api_router.get("/factfinds")
+async def list_factfinds():
+    """List all fact-finds with summary"""
+    factfinds = await db.factfinds.find({}, {"_id": 0}).to_list(100)
+    return {"factfinds": factfinds, "total": len(factfinds)}
+
+# ==================== E-SIGNATURE / DOCUSIGN MOCK ====================
+
+class SignatureRequest(BaseModel):
+    request_id: str = Field(default_factory=lambda: f"sig_{uuid.uuid4().hex[:12]}")
+    document_id: str
+    document_name: str
+    client_id: str
+    client_name: str
+    client_email: str
+    message: Optional[str] = None
+    status: str = "pending"  # pending, sent, partially_signed, completed, expired, cancelled
+    signatures: List[Dict[str, Any]] = []
+    sent_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    completed_at: Optional[datetime] = None
+    expires_at: Optional[datetime] = None
+
+@api_router.post("/esignature/send")
+async def send_signature_request(request: SignatureRequest):
+    """Send a document for e-signature (mock)"""
+    request_dict = request.dict()
+    request_dict["sent_at"] = request_dict["sent_at"].isoformat() if isinstance(request_dict["sent_at"], datetime) else request_dict["sent_at"]
+    request_dict["expires_at"] = (datetime.now(timezone.utc) + timedelta(days=14)).isoformat()
+    
+    await db.signature_requests.insert_one({**request_dict, "_id": None})
+    
+    return {
+        "success": True,
+        "request_id": request.request_id,
+        "message": f"Signature request sent to {request.client_email} (MOCK)"
+    }
+
+@api_router.get("/esignature/requests")
+async def list_signature_requests():
+    """List all signature requests"""
+    requests = await db.signature_requests.find({}, {"_id": 0}).to_list(100)
+    return {"requests": requests, "total": len(requests)}
+
+@api_router.post("/esignature/sign/{request_id}")
+async def sign_document(request_id: str, signature_data: Dict[str, Any]):
+    """Sign a document (mock)"""
+    # Find the request
+    sig_request = await db.signature_requests.find_one({"request_id": request_id})
+    if not sig_request:
+        raise HTTPException(status_code=404, detail="Signature request not found")
+    
+    # Add signature
+    new_signature = {
+        "role": signature_data.get("role", "client"),
+        "name": signature_data.get("name"),
+        "signed_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    signatures = sig_request.get("signatures", [])
+    signatures.append(new_signature)
+    
+    # Update status
+    status = "completed" if len(signatures) >= 2 else "partially_signed"
+    completed_at = datetime.now(timezone.utc).isoformat() if status == "completed" else None
+    
+    await db.signature_requests.update_one(
+        {"request_id": request_id},
+        {"$set": {"signatures": signatures, "status": status, "completed_at": completed_at}}
+    )
+    
+    return {"success": True, "status": status, "signatures_count": len(signatures)}
+
+@api_router.get("/esignature/{request_id}")
+async def get_signature_request(request_id: str):
+    """Get signature request details"""
+    request = await db.signature_requests.find_one({"request_id": request_id}, {"_id": 0})
+    if not request:
+        raise HTTPException(status_code=404, detail="Signature request not found")
+    return request
+
+# ==================== MFA / TWO-FACTOR AUTHENTICATION ====================
+
+class MFASetup(BaseModel):
+    user_id: str
+    enabled: bool = False
+    method: Optional[str] = None  # totp, sms, email
+    secret: Optional[str] = None
+    backup_codes: List[Dict[str, Any]] = []
+    setup_at: Optional[datetime] = None
+
+@api_router.post("/mfa/setup")
+async def setup_mfa(setup: MFASetup):
+    """Setup or update MFA for user"""
+    setup_dict = setup.dict()
+    if setup.setup_at:
+        setup_dict["setup_at"] = setup.setup_at.isoformat()
+    else:
+        setup_dict["setup_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.mfa_settings.update_one(
+        {"user_id": setup.user_id},
+        {"$set": setup_dict},
+        upsert=True
+    )
+    
+    return {"success": True, "user_id": setup.user_id, "mfa_enabled": setup.enabled}
+
+@api_router.get("/mfa/{user_id}")
+async def get_mfa_status(user_id: str):
+    """Get MFA status for user"""
+    mfa = await db.mfa_settings.find_one({"user_id": user_id}, {"_id": 0})
+    if not mfa:
+        return {"user_id": user_id, "enabled": False, "method": None}
+    return mfa
+
+@api_router.post("/mfa/verify")
+async def verify_mfa(data: Dict[str, Any]):
+    """Verify MFA code (mock - accepts any 6-digit code)"""
+    user_id = data.get("user_id")
+    code = data.get("code", "")
+    
+    # Mock verification - accept any 6-digit code
+    if len(code) == 6 and code.isdigit():
+        # Update last used
+        await db.mfa_settings.update_one(
+            {"user_id": user_id},
+            {"$set": {"last_used": datetime.now(timezone.utc).isoformat()}}
+        )
+        return {"success": True, "message": "MFA verification successful (MOCK)"}
+    
+    return {"success": False, "message": "Invalid MFA code"}
+
+@api_router.post("/mfa/disable")
+async def disable_mfa(data: Dict[str, Any]):
+    """Disable MFA for user"""
+    user_id = data.get("user_id")
+    code = data.get("code", "")
+    
+    # Mock verification
+    if len(code) == 6 and code.isdigit():
+        await db.mfa_settings.update_one(
+            {"user_id": user_id},
+            {"$set": {
+                "enabled": False,
+                "method": None,
+                "secret": None,
+                "backup_codes": []
+            }}
+        )
+        return {"success": True, "message": "MFA disabled"}
+    
+    return {"success": False, "message": "Invalid MFA code"}
+
 @api_router.get("/")
 async def root():
     return {"message": "Australian Investment Analyzer API", "version": "1.0.0"}
