@@ -77,6 +77,7 @@ const personalNavGroups = [
     name: "Planning",
     items: [
       { path: "/strategic-planning", label: "Strategic Planning", icon: HeartPulse, title: "Strategic Planning" },
+      { path: "/investment-comparison", label: "Investment Compare", icon: Scale, title: "Investment Structure Comparison" },
       { path: "/budget", label: "Budget", icon: Wallet, title: "Household Budget" },
       { path: "/trust-distributions", label: "Trust Analysis", icon: PieChart, title: "Trust Distribution Analysis" },
       { path: "/income-splitting", label: "Income Splitting", icon: Users, title: "Income Splitting" },
