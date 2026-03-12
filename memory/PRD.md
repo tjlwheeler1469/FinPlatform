@@ -1262,7 +1262,74 @@ Build an app that analyses all options for personal and business investment in A
 - ✅ Enterprise Practice Overview
 
 ## What's Still MOCKED
-1. **AI Advice Generation**: Returns mock recommendations (ready for real LLM integration)
+1. **AI Advice Generation**: ~~Returns mock recommendations~~ **NOW LIVE** - Connected to OpenAI/Claude/Gemini via EMERGENT_LLM_KEY
 2. **Open Banking/Portfolio Aggregation**: Returns mock account data (ready for real API)
 3. **Authentication**: Uses compliance modal (ready for real auth)
 4. **Some portfolio data**: In App.js context
+
+---
+
+## Session Update: March 2026 - 25-Screen Blueprint Completion
+
+### ✅ COMPLETED: Final 4 Screens Verified
+The 25-screen blueprint from user feedback is now **100% complete**. All screens verified working:
+
+1. **Net Worth Trend** (`/net-worth-trend`)
+   - Current net worth display with change percentage
+   - Time range selector (6m, 1y, 2y, 5y)
+   - Chart type toggle (Area, Line)
+   - Best/Worst month cards
+   - Data: MOCKED (frontend generates from portfolio context)
+
+2. **Debt Paydown Planner** (`/debt-paydown`)
+   - Total debt, debt-free date projection
+   - Avalanche/Snowball strategy toggle
+   - Extra payment slider ($0-$2,000)
+   - Debt payoff projection chart
+   - Individual debt cards with focus indicator
+   - Data: MOCKED (frontend calculates from hardcoded debts)
+
+3. **Insurance Gap Analysis** (`/insurance-gap`)
+   - Protection Score badge (0-100)
+   - Your Situation inputs (age, income, retirement, dependents, debt, expenses)
+   - Coverage comparison horizontal bar chart
+   - 4 insurance type cards (Life, Income Protection, TPD, Trauma)
+   - Coverage gap alerts with recommendations
+   - Data: MOCKED (frontend calculates from user inputs)
+
+4. **Revenue & Billing** (`/revenue-billing`) - Adviser Mode
+   - Total AUM, YTD Revenue, This Month revenue
+   - Avg fee per client
+   - Time range selector (3, 6, 12 months)
+   - Revenue trend stacked area chart
+   - Revenue by service pie chart
+   - Top clients by revenue list
+   - Recent invoices table
+   - Data: MOCKED (frontend generates, practice-overview from backend)
+
+### ✅ COMPLETED: Linting Fixes (P2 Issue Resolved)
+Fixed 21 linting errors in `/app/backend/server.py`:
+- Removed unused variables with `_` convention
+- Changed bare `except:` to specific exception types
+- Renamed duplicate function definitions (crm_get_tasks, crm_create_task, etc.)
+
+### ✅ COMPLETED: Live AI Advisor Integration
+- Integrated `emergentintegrations` library
+- Multi-LLM support: OpenAI GPT-4, Claude, Gemini
+- Uses `EMERGENT_LLM_KEY` from backend/.env
+- Fallback mechanism between providers
+
+### Testing Status
+- iteration_29.json: 100% pass rate (backend + frontend)
+- All 4 final screens verified via screenshots and testing agent
+
+### Remaining Work (Future)
+1. **Refactor server.py** - Break into routes, models, services
+2. **Database Migration** - Move from mock data to full MongoDB/PostgreSQL persistence
+3. **Real API Integrations** - Open Banking, super/brokerage feeds
+4. **Enhanced Compliance** - Full audit trails, KYC/AML workflows
+5. **SOC 2 Architecture** - Security compliance
+
+### Test Reports Created
+- `/app/test_reports/iteration_29.json` - Final 4 screens verification
+
