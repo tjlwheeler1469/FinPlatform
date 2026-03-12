@@ -799,6 +799,7 @@ const AppRouter = () => {
       <Route path="/client-portal" element={<ClientPortalMerged />} />
       <Route path="/practice-management" element={<PracticeManagement />} />
       <Route path="/documents" element={<DocumentsCommunications />} />
+      <Route path="/portfolio-rebalancing" element={<PortfolioRebalancing />} />
     </Routes>
   );
 };
