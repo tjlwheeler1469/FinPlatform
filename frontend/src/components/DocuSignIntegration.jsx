@@ -137,10 +137,8 @@ const MOCK_CLIENTS = [
 ];
 
 const DocuSignIntegration = ({ onSignatureComplete }) => {
-  const [signatureRequests, setSignatureRequests] = useState(() => {
-    const saved = localStorage.getItem("wheeler_docusign_requests");
-    return saved ? JSON.parse(saved) : INITIAL_SIGNATURE_REQUESTS;
-  });
+  const [signatureRequests, setSignatureRequests] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [showSendDialog, setShowSendDialog] = useState(false);
   const [showSignDialog, setShowSignDialog] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
@@ -151,37 +149,102 @@ const DocuSignIntegration = ({ onSignatureComplete }) => {
   });
   const [signingStep, setSigningStep] = useState(0);
   const [signatureData, setSignatureData] = useState("");
+  const [isSending, setIsSending] = useState(false);
 
-  // Save to localStorage
+  // Load signature requests from MongoDB on mount
   useEffect(() => {
-    localStorage.setItem("wheeler_docusign_requests", JSON.stringify(signatureRequests));
-  }, [signatureRequests]);
+    const loadRequests = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/esignature/requests`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.requests && data.requests.length > 0) {
+            setSignatureRequests(data.requests);
+          } else {
+            // Use initial data if no requests in DB
+            setSignatureRequests(INITIAL_SIGNATURE_REQUESTS);
+          }
+        }
+      } catch (error) {
+        console.error("Error loading signature requests:", error);
+        // Fall back to localStorage
+        const saved = localStorage.getItem("wheeler_docusign_requests");
+        setSignatureRequests(saved ? JSON.parse(saved) : INITIAL_SIGNATURE_REQUESTS);
+        toast.info("Loaded from local cache");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadRequests();
+  }, []);
 
-  // Send signature request
-  const sendSignatureRequest = () => {
+  // Also keep localStorage as backup
+  useEffect(() => {
+    if (!isLoading && signatureRequests.length > 0) {
+      localStorage.setItem("wheeler_docusign_requests", JSON.stringify(signatureRequests));
+    }
+  }, [signatureRequests, isLoading]);
+
+  // Send signature request to MongoDB
+  const sendSignatureRequest = async () => {
     if (!newRequest.document_id || !newRequest.client_id) {
       toast.error("Please select a document and client");
       return;
     }
 
+    setIsSending(true);
     const template = DOCUMENT_TEMPLATES.find(t => t.id === newRequest.document_id);
     const client = MOCK_CLIENTS.find(c => c.id === newRequest.client_id);
 
-    const request = {
-      id: `sig_${Date.now()}`,
-      document_id: newRequest.document_id,
-      document_name: template.name,
-      client_name: client.name,
-      client_email: client.email,
-      status: "pending",
-      sent_at: new Date().toISOString(),
-      completed_at: null,
-      message: newRequest.message,
-      signatures: []
-    };
+    try {
+      const response = await fetch(`${API_URL}/api/esignature/send`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          document_id: newRequest.document_id,
+          document_name: template.name,
+          client_id: newRequest.client_id,
+          client_name: client.name,
+          client_email: client.email,
+          message: newRequest.message
+        })
+      });
 
-    setSignatureRequests([request, ...signatureRequests]);
-    setShowSendDialog(false);
+      if (response.ok) {
+        const result = await response.json();
+        
+        // Add to local state
+        const request = {
+          request_id: result.request_id,
+          document_id: newRequest.document_id,
+          document_name: template.name,
+          client_name: client.name,
+          client_email: client.email,
+          status: "pending",
+          sent_at: new Date().toISOString(),
+          completed_at: null,
+          message: newRequest.message,
+          signatures: []
+        };
+        
+        setSignatureRequests([request, ...signatureRequests]);
+        setShowSendDialog(false);
+        setNewRequest({ document_id: "", client_id: "", message: "" });
+        
+        toast.success(`Signature request sent to ${client.name}`, {
+          description: `Document: ${template.name} (Saved to MongoDB)`
+        });
+      } else {
+        throw new Error("Failed to send");
+      }
+    } catch (error) {
+      console.error("Error sending signature request:", error);
+      toast.error("Failed to send signature request");
+    } finally {
+      setIsSending(false);
+    }
+  };
     setNewRequest({ document_id: "", client_id: "", message: "" });
     
     toast.success(`Signature request sent to ${client.name}`, {
