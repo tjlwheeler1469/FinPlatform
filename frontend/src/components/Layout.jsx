@@ -1,8 +1,9 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import NotificationsPanel from "@/components/NotificationsPanel";
+import CommandPalette from "@/components/CommandPalette";
 import { useNotifications } from "@/context/NotificationsContext";
 import { 
   TrendingUp, 
@@ -60,7 +61,9 @@ import {
   CreditCard,
   Receipt,
   Settings,
-  MoreHorizontal
+  MoreHorizontal,
+  Search,
+  Command
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
