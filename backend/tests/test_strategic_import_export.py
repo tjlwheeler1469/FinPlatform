@@ -137,7 +137,7 @@ class TestImportExportAPIs:
         
         template = data["template"]
         # Verify template has expected sections
-        expected_sections = ["personal_details", "employment", "assets", "liabilities"]
+        expected_sections = ["personal", "employment", "assets", "liabilities", "goals", "insurance"]
         for section in expected_sections:
             assert section in template, f"Missing template section: {section}"
         
