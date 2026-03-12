@@ -245,12 +245,6 @@ const DocuSignIntegration = ({ onSignatureComplete }) => {
       setIsSending(false);
     }
   };
-    setNewRequest({ document_id: "", client_id: "", message: "" });
-    
-    toast.success(`Signature request sent to ${client.name}`, {
-      description: `Document: ${template.name}`
-    });
-  };
 
   // Simulate signing process
   const startSigning = (request) => {
@@ -260,24 +254,91 @@ const DocuSignIntegration = ({ onSignatureComplete }) => {
     setShowSignDialog(true);
   };
 
-  // Complete signing
-  const completeSigning = () => {
+  // Complete signing - save to MongoDB
+  const completeSigning = async () => {
     if (!signatureData.trim()) {
       toast.error("Please type your signature");
       return;
     }
 
-    const updatedRequests = signatureRequests.map(req => {
-      if (req.id === selectedRequest.id) {
-        const template = DOCUMENT_TEMPLATES.find(t => t.id === req.document_id);
-        const newSignature = {
+    const requestId = selectedRequest.request_id || selectedRequest.id;
+    
+    try {
+      const response = await fetch(`${API_URL}/api/esignature/sign/${requestId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
           role: "client",
-          name: signatureData,
-          signed_at: new Date().toISOString()
-        };
+          name: signatureData
+        })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
         
-        const allSigned = template.required_signatures.length === 1 || 
-          req.signatures.length + 1 >= template.required_signatures.length;
+        // Update local state
+        const updatedRequests = signatureRequests.map(req => {
+          if ((req.request_id || req.id) === requestId) {
+            return {
+              ...req,
+              status: result.status,
+              completed_at: result.status === "completed" ? new Date().toISOString() : null,
+              signatures: [...(req.signatures || []), {
+                role: "client",
+                name: signatureData,
+                signed_at: new Date().toISOString()
+              }]
+            };
+          }
+          return req;
+        });
+
+        setSignatureRequests(updatedRequests);
+        setShowSignDialog(false);
+        toast.success("Document signed successfully!", {
+          description: "Signature saved to MongoDB"
+        });
+        
+        if (onSignatureComplete) {
+          onSignatureComplete(selectedRequest);
+        }
+      } else {
+        throw new Error("Failed to sign");
+      }
+    } catch (error) {
+      console.error("Error signing document:", error);
+      // Fall back to local update
+      const updatedRequests = signatureRequests.map(req => {
+        if ((req.request_id || req.id) === requestId) {
+          const template = DOCUMENT_TEMPLATES.find(t => t.id === req.document_id);
+          const newSignature = {
+            role: "client",
+            name: signatureData,
+            signed_at: new Date().toISOString()
+          };
+          
+          const allSigned = template.required_signatures.length === 1 || 
+            (req.signatures?.length || 0) + 1 >= template.required_signatures.length;
+          
+          return {
+            ...req,
+            status: allSigned ? "completed" : "partially_signed",
+            completed_at: allSigned ? new Date().toISOString() : null,
+            signatures: [...(req.signatures || []), newSignature]
+          };
+        }
+        return req;
+      });
+
+      setSignatureRequests(updatedRequests);
+      setShowSignDialog(false);
+      toast.success("Document signed locally");
+      
+      if (onSignatureComplete) {
+        onSignatureComplete(selectedRequest);
+      }
+    }
+  };
         
         return {
           ...req,
