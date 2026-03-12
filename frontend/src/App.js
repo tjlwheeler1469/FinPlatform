@@ -814,6 +814,10 @@ const AppRouter = () => {
       <Route path="/investment-comparison" element={<InvestmentComparison />} />
       <Route path="/decision-engine" element={<DecisionDashboard />} />
       <Route path="/life-timeline" element={<LifeTimeline />} />
+      <Route path="/client-crm" element={<ClientCRM />} />
+      <Route path="/goal-tracker" element={<GoalTracker />} />
+      <Route path="/ai-advisor" element={<AIAdvisor />} />
+      <Route path="/portfolio-aggregator" element={<PortfolioAggregator />} />
     </Routes>
   );
 };
