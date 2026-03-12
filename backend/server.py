@@ -5165,7 +5165,7 @@ async def get_notes(household_id: str):
 
 # Task Management
 @api_router.get("/crm/tasks")
-async def get_tasks(status: Optional[str] = None, household_id: Optional[str] = None):
+async def crm_get_tasks(status: Optional[str] = None, household_id: Optional[str] = None):
     """Get all tasks"""
     query = {}
     if status:
@@ -5215,7 +5215,7 @@ async def get_tasks(status: Optional[str] = None, household_id: Optional[str] = 
     return {"tasks": tasks, "total": len(tasks)}
 
 @api_router.post("/crm/tasks")
-async def create_task(task: TaskItem):
+async def crm_create_task(task: TaskItem):
     """Create a new task"""
     task_dict = task.model_dump()
     if task_dict.get("due_date"):
@@ -5225,7 +5225,7 @@ async def create_task(task: TaskItem):
     return {"success": True, "task_id": task.task_id}
 
 @api_router.put("/crm/tasks/{task_id}")
-async def update_task(task_id: str, status: str):
+async def crm_update_task(task_id: str, status: str):
     """Update task status"""
     update_data = {"status": status, "updated_at": datetime.now(timezone.utc).isoformat()}
     if status == "completed":
@@ -5235,7 +5235,7 @@ async def update_task(task_id: str, status: str):
 
 # Meeting Management
 @api_router.get("/crm/meetings")
-async def get_meetings(household_id: Optional[str] = None, upcoming_only: bool = True):
+async def crm_get_meetings(household_id: Optional[str] = None, upcoming_only: bool = True):
     """Get meetings"""
     query = {}
     if household_id:
@@ -5276,7 +5276,7 @@ async def get_meetings(household_id: Optional[str] = None, upcoming_only: bool =
     return {"meetings": meetings, "total": len(meetings)}
 
 @api_router.post("/crm/meetings")
-async def create_meeting(meeting: MeetingItem):
+async def crm_create_meeting(meeting: MeetingItem):
     """Schedule a new meeting"""
     meeting_dict = meeting.model_dump()
     meeting_dict["scheduled_at"] = meeting_dict["scheduled_at"].isoformat() if isinstance(meeting_dict["scheduled_at"], datetime) else meeting_dict["scheduled_at"]
