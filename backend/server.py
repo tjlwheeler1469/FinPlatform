@@ -1955,7 +1955,7 @@ def calculate_dividend_reinvestment(
         
         # Franking credit calculation
         franked_amount = dividend_amount * franking_pct
-        unfranked_amount = dividend_amount * (1 - franking_pct)
+        _ = dividend_amount * (1 - franking_pct)  # unfranked_amount - tracked but not directly used
         franking_credit = franked_amount * (0.30 / 0.70)  # Gross up
         
         # Tax on dividends (reduced by franking credits)
@@ -2497,7 +2497,7 @@ async def calculate_estate_plan(request: EstateplanRequest):
     num_beneficiaries = len(request.beneficiaries)
     
     # Calculate per-beneficiary share (simplified equal split)
-    per_beneficiary = total_estate / num_beneficiaries if num_beneficiaries > 0 else total_estate
+    _ = total_estate / num_beneficiaries if num_beneficiaries > 0 else total_estate  # per_beneficiary baseline
     
     # Tax implications
     # Super death benefits tax (for non-dependants)
@@ -2601,7 +2601,7 @@ async def calculate_goal_planning(request: GoalPlanningRequest):
         try:
             target_date = datetime.strptime(goal.target_date, "%Y-%m-%d")
             months_remaining = max(1, (target_date.year - datetime.now().year) * 12 + (target_date.month - datetime.now().month))
-        except:
+        except (ValueError, TypeError):
             months_remaining = 60  # Default 5 years
         
         # Calculate required monthly savings
@@ -2745,7 +2745,7 @@ async def get_tax_deadlines():
                 "days_until": days_until,
                 "status": status
             })
-        except:
+        except (ValueError, TypeError, KeyError):
             continue
     
     # Sort by due date
