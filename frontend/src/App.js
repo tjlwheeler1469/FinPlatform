@@ -68,6 +68,8 @@ const PortfolioRebalancing = lazy(() => import("@/pages/PortfolioRebalancing"));
 const SecuritySettings = lazy(() => import("@/pages/SecuritySettings"));
 const DataImportExportPage = lazy(() => import("@/pages/DataImportExportPage"));
 const InvestmentComparison = lazy(() => import("@/pages/InvestmentComparison"));
+const DecisionDashboard = lazy(() => import("@/pages/DecisionDashboard"));
+const LifeTimeline = lazy(() => import("@/pages/LifeTimeline"));
 
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
