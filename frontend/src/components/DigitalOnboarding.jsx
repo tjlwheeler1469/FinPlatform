@@ -161,118 +161,157 @@ const formatCurrency = (value) => {
 
 const DigitalOnboarding = ({ clientId, onComplete }) => {
   const [activeSection, setActiveSection] = useState("personal");
-  const [factFindData, setFactFindData] = useState(() => {
-    const saved = localStorage.getItem(`wheeler_factfind_${clientId || 'new'}`);
-    return saved ? JSON.parse(saved) : {
-      personal: {
-        title: "",
+  const [isLoading, setIsLoading] = useState(true);
+  const [lastSaved, setLastSaved] = useState(null);
+  
+  const defaultFactFindData = {
+    personal: {
+      title: "",
+      first_name: "",
+      middle_name: "",
+      last_name: "",
+      preferred_name: "",
+      date_of_birth: "",
+      gender: "",
+      marital_status: "",
+      citizenship: "australian",
+      tax_file_number: "",
+      address_street: "",
+      address_suburb: "",
+      address_state: "",
+      address_postcode: "",
+      phone_mobile: "",
+      phone_home: "",
+      email: "",
+      spouse: {
         first_name: "",
-        middle_name: "",
         last_name: "",
-        preferred_name: "",
         date_of_birth: "",
-        gender: "",
-        marital_status: "",
-        citizenship: "australian",
-        tax_file_number: "",
-        address_street: "",
-        address_suburb: "",
-        address_state: "",
-        address_postcode: "",
-        phone_mobile: "",
-        phone_home: "",
-        email: "",
-        spouse: {
-          first_name: "",
-          last_name: "",
-          date_of_birth: "",
-          occupation: "",
-          employer: "",
-          income: 0
-        },
-        dependants: []
-      },
-      employment: {
-        employment_status: "",
         occupation: "",
-        employer_name: "",
-        employer_address: "",
-        years_employed: 0,
-        employment_type: "",
-        salary_gross: 0,
-        salary_net: 0,
-        bonus_commission: 0,
-        other_income: 0,
-        rental_income: 0,
-        dividend_income: 0,
-        centrelink: 0,
-        spouse_income: 0,
-        anticipated_changes: ""
+        employer: "",
+        income: 0
       },
-      assets: {
-        cash_bank: 0,
-        term_deposits: 0,
-        shares_managed_funds: 0,
-        superannuation: 0,
-        investment_property: 0,
-        home_residence: 0,
-        motor_vehicles: 0,
-        household_contents: 0,
-        other_assets: 0,
-        business_interests: 0,
-        property_details: [],
-        share_details: [],
-        super_details: {
-          fund_name: "",
-          member_number: "",
-          balance: 0,
-          insurance_in_super: false,
-          investment_option: ""
-        }
-      },
-      liabilities: {
-        home_loan: 0,
-        investment_loan: 0,
-        car_loan: 0,
-        personal_loan: 0,
-        credit_cards: 0,
-        hecs_help: 0,
-        other_debts: 0,
-        loan_details: []
-      },
-      insurance: {
-        life_insurance: 0,
-        tpd_insurance: 0,
-        income_protection: 0,
-        trauma_insurance: 0,
-        health_insurance: "",
-        has_will: false,
-        will_date: "",
-        has_power_of_attorney: false,
-        has_enduring_guardian: false,
-        estate_beneficiaries: []
-      },
-      goals: {
-        retirement_age: 65,
-        retirement_income: 0,
-        short_term_goals: [],
-        long_term_goals: [],
-        concerns: [],
-        priorities: []
-      },
-      risk: {
-        answers: {},
-        score: 0,
-        profile: ""
+      dependants: []
+    },
+    employment: {
+      employment_status: "",
+      occupation: "",
+      employer_name: "",
+      employer_address: "",
+      years_employed: 0,
+      employment_type: "",
+      salary_gross: 0,
+      salary_net: 0,
+      bonus_commission: 0,
+      other_income: 0,
+      rental_income: 0,
+      dividend_income: 0,
+      centrelink: 0,
+      spouse_income: 0,
+      anticipated_changes: ""
+    },
+    assets: {
+      cash_bank: 0,
+      term_deposits: 0,
+      shares_managed_funds: 0,
+      superannuation: 0,
+      investment_property: 0,
+      home_residence: 0,
+      motor_vehicles: 0,
+      household_contents: 0,
+      other_assets: 0,
+      business_interests: 0,
+      property_details: [],
+      share_details: [],
+      super_details: {
+        fund_name: "",
+        member_number: "",
+        balance: 0,
+        insurance_in_super: false,
+        investment_option: ""
       }
-    };
-  });
+    },
+    liabilities: {
+      home_loan: 0,
+      investment_loan: 0,
+      car_loan: 0,
+      personal_loan: 0,
+      credit_cards: 0,
+      hecs_help: 0,
+      other_debts: 0,
+      loan_details: []
+    },
+    insurance: {
+      life_insurance: 0,
+      tpd_insurance: 0,
+      income_protection: 0,
+      trauma_insurance: 0,
+      health_insurance: "",
+      has_will: false,
+      will_date: "",
+      has_power_of_attorney: false,
+      has_enduring_guardian: false,
+      estate_beneficiaries: []
+    },
+    goals: {
+      retirement_age: 65,
+      retirement_income: 0,
+      short_term_goals: [],
+      long_term_goals: [],
+      concerns: [],
+      priorities: []
+    },
+    risk: {
+      answers: {},
+      score: 0,
+      profile: ""
+    }
+  };
+  
+  const [factFindData, setFactFindData] = useState(defaultFactFindData);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Auto-save to localStorage
+  // Load fact-find data from MongoDB on mount
   useEffect(() => {
-    localStorage.setItem(`wheeler_factfind_${clientId || 'new'}`, JSON.stringify(factFindData));
-  }, [factFindData, clientId]);
+    const loadFactFind = async () => {
+      if (!clientId) {
+        setIsLoading(false);
+        return;
+      }
+      
+      try {
+        const response = await fetch(`${API_URL}/api/factfind/${clientId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setFactFindData(data.data || defaultFactFindData);
+          setLastSaved(data.updated_at);
+          toast.success("Fact-find loaded from database");
+        } else if (response.status === 404) {
+          // No existing fact-find, use defaults
+          setFactFindData(defaultFactFindData);
+        }
+      } catch (error) {
+        console.error("Error loading fact-find:", error);
+        // Fall back to localStorage if API fails
+        const saved = localStorage.getItem(`wheeler_factfind_${clientId}`);
+        if (saved) {
+          setFactFindData(JSON.parse(saved));
+          toast.info("Loaded from local cache");
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadFactFind();
+  }, [clientId]);
+
+  // Also keep localStorage as backup
+  useEffect(() => {
+    if (!isLoading) {
+      localStorage.setItem(`wheeler_factfind_${clientId || 'new'}`, JSON.stringify(factFindData));
+    }
+  }, [factFindData, clientId, isLoading]);
 
   // Update field
   const updateField = (section, field, value) => {
