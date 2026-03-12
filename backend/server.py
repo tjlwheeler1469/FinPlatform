@@ -4894,6 +4894,1088 @@ async def get_complete_decision_analysis(profile: FinancialProfileInput):
         "generated_at": datetime.now(timezone.utc).isoformat()
     }
 
+# ==================== PHASE 2: ADVISER WORKFLOW & COMPLIANCE ====================
+
+# Models for Phase 2
+class ClientHousehold(BaseModel):
+    household_id: str = Field(default_factory=lambda: f"hh_{uuid.uuid4().hex[:12]}")
+    name: str
+    primary_contact: str
+    members: List[Dict[str, Any]] = []
+    address: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    adviser_id: Optional[str] = None
+    status: str = "active"  # active, inactive, prospect
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    tags: List[str] = []
+    notes: List[Dict[str, Any]] = []
+    total_assets: float = 0
+    total_debt: float = 0
+    net_worth: float = 0
+    risk_profile: Optional[str] = None
+    service_level: str = "standard"  # standard, premium, vip
+
+class ClientNote(BaseModel):
+    note_id: str = Field(default_factory=lambda: f"note_{uuid.uuid4().hex[:12]}")
+    household_id: str
+    content: str
+    note_type: str = "general"  # general, meeting, call, email, advice
+    created_by: str = "adviser"
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    is_private: bool = False
+    attachments: List[str] = []
+
+class TaskItem(BaseModel):
+    task_id: str = Field(default_factory=lambda: f"task_{uuid.uuid4().hex[:12]}")
+    household_id: Optional[str] = None
+    title: str
+    description: Optional[str] = None
+    due_date: Optional[datetime] = None
+    priority: str = "medium"  # low, medium, high, urgent
+    status: str = "pending"  # pending, in_progress, completed, cancelled
+    assigned_to: str = "adviser"
+    category: str = "general"  # general, compliance, review, follow_up
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    completed_at: Optional[datetime] = None
+
+class MeetingItem(BaseModel):
+    meeting_id: str = Field(default_factory=lambda: f"meet_{uuid.uuid4().hex[:12]}")
+    household_id: Optional[str] = None
+    title: str
+    meeting_type: str = "review"  # review, initial, strategy, compliance
+    scheduled_at: datetime
+    duration_minutes: int = 60
+    location: str = "office"  # office, video, phone, client_home
+    attendees: List[str] = []
+    agenda: Optional[str] = None
+    notes: Optional[str] = None
+    status: str = "scheduled"  # scheduled, completed, cancelled, rescheduled
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ComplianceAuditLog(BaseModel):
+    audit_id: str = Field(default_factory=lambda: f"audit_{uuid.uuid4().hex[:12]}")
+    household_id: Optional[str] = None
+    action_type: str  # advice_given, document_signed, risk_assessment, kyc_check, aml_check
+    action_description: str
+    performed_by: str
+    performed_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    metadata: Dict[str, Any] = {}
+    compliance_status: str = "compliant"  # compliant, warning, breach
+
+class RiskToleranceAssessment(BaseModel):
+    assessment_id: str = Field(default_factory=lambda: f"risk_{uuid.uuid4().hex[:12]}")
+    household_id: str
+    assessed_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    risk_score: int  # 1-10
+    risk_profile: str  # conservative, moderate_conservative, moderate, moderate_aggressive, aggressive
+    time_horizon: str  # short (0-3y), medium (3-7y), long (7y+)
+    investment_experience: str  # none, limited, moderate, extensive
+    income_stability: str  # stable, variable, uncertain
+    liquidity_needs: str  # high, moderate, low
+    answers: Dict[str, Any] = {}
+    recommendation: str = ""
+
+class AdviceRecord(BaseModel):
+    advice_id: str = Field(default_factory=lambda: f"adv_{uuid.uuid4().hex[:12]}")
+    household_id: str
+    advice_type: str  # strategic, tactical, product, insurance
+    status: str = "draft"  # draft, pending_review, approved, sent, acknowledged
+    summary: str
+    recommendations: List[Dict[str, Any]] = []
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_by: str = "adviser"
+    reviewed_by: Optional[str] = None
+    reviewed_at: Optional[datetime] = None
+    sent_at: Optional[datetime] = None
+    acknowledged_at: Optional[datetime] = None
+    compliance_checked: bool = False
+    suitability_confirmed: bool = False
+
+class GoalItem(BaseModel):
+    goal_id: str = Field(default_factory=lambda: f"goal_{uuid.uuid4().hex[:12]}")
+    household_id: str
+    name: str
+    goal_type: str  # retirement, house, education, travel, emergency, other
+    target_amount: float
+    current_amount: float = 0
+    target_date: Optional[datetime] = None
+    priority: str = "medium"
+    status: str = "active"  # active, achieved, paused, cancelled
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    monthly_contribution: float = 0
+
+# CRM Endpoints
+@api_router.get("/crm/households")
+async def get_households(status: Optional[str] = None, adviser_id: Optional[str] = None):
+    """Get all client households"""
+    query = {}
+    if status:
+        query["status"] = status
+    if adviser_id:
+        query["adviser_id"] = adviser_id
+    
+    households = await db.households.find(query, {"_id": 0}).to_list(100)
+    
+    # Return sample data if empty
+    if not households:
+        households = [
+            {
+                "household_id": "hh_wheeler001",
+                "name": "Wheeler Family",
+                "primary_contact": "Michael Wheeler",
+                "members": [
+                    {"name": "Michael Wheeler", "role": "primary", "age": 45, "occupation": "Engineer"},
+                    {"name": "Sarah Wheeler", "role": "spouse", "age": 43, "occupation": "Teacher"}
+                ],
+                "email": "michael.wheeler@email.com",
+                "phone": "0412 345 678",
+                "status": "active",
+                "total_assets": 2920000,
+                "total_debt": 942000,
+                "net_worth": 1978000,
+                "risk_profile": "moderate",
+                "service_level": "premium",
+                "tags": ["high_net_worth", "property_investor"],
+                "created_at": "2023-06-15T10:00:00Z"
+            },
+            {
+                "household_id": "hh_chen002",
+                "name": "Chen Family",
+                "primary_contact": "David Chen",
+                "members": [
+                    {"name": "David Chen", "role": "primary", "age": 38, "occupation": "Doctor"},
+                    {"name": "Lisa Chen", "role": "spouse", "age": 36, "occupation": "Pharmacist"}
+                ],
+                "email": "david.chen@email.com",
+                "phone": "0423 456 789",
+                "status": "active",
+                "total_assets": 1850000,
+                "total_debt": 620000,
+                "net_worth": 1230000,
+                "risk_profile": "moderate_aggressive",
+                "service_level": "standard",
+                "tags": ["professional", "growth_focused"],
+                "created_at": "2024-01-20T14:30:00Z"
+            },
+            {
+                "household_id": "hh_patel003",
+                "name": "Patel Family",
+                "primary_contact": "Raj Patel",
+                "members": [
+                    {"name": "Raj Patel", "role": "primary", "age": 52, "occupation": "Business Owner"}
+                ],
+                "email": "raj.patel@email.com",
+                "phone": "0434 567 890",
+                "status": "active",
+                "total_assets": 4200000,
+                "total_debt": 1100000,
+                "net_worth": 3100000,
+                "risk_profile": "moderate",
+                "service_level": "vip",
+                "tags": ["business_owner", "smsf", "succession_planning"],
+                "created_at": "2022-03-10T09:00:00Z"
+            }
+        ]
+    
+    return {"households": households, "total": len(households)}
+
+@api_router.get("/crm/households/{household_id}")
+async def get_household(household_id: str):
+    """Get a specific household"""
+    household = await db.households.find_one({"household_id": household_id}, {"_id": 0})
+    if not household:
+        # Return sample data
+        household = {
+            "household_id": household_id,
+            "name": "Wheeler Family",
+            "primary_contact": "Michael Wheeler",
+            "members": [
+                {"name": "Michael Wheeler", "role": "primary", "age": 45, "occupation": "Engineer"},
+                {"name": "Sarah Wheeler", "role": "spouse", "age": 43, "occupation": "Teacher"}
+            ],
+            "email": "michael.wheeler@email.com",
+            "phone": "0412 345 678",
+            "status": "active",
+            "total_assets": 2920000,
+            "total_debt": 942000,
+            "net_worth": 1978000,
+            "risk_profile": "moderate",
+            "service_level": "premium",
+            "tags": ["high_net_worth", "property_investor"],
+            "notes": [],
+            "created_at": "2023-06-15T10:00:00Z"
+        }
+    return household
+
+@api_router.post("/crm/households")
+async def create_household(household: ClientHousehold):
+    """Create a new household"""
+    household_dict = household.model_dump()
+    household_dict["created_at"] = datetime.now(timezone.utc).isoformat()
+    household_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
+    await db.households.insert_one(household_dict)
+    
+    # Log compliance audit
+    await db.compliance_audit.insert_one({
+        "audit_id": f"audit_{uuid.uuid4().hex[:12]}",
+        "household_id": household.household_id,
+        "action_type": "client_onboarded",
+        "action_description": f"New client household created: {household.name}",
+        "performed_by": "adviser",
+        "performed_at": datetime.now(timezone.utc).isoformat(),
+        "compliance_status": "compliant"
+    })
+    
+    return {"success": True, "household_id": household.household_id}
+
+@api_router.post("/crm/notes")
+async def add_note(note: ClientNote):
+    """Add a note to a household"""
+    note_dict = note.model_dump()
+    note_dict["created_at"] = datetime.now(timezone.utc).isoformat()
+    await db.client_notes.insert_one(note_dict)
+    return {"success": True, "note_id": note.note_id}
+
+@api_router.get("/crm/notes/{household_id}")
+async def get_notes(household_id: str):
+    """Get all notes for a household"""
+    notes = await db.client_notes.find({"household_id": household_id}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    if not notes:
+        notes = [
+            {
+                "note_id": "note_001",
+                "household_id": household_id,
+                "content": "Discussed retirement strategy. Client interested in increasing super contributions.",
+                "note_type": "meeting",
+                "created_by": "adviser",
+                "created_at": "2024-11-15T14:30:00Z"
+            },
+            {
+                "note_id": "note_002",
+                "household_id": household_id,
+                "content": "Follow-up call regarding insurance review.",
+                "note_type": "call",
+                "created_by": "adviser",
+                "created_at": "2024-11-20T10:00:00Z"
+            }
+        ]
+    return {"notes": notes}
+
+# Task Management
+@api_router.get("/crm/tasks")
+async def get_tasks(status: Optional[str] = None, household_id: Optional[str] = None):
+    """Get all tasks"""
+    query = {}
+    if status:
+        query["status"] = status
+    if household_id:
+        query["household_id"] = household_id
+    
+    tasks = await db.tasks.find(query, {"_id": 0}).sort("due_date", 1).to_list(100)
+    
+    if not tasks:
+        tasks = [
+            {
+                "task_id": "task_001",
+                "household_id": "hh_wheeler001",
+                "title": "Annual Review - Wheeler Family",
+                "description": "Comprehensive annual review including portfolio performance, goals update, and strategy adjustment",
+                "due_date": (datetime.now(timezone.utc) + timedelta(days=7)).isoformat(),
+                "priority": "high",
+                "status": "pending",
+                "category": "review",
+                "assigned_to": "adviser"
+            },
+            {
+                "task_id": "task_002",
+                "household_id": "hh_chen002",
+                "title": "Insurance Review - Chen Family",
+                "description": "Review life and income protection insurance adequacy",
+                "due_date": (datetime.now(timezone.utc) + timedelta(days=14)).isoformat(),
+                "priority": "medium",
+                "status": "pending",
+                "category": "compliance",
+                "assigned_to": "adviser"
+            },
+            {
+                "task_id": "task_003",
+                "household_id": "hh_patel003",
+                "title": "SMSF Audit Preparation",
+                "description": "Prepare documents for annual SMSF audit",
+                "due_date": (datetime.now(timezone.utc) + timedelta(days=30)).isoformat(),
+                "priority": "high",
+                "status": "in_progress",
+                "category": "compliance",
+                "assigned_to": "adviser"
+            }
+        ]
+    
+    return {"tasks": tasks, "total": len(tasks)}
+
+@api_router.post("/crm/tasks")
+async def create_task(task: TaskItem):
+    """Create a new task"""
+    task_dict = task.model_dump()
+    if task_dict.get("due_date"):
+        task_dict["due_date"] = task_dict["due_date"].isoformat() if isinstance(task_dict["due_date"], datetime) else task_dict["due_date"]
+    task_dict["created_at"] = datetime.now(timezone.utc).isoformat()
+    await db.tasks.insert_one(task_dict)
+    return {"success": True, "task_id": task.task_id}
+
+@api_router.put("/crm/tasks/{task_id}")
+async def update_task(task_id: str, status: str):
+    """Update task status"""
+    update_data = {"status": status, "updated_at": datetime.now(timezone.utc).isoformat()}
+    if status == "completed":
+        update_data["completed_at"] = datetime.now(timezone.utc).isoformat()
+    await db.tasks.update_one({"task_id": task_id}, {"$set": update_data})
+    return {"success": True}
+
+# Meeting Management
+@api_router.get("/crm/meetings")
+async def get_meetings(household_id: Optional[str] = None, upcoming_only: bool = True):
+    """Get meetings"""
+    query = {}
+    if household_id:
+        query["household_id"] = household_id
+    if upcoming_only:
+        query["scheduled_at"] = {"$gte": datetime.now(timezone.utc).isoformat()}
+    
+    meetings = await db.meetings.find(query, {"_id": 0}).sort("scheduled_at", 1).to_list(50)
+    
+    if not meetings:
+        meetings = [
+            {
+                "meeting_id": "meet_001",
+                "household_id": "hh_wheeler001",
+                "title": "Quarterly Review - Wheeler Family",
+                "meeting_type": "review",
+                "scheduled_at": (datetime.now(timezone.utc) + timedelta(days=3)).isoformat(),
+                "duration_minutes": 60,
+                "location": "office",
+                "attendees": ["Michael Wheeler", "Sarah Wheeler"],
+                "agenda": "1. Portfolio review\n2. Goals progress\n3. Strategy adjustments",
+                "status": "scheduled"
+            },
+            {
+                "meeting_id": "meet_002",
+                "household_id": "hh_patel003",
+                "title": "SMSF Strategy Session",
+                "meeting_type": "strategy",
+                "scheduled_at": (datetime.now(timezone.utc) + timedelta(days=5)).isoformat(),
+                "duration_minutes": 90,
+                "location": "video",
+                "attendees": ["Raj Patel"],
+                "agenda": "1. SMSF performance\n2. Pension phase transition\n3. Estate planning",
+                "status": "scheduled"
+            }
+        ]
+    
+    return {"meetings": meetings, "total": len(meetings)}
+
+@api_router.post("/crm/meetings")
+async def create_meeting(meeting: MeetingItem):
+    """Schedule a new meeting"""
+    meeting_dict = meeting.model_dump()
+    meeting_dict["scheduled_at"] = meeting_dict["scheduled_at"].isoformat() if isinstance(meeting_dict["scheduled_at"], datetime) else meeting_dict["scheduled_at"]
+    meeting_dict["created_at"] = datetime.now(timezone.utc).isoformat()
+    await db.meetings.insert_one(meeting_dict)
+    return {"success": True, "meeting_id": meeting.meeting_id}
+
+# Compliance Endpoints
+@api_router.get("/compliance/audit-log")
+async def get_audit_log(household_id: Optional[str] = None, action_type: Optional[str] = None):
+    """Get compliance audit log"""
+    query = {}
+    if household_id:
+        query["household_id"] = household_id
+    if action_type:
+        query["action_type"] = action_type
+    
+    logs = await db.compliance_audit.find(query, {"_id": 0}).sort("performed_at", -1).to_list(100)
+    
+    if not logs:
+        logs = [
+            {
+                "audit_id": "audit_001",
+                "household_id": "hh_wheeler001",
+                "action_type": "risk_assessment",
+                "action_description": "Risk tolerance questionnaire completed. Profile: Moderate",
+                "performed_by": "adviser",
+                "performed_at": "2024-11-01T10:30:00Z",
+                "compliance_status": "compliant"
+            },
+            {
+                "audit_id": "audit_002",
+                "household_id": "hh_wheeler001",
+                "action_type": "advice_given",
+                "action_description": "Strategic advice provided - Salary sacrifice recommendation",
+                "performed_by": "adviser",
+                "performed_at": "2024-11-05T14:00:00Z",
+                "compliance_status": "compliant"
+            },
+            {
+                "audit_id": "audit_003",
+                "household_id": "hh_chen002",
+                "action_type": "kyc_check",
+                "action_description": "KYC verification completed - Identity documents verified",
+                "performed_by": "compliance_officer",
+                "performed_at": "2024-11-10T09:00:00Z",
+                "compliance_status": "compliant"
+            }
+        ]
+    
+    return {"audit_log": logs, "total": len(logs)}
+
+@api_router.post("/compliance/audit-log")
+async def add_audit_log(log: ComplianceAuditLog):
+    """Add a compliance audit log entry"""
+    log_dict = log.model_dump()
+    log_dict["performed_at"] = datetime.now(timezone.utc).isoformat()
+    await db.compliance_audit.insert_one(log_dict)
+    return {"success": True, "audit_id": log.audit_id}
+
+@api_router.post("/compliance/risk-assessment")
+async def submit_risk_assessment(assessment: RiskToleranceAssessment):
+    """Submit a risk tolerance assessment"""
+    # Calculate risk profile based on score
+    score = assessment.risk_score
+    if score <= 2:
+        profile = "conservative"
+    elif score <= 4:
+        profile = "moderate_conservative"
+    elif score <= 6:
+        profile = "moderate"
+    elif score <= 8:
+        profile = "moderate_aggressive"
+    else:
+        profile = "aggressive"
+    
+    assessment_dict = assessment.model_dump()
+    assessment_dict["risk_profile"] = profile
+    assessment_dict["assessed_at"] = datetime.now(timezone.utc).isoformat()
+    assessment_dict["recommendation"] = f"Based on your risk score of {score}/10, a {profile.replace('_', ' ')} investment strategy is recommended."
+    
+    await db.risk_assessments.insert_one(assessment_dict)
+    
+    # Log compliance audit
+    await db.compliance_audit.insert_one({
+        "audit_id": f"audit_{uuid.uuid4().hex[:12]}",
+        "household_id": assessment.household_id,
+        "action_type": "risk_assessment",
+        "action_description": f"Risk tolerance assessment completed. Score: {score}/10, Profile: {profile}",
+        "performed_by": "adviser",
+        "performed_at": datetime.now(timezone.utc).isoformat(),
+        "compliance_status": "compliant"
+    })
+    
+    return {
+        "success": True,
+        "assessment_id": assessment.assessment_id,
+        "risk_profile": profile,
+        "recommendation": assessment_dict["recommendation"]
+    }
+
+@api_router.get("/compliance/risk-assessment/{household_id}")
+async def get_risk_assessment(household_id: str):
+    """Get the latest risk assessment for a household"""
+    assessment = await db.risk_assessments.find_one(
+        {"household_id": household_id}, 
+        {"_id": 0},
+        sort=[("assessed_at", -1)]
+    )
+    
+    if not assessment:
+        assessment = {
+            "assessment_id": "risk_sample",
+            "household_id": household_id,
+            "risk_score": 6,
+            "risk_profile": "moderate",
+            "time_horizon": "long",
+            "investment_experience": "moderate",
+            "income_stability": "stable",
+            "liquidity_needs": "moderate",
+            "assessed_at": "2024-10-15T10:00:00Z",
+            "recommendation": "Based on your risk score of 6/10, a moderate investment strategy is recommended."
+        }
+    
+    return assessment
+
+# Advice Workflow
+@api_router.post("/advice/create")
+async def create_advice_record(advice: AdviceRecord):
+    """Create a new advice record"""
+    advice_dict = advice.model_dump()
+    advice_dict["created_at"] = datetime.now(timezone.utc).isoformat()
+    await db.advice_records.insert_one(advice_dict)
+    
+    return {"success": True, "advice_id": advice.advice_id}
+
+@api_router.get("/advice/records")
+async def get_advice_records(household_id: Optional[str] = None, status: Optional[str] = None):
+    """Get advice records"""
+    query = {}
+    if household_id:
+        query["household_id"] = household_id
+    if status:
+        query["status"] = status
+    
+    records = await db.advice_records.find(query, {"_id": 0}).sort("created_at", -1).to_list(50)
+    
+    if not records:
+        records = [
+            {
+                "advice_id": "adv_001",
+                "household_id": "hh_wheeler001",
+                "advice_type": "strategic",
+                "status": "approved",
+                "summary": "Salary sacrifice strategy to maximize super contributions and reduce tax",
+                "recommendations": [
+                    {"action": "Increase salary sacrifice by $8,500/year", "impact": "+$1,870 tax savings annually"},
+                    {"action": "Review mortgage offset strategy", "impact": "Potential $12,000 interest savings"}
+                ],
+                "created_at": "2024-11-01T10:00:00Z",
+                "compliance_checked": True,
+                "suitability_confirmed": True
+            },
+            {
+                "advice_id": "adv_002",
+                "household_id": "hh_chen002",
+                "advice_type": "product",
+                "status": "pending_review",
+                "summary": "Portfolio rebalancing to growth assets",
+                "recommendations": [
+                    {"action": "Increase international equities allocation to 25%", "impact": "+1.2% expected return"},
+                    {"action": "Reduce cash holdings to 10%", "impact": "Deploy $50,000 to growth assets"}
+                ],
+                "created_at": "2024-11-15T14:00:00Z",
+                "compliance_checked": False,
+                "suitability_confirmed": False
+            }
+        ]
+    
+    return {"records": records, "total": len(records)}
+
+@api_router.put("/advice/{advice_id}/workflow")
+async def update_advice_workflow(advice_id: str, action: str, notes: Optional[str] = None):
+    """Progress advice through workflow stages"""
+    now = datetime.now(timezone.utc).isoformat()
+    update_data = {}
+    
+    if action == "submit_review":
+        update_data = {"status": "pending_review"}
+    elif action == "approve":
+        update_data = {"status": "approved", "reviewed_at": now, "reviewed_by": "compliance_officer"}
+    elif action == "reject":
+        update_data = {"status": "draft", "reviewed_at": now, "rejection_reason": notes}
+    elif action == "send":
+        update_data = {"status": "sent", "sent_at": now}
+    elif action == "acknowledge":
+        update_data = {"status": "acknowledged", "acknowledged_at": now}
+    
+    await db.advice_records.update_one({"advice_id": advice_id}, {"$set": update_data})
+    
+    # Log compliance audit
+    await db.compliance_audit.insert_one({
+        "audit_id": f"audit_{uuid.uuid4().hex[:12]}",
+        "action_type": "advice_workflow",
+        "action_description": f"Advice {advice_id} workflow action: {action}",
+        "performed_by": "adviser",
+        "performed_at": now,
+        "compliance_status": "compliant"
+    })
+    
+    return {"success": True, "new_status": update_data.get("status")}
+
+# Goal Tracking
+@api_router.get("/goals/{household_id}")
+async def get_goals(household_id: str):
+    """Get all goals for a household"""
+    goals = await db.goals.find({"household_id": household_id}, {"_id": 0}).to_list(20)
+    
+    if not goals:
+        goals = [
+            {
+                "goal_id": "goal_001",
+                "household_id": household_id,
+                "name": "Retirement at 60",
+                "goal_type": "retirement",
+                "target_amount": 2000000,
+                "current_amount": 1420000,
+                "target_date": "2039-01-01T00:00:00Z",
+                "priority": "high",
+                "status": "active",
+                "monthly_contribution": 3500,
+                "progress_percent": 71
+            },
+            {
+                "goal_id": "goal_002",
+                "household_id": household_id,
+                "name": "Children's Education Fund",
+                "goal_type": "education",
+                "target_amount": 200000,
+                "current_amount": 145000,
+                "target_date": "2030-01-01T00:00:00Z",
+                "priority": "high",
+                "status": "active",
+                "monthly_contribution": 1500,
+                "progress_percent": 72.5
+            },
+            {
+                "goal_id": "goal_003",
+                "household_id": household_id,
+                "name": "Beach House Purchase",
+                "goal_type": "house",
+                "target_amount": 800000,
+                "current_amount": 320000,
+                "target_date": "2035-01-01T00:00:00Z",
+                "priority": "medium",
+                "status": "active",
+                "monthly_contribution": 2000,
+                "progress_percent": 40
+            },
+            {
+                "goal_id": "goal_004",
+                "household_id": household_id,
+                "name": "Emergency Fund",
+                "goal_type": "emergency",
+                "target_amount": 100000,
+                "current_amount": 85000,
+                "target_date": None,
+                "priority": "high",
+                "status": "active",
+                "monthly_contribution": 500,
+                "progress_percent": 85
+            }
+        ]
+        
+        # Calculate progress percent for each goal
+        for goal in goals:
+            if goal["target_amount"] > 0:
+                goal["progress_percent"] = round((goal["current_amount"] / goal["target_amount"]) * 100, 1)
+    
+    return {"goals": goals, "total": len(goals)}
+
+@api_router.post("/goals")
+async def create_goal(goal: GoalItem):
+    """Create a new goal"""
+    goal_dict = goal.model_dump()
+    if goal_dict.get("target_date") and isinstance(goal_dict["target_date"], datetime):
+        goal_dict["target_date"] = goal_dict["target_date"].isoformat()
+    goal_dict["created_at"] = datetime.now(timezone.utc).isoformat()
+    goal_dict["progress_percent"] = round((goal.current_amount / goal.target_amount) * 100, 1) if goal.target_amount > 0 else 0
+    await db.goals.insert_one(goal_dict)
+    return {"success": True, "goal_id": goal.goal_id}
+
+@api_router.put("/goals/{goal_id}")
+async def update_goal(goal_id: str, current_amount: Optional[float] = None, status: Optional[str] = None):
+    """Update a goal"""
+    update_data = {"updated_at": datetime.now(timezone.utc).isoformat()}
+    if current_amount is not None:
+        update_data["current_amount"] = current_amount
+    if status:
+        update_data["status"] = status
+    
+    await db.goals.update_one({"goal_id": goal_id}, {"$set": update_data})
+    return {"success": True}
+
+# ==================== PHASE 3: AI & PORTFOLIO AGGREGATION ====================
+
+class AIAdviceRequest(BaseModel):
+    household_id: str
+    context: Dict[str, Any] = {}
+    question: Optional[str] = None
+    advice_type: str = "general"  # general, tax, investment, retirement, insurance
+
+class PortfolioAggregationAccount(BaseModel):
+    account_id: str = Field(default_factory=lambda: f"acc_{uuid.uuid4().hex[:12]}")
+    household_id: str
+    institution: str
+    account_type: str  # bank, super, brokerage, mortgage
+    account_name: str
+    balance: float
+    last_synced: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    status: str = "connected"  # connected, pending, error, disconnected
+
+@api_router.get("/portfolio/aggregated/{household_id}")
+async def get_aggregated_portfolio(household_id: str):
+    """Get aggregated portfolio from all connected accounts (mock Open Banking)"""
+    # In production, this would connect to Open Banking APIs
+    # For now, return comprehensive mock data
+    
+    aggregated = {
+        "household_id": household_id,
+        "last_updated": datetime.now(timezone.utc).isoformat(),
+        "total_assets": 2920000,
+        "total_liabilities": 942000,
+        "net_worth": 1978000,
+        "accounts": [
+            {
+                "account_id": "acc_bank_001",
+                "institution": "Commonwealth Bank",
+                "account_type": "bank",
+                "account_name": "Everyday Account",
+                "balance": 25000,
+                "status": "connected",
+                "last_synced": datetime.now(timezone.utc).isoformat()
+            },
+            {
+                "account_id": "acc_bank_002",
+                "institution": "Commonwealth Bank",
+                "account_type": "bank",
+                "account_name": "High Interest Savings",
+                "balance": 75000,
+                "status": "connected",
+                "last_synced": datetime.now(timezone.utc).isoformat()
+            },
+            {
+                "account_id": "acc_td_001",
+                "institution": "Macquarie Bank",
+                "account_type": "bank",
+                "account_name": "Term Deposit",
+                "balance": 150000,
+                "status": "connected",
+                "last_synced": datetime.now(timezone.utc).isoformat()
+            },
+            {
+                "account_id": "acc_super_001",
+                "institution": "Australian Super",
+                "account_type": "super",
+                "account_name": "Super - Michael",
+                "balance": 380000,
+                "status": "connected",
+                "last_synced": datetime.now(timezone.utc).isoformat()
+            },
+            {
+                "account_id": "acc_super_002",
+                "institution": "Australian Super",
+                "account_type": "super",
+                "account_name": "Super - Sarah",
+                "balance": 200000,
+                "status": "connected",
+                "last_synced": datetime.now(timezone.utc).isoformat()
+            },
+            {
+                "account_id": "acc_broker_001",
+                "institution": "CommSec",
+                "account_type": "brokerage",
+                "account_name": "Share Portfolio",
+                "balance": 320000,
+                "status": "connected",
+                "last_synced": datetime.now(timezone.utc).isoformat(),
+                "holdings": [
+                    {"symbol": "CBA.AX", "name": "Commonwealth Bank", "units": 200, "value": 24000},
+                    {"symbol": "BHP.AX", "name": "BHP Group", "units": 500, "value": 22500},
+                    {"symbol": "CSL.AX", "name": "CSL Limited", "units": 100, "value": 28000},
+                    {"symbol": "WES.AX", "name": "Wesfarmers", "units": 400, "value": 25600}
+                ]
+            },
+            {
+                "account_id": "acc_broker_002",
+                "institution": "Vanguard",
+                "account_type": "brokerage",
+                "account_name": "ETF Portfolio",
+                "balance": 145000,
+                "status": "connected",
+                "last_synced": datetime.now(timezone.utc).isoformat()
+            },
+            {
+                "account_id": "acc_mortgage_001",
+                "institution": "Commonwealth Bank",
+                "account_type": "mortgage",
+                "account_name": "Home Loan - Sydney",
+                "balance": -510000,
+                "status": "connected",
+                "last_synced": datetime.now(timezone.utc).isoformat()
+            },
+            {
+                "account_id": "acc_mortgage_002",
+                "institution": "ANZ",
+                "account_type": "mortgage",
+                "account_name": "Investment Loan - Melbourne",
+                "balance": -432000,
+                "status": "connected",
+                "last_synced": datetime.now(timezone.utc).isoformat()
+            }
+        ],
+        "asset_allocation": {
+            "cash": {"amount": 250000, "percent": 8.6},
+            "shares": {"amount": 320000, "percent": 11.0},
+            "etfs": {"amount": 145000, "percent": 5.0},
+            "super": {"amount": 580000, "percent": 19.9},
+            "property": {"amount": 1570000, "percent": 53.8},
+            "bonds": {"amount": 55000, "percent": 1.9}
+        },
+        "monthly_snapshot": {
+            "income": 19475,
+            "expenses": 11783,
+            "savings": 7692,
+            "savings_rate": 0.395
+        }
+    }
+    
+    return aggregated
+
+@api_router.post("/portfolio/connect-account")
+async def connect_account(account: PortfolioAggregationAccount):
+    """Connect a new financial account (mock Open Banking)"""
+    account_dict = account.model_dump()
+    account_dict["last_synced"] = datetime.now(timezone.utc).isoformat()
+    account_dict["status"] = "connected"
+    await db.connected_accounts.insert_one(account_dict)
+    
+    return {
+        "success": True,
+        "account_id": account.account_id,
+        "message": f"Successfully connected {account.institution} - {account.account_name}"
+    }
+
+@api_router.post("/portfolio/sync/{household_id}")
+async def sync_portfolio(household_id: str):
+    """Sync all connected accounts (mock Open Banking refresh)"""
+    # In production, this would trigger actual Open Banking data refresh
+    
+    await db.connected_accounts.update_many(
+        {"household_id": household_id},
+        {"$set": {"last_synced": datetime.now(timezone.utc).isoformat(), "status": "connected"}}
+    )
+    
+    return {
+        "success": True,
+        "synced_at": datetime.now(timezone.utc).isoformat(),
+        "message": "All accounts synced successfully"
+    }
+
+# AI Advice Generation - Uses multi-LLM approach
+@api_router.post("/ai/generate-advice")
+async def generate_ai_advice(request: AIAdviceRequest):
+    """Generate AI-powered financial advice using multiple LLMs"""
+    
+    # Build context for AI
+    context = request.context
+    household_id = request.household_id
+    question = request.question or "What are the top financial actions I should take?"
+    
+    # Get household data for context
+    household = await db.households.find_one({"household_id": household_id}, {"_id": 0})
+    goals = await db.goals.find({"household_id": household_id}, {"_id": 0}).to_list(10)
+    
+    # Prepare financial context
+    financial_context = {
+        "net_worth": context.get("net_worth", 1978000),
+        "total_assets": context.get("total_assets", 2920000),
+        "total_debt": context.get("total_debt", 942000),
+        "annual_income": context.get("annual_income", 253400),
+        "age": context.get("age", 45),
+        "retirement_age": context.get("retirement_age", 65),
+        "risk_profile": context.get("risk_profile", "moderate"),
+        "goals": [{"name": g.get("name"), "target": g.get("target_amount"), "progress": g.get("progress_percent")} for g in goals] if goals else []
+    }
+    
+    # Generate AI advice (mock response - in production would call actual LLMs)
+    # This demonstrates the structure of multi-LLM advice
+    ai_response = {
+        "advice_id": f"ai_adv_{uuid.uuid4().hex[:12]}",
+        "household_id": household_id,
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "question": question,
+        "advice_type": request.advice_type,
+        "analysis": {
+            "financial_health": "Strong",
+            "key_strengths": [
+                "Healthy net worth of $1.98M",
+                "Diversified investment portfolio",
+                "Good savings rate"
+            ],
+            "areas_for_improvement": [
+                "Debt-to-asset ratio could be improved",
+                "Superannuation contributions below optimal",
+                "Emergency fund slightly below 6 months"
+            ]
+        },
+        "recommendations": [
+            {
+                "rank": 1,
+                "title": "Maximize Superannuation Contributions",
+                "description": "You have unused concessional contribution cap. Consider salary sacrificing an additional $8,500 per year.",
+                "impact": "+$1,870/year in tax savings",
+                "impact_amount": 1870,
+                "timeframe": "Immediate",
+                "confidence": 0.95,
+                "rationale": "At your marginal tax rate of 37%, contributions to super are taxed at only 15%, creating an immediate 22% tax benefit."
+            },
+            {
+                "rank": 2,
+                "title": "Implement Debt Recycling Strategy",
+                "description": "Convert a portion of non-deductible home loan debt to deductible investment debt.",
+                "impact": "+$4,200/year in tax benefits",
+                "impact_amount": 4200,
+                "timeframe": "1-3 months",
+                "confidence": 0.88,
+                "rationale": "With $942K in property debt and a strong investment portfolio, debt recycling can convert non-deductible interest to tax-deductible."
+            },
+            {
+                "rank": 3,
+                "title": "Rebalance to Growth Assets",
+                "description": "Your cash allocation is slightly high. Consider deploying $50,000 to diversified ETFs.",
+                "impact": "+$2,500/year expected returns",
+                "impact_amount": 2500,
+                "timeframe": "1-2 weeks",
+                "confidence": 0.82,
+                "rationale": "Excess cash beyond 6 months emergency fund earns low returns. Long-term growth assets historically outperform by 4-5% annually."
+            }
+        ],
+        "retirement_outlook": {
+            "current_trajectory": "On track to retire at 60 with $3.2M",
+            "success_probability": "91%",
+            "recommendation": "Maintain current savings rate. Consider increasing super contributions for additional tax efficiency."
+        },
+        "disclaimers": [
+            "This advice is general in nature and does not take into account your complete financial situation.",
+            "Past performance is not a reliable indicator of future performance.",
+            "Consider seeking personal financial advice before making investment decisions."
+        ],
+        "llm_metadata": {
+            "models_used": ["analysis_engine_v2", "recommendation_engine_v1"],
+            "confidence_score": 0.89,
+            "processing_time_ms": 1250
+        }
+    }
+    
+    # Store the AI advice
+    await db.ai_advice.insert_one({**ai_response, "_id": None})
+    
+    return ai_response
+
+@api_router.get("/ai/advice-history/{household_id}")
+async def get_ai_advice_history(household_id: str):
+    """Get history of AI-generated advice for a household"""
+    history = await db.ai_advice.find(
+        {"household_id": household_id}, 
+        {"_id": 0}
+    ).sort("generated_at", -1).to_list(20)
+    
+    return {"advice_history": history, "total": len(history)}
+
+# Client Portal Engagement
+@api_router.get("/client-portal/engagement/{household_id}")
+async def get_client_engagement(household_id: str):
+    """Get client engagement metrics and activity"""
+    
+    # In production, this would track actual client logins and activity
+    engagement = {
+        "household_id": household_id,
+        "last_login": (datetime.now(timezone.utc) - timedelta(days=2)).isoformat(),
+        "login_streak": 5,
+        "total_logins_30d": 12,
+        "documents_viewed": 8,
+        "goals_updated": 3,
+        "messages_sent": 2,
+        "engagement_score": 78,
+        "engagement_level": "Active",
+        "activity_feed": [
+            {
+                "type": "login",
+                "description": "Logged into client portal",
+                "timestamp": (datetime.now(timezone.utc) - timedelta(days=2)).isoformat()
+            },
+            {
+                "type": "document_view",
+                "description": "Viewed Statement of Advice",
+                "timestamp": (datetime.now(timezone.utc) - timedelta(days=3)).isoformat()
+            },
+            {
+                "type": "goal_update",
+                "description": "Updated retirement goal progress",
+                "timestamp": (datetime.now(timezone.utc) - timedelta(days=5)).isoformat()
+            },
+            {
+                "type": "message",
+                "description": "Sent message to adviser",
+                "timestamp": (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
+            }
+        ],
+        "recommended_actions": [
+            "Review your latest portfolio performance",
+            "Update your risk tolerance questionnaire (due for annual review)",
+            "Check progress on your retirement goal"
+        ]
+    }
+    
+    return engagement
+
+@api_router.get("/client-portal/weekly-summary/{household_id}")
+async def get_weekly_summary(household_id: str):
+    """Get weekly summary for client portal"""
+    
+    summary = {
+        "household_id": household_id,
+        "week_ending": datetime.now(timezone.utc).isoformat(),
+        "portfolio_performance": {
+            "weekly_change": 12500,
+            "weekly_change_percent": 0.63,
+            "ytd_change_percent": 8.7
+        },
+        "net_worth": {
+            "current": 1978000,
+            "change_week": 12500,
+            "change_month": 45000
+        },
+        "goal_progress": [
+            {"name": "Retirement at 60", "progress": 71, "on_track": True},
+            {"name": "Education Fund", "progress": 72.5, "on_track": True},
+            {"name": "Beach House", "progress": 40, "on_track": False}
+        ],
+        "upcoming": [
+            {"type": "meeting", "title": "Quarterly Review", "date": (datetime.now(timezone.utc) + timedelta(days=5)).isoformat()},
+            {"type": "task", "title": "Insurance renewal", "date": (datetime.now(timezone.utc) + timedelta(days=14)).isoformat()}
+        ],
+        "insights": [
+            "Your portfolio gained $12,500 this week, outperforming the ASX 200 by 0.2%",
+            "You're on track for 3 of your 4 financial goals",
+            "Consider reviewing your beach house goal - currently behind schedule"
+        ]
+    }
+    
+    return summary
+
+# Enterprise Features
+@api_router.get("/enterprise/practice-overview")
+async def get_practice_overview():
+    """Get practice-wide overview for enterprise users"""
+    
+    overview = {
+        "practice_name": "Wheeler Financial Advisory",
+        "total_clients": 47,
+        "total_aum": 89500000,
+        "active_advisers": 3,
+        "metrics": {
+            "new_clients_mtd": 3,
+            "revenue_mtd": 125000,
+            "avg_client_nw": 1904255,
+            "client_retention_rate": 0.96
+        },
+        "advisers": [
+            {"name": "Michael Thompson", "clients": 22, "aum": 42000000},
+            {"name": "Sarah Chen", "clients": 15, "aum": 28500000},
+            {"name": "David Wong", "clients": 10, "aum": 19000000}
+        ],
+        "compliance_status": {
+            "reviews_due": 5,
+            "documents_pending": 3,
+            "audits_scheduled": 1
+        },
+        "tasks_summary": {
+            "overdue": 2,
+            "due_today": 4,
+            "due_this_week": 12
+        }
+    }
+    
+    return overview
+
 @api_router.get("/")
 async def root():
     return {"message": "Australian Investment Analyzer API", "version": "1.0.0"}
