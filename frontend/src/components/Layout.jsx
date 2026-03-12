@@ -69,12 +69,13 @@ const personalNavGroups = [
     items: [
       { path: "/decision-engine", label: "Decision Engine", icon: Zap, title: "Decision Engine" },
       { path: "/life-timeline", label: "Life Timeline", icon: Clock, title: "Life Timeline Planning" },
+      { path: "/goal-tracker", label: "Goal Tracker", icon: Target, title: "Goal Progress Tracker" },
+      { path: "/ai-advisor", label: "AI Advisor", icon: Sparkles, title: "AI Financial Advisor" },
       { path: "/daily-briefing", label: "Daily Briefing", icon: Sun, title: "Daily Briefing" },
       { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard, title: "Dashboard" },
       { path: "/overview", label: "Family Overview", icon: Eye, title: "Family Overview" },
       { path: "/family-wealth", label: "Wealth Dashboard", icon: TrendingUp, title: "Family Wealth Dashboard" },
       { path: "/recommendations", label: "Recommendations", icon: Lightbulb, title: "Financial Recommendations" },
-      { path: "/copilot", label: "AI Copilot", icon: Sparkles, title: "AI Copilot" },
     ]
   },
   {
@@ -82,6 +83,7 @@ const personalNavGroups = [
     items: [
       { path: "/strategic-planning", label: "Strategic Planning", icon: HeartPulse, title: "Strategic Planning" },
       { path: "/investment-comparison", label: "Investment Compare", icon: Scale, title: "Investment Structure Comparison" },
+      { path: "/portfolio-aggregator", label: "Portfolio Aggregator", icon: Wallet, title: "Portfolio Aggregation" },
       { path: "/budget", label: "Budget", icon: Wallet, title: "Household Budget" },
       { path: "/trust-distributions", label: "Trust Analysis", icon: PieChart, title: "Trust Distribution Analysis" },
       { path: "/income-splitting", label: "Income Splitting", icon: Users, title: "Income Splitting" },
