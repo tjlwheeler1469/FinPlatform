@@ -192,14 +192,15 @@ const adviserNavGroups = [
     name: "Calculators",
     items: [
       { path: "/loan-calculator", label: "Loan", icon: Landmark, title: "Loan Calculator" },
-      { path: "/bas-calculator", label: "BAS", icon: FileCheck, title: "BAS Calculator" },
+      { path: "/debt-paydown", label: "Debt Paydown", icon: CreditCard, title: "Debt Paydown Planner" },
+      { path: "/insurance-gap", label: "Insurance Gap", icon: Shield, title: "Insurance Gap Analysis" },
       { path: "/smsf-optimizer", label: "SMSF", icon: PiggyBank, title: "SMSF Optimizer" },
-      { path: "/division-7a", label: "Division 7A", icon: FileCheck, title: "Division 7A" },
     ]
   },
   {
     name: "Reports",
     items: [
+      { path: "/revenue-billing", label: "Revenue & Billing", icon: Receipt, title: "Revenue & Billing" },
       { path: "/documents", label: "Documents", icon: FileText, title: "Documents & Communications" },
       { path: "/data-import-export", label: "Import / Export", icon: Database, title: "Data Import & Export" },
       { path: "/reports", label: "Reports", icon: FileText, title: "Reports" },
