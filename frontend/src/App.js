@@ -801,6 +801,7 @@ const AppRouter = () => {
       <Route path="/practice-management" element={<PracticeManagement />} />
       <Route path="/documents" element={<DocumentsCommunications />} />
       <Route path="/portfolio-rebalancing" element={<PortfolioRebalancing />} />
+      <Route path="/security" element={<SecuritySettings />} />
     </Routes>
   );
 };
