@@ -67,6 +67,8 @@ const personalNavGroups = [
   {
     name: "Overview",
     items: [
+      { path: "/decision-engine", label: "Decision Engine", icon: Zap, title: "Decision Engine" },
+      { path: "/life-timeline", label: "Life Timeline", icon: Clock, title: "Life Timeline Planning" },
       { path: "/daily-briefing", label: "Daily Briefing", icon: Sun, title: "Daily Briefing" },
       { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard, title: "Dashboard" },
       { path: "/overview", label: "Family Overview", icon: Eye, title: "Family Overview" },
