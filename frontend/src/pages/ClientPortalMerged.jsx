@@ -31,10 +31,14 @@ import {
   Eye,
   Printer,
   Lock,
-  Loader2
+  Loader2,
+  FileSignature,
+  ClipboardList
 } from "lucide-react";
 import { toast } from "sonner";
 import ChartContainer from "@/components/ChartContainer";
+import DocuSignIntegration from "@/components/DocuSignIntegration";
+import DigitalOnboarding from "@/components/DigitalOnboarding";
 import {
   PieChart as RechartPie,
   Pie,
