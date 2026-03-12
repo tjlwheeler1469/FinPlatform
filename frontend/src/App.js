@@ -808,6 +808,8 @@ const AppRouter = () => {
       <Route path="/security" element={<SecuritySettings />} />
       <Route path="/data-import-export" element={<DataImportExportPage />} />
       <Route path="/investment-comparison" element={<InvestmentComparison />} />
+      <Route path="/decision-engine" element={<DecisionDashboard />} />
+      <Route path="/life-timeline" element={<LifeTimeline />} />
     </Routes>
   );
 };
