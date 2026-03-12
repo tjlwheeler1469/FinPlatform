@@ -6,8 +6,8 @@
  * - Tax Summary Report
  */
 
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import { jsPDF } from 'jspdf';
+import { autoTable } from 'jspdf-autotable';
 
 // Wheeler Financial branding colors
 const COLORS = {
