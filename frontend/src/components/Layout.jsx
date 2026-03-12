@@ -156,6 +156,8 @@ const adviserNavGroups = [
   {
     name: "Client Tools",
     items: [
+      { path: "/decision-engine", label: "Decision Engine", icon: Zap, title: "Decision Engine" },
+      { path: "/life-timeline", label: "Life Timeline", icon: Clock, title: "Life Timeline Planning" },
       { path: "/daily-briefing", label: "Daily Briefing", icon: Sun, title: "Daily Briefing" },
       { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard, title: "Dashboard" },
       { path: "/copilot", label: "AI Copilot", icon: Sparkles, title: "AI Copilot" },
