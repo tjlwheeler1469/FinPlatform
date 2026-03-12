@@ -974,3 +974,67 @@ Build an app that analyses all options for personal and business investment in A
 - ✅ **Codebase Cleanup** - December 2025:
   - Deleted redundant CGTCalculator.jsx and CGTEventTracker.jsx (merged into CGT.jsx)
   - Added redirects from /cgt-calculator and /cgt-events to /cgt
+
+## Completed This Session (December 2025) - Continued
+- ✅ **Investment Structure Comparison** page (/investment-comparison):
+  - Compare investment outcomes across 6 asset classes (AU Shares, International Shares, Property, Crypto, Bonds, Cash)
+  - Compare across 4 tax structures (Personal/Joint, Company, Family Trust, SMSF)
+  - Investment parameters: Amount, Holding Period (1-30 years), Marginal Tax Rate
+  - Run Analysis button triggers API calculation
+  - Results show: Best Overall Option, Best by Asset Class, Best by Tax Structure
+  - Bar chart visualization of After-Tax Returns
+  - Three tabs: Comparison, Best Options, Detailed Results
+  - Important considerations info card with Australian tax advice
+  - Backend API: POST /api/strategic/investment-comparison
+  - Supporting APIs: GET /api/strategic/asset-classes, GET /api/strategic/tax-structures
+
+- ✅ **Data Import/Export** page (/data-import-export):
+  - Import client and adviser data from CSV, JSON, Excel files
+  - Data type selection: Client Data, Adviser Data
+  - Download Templates: CSV, Excel, JSON formats
+  - File upload with drag & drop
+  - Export Data tab with format selection (XLSX, CSV, JSON)
+  - Export Clients and Export Advisers buttons
+  - Backend APIs: 
+    - GET /api/import/template/{data_type}?format={csv|xlsx|json}
+    - POST /api/import/clients
+    - POST /api/import/advisers
+    - GET /api/export/clients?format={csv|xlsx|json}
+    - GET /api/export/advisers?format={csv|xlsx|json}
+
+- ✅ **Navigation Updates**:
+  - Added "Investment Compare" under Planning section (Personal Mode)
+  - Added "Investment Compare" under Analysis section (Adviser Mode)
+  - Added "Import / Export" under Data & Reports section (Personal Mode)
+  - Added "Import / Export" under Reports section (Adviser Mode)
+
+- ✅ **Backend JSON Serialization Fix**:
+  - Fixed float('inf') JSON serialization error in TAX_STRUCTURES
+  - Replaced float('inf') with None in API responses for proper JSON serialization
+
+## Prioritized Backlog
+
+### P0 - Critical
+- None at this time
+
+### P1 - High Priority
+- Full Database Migration: Move all remaining mock data (portfolios, client lists, tasks, meetings) from server.py and localStorage to MongoDB
+
+### P2 - Medium Priority
+- Real API Integrations:
+  - Alpha Vantage for live stock market data
+  - DocuSign for real e-signature integration
+  - Google/Outlook Calendar OAuth for full calendar sync
+- Break down monolithic server.py into separate route/model/service files
+- Replace mock authentication with secure JWT or database-driven solution
+- Consolidate state management (currently split between localStorage, mock data, MongoDB)
+
+### P3 - Nice to Have
+- SOC 2 compliance architecture
+- Enhanced mobile-optimized views
+- LLM-powered AI advisor feature
+
+## Testing Status
+- ✅ Backend: 100% (13/13 tests passed) - iteration_26.json
+- ✅ Frontend: 100% (all features working)
+- Test files: /app/test_reports/iteration_26.json, /app/backend/tests/test_strategic_import_export.py
