@@ -65,6 +65,7 @@ const ClientPortalMerged = lazy(() => import("@/pages/ClientPortalMerged"));
 const PracticeManagement = lazy(() => import("@/pages/PracticeManagement"));
 const DocumentsCommunications = lazy(() => import("@/pages/DocumentsCommunications"));
 const PortfolioRebalancing = lazy(() => import("@/pages/PortfolioRebalancing"));
+const SecuritySettings = lazy(() => import("@/pages/SecuritySettings"));
 
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
