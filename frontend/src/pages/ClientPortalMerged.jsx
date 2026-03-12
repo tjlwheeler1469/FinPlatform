@@ -127,7 +127,7 @@ const MOCK_CLIENT_DATA = {
   ]
 };
 
-const COLORS = ['#0F392B', '#10B981', '#3B82F6', '#D4AF37'];
+const COLORS = ['#1a2744', '#10B981', '#3B82F6', '#D4A84C'];
 
 // Login Component
 const ClientLogin = ({ onLogin }) => {
@@ -198,7 +198,7 @@ const ClientLogin = ({ onLogin }) => {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#0F392B] flex items-center justify-center">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#1a2744] flex items-center justify-center">
             <Shield className="h-8 w-8 text-white" />
           </div>
           <CardTitle className="text-2xl">Client Portal</CardTitle>
@@ -261,7 +261,7 @@ const ClientLogin = ({ onLogin }) => {
             )}
             <Button 
               type="submit" 
-              className="w-full bg-[#0F392B] hover:bg-[#1a5c45]"
+              className="w-full bg-[#1a2744] hover:bg-[#1a5c45]"
               disabled={loading}
               data-testid="client-login-btn"
             >
@@ -288,7 +288,7 @@ const ClientLogin = ({ onLogin }) => {
             <button
               type="button"
               onClick={() => setIsLogin(!isLogin)}
-              className="text-sm text-[#0F392B] hover:underline"
+              className="text-sm text-[#1a2744] hover:underline"
             >
               {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
             </button>
@@ -344,7 +344,7 @@ const ClientDashboard = ({ clientAuth, onLogout }) => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header - Mobile Responsive */}
-      <header className="bg-[#0F392B] text-white p-3 sm:p-4 sticky top-0 z-50">
+      <header className="bg-[#1a2744] text-white p-3 sm:p-4 sticky top-0 z-50">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2 sm:gap-4">
             <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/20 flex items-center justify-center">
@@ -387,7 +387,7 @@ const ClientDashboard = ({ clientAuth, onLogout }) => {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div>
             <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
-              <greeting.icon className="h-5 w-5 sm:h-6 sm:w-6 text-[#D4AF37]" />
+              <greeting.icon className="h-5 w-5 sm:h-6 sm:w-6 text-[#D4A84C]" />
               {greeting.text}, {(clientAuth?.name || client.primaryContact).split(' ')[0]}
             </h2>
             <p className="text-sm text-muted-foreground">
@@ -425,7 +425,7 @@ const ClientDashboard = ({ clientAuth, onLogout }) => {
           <Card>
             <CardContent className="p-4">
               <p className="text-xs text-muted-foreground">Net Worth</p>
-              <p className="text-2xl font-bold text-[#0F392B]">{formatCurrency(client.netWorth)}</p>
+              <p className="text-2xl font-bold text-[#1a2744]">{formatCurrency(client.netWorth)}</p>
               <div className={`flex items-center gap-1 text-xs mt-1 ${client.netWorthChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                 {client.netWorthChange >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
                 {client.netWorthChange >= 0 ? '+' : ''}{client.netWorthChange}% this month
@@ -483,7 +483,7 @@ const ClientDashboard = ({ clientAuth, onLogout }) => {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base flex items-center gap-2">
-                    <PieChart className="h-5 w-5 text-[#D4AF37]" />
+                    <PieChart className="h-5 w-5 text-[#D4A84C]" />
                     Portfolio Allocation
                   </CardTitle>
                 </CardHeader>
@@ -525,7 +525,7 @@ const ClientDashboard = ({ clientAuth, onLogout }) => {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base flex items-center gap-2">
-                    <LineChart className="h-5 w-5 text-[#D4AF37]" />
+                    <LineChart className="h-5 w-5 text-[#D4A84C]" />
                     Net Worth Trend (6 Months)
                   </CardTitle>
                 </CardHeader>
@@ -535,15 +535,15 @@ const ClientDashboard = ({ clientAuth, onLogout }) => {
                       <AreaChart data={client.performanceData}>
                         <defs>
                           <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#0F392B" stopOpacity={0.3}/>
-                            <stop offset="95%" stopColor="#0F392B" stopOpacity={0}/>
+                            <stop offset="5%" stopColor="#1a2744" stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor="#1a2744" stopOpacity={0}/>
                           </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
                         <XAxis dataKey="period" tick={{ fontSize: 11 }} />
                         <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `$${(v/1000000).toFixed(1)}M`} />
                         <Tooltip formatter={(v) => formatCurrency(v)} />
-                        <Area type="monotone" dataKey="value" stroke="#0F392B" strokeWidth={2} fill="url(#colorValue)" />
+                        <Area type="monotone" dataKey="value" stroke="#1a2744" strokeWidth={2} fill="url(#colorValue)" />
                       </AreaChart>
                     </ResponsiveContainer>
                   </ChartContainer>
@@ -555,7 +555,7 @@ const ClientDashboard = ({ clientAuth, onLogout }) => {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-[#D4AF37]" />
+                  <Calendar className="h-5 w-5 text-[#D4A84C]" />
                   Upcoming
                 </CardTitle>
               </CardHeader>
@@ -565,7 +565,7 @@ const ClientDashboard = ({ clientAuth, onLogout }) => {
                     <div key={action.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                       <div className="flex items-center gap-3">
                         {action.type === 'meeting' ? (
-                          <Calendar className="h-5 w-5 text-[#0F392B]" />
+                          <Calendar className="h-5 w-5 text-[#1a2744]" />
                         ) : (
                           <Clock className="h-5 w-5 text-amber-600" />
                         )}
@@ -588,7 +588,7 @@ const ClientDashboard = ({ clientAuth, onLogout }) => {
             <Card>
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-[#D4AF37]" />
+                  <FileText className="h-5 w-5 text-[#D4A84C]" />
                   Your Reports & Documents
                 </CardTitle>
                 <CardDescription>Download your financial documents and reports</CardDescription>
@@ -599,12 +599,12 @@ const ClientDashboard = ({ clientAuth, onLogout }) => {
                     <div key={report.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/30 transition-colors">
                       <div className="flex items-center gap-4">
                         <div className={`w-10 h-10 rounded flex items-center justify-center ${
-                          report.type === 'SOA' ? 'bg-[#0F392B]/10' :
+                          report.type === 'SOA' ? 'bg-[#1a2744]/10' :
                           report.type === 'Tax' ? 'bg-amber-100' :
                           'bg-blue-100'
                         }`}>
                           <FileText className={`h-5 w-5 ${
-                            report.type === 'SOA' ? 'text-[#0F392B]' :
+                            report.type === 'SOA' ? 'text-[#1a2744]' :
                             report.type === 'Tax' ? 'text-amber-600' :
                             'text-blue-600'
                           }`} />
@@ -656,7 +656,7 @@ const ClientDashboard = ({ clientAuth, onLogout }) => {
             <Card>
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Target className="h-5 w-5 text-[#D4AF37]" />
+                  <Target className="h-5 w-5 text-[#D4A84C]" />
                   Your Financial Goals
                 </CardTitle>
                 <CardDescription>Track your progress towards your objectives</CardDescription>
@@ -716,7 +716,7 @@ const ClientDashboard = ({ clientAuth, onLogout }) => {
               <CardContent>
                 <div className="flex flex-col md:flex-row gap-6">
                   <div className="flex items-center gap-4">
-                    <div className="w-20 h-20 rounded-full bg-[#0F392B] text-white flex items-center justify-center text-2xl font-bold">
+                    <div className="w-20 h-20 rounded-full bg-[#1a2744] text-white flex items-center justify-center text-2xl font-bold">
                       {client.adviser.name.split(' ').map(n => n[0]).join('')}
                     </div>
                     <div>
@@ -726,14 +726,14 @@ const ClientDashboard = ({ clientAuth, onLogout }) => {
                   </div>
                   <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3">
                     <a href={`tel:${client.adviser.phone}`} className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
-                      <Phone className="h-5 w-5 text-[#0F392B]" />
+                      <Phone className="h-5 w-5 text-[#1a2744]" />
                       <div>
                         <p className="text-xs text-muted-foreground">Phone</p>
                         <p className="font-medium">{client.adviser.phone}</p>
                       </div>
                     </a>
                     <a href={`mailto:${client.adviser.email}`} className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
-                      <Mail className="h-5 w-5 text-[#0F392B]" />
+                      <Mail className="h-5 w-5 text-[#1a2744]" />
                       <div>
                         <p className="text-xs text-muted-foreground">Email</p>
                         <p className="font-medium">{client.adviser.email}</p>
@@ -755,7 +755,7 @@ const ClientDashboard = ({ clientAuth, onLogout }) => {
                       </div>
                     ))}
                   </div>
-                  <Button className="w-full mt-4 bg-[#0F392B]">
+                  <Button className="w-full mt-4 bg-[#1a2744]">
                     <MessageCircle className="h-4 w-4 mr-2" /> Send Message to Adviser
                   </Button>
                 </div>
@@ -763,7 +763,7 @@ const ClientDashboard = ({ clientAuth, onLogout }) => {
             </Card>
 
             {/* Review Info */}
-            <Card className="border-l-4 border-l-[#D4AF37]">
+            <Card className="border-l-4 border-l-[#D4A84C]">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -863,7 +863,7 @@ const ClientPortalMerged = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto text-[#0F392B]" />
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-[#1a2744]" />
           <p className="mt-2 text-muted-foreground">Loading...</p>
         </div>
       </div>
