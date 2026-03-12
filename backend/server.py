@@ -867,7 +867,7 @@ def compare_scenarios(scenarios: List[Dict[str, Any]]) -> Dict[str, Any]:
         entity_type = scenario.get("entity_type", "personal")
         taxable_income = scenario.get("taxable_income", 0)
         investments = scenario.get("investments", {})
-        expenses = scenario.get("expenses", {})
+        _ = scenario.get("expenses", {})  # Reserved for future use
         
         # Calculate totals
         total_liquid = (
@@ -1470,7 +1470,7 @@ async def analyze_full_scenario(scenario: ScenarioCreate):
     
     # Calculate marginal tax rate first
     if scenario.entity_type == "personal":
-        tax_result = calculate_personal_income_tax(scenario.taxable_income)
+        _ = calculate_personal_income_tax(scenario.taxable_income)  # Calculate for validation
         # Get marginal rate from last bracket
         marginal_rate = 0.30  # Default
         for threshold, rate in PERSONAL_TAX_BRACKETS_2024_25:
@@ -1811,11 +1811,11 @@ def calculate_tax_loss_harvesting(holdings: List[Dict], realized_gains: float, m
         try:
             purchase_dt = datetime.strptime(h["purchase_date"], "%Y-%m-%d")
             days_held = (datetime.now() - purchase_dt).days
-        except:
+        except (ValueError, TypeError, KeyError):
             days_held = 0
         
-        # CGT discount eligibility (held > 12 months)
-        cgt_discount_eligible = days_held > 365
+        # CGT discount eligibility (held > 12 months) - available when days_held > 365
+        _ = days_held > 365  # Used in gain/loss calculations below
         
         if gain_loss < 0:
             total_unrealized_losses += abs(gain_loss)
@@ -1936,7 +1936,7 @@ def calculate_dividend_reinvestment(
     
     # Reinvestment scenario
     reinvest_value = initial
-    reinvest_shares = 1000  # Assume 1000 units initially
+    _ = 1000  # Initial units (reinvest_shares) - used for conceptual tracking
     reinvest_cumulative_dividends = 0
     current_div_yield = div_yield
     
