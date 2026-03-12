@@ -3472,7 +3472,7 @@ async def send_signature_request(request: SignatureRequest):
     request_dict["sent_at"] = request_dict["sent_at"].isoformat() if isinstance(request_dict["sent_at"], datetime) else request_dict["sent_at"]
     request_dict["expires_at"] = (datetime.now(timezone.utc) + timedelta(days=14)).isoformat()
     
-    await db.signature_requests.insert_one({**request_dict, "_id": None})
+    await db.signature_requests.insert_one(request_dict)
     
     return {
         "success": True,
