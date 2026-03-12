@@ -228,8 +228,11 @@ class TestExistingPages:
         assert response.status_code == 200
         data = response.json()
         
-        assert isinstance(data, list)
-        print(f"✓ CRM Meetings: {len(data)} meetings")
+        # API returns {"meetings": [...], "total": N}
+        assert "meetings" in data
+        meetings = data["meetings"]
+        assert isinstance(meetings, list)
+        print(f"✓ CRM Meetings: {len(meetings)} meetings")
     
     def test_smsf_analysis(self):
         """Test SMSF contribution analysis"""
