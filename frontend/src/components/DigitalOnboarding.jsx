@@ -475,6 +475,16 @@ const DigitalOnboarding = ({ clientId, onComplete }) => {
   const riskScore = calculateRiskScore();
   const riskProfile = getRiskProfile(riskScore);
 
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-12">
+        <Loader2 className="h-8 w-8 animate-spin text-[#0F392B]" />
+        <span className="ml-2">Loading fact-find data...</span>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6" data-testid="digital-onboarding">
       {/* Header */}
@@ -484,12 +494,22 @@ const DigitalOnboarding = ({ clientId, onComplete }) => {
             <FileText className="h-5 w-5 text-[#D4AF37]" />
             Client Fact-Find
           </h2>
-          <p className="text-sm text-muted-foreground">Complete client information for comprehensive advice</p>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span>Complete client information for comprehensive advice</span>
+            <Badge variant="outline" className="text-xs flex items-center gap-1">
+              <Database className="h-3 w-3" /> MongoDB
+            </Badge>
+          </div>
         </div>
         <div className="flex items-center gap-4">
           <div className="text-right">
             <p className="text-sm text-muted-foreground">Overall Progress</p>
             <p className="text-xl font-bold text-[#0F392B]">{overallProgress()}%</p>
+            {lastSaved && (
+              <p className="text-xs text-muted-foreground">
+                Last saved: {new Date(lastSaved).toLocaleTimeString()}
+              </p>
+            )}
           </div>
           <Button 
             onClick={saveFactFind} 
@@ -497,8 +517,12 @@ const DigitalOnboarding = ({ clientId, onComplete }) => {
             className="bg-[#0F392B]"
             data-testid="save-factfind-btn"
           >
-            <Save className="h-4 w-4 mr-2" />
-            {isSaving ? "Saving..." : "Save Progress"}
+            {isSaving ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Save className="h-4 w-4 mr-2" />
+            )}
+            {isSaving ? "Saving..." : "Save to Database"}
           </Button>
         </div>
       </div>
