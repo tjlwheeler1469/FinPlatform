@@ -58,100 +58,117 @@ import {
   Clock,
   Zap,
   CreditCard,
-  Receipt
+  Receipt,
+  Settings,
+  MoreHorizontal
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { usePortfolio } from "@/App";
 
-// Personal Mode Navigation
+// ==================== SIMPLIFIED NAVIGATION ====================
+// Following UX best practices: 6 primary sections max
+// Dashboard → Finances → Planning → Clients → Reports → Calculators
+
+// Personal Mode Navigation (5 sections + Settings)
 const personalNavGroups = [
   {
-    name: "Overview",
+    name: "Dashboard",
+    icon: LayoutDashboard,
     items: [
-      { path: "/decision-engine", label: "Decision Engine", icon: Zap, title: "Decision Engine" },
-      { path: "/life-timeline", label: "Life Timeline", icon: Clock, title: "Life Timeline Planning" },
-      { path: "/goal-tracker", label: "Goal Tracker", icon: Target, title: "Goal Progress Tracker" },
-      { path: "/ai-advisor", label: "AI Advisor", icon: Sparkles, title: "AI Financial Advisor" },
-      { path: "/net-worth-trend", label: "Net Worth Trend", icon: TrendingUp, title: "Net Worth Over Time" },
+      { path: "/dashboard", label: "Overview", icon: LayoutDashboard, title: "Dashboard Overview" },
       { path: "/daily-briefing", label: "Daily Briefing", icon: Sun, title: "Daily Briefing" },
-      { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard, title: "Dashboard" },
-      { path: "/family-wealth", label: "Wealth Dashboard", icon: Eye, title: "Family Wealth Dashboard" },
       { path: "/recommendations", label: "Recommendations", icon: Lightbulb, title: "Financial Recommendations" },
+      { path: "/decision-engine", label: "Health Score", icon: Zap, title: "Financial Health Score" },
+    ]
+  },
+  {
+    name: "Finances",
+    icon: Wallet,
+    items: [
+      { path: "/family-wealth", label: "Net Worth", icon: Eye, title: "Net Worth & Balance Sheet" },
+      { path: "/net-worth-trend", label: "Net Worth Trend", icon: TrendingUp, title: "Net Worth Over Time" },
+      { path: "/property-portfolio", label: "Property", icon: Building2, title: "Property Portfolio" },
+      { path: "/share-portfolio", label: "Shares & ETFs", icon: LineChart, title: "Share Portfolio" },
+      { path: "/holdings-performance", label: "Performance", icon: Activity, title: "Holdings Performance" },
+      { path: "/portfolio-aggregator", label: "All Accounts", icon: Link2, title: "Portfolio Aggregation" },
+      { path: "/budget", label: "Cashflow", icon: Wallet, title: "Budget & Cashflow" },
     ]
   },
   {
     name: "Planning",
+    icon: Target,
     items: [
-      { path: "/strategic-planning", label: "Strategic Planning", icon: HeartPulse, title: "Strategic Planning" },
-      { path: "/investment-comparison", label: "Investment Compare", icon: Scale, title: "Investment Structure Comparison" },
-      { path: "/portfolio-aggregator", label: "Portfolio Aggregator", icon: Wallet, title: "Portfolio Aggregation" },
-      { path: "/debt-paydown", label: "Debt Paydown", icon: CreditCard, title: "Debt Paydown Planner" },
-      { path: "/insurance-gap", label: "Insurance Gap", icon: Shield, title: "Insurance Gap Analysis" },
-      { path: "/budget", label: "Budget", icon: Wallet, title: "Household Budget" },
-      { path: "/risk-profiler", label: "Risk Profiler", icon: Shield, title: "Risk Profiler" },
-      { path: "/onboarding", label: "Setup Wizard", icon: Rocket, title: "Setup Wizard" },
+      { path: "/life-timeline", label: "Life Timeline", icon: Clock, title: "Life Timeline Planning" },
+      { path: "/goal-tracker", label: "Goals", icon: Target, title: "Goal Progress Tracker" },
+      { path: "/strategic-planning", label: "Strategy", icon: HeartPulse, title: "Strategic Planning" },
+      { path: "/ai-advisor", label: "AI Advisor", icon: Sparkles, title: "AI Financial Advisor" },
+      { path: "/debt-paydown", label: "Debt Paydown", icon: CreditCard, title: "Debt Paydown Strategy" },
+      { path: "/insurance-gap", label: "Insurance", icon: Shield, title: "Insurance Gap Analysis" },
+      { path: "/risk-profiler", label: "Risk Profile", icon: Shield, title: "Risk Profiler" },
+      { path: "/scenarios", label: "Scenarios", icon: FolderOpen, title: "Saved Scenarios" },
     ]
   },
   {
-    name: "Property",
+    name: "Reports",
+    icon: FileText,
     items: [
-      { path: "/property-portfolio", label: "Properties", icon: Building2, title: "Property Portfolio" },
-      { path: "/property-comparison", label: "Property Comparison", icon: Home, title: "Property Comparison" },
-      { path: "/rental-yield-optimizer", label: "Yield Optimizer", icon: Target, title: "Rental Yield Optimizer" },
-    ]
-  },
-  {
-    name: "Shares",
-    items: [
-      { path: "/share-portfolio", label: "Share Portfolio", icon: LineChart, title: "Share Portfolio" },
-      { path: "/holdings-performance", label: "Performance", icon: Activity, title: "Holdings Performance" },
-      { path: "/portfolio-rebalancing", label: "Rebalancing", icon: ArrowLeftRight, title: "Portfolio Rebalancing" },
-    ]
-  },
-  {
-    name: "Tax & CGT",
-    items: [
-      { path: "/tax-analysis-sync", label: "Tax Analysis", icon: Calculator, title: "Tax Analysis (Synced)" },
-      { path: "/cgt", label: "CGT", icon: TrendingUp, title: "Capital Gains Tax" },
+      { path: "/tax-analysis-sync", label: "Tax Analysis", icon: Calculator, title: "Tax Analysis" },
+      { path: "/cgt", label: "Capital Gains", icon: TrendingUp, title: "Capital Gains Tax" },
       { path: "/tax-calendar", label: "Tax Calendar", icon: CalendarDays, title: "Tax Planning Calendar" },
-      { path: "/bas-calculator", label: "BAS Calculator", icon: FileCheck, title: "BAS Calculator" },
-      { path: "/historical-tax", label: "Tax History", icon: History, title: "Tax History" },
-      { path: "/tax-loss-harvesting", label: "Tax Harvesting", icon: Scissors, title: "Tax Loss Harvesting" },
+      { path: "/historical-tax", label: "Tax History", icon: History, title: "Historical Tax Comparison" },
+      { path: "/reports", label: "Generate Reports", icon: FileText, title: "Report Generator" },
+      { path: "/documents", label: "Documents", icon: FileText, title: "Documents" },
+      { path: "/data-import-export", label: "Import/Export", icon: Database, title: "Data Import & Export" },
     ]
   },
   {
     name: "Calculators",
+    icon: Calculator,
     items: [
       { path: "/loan-calculator", label: "Loan", icon: Landmark, title: "Loan Calculator" },
       { path: "/monte-carlo", label: "Monte Carlo", icon: BarChart3, title: "Monte Carlo Simulation" },
-      { path: "/division-7a", label: "Division 7A", icon: FileCheck, title: "Division 7A Calculator" },
+      { path: "/smsf-optimizer", label: "SMSF", icon: PiggyBank, title: "SMSF Optimizer" },
+      { path: "/sg-calculator", label: "Super Guarantee", icon: Users, title: "Superannuation Guarantee" },
       { path: "/salary-packaging", label: "Salary Packaging", icon: Briefcase, title: "Salary Packaging" },
       { path: "/dividend-reinvestment", label: "Dividends", icon: Repeat, title: "Dividend Reinvestment" },
-      { path: "/smsf-optimizer", label: "SMSF", icon: PiggyBank, title: "SMSF Optimizer" },
-      { path: "/sg-calculator", label: "SG Calculator", icon: Users, title: "Superannuation Guarantee" },
+      { path: "/tax-loss-harvesting", label: "Tax Harvesting", icon: Scissors, title: "Tax Loss Harvesting" },
+      { path: "/bas-calculator", label: "BAS", icon: FileCheck, title: "BAS Calculator" },
+      { path: "/division-7a", label: "Division 7A", icon: FileCheck, title: "Division 7A Calculator" },
+      { path: "/investment-comparison", label: "Compare Structures", icon: Scale, title: "Investment Structure Comparison" },
+      { path: "/property-comparison", label: "Compare Properties", icon: Home, title: "Property Comparison" },
+      { path: "/rental-yield-optimizer", label: "Rental Yield", icon: Target, title: "Rental Yield Optimizer" },
+      { path: "/portfolio-rebalancing", label: "Rebalancing", icon: ArrowLeftRight, title: "Portfolio Rebalancing" },
     ]
   },
   {
-    name: "Data & Reports",
+    name: "Settings",
+    icon: Settings,
     items: [
-      { path: "/documents", label: "Documents", icon: FileText, title: "Documents & Communications" },
+      { path: "/security", label: "Security", icon: Shield, title: "Security Settings" },
       { path: "/bank-feeds", label: "Bank Feeds", icon: Landmark, title: "Bank Feeds" },
-      { path: "/accounting-integrations", label: "Xero / MYOB", icon: Link2, title: "Accounting Integrations" },
-      { path: "/data-import-export", label: "Import / Export", icon: Database, title: "Data Import & Export" },
-      { path: "/reports", label: "Reports", icon: FileText, title: "Reports" },
-      { path: "/scenarios", label: "Saved Scenarios", icon: FolderOpen, title: "Saved Scenarios" },
+      { path: "/accounting-integrations", label: "Integrations", icon: Link2, title: "Accounting Integrations" },
       { path: "/calculation-methodology", label: "Methodology", icon: BookOpen, title: "Calculation Methodology" },
+      { path: "/onboarding", label: "Setup Wizard", icon: Rocket, title: "Setup Wizard" },
     ]
   }
 ];
 
-// Adviser Mode Navigation
+// Adviser Mode Navigation (6 sections)
 const adviserNavGroups = [
   {
-    name: "Adviser Hub",
+    name: "Dashboard",
+    icon: LayoutDashboard,
     items: [
-      { path: "/adviser-dashboard", label: "Client Overview", icon: Briefcase, title: "Adviser Dashboard" },
+      { path: "/adviser-dashboard", label: "Overview", icon: Briefcase, title: "Adviser Dashboard" },
+      { path: "/daily-briefing", label: "Daily Briefing", icon: Sun, title: "Daily Briefing" },
+      { path: "/decision-engine", label: "Health Score", icon: Zap, title: "Financial Health Score" },
+    ]
+  },
+  {
+    name: "Clients",
+    icon: Users,
+    items: [
       { path: "/client-crm", label: "Client CRM", icon: Users, title: "Client Relationship Management" },
       { path: "/practice-management", label: "Practice", icon: ClipboardList, title: "Practice Management" },
       { path: "/collaboration", label: "Team", icon: UserPlus, title: "Collaboration" },
@@ -159,55 +176,53 @@ const adviserNavGroups = [
     ]
   },
   {
-    name: "Client Tools",
+    name: "Finances",
+    icon: Wallet,
     items: [
-      { path: "/decision-engine", label: "Decision Engine", icon: Zap, title: "Decision Engine" },
-      { path: "/life-timeline", label: "Life Timeline", icon: Clock, title: "Life Timeline Planning" },
-      { path: "/goal-tracker", label: "Goal Tracker", icon: Target, title: "Goal Progress Tracker" },
-      { path: "/ai-advisor", label: "AI Advisor", icon: Sparkles, title: "AI Financial Advisor" },
-      { path: "/daily-briefing", label: "Daily Briefing", icon: Sun, title: "Daily Briefing" },
-      { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard, title: "Dashboard" },
-    ]
-  },
-  {
-    name: "Analysis",
-    items: [
-      { path: "/tax-analysis-sync", label: "Tax Analysis", icon: Calculator, title: "Tax Analysis" },
-      { path: "/cgt", label: "CGT", icon: TrendingUp, title: "Capital Gains Tax" },
-      { path: "/strategic-planning", label: "Strategic Planning", icon: HeartPulse, title: "Strategic Planning" },
-      { path: "/investment-comparison", label: "Investment Compare", icon: Scale, title: "Investment Structure Comparison" },
-      { path: "/portfolio-aggregator", label: "Portfolio Aggregator", icon: Wallet, title: "Portfolio Aggregation" },
-      { path: "/risk-profiler", label: "Risk Profiler", icon: Shield, title: "Risk Profiler" },
-    ]
-  },
-  {
-    name: "Portfolios",
-    items: [
-      { path: "/property-portfolio", label: "Properties", icon: Building2, title: "Property Portfolio" },
+      { path: "/family-wealth", label: "Net Worth", icon: Eye, title: "Net Worth & Balance Sheet" },
+      { path: "/property-portfolio", label: "Property", icon: Building2, title: "Property Portfolio" },
       { path: "/share-portfolio", label: "Shares", icon: LineChart, title: "Share Portfolio" },
-      { path: "/budget", label: "Budget", icon: Wallet, title: "Budget" },
+      { path: "/portfolio-aggregator", label: "All Accounts", icon: Link2, title: "Portfolio Aggregation" },
+      { path: "/budget", label: "Cashflow", icon: Wallet, title: "Budget & Cashflow" },
+    ]
+  },
+  {
+    name: "Planning",
+    icon: Target,
+    items: [
+      { path: "/life-timeline", label: "Life Timeline", icon: Clock, title: "Life Timeline Planning" },
+      { path: "/goal-tracker", label: "Goals", icon: Target, title: "Goal Progress Tracker" },
+      { path: "/strategic-planning", label: "Strategy", icon: HeartPulse, title: "Strategic Planning" },
+      { path: "/ai-advisor", label: "AI Advisor", icon: Sparkles, title: "AI Financial Advisor" },
+      { path: "/risk-profiler", label: "Risk Profile", icon: Shield, title: "Risk Profiler" },
+    ]
+  },
+  {
+    name: "Reports",
+    icon: FileText,
+    items: [
+      { path: "/revenue-billing", label: "Revenue & Billing", icon: Receipt, title: "Revenue & Billing" },
+      { path: "/tax-analysis-sync", label: "Tax Analysis", icon: Calculator, title: "Tax Analysis" },
+      { path: "/cgt", label: "Capital Gains", icon: TrendingUp, title: "Capital Gains Tax" },
+      { path: "/reports", label: "Generate Reports", icon: FileText, title: "Report Generator" },
+      { path: "/documents", label: "Documents", icon: FileText, title: "Documents" },
+      { path: "/data-import-export", label: "Import/Export", icon: Database, title: "Data Import & Export" },
     ]
   },
   {
     name: "Calculators",
+    icon: Calculator,
     items: [
       { path: "/loan-calculator", label: "Loan", icon: Landmark, title: "Loan Calculator" },
       { path: "/debt-paydown", label: "Debt Paydown", icon: CreditCard, title: "Debt Paydown Planner" },
       { path: "/insurance-gap", label: "Insurance Gap", icon: Shield, title: "Insurance Gap Analysis" },
       { path: "/smsf-optimizer", label: "SMSF", icon: PiggyBank, title: "SMSF Optimizer" },
-    ]
-  },
-  {
-    name: "Reports",
-    items: [
-      { path: "/revenue-billing", label: "Revenue & Billing", icon: Receipt, title: "Revenue & Billing" },
-      { path: "/documents", label: "Documents", icon: FileText, title: "Documents & Communications" },
-      { path: "/data-import-export", label: "Import / Export", icon: Database, title: "Data Import & Export" },
-      { path: "/reports", label: "Reports", icon: FileText, title: "Reports" },
+      { path: "/monte-carlo", label: "Monte Carlo", icon: BarChart3, title: "Monte Carlo Simulation" },
     ]
   },
   {
     name: "Settings",
+    icon: Settings,
     items: [
       { path: "/security", label: "Security", icon: Shield, title: "Security Settings" },
     ]
