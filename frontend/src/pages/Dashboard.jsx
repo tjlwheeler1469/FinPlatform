@@ -160,7 +160,7 @@ const Dashboard = () => {
               simulations: 1000
             }
           }),
-          axios.post(`${API}/decision/health-score`, {
+          axios.post(`${API}/decision-engine/health-score`, {
             age: 45,
             current_income: portfolio.personal.taxableIncome,
             annual_expenses: 120000,
