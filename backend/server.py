@@ -6039,6 +6039,304 @@ async def get_practice_overview():
     
     return overview
 
+# ==================== NET WORTH & FINANCIAL HISTORY ENDPOINTS ====================
+
+class NetWorthSnapshot(BaseModel):
+    household_id: str
+    date: str
+    net_worth: float
+    total_assets: float
+    total_liabilities: float
+    breakdown: Dict[str, float] = {}
+
+@api_router.post("/trends/net-worth/snapshot")
+async def save_net_worth_snapshot(snapshot: NetWorthSnapshot):
+    """Save a net worth snapshot for historical tracking"""
+    snapshot_dict = snapshot.model_dump()
+    snapshot_dict["created_at"] = datetime.now(timezone.utc).isoformat()
+    
+    # Upsert - update if exists for same date, else insert
+    await db.net_worth_history.update_one(
+        {"household_id": snapshot.household_id, "date": snapshot.date},
+        {"$set": snapshot_dict},
+        upsert=True
+    )
+    
+    return {"success": True, "date": snapshot.date}
+
+@api_router.get("/trends/net-worth/{household_id}")
+async def get_net_worth_history(household_id: str, months: int = 24):
+    """Get net worth history for a household"""
+    
+    # Try to get real data from MongoDB
+    history = await db.net_worth_history.find(
+        {"household_id": household_id},
+        {"_id": 0}
+    ).sort("date", 1).to_list(months)
+    
+    if history and len(history) >= 6:
+        # Use real data if we have at least 6 months
+        return {
+            "household_id": household_id,
+            "history": history,
+            "source": "database",
+            "data_points": len(history)
+        }
+    
+    # Generate demo data if no real data exists
+    current_net_worth = 1978000  # Wheeler family default
+    data = []
+    now = datetime.now()
+    net_worth = current_net_worth * 0.75
+    
+    for i in range(months, -1, -1):
+        date = datetime(now.year, now.month, 1) - timedelta(days=i*30)
+        monthly_growth = 0.005 + (np.random.random() * 0.015)
+        volatility = (np.random.random() - 0.5) * 0.02
+        net_worth = net_worth * (1 + monthly_growth + volatility)
+        
+        assets = net_worth * 1.45
+        liabilities = assets - net_worth
+        
+        data.append({
+            "date": date.strftime("%Y-%m"),
+            "net_worth": round(net_worth),
+            "total_assets": round(assets),
+            "total_liabilities": round(liabilities)
+        })
+    
+    return {
+        "household_id": household_id,
+        "history": data,
+        "source": "generated",
+        "data_points": len(data)
+    }
+
+# ==================== DEBT PAYDOWN PERSISTENCE ====================
+
+class DebtItem(BaseModel):
+    debt_id: str = Field(default_factory=lambda: f"debt_{uuid.uuid4().hex[:8]}")
+    household_id: str
+    name: str
+    debt_type: str  # mortgage, personal, car, credit
+    balance: float
+    interest_rate: float
+    minimum_payment: float
+    term_months: Optional[int] = None
+    start_date: Optional[str] = None
+
+@api_router.post("/planning/debts")
+async def save_debt(debt: DebtItem):
+    """Save or update a debt item"""
+    debt_dict = debt.model_dump()
+    debt_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.debts.update_one(
+        {"debt_id": debt.debt_id},
+        {"$set": debt_dict},
+        upsert=True
+    )
+    
+    return {"success": True, "debt_id": debt.debt_id}
+
+@api_router.get("/planning/debts/{household_id}")
+async def get_debts(household_id: str):
+    """Get all debts for a household"""
+    
+    debts = await db.debts.find(
+        {"household_id": household_id},
+        {"_id": 0}
+    ).to_list(50)
+    
+    if debts:
+        total_debt = sum(d.get("balance", 0) for d in debts)
+        total_min_payment = sum(d.get("minimum_payment", 0) for d in debts)
+        return {
+            "household_id": household_id,
+            "debts": debts,
+            "total_debt": total_debt,
+            "total_minimum_payment": total_min_payment,
+            "source": "database"
+        }
+    
+    # Return demo data if no debts saved
+    demo_debts = [
+        {
+            "debt_id": "debt_home",
+            "household_id": household_id,
+            "name": "Home Mortgage",
+            "debt_type": "mortgage",
+            "balance": 720000,
+            "interest_rate": 6.29,
+            "minimum_payment": 4800,
+            "term_months": 300
+        },
+        {
+            "debt_id": "debt_inv",
+            "household_id": household_id,
+            "name": "Investment Loan",
+            "debt_type": "mortgage",
+            "balance": 222000,
+            "interest_rate": 6.89,
+            "minimum_payment": 1650,
+            "term_months": 240
+        },
+        {
+            "debt_id": "debt_car",
+            "household_id": household_id,
+            "name": "Car Loan",
+            "debt_type": "car",
+            "balance": 25000,
+            "interest_rate": 7.99,
+            "minimum_payment": 500,
+            "term_months": 60
+        }
+    ]
+    
+    return {
+        "household_id": household_id,
+        "debts": demo_debts,
+        "total_debt": 967000,
+        "total_minimum_payment": 6950,
+        "source": "demo"
+    }
+
+@api_router.delete("/planning/debts/{debt_id}")
+async def delete_debt(debt_id: str):
+    """Delete a debt item"""
+    result = await db.debts.delete_one({"debt_id": debt_id})
+    return {"success": result.deleted_count > 0, "debt_id": debt_id}
+
+# ==================== INSURANCE COVERAGE PERSISTENCE ====================
+
+class InsuranceCoverage(BaseModel):
+    coverage_id: str = Field(default_factory=lambda: f"ins_{uuid.uuid4().hex[:8]}")
+    household_id: str
+    insurance_type: str  # life, income, tpd, trauma
+    provider: Optional[str] = None
+    policy_number: Optional[str] = None
+    cover_amount: float
+    premium_monthly: float = 0
+    premium_frequency: str = "monthly"
+    expiry_date: Optional[str] = None
+
+@api_router.post("/planning/insurance")
+async def save_insurance(coverage: InsuranceCoverage):
+    """Save or update insurance coverage"""
+    coverage_dict = coverage.model_dump()
+    coverage_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.insurance_coverage.update_one(
+        {"coverage_id": coverage.coverage_id},
+        {"$set": coverage_dict},
+        upsert=True
+    )
+    
+    return {"success": True, "coverage_id": coverage.coverage_id}
+
+@api_router.get("/planning/insurance/{household_id}")
+async def get_insurance_coverage(household_id: str):
+    """Get all insurance coverage for a household"""
+    
+    coverage = await db.insurance_coverage.find(
+        {"household_id": household_id},
+        {"_id": 0}
+    ).to_list(20)
+    
+    if coverage:
+        return {
+            "household_id": household_id,
+            "coverage": coverage,
+            "source": "database"
+        }
+    
+    # Return demo data
+    demo_coverage = [
+        {
+            "coverage_id": "ins_life",
+            "household_id": household_id,
+            "insurance_type": "life",
+            "cover_amount": 750000,
+            "premium_monthly": 85
+        },
+        {
+            "coverage_id": "ins_income",
+            "household_id": household_id,
+            "insurance_type": "income",
+            "cover_amount": 8000,  # Monthly benefit
+            "premium_monthly": 120
+        },
+        {
+            "coverage_id": "ins_tpd",
+            "household_id": household_id,
+            "insurance_type": "tpd",
+            "cover_amount": 500000,
+            "premium_monthly": 65
+        },
+        {
+            "coverage_id": "ins_trauma",
+            "household_id": household_id,
+            "insurance_type": "trauma",
+            "cover_amount": 150000,
+            "premium_monthly": 95
+        }
+    ]
+    
+    return {
+        "household_id": household_id,
+        "coverage": demo_coverage,
+        "source": "demo"
+    }
+
+# ==================== REVENUE & BILLING HISTORY ====================
+
+@api_router.get("/billing/revenue/{adviser_id}")
+async def get_adviser_revenue(adviser_id: str, months: int = 12):
+    """Get revenue history for an adviser"""
+    
+    # Try to get real data
+    revenue_history = await db.adviser_revenue.find(
+        {"adviser_id": adviser_id},
+        {"_id": 0}
+    ).sort("month", -1).to_list(months)
+    
+    if revenue_history:
+        return {
+            "adviser_id": adviser_id,
+            "history": revenue_history,
+            "source": "database"
+        }
+    
+    # Generate demo revenue data
+    now = datetime.now()
+    history = []
+    
+    for i in range(months - 1, -1, -1):
+        date = datetime(now.year, now.month, 1) - timedelta(days=i*30)
+        
+        # Simulate revenue with seasonality
+        base_revenue = 110000
+        seasonal = 1 + 0.1 * np.sin(2 * np.pi * date.month / 12)
+        volatility = 1 + (np.random.random() - 0.5) * 0.15
+        
+        advice_fees = base_revenue * 0.6 * seasonal * volatility
+        service_fees = base_revenue * 0.25 * seasonal * volatility
+        commissions = base_revenue * 0.15 * seasonal * volatility
+        
+        history.append({
+            "month": date.strftime("%Y-%m"),
+            "advice_fees": round(advice_fees),
+            "service_fees": round(service_fees),
+            "commissions": round(commissions),
+            "total": round(advice_fees + service_fees + commissions)
+        })
+    
+    return {
+        "adviser_id": adviser_id,
+        "history": history,
+        "source": "generated"
+    }
+
 @api_router.get("/")
 async def root():
     return {"message": "Australian Investment Analyzer API", "version": "1.0.0"}
