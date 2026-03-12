@@ -195,6 +195,7 @@ Build an app that analyses all options for personal and business investment in A
 52. ~~Phase 2: Digital Onboarding~~ ✅ DONE (March 2026) - 7-section fact-find forms (Personal, Employment, Assets, Liabilities, Insurance, Goals, Risk)
 53. ~~Phase 3: MFA Authentication~~ ✅ DONE (March 2026) - TOTP-based two-factor authentication with backup codes
 54. ~~Phase 3: Security Settings~~ ✅ DONE (March 2026) - Password change, session management, activity log, security preferences
+55. ~~Database Migration~~ ✅ DONE (March 2026) - Fact-find, E-signatures, MFA now persist to MongoDB with localStorage fallback
 
 - ✅ **Phase 1: Adviser Portal Core Enhancements** (March 2026)
   - Portfolio Rebalancing with 5 risk profiles
