@@ -30,7 +30,9 @@ import {
   FileText,
   Pen,
   X,
-  ExternalLink
+  ExternalLink,
+  ChevronRight,
+  ChevronLeft
 } from "lucide-react";
 import { toast } from "sonner";
 
