@@ -191,6 +191,10 @@ Build an app that analyses all options for personal and business investment in A
 48. ~~Phase 1: Workflow Automation~~ ✅ DONE (March 2026) - 4 workflow templates with client management
 49. ~~Phase 1: Portfolio Rebalancing~~ ✅ DONE (March 2026) - 5 risk profiles, drift analysis, trade suggestions
 50. ~~Phase 1: Compliance Audit Tools~~ ✅ DONE (March 2026) - Activity logging, KYC/AML checklists, AFSL compliance
+51. ~~Phase 2: DocuSign Integration~~ ✅ DONE (March 2026) - MOCK e-signature with send/sign/view functionality
+52. ~~Phase 2: Digital Onboarding~~ ✅ DONE (March 2026) - 7-section fact-find forms (Personal, Employment, Assets, Liabilities, Insurance, Goals, Risk)
+53. ~~Phase 3: MFA Authentication~~ ✅ DONE (March 2026) - TOTP-based two-factor authentication with backup codes
+54. ~~Phase 3: Security Settings~~ ✅ DONE (March 2026) - Password change, session management, activity log, security preferences
 
 - ✅ **Phase 1: Adviser Portal Core Enhancements** (March 2026)
   - Portfolio Rebalancing with 5 risk profiles
