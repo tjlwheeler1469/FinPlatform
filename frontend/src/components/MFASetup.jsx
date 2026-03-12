@@ -253,7 +253,6 @@ const MFASetup = ({ userId, userEmail, onMFAEnabled, onMFADisabled }) => {
     }
     
     setMfaStatus(updatedStatus);
-    }));
     toast.success("New backup codes generated");
     setShowBackupCodes(true);
   };
@@ -262,6 +261,16 @@ const MFASetup = ({ userId, userEmail, onMFAEnabled, onMFADisabled }) => {
   const formatSecret = (secret) => {
     return secret?.match(/.{1,4}/g)?.join(' ') || '';
   };
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-12">
+        <Loader2 className="h-8 w-8 animate-spin text-[#0F392B]" />
+        <span className="ml-2">Loading MFA status...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6" data-testid="mfa-setup">
@@ -285,6 +294,9 @@ const MFASetup = ({ userId, userEmail, onMFAEnabled, onMFADisabled }) => {
                   ) : (
                     <Badge variant="outline" className="text-amber-600 border-amber-600">Not Enabled</Badge>
                   )}
+                  <Badge variant="outline" className="text-xs flex items-center gap-1 ml-2">
+                    <Database className="h-3 w-3" /> MongoDB
+                  </Badge>
                 </CardTitle>
                 <CardDescription>
                   Add an extra layer of security to your account
