@@ -8,7 +8,7 @@ import { toast } from "sonner";
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-gray-50">
     <div className="text-center">
-      <div className="w-8 h-8 border-4 border-[#0F392B] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+      <div className="w-8 h-8 border-4 border-[#1a2744] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
       <p className="text-muted-foreground">Loading...</p>
     </div>
   </div>
