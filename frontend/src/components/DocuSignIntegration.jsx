@@ -395,6 +395,16 @@ const DocuSignIntegration = ({ onSignatureComplete }) => {
   const completedCount = signatureRequests.filter(r => r.status === "completed").length;
   const expiredCount = signatureRequests.filter(r => r.status === "expired").length;
 
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-12">
+        <Loader2 className="h-8 w-8 animate-spin text-[#0F392B]" />
+        <span className="ml-2">Loading signature requests...</span>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6" data-testid="docusign-integration">
       {/* Header */}
@@ -404,7 +414,12 @@ const DocuSignIntegration = ({ onSignatureComplete }) => {
             <FileSignature className="h-5 w-5 text-[#D4AF37]" />
             E-Signature Management
           </h2>
-          <p className="text-sm text-muted-foreground">Send and manage document signatures (DocuSign MOCK)</p>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span>Send and manage document signatures (DocuSign MOCK)</span>
+            <Badge variant="outline" className="text-xs flex items-center gap-1">
+              <Database className="h-3 w-3" /> MongoDB
+            </Badge>
+          </div>
         </div>
         <Dialog open={showSendDialog} onOpenChange={setShowSendDialog}>
           <DialogTrigger asChild>
