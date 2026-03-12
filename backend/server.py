@@ -2870,7 +2870,7 @@ def verify_password(password: str, stored_hash: str) -> bool:
         salt, hash_value = stored_hash.split(':')
         hashed = hashlib.pbkdf2_hmac('sha256', password.encode(), salt.encode(), 100000)
         return hashed.hex() == hash_value
-    except:
+    except (ValueError, AttributeError):
         return False
 
 def generate_client_token() -> str:
@@ -4346,7 +4346,7 @@ def calculate_financial_health_score(profile: Dict[str, Any]) -> Dict[str, Any]:
         property_pct = property_value / total_investable
         super_pct = super_balance / total_investable
         investment_pct = investment_portfolio / total_investable
-        cash_pct = cash / total_investable
+        _ = cash / total_investable  # cash_pct - tracked for complete picture
         
         # Check for over-concentration
         max_allocation = max(property_pct, super_pct, investment_pct)
@@ -4609,11 +4609,11 @@ def generate_top_actions(profile: Dict[str, Any]) -> List[Dict[str, Any]]:
     """
     actions = []
     
-    age = profile.get("age", 45)
+    _ = profile.get("age", 45)  # age - available for future enhancements
     current_income = profile.get("current_income", 185000)
-    super_balance = profile.get("super_balance", 580000)
+    _ = profile.get("super_balance", 580000)  # super_balance - tracked for context
     savings_rate = profile.get("savings_rate", 0.15)
-    total_debt = profile.get("total_debt", 942000)
+    _ = profile.get("total_debt", 942000)  # total_debt - tracked for context
     property_debt = profile.get("property_debt", 942000)
     cash_savings = profile.get("cash_savings", 225000)
     annual_expenses = profile.get("annual_expenses", 120000)
@@ -4732,7 +4732,7 @@ def calculate_life_timeline(timeline: Dict[str, Any]) -> Dict[str, Any]:
     events = timeline.get("events", [])
     current_assets = timeline.get("current_assets", 2920000)
     current_debt = timeline.get("current_debt", 942000)
-    annual_income = timeline.get("annual_income", 185000)
+    _ = timeline.get("annual_income", 185000)  # annual_income - available for future enhancements
     annual_savings = timeline.get("annual_savings", 50000)
     expected_return = timeline.get("expected_return", 0.07)
     inflation_rate = timeline.get("inflation_rate", 0.025)
