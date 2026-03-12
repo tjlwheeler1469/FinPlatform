@@ -78,6 +78,7 @@ const NetWorthTrend = lazy(() => import("@/pages/NetWorthTrend"));
 const InsuranceGapAnalysis = lazy(() => import("@/pages/InsuranceGapAnalysis"));
 const DebtPaydownPlanner = lazy(() => import("@/pages/DebtPaydownPlanner"));
 const RevenueBilling = lazy(() => import("@/pages/RevenueBilling"));
+const ScenarioComparison = lazy(() => import("@/pages/ScenarioComparison"));
 
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
