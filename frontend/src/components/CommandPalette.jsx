@@ -134,6 +134,7 @@ const CommandPalette = ({ open, onOpenChange }) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg p-0 gap-0 overflow-hidden">
+        <DialogTitle className="sr-only">Search pages and tools</DialogTitle>
         {/* Search Input */}
         <div className="flex items-center border-b px-3 py-2">
           <Search className="h-4 w-4 text-muted-foreground mr-2" />
