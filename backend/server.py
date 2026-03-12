@@ -4203,6 +4203,14 @@ async def compare_investments(data: Dict[str, Any]):
         elif result["after_tax_return"] > best_by_structure[structure]["after_tax_return"]:
             best_by_structure[structure] = result
     
+    # Sanitize tax structures for JSON (replace float('inf') with None)
+    import copy
+    tax_structures_json = copy.deepcopy(TAX_STRUCTURES)
+    if "personal" in tax_structures_json and "income_tax_brackets" in tax_structures_json["personal"]:
+        for bracket in tax_structures_json["personal"]["income_tax_brackets"]:
+            if bracket.get("threshold") == float('inf'):
+                bracket["threshold"] = None
+    
     return {
         "parameters": {
             "investment_amount": investment_amount,
@@ -4214,7 +4222,7 @@ async def compare_investments(data: Dict[str, Any]):
         "best_by_asset_class": best_by_asset,
         "best_by_tax_structure": best_by_structure,
         "asset_classes": ASSET_CLASSES,
-        "tax_structures": TAX_STRUCTURES
+        "tax_structures": tax_structures_json
     }
 
 @api_router.get("/strategic/tax-structures")
