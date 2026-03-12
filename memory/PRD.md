@@ -189,6 +189,34 @@ Build an app that analyses all options for personal and business investment in A
 
 ### Session Continuation (March 2026 - LATEST)
 
+- ✅ **PDF Report Generation** (jsPDF with autoTable)
+  - Portfolio Summary - Single page with financial overview, asset allocation, top holdings
+  - Statement of Advice - Multi-page with cover, situation, goals, recommendations, fees
+  - Tax Summary - Income, deductions, CGT events, tax payable summary
+  - Professional Wheeler Financial branding with green header and gold accents
+  - Auto-download on generation with toast notification
+
+- ✅ **Document Manager** (/documents)
+  - Document list with search and filter by type
+  - Generate Report dialog with 3 report types
+  - Star, Archive, Delete document actions
+  - Download regenerates PDF with current portfolio data
+  - Documents persisted to localStorage
+
+- ✅ **Client Messaging** (Email-style inbox)
+  - Compose new message dialog
+  - Folder navigation: Inbox, Starred, Sent, Archive
+  - Unread count badges
+  - Full message view with Reply/Star/Archive/Delete
+  - Attachment indicators
+  - Messages persisted to localStorage
+
+- ✅ **Performance Optimizations**
+  - React.lazy for 40+ pages (lazy loading)
+  - Suspense with loading spinner fallback
+  - Core pages (Dashboard, ModeSelector) loaded immediately
+  - Reduced initial bundle size
+
 - ✅ **Live Price Updates** (Share Portfolio)
   - "Start Live" button activates 30-second auto-updates
   - Realistic price fluctuations (2% max change with slight upward bias)
