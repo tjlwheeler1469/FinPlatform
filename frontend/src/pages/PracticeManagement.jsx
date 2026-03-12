@@ -267,12 +267,18 @@ const PracticeManagement = () => {
 
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-6 w-full">
+          <TabsList className="grid grid-cols-4 lg:grid-cols-8 w-full">
             <TabsTrigger value="dashboard" data-testid="tab-practice-dashboard">Dashboard</TabsTrigger>
             <TabsTrigger value="tasks" data-testid="tab-tasks">Tasks</TabsTrigger>
             <TabsTrigger value="meetings" data-testid="tab-meetings">Meetings</TabsTrigger>
-            <TabsTrigger value="time" data-testid="tab-time">Time Tracking</TabsTrigger>
+            <TabsTrigger value="time" data-testid="tab-time">Time</TabsTrigger>
             <TabsTrigger value="billing" data-testid="tab-billing">Billing</TabsTrigger>
+            <TabsTrigger value="workflows" data-testid="tab-workflows" className="flex items-center gap-1">
+              <Zap className="h-3 w-3" /> Automation
+            </TabsTrigger>
+            <TabsTrigger value="audit" data-testid="tab-audit" className="flex items-center gap-1">
+              <Activity className="h-3 w-3" /> Audit
+            </TabsTrigger>
             <TabsTrigger value="compliance" data-testid="tab-compliance">Compliance</TabsTrigger>
           </TabsList>
 
