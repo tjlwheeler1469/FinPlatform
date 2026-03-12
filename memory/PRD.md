@@ -277,6 +277,95 @@ Build an app that analyses all options for personal and business investment in A
   - Portfolio Rebalancing added to Shares section in sidebar
   - ArrowLeftRight icon for Rebalancing nav item
   - Practice Management tabs expanded to 8: Dashboard, Tasks, Meetings, Time, Billing, Automation, Audit, Compliance
+  - Security Settings page added to Settings section
+
+### Phase 2: Client Portal Enhancements (March 2026 - COMPLETE)
+
+- ✅ **DocuSign MOCK Integration** (Client Portal - E-Sign tab)
+  - **Document Templates**: SOA, Fee Disclosure, KYC Form, Privacy Consent, Authority to Proceed, Investment Policy Agreement
+  - **Send for Signature**: Select document template and client, add optional message
+  - **Signature Requests List**: Shows Pending/Completed/Expired/Cancelled status
+  - **Sign Now**: Mock signing interface with document preview
+  - **Signature Input**: Type full legal name as signature with preview
+  - **Complete Signature**: Finalizes document signing
+  - Stats cards showing: Pending, Completed, Expired counts
+  - Download completed documents, Resend expired requests
+  - MOCK integration notice with DocuSign developer link
+
+- ✅ **Digital Onboarding / Client Fact-Find** (Client Portal - Onboarding tab)
+  - **7 Fact-Find Sections**:
+    1. **Personal Details**: Title, Name, DOB, Marital Status, TFN, Contact Details, Dependants
+    2. **Employment & Income**: Employment status, Occupation, Employer, Salary, Bonus, Other Income, Rental Income, Dividends, Centrelink
+    3. **Assets**: Cash, Term Deposits, Shares, Super, Property, Vehicles, Contents, Business
+    4. **Liabilities**: Home Loan, Investment Loan, Car Loan, Personal Loan, Credit Cards, HECS/HELP
+    5. **Insurance & Estate**: Life, TPD, Income Protection, Trauma, Will, Power of Attorney, Enduring Guardian
+    6. **Goals & Objectives**: Retirement Age, Retirement Income, Short-term Goals, Long-term Goals
+    7. **Risk Profile**: 8 investment questions with scoring to determine risk profile
+  - **Risk Profiles**: Conservative, Moderately Conservative, Balanced, Growth, High Growth
+  - Section navigation with progress indicators
+  - Overall progress bar showing completion percentage
+  - Save Progress button with localStorage persistence
+  - Previous/Next navigation between sections
+
+### Phase 3: Security & Authentication (March 2026 - COMPLETE)
+
+- ✅ **Security Settings Page** (/security)
+  - **5 Tabs**: Two-Factor Auth, Password, Sessions, Activity Log, Preferences
+
+- ✅ **MFA with TOTP** (Two-Factor Auth tab)
+  - Enable/Disable 2FA toggle
+  - Mock QR code for authenticator app setup
+  - Manual code entry with formatted display (groups of 4)
+  - Copy to clipboard button
+  - 6-digit verification code input
+  - Backup codes display (10 codes)
+  - Regenerate backup codes
+  - Security recommendations checklist
+
+- ✅ **Password Management** (Password tab)
+  - Current password, New password, Confirm password fields
+  - Show/hide password toggles
+  - Password requirements checklist (8+ chars, uppercase, number, special)
+  - Change Password button
+
+- ✅ **Session Management** (Sessions tab)
+  - Active sessions list with device, location, IP, last active
+  - Current session badge
+  - Revoke individual sessions
+  - Sign Out All Other Devices button
+
+- ✅ **Security Activity Log** (Activity Log tab)
+  - Security events history (login, password change, MFA enabled, failed login)
+  - Success/Failed status badges
+  - Device and location info
+  - Timestamp
+
+- ✅ **Security Preferences** (Preferences tab)
+  - Login Alerts toggle
+  - New Device Alerts toggle
+  - Require MFA for Sensitive Actions toggle
+  - Session Timeout slider (minutes)
+
+### Backend APIs Added (March 2026)
+
+- `/api/factfind` (POST) - Save client fact-find data
+- `/api/factfind/{client_id}` (GET) - Get client fact-find data
+- `/api/factfinds` (GET) - List all fact-finds
+- `/api/esignature/send` (POST) - Send document for e-signature
+- `/api/esignature/requests` (GET) - List signature requests
+- `/api/esignature/sign/{request_id}` (POST) - Sign a document
+- `/api/esignature/{request_id}` (GET) - Get signature request details
+- `/api/mfa/setup` (POST) - Setup or update MFA
+- `/api/mfa/{user_id}` (GET) - Get MFA status
+- `/api/mfa/verify` (POST) - Verify MFA code
+- `/api/mfa/disable` (POST) - Disable MFA
+
+### New Files Created (March 2026 - Phase 2 & 3)
+
+- `/app/frontend/src/components/DocuSignIntegration.jsx` - MOCK DocuSign e-signature component
+- `/app/frontend/src/components/DigitalOnboarding.jsx` - 7-section fact-find forms
+- `/app/frontend/src/components/MFASetup.jsx` - TOTP-based MFA setup component
+- `/app/frontend/src/pages/SecuritySettings.jsx` - Security settings page
 
 - ✅ **PDF Report Generation** (jsPDF with autoTable)
   - Portfolio Summary - Single page with financial overview, asset allocation, top holdings
