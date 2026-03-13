@@ -1,0 +1,144 @@
+{
+  "summary": "What-If Quick Toggle feature testing complete. All 12 tests passed. The What-If panel opens/closes correctly, all 4 sliders (Savings Rate 5-50%, Market Return 2-12%, Retirement Age 50-70, Inflation 1-6%) work with default values (15%, 7%, 60, 3%). When sliders are modified, the 'Modified' badge appears, 'Projected Impact' section shows Retirement Nest Egg, Monthly Savings, and Success Probability metrics with delta indicators. Reset button successfully resets all values. Save as Scenario button navigates to Scenarios page. Dashboard displays all key metrics correctly: Net Worth $1,978,000, Monthly Cashflow +$5,417, Goal Progress 3/4, Retirement Success 81%. Financial Health Score gauge shows 82/100. Navigation to AI Advisor and Scenarios pages works correctly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Scenarios page",
+        "issues": ["Console warnings about chart width/height being -1 - charts may not render correctly on initial load"]
+      }
+    ]
+  },
+  "passed_tests": [
+    "What-If toggle button opens panel on click",
+    "What-If toggle button closes panel on second click",
+    "Savings Rate slider present with data-testid='savings-rate-slider'",
+    "Market Return slider present with data-testid='market-return-slider'",
+    "Retirement Age slider present with data-testid='retirement-age-slider'",
+    "Inflation slider present with data-testid='inflation-slider'",
+    "Default values displayed: 15%, 7%, 60, 3%",
+    "Reset button present with data-testid='what-if-reset-btn'",
+    "Modified badge appears when slider values changed",
+    "Projected Impact section appears with modified values",
+    "Retirement Nest Egg metric displayed in impact section",
+    "Monthly Savings metric displayed in impact section",
+    "Success Probability metric displayed in impact section",
+    "Save as Scenario button appears when values modified",
+    "Save as Scenario button navigates to /scenarios page",
+    "Reset button resets all values to defaults",
+    "Modified badge removed after reset",
+    "Scenarios button navigates to /scenarios page",
+    "AI Advisor button navigates to /ai-advisor page",
+    "Sidebar navigation works correctly",
+    "Dashboard key metrics displayed: Net Worth $1,978,000",
+    "Dashboard key metrics displayed: Monthly Cashflow +$5,417",
+    "Dashboard key metrics displayed: Goal Progress 3/4",
+    "Dashboard key metrics displayed: Retirement Success 81%",
+    "Financial Health Score gauge shows 82/100",
+    "Top Actions section shows 4 recommendations with $ impact",
+    "Goal Progress section shows 4 goals with progress bars",
+    "Net Worth Trend chart renders",
+    "Backend Monte Carlo API returns projections correctly",
+    "Backend Health Score API returns score correctly"
+  ],
+  "test_report_links": [
+    "/app/test_reports/iteration_35.json"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "What-If feature implementation is complete and working correctly",
+    "Slider interactions trigger real-time recalculation of projected metrics",
+    "Impact calculations use client-side financial projection model as expected",
+    "Backend Monte Carlo simulation endpoint is called when whatIfParams change"
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "100% (2/2 API tests passed)",
+    "frontend": "100% (all What-If features working)"
+  },
+  "seed_data_creation": "None - using existing mock data",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "What-If Quick Toggle feature fully tested and working. Panel opens/closes with toggle button. All 4 sliders work: Savings Rate (5-50%, default 15%), Market Return (2-12%, default 7%), Retirement Age (50-70, default 60), Inflation (1-6%, default 3%). When modified, shows Projected Impact with Retirement Nest Egg, Monthly Savings, Success Probability. Reset button resets to defaults. Save as Scenario navigates to /scenarios. Compliance modal appears on first visit - dismiss by checking checkbox and clicking 'I Understand & Accept'.",
+  "mocked_apis": {
+    "note": "Dashboard and What-If calculations use MOCKED APIs that return calculated data",
+    "endpoints": [
+      "/api/decision-engine/health-score - returns calculated health score",
+      "/api/analyze/monte-carlo - returns simulated projections",
+      "/api/trends/net-worth/{household_id} - returns generated history data"
+    ]
+  },
+  "features_verified": {
+    "what_if_toggle": {
+      "toggle_button": true,
+      "panel_opens_closes": true,
+      "data_testid": "what-if-toggle-btn"
+    },
+    "what_if_sliders": {
+      "savings_rate": {
+        "present": true,
+        "range": "5-50%",
+        "default": "15%",
+        "data_testid": "savings-rate-slider"
+      },
+      "market_return": {
+        "present": true,
+        "range": "2-12%",
+        "default": "7%",
+        "data_testid": "market-return-slider"
+      },
+      "retirement_age": {
+        "present": true,
+        "range": "50-70",
+        "default": "60",
+        "data_testid": "retirement-age-slider"
+      },
+      "inflation": {
+        "present": true,
+        "range": "1-6%",
+        "default": "3%",
+        "data_testid": "inflation-slider"
+      }
+    },
+    "what_if_impact": {
+      "appears_when_modified": true,
+      "retirement_nest_egg": true,
+      "monthly_savings": true,
+      "success_probability": true,
+      "delta_indicators": true
+    },
+    "what_if_controls": {
+      "reset_button": {
+        "present": true,
+        "works": true,
+        "data_testid": "what-if-reset-btn"
+      },
+      "modified_badge": {
+        "appears_when_modified": true,
+        "removed_after_reset": true
+      },
+      "save_scenario_button": {
+        "appears_when_modified": true,
+        "navigates_to_scenarios": true,
+        "data_testid": "save-scenario-btn"
+      }
+    },
+    "dashboard_metrics": {
+      "net_worth": "$1,978,000",
+      "monthly_cashflow": "+$5,417",
+      "goal_progress": "3/4",
+      "retirement_success": "81%",
+      "financial_health_score": "82/100"
+    },
+    "navigation": {
+      "scenarios_button": true,
+      "ai_advisor_button": true,
+      "sidebar_navigation": true
+    }
+  }
+}
