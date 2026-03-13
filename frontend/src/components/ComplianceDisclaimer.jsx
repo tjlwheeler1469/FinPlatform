@@ -88,17 +88,6 @@ const COMPLIANCE_CONTENT = {
   ]
 };
 
-// Check if user has already acknowledged compliance
-const hasUserAcknowledged = () => {
-  try {
-    return localStorage.getItem(STORAGE_KEY) || 
-           localStorage.getItem(STORAGE_KEY_V2) || 
-           sessionStorage.getItem('compliance_session');
-  } catch {
-    return false;
-  }
-};
-
 // Set acknowledgement in both localStorage and sessionStorage for reliability
 const setAcknowledgement = () => {
   try {
@@ -106,18 +95,20 @@ const setAcknowledgement = () => {
     localStorage.setItem(STORAGE_KEY, timestamp);
     localStorage.setItem(STORAGE_KEY_V2, timestamp);
     sessionStorage.setItem('compliance_session', timestamp);
+    moduleHasAcknowledged = true;
   } catch (e) {
     console.warn('Could not persist compliance acknowledgement:', e);
+    moduleHasAcknowledged = true; // Still set in memory to prevent re-showing
   }
 };
 
 // Modal component shown on first visit
 export const ComplianceModal = ({ onAccept }) => {
   const [acknowledged, setAcknowledged] = useState(false);
-  const [open, setOpen] = useState(() => !hasUserAcknowledged());
+  const [open, setOpen] = useState(() => !moduleHasAcknowledged);
 
-  // Don't render anything if already acknowledged
-  if (!open) return null;
+  // Don't render anything if already acknowledged at module level or after closing
+  if (!open || moduleHasAcknowledged) return null;
 
   const handleAccept = () => {
     if (acknowledged) {
