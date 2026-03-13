@@ -140,6 +140,12 @@ The following data is currently MOCKED and not connected to live sources:
 - Stock prices (ASX mock data)
 - Property valuations
 - Bank account feeds
+- Connected Accounts display data
+
+**NOW REAL:**
+- ✅ Monte Carlo simulations (10,000 real iterations using numpy)
+- ✅ Financial Health Score calculations
+- ✅ Recommendation impact calculations
 
 ---
 
