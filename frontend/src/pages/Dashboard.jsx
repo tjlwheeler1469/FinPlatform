@@ -273,21 +273,43 @@ const Dashboard = () => {
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Retirement Success Probability</p>
                   <div className="flex items-baseline gap-3">
-                    <span className="text-5xl font-bold">{retirementProbability}%</span>
+                    <span className="text-5xl font-bold">{Math.round(retirementProbability)}%</span>
                     <Badge variant={retirementProbability >= 80 ? "default" : "secondary"} className={retirementProbability >= 80 ? "bg-green-500" : "bg-amber-500"}>
                       {retirementProbability >= 80 ? "On Track" : "Needs Attention"}
                     </Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-2">Based on 10,000 Monte Carlo simulations</p>
-                  <p className="text-sm mt-1">Target: <span className="font-medium">85%</span> • Gap: <span className="text-amber-600 font-medium">{85 - retirementProbability}%</span></p>
+                  <p className="text-sm text-muted-foreground mt-2">Based on {monteCarloResult?.simulations_run?.toLocaleString() || "10,000"} Monte Carlo simulations</p>
+                  <p className="text-sm mt-1">Target: <span className="font-medium">85%</span> • Gap: <span className={retirementProbability >= 85 ? "text-green-600" : "text-amber-600"} >{retirementProbability >= 85 ? "None" : `${Math.round(85 - retirementProbability)}%`}</span></p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm text-muted-foreground">Projected Balance at 60</p>
-                  <p className="text-2xl font-semibold">{formatCompact(3200000)}</p>
+                  <p className="text-sm text-muted-foreground">Projected Balance at {whatIfParams.retirementAge}</p>
+                  <p className="text-2xl font-semibold">{formatCompact(projectedBalance)}</p>
                   <p className="text-sm text-muted-foreground mt-2">Monthly Income</p>
-                  <p className="text-lg font-medium">{formatCurrency(10667)}/mo</p>
+                  <p className="text-lg font-medium">{formatCurrency(monthlyRetirementIncome)}/mo</p>
                 </div>
               </div>
+              
+              {/* Monte Carlo Stats */}
+              {monteCarloResult && (
+                <div className="mt-4 grid grid-cols-4 gap-3 p-3 bg-muted/30 rounded-lg text-sm">
+                  <div>
+                    <p className="text-muted-foreground text-xs">Best Case (95th)</p>
+                    <p className="font-medium text-green-600">{formatCompact(monteCarloResult.best_case)}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground text-xs">Median Outcome</p>
+                    <p className="font-medium">{formatCompact(monteCarloResult.median_outcome)}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground text-xs">Worst Case (5th)</p>
+                    <p className="font-medium text-red-600">{formatCompact(monteCarloResult.worst_case)}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground text-xs">Shortfall Risk</p>
+                    <p className="font-medium text-amber-600">{monteCarloResult.shortfall_risk}%</p>
+                  </div>
+                </div>
+              )}
               
               {/* Quick Scenario Comparison */}
               <div className="mt-6 pt-4 border-t">
