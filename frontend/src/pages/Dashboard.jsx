@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Slider } from "@/components/ui/slider";
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -31,7 +32,11 @@ import {
   TrendingUpIcon,
   Activity,
   ChevronRight,
-  Wallet
+  Wallet,
+  SlidersHorizontal,
+  ChevronDown,
+  ChevronUp,
+  RotateCcw
 } from "lucide-react";
 import { usePortfolio } from "@/App";
 import ChartContainer from "@/components/ChartContainer";
