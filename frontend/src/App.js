@@ -69,7 +69,9 @@ const SecuritySettings = lazy(() => import("@/pages/SecuritySettings"));
 const DataImportExportPage = lazy(() => import("@/pages/DataImportExportPage"));
 const InvestmentComparison = lazy(() => import("@/pages/InvestmentComparison"));
 const DecisionDashboard = lazy(() => import("@/pages/DecisionDashboard"));
+const DecisionEngine = lazy(() => import("@/pages/DecisionEngine"));
 const LifeTimeline = lazy(() => import("@/pages/LifeTimeline"));
+const LifeTimelinePlanner = lazy(() => import("@/pages/LifeTimelinePlanner"));
 const ClientCRM = lazy(() => import("@/pages/ClientCRM"));
 const GoalTracker = lazy(() => import("@/pages/GoalTracker"));
 const AIAdvisor = lazy(() => import("@/pages/AIAdvisor"));
@@ -79,6 +81,7 @@ const InsuranceGapAnalysis = lazy(() => import("@/pages/InsuranceGapAnalysis"));
 const DebtPaydownPlanner = lazy(() => import("@/pages/DebtPaydownPlanner"));
 const RevenueBilling = lazy(() => import("@/pages/RevenueBilling"));
 const ScenarioComparison = lazy(() => import("@/pages/ScenarioComparison"));
+const AdviceWorkflow = lazy(() => import("@/pages/AdviceWorkflow"));
 
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
