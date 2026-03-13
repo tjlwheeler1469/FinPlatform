@@ -110,8 +110,8 @@ const DecisionEngine = () => {
       };
 
       const [healthRes, recsRes] = await Promise.all([
-        axios.post(`${API}/decision-engine/health-score`, requestData),
-        axios.post(`${API}/decision-engine/recommendations`, requestData)
+        axios.post(`${API}/decision-engine/health-score-v2`, requestData),
+        axios.post(`${API}/decision-engine/recommendations-v2`, requestData)
       ]);
       
       setHealthScore(healthRes.data);
