@@ -1,11 +1,12 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Slider } from "@/components/ui/slider";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -38,10 +39,10 @@ import {
   RotateCcw,
   ArrowUpRight,
   DollarSign,
-  LineChart
+  LineChart,
+  Info
 } from "lucide-react";
 import { usePortfolio } from "@/App";
-import ChartContainer from "@/components/ChartContainer";
 import axios from "axios";
 import {
   AreaChart,
@@ -51,7 +52,9 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  ReferenceLine
+  ReferenceLine,
+  LineChart as RechartsLineChart,
+  Line
 } from "recharts";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -70,20 +73,6 @@ const formatCompact = (value) => {
   if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
   if (value >= 1000) return `$${(value / 1000).toFixed(0)}K`;
   return `$${value}`;
-};
-
-const COLORS = ['#1a2744', '#D4A84C', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'];
-
-// Goal icons mapping
-const GOAL_ICONS = {
-  retirement: PiggyBank,
-  house: Home,
-  education: GraduationCap,
-  travel: Plane,
-  emergency: Shield,
-  investment: TrendingUp,
-  debt: CreditCard,
-  default: Target
 };
 
 // Sample goals data
@@ -105,11 +94,11 @@ const DEFAULT_WHATIF = {
 const Dashboard = () => {
   const navigate = useNavigate();
   const { portfolio } = usePortfolio();
-  const [monteCarloData, setMonteCarloData] = useState(null);
   const [healthScore, setHealthScore] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
   const [netWorthProjection, setNetWorthProjection] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("overview");
   
   // What-If Toggle State
   const [showWhatIf, setShowWhatIf] = useState(false);
@@ -134,16 +123,7 @@ const Dashboard = () => {
           mortgage_balance: portfolio.summary.totalDebt
         };
 
-        const [monteCarloRes, healthRes, recsRes, projectionRes] = await Promise.all([
-          axios.post(`${API}/analyze/monte-carlo`, null, {
-            params: {
-              initial_value: portfolio.summary.netWorth,
-              expected_return: whatIfParams.marketReturn / 100,
-              volatility: 0.12,
-              years: whatIfParams.retirementAge - 45,
-              simulations: 1000
-            }
-          }),
+        const [healthRes, recsRes, projectionRes] = await Promise.all([
           axios.post(`${API}/decision-engine/health-score-v2`, requestData),
           axios.post(`${API}/decision-engine/recommendations-v2`, requestData),
           axios.get(`${API}/decision-engine/net-worth-projection`, {
@@ -156,7 +136,6 @@ const Dashboard = () => {
           })
         ]);
         
-        setMonteCarloData(monteCarloRes.data);
         setHealthScore(healthRes.data);
         setRecommendations(recsRes.data.recommendations || []);
         setNetWorthProjection(projectionRes.data || []);
@@ -203,47 +182,40 @@ const Dashboard = () => {
   
   const resetWhatIf = () => setWhatIfParams(DEFAULT_WHATIF);
 
-  const retirementProbability = monteCarloData?.success_probability || healthScore?.retirement_probability || 81;
+  const retirementProbability = healthScore?.retirement_probability || 81;
   const monthlyIncome = portfolio.personal.taxableIncome / 12;
   const monthlyExpenses = 10000;
   const monthlySavings = monthlyIncome - monthlyExpenses;
   const savingsRate = (monthlySavings / monthlyIncome) * 100;
-
-  // Total potential impact from recommendations
   const totalPotentialImpact = recommendations.reduce((sum, r) => sum + (r.impact_primary || 0), 0);
 
   return (
     <Layout>
       <div className="space-y-6" data-testid="dashboard">
-        {/* Header */}
+        {/* Clean Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">
-              Financial Decision Engine
+            <h1 className="text-2xl font-semibold text-foreground">
+              Financial Overview
             </h1>
-            <p className="text-muted-foreground mt-1">
-              AI-powered insights to optimize your wealth
+            <p className="text-sm text-muted-foreground mt-1">
+              Wheeler Family • Last updated today
             </p>
           </div>
           <div className="flex gap-2">
             <Button 
-              variant={showWhatIf ? "default" : "outline"}
+              variant="outline"
+              size="sm"
               onClick={() => setShowWhatIf(!showWhatIf)}
               data-testid="what-if-toggle-btn"
-              className={showWhatIf ? "bg-[#D4A84C] hover:bg-[#D4A84C]/90 text-[#1a2744]" : ""}
             >
               <SlidersHorizontal className="h-4 w-4 mr-2" />
-              What-If
-              {showWhatIf ? <ChevronUp className="h-4 w-4 ml-1" /> : <ChevronDown className="h-4 w-4 ml-1" />}
-            </Button>
-            <Button variant="outline" onClick={() => navigate("/scenarios")}>
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Scenarios
+              What-If Analysis
             </Button>
             <Button 
+              size="sm"
               data-testid="ai-advisor-btn"
               onClick={() => navigate("/ai-advisor")}
-              className="bg-[#1a2744] hover:bg-[#1a2744]/90"
             >
               <Sparkles className="h-4 w-4 mr-2" />
               AI Advisor
@@ -251,33 +223,36 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* What-If Quick Toggle Bar */}
+        {/* What-If Panel - Clean Design */}
         {showWhatIf && (
-          <Card className="border-[#D4A84C]/30 bg-gradient-to-r from-[#1a2744]/5 to-[#D4A84C]/5" data-testid="what-if-panel">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <SlidersHorizontal className="h-5 w-5 text-[#D4A84C]" />
-                  <span className="font-semibold">What-If Scenario Builder</span>
-                  {whatIfMetrics.isModified && <Badge className="bg-[#D4A84C] text-[#1a2744]">Modified</Badge>}
+          <Card data-testid="what-if-panel">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <SlidersHorizontal className="h-4 w-4" />
+                    What-If Scenario Builder
+                  </CardTitle>
+                  <CardDescription>Adjust parameters to see projected outcomes</CardDescription>
                 </div>
                 <Button variant="ghost" size="sm" onClick={resetWhatIf} disabled={!whatIfMetrics.isModified}>
                   <RotateCcw className="h-4 w-4 mr-1" />
                   Reset
                 </Button>
               </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {[
-                  { key: 'savingsRate', label: 'Savings Rate', min: 5, max: 50, step: 1, suffix: '%', desc: '% of income saved monthly' },
-                  { key: 'marketReturn', label: 'Market Return', min: 2, max: 12, step: 0.5, suffix: '%', desc: 'Expected annual return' },
-                  { key: 'retirementAge', label: 'Retirement Age', min: 50, max: 70, step: 1, suffix: '', desc: 'Target retirement age' },
-                  { key: 'inflationRate', label: 'Inflation', min: 1, max: 6, step: 0.5, suffix: '%', desc: 'Assumed inflation rate' }
+                  { key: 'savingsRate', label: 'Savings Rate', min: 5, max: 50, step: 1, suffix: '%' },
+                  { key: 'marketReturn', label: 'Market Return', min: 2, max: 12, step: 0.5, suffix: '%' },
+                  { key: 'retirementAge', label: 'Retirement Age', min: 50, max: 70, step: 1, suffix: '' },
+                  { key: 'inflationRate', label: 'Inflation', min: 1, max: 6, step: 0.5, suffix: '%' }
                 ].map(slider => (
-                  <div key={slider.key} className="space-y-3">
+                  <div key={slider.key} className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <label className="text-sm font-medium">{slider.label}</label>
-                      <span className="text-sm font-bold text-[#D4A84C]">{whatIfParams[slider.key]}{slider.suffix}</span>
+                      <label className="text-sm text-muted-foreground">{slider.label}</label>
+                      <span className="text-sm font-medium">{whatIfParams[slider.key]}{slider.suffix}</span>
                     </div>
                     <Slider
                       value={[whatIfParams[slider.key]]}
@@ -287,35 +262,27 @@ const Dashboard = () => {
                       step={slider.step}
                       className="cursor-pointer"
                     />
-                    <p className="text-xs text-muted-foreground">{slider.desc}</p>
                   </div>
                 ))}
               </div>
 
               {whatIfMetrics.isModified && (
-                <div className="mt-4 pt-4 border-t border-border">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="bg-background rounded-lg p-3 border">
-                      <p className="text-xs text-muted-foreground">Retirement Nest Egg</p>
-                      <p className="text-lg font-bold">{formatCompact(whatIfMetrics.projectedNetWorth)}</p>
-                      <div className={`flex items-center gap-1 text-xs ${whatIfMetrics.netWorthDelta >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-                        {whatIfMetrics.netWorthDelta >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-                        {whatIfMetrics.netWorthDelta >= 0 ? '+' : ''}{formatCompact(whatIfMetrics.netWorthDelta)}
-                      </div>
+                <div className="mt-6 pt-4 border-t">
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <p className="text-xs text-muted-foreground">Projected Retirement Balance</p>
+                      <p className="text-lg font-semibold">{formatCompact(whatIfMetrics.projectedNetWorth)}</p>
+                      <p className={`text-xs ${whatIfMetrics.netWorthDelta >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                        {whatIfMetrics.netWorthDelta >= 0 ? '+' : ''}{formatCompact(whatIfMetrics.netWorthDelta)} vs baseline
+                      </p>
                     </div>
-                    <div className="bg-background rounded-lg p-3 border">
+                    <div>
                       <p className="text-xs text-muted-foreground">Monthly Savings</p>
-                      <p className="text-lg font-bold">{formatCurrency(whatIfMetrics.monthlyCashflow)}</p>
+                      <p className="text-lg font-semibold">{formatCurrency(whatIfMetrics.monthlyCashflow)}</p>
                     </div>
-                    <div className="bg-background rounded-lg p-3 border">
+                    <div>
                       <p className="text-xs text-muted-foreground">Success Probability</p>
-                      <p className="text-lg font-bold">{whatIfMetrics.retirementProbability}%</p>
-                    </div>
-                    <div className="flex items-center justify-center">
-                      <Button onClick={() => navigate('/scenarios')} className="bg-[#1a2744] hover:bg-[#1a2744]/90">
-                        Save as Scenario
-                        <ArrowRight className="h-4 w-4 ml-2" />
-                      </Button>
+                      <p className="text-lg font-semibold">{whatIfMetrics.retirementProbability}%</p>
                     </div>
                   </div>
                 </div>
@@ -324,345 +291,367 @@ const Dashboard = () => {
           </Card>
         )}
 
-        {/* SECTION 1: Key Metrics Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Net Worth */}
-          <Card className="bg-gradient-to-br from-[#1a2744] to-[#1a2744]/80 text-white border-none cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/family-wealth')}>
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-sm text-white/70">Net Worth</p>
-                <Wallet className="h-5 w-5 text-[#D4A84C]" />
-              </div>
-              <p className="text-3xl font-bold">{formatCurrency(portfolio.summary.netWorth)}</p>
-              <div className="flex items-center gap-1 mt-2 text-[#D4A84C]">
-                <TrendingUp className="h-4 w-4" />
-                <span className="text-sm font-medium">+12.4% YTD</span>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Monthly Cashflow */}
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/budget')}>
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-sm text-muted-foreground">Monthly Cashflow</p>
-                <Activity className="h-5 w-5 text-green-500" />
-              </div>
-              <p className="text-3xl font-bold text-green-600">+{formatCurrency(monthlySavings)}</p>
-              <div className="flex items-center gap-2 mt-2">
-                <Progress value={savingsRate} className="h-2 flex-1" />
-                <span className="text-sm text-muted-foreground">{savingsRate.toFixed(0)}% saved</span>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Goal Progress */}
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/goal-tracker')}>
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-sm text-muted-foreground">Goal Progress</p>
-                <Target className="h-5 w-5 text-blue-500" />
-              </div>
-              <p className="text-3xl font-bold">{GOALS_DATA.filter(g => g.onTrack).length}/{GOALS_DATA.length}</p>
-              <p className="text-sm text-muted-foreground mt-1">goals on track</p>
-              <div className="flex gap-1 mt-2">
-                {GOALS_DATA.map(g => (
-                  <div key={g.id} className={`h-2 flex-1 rounded-full ${g.onTrack ? 'bg-green-500' : 'bg-amber-500'}`} />
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Retirement Success - PROMINENT */}
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow border-2 border-[#D4A84C]/30" onClick={() => navigate('/monte-carlo')}>
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-sm text-muted-foreground">Retirement Success</p>
-                <PiggyBank className="h-5 w-5 text-[#D4A84C]" />
-              </div>
-              <div className="flex items-baseline gap-2">
-                <p className="text-3xl font-bold">{retirementProbability}%</p>
-                <Badge className={retirementProbability >= 80 ? "bg-green-500" : "bg-amber-500"}>
-                  {retirementProbability >= 80 ? "On Track" : "Review"}
-                </Badge>
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                Monte Carlo: {retirementProbability}% probability
+        {/* Key Metrics - Clean Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card className="cursor-pointer hover:shadow-sm transition-shadow" onClick={() => navigate('/family-wealth')}>
+            <CardContent className="p-4">
+              <p className="text-xs text-muted-foreground mb-1">Net Worth</p>
+              <p className="text-2xl font-semibold">{formatCurrency(portfolio.summary.netWorth)}</p>
+              <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                <TrendingUp className="h-3 w-3" />
+                +12.4% this year
               </p>
             </CardContent>
           </Card>
-        </div>
 
-        {/* SECTION 2: Financial Health + Top Actions (THE DECISION ENGINE) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Financial Health Score - LARGE & PROMINENT */}
-          <Card className="lg:col-span-4 bg-gradient-to-br from-[#1a2744]/5 to-[#D4A84C]/10 border-[#D4A84C]/30">
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Zap className="h-5 w-5 text-[#D4A84C]" />
-                Financial Health Score
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {/* Large Score Display */}
-              <div className="flex items-center justify-center py-6">
-                <div className="relative">
-                  <svg className="w-40 h-40 transform -rotate-90">
-                    <circle cx="80" cy="80" r="70" stroke="currentColor" strokeWidth="14" fill="none" className="text-muted/20" />
-                    <circle
-                      cx="80" cy="80" r="70"
-                      stroke="url(#scoreGradient)" strokeWidth="14" fill="none"
-                      strokeDasharray={`${(healthScore?.score || 78) * 4.4} 440`}
-                      strokeLinecap="round"
-                    />
-                    <defs>
-                      <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="#D4A84C" />
-                        <stop offset="100%" stopColor="#1a2744" />
-                      </linearGradient>
-                    </defs>
-                  </svg>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-5xl font-bold">{healthScore?.score || 78}</span>
-                    <Badge className="mt-2 bg-[#D4A84C] text-[#1a2744] text-lg px-3">
-                      {healthScore?.grade || 'B+'}
-                    </Badge>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Score Components */}
-              <div className="space-y-2 mt-2">
-                {[
-                  { label: 'Savings Rate', value: '15%', status: 'good' },
-                  { label: 'Debt Ratio', value: '32%', status: 'good' },
-                  { label: 'Emergency Fund', value: '4.2mo', status: 'warning' },
-                  { label: 'Retirement Ready', value: `${retirementProbability}%`, status: 'good' },
-                  { label: 'Diversification', value: 'Good', status: 'good' }
-                ].map((item, i) => (
-                  <div key={i} className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">{item.label}</span>
-                    <span className={`font-medium ${item.status === 'good' ? 'text-green-600' : 'text-amber-600'}`}>
-                      {item.value} {item.status === 'good' ? '✓' : '⚠'}
-                    </span>
-                  </div>
-                ))}
-              </div>
-              
-              <Button variant="outline" className="w-full mt-4" onClick={() => navigate('/decision-engine')}>
-                View Full Analysis
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
+          <Card className="cursor-pointer hover:shadow-sm transition-shadow" onClick={() => navigate('/budget')}>
+            <CardContent className="p-4">
+              <p className="text-xs text-muted-foreground mb-1">Monthly Cashflow</p>
+              <p className="text-2xl font-semibold text-green-600">+{formatCurrency(monthlySavings)}</p>
+              <p className="text-xs text-muted-foreground mt-1">{savingsRate.toFixed(0)}% savings rate</p>
             </CardContent>
           </Card>
 
-          {/* TOP ACTIONS - THE CORE DECISION ENGINE */}
-          <Card className="lg:col-span-8">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center gap-2 text-xl">
-                    <Lightbulb className="h-6 w-6 text-[#D4A84C]" />
-                    Recommended Actions
+          <Card className="cursor-pointer hover:shadow-sm transition-shadow" onClick={() => navigate('/goal-tracker')}>
+            <CardContent className="p-4">
+              <p className="text-xs text-muted-foreground mb-1">Goal Progress</p>
+              <p className="text-2xl font-semibold">{GOALS_DATA.filter(g => g.onTrack).length} of {GOALS_DATA.length}</p>
+              <p className="text-xs text-muted-foreground mt-1">goals on track</p>
+            </CardContent>
+          </Card>
+
+          <Card className="cursor-pointer hover:shadow-sm transition-shadow" onClick={() => navigate('/monte-carlo')}>
+            <CardContent className="p-4">
+              <p className="text-xs text-muted-foreground mb-1">Retirement Probability</p>
+              <p className="text-2xl font-semibold">{retirementProbability}%</p>
+              <p className="text-xs text-muted-foreground mt-1">Monte Carlo analysis</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Main Content Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList>
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="actions">Recommended Actions</TabsTrigger>
+            <TabsTrigger value="projections">Projections</TabsTrigger>
+            <TabsTrigger value="goals">Goals</TabsTrigger>
+          </TabsList>
+
+          {/* Overview Tab */}
+          <TabsContent value="overview" className="mt-4 space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              {/* Financial Health Score */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <DollarSign className="h-4 w-4" />
+                    Financial Health Score
                   </CardTitle>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    AI-powered insights to optimize your wealth
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm text-muted-foreground">Total Potential Impact</p>
-                  <p className="text-2xl font-bold text-green-600">+{formatCompact(totalPotentialImpact || 643000)}</p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {(recommendations.length > 0 ? recommendations.slice(0, 4) : [
-                  { id: 1, title: "Increase super contributions", description: "Salary sacrifice $500/month to reach concessional cap", impact_primary: 520000, impact_label: "retirement balance", priority: "high", category: "super" },
-                  { id: 2, title: "Refinance mortgage", description: "Switch to 5.89% rate to save on interest", impact_primary: 78000, impact_label: "interest saved", priority: "high", category: "debt" },
-                  { id: 3, title: "Build emergency fund", description: "Increase from 4.2 to 6 months expenses", impact_primary: 45000, impact_label: "security buffer", priority: "medium", category: "savings" },
-                  { id: 4, title: "Maximize franking credits", description: "Rebalance portfolio for tax efficiency", impact_primary: 8400, impact_label: "tax refund/year", priority: "medium", category: "tax" }
-                ]).map((action, index) => {
-                  const icons = { super: PiggyBank, debt: Home, savings: Shield, tax: Calculator };
-                  const colors = { super: 'text-purple-600 bg-purple-50', debt: 'text-blue-600 bg-blue-50', savings: 'text-amber-600 bg-amber-50', tax: 'text-green-600 bg-green-50' };
-                  const Icon = icons[action.category] || Lightbulb;
-                  const colorClass = colors[action.category] || 'text-gray-600 bg-gray-50';
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="text-4xl font-bold">{healthScore?.score || 78}</div>
+                    <div>
+                      <Badge variant="secondary" className="text-sm">{healthScore?.grade || 'B+'}</Badge>
+                      <p className="text-xs text-muted-foreground mt-1">out of 100</p>
+                    </div>
+                  </div>
                   
-                  return (
-                    <div 
-                      key={action.id}
-                      className="flex items-center gap-4 p-4 rounded-xl border hover:border-[#D4A84C]/50 hover:bg-muted/30 transition-all cursor-pointer group"
-                      onClick={() => navigate('/decision-engine')}
-                    >
-                      {/* Rank Badge */}
-                      <div className="w-8 h-8 rounded-full bg-[#1a2744] text-white flex items-center justify-center font-bold text-sm flex-shrink-0">
-                        {index + 1}
+                  <div className="space-y-2">
+                    {[
+                      { label: 'Savings Rate', value: '15%', score: 85 },
+                      { label: 'Debt Ratio', value: '32%', score: 70 },
+                      { label: 'Emergency Fund', value: '4.2 mo', score: 60 },
+                      { label: 'Retirement Readiness', value: `${retirementProbability}%`, score: retirementProbability },
+                      { label: 'Diversification', value: 'Good', score: 80 }
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">{item.label}</span>
+                        <span className="font-medium">{item.value}</span>
                       </div>
-                      
-                      {/* Icon */}
-                      <div className={`w-12 h-12 rounded-xl ${colorClass.split(' ')[1]} flex items-center justify-center flex-shrink-0`}>
-                        <Icon className={`h-6 w-6 ${colorClass.split(' ')[0]}`} />
-                      </div>
-                      
-                      {/* Content */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <p className="font-semibold">{action.title}</p>
-                          {action.priority === 'high' && (
-                            <Badge className="bg-red-500 text-white text-[10px]">HIGH IMPACT</Badge>
-                          )}
-                        </div>
-                        <p className="text-sm text-muted-foreground">{action.description}</p>
-                      </div>
-                      
-                      {/* Impact */}
-                      <div className="text-right flex-shrink-0">
-                        <p className="text-xl font-bold text-green-600">
-                          +{formatCompact(action.impact_primary)}
-                        </p>
-                        <p className="text-xs text-muted-foreground">{action.impact_label}</p>
-                      </div>
-                      
-                      {/* Action Button */}
-                      <Button 
-                        size="sm" 
-                        className="bg-[#1a2744] hover:bg-[#1a2744]/90 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={(e) => { e.stopPropagation(); navigate('/decision-engine'); }}
-                      >
-                        Take Action
-                        <ArrowUpRight className="h-3 w-3 ml-1" />
-                      </Button>
-                    </div>
-                  );
-                })}
-              </div>
-              
-              <Button className="w-full mt-4 bg-[#D4A84C] hover:bg-[#D4A84C]/90 text-[#1a2744]" onClick={() => navigate('/ai-advisor')}>
-                <Sparkles className="h-4 w-4 mr-2" />
-                Get Personalized AI Advice
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* SECTION 3: Net Worth Projection + Goals */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Net Worth Projection Chart - PROMINENT */}
-          <Card>
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <LineChart className="h-5 w-5 text-[#D4A84C]" />
-                  Net Worth Projection
-                </CardTitle>
-                <div className="flex items-center gap-4">
-                  <div className="text-right">
-                    <p className="text-xs text-muted-foreground">2025</p>
-                    <p className="font-bold">{formatCompact(portfolio.summary.netWorth)}</p>
+                    ))}
                   </div>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                </CardContent>
+              </Card>
+
+              {/* Asset Allocation */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <BarChart3 className="h-4 w-4" />
+                    Asset Allocation
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {[
+                      { name: 'Property', value: portfolio.investments.properties.reduce((s, p) => s + p.value, 0), color: 'bg-blue-500' },
+                      { name: 'Super', value: portfolio.investments.smsf_balance, color: 'bg-purple-500' },
+                      { name: 'Shares & ETFs', value: portfolio.investments.shares_value + portfolio.investments.etf_value, color: 'bg-green-500' },
+                      { name: 'Cash', value: 75000, color: 'bg-amber-500' }
+                    ].map((asset, i) => {
+                      const pct = (asset.value / portfolio.summary.totalAssets) * 100;
+                      return (
+                        <div key={i}>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span>{asset.name}</span>
+                            <span className="font-medium">{formatCompact(asset.value)} ({pct.toFixed(0)}%)</span>
+                          </div>
+                          <div className="h-2 bg-muted rounded-full overflow-hidden">
+                            <div className={`h-full ${asset.color}`} style={{ width: `${pct}%` }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Quick Stats */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Activity className="h-4 w-4" />
+                    Key Metrics
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Total Assets</span>
+                      <span className="font-medium">{formatCurrency(portfolio.summary.totalAssets)}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Total Liabilities</span>
+                      <span className="font-medium text-red-600">{formatCurrency(portfolio.summary.totalDebt)}</span>
+                    </div>
+                    <hr />
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Net Worth</span>
+                      <span className="font-semibold">{formatCurrency(portfolio.summary.netWorth)}</span>
+                    </div>
+                    <hr />
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Annual Income</span>
+                      <span className="font-medium">{formatCurrency(portfolio.personal.taxableIncome)}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Annual Savings</span>
+                      <span className="font-medium text-green-600">{formatCurrency(monthlySavings * 12)}</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Recommended Actions Tab */}
+          <TabsContent value="actions" className="mt-4">
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <Lightbulb className="h-4 w-4" />
+                      Recommended Actions
+                    </CardTitle>
+                    <CardDescription>AI-powered recommendations to optimize your wealth</CardDescription>
+                  </div>
                   <div className="text-right">
-                    <p className="text-xs text-muted-foreground">2040</p>
-                    <p className="font-bold text-green-600">{formatCompact(netWorthProjection[15]?.net_worth || 3900000)}</p>
+                    <p className="text-xs text-muted-foreground">Total Potential Impact</p>
+                    <p className="text-lg font-semibold text-green-600">+{formatCompact(totalPotentialImpact || 643000)}</p>
                   </div>
                 </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer height={220}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={netWorthProjection.length > 0 ? netWorthProjection : [
-                    { year: 2025, net_worth: 1978000 },
-                    { year: 2027, net_worth: 2300000 },
-                    { year: 2030, net_worth: 2800000 },
-                    { year: 2035, net_worth: 3500000 },
-                    { year: 2040, net_worth: 3900000 },
-                    { year: 2045, net_worth: 4500000 }
-                  ]}>
-                    <defs>
-                      <linearGradient id="netWorthGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#1a2744" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#1a2744" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis dataKey="year" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
-                    <YAxis tickFormatter={(v) => formatCompact(v)} tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
-                    <Tooltip 
-                      formatter={(value) => [formatCurrency(value), "Net Worth"]}
-                      contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px' }}
-                    />
-                    <ReferenceLine y={3500000} stroke="#D4A84C" strokeDasharray="5 5" label={{ value: 'Target', fill: '#D4A84C', fontSize: 10 }} />
-                    <Area type="monotone" dataKey="net_worth" stroke="#1a2744" strokeWidth={2} fill="url(#netWorthGradient)" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </ChartContainer>
-              
-              {/* Milestones */}
-              <div className="flex justify-between mt-4 pt-4 border-t">
-                {[
-                  { year: 2027, label: '$2M', emoji: '💰' },
-                  { year: 2032, label: '$3M', emoji: '💎' },
-                  { year: 2038, label: '$4M', emoji: '🏆' }
-                ].map((m, i) => (
-                  <div key={i} className="text-center">
-                    <p className="text-lg">{m.emoji}</p>
-                    <p className="font-bold">{m.label}</p>
-                    <p className="text-xs text-muted-foreground">{m.year}</p>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="text-left py-3 px-2 text-xs font-medium text-muted-foreground">Action</th>
+                        <th className="text-left py-3 px-2 text-xs font-medium text-muted-foreground">Description</th>
+                        <th className="text-right py-3 px-2 text-xs font-medium text-muted-foreground">Impact</th>
+                        <th className="text-center py-3 px-2 text-xs font-medium text-muted-foreground">Priority</th>
+                        <th className="py-3 px-2"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(recommendations.length > 0 ? recommendations : [
+                        { id: 1, title: "Increase super contributions", description: "Salary sacrifice $500/month to reach concessional cap", impact_primary: 520000, priority: "high", category: "super" },
+                        { id: 2, title: "Refinance mortgage", description: "Switch to 5.89% rate to save on interest", impact_primary: 78000, priority: "high", category: "debt" },
+                        { id: 3, title: "Build emergency fund", description: "Increase from 4.2 to 6 months expenses", impact_primary: 45000, priority: "medium", category: "savings" },
+                        { id: 4, title: "Maximize franking credits", description: "Rebalance portfolio for tax efficiency", impact_primary: 8400, priority: "medium", category: "tax" }
+                      ]).map((action, index) => (
+                        <tr key={action.id} className="border-b last:border-0 hover:bg-muted/50">
+                          <td className="py-3 px-2">
+                            <div className="flex items-center gap-2">
+                              <span className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs font-medium">
+                                {index + 1}
+                              </span>
+                              <span className="font-medium text-sm">{action.title}</span>
+                            </div>
+                          </td>
+                          <td className="py-3 px-2 text-sm text-muted-foreground">{action.description}</td>
+                          <td className="py-3 px-2 text-right">
+                            <span className="font-semibold text-green-600">+{formatCompact(action.impact_primary)}</span>
+                          </td>
+                          <td className="py-3 px-2 text-center">
+                            <Badge variant={action.priority === 'high' ? 'destructive' : 'secondary'} className="text-xs">
+                              {action.priority}
+                            </Badge>
+                          </td>
+                          <td className="py-3 px-2">
+                            <Button variant="ghost" size="sm" onClick={() => navigate('/decision-engine')}>
+                              <ChevronRight className="h-4 w-4" />
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-          {/* Goal Progress */}
-          <Card>
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Target className="h-5 w-5 text-[#D4A84C]" />
-                  Goal Progress
-                </CardTitle>
-                <Button variant="ghost" size="sm" onClick={() => navigate('/goal-tracker')}>
-                  Manage Goals
-                  <ChevronRight className="h-4 w-4 ml-1" />
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {GOALS_DATA.map((goal) => {
-                  const GoalIcon = GOAL_ICONS[goal.icon] || GOAL_ICONS.default;
-                  return (
-                    <div key={goal.id} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <GoalIcon className="h-4 w-4 text-muted-foreground" />
-                          <span className="font-medium text-sm">{goal.name}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-bold">{goal.progress}%</span>
-                          {goal.onTrack ? (
-                            <Badge className="bg-green-500 text-white text-[10px]">On Track</Badge>
-                          ) : (
-                            <Badge className="bg-amber-500 text-white text-[10px]">Behind</Badge>
-                          )}
-                        </div>
-                      </div>
-                      <div className="relative">
-                        <Progress value={goal.progress} className="h-3" />
-                        <div className="flex justify-between mt-1 text-xs text-muted-foreground">
-                          <span>{formatCompact(goal.current)}</span>
-                          <span>{formatCompact(goal.target)}</span>
-                        </div>
-                      </div>
+          {/* Projections Tab */}
+          <TabsContent value="projections" className="mt-4">
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <LineChart className="h-4 w-4" />
+                      Net Worth Projection
+                    </CardTitle>
+                    <CardDescription>Projected wealth growth over time</CardDescription>
+                  </div>
+                  <div className="flex gap-6 text-sm">
+                    <div>
+                      <p className="text-muted-foreground">2025</p>
+                      <p className="font-semibold">{formatCompact(portfolio.summary.netWorth)}</p>
                     </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+                    <div>
+                      <p className="text-muted-foreground">2040</p>
+                      <p className="font-semibold text-green-600">{formatCompact(netWorthProjection[15]?.net_worth || 3900000)}</p>
+                    </div>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={netWorthProjection.length > 0 ? netWorthProjection : [
+                      { year: 2025, net_worth: 1978000 },
+                      { year: 2028, net_worth: 2400000 },
+                      { year: 2032, net_worth: 3100000 },
+                      { year: 2036, net_worth: 3600000 },
+                      { year: 2040, net_worth: 3900000 },
+                      { year: 2045, net_worth: 4500000 }
+                    ]}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="year" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
+                      <YAxis tickFormatter={(v) => formatCompact(v)} tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
+                      <Tooltip 
+                        formatter={(value) => [formatCurrency(value), "Net Worth"]}
+                        contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px' }}
+                      />
+                      <ReferenceLine y={3500000} stroke="hsl(var(--muted-foreground))" strokeDasharray="5 5" />
+                      <Area type="monotone" dataKey="net_worth" stroke="hsl(var(--primary))" strokeWidth={2} fill="hsl(var(--primary))" fillOpacity={0.1} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+                
+                {/* Milestones Table */}
+                <div className="mt-6 pt-4 border-t">
+                  <p className="text-sm font-medium mb-3">Projected Milestones</p>
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="text-left py-2 text-xs font-medium text-muted-foreground">Milestone</th>
+                        <th className="text-center py-2 text-xs font-medium text-muted-foreground">Year</th>
+                        <th className="text-right py-2 text-xs font-medium text-muted-foreground">Net Worth</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-b">
+                        <td className="py-2">$2M Net Worth</td>
+                        <td className="py-2 text-center">2026</td>
+                        <td className="py-2 text-right font-medium">$2,000,000</td>
+                      </tr>
+                      <tr className="border-b">
+                        <td className="py-2">$3M Net Worth</td>
+                        <td className="py-2 text-center">2032</td>
+                        <td className="py-2 text-right font-medium">$3,000,000</td>
+                      </tr>
+                      <tr className="border-b">
+                        <td className="py-2">Retirement Target</td>
+                        <td className="py-2 text-center">2040</td>
+                        <td className="py-2 text-right font-medium">$3,500,000</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Goals Tab */}
+          <TabsContent value="goals" className="mt-4">
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <Target className="h-4 w-4" />
+                      Financial Goals
+                    </CardTitle>
+                    <CardDescription>Track progress towards your financial objectives</CardDescription>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={() => navigate('/goal-tracker')}>
+                    Manage Goals
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-3 text-xs font-medium text-muted-foreground">Goal</th>
+                      <th className="text-right py-3 text-xs font-medium text-muted-foreground">Current</th>
+                      <th className="text-right py-3 text-xs font-medium text-muted-foreground">Target</th>
+                      <th className="text-center py-3 text-xs font-medium text-muted-foreground">Progress</th>
+                      <th className="text-center py-3 text-xs font-medium text-muted-foreground">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {GOALS_DATA.map((goal) => (
+                      <tr key={goal.id} className="border-b last:border-0">
+                        <td className="py-3 font-medium text-sm">{goal.name}</td>
+                        <td className="py-3 text-right text-sm">{formatCompact(goal.current)}</td>
+                        <td className="py-3 text-right text-sm text-muted-foreground">{formatCompact(goal.target)}</td>
+                        <td className="py-3 px-4">
+                          <div className="flex items-center gap-2">
+                            <Progress value={goal.progress} className="h-2 flex-1" />
+                            <span className="text-xs font-medium w-10 text-right">{goal.progress}%</span>
+                          </div>
+                        </td>
+                        <td className="py-3 text-center">
+                          {goal.onTrack ? (
+                            <Badge variant="secondary" className="bg-green-50 text-green-700 text-xs">On Track</Badge>
+                          ) : (
+                            <Badge variant="secondary" className="bg-amber-50 text-amber-700 text-xs">Behind</Badge>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </Layout>
   );
