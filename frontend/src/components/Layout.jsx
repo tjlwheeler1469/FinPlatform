@@ -519,23 +519,26 @@ const Layout = ({ children }) => {
         >
           {activeNavGroups.map((group) => {
             const GroupIcon = group.icon;
+            const groupActive = isGroupActive(group);
             return (
-            <div key={group.name} className="mb-1">
-              {/* Group Header */}
+            <div key={group.name} className="mb-2">
+              {/* Group Header - ENHANCED VISIBILITY */}
               {!sidebarCollapsed && (
                 <button
                   onClick={() => toggleGroup(group.name)}
                   className={cn(
-                    "w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition-colors",
-                    isGroupActive(group) ? "text-[#D4A84C]" : "text-white/50 hover:text-white/70"
+                    "w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-bold uppercase tracking-wider transition-all",
+                    groupActive 
+                      ? "bg-[#D4A84C]/20 text-[#D4A84C] border-l-2 border-[#D4A84C]" 
+                      : "text-white/80 hover:text-white hover:bg-white/5"
                   )}
                 >
                   <span className="flex items-center gap-2">
-                    {GroupIcon && <GroupIcon className="h-3.5 w-3.5" />}
+                    {GroupIcon && <GroupIcon className={cn("h-4 w-4", groupActive ? "text-[#D4A84C]" : "")} />}
                     {group.name}
                   </span>
                   <ChevronDown className={cn(
-                    "h-3 w-3 transition-transform",
+                    "h-4 w-4 transition-transform",
                     expandedGroups[group.name] ? "rotate-0" : "-rotate-90"
                   )} />
                 </button>
