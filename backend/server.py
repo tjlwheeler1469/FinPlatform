@@ -4778,19 +4778,19 @@ async def get_financial_health_score(profile: FinancialProfileInput):
     """Calculate comprehensive Financial Health Score (0-100)"""
     from services.decision_engine import FinancialProfile
     financial_profile = FinancialProfile(
-        age=profile.current_age,
+        age=profile.age,
         retirement_age=profile.retirement_age,
         current_income=profile.current_income,
         annual_expenses=profile.annual_expenses,
         total_assets=profile.total_assets,
         total_debt=profile.total_debt,
         super_balance=profile.super_balance,
-        emergency_fund=profile.emergency_fund,
+        emergency_fund=profile.cash_savings,
         investment_portfolio=profile.investment_portfolio,
         property_value=profile.property_value,
         savings_rate=profile.savings_rate,
-        mortgage_rate=getattr(profile, 'mortgage_rate', 6.5),
-        mortgage_balance=getattr(profile, 'mortgage_balance', profile.total_debt)
+        mortgage_rate=6.5,
+        mortgage_balance=profile.property_debt
     )
     return calculate_financial_health_score(financial_profile)
 
