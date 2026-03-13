@@ -338,6 +338,7 @@ const ScenarioComparison = () => {
               </div>
             </CardContent>
           )}
+        </Card>
 
         {/* Scenario Tabs */}
         <div className="flex gap-2 overflow-x-auto pb-2">
