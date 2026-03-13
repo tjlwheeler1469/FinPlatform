@@ -302,6 +302,16 @@ const Dashboard = () => {
           </div>
           <div className="flex gap-2">
             <Button 
+              variant={showWhatIf ? "default" : "outline"}
+              onClick={() => setShowWhatIf(!showWhatIf)}
+              data-testid="what-if-toggle-btn"
+              className={showWhatIf ? "bg-[#D4A84C] hover:bg-[#D4A84C]/90 text-[#1a2744]" : ""}
+            >
+              <SlidersHorizontal className="h-4 w-4 mr-2" />
+              What-If
+              {showWhatIf ? <ChevronUp className="h-4 w-4 ml-1" /> : <ChevronDown className="h-4 w-4 ml-1" />}
+            </Button>
+            <Button 
               variant="outline"
               onClick={() => navigate("/scenarios")}
             >
@@ -318,6 +328,153 @@ const Dashboard = () => {
             </Button>
           </div>
         </div>
+
+        {/* What-If Quick Toggle Bar */}
+        {showWhatIf && (
+          <Card className="border-[#D4A84C]/30 bg-gradient-to-r from-[#1a2744]/5 to-[#D4A84C]/5" data-testid="what-if-panel">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <SlidersHorizontal className="h-5 w-5 text-[#D4A84C]" />
+                  <span className="font-semibold">What-If Scenario Builder</span>
+                  {whatIfMetrics.isModified && (
+                    <Badge className="bg-[#D4A84C] text-[#1a2744]">Modified</Badge>
+                  )}
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={resetWhatIf}
+                  disabled={!whatIfMetrics.isModified}
+                  data-testid="what-if-reset-btn"
+                >
+                  <RotateCcw className="h-4 w-4 mr-1" />
+                  Reset
+                </Button>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {/* Savings Rate Slider */}
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <label className="text-sm font-medium">Savings Rate</label>
+                    <span className="text-sm font-bold text-[#D4A84C]">{whatIfParams.savingsRate}%</span>
+                  </div>
+                  <Slider
+                    value={[whatIfParams.savingsRate]}
+                    onValueChange={(val) => setWhatIfParams(p => ({ ...p, savingsRate: val[0] }))}
+                    min={5}
+                    max={50}
+                    step={1}
+                    className="cursor-pointer"
+                    data-testid="savings-rate-slider"
+                  />
+                  <p className="text-xs text-muted-foreground">% of income saved monthly</p>
+                </div>
+
+                {/* Market Return Slider */}
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <label className="text-sm font-medium">Market Return</label>
+                    <span className="text-sm font-bold text-[#D4A84C]">{whatIfParams.marketReturn}%</span>
+                  </div>
+                  <Slider
+                    value={[whatIfParams.marketReturn]}
+                    onValueChange={(val) => setWhatIfParams(p => ({ ...p, marketReturn: val[0] }))}
+                    min={2}
+                    max={12}
+                    step={0.5}
+                    className="cursor-pointer"
+                    data-testid="market-return-slider"
+                  />
+                  <p className="text-xs text-muted-foreground">Expected annual return</p>
+                </div>
+
+                {/* Retirement Age Slider */}
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <label className="text-sm font-medium">Retirement Age</label>
+                    <span className="text-sm font-bold text-[#D4A84C]">{whatIfParams.retirementAge}</span>
+                  </div>
+                  <Slider
+                    value={[whatIfParams.retirementAge]}
+                    onValueChange={(val) => setWhatIfParams(p => ({ ...p, retirementAge: val[0] }))}
+                    min={50}
+                    max={70}
+                    step={1}
+                    className="cursor-pointer"
+                    data-testid="retirement-age-slider"
+                  />
+                  <p className="text-xs text-muted-foreground">Target retirement age</p>
+                </div>
+
+                {/* Inflation Rate Slider */}
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <label className="text-sm font-medium">Inflation</label>
+                    <span className="text-sm font-bold text-[#D4A84C]">{whatIfParams.inflationRate}%</span>
+                  </div>
+                  <Slider
+                    value={[whatIfParams.inflationRate]}
+                    onValueChange={(val) => setWhatIfParams(p => ({ ...p, inflationRate: val[0] }))}
+                    min={1}
+                    max={6}
+                    step={0.5}
+                    className="cursor-pointer"
+                    data-testid="inflation-slider"
+                  />
+                  <p className="text-xs text-muted-foreground">Assumed inflation rate</p>
+                </div>
+              </div>
+
+              {/* Impact Summary */}
+              {whatIfMetrics.isModified && (
+                <div className="mt-4 pt-4 border-t border-border">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Zap className="h-4 w-4 text-[#D4A84C]" />
+                    <span className="text-sm font-semibold">Projected Impact</span>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="bg-background rounded-lg p-3 border">
+                      <p className="text-xs text-muted-foreground">Retirement Nest Egg</p>
+                      <p className="text-lg font-bold">{formatCompact(whatIfMetrics.projectedNetWorth)}</p>
+                      <div className={`flex items-center gap-1 text-xs ${whatIfMetrics.netWorthDelta >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                        {whatIfMetrics.netWorthDelta >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                        {whatIfMetrics.netWorthDelta >= 0 ? '+' : ''}{formatCompact(whatIfMetrics.netWorthDelta)}
+                      </div>
+                    </div>
+                    <div className="bg-background rounded-lg p-3 border">
+                      <p className="text-xs text-muted-foreground">Monthly Savings</p>
+                      <p className="text-lg font-bold">{formatCurrency(whatIfMetrics.monthlyCashflow)}</p>
+                      <div className={`flex items-center gap-1 text-xs ${whatIfMetrics.cashflowDelta >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                        {whatIfMetrics.cashflowDelta >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                        {whatIfMetrics.cashflowDelta >= 0 ? '+' : ''}{formatCurrency(whatIfMetrics.cashflowDelta)}
+                      </div>
+                    </div>
+                    <div className="bg-background rounded-lg p-3 border">
+                      <p className="text-xs text-muted-foreground">Success Probability</p>
+                      <p className="text-lg font-bold">{whatIfMetrics.retirementProbability}%</p>
+                      <div className={`flex items-center gap-1 text-xs ${whatIfMetrics.retirementProbability >= 80 ? 'text-green-600' : 'text-amber-500'}`}>
+                        {whatIfMetrics.retirementProbability >= 80 ? <CheckCircle className="h-3 w-3" /> : <AlertCircle className="h-3 w-3" />}
+                        {whatIfMetrics.retirementProbability >= 80 ? 'On Track' : 'Needs Review'}
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-center">
+                      <Button 
+                        onClick={() => navigate('/scenarios')}
+                        className="bg-[#1a2744] hover:bg-[#1a2744]/90"
+                        data-testid="save-scenario-btn"
+                      >
+                        Save as Scenario
+                        <ArrowRight className="h-4 w-4 ml-2" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Row 1: Key Metrics - The 4 Questions */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
