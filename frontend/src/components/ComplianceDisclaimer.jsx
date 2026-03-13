@@ -105,10 +105,22 @@ const setAcknowledgement = () => {
 // Modal component shown on first visit
 export const ComplianceModal = ({ onAccept }) => {
   const [acknowledged, setAcknowledged] = useState(false);
-  const [open, setOpen] = useState(() => !moduleHasAcknowledged);
+  const [open, setOpen] = useState(false);
 
-  // Don't render anything if already acknowledged at module level or after closing
-  if (!open || moduleHasAcknowledged) return null;
+  // Check localStorage on mount to determine if modal should show
+  useEffect(() => {
+    const hasAcknowledged = 
+      localStorage.getItem(STORAGE_KEY) || 
+      localStorage.getItem(STORAGE_KEY_V2) || 
+      sessionStorage.getItem('compliance_session');
+    
+    if (!hasAcknowledged) {
+      setOpen(true);
+    }
+  }, []);
+
+  // Don't render anything if not open
+  if (!open) return null;
 
   const handleAccept = () => {
     if (acknowledged) {
