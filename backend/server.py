@@ -6428,7 +6428,7 @@ try:
         ADVICE_WORKFLOW_STAGES
     )
     
-    # Decision Engine - Health Score
+    # Decision Engine - Health Score (v2 - uses new service)
     class HealthScoreRequest(BaseModel):
         age: int
         retirement_age: int = 65
@@ -6444,8 +6444,8 @@ try:
         mortgage_rate: float = 6.5
         mortgage_balance: float = 0
     
-    @api_router.post("/decision-engine/health-score")
-    async def get_health_score(request: HealthScoreRequest):
+    @api_router.post("/decision-engine/health-score-v2")
+    async def get_health_score_v2(request: HealthScoreRequest):
         """Calculate comprehensive Financial Health Score (0-100)"""
         profile = FinancialProfile(
             age=request.age,
