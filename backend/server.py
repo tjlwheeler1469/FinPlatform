@@ -6397,6 +6397,365 @@ try:
 except ImportError as e:
     logger.warning(f"Data feeds service not available: {e}")
 
+# ==================== DECISION ENGINE ENDPOINTS ====================
+
+try:
+    from services.decision_engine import (
+        FinancialProfile,
+        calculate_financial_health_score,
+        generate_smart_recommendations,
+        run_advanced_monte_carlo,
+        calculate_goal_progress,
+        generate_net_worth_projection
+    )
+    from services.life_timeline import (
+        generate_default_timeline,
+        calculate_timeline_impact,
+        simulate_retirement_age_change,
+        get_milestone_events,
+        LIFE_EVENT_TYPES
+    )
+    from services.client_crm import (
+        create_client,
+        create_meeting_note,
+        create_task,
+        create_document,
+        create_advice_workflow,
+        update_workflow_progress,
+        advance_workflow_stage,
+        get_client_portal_data,
+        generate_demo_clients,
+        ADVICE_WORKFLOW_STAGES
+    )
+    
+    # Decision Engine - Health Score
+    class HealthScoreRequest(BaseModel):
+        age: int
+        retirement_age: int = 65
+        current_income: float
+        annual_expenses: float
+        total_assets: float
+        total_debt: float
+        super_balance: float
+        emergency_fund: float
+        investment_portfolio: float
+        property_value: float
+        savings_rate: float
+        mortgage_rate: float = 6.5
+        mortgage_balance: float = 0
+    
+    @api_router.post("/decision-engine/health-score")
+    async def get_health_score(request: HealthScoreRequest):
+        """Calculate comprehensive Financial Health Score (0-100)"""
+        profile = FinancialProfile(
+            age=request.age,
+            retirement_age=request.retirement_age,
+            current_income=request.current_income,
+            annual_expenses=request.annual_expenses,
+            total_assets=request.total_assets,
+            total_debt=request.total_debt,
+            super_balance=request.super_balance,
+            emergency_fund=request.emergency_fund,
+            investment_portfolio=request.investment_portfolio,
+            property_value=request.property_value,
+            savings_rate=request.savings_rate,
+            mortgage_rate=request.mortgage_rate,
+            mortgage_balance=request.mortgage_balance
+        )
+        return calculate_financial_health_score(profile)
+    
+    @api_router.post("/decision-engine/recommendations")
+    async def get_smart_recommendations(request: HealthScoreRequest):
+        """Generate AI-powered actionable recommendations with $ impact"""
+        profile = FinancialProfile(
+            age=request.age,
+            retirement_age=request.retirement_age,
+            current_income=request.current_income,
+            annual_expenses=request.annual_expenses,
+            total_assets=request.total_assets,
+            total_debt=request.total_debt,
+            super_balance=request.super_balance,
+            emergency_fund=request.emergency_fund,
+            investment_portfolio=request.investment_portfolio,
+            property_value=request.property_value,
+            savings_rate=request.savings_rate,
+            mortgage_rate=request.mortgage_rate,
+            mortgage_balance=request.mortgage_balance
+        )
+        return {
+            'recommendations': generate_smart_recommendations(profile),
+            'profile_summary': {
+                'age': profile.age,
+                'retirement_age': profile.retirement_age,
+                'years_to_retirement': profile.retirement_age - profile.age
+            }
+        }
+    
+    # Advanced Monte Carlo
+    class MonteCarloAdvancedRequest(BaseModel):
+        initial_value: float
+        annual_contribution: float
+        expected_return: float = 0.07
+        volatility: float = 0.15
+        years: int = 20
+        target_value: float = 2000000
+        simulations: int = 10000
+        inflation_rate: float = 0.03
+    
+    @api_router.post("/decision-engine/monte-carlo-advanced")
+    async def run_monte_carlo_advanced(request: MonteCarloAdvancedRequest):
+        """Run advanced Monte Carlo simulation with 10,000 scenarios"""
+        return run_advanced_monte_carlo(
+            initial_value=request.initial_value,
+            annual_contribution=request.annual_contribution,
+            expected_return=request.expected_return,
+            volatility=request.volatility,
+            years=request.years,
+            target_value=request.target_value,
+            simulations=request.simulations,
+            inflation_rate=request.inflation_rate
+        )
+    
+    # Goal Progress
+    class GoalProgressRequest(BaseModel):
+        goals: List[Dict[str, Any]]
+        current_values: Dict[str, float] = {}
+    
+    @api_router.post("/decision-engine/goal-progress")
+    async def get_goal_progress(request: GoalProgressRequest):
+        """Calculate progress towards financial goals"""
+        return calculate_goal_progress(request.goals, request.current_values)
+    
+    # Net Worth Projection
+    @api_router.get("/decision-engine/net-worth-projection")
+    async def get_net_worth_projection(
+        current_net_worth: float,
+        annual_savings: float,
+        years: int = 20,
+        growth_rate: float = 0.07
+    ):
+        """Generate net worth projection over time"""
+        return generate_net_worth_projection(
+            current_net_worth, annual_savings, years, growth_rate
+        )
+    
+    # ==================== LIFE TIMELINE ENDPOINTS ====================
+    
+    @api_router.get("/timeline/default")
+    async def get_default_timeline(current_age: int = 45):
+        """Get default life timeline based on current age"""
+        from datetime import datetime
+        current_year = datetime.now().year
+        events = generate_default_timeline(current_age, current_year)
+        return {
+            'events': events,
+            'event_types': LIFE_EVENT_TYPES
+        }
+    
+    class TimelineImpactRequest(BaseModel):
+        events: List[Dict[str, Any]]
+        current_net_worth: float
+        annual_income: float
+        savings_rate: float = 0.15
+        growth_rate: float = 0.07
+    
+    @api_router.post("/timeline/calculate-impact")
+    async def calculate_timeline_financial_impact(request: TimelineImpactRequest):
+        """Calculate financial impact of a life timeline"""
+        result = calculate_timeline_impact(
+            request.events,
+            request.current_net_worth,
+            request.annual_income,
+            request.savings_rate,
+            request.growth_rate
+        )
+        result['milestones'] = get_milestone_events(result['projections'])
+        return result
+    
+    class RetirementAgeChangeRequest(BaseModel):
+        current_timeline: Dict[str, Any]
+        new_retirement_age: int
+        current_age: int
+        current_net_worth: float
+        annual_income: float
+        savings_rate: float = 0.15
+    
+    @api_router.post("/timeline/retirement-age-change")
+    async def simulate_retirement_change(request: RetirementAgeChangeRequest):
+        """Simulate impact of changing retirement age"""
+        return simulate_retirement_age_change(
+            request.current_timeline,
+            request.new_retirement_age,
+            request.current_age,
+            request.current_net_worth,
+            request.annual_income,
+            request.savings_rate
+        )
+    
+    # ==================== CLIENT CRM ENDPOINTS ====================
+    
+    @api_router.get("/crm/clients")
+    async def get_clients():
+        """Get all clients (demo data)"""
+        clients = generate_demo_clients()
+        return {
+            'clients': clients,
+            'summary': {
+                'total': len(clients),
+                'active': len([c for c in clients if c['status'] == 'active']),
+                'prospects': len([c for c in clients if c['status'] == 'prospect']),
+                'review_due': len([c for c in clients if c['status'] == 'review']),
+                'total_aum': sum(c['financial_summary']['net_worth'] for c in clients)
+            }
+        }
+    
+    @api_router.get("/crm/clients/{client_id}")
+    async def get_client_detail(client_id: str):
+        """Get client detail"""
+        clients = generate_demo_clients()
+        client = next((c for c in clients if c['client_id'] == client_id), None)
+        if not client:
+            raise HTTPException(status_code=404, detail="Client not found")
+        return client
+    
+    class CreateClientRequest(BaseModel):
+        name: str
+        email: str
+        phone: Optional[str] = None
+    
+    @api_router.post("/crm/clients")
+    async def create_new_client(request: CreateClientRequest):
+        """Create a new client"""
+        client = create_client(request.name, request.email, request.phone)
+        # In production, save to database
+        return client
+    
+    # Meeting Notes
+    class CreateNoteRequest(BaseModel):
+        client_id: str
+        title: str
+        content: str
+        meeting_type: str = "general"
+        action_items: List[str] = []
+    
+    @api_router.post("/crm/notes")
+    async def create_note(request: CreateNoteRequest):
+        """Create a meeting note"""
+        note = create_meeting_note(
+            request.client_id,
+            "adviser_001",  # In production, get from auth
+            request.title,
+            request.content,
+            request.meeting_type,
+            request.action_items
+        )
+        return note
+    
+    # Tasks
+    class CreateTaskRequest(BaseModel):
+        client_id: str
+        title: str
+        description: Optional[str] = None
+        due_date: Optional[str] = None
+        priority: str = "medium"
+        category: str = "general"
+    
+    @api_router.post("/crm/tasks")
+    async def create_new_task(request: CreateTaskRequest):
+        """Create a task"""
+        from services.client_crm import TaskPriority
+        task = create_task(
+            request.client_id,
+            "adviser_001",
+            request.title,
+            request.description,
+            request.due_date,
+            TaskPriority(request.priority),
+            request.category
+        )
+        return task
+    
+    @api_router.get("/crm/tasks")
+    async def get_all_tasks(client_id: Optional[str] = None, status: Optional[str] = None):
+        """Get tasks, optionally filtered by client or status"""
+        # Demo tasks
+        from datetime import datetime, timedelta
+        now = datetime.now()
+        tasks = [
+            {'task_id': 'task_001', 'client_id': 'client_wheeler001', 'title': 'Annual review meeting', 'status': 'pending', 'priority': 'high', 'due_date': (now + timedelta(days=7)).isoformat(), 'category': 'review'},
+            {'task_id': 'task_002', 'client_id': 'client_chen002', 'title': 'Submit super contribution form', 'status': 'in_progress', 'priority': 'medium', 'due_date': (now + timedelta(days=14)).isoformat(), 'category': 'compliance'},
+            {'task_id': 'task_003', 'client_id': 'client_patel003', 'title': 'Collect ID documents', 'status': 'pending', 'priority': 'high', 'due_date': (now + timedelta(days=3)).isoformat(), 'category': 'document'},
+            {'task_id': 'task_004', 'client_id': 'client_jones004', 'title': 'Review insurance coverage', 'status': 'pending', 'priority': 'medium', 'due_date': (now - timedelta(days=5)).isoformat(), 'category': 'review'},
+            {'task_id': 'task_005', 'client_id': 'client_chen002', 'title': 'Execute ETF purchase', 'status': 'pending', 'priority': 'high', 'due_date': (now + timedelta(days=1)).isoformat(), 'category': 'implementation'},
+        ]
+        
+        if client_id:
+            tasks = [t for t in tasks if t['client_id'] == client_id]
+        if status:
+            tasks = [t for t in tasks if t['status'] == status]
+        
+        return {'tasks': tasks, 'total': len(tasks)}
+    
+    # Advice Workflow
+    @api_router.get("/crm/workflow/stages")
+    async def get_workflow_stages():
+        """Get all advice workflow stages"""
+        return {'stages': ADVICE_WORKFLOW_STAGES}
+    
+    @api_router.post("/crm/workflow")
+    async def create_workflow(client_id: str):
+        """Create advice workflow for a client"""
+        workflow = create_advice_workflow(client_id, "adviser_001")
+        return workflow
+    
+    @api_router.get("/crm/workflow/{client_id}")
+    async def get_client_workflow(client_id: str):
+        """Get advice workflow for a client"""
+        # Demo workflow
+        workflow = create_advice_workflow(client_id, "adviser_001")
+        # Simulate some progress for demo
+        if client_id == 'client_wheeler001':
+            workflow['current_stage'] = 'review'
+            workflow['progress_percentage'] = 85
+        elif client_id == 'client_chen002':
+            workflow['current_stage'] = 'implementation'
+            workflow['progress_percentage'] = 65
+        elif client_id == 'client_patel003':
+            workflow['current_stage'] = 'discovery'
+            workflow['progress_percentage'] = 15
+        return workflow
+    
+    # Client Portal
+    @api_router.get("/portal/{client_id}")
+    async def get_portal_data(client_id: str):
+        """Get client portal view data"""
+        clients = generate_demo_clients()
+        client = next((c for c in clients if c['client_id'] == client_id), None)
+        if not client:
+            raise HTTPException(status_code=404, detail="Client not found")
+        
+        # Demo goals
+        goals = [
+            {'name': 'Retirement', 'progress': 72, 'target': 3500000, 'current': 2520000},
+            {'name': 'House Upgrade', 'progress': 49, 'target': 500000, 'current': 245000},
+            {'name': 'Education Fund', 'progress': 91, 'target': 200000, 'current': 182000},
+        ]
+        
+        # Demo tasks for client
+        tasks_response = await get_all_tasks(client_id=client_id)
+        
+        # Demo documents
+        documents = [
+            {'name': 'Statement of Advice', 'document_type': 'soa', 'uploaded_at': '2024-01-15', 'is_signed': True},
+            {'name': 'Risk Profile', 'document_type': 'risk_profile', 'uploaded_at': '2024-01-10', 'is_signed': True},
+            {'name': 'Annual Review 2024', 'document_type': 'review', 'uploaded_at': '2024-06-01', 'is_signed': False},
+        ]
+        
+        return get_client_portal_data(client, goals, tasks_response['tasks'], documents)
+
+except ImportError as e:
+    logger.warning(f"Decision engine services not available: {e}")
+
 # Include the router in the main app
 app.include_router(api_router)
 
