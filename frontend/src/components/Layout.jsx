@@ -283,10 +283,14 @@ const Layout = ({ children }) => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Update expanded groups when mode changes
+  // Update expanded groups when mode changes - COLLAPSED by default, only expand active
   useEffect(() => {
+    const activeGroup = activeNavGroups.find(group => 
+      group.items.some(item => location.pathname === item.path)
+    );
     setExpandedGroups(activeNavGroups.reduce((acc, group) => {
-      acc[group.name] = true;
+      // Only expand the group that contains the current page
+      acc[group.name] = activeGroup ? group.name === activeGroup.name : group.name === "Dashboard";
       return acc;
     }, {}));
   }, [appMode]);
