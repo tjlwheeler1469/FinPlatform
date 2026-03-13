@@ -302,6 +302,43 @@ const ScenarioComparison = () => {
           </div>
         </div>
 
+        {/* Stress Test Quick Actions */}
+        <Card className="border-red-200 bg-gradient-to-r from-red-50/50 to-amber-50/50">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">⚡</span>
+                <CardTitle className="text-lg">Stress Test Your Plan</CardTitle>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => setShowStressTests(!showStressTests)}
+              >
+                {showStressTests ? 'Hide' : 'Show'} Tests
+              </Button>
+            </div>
+            <CardDescription>See how your plan holds up under adverse conditions</CardDescription>
+          </CardHeader>
+          {showStressTests && (
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {STRESS_TEST_PRESETS.map((preset, index) => (
+                  <button
+                    key={index}
+                    onClick={() => applyStressTest(preset)}
+                    disabled={scenarios.length >= 6}
+                    className="flex flex-col items-center p-4 rounded-lg border-2 border-dashed border-red-200 hover:border-red-400 hover:bg-red-50 transition-all text-center disabled:opacity-50"
+                  >
+                    <span className="text-3xl mb-2">{preset.icon}</span>
+                    <span className="font-semibold text-sm">{preset.name}</span>
+                    <span className="text-xs text-muted-foreground mt-1">{preset.description}</span>
+                  </button>
+                ))}
+              </div>
+            </CardContent>
+          )}
+
         {/* Scenario Tabs */}
         <div className="flex gap-2 overflow-x-auto pb-2">
           {scenarios.map((scenario, index) => (
