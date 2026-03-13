@@ -548,8 +548,10 @@ const Layout = ({ children }) => {
               {sidebarCollapsed && GroupIcon && (
                 <div 
                   className={cn(
-                    "flex items-center justify-center p-2 mb-1 rounded-lg cursor-pointer",
-                    isGroupActive(group) ? "text-[#D4A84C]" : "text-white/50 hover:text-white/70"
+                    "flex items-center justify-center p-2 mb-1 rounded-lg cursor-pointer transition-all",
+                    groupActive 
+                      ? "text-[#D4A84C] bg-[#D4A84C]/20" 
+                      : "text-white/60 hover:text-white hover:bg-white/10"
                   )}
                   onClick={() => toggleGroup(group.name)}
                   title={group.name}
