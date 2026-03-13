@@ -32,6 +32,18 @@ import {
 const STORAGE_KEY = "wheeler_compliance_acknowledged";
 const STORAGE_KEY_V2 = "halcyon_compliance_v2";  // New versioned key for better tracking
 
+// Check once at module load if already acknowledged
+let moduleHasAcknowledged = false;
+try {
+  moduleHasAcknowledged = !!(
+    localStorage.getItem(STORAGE_KEY) || 
+    localStorage.getItem(STORAGE_KEY_V2) || 
+    sessionStorage.getItem('compliance_session')
+  );
+} catch {
+  moduleHasAcknowledged = false;
+}
+
 // Compliance disclaimer content
 const COMPLIANCE_CONTENT = {
   title: "Important Information",
