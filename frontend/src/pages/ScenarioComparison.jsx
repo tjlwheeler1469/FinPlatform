@@ -120,7 +120,35 @@ const calculateScenario = (scenario, currentData) => {
   };
 };
 
-const SCENARIO_COLORS = ['#1a2744', '#D4A84C', '#10B981', '#3B82F6'];
+const SCENARIO_COLORS = ['#1a2744', '#D4A84C', '#10B981', '#3B82F6', '#EF4444', '#8B5CF6'];
+
+// Stress Test Presets
+const STRESS_TEST_PRESETS = [
+  { 
+    name: "Market Crash (-30%)", 
+    icon: "📉",
+    description: "Simulates a severe market downturn",
+    overrides: { investmentReturn: -5, inflationRate: 4 }
+  },
+  { 
+    name: "High Inflation", 
+    icon: "💹",
+    description: "Sustained 6% inflation scenario",
+    overrides: { inflationRate: 6, investmentReturn: 5 }
+  },
+  { 
+    name: "Job Loss (1 Year)", 
+    icon: "💼",
+    description: "No income for 12 months",
+    overrides: { savingsRate: 0, superContribution: 0 }
+  },
+  { 
+    name: "Property Crash", 
+    icon: "🏠",
+    description: "Property values drop 20%",
+    overrides: { propertyGrowth: -10 }
+  }
+];
 
 const ScenarioComparison = () => {
   const navigate = useNavigate();
@@ -147,6 +175,18 @@ const ScenarioComparison = () => {
   
   const [selectedScenario, setSelectedScenario] = useState(0);
   const [compareMode, setCompareMode] = useState(true);
+  const [showStressTests, setShowStressTests] = useState(false);
+
+  // Apply stress test to a scenario
+  const applyStressTest = (preset) => {
+    const stressScenario = calculateScenario(
+      createScenario(preset.name, SCENARIO_COLORS[scenarios.length % SCENARIO_COLORS.length], preset.overrides),
+      currentData
+    );
+    if (scenarios.length < 6) {
+      setScenarios([...scenarios, stressScenario]);
+    }
+  };
 
   // Update scenario calculations when parameters change
   const updateScenario = (index, updates) => {
