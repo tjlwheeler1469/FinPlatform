@@ -6464,8 +6464,8 @@ try:
         )
         return calculate_financial_health_score(profile)
     
-    @api_router.post("/decision-engine/recommendations")
-    async def get_smart_recommendations(request: HealthScoreRequest):
+    @api_router.post("/decision-engine/recommendations-v2")
+    async def get_smart_recommendations_v2(request: HealthScoreRequest):
         """Generate AI-powered actionable recommendations with $ impact"""
         profile = FinancialProfile(
             age=request.age,
