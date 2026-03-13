@@ -172,7 +172,7 @@ The following data is currently MOCKED and not connected to live sources:
 ---
 
 ## Testing Status
-- **Test Reports**: `/app/test_reports/iteration_35.json` through `iteration_37.json`
+- **Test Reports**: `/app/test_reports/iteration_35.json` through `iteration_39.json`
 - **Backend**: 100% pass rate
 - **Frontend**: 100% pass rate
 - **Integration**: All APIs working correctly
@@ -181,7 +181,20 @@ The following data is currently MOCKED and not connected to live sources:
 
 ## Changelog
 
-### March 13, 2026
+### March 13, 2026 (Latest Session)
+- ✅ **REAL Monte Carlo Simulation** - Implemented actual 10,000-iteration Monte Carlo simulation using numpy
+  - Replaces mock static data with real calculated probabilities
+  - Returns success_probability, median_outcome, best_case, worst_case, shortfall_risk
+  - Dashboard now shows dynamic, varying results based on real calculations
+- ✅ **Compliance Modal Bug Fixed** - Modal now only appears once on first visit
+  - Fixed localStorage persistence using useEffect instead of module-level variable
+  - Keys: `wheeler_compliance_acknowledged`, `halcyon_compliance_v2`
+  - No longer reappears on navigation between pages
+- ✅ **What-If Scenario Builder** - Now triggers real Monte Carlo recalculations
+  - 4 adjustable sliders update Monte Carlo results in real-time
+  - Shows updated probabilities and projected balances
+
+### March 13, 2026 (Earlier)
 - ✅ Completed Phase 1-4 implementation
 - ✅ Added What-If Quick Toggle to Dashboard
 - ✅ Created Decision Engine page with health score and recommendations
