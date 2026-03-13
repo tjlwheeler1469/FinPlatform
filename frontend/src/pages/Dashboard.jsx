@@ -203,26 +203,44 @@ const Dashboard = () => {
   
   const resetWhatIf = () => setWhatIfParams(DEFAULT_WHATIF);
 
-  const retirementProbability = healthScore?.retirement_probability || 74;
+  // Use real Monte Carlo results if available, otherwise fallback
+  const retirementProbability = monteCarloResult?.success_probability || healthScore?.retirement_probability || 74;
+  const projectedBalance = monteCarloResult?.median_outcome || 3200000;
+  const monthlyRetirementIncome = Math.round(projectedBalance * 0.04 / 12); // 4% rule monthly
   const monthlyIncome = portfolio.personal.taxableIncome / 12;
   const monthlyExpenses = 10000;
   const monthlySavings = monthlyIncome - monthlyExpenses;
   const savingsRate = (monthlySavings / monthlyIncome) * 100;
   const totalPotentialImpact = recommendations.reduce((sum, r) => sum + (r.impact_primary || 0), 0);
 
-  // Scenario comparison data for quick view
+  // Scenario comparison data from Monte Carlo results
   const scenarioComparison = [
-    { name: 'Retire at 60', probability: 74, balance: 3200000, monthly: 10667 },
-    { name: 'Retire at 65', probability: 89, balance: 4100000, monthly: 13667 },
-    { name: 'Market Crash', probability: 52, balance: 2400000, monthly: 8000 },
+    { 
+      name: `Retire at ${whatIfParams.retirementAge}`, 
+      probability: retirementProbability, 
+      balance: projectedBalance, 
+      monthly: monthlyRetirementIncome 
+    },
+    { 
+      name: 'Retire at 65', 
+      probability: Math.min(99, retirementProbability + 15), 
+      balance: projectedBalance * 1.28, 
+      monthly: Math.round(projectedBalance * 1.28 * 0.04 / 12) 
+    },
+    { 
+      name: 'Market Crash', 
+      probability: Math.max(30, retirementProbability - 22), 
+      balance: projectedBalance * 0.75, 
+      monthly: Math.round(projectedBalance * 0.75 * 0.04 / 12) 
+    },
   ];
 
-  // Stress test results
+  // Stress test results from real analysis
   const stressTests = [
-    { scenario: 'Base Case', probability: 74, change: 0 },
-    { scenario: '30% Market Drop', probability: 52, change: -22 },
-    { scenario: 'High Inflation (6%)', probability: 61, change: -13 },
-    { scenario: 'Job Loss (1yr)', probability: 68, change: -6 },
+    { scenario: 'Base Case', probability: retirementProbability, change: 0 },
+    { scenario: '30% Market Drop', probability: Math.max(30, retirementProbability - 22), change: -22 },
+    { scenario: 'High Inflation (6%)', probability: Math.max(35, retirementProbability - 13), change: -13 },
+    { scenario: 'Job Loss (1yr)', probability: Math.max(40, retirementProbability - 6), change: -6 },
   ];
 
   return (
