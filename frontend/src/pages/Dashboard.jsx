@@ -144,6 +144,14 @@ const GOALS_DATA = [
   { id: 4, name: "Europe Trip 2026", target: 35000, current: 28000, progress: 80, icon: "travel", onTrack: true }
 ];
 
+// Default What-If parameters
+const DEFAULT_WHATIF = {
+  savingsRate: 15,
+  marketReturn: 7,
+  retirementAge: 60,
+  inflationRate: 3
+};
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const { portfolio, recommendations } = usePortfolio();
@@ -151,6 +159,10 @@ const Dashboard = () => {
   const [healthScore, setHealthScore] = useState(null);
   const [netWorthHistory, setNetWorthHistory] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // What-If Toggle State
+  const [showWhatIf, setShowWhatIf] = useState(false);
+  const [whatIfParams, setWhatIfParams] = useState(DEFAULT_WHATIF);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -159,9 +171,9 @@ const Dashboard = () => {
           axios.post(`${API}/analyze/monte-carlo`, null, {
             params: {
               initial_value: portfolio.summary.netWorth,
-              expected_return: 0.07,
+              expected_return: whatIfParams.marketReturn / 100,
               volatility: 0.12,
-              years: 25,
+              years: whatIfParams.retirementAge - 45,
               simulations: 1000
             }
           }),
@@ -175,8 +187,8 @@ const Dashboard = () => {
             emergency_fund: 75000,
             investment_portfolio: portfolio.investments.shares_value + portfolio.investments.etf_value,
             property_value: portfolio.investments.properties.reduce((sum, p) => sum + p.value, 0),
-            savings_rate: 0.15,
-            retirement_age: 60,
+            savings_rate: whatIfParams.savingsRate / 100,
+            retirement_age: whatIfParams.retirementAge,
             desired_retirement_income: 100000
           }),
           axios.get(`${API}/trends/net-worth/wheeler`)
@@ -195,7 +207,54 @@ const Dashboard = () => {
     };
 
     fetchData();
-  }, [portfolio]);
+  }, [portfolio, whatIfParams]);
+  
+  // Calculate What-If adjusted metrics
+  const whatIfMetrics = useMemo(() => {
+    const baseNetWorth = portfolio.summary.netWorth;
+    const baseMonthlyIncome = portfolio.personal.taxableIncome / 12;
+    const yearsToRetirement = whatIfParams.retirementAge - 45;
+    
+    // Calculate adjusted monthly savings based on savings rate
+    const adjustedMonthlySavings = baseMonthlyIncome * (whatIfParams.savingsRate / 100);
+    
+    // Calculate adjusted cashflow
+    const adjustedMonthlyCashflow = adjustedMonthlySavings;
+    
+    // Simple future value calculation with compound growth
+    const annualReturn = whatIfParams.marketReturn / 100;
+    const inflationAdjustedReturn = annualReturn - (whatIfParams.inflationRate / 100);
+    
+    // Future Value = PV * (1 + r)^n + PMT * [((1 + r)^n - 1) / r]
+    const fv = baseNetWorth * Math.pow(1 + inflationAdjustedReturn, yearsToRetirement) + 
+               (adjustedMonthlySavings * 12) * ((Math.pow(1 + inflationAdjustedReturn, yearsToRetirement) - 1) / inflationAdjustedReturn);
+    
+    // Estimated retirement probability (simplified model)
+    const retirementTarget = 3500000;
+    const probabilityBase = Math.min(100, Math.round((fv / retirementTarget) * 75 + 
+      (whatIfParams.savingsRate > 15 ? 10 : 0) + 
+      (whatIfParams.marketReturn > 7 ? 5 : 0)));
+    
+    // Compare to defaults
+    const defaultFV = baseNetWorth * Math.pow(1 + 0.04, 15) + 
+                     (baseMonthlyIncome * 0.15 * 12) * ((Math.pow(1 + 0.04, 15) - 1) / 0.04);
+    
+    const netWorthDelta = fv - defaultFV;
+    const cashflowDelta = adjustedMonthlySavings - (baseMonthlyIncome * 0.15);
+    
+    return {
+      projectedNetWorth: fv,
+      monthlyCashflow: adjustedMonthlyCashflow,
+      retirementProbability: probabilityBase,
+      netWorthDelta,
+      cashflowDelta,
+      isModified: JSON.stringify(whatIfParams) !== JSON.stringify(DEFAULT_WHATIF)
+    };
+  }, [whatIfParams, portfolio]);
+  
+  const resetWhatIf = () => {
+    setWhatIfParams(DEFAULT_WHATIF);
+  };
 
   // Calculate retirement probability from Monte Carlo
   const retirementProbability = monteCarloData?.success_probability || 81;
