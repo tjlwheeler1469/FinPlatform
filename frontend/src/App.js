@@ -820,8 +820,11 @@ const AppRouter = () => {
       <Route path="/security" element={<SecuritySettings />} />
       <Route path="/data-import-export" element={<DataImportExportPage />} />
       <Route path="/investment-comparison" element={<InvestmentComparison />} />
-      <Route path="/decision-engine" element={<DecisionDashboard />} />
-      <Route path="/life-timeline" element={<LifeTimeline />} />
+      <Route path="/decision-engine" element={<DecisionEngine />} />
+      <Route path="/decision-dashboard" element={<DecisionDashboard />} />
+      <Route path="/life-timeline" element={<LifeTimelinePlanner />} />
+      <Route path="/timeline" element={<LifeTimeline />} />
+      <Route path="/clients" element={<ClientCRM />} />
       <Route path="/client-crm" element={<ClientCRM />} />
       <Route path="/goal-tracker" element={<GoalTracker />} />
       <Route path="/ai-advisor" element={<AIAdvisor />} />
@@ -830,6 +833,7 @@ const AppRouter = () => {
       <Route path="/insurance-gap" element={<InsuranceGapAnalysis />} />
       <Route path="/debt-paydown" element={<DebtPaydownPlanner />} />
       <Route path="/revenue-billing" element={<RevenueBilling />} />
+      <Route path="/advice-workflow" element={<AdviceWorkflow />} />
     </Routes>
   );
 };
