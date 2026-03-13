@@ -115,6 +115,10 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const yearsToRetirement = whatIfParams.retirementAge - 45;
+        const annualSavings = portfolio.personal.taxableIncome * (whatIfParams.savingsRate / 100);
+        const retirementTarget = 3500000;
+        
         const requestData = {
           age: 45,
           retirement_age: whatIfParams.retirementAge,
@@ -131,22 +135,36 @@ const Dashboard = () => {
           mortgage_balance: portfolio.summary.totalDebt
         };
 
-        const [healthRes, recsRes, projectionRes] = await Promise.all([
+        // Monte Carlo request
+        const monteCarloData = {
+          initial_value: portfolio.summary.netWorth,
+          annual_contribution: annualSavings,
+          expected_return: whatIfParams.marketReturn / 100,
+          volatility: 0.15, // Standard 15% market volatility
+          years: yearsToRetirement,
+          target_value: retirementTarget,
+          simulations: 10000,
+          inflation_rate: whatIfParams.inflationRate / 100
+        };
+
+        const [healthRes, recsRes, projectionRes, monteCarloRes] = await Promise.all([
           axios.post(`${API}/decision-engine/health-score-v2`, requestData),
           axios.post(`${API}/decision-engine/recommendations-v2`, requestData),
           axios.get(`${API}/decision-engine/net-worth-projection`, {
             params: {
               current_net_worth: portfolio.summary.netWorth,
-              annual_savings: portfolio.personal.taxableIncome * (whatIfParams.savingsRate / 100),
+              annual_savings: annualSavings,
               years: 20,
               growth_rate: whatIfParams.marketReturn / 100
             }
-          })
+          }),
+          axios.post(`${API}/decision-engine/monte-carlo-advanced`, monteCarloData)
         ]);
         
         setHealthScore(healthRes.data);
         setRecommendations(recsRes.data.recommendations || []);
         setNetWorthProjection(projectionRes.data || []);
+        setMonteCarloResult(monteCarloRes.data);
       } catch (error) {
         console.error("Error fetching data:", error);
         setHealthScore({ score: 78, grade: "B+", retirement_probability: 81 });
