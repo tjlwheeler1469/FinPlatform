@@ -6768,6 +6768,143 @@ try:
         ]
         
         return get_client_portal_data(client, goals, tasks_response['tasks'], documents)
+    
+    # ==================== AI SCENARIO GENERATOR ====================
+    
+    class ScenarioGeneratorRequest(BaseModel):
+        current_net_worth: float
+        annual_income: float
+        annual_expenses: float
+        savings_rate: float
+        retirement_age: int = 65
+        current_age: int = 45
+        risk_tolerance: str = "moderate"  # conservative, moderate, aggressive
+    
+    @api_router.post("/ai/generate-scenarios")
+    async def generate_optimal_scenarios(request: ScenarioGeneratorRequest):
+        """AI-powered scenario generator that suggests optimal financial paths"""
+        import os
+        from datetime import datetime, timezone
+        
+        current_savings = request.annual_income * request.savings_rate
+        years_to_retirement = request.retirement_age - request.current_age
+        
+        # Generate three different scenario types based on risk tolerance
+        scenarios = []
+        
+        # Scenario 1: Conservative Path
+        conservative_savings_rate = min(request.savings_rate + 0.05, 0.30)
+        conservative_annual_savings = request.annual_income * conservative_savings_rate
+        conservative_fv = request.current_net_worth * (1.05 ** years_to_retirement) + \
+                         conservative_annual_savings * ((1.05 ** years_to_retirement - 1) / 0.05)
+        
+        scenarios.append({
+            'id': 'conservative',
+            'name': 'Conservative Growth Path',
+            'description': 'Lower risk, steady growth focusing on capital preservation',
+            'parameters': {
+                'savings_rate': round(conservative_savings_rate * 100, 1),
+                'market_return': 5.0,
+                'retirement_age': request.retirement_age,
+                'risk_level': 'low'
+            },
+            'projections': {
+                'retirement_net_worth': round(conservative_fv, 0),
+                'monthly_retirement_income': round(conservative_fv * 0.04 / 12, 0),
+                'success_probability': 92 if conservative_fv >= 2500000 else 78
+            },
+            'key_actions': [
+                f'Increase savings to {round(conservative_savings_rate * 100)}% of income',
+                'Shift portfolio to 60/40 stocks/bonds allocation',
+                'Maximize government co-contributions'
+            ],
+            'pros': ['Lower volatility', 'Predictable growth', 'Sleep-well-at-night factor'],
+            'cons': ['Lower potential returns', 'May need longer accumulation phase']
+        })
+        
+        # Scenario 2: Balanced Growth Path
+        balanced_savings_rate = min(request.savings_rate + 0.08, 0.35)
+        balanced_annual_savings = request.annual_income * balanced_savings_rate
+        balanced_fv = request.current_net_worth * (1.07 ** years_to_retirement) + \
+                     balanced_annual_savings * ((1.07 ** years_to_retirement - 1) / 0.07)
+        
+        scenarios.append({
+            'id': 'balanced',
+            'name': 'Balanced Growth Path',
+            'description': 'Optimal mix of growth and stability for long-term wealth building',
+            'parameters': {
+                'savings_rate': round(balanced_savings_rate * 100, 1),
+                'market_return': 7.0,
+                'retirement_age': request.retirement_age,
+                'risk_level': 'medium'
+            },
+            'projections': {
+                'retirement_net_worth': round(balanced_fv, 0),
+                'monthly_retirement_income': round(balanced_fv * 0.04 / 12, 0),
+                'success_probability': 85 if balanced_fv >= 3000000 else 72
+            },
+            'key_actions': [
+                f'Target {round(balanced_savings_rate * 100)}% savings rate',
+                'Maintain 70/30 growth/defensive allocation',
+                'Maximize super contributions to $30k concessional cap',
+                'Implement debt recycling strategy'
+            ],
+            'pros': ['Good growth potential', 'Manageable risk', 'Tax-efficient'],
+            'cons': ['Some market exposure', 'Requires discipline']
+        })
+        
+        # Scenario 3: Aggressive Growth Path (Early Retirement)
+        early_retirement_age = max(55, request.retirement_age - 5)
+        early_years = early_retirement_age - request.current_age
+        aggressive_savings_rate = min(request.savings_rate + 0.12, 0.40)
+        aggressive_annual_savings = request.annual_income * aggressive_savings_rate
+        aggressive_fv = request.current_net_worth * (1.09 ** early_years) + \
+                       aggressive_annual_savings * ((1.09 ** early_years - 1) / 0.09)
+        
+        scenarios.append({
+            'id': 'aggressive',
+            'name': 'Early Retirement Path',
+            'description': f'Aggressive growth strategy to retire {request.retirement_age - early_retirement_age} years earlier',
+            'parameters': {
+                'savings_rate': round(aggressive_savings_rate * 100, 1),
+                'market_return': 9.0,
+                'retirement_age': early_retirement_age,
+                'risk_level': 'high'
+            },
+            'projections': {
+                'retirement_net_worth': round(aggressive_fv, 0),
+                'monthly_retirement_income': round(aggressive_fv * 0.04 / 12, 0),
+                'success_probability': 75 if aggressive_fv >= 2500000 else 62
+            },
+            'key_actions': [
+                f'Maximize savings to {round(aggressive_savings_rate * 100)}%',
+                'Overweight growth assets (80%+ equities)',
+                'Consider income-generating investments',
+                f'Target retirement at {early_retirement_age}'
+            ],
+            'pros': [f'Retire {request.retirement_age - early_retirement_age} years earlier', 'Higher wealth potential', 'More flexibility'],
+            'cons': ['Higher volatility', 'Requires significant lifestyle adjustment', 'Less margin for error']
+        })
+        
+        # Calculate comparison metrics
+        current_trajectory_fv = request.current_net_worth * (1.07 ** years_to_retirement) + \
+                               current_savings * ((1.07 ** years_to_retirement - 1) / 0.07)
+        
+        return {
+            'generated_at': datetime.now(timezone.utc).isoformat(),
+            'current_trajectory': {
+                'savings_rate': round(request.savings_rate * 100, 1),
+                'projected_retirement': round(current_trajectory_fv, 0),
+                'success_probability': 81
+            },
+            'scenarios': scenarios,
+            'recommendation': {
+                'suggested_scenario': 'balanced' if request.risk_tolerance == 'moderate' else (
+                    'conservative' if request.risk_tolerance == 'conservative' else 'aggressive'
+                ),
+                'reason': 'Best match for your risk tolerance and financial goals'
+            }
+        }
 
 except ImportError as e:
     logger.warning(f"Decision engine services not available: {e}")
