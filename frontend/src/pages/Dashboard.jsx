@@ -106,6 +106,7 @@ const Dashboard = () => {
   const [healthScore, setHealthScore] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
   const [netWorthProjection, setNetWorthProjection] = useState([]);
+  const [monteCarloResult, setMonteCarloResult] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("insights");
   const [showWhatIf, setShowWhatIf] = useState(false);
