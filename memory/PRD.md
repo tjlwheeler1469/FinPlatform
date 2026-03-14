@@ -188,17 +188,32 @@ The following data is currently MOCKED and not connected to live sources:
 ## Changelog
 
 ### March 13, 2026 (Latest Session)
-- ✅ **REAL Monte Carlo Simulation** - Implemented actual 10,000-iteration Monte Carlo simulation using numpy
-  - Replaces mock static data with real calculated probabilities
-  - Returns success_probability, median_outcome, best_case, worst_case, shortfall_risk
-  - Dashboard now shows dynamic, varying results based on real calculations
-- ✅ **Compliance Modal Bug Fixed** - Modal now only appears once on first visit
-  - Fixed localStorage persistence using useEffect instead of module-level variable
-  - Keys: `wheeler_compliance_acknowledged`, `halcyon_compliance_v2`
-  - No longer reappears on navigation between pages
-- ✅ **What-If Scenario Builder** - Now triggers real Monte Carlo recalculations
-  - 4 adjustable sliders update Monte Carlo results in real-time
-  - Shows updated probabilities and projected balances
+- ✅ **AI WEALTH STRATEGIST TRANSFORMATION** - Complete overhaul turning dashboard into true AI-powered financial advisor
+  
+  **NEW: AI Wealth Brief (Hero Section)**
+  - Personalized headline: "Action needed: Consider retiring at X instead of Y"
+  - Key insight summary showing total impact potential
+  - Top 3 recommendations with specific $ amounts
+  - Wealth Trajectory visualization showing net worth at ages 45, 50, 55, 60
+  
+  **NEW: Life Decision Simulator**
+  - 6 interactive scenarios: Retire early, Buy property, Start business, Market crash, Inheritance, Save extra
+  - Click any scenario to see: Current probability → New probability, Wealth impact, Recommendation
+  - Backend endpoint: `/api/ai/life-scenario`
+  
+  **Enhanced Monte Carlo Simulation**
+  - Real 10,000-iteration calculations using numpy
+  - Shows: Success probability, Best/Worst case, Median outcome, Shortfall risk
+  - Dynamic recalculation when What-If sliders change
+  
+  **AI Wealth Brief Backend Service**
+  - New file: `/app/backend/services/ai_wealth_brief.py`
+  - Generates personalized recommendations based on user profile
+  - Calculates optimal retirement age
+  - Returns net worth projections at multiple ages
+  
+- ✅ **Compliance Modal Bug Fixed** - Only shows once, persists via localStorage
+- ✅ **Real Monte Carlo Simulation** - Replaced mock data with actual calculations
 
 ### March 13, 2026 (Earlier)
 - ✅ Completed Phase 1-4 implementation
