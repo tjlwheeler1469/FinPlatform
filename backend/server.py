@@ -6611,6 +6611,96 @@ try:
             years_to_retirement=request.years_to_retirement
         )
     
+    # ==================== AI FINANCIAL PLAN GENERATOR ====================
+    
+    from services.financial_plan_generator import (
+        generate_comprehensive_financial_plan,
+        generate_meeting_summary,
+        generate_client_insights
+    )
+    
+    class FinancialPlanRequest(BaseModel):
+        client_name: str
+        age: int = 45
+        retirement_age: int = 60
+        net_worth: float
+        annual_income: float
+        annual_expenses: float = 120000
+        total_assets: float
+        total_debt: float
+        super_balance: float
+        investment_portfolio: float
+        savings_rate: float = 0.15
+        risk_tolerance: str = "moderate"
+        monte_carlo_probability: float = 50.0
+    
+    @api_router.post("/ai/generate-financial-plan")
+    async def create_financial_plan(request: FinancialPlanRequest):
+        """
+        Generate comprehensive AI financial plan.
+        This is the killer feature that saves advisors 5-10 hours per client.
+        """
+        return generate_comprehensive_financial_plan(
+            client_name=request.client_name,
+            age=request.age,
+            retirement_age=request.retirement_age,
+            net_worth=request.net_worth,
+            annual_income=request.annual_income,
+            annual_expenses=request.annual_expenses,
+            total_assets=request.total_assets,
+            total_debt=request.total_debt,
+            super_balance=request.super_balance,
+            investment_portfolio=request.investment_portfolio,
+            savings_rate=request.savings_rate,
+            risk_tolerance=request.risk_tolerance,
+            monte_carlo_probability=request.monte_carlo_probability
+        )
+    
+    class MeetingSummaryRequest(BaseModel):
+        client_name: str
+        meeting_date: str
+        meeting_type: str = "Annual Review"
+        attendees: List[str] = []
+        discussion_points: List[str] = []
+        client_data: Dict[str, Any] = {}
+    
+    @api_router.post("/ai/generate-meeting-summary")
+    async def create_meeting_summary(request: MeetingSummaryRequest):
+        """
+        Generate AI meeting summary with action items.
+        Saves advisors hours of admin work.
+        """
+        return generate_meeting_summary(
+            client_name=request.client_name,
+            meeting_date=request.meeting_date,
+            meeting_type=request.meeting_type,
+            attendees=request.attendees,
+            discussion_points=request.discussion_points,
+            client_data=request.client_data
+        )
+    
+    class ClientInsightsRequest(BaseModel):
+        client_name: str
+        net_worth: float
+        annual_income: float
+        annual_expenses: float
+        savings_rate: float
+        retirement_probability: float
+    
+    @api_router.post("/ai/client-insights")
+    async def get_client_insights(request: ClientInsightsRequest):
+        """
+        Generate AI-powered insights that help advisors look smarter to clients.
+        """
+        return generate_client_insights(
+            client_name=request.client_name,
+            net_worth=request.net_worth,
+            annual_income=request.annual_income,
+            annual_expenses=request.annual_expenses,
+            savings_rate=request.savings_rate,
+            retirement_probability=request.retirement_probability
+        )
+    
     # ==================== LIFE TIMELINE ENDPOINTS ====================
     
     @api_router.get("/timeline/default")
