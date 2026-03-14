@@ -511,8 +511,8 @@ class TestDashboard3EngineSystem:
         assert "base_probability" in data, "Should have base_probability"
         assert "new_probability" in data, "Should have new_probability"
         assert "base_wealth" in data, "Should have base_wealth"
-        assert "new_wealth" in data, "Should have new_wealth"
-        assert "wealth_impact" in data, "Should have wealth_impact"
+        assert "projected_wealth" in data, "Should have projected_wealth"
+        assert "wealth_change" in data, "Should have wealth_change"
     
     def test_ai_wealth_insights(self):
         """Test ENGINE 3 - AI Wealth Insights"""
