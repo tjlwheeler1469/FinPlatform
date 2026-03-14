@@ -35,7 +35,15 @@ import {
   Landmark,
   AlertTriangle,
   ArrowUpRight,
-  Play
+  Play,
+  Brain,
+  Home,
+  Briefcase,
+  Plane,
+  TrendingDown as CrashIcon,
+  Gift,
+  Calendar,
+  User
 } from "lucide-react";
 import { usePortfolio } from "@/App";
 import axios from "axios";
@@ -49,7 +57,9 @@ import {
   ResponsiveContainer,
   ReferenceLine,
   BarChart,
-  Bar
+  Bar,
+  LineChart as RechartsLineChart,
+  Line
 } from "recharts";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -92,6 +102,16 @@ const ACCOUNT_ICONS = {
   credit: CreditCard
 };
 
+// Life Decision Scenarios
+const LIFE_SCENARIOS = [
+  { id: "retire_early_5", name: "Retire 5 years early", icon: Calendar, color: "text-blue-600" },
+  { id: "buy_property", name: "Buy investment property", icon: Home, color: "text-green-600" },
+  { id: "start_business", name: "Start a business", icon: Briefcase, color: "text-purple-600" },
+  { id: "market_crash", name: "30% market crash", icon: CrashIcon, color: "text-red-600" },
+  { id: "inheritance", name: "Receive inheritance", icon: Gift, color: "text-amber-600" },
+  { id: "increase_savings_500", name: "Save extra $500/mo", icon: PiggyBank, color: "text-emerald-600" },
+];
+
 // Default What-If parameters
 const DEFAULT_WHATIF = {
   savingsRate: 15,
@@ -107,10 +127,13 @@ const Dashboard = () => {
   const [recommendations, setRecommendations] = useState([]);
   const [netWorthProjection, setNetWorthProjection] = useState([]);
   const [monteCarloResult, setMonteCarloResult] = useState(null);
+  const [wealthBrief, setWealthBrief] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("insights");
+  const [activeTab, setActiveTab] = useState("brief");
   const [showWhatIf, setShowWhatIf] = useState(false);
   const [whatIfParams, setWhatIfParams] = useState(DEFAULT_WHATIF);
+  const [selectedScenario, setSelectedScenario] = useState(null);
+  const [scenarioResult, setScenarioResult] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -135,12 +158,11 @@ const Dashboard = () => {
           mortgage_balance: portfolio.summary.totalDebt
         };
 
-        // Monte Carlo request
         const monteCarloData = {
           initial_value: portfolio.summary.netWorth,
           annual_contribution: annualSavings,
           expected_return: whatIfParams.marketReturn / 100,
-          volatility: 0.15, // Standard 15% market volatility
+          volatility: 0.15,
           years: yearsToRetirement,
           target_value: retirementTarget,
           simulations: 10000,
@@ -165,6 +187,26 @@ const Dashboard = () => {
         setRecommendations(recsRes.data.recommendations || []);
         setNetWorthProjection(projectionRes.data || []);
         setMonteCarloResult(monteCarloRes.data);
+
+        // Fetch AI Wealth Brief
+        const wealthBriefData = {
+          age: 45,
+          retirement_age: whatIfParams.retirementAge,
+          net_worth: portfolio.summary.netWorth,
+          annual_income: portfolio.personal.taxableIncome,
+          annual_expenses: 120000,
+          total_assets: portfolio.summary.totalAssets,
+          total_debt: portfolio.summary.totalDebt,
+          super_balance: portfolio.investments.smsf_balance,
+          investment_portfolio: portfolio.investments.shares_value + portfolio.investments.etf_value,
+          savings_rate: whatIfParams.savingsRate / 100,
+          mortgage_balance: portfolio.summary.totalDebt,
+          mortgage_rate: 6.5,
+          monte_carlo_probability: monteCarloRes.data?.success_probability || 50
+        };
+        
+        const briefRes = await axios.post(`${API}/ai/wealth-brief`, wealthBriefData);
+        setWealthBrief(briefRes.data);
       } catch (error) {
         console.error("Error fetching data:", error);
         setHealthScore({ score: 78, grade: "B+", retirement_probability: 81 });
@@ -175,8 +217,24 @@ const Dashboard = () => {
 
     fetchData();
   }, [portfolio, whatIfParams]);
+
+  // Handle life scenario selection
+  const handleScenarioClick = async (scenarioId) => {
+    setSelectedScenario(scenarioId);
+    try {
+      const res = await axios.post(`${API}/ai/life-scenario`, {
+        scenario_id: scenarioId,
+        base_probability: retirementProbability,
+        net_worth: portfolio.summary.netWorth,
+        annual_savings: portfolio.personal.taxableIncome * (whatIfParams.savingsRate / 100),
+        years_to_retirement: whatIfParams.retirementAge - 45
+      });
+      setScenarioResult(res.data);
+    } catch (error) {
+      console.error("Error calculating scenario:", error);
+    }
+  };
   
-  // What-If metrics calculation
   const whatIfMetrics = useMemo(() => {
     const baseNetWorth = portfolio.summary.netWorth;
     const baseMonthlyIncome = portfolio.personal.taxableIncome / 12;
@@ -203,39 +261,21 @@ const Dashboard = () => {
   
   const resetWhatIf = () => setWhatIfParams(DEFAULT_WHATIF);
 
-  // Use real Monte Carlo results if available, otherwise fallback
   const retirementProbability = monteCarloResult?.success_probability || healthScore?.retirement_probability || 74;
   const projectedBalance = monteCarloResult?.median_outcome || 3200000;
-  const monthlyRetirementIncome = Math.round(projectedBalance * 0.04 / 12); // 4% rule monthly
+  const monthlyRetirementIncome = Math.round(projectedBalance * 0.04 / 12);
   const monthlyIncome = portfolio.personal.taxableIncome / 12;
   const monthlyExpenses = 10000;
   const monthlySavings = monthlyIncome - monthlyExpenses;
   const savingsRate = (monthlySavings / monthlyIncome) * 100;
-  const totalPotentialImpact = recommendations.reduce((sum, r) => sum + (r.impact_primary || 0), 0);
+  const totalPotentialImpact = wealthBrief?.total_impact || recommendations.reduce((sum, r) => sum + (r.impact_primary || 0), 0);
 
-  // Scenario comparison data from Monte Carlo results
   const scenarioComparison = [
-    { 
-      name: `Retire at ${whatIfParams.retirementAge}`, 
-      probability: retirementProbability, 
-      balance: projectedBalance, 
-      monthly: monthlyRetirementIncome 
-    },
-    { 
-      name: 'Retire at 65', 
-      probability: Math.min(99, retirementProbability + 15), 
-      balance: projectedBalance * 1.28, 
-      monthly: Math.round(projectedBalance * 1.28 * 0.04 / 12) 
-    },
-    { 
-      name: 'Market Crash', 
-      probability: Math.max(30, retirementProbability - 22), 
-      balance: projectedBalance * 0.75, 
-      monthly: Math.round(projectedBalance * 0.75 * 0.04 / 12) 
-    },
+    { name: `Retire at ${whatIfParams.retirementAge}`, probability: retirementProbability, balance: projectedBalance, monthly: monthlyRetirementIncome },
+    { name: 'Retire at 65', probability: Math.min(99, retirementProbability + 15), balance: projectedBalance * 1.28, monthly: Math.round(projectedBalance * 1.28 * 0.04 / 12) },
+    { name: 'Market Crash', probability: Math.max(30, retirementProbability - 22), balance: projectedBalance * 0.75, monthly: Math.round(projectedBalance * 0.75 * 0.04 / 12) },
   ];
 
-  // Stress test results from real analysis
   const stressTests = [
     { scenario: 'Base Case', probability: retirementProbability, change: 0 },
     { scenario: '30% Market Drop', probability: Math.max(30, retirementProbability - 22), change: -22 },
@@ -249,8 +289,8 @@ const Dashboard = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold text-foreground">Wealth Command Center</h1>
-            <p className="text-sm text-muted-foreground mt-1">Wheeler Family • Last updated today</p>
+            <h1 className="text-2xl font-semibold text-foreground">Your Financial Command Center</h1>
+            <p className="text-sm text-muted-foreground mt-1">Wheeler Family • AI-Powered Wealth Strategy</p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={() => setShowWhatIf(!showWhatIf)}>
@@ -264,9 +304,76 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* HERO SECTION: Retirement Probability + Health Score */}
+        {/* AI WEALTH BRIEF - THE HERO SECTION */}
+        <Card className="bg-gradient-to-br from-slate-900 to-slate-800 text-white border-0">
+          <CardContent className="p-6">
+            <div className="flex items-start gap-3 mb-4">
+              <div className="p-2 bg-amber-500/20 rounded-lg">
+                <Brain className="h-6 w-6 text-amber-400" />
+              </div>
+              <div>
+                <p className="text-amber-400 text-sm font-medium">AI Wealth Brief</p>
+                <h2 className="text-2xl font-bold mt-1">
+                  {wealthBrief?.headline || `You can retire at ${whatIfParams.retirementAge} with strategic adjustments`}
+                </h2>
+              </div>
+            </div>
+            
+            {/* Key Insight */}
+            <div className="bg-white/10 rounded-lg p-4 mb-4">
+              <p className="text-white/90">
+                {wealthBrief?.key_insight || `Implementing 3 key changes could add $${(totalPotentialImpact/1000000).toFixed(1)}M to your retirement wealth.`}
+              </p>
+            </div>
+
+            {/* Top 3 Recommendations */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {(wealthBrief?.recommendations || [
+                { title: "Maximize super contributions", impact: 380000, impact_text: "+$380K to retirement" },
+                { title: "Refinance mortgage", impact: 68000, impact_text: "$68K interest saved" },
+                { title: "Increase growth allocation", impact: 45000, impact_text: "+$45K from returns" }
+              ]).slice(0, 3).map((rec, i) => (
+                <div key={i} className="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="w-6 h-6 rounded-full bg-amber-500 text-slate-900 flex items-center justify-center text-sm font-bold">
+                      {i + 1}
+                    </span>
+                    <span className="font-medium text-sm">{rec.title}</span>
+                  </div>
+                  <p className="text-amber-400 font-semibold">{rec.impact_text || formatCompact(rec.impact)}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Net Worth Projection Timeline */}
+            <div className="mt-6 pt-4 border-t border-white/10">
+              <p className="text-sm text-white/70 mb-3">Your Wealth Trajectory</p>
+              <div className="flex items-end justify-between gap-4">
+                {(wealthBrief?.net_worth_projections || [
+                  { age: 45, formatted: "$2.0M" },
+                  { age: 50, formatted: "$2.8M" },
+                  { age: 55, formatted: "$4.0M" },
+                  { age: 60, formatted: "$5.5M" }
+                ]).map((proj, i) => (
+                  <div key={i} className="text-center flex-1">
+                    <div className="h-16 flex items-end justify-center mb-2">
+                      <div 
+                        className="w-full max-w-[40px] bg-gradient-to-t from-amber-500 to-amber-400 rounded-t"
+                        style={{ height: `${Math.min(100, (i + 1) * 25)}%` }}
+                      />
+                    </div>
+                    <p className="text-lg font-bold">{proj.formatted}</p>
+                    <p className="text-xs text-white/60">Age {proj.age}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* HERO ROW: Retirement Probability + Health Score */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {/* Monte Carlo - PROMINENT */}
+          {/* Monte Carlo */}
           <Card className="lg:col-span-2">
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
@@ -279,7 +386,7 @@ const Dashboard = () => {
                     </Badge>
                   </div>
                   <p className="text-sm text-muted-foreground mt-2">Based on {monteCarloResult?.simulations_run?.toLocaleString() || "10,000"} Monte Carlo simulations</p>
-                  <p className="text-sm mt-1">Target: <span className="font-medium">85%</span> • Gap: <span className={retirementProbability >= 85 ? "text-green-600" : "text-amber-600"} >{retirementProbability >= 85 ? "None" : `${Math.round(85 - retirementProbability)}%`}</span></p>
+                  <p className="text-sm mt-1">Target: <span className="font-medium">85%</span> • Gap: <span className={retirementProbability >= 85 ? "text-green-600" : "text-amber-600"}>{retirementProbability >= 85 ? "None" : `${Math.round(85 - retirementProbability)}%`}</span></p>
                 </div>
                 <div className="text-right">
                   <p className="text-sm text-muted-foreground">Projected Balance at {whatIfParams.retirementAge}</p>
@@ -289,7 +396,6 @@ const Dashboard = () => {
                 </div>
               </div>
               
-              {/* Monte Carlo Stats */}
               {monteCarloResult && (
                 <div className="mt-4 grid grid-cols-4 gap-3 p-3 bg-muted/30 rounded-lg text-sm">
                   <div>
@@ -311,14 +417,13 @@ const Dashboard = () => {
                 </div>
               )}
               
-              {/* Quick Scenario Comparison */}
               <div className="mt-6 pt-4 border-t">
                 <p className="text-sm font-medium mb-3">Quick Scenario Comparison</p>
                 <div className="grid grid-cols-3 gap-4">
                   {scenarioComparison.map((scenario, i) => (
                     <div key={i} className={`p-3 rounded-lg ${i === 0 ? 'bg-blue-50 border border-blue-200' : 'bg-muted/50'}`}>
                       <p className="text-xs text-muted-foreground">{scenario.name}</p>
-                      <p className="text-xl font-semibold">{scenario.probability}%</p>
+                      <p className="text-xl font-semibold">{Math.round(scenario.probability)}%</p>
                       <p className="text-xs text-muted-foreground">{formatCompact(scenario.balance)}</p>
                     </div>
                   ))}
@@ -356,7 +461,7 @@ const Dashboard = () => {
               
               <div className="space-y-2 text-sm">
                 {[
-                  { label: 'Savings Rate', value: '15%', good: true },
+                  { label: 'Savings Rate', value: `${Math.round(savingsRate)}%`, good: savingsRate >= 15 },
                   { label: 'Debt Ratio', value: '32%', good: true },
                   { label: 'Emergency Fund', value: '4.2mo', good: false },
                   { label: 'Diversification', value: 'Good', good: true }
@@ -399,8 +504,8 @@ const Dashboard = () => {
           <Card className="cursor-pointer hover:shadow-sm" onClick={() => navigate('/life-timeline')}>
             <CardContent className="p-4">
               <p className="text-xs text-muted-foreground">Years to Retirement</p>
-              <p className="text-2xl font-semibold">15</p>
-              <p className="text-xs text-muted-foreground mt-1">Target age: 60</p>
+              <p className="text-2xl font-semibold">{whatIfParams.retirementAge - 45}</p>
+              <p className="text-xs text-muted-foreground mt-1">Target age: {whatIfParams.retirementAge}</p>
             </CardContent>
           </Card>
         </div>
@@ -458,18 +563,81 @@ const Dashboard = () => {
           </Card>
         )}
 
+        {/* LIFE DECISION SIMULATOR */}
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center gap-2">
+              <Lightbulb className="h-5 w-5 text-amber-500" />
+              <CardTitle className="text-base">Life Decision Simulator</CardTitle>
+            </div>
+            <CardDescription>See how major life decisions impact your financial future</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+              {LIFE_SCENARIOS.map((scenario) => {
+                const Icon = scenario.icon;
+                const isSelected = selectedScenario === scenario.id;
+                return (
+                  <button
+                    key={scenario.id}
+                    onClick={() => handleScenarioClick(scenario.id)}
+                    className={`p-4 rounded-lg border text-left transition-all hover:shadow-md ${
+                      isSelected ? 'border-primary bg-primary/5 shadow-md' : 'border-border hover:border-primary/50'
+                    }`}
+                  >
+                    <Icon className={`h-5 w-5 ${scenario.color} mb-2`} />
+                    <p className="text-sm font-medium">{scenario.name}</p>
+                  </button>
+                );
+              })}
+            </div>
+            
+            {/* Scenario Result */}
+            {scenarioResult && (
+              <div className="mt-4 p-4 bg-muted/50 rounded-lg">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="font-semibold">{scenarioResult.name}</h4>
+                  <Badge variant={scenarioResult.probability_change < 0 ? "destructive" : "default"}>
+                    {scenarioResult.probability_change > 0 ? '+' : ''}{scenarioResult.probability_change}% probability
+                  </Badge>
+                </div>
+                <p className="text-sm text-muted-foreground mb-3">{scenarioResult.description}</p>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Current Probability</p>
+                    <p className="text-lg font-semibold">{Math.round(scenarioResult.base_probability)}%</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">New Probability</p>
+                    <p className={`text-lg font-semibold ${scenarioResult.probability_change < 0 ? 'text-red-600' : 'text-green-600'}`}>
+                      {Math.round(scenarioResult.new_probability)}%
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Wealth Impact</p>
+                    <p className={`text-lg font-semibold ${scenarioResult.wealth_change < 0 ? 'text-red-600' : 'text-green-600'}`}>
+                      {scenarioResult.wealth_change >= 0 ? '+' : ''}{formatCompact(scenarioResult.wealth_change)}
+                    </p>
+                  </div>
+                </div>
+                <p className="text-sm mt-3 font-medium text-primary">{scenarioResult.recommendation}</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         {/* MAIN TABS */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList>
-            <TabsTrigger value="insights">Wealth Insights</TabsTrigger>
+            <TabsTrigger value="brief">AI Insights</TabsTrigger>
             <TabsTrigger value="actions">Top Actions</TabsTrigger>
             <TabsTrigger value="projections">Projections</TabsTrigger>
-            <TabsTrigger value="accounts">Connected Accounts</TabsTrigger>
+            <TabsTrigger value="goals">Goals</TabsTrigger>
+            <TabsTrigger value="accounts">Accounts</TabsTrigger>
           </TabsList>
 
-          {/* WEALTH INSIGHTS TAB - Decision Engine */}
-          <TabsContent value="insights" className="mt-4 space-y-4">
-            {/* Wealth Command Insights - THE DECISION ENGINE */}
+          {/* AI INSIGHTS TAB */}
+          <TabsContent value="brief" className="mt-4 space-y-4">
             <Card className="border-primary/20">
               <CardHeader className="pb-2">
                 <div className="flex items-center gap-2">
@@ -483,11 +651,11 @@ const Dashboard = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-muted-foreground">Current Retirement Probability</p>
-                      <p className="text-3xl font-bold">{retirementProbability}%</p>
+                      <p className="text-3xl font-bold">{Math.round(retirementProbability)}%</p>
                     </div>
                     <div className="text-right">
                       <p className="text-sm text-muted-foreground">Potential with All Actions</p>
-                      <p className="text-3xl font-bold text-green-600">{Math.min(95, retirementProbability + 15)}%</p>
+                      <p className="text-3xl font-bold text-green-600">{Math.min(95, Math.round(retirementProbability) + 15)}%</p>
                     </div>
                     <div className="text-right">
                       <p className="text-sm text-muted-foreground">Total Impact</p>
@@ -498,13 +666,12 @@ const Dashboard = () => {
 
                 <p className="text-sm font-medium mb-3">Recommended Actions</p>
                 <div className="space-y-3">
-                  {(recommendations.length > 0 ? recommendations.slice(0, 4) : [
-                    { id: 1, title: "Increase super contributions", description: "+$500/month to reach concessional cap", impact_primary: 380000, impact_label: "retirement wealth", priority: "high" },
-                    { id: 2, title: "Refinance mortgage", description: "Switch to 5.89% rate", impact_primary: 68000, impact_label: "interest saved", priority: "high" },
-                    { id: 3, title: "Adjust portfolio allocation", description: "Increase growth assets by 10%", impact_primary: 45000, impact_label: "+0.7% annual return", priority: "medium" },
-                    { id: 4, title: "Build emergency fund", description: "Increase to 6 months expenses", impact_primary: 30000, impact_label: "liquidity buffer", priority: "medium" }
+                  {(wealthBrief?.recommendations || recommendations.slice(0, 4) || [
+                    { id: 1, title: "Increase super contributions", description: "+$500/month to reach concessional cap", impact: 380000, impact_text: "retirement wealth" },
+                    { id: 2, title: "Refinance mortgage", description: "Switch to 5.89% rate", impact: 68000, impact_text: "interest saved" },
+                    { id: 3, title: "Adjust portfolio allocation", description: "Increase growth assets by 10%", impact: 45000, impact_text: "+0.7% annual return" }
                   ]).map((action, i) => (
-                    <div key={action.id} className="flex items-center gap-4 p-3 border rounded-lg hover:bg-muted/50 transition-colors">
+                    <div key={action.id || i} className="flex items-center gap-4 p-3 border rounded-lg hover:bg-muted/50 transition-colors">
                       <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
                         {i + 1}
                       </div>
@@ -513,8 +680,8 @@ const Dashboard = () => {
                         <p className="text-xs text-muted-foreground">{action.description}</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-semibold text-green-600">+{formatCompact(action.impact_primary)}</p>
-                        <p className="text-xs text-muted-foreground">{action.impact_label}</p>
+                        <p className="font-semibold text-green-600">+{formatCompact(action.impact || action.impact_primary)}</p>
+                        <p className="text-xs text-muted-foreground">{action.impact_text || action.impact_label}</p>
                       </div>
                       <Button variant="outline" size="sm" onClick={() => navigate('/decision-engine')}>
                         <Play className="h-3 w-3 mr-1" /> Take Action
@@ -551,7 +718,7 @@ const Dashboard = () => {
                     {stressTests.map((test, i) => (
                       <tr key={i} className="border-b last:border-0">
                         <td className="py-3">{test.scenario}</td>
-                        <td className="py-3 text-center font-medium">{test.probability}%</td>
+                        <td className="py-3 text-center font-medium">{Math.round(test.probability)}%</td>
                         <td className={`py-3 text-right font-medium ${test.change < 0 ? 'text-red-600' : test.change > 0 ? 'text-green-600' : ''}`}>
                           {test.change !== 0 && (test.change > 0 ? '+' : '')}{test.change}%
                         </td>
@@ -590,15 +757,15 @@ const Dashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {(recommendations.length > 0 ? recommendations : [
-                      { id: 1, title: "Increase super contributions", description: "+$500/month to cap", impact_primary: 380000, priority: "high" },
-                      { id: 2, title: "Refinance mortgage", description: "Switch to 5.89%", impact_primary: 68000, priority: "high" },
-                      { id: 3, title: "Adjust portfolio allocation", description: "+10% growth assets", impact_primary: 45000, priority: "medium" },
-                      { id: 4, title: "Build emergency fund", description: "6 months expenses", impact_primary: 30000, priority: "medium" },
-                      { id: 5, title: "Maximize franking credits", description: "Tax efficiency", impact_primary: 12000, priority: "low" },
-                      { id: 6, title: "Review insurance coverage", description: "Income protection", impact_primary: 8000, priority: "low" }
+                    {(wealthBrief?.recommendations || recommendations || [
+                      { id: 1, title: "Increase super contributions", description: "+$500/month to cap", impact: 380000, difficulty: "easy" },
+                      { id: 2, title: "Refinance mortgage", description: "Switch to 5.89%", impact: 68000, difficulty: "medium" },
+                      { id: 3, title: "Adjust portfolio allocation", description: "+10% growth assets", impact: 45000, difficulty: "easy" },
+                      { id: 4, title: "Build emergency fund", description: "6 months expenses", impact: 30000, difficulty: "medium" },
+                      { id: 5, title: "Maximize franking credits", description: "Tax efficiency", impact: 12000, difficulty: "easy" },
+                      { id: 6, title: "Review insurance coverage", description: "Income protection", impact: 8000, difficulty: "complex" }
                     ]).map((action, i) => (
-                      <tr key={action.id} className="border-b last:border-0 hover:bg-muted/50">
+                      <tr key={action.id || i} className="border-b last:border-0 hover:bg-muted/50">
                         <td className="py-3">
                           <span className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold">
                             {i + 1}
@@ -608,10 +775,10 @@ const Dashboard = () => {
                           <p className="font-medium text-sm">{action.title}</p>
                           <p className="text-xs text-muted-foreground">{action.description}</p>
                         </td>
-                        <td className="py-3 text-right font-semibold text-green-600">+{formatCompact(action.impact_primary)}</td>
+                        <td className="py-3 text-right font-semibold text-green-600">+{formatCompact(action.impact || action.impact_primary)}</td>
                         <td className="py-3 text-center">
-                          <Badge variant={action.priority === 'high' ? 'destructive' : action.priority === 'medium' ? 'default' : 'secondary'}>
-                            {action.priority}
+                          <Badge variant={action.difficulty === 'easy' ? 'default' : action.difficulty === 'medium' ? 'secondary' : 'outline'}>
+                            {action.difficulty || action.priority || 'medium'}
                           </Badge>
                         </td>
                         <td className="py-3">
@@ -658,8 +825,10 @@ const Dashboard = () => {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
 
-            {/* Goals Progress */}
+          {/* GOALS TAB */}
+          <TabsContent value="goals" className="mt-4">
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">Goal Progress</CardTitle>
@@ -741,7 +910,6 @@ const Dashboard = () => {
                   })}
                 </div>
                 
-                {/* Suggested Connections */}
                 <div className="mt-6 pt-4 border-t">
                   <p className="text-sm font-medium mb-3">Suggested Connections</p>
                   <div className="grid grid-cols-2 gap-3">
