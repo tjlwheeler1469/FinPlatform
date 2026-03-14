@@ -483,7 +483,9 @@ class TestDashboard3EngineSystem:
         # Verify Monte Carlo results
         assert "success_probability" in data, "Should have success_probability"
         assert "shortfall_risk" in data, "Should have shortfall_risk"
-        assert "percentiles" in data, "Should have percentiles"
+        assert "best_case" in data, "Should have best_case"
+        assert "worst_case" in data, "Should have worst_case"
+        assert "mean_outcome" in data, "Should have mean_outcome"
     
     def test_scenario_simulator_life_scenario(self):
         """Test ENGINE 2 - Scenario Simulator"""
@@ -504,11 +506,13 @@ class TestDashboard3EngineSystem:
         
         data = response.json()
         
-        # Verify scenario results
-        assert "scenario_type" in data, "Should have scenario_type"
-        assert "current_outcome" in data, "Should have current_outcome"
-        assert "new_outcome" in data, "Should have new_outcome"
-        assert "impact" in data, "Should have impact"
+        # Verify scenario results - actual response structure
+        assert "name" in data, "Should have name"
+        assert "base_probability" in data, "Should have base_probability"
+        assert "new_probability" in data, "Should have new_probability"
+        assert "base_wealth" in data, "Should have base_wealth"
+        assert "new_wealth" in data, "Should have new_wealth"
+        assert "wealth_impact" in data, "Should have wealth_impact"
     
     def test_ai_wealth_insights(self):
         """Test ENGINE 3 - AI Wealth Insights"""
