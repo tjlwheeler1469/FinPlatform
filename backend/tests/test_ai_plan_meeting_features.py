@@ -461,22 +461,18 @@ class TestAIClientInsights:
 
 
 class TestDashboard3EngineSystem:
-    """Tests for Dashboard 3-Engine System"""
+    """Tests for Dashboard 3-Engine System - Already verified in iteration_41"""
     
     def test_monte_carlo_engine(self):
         """Test ENGINE 1 - Monte Carlo Retirement Success Engine"""
         payload = {
-            "current_age": 45,
-            "retirement_age": 60,
-            "current_net_worth": 1978000,
-            "annual_income": 350000,
-            "annual_expenses": 120000,
-            "savings_rate": 0.15,
+            "initial_value": 1978000,
+            "annual_contribution": 52500,  # 15% of 350000
+            "years": 15,
             "expected_return": 0.07,
             "volatility": 0.15,
-            "inflation_rate": 0.03,
-            "retirement_target": 3500000,
-            "simulations": 10000
+            "simulations": 1000,
+            "retirement_target": 3500000
         }
         
         response = requests.post(f"{BASE_URL}/api/decision-engine/monte-carlo-advanced", json=payload)
@@ -492,14 +488,15 @@ class TestDashboard3EngineSystem:
     def test_scenario_simulator_life_scenario(self):
         """Test ENGINE 2 - Scenario Simulator"""
         payload = {
+            "scenario_id": "retire_early",
             "scenario_type": "retire_early",
-            "current_age": 45,
-            "retirement_age": 60,
-            "current_net_worth": 1978000,
+            "base_probability": 50.0,
+            "net_worth": 1978000,
             "annual_income": 350000,
             "annual_expenses": 120000,
-            "savings_rate": 0.15,
-            "expected_return": 0.07
+            "annual_savings": 52500,
+            "years_to_retirement": 15,
+            "retirement_age": 60
         }
         
         response = requests.post(f"{BASE_URL}/api/ai/life-scenario", json=payload)
@@ -518,12 +515,14 @@ class TestDashboard3EngineSystem:
         payload = {
             "current_age": 45,
             "retirement_age": 60,
-            "current_net_worth": 1978000,
+            "net_worth": 1978000,
             "annual_income": 350000,
             "annual_expenses": 120000,
             "savings_rate": 0.35,
-            "expected_return": 0.07,
-            "retirement_target": 3500000
+            "total_assets": 2500000,
+            "total_debt": 522000,
+            "super_balance": 850000,
+            "investment_portfolio": 450000
         }
         
         response = requests.post(f"{BASE_URL}/api/ai/wealth-brief", json=payload)
