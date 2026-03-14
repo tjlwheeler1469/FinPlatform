@@ -1,0 +1,168 @@
+{
+  "summary": "Comprehensive testing of Wealth Command 3-Engine Dashboard complete. All 28 backend API tests passed (100%). All 3 core engines verified working: ENGINE 1 (Monte Carlo Retirement Success), ENGINE 2 (Scenario Simulator), ENGINE 3 (AI Wealth Insights). Minor UI bug found in Retire at 55 display.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Scenario Simulator - Retirement Age Impact",
+        "issue": "Retire at 55 displays very long number '24.200000000000' or '23.700000000000' instead of percentage like '24.2%'",
+        "selector": "Retirement Age Impact grid - first option",
+        "priority": "MEDIUM"
+      },
+      {
+        "component": "Compliance Modal",
+        "issue": "Modal appears on every page load - may need localStorage persistence to remember user acceptance",
+        "selector": "Important Information modal",
+        "priority": "LOW"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "ENGINE 1 - Monte Carlo API returns 200 with success_probability",
+    "ENGINE 1 - Monte Carlo returns Best Case (95th), Median, Worst Case (5th) percentiles",
+    "ENGINE 1 - Monte Carlo returns shortfall_risk percentage",
+    "ENGINE 1 - Monte Carlo configured for 10,000 simulations",
+    "ENGINE 1 - Health Score returns score (0-100) and grade",
+    "ENGINE 1 - Net Worth Projection returns projection data",
+    "ENGINE 1 - Risk of running out of money percentage displayed",
+    "ENGINE 1 - Safe Annual Spending displayed",
+    "ENGINE 1 - Monthly Income displayed",
+    "ENGINE 2 - Retirement Age Impact shows 4 options (55, 60, 65, 70)",
+    "ENGINE 2 - Savings Rate slider adjustable (5-40%)",
+    "ENGINE 2 - Expected Return slider adjustable (3-10%)",
+    "ENGINE 2 - Retirement Age slider adjustable (50-70)",
+    "ENGINE 2 - Inflation slider adjustable (2-6%)",
+    "ENGINE 2 - Quick Life Decisions: Retire 5 years early",
+    "ENGINE 2 - Quick Life Decisions: Retire 5 years later",
+    "ENGINE 2 - Quick Life Decisions: Save +$500/month",
+    "ENGINE 2 - Quick Life Decisions: Save +$1,000/month",
+    "ENGINE 2 - Quick Life Decisions: Buy investment property",
+    "ENGINE 2 - Quick Life Decisions: 30% market crash",
+    "ENGINE 2 - Life scenario shows Current, After Change, Wealth Impact",
+    "ENGINE 3 - AI Wealth Brief returns personalized headline",
+    "ENGINE 3 - Current vs Recommended savings rate comparison (35% vs 20%)",
+    "ENGINE 3 - Top 3 Improvements with specific $ impact amounts",
+    "ENGINE 3 - Total Potential Impact displayed (+$1.1M)",
+    "ENGINE 3 - Optimal retirement age calculated",
+    "SUPPORTING - Financial Health Score (74/100 Grade B)",
+    "SUPPORTING - Net Worth ($1,978,000)",
+    "SUPPORTING - Monthly Savings (+$5,417)",
+    "SUPPORTING - Years to Retirement (15)",
+    "NET WORTH CHART - Shows projection from today to retirement",
+    "NET WORTH CHART - Target line at $3.5M visible",
+    "GOAL PROGRESS - Retirement goal with Behind badge",
+    "GOAL PROGRESS - Education Fund with On Track badge",
+    "GOAL PROGRESS - House Upgrade with Behind badge",
+    "GOAL PROGRESS - Emergency Fund with Achieved badge"
+  ],
+  "api_tests_passed": [
+    "POST /api/decision-engine/monte-carlo-advanced - 10,000 simulations with percentiles",
+    "POST /api/decision-engine/health-score-v2 - Score, grade, components",
+    "POST /api/decision-engine/recommendations-v2 - Recommendations list",
+    "GET /api/decision-engine/net-worth-projection - Projection data",
+    "POST /api/ai/wealth-brief - Personalized headline and recommendations",
+    "POST /api/ai/life-scenario - All 6 scenarios return correct impact"
+  ],
+  "test_report_links": [
+    "/app/test_reports/pytest/pytest_3_engines.xml",
+    "/app/backend/tests/test_3_engines.py"
+  ],
+  "action_items": [
+    "FIX: Retire at 55 display shows long decimal number instead of percentage format"
+  ],
+  "critical_code_review_comments": [
+    "Dashboard.jsx line 227-232: scenarioComparisons calculation for age 55 may have floating point precision issue causing display bug"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_3_engines.py"
+  ],
+  "success_rate": {
+    "backend": "100% (28/28 pytest tests passed)",
+    "frontend": "97% (1 minor display bug in Retire at 55)"
+  },
+  "seed_data_creation": "None - using existing Wheeler family demo data",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "All 3 core engines working: Monte Carlo (10K simulations), Scenario Simulator (4 age options, 4 sliders, 6 quick decisions), AI Wealth Insights (headline, savings comparison, top 3 recommendations). Minor bug: Retire at 55 shows long decimal. Connected Accounts data is MOCKED.",
+  "mocked_apis": {
+    "has_mocked_apis": true,
+    "mocked_apis_list": [
+      "Connected Accounts data (Commonwealth Bank, Vanguard Super, CommSec)"
+    ]
+  },
+  "features_verified": {
+    "engine_1_retirement_success": {
+      "monte_carlo_probability": "49% displayed with At Risk badge",
+      "risk_of_running_out": "51% displayed",
+      "safe_annual_spending": "$215,880",
+      "monthly_income": "$17,990",
+      "monte_carlo_outcomes": {
+        "best_case_95th": "$12.4M",
+        "median_outcome": "$5.4M",
+        "worst_case_5th": "$2.3M",
+        "shortfall_risk": "3.1%"
+      },
+      "projected_retirement_balance": "$5.4M",
+      "retirement_age": "60"
+    },
+    "engine_2_scenario_simulator": {
+      "retirement_age_impact": {
+        "retire_at_55": "BUG - shows long decimal",
+        "retire_at_60": "49.2% success",
+        "retire_at_65": "67.2% success",
+        "retire_at_70": "79.2% success"
+      },
+      "sliders": {
+        "savings_rate": "15% (5-40% range)",
+        "expected_return": "7% (3-10% range)",
+        "retirement_age": "60 (50-70 range)",
+        "inflation": "3% (2-6% range)"
+      },
+      "quick_life_decisions": [
+        "Retire 5 years early",
+        "Retire 5 years later",
+        "Save +$500/month",
+        "Save +$1,000/month",
+        "Buy investment property",
+        "30% market crash"
+      ],
+      "scenario_result_display": "Shows Current, After Change, Wealth Impact"
+    },
+    "engine_3_ai_wealth_insights": {
+      "personalized_headline": "Action needed: Consider retiring at 51 instead of 60",
+      "savings_rate_comparison": {
+        "current": "35%",
+        "recommended": "20%"
+      },
+      "potential_impact": "+$1.1M",
+      "top_3_improvements": [
+        {"rank": 1, "title": "Implement debt recycling strategy", "impact": "+$314K"},
+        {"rank": 2, "title": "Increase savings by $771/month", "impact": "+$249K"},
+        {"rank": 3, "title": "Salary sacrifice $727/month to super", "impact": "+$235K"}
+      ]
+    },
+    "supporting_metrics": {
+      "financial_health_score": "74/100 Grade B",
+      "net_worth": "$1,978,000",
+      "monthly_savings": "+$5,417 (35% savings rate)",
+      "years_to_retirement": "15"
+    },
+    "net_worth_chart": {
+      "today": "$2.0M",
+      "at_retirement": "$5.4M",
+      "target_line": "$3.5M",
+      "years_range": "2026-2051"
+    },
+    "goal_progress": [
+      {"name": "Retirement", "progress": "57%", "current": "$2.0M", "target": "$3.5M", "status": "Behind"},
+      {"name": "Education Fund", "progress": "91%", "current": "$182K", "target": "$200K", "status": "On Track"},
+      {"name": "House Upgrade", "progress": "49%", "current": "$245K", "target": "$500K", "status": "Behind"},
+      {"name": "Emergency Fund", "progress": "100%", "current": "$75K", "target": "$60K", "status": "Achieved!"}
+    ]
+  }
+}
