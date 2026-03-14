@@ -224,10 +224,10 @@ const Dashboard = () => {
   const scenarioComparisons = useMemo(() => {
     const baseProb = retirementProbability;
     return [
-      { age: 55, probability: Math.max(20, baseProb - 25), label: "Retire at 55" },
-      { age: 60, probability: baseProb, label: "Retire at 60", current: whatIfParams.retirementAge === 60 },
-      { age: 65, probability: Math.min(95, baseProb + 18), label: "Retire at 65" },
-      { age: 70, probability: Math.min(99, baseProb + 30), label: "Retire at 70" },
+      { age: 55, probability: Math.max(20, Math.round(baseProb - 25)), label: "Retire at 55" },
+      { age: 60, probability: Math.round(baseProb), label: "Retire at 60", current: whatIfParams.retirementAge === 60 },
+      { age: 65, probability: Math.min(95, Math.round(baseProb + 18)), label: "Retire at 65" },
+      { age: 70, probability: Math.min(99, Math.round(baseProb + 30)), label: "Retire at 70" },
     ];
   }, [retirementProbability, whatIfParams.retirementAge]);
 
