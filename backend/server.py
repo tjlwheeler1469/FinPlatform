@@ -6555,6 +6555,62 @@ try:
             current_net_worth, annual_savings, years, growth_rate
         )
     
+    # ==================== AI WEALTH BRIEF ENDPOINTS ====================
+    
+    from services.ai_wealth_brief import generate_wealth_brief, generate_life_scenario_impact
+    
+    class WealthBriefRequest(BaseModel):
+        age: int = 45
+        retirement_age: int = 60
+        net_worth: float
+        annual_income: float
+        annual_expenses: float = 120000
+        total_assets: float
+        total_debt: float
+        super_balance: float
+        investment_portfolio: float
+        savings_rate: float = 0.15
+        mortgage_balance: float = 0
+        mortgage_rate: float = 6.5
+        monte_carlo_probability: float = 50.0
+    
+    @api_router.post("/ai/wealth-brief")
+    async def get_wealth_brief(request: WealthBriefRequest):
+        """Generate AI-powered personalized wealth brief with actionable insights"""
+        return generate_wealth_brief(
+            age=request.age,
+            retirement_age=request.retirement_age,
+            net_worth=request.net_worth,
+            annual_income=request.annual_income,
+            annual_expenses=request.annual_expenses,
+            total_assets=request.total_assets,
+            total_debt=request.total_debt,
+            super_balance=request.super_balance,
+            investment_portfolio=request.investment_portfolio,
+            savings_rate=request.savings_rate,
+            mortgage_balance=request.mortgage_balance,
+            mortgage_rate=request.mortgage_rate,
+            monte_carlo_probability=request.monte_carlo_probability
+        )
+    
+    class LifeScenarioRequest(BaseModel):
+        scenario_id: str
+        base_probability: float
+        net_worth: float
+        annual_savings: float
+        years_to_retirement: int
+    
+    @api_router.post("/ai/life-scenario")
+    async def calculate_life_scenario(request: LifeScenarioRequest):
+        """Calculate impact of a life decision scenario"""
+        return generate_life_scenario_impact(
+            scenario_id=request.scenario_id,
+            base_probability=request.base_probability,
+            net_worth=request.net_worth,
+            annual_savings=request.annual_savings,
+            years_to_retirement=request.years_to_retirement
+        )
+    
     # ==================== LIFE TIMELINE ENDPOINTS ====================
     
     @api_router.get("/timeline/default")
