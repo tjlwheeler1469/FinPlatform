@@ -82,6 +82,8 @@ const DebtPaydownPlanner = lazy(() => import("@/pages/DebtPaydownPlanner"));
 const RevenueBilling = lazy(() => import("@/pages/RevenueBilling"));
 const ScenarioComparison = lazy(() => import("@/pages/ScenarioComparison"));
 const AdviceWorkflow = lazy(() => import("@/pages/AdviceWorkflow"));
+const FinancialPlanGenerator = lazy(() => import("@/pages/FinancialPlanGenerator"));
+const MeetingSummaryGenerator = lazy(() => import("@/pages/MeetingSummaryGenerator"));
 
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
