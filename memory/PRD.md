@@ -191,7 +191,26 @@ The following data is currently MOCKED and not connected to live sources:
 
 ## Changelog
 
-### March 14, 2026 (Latest Session)
+### March 14, 2026 (Latest Session - Advisor Features)
+- ✅ **AI FINANCIAL PLAN GENERATOR** - The #1 killer feature that makes advisors switch
+  - Generates comprehensive financial plans in seconds (normally takes 5-10 hours)
+  - Sections: Executive Summary, Retirement Plan, Investment Strategy, Tax Strategy, Insurance Gaps, Action Plan
+  - Plan Metrics: 12 recommendations, 4 high priority, $1.2M wealth impact, +15% probability boost
+  - Endpoint: `/api/ai/generate-financial-plan`
+  
+- ✅ **AI MEETING SUMMARY GENERATOR** - Saves hours of admin work
+  - Auto-generates meeting summaries with action items
+  - Sections: Executive Summary, Topics Covered, Decisions Made, Action Items, Plan Updates, Next Meeting
+  - Action items include: task, assignee, due date, priority, status
+  - Endpoint: `/api/ai/generate-meeting-summary`
+  
+- ✅ **AI CLIENT INSIGHTS ENGINE** - Makes advisors look smarter to clients
+  - Generates headline insights ("Client could retire 4 years earlier if...")
+  - Detects risks and opportunities
+  - Provides conversation starters and quick wins
+  - Endpoint: `/api/ai/client-insights`
+
+### March 14, 2026 (Earlier - 3-Engine Dashboard)
 - ✅ **PROFESSIONAL-GRADE 3-ENGINE DASHBOARD** - Complete overhaul matching top financial planning platforms
   
   **ENGINE 1: RETIREMENT SUCCESS ENGINE**
