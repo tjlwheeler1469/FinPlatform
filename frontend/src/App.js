@@ -836,6 +836,8 @@ const AppRouter = () => {
       <Route path="/debt-paydown" element={<DebtPaydownPlanner />} />
       <Route path="/revenue-billing" element={<RevenueBilling />} />
       <Route path="/advice-workflow" element={<AdviceWorkflow />} />
+      <Route path="/financial-plan-generator" element={<FinancialPlanGenerator />} />
+      <Route path="/meeting-summary" element={<MeetingSummaryGenerator />} />
     </Routes>
   );
 };
