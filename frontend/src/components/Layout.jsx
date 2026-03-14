@@ -174,9 +174,10 @@ const adviserNavGroups = [
     icon: Users,
     items: [
       { path: "/client-crm", label: "Client CRM", icon: Users, title: "Client Relationship Management" },
-      { path: "/practice-management", label: "Practice", icon: ClipboardList, title: "Practice Management" },
-      { path: "/collaboration", label: "Team", icon: UserPlus, title: "Collaboration" },
+      { path: "/financial-plan-generator", label: "Plan Generator", icon: FileText, title: "AI Financial Plan Generator" },
+      { path: "/meeting-summary", label: "Meeting Notes", icon: ClipboardList, title: "AI Meeting Summary Generator" },
       { path: "/statement-of-advice", label: "SOA Generator", icon: FileText, title: "Statement of Advice" },
+      { path: "/practice-management", label: "Practice", icon: ClipboardList, title: "Practice Management" },
     ]
   },
   {
