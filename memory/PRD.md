@@ -112,6 +112,8 @@ The dashboard has been completely transformed into a true **Financial Decision E
 | Feature | Frontend | Backend |
 |---------|----------|---------|
 | Dashboard | `/pages/Dashboard.jsx` | Multiple endpoints |
+| AI Wealth Brief | `/pages/Dashboard.jsx` (Hero) | `/services/ai_wealth_brief.py` |
+| Life Decision Sim | `/pages/Dashboard.jsx` | `/api/ai/life-scenario` |
 | Decision Engine | `/pages/DecisionEngine.jsx` | `/services/decision_engine.py` |
 | Life Timeline | `/pages/LifeTimelinePlanner.jsx` | `/services/life_timeline.py` |
 | Client CRM | `/pages/ClientCRM.jsx` | `/services/client_crm.py` |
@@ -120,9 +122,11 @@ The dashboard has been completely transformed into a true **Financial Decision E
 ### API Endpoints
 | Endpoint | Method | Description |
 |----------|--------|-------------|
+| `/api/ai/wealth-brief` | POST | AI-powered personalized wealth insights |
+| `/api/ai/life-scenario` | POST | Life decision scenario impact calculator |
 | `/api/decision-engine/health-score-v2` | POST | Calculate health score |
 | `/api/decision-engine/recommendations-v2` | POST | Generate recommendations |
-| `/api/decision-engine/monte-carlo-advanced` | POST | Advanced Monte Carlo |
+| `/api/decision-engine/monte-carlo-advanced` | POST | Advanced Monte Carlo (10K simulations) |
 | `/api/timeline/default` | GET | Get default timeline |
 | `/api/timeline/calculate-impact` | POST | Calculate timeline impact |
 | `/api/crm/clients` | GET | Get all clients |
