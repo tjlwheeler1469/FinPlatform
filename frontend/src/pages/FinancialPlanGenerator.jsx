@@ -191,11 +191,15 @@ const FinancialPlanGenerator = () => {
           </div>
           {plan && (
             <div className="flex gap-2">
-              <Button variant="outline" onClick={exportPDF}>
+              <Button variant="outline" onClick={() => window.print()}>
                 <Printer className="h-4 w-4 mr-2" /> Print
               </Button>
-              <Button variant="outline" onClick={exportPDF}>
-                <Download className="h-4 w-4 mr-2" /> Export PDF
+              <Button variant="outline" onClick={exportPDF} disabled={exporting} data-testid="export-pdf-btn">
+                {exporting ? (
+                  <><RefreshCw className="h-4 w-4 mr-2 animate-spin" /> Generating...</>
+                ) : (
+                  <><Download className="h-4 w-4 mr-2" /> Export PDF</>
+                )}
               </Button>
             </div>
           )}
