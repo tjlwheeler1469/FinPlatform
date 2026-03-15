@@ -1,283 +1,191 @@
-# Halcyon Wealth Operating System - PRD
+# Wealth Command - AI-Powered Financial Planning Platform
 
-## Vision
-Transform from a "Financial Dashboard" to a "Wealth Operating System" - the operating system for your financial life.
+## Product Requirements Document (PRD)
 
-**Current Rating Target: 10/10** 
-
-## Original Problem Statement
-Build a best-in-class AI-powered financial planning platform for the Australian market, targeting financial advisers and their clients. The platform should combine projections, scenario modeling, tax optimization, client collaboration, and automated data feeds.
+### Original Vision
+Build a best-in-class "AI-powered financial planning platform" named "Wealth Command" - a comprehensive "Wealth Operating System" for financial advisers and their clients that can compete with tools like RightCapital and eMoney.
 
 ---
 
-## What's Been Implemented (March 13, 2026)
+## Core Architecture
 
-### ✅ DASHBOARD - FINANCIAL DECISION ENGINE
-The dashboard has been completely transformed into a true **Financial Decision Engine**:
+### Three Core Engines
+1. **Retirement Success Engine**: Real-time Monte Carlo simulation (10,000 iterations) calculating retirement success probability
+2. **Scenario Simulator**: Interactive "what-if" modeling tool for testing financial decisions
+3. **AI Recommendations Engine**: LLM-powered analysis providing ranked, actionable advice
 
-**Key Metrics Row:**
-- Net Worth ($1,978,000) with YTD change
-- Monthly Cashflow (+$5,417) with savings rate
-- Goal Progress (3/4 on track) with visual indicators
-- Retirement Success (Monte Carlo probability)
-
-**Financial Health Score:**
-- Large prominent gauge (74/100, Grade B)
-- 5 component breakdown: Savings Rate, Debt Ratio, Emergency Fund, Retirement Readiness, Diversification
-- Grade badges and status indicators
-
-**Recommended Actions (THE CORE DECISION ENGINE):**
-- 4 ranked actions with specific $ impact
-- Total Potential Impact: +$609K
-- HIGH IMPACT badges for priority actions
-- "Take Action" buttons on hover
-- Categories: Super, Debt, Savings, Tax
-
-**Net Worth Projection:**
-- Chart showing trajectory 2025 → 2040
-- Wealth milestones (💰 $2M, 💎 $3M, 🏆 $4M)
-- Target reference line
-
-**Goal Progress:**
-- 4 goals with progress bars
-- On Track / Behind status badges
-- Current vs Target amounts
-
-**What-If Scenario Builder:**
-- 4 adjustable sliders (Savings Rate, Market Return, Retirement Age, Inflation)
-- Real-time impact calculations
-- Save as Scenario functionality
-
-### ✅ SCENARIO MODELING WITH STRESS TESTS
-**Stress Test Presets:**
-- 📉 Market Crash (-30%)
-- 💹 High Inflation (6%)
-- 💼 Job Loss (1 Year)
-- 🏠 Property Crash (-20%)
-
-**Comparison Features:**
-- Side-by-side scenario comparison cards
-- Net Worth Projection by Scenario chart
-- Monte Carlo and AI Analysis options
-
-### ✅ MONTE CARLO RETIREMENT ANALYSIS
-- 10,000 simulation engine
-- Success probability calculation
-- Percentile projections (P5-P95)
-- Adjustment recommendations if below target
-
-### ✅ LIFE TIMELINE PLANNER
-- Interactive visual timeline with life events
-- Adjustable retirement age slider (50-70)
-- Real-time projection updates
-- Wealth milestones tracking
-- Financial impact per event
-
-### ✅ CLIENT CRM FOR ADVISERS
-- Client list with search and status badges
-- Tasks management with priority badges
-- 6-stage Advice Workflow Pipeline
-- Summary cards (Total Clients, AUM)
-
-### ✅ AI FINANCIAL ADVISOR
-- Live LLM integration (GPT-5.2 via Emergent LLM Key)
-- Multi-LLM fallback support
-- Structured AI responses
-- Quick question shortcuts
-
-### ✅ UI/UX IMPROVEMENTS
-- Sidebar navigation collapsed by default
-- Only active section expands automatically
-- Bold uppercase section headers with gold highlighting
-- Halcyon Wealth branding throughout
+### Tech Stack
+- **Frontend**: React with Shadcn/UI components, Recharts for visualization
+- **Backend**: FastAPI with Python
+- **Database**: MongoDB (for future persistence)
+- **AI**: OpenAI GPT-4o via emergentintegrations library
+- **PDF Generation**: ReportLab
 
 ---
 
-## Technical Architecture
+## Implemented Features ✅
 
-### Frontend
-- **Framework**: React 18 with React Router
-- **UI Components**: Shadcn UI + Tailwind CSS
-- **Charts**: Recharts
-- **State Management**: React Context (usePortfolio)
-- **Branding**: Halcyon Wealth theme (Navy #1a2744, Gold #D4A84C)
+### Phase 1: Core Platform (Complete)
+- [x] Professional Dashboard with 3 Core Engines
+- [x] Retirement Readiness calculation with Monte Carlo
+- [x] Net Worth tracking and projections
+- [x] Tax Analysis tools (Australian tax brackets)
+- [x] Property Portfolio management
+- [x] Share Portfolio tracking
+- [x] Family Wealth Dashboard
+- [x] Risk Profiler assessment
 
-### Backend
-- **Framework**: FastAPI
-- **Database**: MongoDB
-- **AI Integration**: emergentintegrations library with Emergent LLM Key
-- **Services**: Modular architecture with `/services/` directory
+### Phase 2: AI-First Advisor Features (Complete)
+- [x] **AI Financial Plan Generator** - Comprehensive plans in seconds
+  - Executive Summary
+  - Retirement Analysis
+  - Investment Strategy
+  - Tax Strategy
+  - Action Items
+- [x] **AI Meeting Summary Generator** - Automated meeting notes
+- [x] **AI Wealth Brief** - Personalized recommendations
+- [x] **AI Copilot Chat** - Conversational financial assistant
+  - Multi-language support (15 languages)
+  - Context-aware responses
+  - Suggested questions
+  - Smart Alerts
 
-### Key Files
-| Feature | Frontend | Backend |
-|---------|----------|---------|
-| Dashboard | `/pages/Dashboard.jsx` | Multiple endpoints |
-| AI Wealth Brief | `/pages/Dashboard.jsx` (Hero) | `/services/ai_wealth_brief.py` |
-| Life Decision Sim | `/pages/Dashboard.jsx` | `/api/ai/life-scenario` |
-| Decision Engine | `/pages/DecisionEngine.jsx` | `/services/decision_engine.py` |
-| Life Timeline | `/pages/LifeTimelinePlanner.jsx` | `/services/life_timeline.py` |
-| Client CRM | `/pages/ClientCRM.jsx` | `/services/client_crm.py` |
-| AI Advisor | `/pages/AIAdvisor.jsx` | `server.py` (lines 5695-5900) |
+### Phase 3: Account Aggregation & Document Management (Complete)
+- [x] **Connected Accounts (Account Aggregation)**
+  - Simulated Plaid-like integration
+  - 11 Australian institutions supported
+  - Real-time balance sync
+  - Transaction history
+  - Cashflow analysis with expense breakdown
+  - Net worth aggregation
+- [x] **Document Vault with AI Analysis**
+  - Secure document storage
+  - AI-powered document extraction
+  - Category-based organization
+  - Portfolio insights (coverage analysis)
+  - Gap identification
 
-### API Endpoints
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/ai/wealth-brief` | POST | AI-powered personalized wealth insights |
-| `/api/ai/life-scenario` | POST | Life decision scenario impact calculator |
-| `/api/decision-engine/health-score-v2` | POST | Calculate health score |
-| `/api/decision-engine/recommendations-v2` | POST | Generate recommendations |
-| `/api/decision-engine/monte-carlo-advanced` | POST | Advanced Monte Carlo (10K simulations) |
-| `/api/timeline/default` | GET | Get default timeline |
-| `/api/timeline/calculate-impact` | POST | Calculate timeline impact |
-| `/api/crm/clients` | GET | Get all clients |
-| `/api/crm/tasks` | GET | Get tasks |
-| `/api/crm/workflow/{client_id}` | GET | Get client workflow |
-| `/api/ai/generate-advice` | POST | AI financial advice |
-| `/api/ai/generate-scenarios` | POST | AI scenario generator |
+### Phase 4: Export & Reporting (Complete)
+- [x] **PDF Export for Financial Plans**
+  - Professional formatted PDFs
+  - Executive Summary
+  - Investment Strategy tables
+  - Action items
+- [x] Portfolio Statement PDF
+- [x] Meeting Summary PDF
+
+### Phase 5: Planning Tools (Complete)
+- [x] **Estate Planning**
+  - Net Worth projections
+  - Beneficiary allocations
+  - Estate value calculations
+- [x] **Portfolio Analyzer**
+  - Risk assessment
+  - Sector exposure analysis
+  - Rebalancing recommendations
+- [x] **Product Marketplace**
+  - Insurance products
+  - Investment products
+  - Super funds
+  - AI-powered recommendations
+
+### Additional Features (Complete)
+- [x] Client CRM system
+- [x] Life Timeline Planner
+- [x] Goal Tracker
+- [x] Loan Calculator
+- [x] CGT Calculator
+- [x] SMSF Optimizer
+- [x] Salary Packaging calculator
+- [x] Dividend Reinvestment analysis
+- [x] Tax Loss Harvesting
+- [x] Compliance Modal (properly persisted in localStorage)
 
 ---
 
-## Mocked Data (IMPORTANT)
-The following data is currently MOCKED and not connected to live sources:
-- Portfolio data (Wheeler family demo)
-- CRM clients (4 demo clients)
-- Stock prices (ASX mock data)
-- Property valuations
-- Bank account feeds
-- Connected Accounts display data
+## API Endpoints
 
-**NOW REAL:**
-- ✅ Monte Carlo simulations (10,000 real iterations using numpy)
-- ✅ Financial Health Score calculations
-- ✅ Recommendation impact calculations
+### Core APIs
+- `GET /api/health` - Health check
+- `POST /api/monte-carlo/run` - Monte Carlo simulation
+- `POST /api/ai/wealth-brief` - AI recommendations
+- `POST /api/ai/life-scenario` - Scenario analysis
+
+### AI Features
+- `POST /api/advisor/generate-plan` - Generate financial plan
+- `POST /api/advisor/generate-meeting-summary` - Generate meeting summary
+- `POST /api/copilot/chat` - AI copilot conversation
+- `GET /api/copilot/suggestions` - Suggested questions
+
+### Account Aggregation
+- `GET /api/accounts/aggregated` - All connected accounts
+- `GET /api/accounts/{id}/transactions` - Transaction history
+- `POST /api/accounts/sync` - Sync all accounts
+- `GET /api/accounts/cashflow` - Cashflow analysis
+- `GET /api/accounts/institutions` - Available institutions
+- `POST /api/accounts/connect` - Connect new account
+
+### Documents
+- `GET /api/documents` - List documents
+- `POST /api/documents/upload` - Upload document
+- `POST /api/documents/analyze` - AI document analysis
+- `POST /api/documents/insights` - Portfolio insights
+
+### Export
+- `POST /api/export/financial-plan` - Generate PDF
+- `POST /api/export/portfolio-statement` - Portfolio PDF
+- `POST /api/export/meeting-summary` - Meeting PDF
 
 ---
 
-## Prioritized Backlog
+## Known Limitations
 
-### P0 - Critical (Complete)
-- ✅ What-If Quick Toggle
-- ✅ Decision Engine with recommendations
-- ✅ Life Timeline Planner
-- ✅ Client CRM
-- ✅ AI Advisor integration
-- ✅ AI Scenario Generator
+### Mocked Features
+1. **Account Aggregation** - Simulates Plaid-like integration (not connected to real banks)
+2. **Document Analysis** - Uses mock data templates based on document category
+3. **Market Data** - Property and stock prices are simulated
 
-### P1 - High Priority (Next)
-1. **Live Data Integrations** - Connect to Australian banking APIs, brokerage accounts, superannuation funds
-2. **Backend Refactoring** - Complete decomposition of 6000+ line server.py
-3. **Real-time Data Feeds** - Replace mock data with live feeds
+### Technical Debt
+1. `server.py` is 7400+ lines - needs refactoring into route modules
+2. No persistent database - uses hardcoded demo data
+3. No real authentication flow
 
-### P2 - Medium Priority
-4. **Client Portal** - Dedicated portal for clients to view their data
-5. **Document Management** - Upload, sign, and manage advice documents
-6. **Mobile Responsiveness** - Optimize for mobile devices
+---
 
-### P3 - Future/Backlog
-7. **PostgreSQL Migration** - Move from MongoDB to PostgreSQL
-8. **SOC 2 Compliance** - Security and compliance architecture
-9. **Marketplace Integration** - Mortgages, insurance, investments
-10. **White-label Solution** - Multi-tenant for advisory firms
+## Future Roadmap
+
+### P0 (Critical)
+- [ ] Backend Refactoring - Split server.py into modular routes
+- [ ] Real Account Aggregation via Plaid/Basiq integration
+- [ ] Database Migration (PostgreSQL)
+
+### P1 (High Priority)
+- [ ] Real Authentication (JWT + Google OAuth)
+- [ ] Advisor Business Analytics dashboard
+- [ ] Client Portal with goal tracking
+
+### P2 (Medium Priority)
+- [ ] SOC 2 Compliance Architecture
+- [ ] Mobile-responsive optimization
+- [ ] Multi-tenant support for advisors
+
+### P3 (Low Priority)
+- [ ] Revenue/Commission tracking for Marketplace
+- [ ] API rate limiting and quotas
+- [ ] Performance optimization
 
 ---
 
 ## Testing Status
-- **Test Reports**: `/app/test_reports/iteration_35.json` through `iteration_39.json`
-- **Backend**: 100% pass rate
-- **Frontend**: 100% pass rate
-- **Integration**: All APIs working correctly
+
+- **Backend**: 100% tests passing (18/18)
+- **Frontend**: 100% pages loading correctly
+- **Test Reports**: `/app/test_reports/iteration_43.json`
 
 ---
 
-## Changelog
+## Last Updated
+December 2025
 
-### March 14, 2026 (Latest Session - Advisor Features)
-- ✅ **AI FINANCIAL PLAN GENERATOR** - The #1 killer feature that makes advisors switch
-  - Generates comprehensive financial plans in seconds (normally takes 5-10 hours)
-  - Sections: Executive Summary, Retirement Plan, Investment Strategy, Tax Strategy, Insurance Gaps, Action Plan
-  - Plan Metrics: 12 recommendations, 4 high priority, $1.2M wealth impact, +15% probability boost
-  - Endpoint: `/api/ai/generate-financial-plan`
-  
-- ✅ **AI MEETING SUMMARY GENERATOR** - Saves hours of admin work
-  - Auto-generates meeting summaries with action items
-  - Sections: Executive Summary, Topics Covered, Decisions Made, Action Items, Plan Updates, Next Meeting
-  - Action items include: task, assignee, due date, priority, status
-  - Endpoint: `/api/ai/generate-meeting-summary`
-  
-- ✅ **AI CLIENT INSIGHTS ENGINE** - Makes advisors look smarter to clients
-  - Generates headline insights ("Client could retire 4 years earlier if...")
-  - Detects risks and opportunities
-  - Provides conversation starters and quick wins
-  - Endpoint: `/api/ai/client-insights`
-
-### March 14, 2026 (Earlier - 3-Engine Dashboard)
-- ✅ **PROFESSIONAL-GRADE 3-ENGINE DASHBOARD** - Complete overhaul matching top financial planning platforms
-  
-  **ENGINE 1: RETIREMENT SUCCESS ENGINE**
-  - Hero metric: Monte Carlo probability (e.g., 50%) with status badge
-  - Risk of running out of money percentage
-  - Safe Annual Spending calculation (4% rule)
-  - Monthly Income sustainable withdrawal
-  - Monte Carlo Outcomes: Best/Median/Worst case + Shortfall Risk
-  
-  **ENGINE 2: SCENARIO SIMULATOR**
-  - Interactive Retirement Age Impact (55/60/65/70 comparison)
-  - 4 Parameter Sliders: Savings Rate, Expected Return, Retirement Age, Inflation
-  - Quick Life Decisions: 6 scenario buttons with instant impact calculation
-  
-  **ENGINE 3: AI WEALTH INSIGHTS**
-  - Personalized headline ("You can retire at X")
-  - Current vs Recommended savings rate comparison
-  - Top 3 Improvements with specific $ amounts
-  - Total potential impact display
-
-  **SUPPORTING FEATURES**
-  - Financial Health Score with grade
-  - Net Worth Projection Chart with target line
-  - Goal Progress (4 goals with status badges)
-  - Quick action buttons
-
-### March 13, 2026 (Earlier Session)
-- ✅ **AI WEALTH STRATEGIST TRANSFORMATION** - Complete overhaul turning dashboard into true AI-powered financial advisor
-  
-  **NEW: AI Wealth Brief (Hero Section)**
-  - Personalized headline: "Action needed: Consider retiring at X instead of Y"
-  - Key insight summary showing total impact potential
-  - Top 3 recommendations with specific $ amounts
-  - Wealth Trajectory visualization showing net worth at ages 45, 50, 55, 60
-  
-  **NEW: Life Decision Simulator**
-  - 6 interactive scenarios: Retire early, Buy property, Start business, Market crash, Inheritance, Save extra
-  - Click any scenario to see: Current probability → New probability, Wealth impact, Recommendation
-  - Backend endpoint: `/api/ai/life-scenario`
-  
-  **Enhanced Monte Carlo Simulation**
-  - Real 10,000-iteration calculations using numpy
-  - Shows: Success probability, Best/Worst case, Median outcome, Shortfall risk
-  - Dynamic recalculation when What-If sliders change
-  
-  **AI Wealth Brief Backend Service**
-  - New file: `/app/backend/services/ai_wealth_brief.py`
-  - Generates personalized recommendations based on user profile
-  - Calculates optimal retirement age
-  - Returns net worth projections at multiple ages
-  
-- ✅ **Compliance Modal Bug Fixed** - Only shows once, persists via localStorage
-- ✅ **Real Monte Carlo Simulation** - Replaced mock data with actual calculations
-
-### March 13, 2026 (Earlier)
-- ✅ Completed Phase 1-4 implementation
-- ✅ Added What-If Quick Toggle to Dashboard
-- ✅ Created Decision Engine page with health score and recommendations
-- ✅ Built Life Timeline Planner with adjustable retirement age
-- ✅ Implemented Client CRM with workflow pipeline
-- ✅ Integrated AI Advisor with live LLM (Emergent LLM Key)
-- ✅ Added AI Scenario Generator endpoint
-
-### Previous Sessions
-- Halcyon Wealth rebranding
-- Simplified navigation (6-section sidebar)
-- Command Center dashboard
-- Scenario Comparison page
-- Encrypted mock data feeds (AES-256-GCM)
-- Backend service modularization started
+## Version
+2.0.0 - AI-First Advisor Operating System
