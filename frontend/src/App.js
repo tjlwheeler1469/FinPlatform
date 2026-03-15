@@ -84,6 +84,10 @@ const ScenarioComparison = lazy(() => import("@/pages/ScenarioComparison"));
 const AdviceWorkflow = lazy(() => import("@/pages/AdviceWorkflow"));
 const FinancialPlanGenerator = lazy(() => import("@/pages/FinancialPlanGenerator"));
 const MeetingSummaryGenerator = lazy(() => import("@/pages/MeetingSummaryGenerator"));
+const DocumentVault = lazy(() => import("@/pages/DocumentVault"));
+const EstatePlanning = lazy(() => import("@/pages/EstatePlanning"));
+const ProductMarketplace = lazy(() => import("@/pages/ProductMarketplace"));
+const PortfolioAnalyzer = lazy(() => import("@/pages/PortfolioAnalyzer"));
 
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
