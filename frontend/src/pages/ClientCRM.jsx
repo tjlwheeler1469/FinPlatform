@@ -258,7 +258,8 @@ const ClientCRM = () => {
                 <Card 
                   key={client.client_id} 
                   className="hover:shadow-md transition-shadow cursor-pointer"
-                  onClick={() => setSelectedClient(client)}
+                  onClick={() => handleSelectClient(client)}
+                  data-testid={`client-card-${client.client_id}`}
                 >
                   <CardContent className="p-4">
                     <div className="flex items-center gap-4">
