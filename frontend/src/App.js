@@ -847,6 +847,7 @@ const AppRouter = () => {
       <Route path="/estate-planning" element={<EstatePlanning />} />
       <Route path="/product-marketplace" element={<ProductMarketplace />} />
       <Route path="/portfolio-analyzer" element={<PortfolioAnalyzer />} />
+      <Route path="/connected-accounts" element={<ConnectedAccounts />} />
     </Routes>
   );
 };
