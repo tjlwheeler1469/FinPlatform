@@ -159,7 +159,7 @@ const personalNavGroups = [
   }
 ];
 
-// Adviser Mode Navigation - Ideal 7-section structure
+// Adviser Mode Navigation - Client-centric structure
 const adviserNavGroups = [
   {
     name: "Dashboard",
@@ -167,59 +167,58 @@ const adviserNavGroups = [
     items: [
       { path: "/adviser-dashboard", label: "Overview", icon: Briefcase, title: "Adviser Dashboard" },
       { path: "/daily-briefing", label: "Daily Briefing", icon: Sun, title: "Daily Briefing" },
-      { path: "/decision-engine", label: "Health Score", icon: Zap, title: "Financial Health Score" },
+      { path: "/practice-management", label: "Practice", icon: ClipboardList, title: "Practice Management" },
     ]
   },
   {
     name: "Clients",
     icon: Users,
     items: [
-      { path: "/client-crm", label: "Client CRM", icon: Users, title: "Client Relationship Management" },
-      { path: "/financial-plan-generator", label: "Plan Generator", icon: FileText, title: "AI Financial Plan Generator" },
-      { path: "/meeting-summary", label: "Meeting Notes", icon: ClipboardList, title: "AI Meeting Summary Generator" },
-      { path: "/statement-of-advice", label: "SOA Generator", icon: FileText, title: "Statement of Advice" },
-      { path: "/advice-workflow", label: "Advice Workflow", icon: Activity, title: "Advice Workflow" },
+      { path: "/client-crm", label: "All Clients", icon: Users, title: "Client Relationship Management" },
+      { path: "/onboarding", label: "New Client", icon: UserPlus, title: "Client Onboarding" },
+      { path: "/advice-workflow", label: "Workflow", icon: Activity, title: "Advice Workflow" },
     ]
   },
   {
-    name: "Financial Plan",
+    name: "Client: Financial Plan",
     icon: Target,
     items: [
-      { path: "/life-timeline", label: "Life Timeline", icon: Clock, title: "Life Timeline Planning" },
+      { path: "/financial-plan-generator", label: "Generate Plan", icon: FileText, title: "AI Financial Plan Generator" },
       { path: "/goal-tracker", label: "Goals", icon: Target, title: "Goal Progress Tracker" },
       { path: "/scenario-comparison", label: "Scenarios", icon: BarChart3, title: "Scenario Comparison" },
-      { path: "/estate-planning", label: "Estate Planning", icon: Users, title: "Estate Planning" },
+      { path: "/estate-planning", label: "Estate", icon: Users, title: "Estate Planning" },
       { path: "/strategic-planning", label: "Strategy", icon: HeartPulse, title: "Strategic Planning" },
     ]
   },
   {
-    name: "Investments",
+    name: "Client: Investments",
     icon: TrendingUp,
     items: [
       { path: "/family-wealth", label: "Net Worth", icon: Eye, title: "Net Worth & Balance Sheet" },
+      { path: "/portfolio-analyzer", label: "Analysis", icon: BarChart3, title: "Portfolio Analysis" },
+      { path: "/connected-accounts", label: "Accounts", icon: Link2, title: "Connected Accounts" },
       { path: "/share-portfolio", label: "Shares", icon: LineChart, title: "Share Portfolio" },
-      { path: "/portfolio-analyzer", label: "Portfolio Analyzer", icon: BarChart3, title: "Portfolio Analysis" },
-      { path: "/portfolio-aggregator", label: "All Accounts", icon: Link2, title: "Portfolio Aggregation" },
-      { path: "/product-marketplace", label: "Marketplace", icon: Building2, title: "Product Marketplace" },
+      { path: "/product-marketplace", label: "Products", icon: Building2, title: "Product Marketplace" },
     ]
   },
   {
-    name: "Documents",
+    name: "Client: Documents",
     icon: FileText,
     items: [
-      { path: "/document-vault", label: "Document Vault", icon: FolderOpen, title: "Secure Document Storage" },
-      { path: "/reports", label: "Generate Reports", icon: FileText, title: "Report Generator" },
-      { path: "/tax-analysis-sync", label: "Tax Analysis", icon: Calculator, title: "Tax Analysis" },
-      { path: "/data-import-export", label: "Import/Export", icon: Database, title: "Data Import & Export" },
+      { path: "/document-vault", label: "Vault", icon: FolderOpen, title: "Secure Document Storage" },
+      { path: "/statement-of-advice", label: "SOA", icon: FileText, title: "Statement of Advice" },
+      { path: "/meeting-summary", label: "Meetings", icon: ClipboardList, title: "AI Meeting Notes" },
+      { path: "/reports", label: "Reports", icon: FileText, title: "Report Generator" },
     ]
   },
   {
-    name: "AI Advisor",
+    name: "Client: AI Advisor",
     icon: Sparkles,
     items: [
-      { path: "/ai-advisor", label: "AI Advisor", icon: Sparkles, title: "AI Financial Advisor" },
-      { path: "/copilot", label: "AI Copilot", icon: MessageSquare, title: "AI Copilot Chat" },
-      { path: "/risk-profiler", label: "Risk Profiler", icon: Shield, title: "Risk Profiler" },
+      { path: "/ai-advisor", label: "Advisor", icon: Sparkles, title: "AI Financial Advisor" },
+      { path: "/copilot", label: "Copilot", icon: MessageSquare, title: "AI Copilot Chat" },
+      { path: "/risk-profiler", label: "Risk Profile", icon: Shield, title: "Risk Profiler" },
+      { path: "/decision-engine", label: "Health Score", icon: Zap, title: "Financial Health Score" },
     ]
   },
   {
@@ -228,8 +227,7 @@ const adviserNavGroups = [
     items: [
       { path: "/security", label: "Security", icon: Shield, title: "Security Settings" },
       { path: "/bank-feeds", label: "Bank Feeds", icon: Landmark, title: "Bank Feeds" },
-      { path: "/connected-accounts", label: "Connected Accounts", icon: Link2, title: "Account Aggregation" },
-      { path: "/practice-management", label: "Practice", icon: ClipboardList, title: "Practice Management" },
+      { path: "/data-import-export", label: "Import/Export", icon: Database, title: "Data Import & Export" },
     ]
   }
 ];
