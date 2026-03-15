@@ -242,7 +242,7 @@ const clientContextNav = [
 const adviserNavGroups = [...adviserBaseNav];
 
 // Flatten all nav items for title lookup
-const allNavItems = [...personalNavGroups, ...adviserNavGroups].flatMap(group => group.items);
+const allNavItems = [...personalNavGroups, ...adviserBaseNav, ...clientContextNav].flatMap(group => group.items);
 
 // Mobile bottom navigation - simplified to match new 5-tab structure
 const mobileBottomNav = [
