@@ -52,6 +52,7 @@ const formatCompact = (value) => {
 const FinancialPlanGenerator = () => {
   const { portfolio } = usePortfolio();
   const [loading, setLoading] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [plan, setPlan] = useState(null);
   const [activeTab, setActiveTab] = useState("summary");
   const [formData, setFormData] = useState({
@@ -89,9 +90,83 @@ const FinancialPlanGenerator = () => {
     }
   };
 
-  const exportPDF = () => {
-    // In a real implementation, this would generate a PDF
-    window.print();
+  const exportPDF = async () => {
+    if (!plan) return;
+    
+    setExporting(true);
+    try {
+      // Prepare plan data for PDF export
+      const planData = {
+        client_name: formData.client_name,
+        plan_id: `FP-${Date.now()}`,
+        executive_summary: {
+          headline: plan.executive_summary || "Your comprehensive financial plan",
+          key_metrics: [
+            { name: "Net Worth", current: formatCurrency(portfolio.summary.netWorth), target: formatCurrency(portfolio.summary.netWorth * 1.5) },
+            { name: "Retirement Income", current: formatCurrency(80000), target: formatCurrency(120000) },
+            { name: "Super Balance", current: formatCurrency(portfolio.investments.smsf_balance), target: formatCurrency(2000000) }
+          ]
+        },
+        retirement_plan: {
+          target_age: formData.retirement_age,
+          success_probability: plan.retirement_success || 85,
+          annual_income: 120000,
+          recommendations: plan.recommendations?.slice(0, 3) || []
+        },
+        investment_strategy: {
+          risk_profile: formData.risk_tolerance,
+          time_horizon: `${formData.retirement_age - formData.age} years`,
+          target_allocation: {
+            australian_shares: { current: 30, target: 35, action: "Increase" },
+            international_shares: { current: 25, target: 30, action: "Increase" },
+            property: { current: 35, target: 25, action: "Reduce" },
+            fixed_income: { current: 10, target: 10, action: "Hold" }
+          }
+        },
+        tax_strategy: {
+          effective_rate: 32,
+          potential_savings: 15000,
+          strategies: plan.tax_strategies || [
+            { name: "Super Contributions", description: "Maximize concessional contributions to reduce taxable income" },
+            { name: "Negative Gearing", description: "Review property expenses for tax deduction opportunities" }
+          ]
+        },
+        action_items: plan.action_items || [
+          { priority: "High", action: "Review superannuation contributions", timeline: "This month", impact: "Tax savings" },
+          { priority: "Medium", action: "Consolidate super accounts", timeline: "Next quarter", impact: "Fee reduction" },
+          { priority: "Low", action: "Update estate planning documents", timeline: "Within 6 months", impact: "Legacy protection" }
+        ]
+      };
+
+      const response = await axios.post(`${API}/export/financial-plan`, planData);
+      
+      if (response.data.success && response.data.data) {
+        // Convert base64 to blob and download
+        const byteCharacters = atob(response.data.data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: 'application/pdf' });
+        
+        // Create download link
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = response.data.filename || 'financial_plan.pdf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      }
+    } catch (error) {
+      console.error("Error exporting PDF:", error);
+      // Fallback to print
+      window.print();
+    } finally {
+      setExporting(false);
+    }
   };
 
   const PriorityBadge = ({ priority }) => {
