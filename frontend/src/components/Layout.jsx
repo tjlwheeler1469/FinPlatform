@@ -103,7 +103,6 @@ const personalNavGroups = [
     name: "Planning",
     icon: Target,
     items: [
-      { path: "/life-timeline", label: "Life Timeline", icon: Clock, title: "Life Timeline Planning" },
       { path: "/goal-tracker", label: "Goals", icon: Target, title: "Goal Progress Tracker" },
       { path: "/scenario-comparison", label: "Scenario Compare", icon: BarChart3, title: "Scenario Comparison" },
       { path: "/strategic-planning", label: "Strategy", icon: HeartPulse, title: "Strategic Planning" },
