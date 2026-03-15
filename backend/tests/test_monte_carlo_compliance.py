@@ -6,7 +6,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://ai-wealth-planner-1.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://advisor-platform-15.preview.emergentagent.com')
 
 class TestMonteCarloAPI:
     """Test Monte Carlo Advanced API endpoint"""
