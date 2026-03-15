@@ -526,18 +526,18 @@ const Layout = ({ children }) => {
                 <button
                   onClick={() => toggleGroup(group.name)}
                   className={cn(
-                    "w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-bold uppercase tracking-wider transition-all",
+                    "w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition-all",
                     groupActive 
                       ? "bg-[#D4A84C]/20 text-[#D4A84C] border-l-2 border-[#D4A84C]" 
                       : "text-white/80 hover:text-white hover:bg-white/5"
                   )}
                 >
-                  <span className="flex items-center gap-2">
-                    {GroupIcon && <GroupIcon className={cn("h-4 w-4", groupActive ? "text-[#D4A84C]" : "")} />}
-                    {group.name}
+                  <span className="flex items-center gap-2 min-w-0 flex-1">
+                    {GroupIcon && <GroupIcon className={cn("h-4 w-4 flex-shrink-0", groupActive ? "text-[#D4A84C]" : "")} />}
+                    <span className="truncate">{group.name}</span>
                   </span>
                   <ChevronDown className={cn(
-                    "h-4 w-4 transition-transform",
+                    "h-4 w-4 flex-shrink-0 transition-transform ml-1",
                     expandedGroups[group.name] ? "rotate-0" : "-rotate-90"
                   )} />
                 </button>
