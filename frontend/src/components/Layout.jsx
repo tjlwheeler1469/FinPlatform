@@ -228,6 +228,7 @@ const adviserNavGroups = [
     items: [
       { path: "/security", label: "Security", icon: Shield, title: "Security Settings" },
       { path: "/bank-feeds", label: "Bank Feeds", icon: Landmark, title: "Bank Feeds" },
+      { path: "/connected-accounts", label: "Connected Accounts", icon: Link2, title: "Account Aggregation" },
       { path: "/practice-management", label: "Practice", icon: ClipboardList, title: "Practice Management" },
     ]
   }
