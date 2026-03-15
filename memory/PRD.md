@@ -89,9 +89,21 @@ Build a best-in-class "AI-powered financial planning platform" named "Wealth Com
   - Super funds
   - AI-powered recommendations
 
+### Phase 6: Adviser Mode Navigation (Complete - Dec 2025)
+- [x] **Client-Centric Navigation Hierarchy**
+  - Dashboard: Overview, Daily Briefing, Practice
+  - Clients: All Clients, New Client, Workflow
+  - Client: Financial Plan - Generate Plan, Goals, Scenarios, Estate, Strategy
+  - Client: Investments - Net Worth, Analysis, Accounts, Shares, Products
+  - Client: Documents - Vault, SOA, Meetings, Reports
+  - Client: AI Advisor - Advisor, Copilot, Risk Profile, Health Score
+  - Settings
+- [x] Removed Life Timeline from navigation
+- [x] Fixed sidebar overflow/text truncation issues
+- [x] Increased sidebar width (w-64) for better readability
+
 ### Additional Features (Complete)
 - [x] Client CRM system
-- [x] Life Timeline Planner
 - [x] Goal Tracker
 - [x] Loan Calculator
 - [x] CGT Calculator
