@@ -750,7 +750,7 @@ const Layout = ({ children }) => {
         className={cn(
           "flex-1 min-h-screen transition-all duration-300 overflow-y-auto",
           "pt-14 pb-20 lg:pt-0 lg:pb-0",
-          sidebarCollapsed ? "lg:ml-16" : "lg:ml-56"
+          sidebarCollapsed ? "lg:ml-16" : "lg:ml-64"
         )}
       >
         <div className="p-4 md:p-6 lg:p-8">
