@@ -261,8 +261,40 @@ const Layout = ({ children }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [appMode, setAppMode] = useState(() => localStorage.getItem("app_mode") || "personal");
   
-  // Get the right nav groups based on mode
-  const activeNavGroups = appMode === "adviser" ? adviserNavGroups : personalNavGroups;
+  // Selected client for adviser mode
+  const [selectedClient, setSelectedClient] = useState(() => {
+    const saved = localStorage.getItem("selected_client");
+    return saved ? JSON.parse(saved) : null;
+  });
+  
+  // Get the right nav groups based on mode and client selection
+  const getActiveNavGroups = () => {
+    if (appMode === "adviser") {
+      if (selectedClient) {
+        // Show client-specific nav when client is selected
+        return [...adviserBaseNav.slice(0, 2), ...clientContextNav, adviserBaseNav[2]];
+      }
+      return adviserBaseNav;
+    }
+    return personalNavGroups;
+  };
+  
+  const activeNavGroups = getActiveNavGroups();
+  
+  // Save selected client to localStorage
+  useEffect(() => {
+    if (selectedClient) {
+      localStorage.setItem("selected_client", JSON.stringify(selectedClient));
+    } else {
+      localStorage.removeItem("selected_client");
+    }
+  }, [selectedClient]);
+  
+  // Clear selected client when switching modes
+  const handleClearClient = () => {
+    setSelectedClient(null);
+    navigate("/client-crm");
+  };
   
   const [expandedGroups, setExpandedGroups] = useState(() => {
     return activeNavGroups.reduce((acc, group) => {
