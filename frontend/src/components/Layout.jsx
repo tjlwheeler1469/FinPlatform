@@ -248,7 +248,7 @@ const allNavItems = [...personalNavGroups, ...adviserBaseNav, ...clientContextNa
 const mobileBottomNav = [
   { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { path: "/family-wealth", label: "Finances", icon: Wallet },
-  { path: "/life-timeline", label: "Planning", icon: Target },
+  { path: "/goal-tracker", label: "Goals", icon: Target },
   { path: "/reports", label: "Reports", icon: FileText },
   { path: "/loan-calculator", label: "Calc", icon: Calculator },
 ];
