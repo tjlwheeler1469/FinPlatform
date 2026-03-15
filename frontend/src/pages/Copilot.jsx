@@ -720,23 +720,55 @@ const Copilot = () => {
     setIsProcessing(true);
     setActiveResult(null);
 
-    await new Promise(resolve => setTimeout(resolve, 600));
+    try {
+      // Try backend AI copilot first
+      const sessionId = localStorage.getItem("copilot_session_id") || `session_${Date.now()}`;
+      localStorage.setItem("copilot_session_id", sessionId);
+      
+      const aiResponse = await axios.post(`${API}/copilot/chat`, {
+        session_id: sessionId,
+        message: input,
+        client_context: {
+          name: "Wheeler Family",
+          age: 45,
+          income: 185000,
+          net_worth: portfolio.summary?.netWorth || 2850000,
+          super_balance: 580000,
+          risk_profile: "moderate",
+          goals: ["retirement", "wealth building", "education funding"]
+        }
+      });
+      
+      const botMessage = {
+        id: Date.now() + 1,
+        type: "bot",
+        content: aiResponse.data.response,
+        insights: aiResponse.data.insights,
+        timestamp: new Date().toISOString(),
+      };
+      
+      setMessages(prev => [...prev, botMessage]);
+    } catch (error) {
+      console.error("Backend AI error, falling back to local:", error);
+      // Fallback to local processing
+      await new Promise(resolve => setTimeout(resolve, 600));
+      const response = await processCommand(input);
 
-    const response = await processCommand(input);
+      const botMessage = {
+        id: Date.now() + 1,
+        type: "bot",
+        content: response.content,
+        result: response.result,
+        action: response.action,
+        timestamp: new Date().toISOString(),
+      };
 
-    const botMessage = {
-      id: Date.now() + 1,
-      type: "bot",
-      content: response.content,
-      result: response.result,
-      action: response.action,
-      timestamp: new Date().toISOString(),
-    };
-
-    setMessages(prev => [...prev, botMessage]);
-    if (response.result) {
-      setActiveResult(response.result);
+      setMessages(prev => [...prev, botMessage]);
+      if (response.result) {
+        setActiveResult(response.result);
+      }
     }
+    
     setIsProcessing(false);
   };
 
