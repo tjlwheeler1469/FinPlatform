@@ -77,6 +77,19 @@ const ClientCRM = () => {
   const [activeTab, setActiveTab] = useState('clients');
   const [selectedClient, setSelectedClient] = useState(null);
 
+  // Handle selecting a client - save to localStorage for Layout to pick up
+  const handleSelectClient = (client) => {
+    setSelectedClient(client);
+    // Save to localStorage so Layout can show client-specific navigation
+    localStorage.setItem("selected_client", JSON.stringify({
+      id: client.client_id,
+      name: client.name,
+      email: client.email
+    }));
+    // Navigate to the client's financial plan
+    navigate("/financial-plan-generator");
+  };
+
   useEffect(() => {
     fetchData();
   }, []);
