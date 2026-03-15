@@ -291,8 +291,11 @@ class TestAICopilot:
         assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
         
         data = response.json()
-        assert isinstance(data, list), "Response should be a list of suggestions"
-        print(f"Copilot Suggestions: {data[:3]}...")
+        # API returns {"suggestions": [...]} or just a list
+        suggestions = data.get("suggestions", data) if isinstance(data, dict) else data
+        assert isinstance(suggestions, list), "Response should contain a list of suggestions"
+        assert len(suggestions) > 0, "Should have at least one suggestion"
+        print(f"Copilot Suggestions: {suggestions[:3]}...")
     
     def test_copilot_conversation_flow(self):
         """Test a multi-turn conversation with the copilot"""
