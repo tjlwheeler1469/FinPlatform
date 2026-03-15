@@ -90,14 +90,12 @@ Build a best-in-class "AI-powered financial planning platform" named "Wealth Com
   - AI-powered recommendations
 
 ### Phase 6: Adviser Mode Navigation (Complete - Dec 2025)
-- [x] **Client-Centric Navigation Hierarchy**
-  - Dashboard: Overview, Daily Briefing, Practice
-  - Clients: All Clients, New Client, Workflow
-  - Client: Financial Plan - Generate Plan, Goals, Scenarios, Estate, Strategy
-  - Client: Investments - Net Worth, Analysis, Accounts, Shares, Products
-  - Client: Documents - Vault, SOA, Meetings, Reports
-  - Client: AI Advisor - Advisor, Copilot, Risk Profile, Health Score
-  - Settings
+- [x] **Two-Level Hierarchical Navigation**
+  - **Level 1 (Adviser - no client)**: Dashboard, Clients, Settings only
+  - **Level 2 (Client selected)**: Financial Plan, Investments, Documents, AI Advisor
+- [x] Client selector shows selected client name with X button to deselect
+- [x] "Select a client to view their data" prompt when no client selected
+- [x] Clicking a client in CRM navigates to their Financial Plan
 - [x] Removed Life Timeline from navigation
 - [x] Fixed sidebar overflow/text truncation issues
 - [x] Increased sidebar width (w-64) for better readability
