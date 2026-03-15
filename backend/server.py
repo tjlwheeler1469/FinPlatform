@@ -7203,6 +7203,198 @@ try:
 except ImportError as e:
     logger.warning(f"Decision engine services not available: {e}")
 
+# ==================== AI DOCUMENT ANALYSIS ENDPOINTS ====================
+
+try:
+    from services.ai_document_analysis import (
+        analyze_document, get_document_insights
+    )
+    
+    class DocumentAnalysisRequest(BaseModel):
+        document_name: str
+        document_type: str = "pdf"
+        document_category: str
+        document_content: str = None
+    
+    @api_router.post("/documents/analyze")
+    async def analyze_uploaded_document(request: DocumentAnalysisRequest):
+        """AI-powered document analysis"""
+        return await analyze_document(
+            document_name=request.document_name,
+            document_type=request.document_type,
+            document_category=request.document_category,
+            document_content=request.document_content
+        )
+    
+    @api_router.post("/documents/insights")
+    async def get_portfolio_document_insights(documents: List[Dict]):
+        """Get portfolio-wide insights from documents"""
+        return get_document_insights(documents)
+
+except ImportError as e:
+    logger.warning(f"AI document analysis not available: {e}")
+
+# ==================== ACCOUNT AGGREGATION ENDPOINTS ====================
+
+try:
+    from services.account_aggregation import (
+        get_aggregated_accounts, get_account_transactions, connect_account,
+        disconnect_account, sync_accounts, get_cashflow_analysis, get_available_institutions
+    )
+    
+    @api_router.get("/accounts/aggregated")
+    async def get_all_connected_accounts(client_id: str = "wheeler-family"):
+        """Get all connected accounts with aggregated totals"""
+        return get_aggregated_accounts(client_id)
+    
+    @api_router.get("/accounts/{account_id}/transactions")
+    async def get_transactions(account_id: str, days: int = 30, category: str = None):
+        """Get transactions for an account"""
+        return get_account_transactions(account_id, days, category)
+    
+    class ConnectAccountRequest(BaseModel):
+        client_id: str = "wheeler-family"
+        institution: str
+        credentials: Dict = None
+    
+    @api_router.post("/accounts/connect")
+    async def connect_new_account(request: ConnectAccountRequest):
+        """Connect a new account"""
+        return connect_account(request.client_id, request.institution, request.credentials)
+    
+    @api_router.delete("/accounts/{account_id}")
+    async def disconnect_linked_account(account_id: str, client_id: str = "wheeler-family"):
+        """Disconnect an account"""
+        return disconnect_account(client_id, account_id)
+    
+    @api_router.post("/accounts/sync")
+    async def sync_all_accounts(client_id: str = "wheeler-family"):
+        """Refresh all account data"""
+        return sync_accounts(client_id)
+    
+    @api_router.get("/accounts/cashflow")
+    async def get_cashflow(client_id: str = "wheeler-family", months: int = 3):
+        """Get cashflow analysis across accounts"""
+        return get_cashflow_analysis(client_id, months)
+    
+    @api_router.get("/accounts/institutions")
+    async def list_available_institutions():
+        """Get list of available institutions for connection"""
+        return get_available_institutions()
+
+except ImportError as e:
+    logger.warning(f"Account aggregation not available: {e}")
+
+# ==================== PDF EXPORT ENDPOINTS ====================
+
+try:
+    from services.pdf_export import (
+        generate_financial_plan_pdf, generate_portfolio_statement_pdf,
+        generate_meeting_summary_pdf, encode_pdf_base64
+    )
+    
+    @api_router.post("/export/financial-plan")
+    async def export_financial_plan_pdf(plan_data: Dict[str, Any]):
+        """Generate and download financial plan as PDF"""
+        pdf_bytes = generate_financial_plan_pdf(plan_data)
+        pdf_base64 = encode_pdf_base64(pdf_bytes)
+        
+        return {
+            "success": True,
+            "filename": f"financial_plan_{datetime.now(timezone.utc).strftime('%Y%m%d')}.pdf",
+            "content_type": "application/pdf",
+            "data": pdf_base64,
+            "size_bytes": len(pdf_bytes)
+        }
+    
+    @api_router.post("/export/portfolio-statement")
+    async def export_portfolio_statement(portfolio_data: Dict[str, Any]):
+        """Generate portfolio statement PDF"""
+        pdf_bytes = generate_portfolio_statement_pdf(portfolio_data)
+        pdf_base64 = encode_pdf_base64(pdf_bytes)
+        
+        return {
+            "success": True,
+            "filename": f"portfolio_statement_{datetime.now(timezone.utc).strftime('%Y%m%d')}.pdf",
+            "content_type": "application/pdf",
+            "data": pdf_base64,
+            "size_bytes": len(pdf_bytes)
+        }
+    
+    @api_router.post("/export/meeting-summary")
+    async def export_meeting_summary(meeting_data: Dict[str, Any]):
+        """Generate meeting summary PDF"""
+        pdf_bytes = generate_meeting_summary_pdf(meeting_data)
+        pdf_base64 = encode_pdf_base64(pdf_bytes)
+        
+        return {
+            "success": True,
+            "filename": f"meeting_summary_{datetime.now(timezone.utc).strftime('%Y%m%d')}.pdf",
+            "content_type": "application/pdf",
+            "data": pdf_base64,
+            "size_bytes": len(pdf_bytes)
+        }
+
+except ImportError as e:
+    logger.warning(f"PDF export not available: {e}")
+
+# ==================== AI COPILOT ENDPOINTS ====================
+
+try:
+    from services.ai_copilot import (
+        process_copilot_message, get_conversation_history,
+        clear_conversation, get_suggested_questions
+    )
+    
+    class CopilotMessageRequest(BaseModel):
+        session_id: str
+        message: str
+        client_context: Dict = None
+    
+    @api_router.post("/copilot/chat")
+    async def copilot_chat(request: CopilotMessageRequest):
+        """Send a message to the AI copilot"""
+        return await process_copilot_message(
+            session_id=request.session_id,
+            user_message=request.message,
+            client_context=request.client_context
+        )
+    
+    @api_router.get("/copilot/history/{session_id}")
+    async def get_copilot_history(session_id: str):
+        """Get conversation history for a session"""
+        return {
+            "session_id": session_id,
+            "messages": get_conversation_history(session_id)
+        }
+    
+    @api_router.delete("/copilot/history/{session_id}")
+    async def clear_copilot_history(session_id: str):
+        """Clear conversation history"""
+        return clear_conversation(session_id)
+    
+    @api_router.get("/copilot/suggestions")
+    async def get_copilot_suggestions(
+        age: int = None,
+        income: float = None,
+        net_worth: float = None
+    ):
+        """Get suggested questions based on context"""
+        context = {}
+        if age:
+            context["age"] = age
+        if income:
+            context["income"] = income
+        if net_worth:
+            context["net_worth"] = net_worth
+        
+        return {
+            "suggestions": get_suggested_questions(context if context else None)
+        }
+
+except ImportError as e:
+    logger.warning(f"AI Copilot not available: {e}")
+
 # Include the router in the main app
 app.include_router(api_router)
 
