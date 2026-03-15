@@ -158,8 +158,11 @@ const personalNavGroups = [
   }
 ];
 
-// Adviser Mode Navigation - Client-centric structure
-const adviserNavGroups = [
+// Adviser Mode Navigation - Two-level hierarchy
+// Level 1: Adviser (no client selected) - Dashboard, Clients, Settings
+// Level 2: Client Context (client selected) - Financial Plan, Investments, Documents, AI Advisor
+
+const adviserBaseNav = [
   {
     name: "Dashboard",
     icon: LayoutDashboard,
@@ -179,7 +182,20 @@ const adviserNavGroups = [
     ]
   },
   {
-    name: "Client: Financial Plan",
+    name: "Settings",
+    icon: Settings,
+    items: [
+      { path: "/security", label: "Security", icon: Shield, title: "Security Settings" },
+      { path: "/bank-feeds", label: "Bank Feeds", icon: Landmark, title: "Bank Feeds" },
+      { path: "/data-import-export", label: "Import/Export", icon: Database, title: "Data Import & Export" },
+    ]
+  }
+];
+
+// Client-specific navigation (shown when client is selected)
+const clientContextNav = [
+  {
+    name: "Financial Plan",
     icon: Target,
     items: [
       { path: "/financial-plan-generator", label: "Generate Plan", icon: FileText, title: "AI Financial Plan Generator" },
@@ -190,7 +206,7 @@ const adviserNavGroups = [
     ]
   },
   {
-    name: "Client: Investments",
+    name: "Investments",
     icon: TrendingUp,
     items: [
       { path: "/family-wealth", label: "Net Worth", icon: Eye, title: "Net Worth & Balance Sheet" },
@@ -201,7 +217,7 @@ const adviserNavGroups = [
     ]
   },
   {
-    name: "Client: Documents",
+    name: "Documents",
     icon: FileText,
     items: [
       { path: "/document-vault", label: "Vault", icon: FolderOpen, title: "Secure Document Storage" },
@@ -211,7 +227,7 @@ const adviserNavGroups = [
     ]
   },
   {
-    name: "Client: AI Advisor",
+    name: "AI Advisor",
     icon: Sparkles,
     items: [
       { path: "/ai-advisor", label: "Advisor", icon: Sparkles, title: "AI Financial Advisor" },
@@ -219,17 +235,11 @@ const adviserNavGroups = [
       { path: "/risk-profiler", label: "Risk Profile", icon: Shield, title: "Risk Profiler" },
       { path: "/decision-engine", label: "Health Score", icon: Zap, title: "Financial Health Score" },
     ]
-  },
-  {
-    name: "Settings",
-    icon: Settings,
-    items: [
-      { path: "/security", label: "Security", icon: Shield, title: "Security Settings" },
-      { path: "/bank-feeds", label: "Bank Feeds", icon: Landmark, title: "Bank Feeds" },
-      { path: "/data-import-export", label: "Import/Export", icon: Database, title: "Data Import & Export" },
-    ]
   }
 ];
+
+// Combined for backwards compatibility
+const adviserNavGroups = [...adviserBaseNav];
 
 // Flatten all nav items for title lookup
 const allNavItems = [...personalNavGroups, ...adviserNavGroups].flatMap(group => group.items);
