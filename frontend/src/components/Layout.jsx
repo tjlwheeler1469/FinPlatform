@@ -551,6 +551,40 @@ const Layout = ({ children }) => {
           </Select>
         </div>
 
+        {/* Selected Client Indicator (Adviser Mode) */}
+        {appMode === "adviser" && !sidebarCollapsed && selectedClient && (
+          <div className="px-3 py-2 border-b border-white/10">
+            <div className="bg-[#D4A84C]/20 rounded-lg p-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Users className="h-4 w-4 text-[#D4A84C] flex-shrink-0" />
+                  <span className="text-sm font-medium text-[#D4A84C] truncate">
+                    {selectedClient.name}
+                  </span>
+                </div>
+                <button 
+                  onClick={handleClearClient}
+                  className="text-white/60 hover:text-white p-1"
+                  title="Back to all clients"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Prompt to select client (Adviser Mode without client) */}
+        {appMode === "adviser" && !sidebarCollapsed && !selectedClient && (
+          <div className="px-3 py-2 border-b border-white/10">
+            <div className="bg-white/5 rounded-lg p-2 text-center">
+              <p className="text-xs text-white/60">
+                Select a client to view their data
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Navigation */}
         <nav 
           ref={sidebarNavRef}
