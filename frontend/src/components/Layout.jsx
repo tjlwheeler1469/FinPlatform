@@ -405,7 +405,7 @@ const Layout = ({ children }) => {
       <aside 
         className={cn(
           "hidden lg:flex flex-col fixed left-0 top-0 h-full bg-[#1a2744] text-white transition-all duration-300 z-50",
-          sidebarCollapsed ? "w-16" : "w-56"
+          sidebarCollapsed ? "w-16" : "w-64"
         )}
       >
         {/* Logo */}
