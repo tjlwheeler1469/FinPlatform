@@ -168,7 +168,6 @@ const adviserBaseNav = [
     icon: LayoutDashboard,
     items: [
       { path: "/adviser-dashboard", label: "Overview", icon: Briefcase, title: "Adviser Dashboard" },
-      { path: "/daily-briefing", label: "Daily Briefing", icon: Sun, title: "Daily Briefing" },
       { path: "/practice-management", label: "Practice", icon: ClipboardList, title: "Practice Management" },
     ]
   },
