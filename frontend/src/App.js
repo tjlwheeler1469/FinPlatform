@@ -88,6 +88,7 @@ const DocumentVault = lazy(() => import("@/pages/DocumentVault"));
 const EstatePlanning = lazy(() => import("@/pages/EstatePlanning"));
 const ProductMarketplace = lazy(() => import("@/pages/ProductMarketplace"));
 const PortfolioAnalyzer = lazy(() => import("@/pages/PortfolioAnalyzer"));
+const ConnectedAccounts = lazy(() => import("@/pages/ConnectedAccounts"));
 
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
