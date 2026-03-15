@@ -6701,6 +6701,154 @@ try:
             retirement_probability=request.retirement_probability
         )
     
+    # ==================== DOCUMENT VAULT ENDPOINTS ====================
+    
+    from services.document_vault import (
+        get_all_documents, upload_document, delete_document, search_documents
+    )
+    
+    @api_router.get("/documents")
+    async def list_documents(client_id: str = "wheeler-family"):
+        """Get all documents for a client"""
+        return get_all_documents(client_id)
+    
+    @api_router.get("/documents/search")
+    async def search_docs(query: str, client_id: str = "wheeler-family"):
+        """Search documents"""
+        return search_documents(query, client_id)
+    
+    class DocumentUploadRequest(BaseModel):
+        name: str
+        category: str
+        file_type: str = "pdf"
+        size: int = 100000
+        description: str = ""
+        tags: List[str] = []
+        client_id: str = "wheeler-family"
+    
+    @api_router.post("/documents/upload")
+    async def upload_doc(request: DocumentUploadRequest):
+        """Upload a new document"""
+        return upload_document(
+            name=request.name,
+            category=request.category,
+            file_type=request.file_type,
+            size=request.size,
+            description=request.description,
+            tags=request.tags,
+            client_id=request.client_id
+        )
+    
+    @api_router.delete("/documents/{doc_id}")
+    async def delete_doc(doc_id: str):
+        """Delete a document"""
+        return delete_document(doc_id)
+    
+    # ==================== ESTATE PLANNING ENDPOINTS ====================
+    
+    from services.estate_planning import (
+        calculate_estate_projections, create_estate_plan, calculate_trust_distribution
+    )
+    
+    class EstateProjectionRequest(BaseModel):
+        current_age: int = 45
+        life_expectancy: int = 85
+        current_net_worth: float
+        annual_growth_rate: float = 0.05
+        annual_expenses: float = 120000
+        super_balance: float = 600000
+        property_value: float = 2500000
+        investment_portfolio: float = 500000
+    
+    @api_router.post("/estate/projections")
+    async def get_estate_projections(request: EstateProjectionRequest):
+        """Calculate estate projections"""
+        return calculate_estate_projections(
+            current_age=request.current_age,
+            life_expectancy=request.life_expectancy,
+            current_net_worth=request.current_net_worth,
+            annual_growth_rate=request.annual_growth_rate,
+            annual_expenses=request.annual_expenses,
+            super_balance=request.super_balance,
+            property_value=request.property_value,
+            investment_portfolio=request.investment_portfolio
+        )
+    
+    class EstatePlanRequest(BaseModel):
+        primary_name: str
+        spouse_name: str = None
+        beneficiaries: List[Dict] = None
+        assets: Dict[str, float] = None
+        executor: str = None
+    
+    @api_router.post("/estate/create-plan")
+    async def create_new_estate_plan(request: EstatePlanRequest):
+        """Create an estate plan"""
+        return create_estate_plan(
+            primary_name=request.primary_name,
+            spouse_name=request.spouse_name,
+            beneficiaries=request.beneficiaries,
+            assets=request.assets,
+            executor=request.executor
+        )
+    
+    # ==================== PRODUCT MARKETPLACE ENDPOINTS ====================
+    
+    from services.product_marketplace import (
+        get_product_recommendations, search_products, get_product_comparison
+    )
+    
+    class ProductRecommendationRequest(BaseModel):
+        annual_income: float
+        net_worth: float
+        age: int = 45
+        risk_tolerance: str = "moderate"
+    
+    @api_router.post("/marketplace/recommendations")
+    async def get_product_recs(request: ProductRecommendationRequest):
+        """Get personalized product recommendations"""
+        return get_product_recommendations(
+            annual_income=request.annual_income,
+            net_worth=request.net_worth,
+            age=request.age,
+            risk_tolerance=request.risk_tolerance
+        )
+    
+    @api_router.get("/marketplace/products")
+    async def list_products(category: str = None, min_rating: float = 0, provider: str = None):
+        """Search available products"""
+        return search_products(category=category, min_rating=min_rating, provider=provider)
+    
+    @api_router.post("/marketplace/compare")
+    async def compare_products(product_ids: List[str]):
+        """Compare multiple products"""
+        return get_product_comparison(product_ids)
+    
+    # ==================== PORTFOLIO ANALYZER ENDPOINTS ====================
+    
+    from services.portfolio_analyzer import analyze_portfolio, get_sector_exposure
+    
+    class PortfolioAnalysisRequest(BaseModel):
+        portfolio: Dict[str, float] = None
+        risk_tolerance: str = "moderate"
+        age: int = 45
+        years_to_retirement: int = 15
+    
+    @api_router.post("/portfolio/analyze")
+    async def analyze_client_portfolio(request: PortfolioAnalysisRequest):
+        """Comprehensive portfolio analysis"""
+        return analyze_portfolio(
+            portfolio=request.portfolio,
+            risk_tolerance=request.risk_tolerance,
+            age=request.age,
+            years_to_retirement=request.years_to_retirement
+        )
+    
+    @api_router.post("/portfolio/sector-exposure")
+    async def get_portfolio_sectors(holdings: List[Dict] = None):
+        """Analyze sector exposure"""
+        return get_sector_exposure(holdings)
+    
     # ==================== LIFE TIMELINE ENDPOINTS ====================
     
     @api_router.get("/timeline/default")
