@@ -355,7 +355,7 @@ const GoalTracker = () => {
                       </div>
                       <div>
                         <CardTitle className="text-lg">{goal.name}</CardTitle>
-                        <CardDescription>{goal.goal_type.replace('_', ' ')}</CardDescription>
+                        <CardDescription>{goalType.replace('_', ' ')}</CardDescription>
                       </div>
                     </div>
                     <Badge className={isOnTrack ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}>
@@ -368,11 +368,11 @@ const GoalTracker = () => {
                     <div>
                       <div className="flex justify-between text-sm mb-2">
                         <span className="text-muted-foreground">Progress</span>
-                        <span className="font-semibold">{goal.progress_percent}%</span>
+                        <span className="font-semibold">{progressPercent.toFixed(1)}%</span>
                       </div>
                       <Progress 
-                        value={goal.progress_percent} 
-                        className={`h-3 ${getProgressColor(goal.progress_percent)}`}
+                        value={progressPercent} 
+                        className={`h-3 ${getProgressColor(progressPercent)}`}
                       />
                     </div>
                     
