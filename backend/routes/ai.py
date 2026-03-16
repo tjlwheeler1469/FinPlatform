@@ -186,17 +186,50 @@ async def analyze_document(request: DocumentAnalysisRequest):
         }
 
 
+class WealthBriefRequest(BaseModel):
+    """Request model for wealth brief generation."""
+    client_id: Optional[str] = "default_client"
+    age: int = 45
+    retirement_age: int = 60
+    net_worth: float = 1500000
+    annual_income: float = 180000
+    annual_expenses: float = 120000
+    total_assets: float = 2000000
+    total_debt: float = 500000
+    super_balance: float = 400000
+    investment_portfolio: float = 300000
+    savings_rate: float = 0.15
+    mortgage_balance: float = 450000
+    mortgage_rate: float = 6.5
+    monte_carlo_probability: float = 50.0
+
+
 @router.post("/wealth-brief")
-async def generate_wealth_brief(client_id: str, portfolio_data: Dict[str, Any]):
+async def generate_wealth_brief(request: WealthBriefRequest):
     """Generate AI-powered wealth brief."""
     try:
-        brief_generator = AIWealthBrief()
-        brief = await brief_generator.generate(client_id, portfolio_data)
-        return brief
+        # Import the service function
+        from services.ai_wealth_brief import generate_wealth_brief as gen_brief
+        
+        return gen_brief(
+            age=request.age,
+            retirement_age=request.retirement_age,
+            net_worth=request.net_worth,
+            annual_income=request.annual_income,
+            annual_expenses=request.annual_expenses,
+            total_assets=request.total_assets,
+            total_debt=request.total_debt,
+            super_balance=request.super_balance,
+            investment_portfolio=request.investment_portfolio,
+            savings_rate=request.savings_rate,
+            mortgage_balance=request.mortgage_balance,
+            mortgage_rate=request.mortgage_rate,
+            monte_carlo_probability=request.monte_carlo_probability
+        )
     except Exception as e:
         logger.error(f"Wealth brief error: {e}")
         return {
-            "client_id": client_id,
+            "client_id": request.client_id,
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "summary": "Your wealth position remains strong with positive trajectory.",
             "highlights": [
