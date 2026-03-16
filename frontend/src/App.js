@@ -881,6 +881,12 @@ const AppRouter = () => {
       <Route path="/client-insights" element={<ClientIntelligenceFeed />} />
       <Route path="/intelligence-feed" element={<ClientIntelligenceFeed />} />
       <Route path="/client-portal" element={<ClientPortal />} />
+      
+      {/* Super App Features */}
+      <Route path="/meeting-prep" element={<MeetingPrep />} />
+      <Route path="/stock-research" element={<StockResearch />} />
+      <Route path="/compliance" element={<ComplianceCenter />} />
+      <Route path="/wealth-dashboard" element={<WealthDashboard />} />
     </Routes>
   );
 };
