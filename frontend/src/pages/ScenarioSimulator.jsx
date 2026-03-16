@@ -47,9 +47,32 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 const formatCurrency = (value) => {
+  if (value === undefined || value === null || isNaN(value)) return "$0";
   if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
   if (value >= 1000) return `$${(value / 1000).toFixed(0)}K`;
   return `$${value.toFixed(0)}`;
+};
+
+// Helper to safely get nested values from API response
+const getResultValue = (result, key, defaultValue = 0) => {
+  if (!result || !result.results) return defaultValue;
+  const r = result.results;
+  
+  // Map frontend keys to backend response structure
+  switch(key) {
+    case 'retirement_wealth':
+      return r.wealth_at_retirement?.median || r.retirement_wealth || defaultValue;
+    case 'retirement_wealth_real':
+      return r.wealth_at_retirement?.p50 || r.retirement_wealth_real || defaultValue;
+    case 'annual_retirement_income':
+      return r.wealth_at_retirement?.median * 0.04 || r.annual_retirement_income || defaultValue;
+    case 'monthly_retirement_income':
+      return (r.wealth_at_retirement?.median * 0.04 / 12) || r.monthly_retirement_income || defaultValue;
+    case 'income_replacement_ratio':
+      return r.income_replacement_ratio || 67;
+    default:
+      return r[key] || defaultValue;
+  }
 };
 
 const ScenarioSimulator = () => {
