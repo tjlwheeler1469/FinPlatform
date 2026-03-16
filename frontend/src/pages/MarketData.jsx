@@ -264,18 +264,18 @@ const MarketData = () => {
                           onClick={() => handleSelectStock(position.symbol)}
                         >
                           <td className="py-3 font-medium">{position.symbol}</td>
-                          <td className="py-3 text-muted-foreground">{position.name}</td>
-                          <td className="py-3 text-right">{position.units.toLocaleString()}</td>
-                          <td className="py-3 text-right">{formatCurrency(position.current_price)}</td>
-                          <td className="py-3 text-right font-medium">{formatCurrency(position.market_value)}</td>
-                          <td className={`py-3 text-right ${position.gain_loss >= 0 ? "text-green-600" : "text-red-600"}`}>
-                            {formatCurrency(position.gain_loss)} ({position.gain_loss_percent.toFixed(1)}%)
+                          <td className="py-3 text-muted-foreground">{position.name || position.symbol}</td>
+                          <td className="py-3 text-right">{(position.units || 0).toLocaleString()}</td>
+                          <td className="py-3 text-right">{formatCurrency(position.current_price || 0)}</td>
+                          <td className="py-3 text-right font-medium">{formatCurrency(position.market_value || position.current_value || 0)}</td>
+                          <td className={`py-3 text-right ${(position.gain_loss || 0) >= 0 ? "text-green-600" : "text-red-600"}`}>
+                            {formatCurrency(position.gain_loss || 0)} ({(position.gain_loss_percent || 0).toFixed(1)}%)
                           </td>
-                          <td className={`py-3 text-right ${position.day_change_percent >= 0 ? "text-green-600" : "text-red-600"}`}>
-                            {position.day_change_percent >= 0 ? "+" : ""}{position.day_change_percent.toFixed(2)}%
+                          <td className={`py-3 text-right ${(position.day_change_percent || 0) >= 0 ? "text-green-600" : "text-red-600"}`}>
+                            {(position.day_change_percent || 0) >= 0 ? "+" : ""}{(position.day_change_percent || 0).toFixed(2)}%
                           </td>
                           <td className="py-3 text-right">
-                            <Badge variant="outline">{position.weight.toFixed(1)}%</Badge>
+                            <Badge variant="outline">{(position.weight || 0).toFixed(1)}%</Badge>
                           </td>
                         </tr>
                       ))}
