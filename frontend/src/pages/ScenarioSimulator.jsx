@@ -208,25 +208,25 @@ const ScenarioSimulator = () => {
                 <div className="text-center">
                   <p className="text-white/70 text-sm mb-1">Retirement Wealth</p>
                   <p className="text-3xl font-bold text-[#D4A84C]">
-                    {formatCurrency(result.results.retirement_wealth)}
+                    {formatCurrency(getResultValue(result, 'retirement_wealth'))}
                   </p>
                   <p className="text-xs text-white/50 mt-1">
-                    Real: {formatCurrency(result.results.retirement_wealth_real)}
+                    Real: {formatCurrency(getResultValue(result, 'retirement_wealth_real'))}
                   </p>
                 </div>
                 <div className="text-center">
                   <p className="text-white/70 text-sm mb-1">Annual Retirement Income</p>
                   <p className="text-3xl font-bold">
-                    {formatCurrency(result.results.annual_retirement_income)}
+                    {formatCurrency(getResultValue(result, 'annual_retirement_income'))}
                   </p>
                   <p className="text-xs text-white/50 mt-1">
-                    {formatCurrency(result.results.monthly_retirement_income)}/month
+                    {formatCurrency(getResultValue(result, 'monthly_retirement_income'))}/month
                   </p>
                 </div>
                 <div className="text-center">
                   <p className="text-white/70 text-sm mb-1">Income Replacement</p>
                   <p className="text-3xl font-bold">
-                    {result.results.income_replacement_ratio}%
+                    {getResultValue(result, 'income_replacement_ratio')}%
                   </p>
                   <p className="text-xs text-white/50 mt-1">
                     of current income
