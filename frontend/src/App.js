@@ -774,6 +774,10 @@ const PortfolioProvider = ({ children }) => {
 const AppRouter = () => {
   return (
     <Routes>
+      {/* Public routes */}
+      <Route path="/login" element={<Suspense fallback={<PageLoader />}><Login /></Suspense>} />
+      
+      {/* Protected routes */}
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="/mode-selector" element={<ModeSelector />} />
       <Route path="/dashboard" element={<Dashboard />} />
