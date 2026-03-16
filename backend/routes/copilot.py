@@ -130,10 +130,12 @@ async def generate_financial_plan(request: PlanGenerationRequest):
     - Tax optimization strategies
     - Action plan
     """
+    import asyncio
+    
     try:
         generator = AIFinancialPlanGenerator()
         
-        plan = await generator.generate_plan({
+        client_data = {
             "name": request.client_name,
             "age": request.age,
             "retirement_age": request.retirement_age,
@@ -147,9 +149,19 @@ async def generate_financial_plan(request: PlanGenerationRequest):
             "other_debt": request.other_debt,
             "risk_profile": request.risk_profile,
             "goals": request.goals or ["Comfortable retirement", "Pay off mortgage", "Build wealth"]
-        })
+        }
         
-        return plan
+        # Use timeout to prevent long waits
+        try:
+            plan = await asyncio.wait_for(
+                generator.generate_plan(client_data),
+                timeout=15.0  # 15 second timeout
+            )
+            return plan
+        except asyncio.TimeoutError:
+            # Return fallback plan if LLM takes too long
+            logger.warning("Plan generation timed out, using fallback")
+            return generator._generate_fallback_plan(client_data)
         
     except Exception as e:
         logger.error(f"Plan generation error: {e}")
