@@ -199,7 +199,7 @@ const clientContextNav = [
     items: [
       { path: "/financial-plan-generator", label: "Generate Plan", icon: FileText, title: "AI Financial Plan Generator" },
       { path: "/goal-tracker", label: "Goals", icon: Target, title: "Goal Progress Tracker" },
-      { path: "/scenario-comparison", label: "Scenarios", icon: BarChart3, title: "Scenario Comparison" },
+      { path: "/scenario-simulator", label: "Scenarios", icon: BarChart3, title: "Scenario Simulator" },
       { path: "/estate-planning", label: "Estate", icon: Users, title: "Estate Planning" },
       { path: "/strategic-planning", label: "Strategy", icon: HeartPulse, title: "Strategic Planning" },
     ]
@@ -209,6 +209,7 @@ const clientContextNav = [
     icon: TrendingUp,
     items: [
       { path: "/family-wealth", label: "Net Worth", icon: Eye, title: "Net Worth & Balance Sheet" },
+      { path: "/market-data", label: "Live Markets", icon: BarChart3, title: "Real-Time Market Data" },
       { path: "/portfolio-analyzer", label: "Analysis", icon: BarChart3, title: "Portfolio Analysis" },
       { path: "/connected-accounts", label: "Accounts", icon: Link2, title: "Connected Accounts" },
       { path: "/share-portfolio", label: "Shares", icon: LineChart, title: "Share Portfolio" },
