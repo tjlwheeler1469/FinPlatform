@@ -98,7 +98,7 @@ const GoalTracker = () => {
     const fetchGoals = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`${API}/goals/hh_wheeler001`);
+        const res = await axios.get(`${API}/goals/?household_id=hh_001`);
         setGoals(res.data.goals || []);
       } catch (error) {
         console.error("Error fetching goals:", error);
@@ -117,8 +117,8 @@ const GoalTracker = () => {
       return;
     }
     try {
-      await axios.post(`${API}/goals`, {
-        household_id: "hh_wheeler001",
+      await axios.post(`${API}/goals/`, {
+        household_id: "hh_001",
         ...newGoal
       });
       toast.success("Goal created");
@@ -132,7 +132,7 @@ const GoalTracker = () => {
         priority: "medium"
       });
       // Refresh goals
-      const res = await axios.get(`${API}/goals/hh_wheeler001`);
+      const res = await axios.get(`${API}/goals/?household_id=hh_001`);
       setGoals(res.data.goals || []);
     } catch (error) {
       toast.error("Failed to create goal");
