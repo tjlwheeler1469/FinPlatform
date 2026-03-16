@@ -151,21 +151,31 @@ async def generate_financial_plan(request: PlanGenerationRequest):
             "goals": request.goals or ["Comfortable retirement", "Pay off mortgage", "Build wealth"]
         }
         
-        # Use timeout to prevent long waits
+        # Use timeout to prevent long waits - fallback plan is built into generator
         try:
             plan = await asyncio.wait_for(
                 generator.generate_plan(client_data),
-                timeout=15.0  # 15 second timeout
+                timeout=12.0  # 12 second timeout
             )
             return plan
         except asyncio.TimeoutError:
-            # Return fallback plan if LLM takes too long
+            # Return fallback plan if anything takes too long
             logger.warning("Plan generation timed out, using fallback")
             return generator._generate_fallback_plan(client_data)
         
     except Exception as e:
         logger.error(f"Plan generation error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        # Create generator just for fallback
+        try:
+            generator = AIFinancialPlanGenerator()
+            return generator._generate_fallback_plan({
+                "name": request.client_name,
+                "age": request.age,
+                "retirement_age": request.retirement_age,
+                "annual_income": request.annual_income
+            })
+        except:
+            raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/insights")
