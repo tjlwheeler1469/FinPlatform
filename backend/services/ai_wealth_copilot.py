@@ -449,7 +449,15 @@ Please provide a comprehensive financial plan with specific recommendations and 
         try:
             if self.chat:
                 user_message = UserMessage(text=prompt)
-                response = await self.chat.send_message(user_message)
+                # Add timeout at the LLM call level
+                try:
+                    response = await asyncio.wait_for(
+                        self.chat.send_message(user_message),
+                        timeout=12.0  # 12 second timeout for LLM call
+                    )
+                except asyncio.TimeoutError:
+                    logger.warning("LLM call timed out, using fallback plan")
+                    return self._generate_fallback_plan(client_data)
                 
                 return {
                     "success": True,
