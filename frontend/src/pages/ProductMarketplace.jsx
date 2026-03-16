@@ -51,24 +51,54 @@ const ProductMarketplace = () => {
 
   const fetchRecommendations = async () => {
     try {
-      const response = await axios.post(`${API}/marketplace/recommendations`, {
-        annual_income: portfolio.personal.taxableIncome,
-        net_worth: portfolio.summary.netWorth,
-        age: 45,
-        risk_tolerance: "moderate"
+      // Use the new AI recommendations endpoint
+      const clientId = portfolio?.client_id || "default_client";
+      const response = await axios.get(`${API}/marketplace/ai-recommendations/${clientId}`);
+      
+      // Transform recommendations to match expected format
+      const data = response.data;
+      setRecommendations({
+        recommendations: data.recommendations || [],
+        summary: {
+          insurance_gaps_identified: data.recommendations?.filter(r => r.product_type === "insurance").length || 0,
+          investment_opportunities: data.recommendations?.filter(r => r.product_type === "investment").length || 0,
+          loan_savings_potential: data.recommendations?.filter(r => r.product_type === "mortgage")
+            .reduce((sum, r) => sum + (r.potential_savings || 0), 0) || 0
+        }
       });
-      setRecommendations(response.data);
     } catch (error) {
       console.error("Error fetching recommendations:", error);
+      // Set default recommendations on error
+      setRecommendations({
+        recommendations: [],
+        summary: { insurance_gaps_identified: 0, investment_opportunities: 0, loan_savings_potential: 0 }
+      });
     }
   };
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get(`${API}/marketplace/products`);
-      setProducts(response.data);
+      // Fetch all product types from the new endpoints
+      const [insurance, mortgages, investments] = await Promise.all([
+        axios.get(`${API}/marketplace/products/insurance`),
+        axios.get(`${API}/marketplace/products/mortgages`),
+        axios.get(`${API}/marketplace/products/investments`)
+      ]);
+      
+      // Combine products into a unified format
+      const allProducts = [
+        ...insurance.data.providers.map(p => ({ ...p, category: "insurance", type: "Insurance" })),
+        ...mortgages.data.providers.map(p => ({ ...p, category: "mortgage", type: "Mortgage" })),
+        ...investments.data.products.map(p => ({ ...p, category: "investment", type: "Investment" }))
+      ];
+      
+      setProducts({
+        products: allProducts,
+        categories: ["insurance", "mortgage", "investment"]
+      });
     } catch (error) {
       console.error("Error fetching products:", error);
+      setProducts({ products: [], categories: [] });
     } finally {
       setLoading(false);
     }
