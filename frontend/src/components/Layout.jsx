@@ -170,6 +170,7 @@ const adviserBaseNav = [
       { path: "/adviser-dashboard", label: "Overview", icon: Briefcase, title: "Adviser Dashboard" },
       { path: "/client-insights", label: "AI Insights", icon: Sparkles, title: "Today's AI Insights" },
       { path: "/practice-management", label: "Practice", icon: ClipboardList, title: "Practice Management" },
+      { path: "/meeting-prep", label: "Meeting Prep", icon: Clock, title: "AI Meeting Prep" },
     ]
   },
   {
@@ -179,6 +180,15 @@ const adviserBaseNav = [
       { path: "/ai-copilot", label: "Wealth Copilot", icon: MessageSquare, title: "AI Wealth Copilot" },
       { path: "/decision-center", label: "Decision Center", icon: Zap, title: "Real-Time Scenario Modeling" },
       { path: "/financial-plan-generator", label: "Plan Generator", icon: FileText, title: "AI Plan Generator" },
+    ]
+  },
+  {
+    name: "Research",
+    icon: BarChart3,
+    items: [
+      { path: "/stock-research", label: "Stock Screener", icon: LineChart, title: "ASX Stock Research" },
+      { path: "/market-data", label: "Market Data", icon: TrendingUp, title: "Live Market Data" },
+      { path: "/product-marketplace", label: "Marketplace", icon: CreditCard, title: "Product Marketplace" },
     ]
   },
   {
@@ -192,10 +202,27 @@ const adviserBaseNav = [
     ]
   },
   {
+    name: "Wealth",
+    icon: Wallet,
+    items: [
+      { path: "/wealth-dashboard", label: "Wealth Dashboard", icon: PieChart, title: "Comprehensive Wealth View" },
+      { path: "/connected-accounts", label: "Bank Feeds", icon: Link2, title: "Connected Accounts" },
+      { path: "/portfolio-aggregator", label: "Aggregator", icon: Database, title: "Portfolio Aggregation" },
+    ]
+  },
+  {
+    name: "Compliance",
+    icon: Shield,
+    items: [
+      { path: "/compliance", label: "Compliance Center", icon: Shield, title: "Compliance & Audit" },
+      { path: "/soa-generator", label: "SOA Generator", icon: FileCheck, title: "Statement of Advice" },
+      { path: "/security", label: "Security", icon: Shield, title: "Security Settings" },
+    ]
+  },
+  {
     name: "Settings",
     icon: Settings,
     items: [
-      { path: "/security", label: "Security", icon: Shield, title: "Security Settings" },
       { path: "/bank-feeds", label: "Bank Feeds", icon: Landmark, title: "Bank Feeds" },
       { path: "/data-import-export", label: "Import/Export", icon: Database, title: "Data Import & Export" },
     ]
