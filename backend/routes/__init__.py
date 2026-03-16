@@ -1,8 +1,33 @@
-"""Routes module for Australian Investment Analyzer
-This module contains API route handlers organized by domain.
 """
+Routes Module
+Exports all API routers for the application.
+"""
+from .auth import router as auth_router
+from .dashboard import router as dashboard_router
+from .tax import router as tax_router
+from .analysis import router as analysis_router
+from .crm import router as crm_router
+from .practice import router as practice_router
+from .documents import router as documents_router
+from .portfolio import router as portfolio_router
+from .market import router as market_router
+from .scenarios import router as scenarios_router
+from .security import router as security_router
+from .goals import router as goals_router
+from .ai import router as ai_router
 
-# Routes will be imported here as they are migrated from server.py
-# Example:
-# from .auth import router as auth_router
-# from .analyze import router as analyze_router
+__all__ = [
+    "auth_router",
+    "dashboard_router",
+    "tax_router",
+    "analysis_router",
+    "crm_router",
+    "practice_router",
+    "documents_router",
+    "portfolio_router",
+    "market_router",
+    "scenarios_router",
+    "security_router",
+    "goals_router",
+    "ai_router"
+]
