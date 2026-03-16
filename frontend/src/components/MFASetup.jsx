@@ -339,7 +339,7 @@ const MFASetup = ({ userId, userEmail, onMFAEnabled, onMFADisabled }) => {
                 <div>
                   <p className="font-medium text-sm">Backup Codes</p>
                   <p className="text-xs text-muted-foreground">
-                    {mfaStatus.backup_codes.filter(c => !c.used).length} remaining
+                    {(mfaStatus.backup_codes || []).filter(c => !c.used).length} remaining
                   </p>
                 </div>
               </div>
