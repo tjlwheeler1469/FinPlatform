@@ -268,7 +268,35 @@ const AdviserDashboard = () => {
 
   const viewClientPortal = (clientId) => {
     localStorage.setItem("active_client_id", clientId.toString());
-    navigate("/client-portal");
+    navigate("/client-wealth");
+  };
+
+  const viewClientCompliance = (clientId) => {
+    localStorage.setItem("active_client_id", clientId.toString());
+    navigate("/compliance");
+  };
+
+  const handleActionClick = (action, clientId) => {
+    localStorage.setItem("active_client_id", clientId?.toString() || "client_1");
+    switch (action) {
+      case "wealth":
+        navigate("/client-wealth");
+        break;
+      case "compliance":
+        navigate("/compliance");
+        break;
+      case "insights":
+        navigate("/client-insights");
+        break;
+      case "meeting":
+        navigate("/meeting-prep");
+        break;
+      case "scenario":
+        navigate("/decision-center");
+        break;
+      default:
+        navigate("/client-crm");
+    }
   };
 
   return (
