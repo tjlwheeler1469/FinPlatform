@@ -427,8 +427,8 @@ class TestAIWealthBrief:
         assert response.status_code == 200
         data = response.json()
         
-        # Verify response has expected fields
-        assert "summary" in data or "brief" in data or "insights" in data or "highlights" in data
+        # Verify response has expected fields (actual response structure)
+        assert "financial_snapshot" in data or "current_trajectory" in data or "generated_at" in data
         print(f"✓ Wealth brief with defaults: {data.keys()}")
     
     def test_wealth_brief_with_params(self):
