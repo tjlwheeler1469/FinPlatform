@@ -481,7 +481,7 @@ Please provide a comprehensive financial plan with specific recommendations and 
                 
         except Exception as e:
             logger.error(f"Plan generation error: {e}")
-            return self._generate_fallback_plan(client_data)
+            return fallback_plan
 
     def _generate_fallback_plan(self, client_data: Dict) -> Dict[str, Any]:
         """Generate fallback plan when LLM unavailable."""
