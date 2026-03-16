@@ -7395,6 +7395,223 @@ try:
 except ImportError as e:
     logger.warning(f"AI Copilot not available: {e}")
 
+# ==================== 2FA/MFA ENDPOINTS ====================
+
+try:
+    from services.mfa_service import (
+        generate_totp_secret, verify_totp, generate_sms_code,
+        verify_sms_code, get_mfa_status, disable_mfa,
+        regenerate_backup_codes, verify_mfa_session
+    )
+    
+    class MFASetupRequest(BaseModel):
+        user_id: str
+        user_email: str
+    
+    class MFAVerifyRequest(BaseModel):
+        user_id: str
+        code: str
+    
+    class SMSCodeRequest(BaseModel):
+        user_id: str
+        phone_number: str
+    
+    @api_router.post("/mfa/setup")
+    async def setup_mfa(request: MFASetupRequest):
+        """Initialize MFA setup - returns TOTP secret and QR code"""
+        return generate_totp_secret(request.user_id, request.user_email)
+    
+    @api_router.post("/mfa/verify-totp")
+    async def verify_totp_code(request: MFAVerifyRequest):
+        """Verify TOTP code from authenticator app"""
+        return verify_totp(request.user_id, request.code)
+    
+    @api_router.post("/mfa/send-sms")
+    async def send_sms_code(request: SMSCodeRequest):
+        """Send SMS verification code"""
+        return generate_sms_code(request.user_id, request.phone_number)
+    
+    @api_router.post("/mfa/verify-sms")
+    async def verify_sms(request: MFAVerifyRequest):
+        """Verify SMS code"""
+        return verify_sms_code(request.user_id, request.code)
+    
+    @api_router.get("/mfa/status/{user_id}")
+    async def get_user_mfa_status(user_id: str):
+        """Get MFA configuration status"""
+        return get_mfa_status(user_id)
+    
+    @api_router.post("/mfa/disable")
+    async def disable_user_mfa(request: MFAVerifyRequest):
+        """Disable MFA (requires current code)"""
+        return disable_mfa(request.user_id, request.code)
+    
+    @api_router.post("/mfa/regenerate-backup")
+    async def regenerate_backup(request: MFAVerifyRequest):
+        """Regenerate backup codes (requires verification)"""
+        return regenerate_backup_codes(request.user_id, request.code)
+    
+    @api_router.get("/mfa/verify-session/{session_token}")
+    async def verify_session(session_token: str):
+        """Verify if session has passed MFA"""
+        return verify_mfa_session(session_token)
+
+except ImportError as e:
+    logger.warning(f"MFA service not available: {e}")
+
+# ==================== AUDIT & COMPLIANCE ENDPOINTS ====================
+
+try:
+    from services.audit_service import (
+        log_audit_event, get_audit_logs, get_security_alerts,
+        acknowledge_alert, get_compliance_report, get_user_activity,
+        AuditEventType, RiskLevel
+    )
+    
+    class AuditLogRequest(BaseModel):
+        event_type: str
+        user_id: str
+        resource_id: str = None
+        resource_type: str = None
+        details: Dict = None
+        ip_address: str = None
+    
+    @api_router.post("/audit/log")
+    async def create_audit_log(request: AuditLogRequest):
+        """Create an audit log entry"""
+        try:
+            event_type = AuditEventType(request.event_type)
+        except ValueError:
+            event_type = AuditEventType.CLIENT_VIEWED
+        
+        return log_audit_event(
+            event_type=event_type,
+            user_id=request.user_id,
+            resource_id=request.resource_id,
+            resource_type=request.resource_type,
+            details=request.details,
+            ip_address=request.ip_address
+        )
+    
+    @api_router.get("/audit/logs")
+    async def query_audit_logs(
+        user_id: str = None,
+        event_type: str = None,
+        start_date: str = None,
+        end_date: str = None,
+        risk_level: str = None,
+        limit: int = 100
+    ):
+        """Query audit logs with filters"""
+        return get_audit_logs(
+            user_id=user_id,
+            event_type=event_type,
+            start_date=start_date,
+            end_date=end_date,
+            risk_level=risk_level,
+            limit=limit
+        )
+    
+    @api_router.get("/audit/alerts")
+    async def get_alerts(status: str = None, limit: int = 50):
+        """Get security alerts"""
+        return get_security_alerts(status=status, limit=limit)
+    
+    class AcknowledgeAlertRequest(BaseModel):
+        alert_id: str
+        reviewer_id: str
+        notes: str = None
+    
+    @api_router.post("/audit/alerts/acknowledge")
+    async def acknowledge_security_alert(request: AcknowledgeAlertRequest):
+        """Acknowledge a security alert"""
+        return acknowledge_alert(request.alert_id, request.reviewer_id, request.notes)
+    
+    @api_router.get("/audit/compliance-report")
+    async def generate_compliance_report(start_date: str = None, end_date: str = None):
+        """Generate SOC2 compliance report"""
+        return get_compliance_report(start_date=start_date, end_date=end_date)
+    
+    @api_router.get("/audit/user-activity/{user_id}")
+    async def get_user_audit_activity(user_id: str, days: int = 30):
+        """Get user activity summary"""
+        return get_user_activity(user_id, days)
+
+except ImportError as e:
+    logger.warning(f"Audit service not available: {e}")
+
+# ==================== ENHANCED SCENARIO SIMULATOR ENDPOINTS ====================
+
+try:
+    from services.scenario_simulator import (
+        run_scenario_simulation, compare_scenarios,
+        calculate_what_if, get_preset_scenarios
+    )
+    
+    class ScenarioRequest(BaseModel):
+        current_age: int
+        retirement_age: int
+        life_expectancy: int = 90
+        current_savings: float = 0
+        annual_income: float = 100000
+        annual_expenses: float = 80000
+        savings_rate: float = 0.15
+        current_super: float = 0
+        employer_super_rate: float = 0.115
+        investment_return: float = 0.07
+        inflation_rate: float = 0.025
+        property_value: float = 0
+        property_growth: float = 0.04
+        debt_balance: float = 0
+        debt_interest_rate: float = 0.06
+        debt_repayment_monthly: float = 0
+        risk_profile: str = "moderate"
+    
+    @api_router.post("/scenarios/simulate")
+    async def simulate_scenario(request: ScenarioRequest):
+        """Run comprehensive scenario simulation"""
+        return run_scenario_simulation(
+            current_age=request.current_age,
+            retirement_age=request.retirement_age,
+            life_expectancy=request.life_expectancy,
+            current_savings=request.current_savings,
+            annual_income=request.annual_income,
+            annual_expenses=request.annual_expenses,
+            savings_rate=request.savings_rate,
+            current_super=request.current_super,
+            employer_super_rate=request.employer_super_rate,
+            investment_return=request.investment_return,
+            inflation_rate=request.inflation_rate,
+            property_value=request.property_value,
+            property_growth=request.property_growth,
+            debt_balance=request.debt_balance,
+            debt_interest_rate=request.debt_interest_rate,
+            debt_repayment_monthly=request.debt_repayment_monthly,
+            risk_profile=request.risk_profile
+        )
+    
+    @api_router.post("/scenarios/compare")
+    async def compare_multiple_scenarios(scenarios: List[Dict]):
+        """Compare multiple scenarios"""
+        return compare_scenarios(scenarios)
+    
+    class WhatIfRequest(BaseModel):
+        base_scenario: Dict
+        changes: Dict
+    
+    @api_router.post("/scenarios/what-if")
+    async def calculate_scenario_what_if(request: WhatIfRequest):
+        """Calculate impact of changes to a scenario"""
+        return calculate_what_if(request.base_scenario, request.changes)
+    
+    @api_router.get("/scenarios/presets")
+    async def get_scenario_presets():
+        """Get available preset scenarios"""
+        return get_preset_scenarios()
+
+except ImportError as e:
+    logger.warning(f"Scenario simulator not available: {e}")
+
 # Include the router in the main app
 app.include_router(api_router)
 
