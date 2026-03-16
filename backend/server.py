@@ -6562,15 +6562,15 @@ try:
     class WealthBriefRequest(BaseModel):
         age: int = 45
         retirement_age: int = 60
-        net_worth: float
-        annual_income: float
+        net_worth: float = 1500000
+        annual_income: float = 180000
         annual_expenses: float = 120000
-        total_assets: float
-        total_debt: float
-        super_balance: float
-        investment_portfolio: float
+        total_assets: float = 2000000
+        total_debt: float = 500000
+        super_balance: float = 400000
+        investment_portfolio: float = 300000
         savings_rate: float = 0.15
-        mortgage_balance: float = 0
+        mortgage_balance: float = 450000
         mortgage_rate: float = 6.5
         monte_carlo_probability: float = 50.0
     
