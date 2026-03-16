@@ -6509,8 +6509,8 @@ try:
     
     # Advanced Monte Carlo
     class MonteCarloAdvancedRequest(BaseModel):
-        initial_value: float
-        annual_contribution: float
+        initial_value: float = 500000
+        annual_contribution: float = 50000
         expected_return: float = 0.07
         volatility: float = 0.15
         years: int = 20
