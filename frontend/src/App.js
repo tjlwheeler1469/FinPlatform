@@ -846,6 +846,7 @@ const AppRouter = () => {
       <Route path="/clients" element={<ClientCRM />} />
       <Route path="/client-crm" element={<ClientCRM />} />
       <Route path="/goal-tracker" element={<GoalTracker />} />
+      <Route path="/goals" element={<GoalTracker />} />
       <Route path="/ai-advisor" element={<AIAdvisor />} />
       <Route path="/portfolio-aggregator" element={<PortfolioAggregator />} />
       <Route path="/net-worth-trend" element={<NetWorthTrend />} />
