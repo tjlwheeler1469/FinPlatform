@@ -867,6 +867,14 @@ const AppRouter = () => {
       <Route path="/product-marketplace" element={<ProductMarketplace />} />
       <Route path="/portfolio-analyzer" element={<PortfolioAnalyzer />} />
       <Route path="/connected-accounts" element={<ConnectedAccounts />} />
+      
+      {/* New AI-Powered Features */}
+      <Route path="/ai-copilot" element={<AICopilot />} />
+      <Route path="/copilot" element={<AICopilot />} />
+      <Route path="/decision-center" element={<DecisionCenter />} />
+      <Route path="/client-insights" element={<ClientIntelligenceFeed />} />
+      <Route path="/intelligence-feed" element={<ClientIntelligenceFeed />} />
+      <Route path="/client-portal" element={<ClientPortal />} />
     </Routes>
   );
 };
