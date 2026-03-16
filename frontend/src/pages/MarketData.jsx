@@ -328,22 +328,21 @@ const MarketData = () => {
                 <div className="space-y-3">
                   {sectors.map((sector) => (
                     <div 
-                      key={sector.symbol} 
+                      key={sector.etf || sector.name} 
                       className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 cursor-pointer"
-                      onClick={() => handleSelectStock(sector.symbol)}
+                      onClick={() => handleSelectStock(sector.etf)}
                     >
                       <div>
                         <p className="font-medium">{sector.name}</p>
-                        <p className="text-sm text-muted-foreground">{sector.symbol}</p>
+                        <p className="text-sm text-muted-foreground">{sector.etf}</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-medium">{formatCurrency(sector.current_price)}</p>
                         <div className="flex items-center gap-4 text-sm">
-                          <span className={sector.day_change >= 0 ? "text-green-600" : "text-red-600"}>
-                            Day: {sector.day_change >= 0 ? "+" : ""}{sector.day_change.toFixed(2)}%
+                          <span className={(sector.change_percent || 0) >= 0 ? "text-green-600" : "text-red-600"}>
+                            Day: {(sector.change_percent || 0) >= 0 ? "+" : ""}{(sector.change_percent || 0).toFixed(2)}%
                           </span>
-                          <span className={sector.ytd_return >= 0 ? "text-green-600" : "text-red-600"}>
-                            YTD: {sector.ytd_return >= 0 ? "+" : ""}{sector.ytd_return.toFixed(2)}%
+                          <span className={(sector.ytd || 0) >= 0 ? "text-green-600" : "text-red-600"}>
+                            YTD: {(sector.ytd || 0) >= 0 ? "+" : ""}{(sector.ytd || 0).toFixed(2)}%
                           </span>
                         </div>
                       </div>
