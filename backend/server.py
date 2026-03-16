@@ -7730,6 +7730,7 @@ try:
     from routes.timeline import router as timeline_router
     from routes.copilot import router as copilot_router
     from routes.marketplace import router as marketplace_router
+    from routes.aggregation import router as aggregation_router
     
     # Include all modular routers with /api prefix
     app.include_router(auth_router, prefix="/api")
