@@ -838,7 +838,7 @@ const AppRouter = () => {
       <Route path="/copilot" element={<Copilot />} />
       <Route path="/daily-briefing" element={<DailyBriefing />} />
       <Route path="/adviser-dashboard" element={<AdviserDashboard />} />
-      <Route path="/client-portal" element={<ClientPortalMerged />} />
+      <Route path="/client-portal-old" element={<ClientPortalMerged />} />
       <Route path="/practice-management" element={<PracticeManagement />} />
       <Route path="/documents" element={<DocumentsCommunications />} />
       <Route path="/portfolio-rebalancing" element={<PortfolioRebalancing />} />
