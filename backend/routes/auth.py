@@ -28,6 +28,24 @@ USERS_DB: Dict[str, Dict] = {
         "role": "advisor",
         "created_at": datetime.now(timezone.utc).isoformat(),
         "mfa_enabled": False
+    },
+    "advisor@wealthcommand.io": {
+        "id": "user_002",
+        "email": "advisor@wealthcommand.io",
+        "password_hash": hashlib.sha256("secure_password_123".encode()).hexdigest(),
+        "name": "Sarah Chen",
+        "role": "advisor",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "mfa_enabled": False
+    },
+    "client@example.com": {
+        "id": "user_003",
+        "email": "client@example.com",
+        "password_hash": hashlib.sha256("client123".encode()).hexdigest(),
+        "name": "Michael Thompson",
+        "role": "client",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "mfa_enabled": False
     }
 }
 
