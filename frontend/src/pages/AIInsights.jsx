@@ -275,6 +275,9 @@ function InsightsList({ insights, onAction }) {
     <div className="space-y-4">
       {insights.map((insight, idx) => {
         const IconComponent = getInsightIcon(insight.type);
+        const affectedClients = insight.clients || insight.affected_clients || [];
+        const actionItems = insight.action_items || (insight.action ? [insight.action] : []);
+        
         return (
           <Card key={idx} className={`${getPriorityBorder(insight.priority)} hover:shadow-md transition-shadow`}>
             <CardContent className="p-4">
@@ -298,9 +301,9 @@ function InsightsList({ insights, onAction }) {
                   <p className="text-muted-foreground text-sm mb-2">{insight.description}</p>
                   
                   {/* Affected Clients */}
-                  {insight.affected_clients && insight.affected_clients.length > 0 && (
+                  {affectedClients.length > 0 && (
                     <div className="flex flex-wrap gap-2 mb-3">
-                      {insight.affected_clients.map((client, cidx) => (
+                      {affectedClients.map((client, cidx) => (
                         <Badge key={cidx} variant="outline" className="gap-1">
                           <Users className="h-3 w-3" />
                           {client}
@@ -310,11 +313,11 @@ function InsightsList({ insights, onAction }) {
                   )}
                   
                   {/* Action Items */}
-                  {insight.action_items && insight.action_items.length > 0 && (
+                  {actionItems.length > 0 && (
                     <div className="bg-muted rounded-lg p-3 mb-3">
                       <p className="text-sm font-medium mb-2">Recommended Actions:</p>
                       <ul className="space-y-1">
-                        {insight.action_items.map((action, aidx) => (
+                        {actionItems.map((action, aidx) => (
                           <li key={aidx} className="text-sm text-muted-foreground flex items-center gap-2">
                             <ChevronRight className="h-3 w-3" />
                             {action}
@@ -352,11 +355,11 @@ function InsightsList({ insights, onAction }) {
                   </div>
                 </div>
                 
-                {/* Impact Badge */}
-                {insight.potential_impact && (
+                {/* Count Badge */}
+                {insight.count && (
                   <div className="text-right">
-                    <p className="text-xs text-muted-foreground">Potential Impact</p>
-                    <p className="font-bold text-lg text-green-600">{insight.potential_impact}</p>
+                    <p className="text-xs text-muted-foreground">Affected</p>
+                    <p className="font-bold text-lg">{insight.count}</p>
                   </div>
                 )}
               </div>
