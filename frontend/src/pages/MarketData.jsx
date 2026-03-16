@@ -175,16 +175,16 @@ const MarketData = () => {
             <Card key={index.symbol} className="hover:shadow-md transition-shadow">
               <CardContent className="p-3">
                 <p className="text-xs text-muted-foreground">{index.name}</p>
-                <p className="text-lg font-bold">{index.value.toLocaleString()}</p>
+                <p className="text-lg font-bold">{(index.value || 0).toLocaleString()}</p>
                 <div className={`flex items-center text-sm ${
-                  index.change_percent >= 0 ? "text-green-600" : "text-red-600"
+                  (index.change_percent || 0) >= 0 ? "text-green-600" : "text-red-600"
                 }`}>
-                  {index.change_percent >= 0 ? (
+                  {(index.change_percent || 0) >= 0 ? (
                     <ArrowUpRight className="h-4 w-4" />
                   ) : (
                     <ArrowDownRight className="h-4 w-4" />
                   )}
-                  <span>{Math.abs(index.change_percent).toFixed(2)}%</span>
+                  <span>{Math.abs(index.change_percent || 0).toFixed(2)}%</span>
                 </div>
               </CardContent>
             </Card>
