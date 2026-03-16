@@ -7754,6 +7754,10 @@ try:
     app.include_router(copilot_router, prefix="/api")
     app.include_router(marketplace_router, prefix="/api")
     app.include_router(aggregation_router, prefix="/api")
+    app.include_router(meeting_prep_router, prefix="/api")
+    app.include_router(research_router, prefix="/api")
+    app.include_router(compliance_router, prefix="/api")
+    app.include_router(wealth_dashboard_router, prefix="/api")
     
     logger.info("All modular routes loaded successfully")
 except ImportError as e:
