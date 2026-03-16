@@ -304,13 +304,13 @@ const MarketData = () => {
                         cx="50%"
                         cy="50%"
                         outerRadius={80}
-                        label={({ symbol, weight }) => `${symbol} (${weight.toFixed(0)}%)`}
+                        label={({ symbol, weight }) => `${symbol} (${(weight || 0).toFixed(0)}%)`}
                       >
                         {portfolio?.positions?.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(value) => `${value.toFixed(1)}%`} />
+                      <Tooltip formatter={(value) => `${(value || 0).toFixed(1)}%`} />
                     </RechartsPieChart>
                   </ResponsiveContainer>
                 </div>
