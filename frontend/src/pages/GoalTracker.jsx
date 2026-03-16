@@ -140,18 +140,18 @@ const GoalTracker = () => {
   };
 
   // Calculate summary
-  const totalTarget = goals.reduce((sum, g) => sum + g.target_amount, 0);
-  const totalCurrent = goals.reduce((sum, g) => sum + g.current_amount, 0);
+  const totalTarget = goals.reduce((sum, g) => sum + (g.target_amount || 0), 0);
+  const totalCurrent = goals.reduce((sum, g) => sum + (g.current_amount || 0), 0);
   const overallProgress = totalTarget > 0 ? (totalCurrent / totalTarget) * 100 : 0;
-  const goalsOnTrack = goals.filter(g => g.progress_percent >= 50).length;
+  const goalsOnTrack = goals.filter(g => (g.progress_percent || g.progress || 0) >= 50).length;
 
   // Chart data
   const chartData = goals.map(g => ({
     name: g.name.length > 15 ? g.name.substring(0, 15) + '...' : g.name,
-    progress: g.progress_percent,
-    target: g.target_amount,
-    current: g.current_amount,
-    color: getGoalColor(g.goal_type)
+    progress: g.progress_percent || g.progress || 0,
+    target: g.target_amount || 0,
+    current: g.current_amount || 0,
+    color: getGoalColor(g.goal_type || g.category || 'other')
   }));
 
   if (loading) {
