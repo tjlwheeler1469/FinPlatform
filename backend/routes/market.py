@@ -80,41 +80,73 @@ async def get_price_history(
 async def calculate_portfolio_value(request: PortfolioValueRequest):
     """Calculate real-time portfolio value."""
     total_value = 0
-    holdings_with_prices = []
+    total_cost = 0
+    positions = []
     
     for holding in request.holdings:
         symbol = holding.get("symbol", "")
-        quantity = holding.get("quantity", 0)
+        units = holding.get("units", holding.get("quantity", 0))
+        cost_basis = holding.get("cost_basis", holding.get("purchase_price", 0))
         
         try:
             if market_service:
                 quote = await market_service.get_quote(symbol)
                 current_price = quote.get("price", 0)
+                name = quote.get("name", symbol)
             else:
                 mock_quote = get_mock_quote(symbol)
                 current_price = mock_quote.get("price", 0)
+                name = mock_quote.get("name", symbol)
             
-            value = current_price * quantity
-            total_value += value
+            market_value = current_price * units
+            cost_value = cost_basis * units
+            gain_loss = market_value - cost_value
+            gain_loss_percent = (gain_loss / cost_value * 100) if cost_value > 0 else 0
             
-            holdings_with_prices.append({
-                **holding,
+            total_value += market_value
+            total_cost += cost_value
+            
+            positions.append({
+                "symbol": symbol,
+                "name": name,
+                "units": units,
                 "current_price": current_price,
-                "current_value": value,
-                "gain_loss": value - (holding.get("purchase_price", current_price) * quantity)
+                "cost_basis": cost_basis,
+                "market_value": market_value,
+                "gain_loss": gain_loss,
+                "gain_loss_percent": gain_loss_percent,
+                "day_change_percent": mock_quote.get("change_percent", 0) if not market_service else 0,
+                "weight": 0  # Will be calculated below
             })
         except Exception as e:
             logger.error(f"Error calculating value for {symbol}: {e}")
-            holdings_with_prices.append({
-                **holding,
+            positions.append({
+                "symbol": symbol,
+                "name": symbol,
+                "units": units,
                 "current_price": 0,
-                "current_value": 0,
+                "market_value": 0,
+                "gain_loss": 0,
+                "gain_loss_percent": 0,
+                "day_change_percent": 0,
+                "weight": 0,
                 "error": str(e)
             })
     
+    # Calculate weights
+    for position in positions:
+        if total_value > 0:
+            position["weight"] = (position.get("market_value", 0) / total_value) * 100
+    
+    total_gain_loss = total_value - total_cost
+    total_return_percent = (total_gain_loss / total_cost * 100) if total_cost > 0 else 0
+    
     return {
         "total_value": total_value,
-        "holdings": holdings_with_prices,
+        "total_cost": total_cost,
+        "total_gain_loss": total_gain_loss,
+        "total_return_percent": total_return_percent,
+        "positions": positions,
         "calculated_at": datetime.now(timezone.utc).isoformat()
     }
 
