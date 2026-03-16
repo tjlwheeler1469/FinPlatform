@@ -102,11 +102,6 @@ export default function AIInsights() {
     }
   };
 
-  const filterInsights = (insightList, filter) => {
-    if (filter === "all") return insightList;
-    return insightList?.filter(i => i.priority === filter) || [];
-  };
-
   if (isLoading) {
     return (
       <Layout>
