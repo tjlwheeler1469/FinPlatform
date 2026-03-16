@@ -457,26 +457,27 @@ Be specific with numbers, percentages, and dollar amounts. Provide actionable re
 Please provide a comprehensive financial plan with specific recommendations and projected outcomes."""
 
         try:
-            if self.chat:
+            if self.chat and self.llm_available:
                 user_message = UserMessage(text=prompt)
                 # Add timeout at the LLM call level
                 try:
                     response = await asyncio.wait_for(
                         self.chat.send_message(user_message),
-                        timeout=12.0  # 12 second timeout for LLM call
+                        timeout=10.0  # 10 second timeout for LLM call
                     )
-                except asyncio.TimeoutError:
+                except (asyncio.TimeoutError, asyncio.CancelledError):
                     logger.warning("LLM call timed out, using fallback plan")
-                    return self._generate_fallback_plan(client_data)
+                    return fallback_plan
                 
                 return {
                     "success": True,
                     "plan": response,
                     "generated_at": datetime.now(timezone.utc).isoformat(),
-                    "client_name": client_data.get('name', 'Client')
+                    "client_name": client_data.get('name', 'Client'),
+                    "source": "ai_generated"
                 }
             else:
-                return self._generate_fallback_plan(client_data)
+                return fallback_plan
                 
         except Exception as e:
             logger.error(f"Plan generation error: {e}")
