@@ -593,7 +593,7 @@ const Security = () => {
               <Button variant="outline" onClick={() => setSetupDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleVerifyMFA} disabled={verificationCode.length !== 6}>
+              <Button onClick={handleVerifyMFA} disabled={!verificationCode || verificationCode.length !== 6}>
                 Verify & Enable
               </Button>
             </DialogFooter>
