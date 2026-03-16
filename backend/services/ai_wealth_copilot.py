@@ -416,12 +416,19 @@ Be specific with numbers, percentages, and dollar amounts. Provide actionable re
     async def generate_plan(self, client_data: Dict) -> Dict[str, Any]:
         """Generate a comprehensive financial plan."""
         import asyncio
+        import concurrent.futures
         
-        # Use fallback directly if LLM is not available - faster response
-        if not self.chat:
-            return self._generate_fallback_plan(client_data)
+        # Always return fallback plan quickly - it's comprehensive and reliable
+        # LLM plans are optional enhancement and may time out
+        fallback_plan = self._generate_fallback_plan(client_data)
         
-        prompt = f"""Generate a comprehensive financial plan for this client:
+        # If LLM available, try to enhance but don't block
+        if not self.llm_available:
+            return fallback_plan
+        
+        # Try LLM with very short timeout - fallback is already good quality
+        try:
+            prompt = f"""Generate a comprehensive financial plan for this client:
 
 **Client Profile:**
 - Name: {client_data.get('name', 'Client')}
