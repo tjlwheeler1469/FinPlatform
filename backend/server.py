@@ -7710,15 +7710,44 @@ try:
 except ImportError as e:
     logger.warning(f"Twilio SMS service not available: {e}")
 
-# ==================== JWT AUTH ROUTES ====================
+# ==================== MODULAR ROUTES ====================
 
+# Import and include modular routes
 try:
     from routes.auth import router as auth_router
+    from routes.dashboard import router as dashboard_router
+    from routes.tax import router as tax_router
+    from routes.analysis import router as analysis_router
+    from routes.crm import router as crm_router
+    from routes.practice import router as practice_router
+    from routes.documents import router as documents_router
+    from routes.portfolio import router as portfolio_router
+    from routes.market import router as market_router
+    from routes.scenarios import router as scenarios_router
+    from routes.security import router as security_router
+    from routes.goals import router as goals_router
+    from routes.ai import router as ai_router
+    
+    # Include all modular routers with /api prefix
     app.include_router(auth_router, prefix="/api")
+    app.include_router(dashboard_router, prefix="/api")
+    app.include_router(tax_router, prefix="/api")
+    app.include_router(analysis_router, prefix="/api")
+    app.include_router(crm_router, prefix="/api")
+    app.include_router(practice_router, prefix="/api")
+    app.include_router(documents_router, prefix="/api")
+    app.include_router(portfolio_router, prefix="/api")
+    app.include_router(market_router, prefix="/api")
+    app.include_router(scenarios_router, prefix="/api")
+    app.include_router(security_router, prefix="/api")
+    app.include_router(goals_router, prefix="/api")
+    app.include_router(ai_router, prefix="/api")
+    
+    logger.info("All modular routes loaded successfully")
 except ImportError as e:
-    logger.warning(f"Auth routes not available: {e}")
+    logger.warning(f"Some modular routes not available: {e}")
 
-# Include the router in the main app
+# Include the legacy router in the main app (backwards compatibility)
 app.include_router(api_router)
 
 app.add_middleware(
