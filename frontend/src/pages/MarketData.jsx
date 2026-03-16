@@ -42,6 +42,7 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 const formatCurrency = (value, currency = "AUD") => {
+  if (value === undefined || value === null || isNaN(value)) return "$0.00";
   return new Intl.NumberFormat("en-AU", {
     style: "currency",
     currency: currency,
@@ -50,6 +51,7 @@ const formatCurrency = (value, currency = "AUD") => {
 };
 
 const formatLargeCurrency = (value) => {
+  if (value === undefined || value === null || isNaN(value)) return "$0";
   if (value >= 1000000000) return `$${(value / 1000000000).toFixed(1)}B`;
   if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
   if (value >= 1000) return `$${(value / 1000).toFixed(0)}K`;
