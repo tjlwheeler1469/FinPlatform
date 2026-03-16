@@ -556,7 +556,7 @@ const MFASetup = ({ userId, userEmail, onMFAEnabled, onMFADisabled }) => {
             </div>
             
             <div className="grid grid-cols-2 gap-2">
-              {(mfaStatus.backup_codes.length > 0 ? mfaStatus.backup_codes : newBackupCodes).map((item, index) => (
+              {((mfaStatus.backup_codes || []).length > 0 ? mfaStatus.backup_codes : newBackupCodes).map((item, index) => (
                 <div 
                   key={index}
                   className={`p-2 font-mono text-center rounded border ${
@@ -572,7 +572,7 @@ const MFASetup = ({ userId, userEmail, onMFAEnabled, onMFADisabled }) => {
               variant="outline" 
               className="w-full"
               onClick={() => copyToClipboard(
-                (mfaStatus.backup_codes.length > 0 ? mfaStatus.backup_codes : newBackupCodes)
+                ((mfaStatus.backup_codes || []).length > 0 ? mfaStatus.backup_codes : newBackupCodes)
                   .map(c => c.code)
                   .join('\n')
               )}
