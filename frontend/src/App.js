@@ -98,6 +98,12 @@ const DecisionCenter = lazy(() => import("@/pages/DecisionCenter"));
 const ClientIntelligenceFeed = lazy(() => import("@/pages/ClientIntelligenceFeed"));
 const ClientPortal = lazy(() => import("@/pages/ClientPortal"));
 
+// Super App Features - Meeting Prep, Research, Compliance, Wealth
+const MeetingPrep = lazy(() => import("@/pages/MeetingPrep"));
+const StockResearch = lazy(() => import("@/pages/StockResearch"));
+const ComplianceCenter = lazy(() => import("@/pages/ComplianceCenter"));
+const WealthDashboard = lazy(() => import("@/pages/WealthDashboard"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
