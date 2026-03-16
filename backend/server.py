@@ -7731,6 +7731,10 @@ try:
     from routes.copilot import router as copilot_router
     from routes.marketplace import router as marketplace_router
     from routes.aggregation import router as aggregation_router
+    from routes.meeting_prep import router as meeting_prep_router
+    from routes.research import router as research_router
+    from routes.compliance import router as compliance_router
+    from routes.wealth_dashboard import router as wealth_dashboard_router
     
     # Include all modular routers with /api prefix
     app.include_router(auth_router, prefix="/api")
