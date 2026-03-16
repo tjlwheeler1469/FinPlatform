@@ -196,18 +196,9 @@ const adviserBaseNav = [
     icon: Users,
     items: [
       { path: "/client-crm", label: "All Clients", icon: Users, title: "Client Relationship Management" },
-      { path: "/client-portal", label: "Client Portal View", icon: Eye, title: "View as Client" },
+      { path: "/client-wealth", label: "Client Wealth", icon: Wallet, title: "Client Wealth Overview" },
+      { path: "/client-portal", label: "Client Portal", icon: Eye, title: "View as Client" },
       { path: "/onboarding", label: "New Client", icon: UserPlus, title: "Client Onboarding" },
-      { path: "/advice-workflow", label: "Workflow", icon: Activity, title: "Advice Workflow" },
-    ]
-  },
-  {
-    name: "Wealth",
-    icon: Wallet,
-    items: [
-      { path: "/wealth-dashboard", label: "Wealth Dashboard", icon: PieChart, title: "Comprehensive Wealth View" },
-      { path: "/connected-accounts", label: "Bank Feeds", icon: Link2, title: "Connected Accounts" },
-      { path: "/portfolio-aggregator", label: "Aggregator", icon: Database, title: "Portfolio Aggregation" },
     ]
   },
   {
@@ -215,7 +206,7 @@ const adviserBaseNav = [
     icon: Shield,
     items: [
       { path: "/compliance", label: "Compliance Center", icon: Shield, title: "Compliance & Audit" },
-      { path: "/soa-generator", label: "SOA Generator", icon: FileCheck, title: "Statement of Advice" },
+      { path: "/connected-accounts", label: "Bank Feeds", icon: Link2, title: "Connected Accounts" },
       { path: "/security", label: "Security", icon: Shield, title: "Security Settings" },
     ]
   },
@@ -223,7 +214,6 @@ const adviserBaseNav = [
     name: "Settings",
     icon: Settings,
     items: [
-      { path: "/bank-feeds", label: "Bank Feeds", icon: Landmark, title: "Bank Feeds" },
       { path: "/data-import-export", label: "Import/Export", icon: Database, title: "Data Import & Export" },
     ]
   }
