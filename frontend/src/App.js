@@ -868,15 +868,17 @@ function App() {
   return (
     <div className="App min-h-screen bg-background">
       <BrowserRouter>
-        <PortfolioProvider>
-          <NotificationsProvider>
-            <ComplianceModal />
-            <Suspense fallback={<PageLoader />}>
-              <AppRouter />
-            </Suspense>
-            <Toaster position="top-right" richColors />
-          </NotificationsProvider>
-        </PortfolioProvider>
+        <AuthProvider>
+          <PortfolioProvider>
+            <NotificationsProvider>
+              <ComplianceModal />
+              <Suspense fallback={<PageLoader />}>
+                <AppRouter />
+              </Suspense>
+              <Toaster position="top-right" richColors />
+            </NotificationsProvider>
+          </PortfolioProvider>
+        </AuthProvider>
       </BrowserRouter>
     </div>
   );
