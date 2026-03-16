@@ -883,15 +883,20 @@ const AppRouter = () => {
       <Route path="/ai-copilot" element={<AICopilot />} />
       <Route path="/copilot" element={<AICopilot />} />
       <Route path="/decision-center" element={<DecisionCenter />} />
-      <Route path="/client-insights" element={<ClientIntelligenceFeed />} />
-      <Route path="/intelligence-feed" element={<ClientIntelligenceFeed />} />
+      <Route path="/client-insights" element={<AIInsights />} />
+      <Route path="/intelligence-feed" element={<AIInsights />} />
+      <Route path="/ai-insights" element={<AIInsights />} />
       <Route path="/client-portal" element={<ClientPortal />} />
       
       {/* Super App Features */}
       <Route path="/meeting-prep" element={<MeetingPrep />} />
       <Route path="/stock-research" element={<StockResearch />} />
-      <Route path="/compliance" element={<ComplianceCenter />} />
+      <Route path="/compliance" element={<ClientCompliance />} />
       <Route path="/wealth-dashboard" element={<WealthDashboard />} />
+      
+      {/* Client-Level Pages (Adviser viewing client data) */}
+      <Route path="/client-wealth" element={<ClientWealth />} />
+      <Route path="/client-compliance" element={<ClientCompliance />} />
     </Routes>
   );
 };
