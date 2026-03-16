@@ -82,6 +82,7 @@ const DebtPaydownPlanner = lazy(() => import("@/pages/DebtPaydownPlanner"));
 const RevenueBilling = lazy(() => import("@/pages/RevenueBilling"));
 const ScenarioComparison = lazy(() => import("@/pages/ScenarioComparison"));
 const ScenarioSimulator = lazy(() => import("@/pages/ScenarioSimulator"));
+const MarketData = lazy(() => import("@/pages/MarketData"));
 const AdviceWorkflow = lazy(() => import("@/pages/AdviceWorkflow"));
 const FinancialPlanGenerator = lazy(() => import("@/pages/FinancialPlanGenerator"));
 const MeetingSummaryGenerator = lazy(() => import("@/pages/MeetingSummaryGenerator"));
