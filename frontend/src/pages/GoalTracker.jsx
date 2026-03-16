@@ -334,12 +334,15 @@ const GoalTracker = () => {
         {/* Goals Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {goals.map((goal) => {
-            const Icon = getGoalIcon(goal.goal_type);
-            const color = getGoalColor(goal.goal_type);
-            const isOnTrack = goal.progress_percent >= 50;
+            // Handle both goal_type and category field names
+            const goalType = goal.goal_type || goal.category || 'other';
+            const progressPercent = goal.progress_percent || goal.progress || 0;
+            const Icon = getGoalIcon(goalType);
+            const color = getGoalColor(goalType);
+            const isOnTrack = progressPercent >= 50;
             
             return (
-              <Card key={goal.goal_id} className="overflow-hidden">
+              <Card key={goal.id || goal.goal_id} className="overflow-hidden">
                 <div className="h-2" style={{ backgroundColor: color }} />
                 <CardHeader>
                   <div className="flex items-center justify-between">
