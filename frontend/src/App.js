@@ -92,6 +92,12 @@ const ProductMarketplace = lazy(() => import("@/pages/ProductMarketplace"));
 const PortfolioAnalyzer = lazy(() => import("@/pages/PortfolioAnalyzer"));
 const ConnectedAccounts = lazy(() => import("@/pages/ConnectedAccounts"));
 
+// New AI-Powered Features
+const AICopilot = lazy(() => import("@/pages/AICopilot"));
+const DecisionCenter = lazy(() => import("@/pages/DecisionCenter"));
+const ClientIntelligenceFeed = lazy(() => import("@/pages/ClientIntelligenceFeed"));
+const ClientPortal = lazy(() => import("@/pages/ClientPortal"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
