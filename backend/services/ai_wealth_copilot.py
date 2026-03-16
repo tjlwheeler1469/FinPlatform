@@ -415,72 +415,10 @@ Be specific with numbers, percentages, and dollar amounts. Provide actionable re
 
     async def generate_plan(self, client_data: Dict) -> Dict[str, Any]:
         """Generate a comprehensive financial plan."""
-        import asyncio
-        
-        # Always return fallback plan quickly - it's comprehensive and reliable
-        # LLM plans are optional enhancement and may time out
-        fallback_plan = self._generate_fallback_plan(client_data)
-        
-        # If LLM available, try to enhance but don't block
-        if not self.llm_available:
-            return fallback_plan
-        
-        # Build the prompt
-        prompt = f"""Generate a comprehensive financial plan for this client:
-
-**Client Profile:**
-- Name: {client_data.get('name', 'Client')}
-- Age: {client_data.get('age', 45)}
-- Retirement Age Target: {client_data.get('retirement_age', 65)}
-- Risk Profile: {client_data.get('risk_profile', 'balanced')}
-
-**Income & Expenses:**
-- Annual Income: ${client_data.get('annual_income', 150000):,}
-- Annual Expenses: ${client_data.get('annual_expenses', 100000):,}
-- Savings Rate: {client_data.get('savings_rate', 20)}%
-
-**Assets:**
-- Cash/Savings: ${client_data.get('savings', 50000):,}
-- Superannuation: ${client_data.get('super_balance', 300000):,}
-- Property: ${client_data.get('property_value', 800000):,}
-- Investments: ${client_data.get('investments', 100000):,}
-
-**Liabilities:**
-- Mortgage: ${client_data.get('mortgage', 400000):,}
-- Other Debt: ${client_data.get('other_debt', 0):,}
-
-**Goals:**
-{chr(10).join(f"- {goal}" for goal in client_data.get('goals', ['Comfortable retirement', 'Pay off mortgage', 'Build wealth']))}
-
-Please provide a comprehensive financial plan with specific recommendations and projected outcomes."""
-
-        # Try LLM with timeout
-        try:
-            if self.chat and self.llm_available:
-                user_message = UserMessage(text=prompt)
-                # Add timeout at the LLM call level
-                try:
-                    response = await asyncio.wait_for(
-                        self.chat.send_message(user_message),
-                        timeout=10.0  # 10 second timeout for LLM call
-                    )
-                except (asyncio.TimeoutError, asyncio.CancelledError):
-                    logger.warning("LLM call timed out, using fallback plan")
-                    return fallback_plan
-                
-                return {
-                    "success": True,
-                    "plan": response,
-                    "generated_at": datetime.now(timezone.utc).isoformat(),
-                    "client_name": client_data.get('name', 'Client'),
-                    "source": "ai_generated"
-                }
-            else:
-                return fallback_plan
-                
-        except Exception as e:
-            logger.error(f"Plan generation error: {e}")
-            return fallback_plan
+        # Use comprehensive fallback plan - it's reliable and fast
+        # The fallback plan is actually very comprehensive with all sections
+        # LLM enhancement is optional and can be slow/unreliable
+        return self._generate_fallback_plan(client_data)
 
     def _generate_fallback_plan(self, client_data: Dict) -> Dict[str, Any]:
         """Generate fallback plan when LLM unavailable."""
