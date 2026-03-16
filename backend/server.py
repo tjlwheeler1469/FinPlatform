@@ -7749,6 +7749,7 @@ try:
     app.include_router(timeline_router, prefix="/api")
     app.include_router(copilot_router, prefix="/api")
     app.include_router(marketplace_router, prefix="/api")
+    app.include_router(aggregation_router, prefix="/api")
     
     logger.info("All modular routes loaded successfully")
 except ImportError as e:
