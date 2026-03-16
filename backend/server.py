@@ -7728,6 +7728,7 @@ try:
     from routes.goals import router as goals_router
     from routes.ai import router as ai_router
     from routes.timeline import router as timeline_router
+    from routes.copilot import router as copilot_router
     
     # Include all modular routers with /api prefix
     app.include_router(auth_router, prefix="/api")
@@ -7744,6 +7745,7 @@ try:
     app.include_router(goals_router, prefix="/api")
     app.include_router(ai_router, prefix="/api")
     app.include_router(timeline_router, prefix="/api")
+    app.include_router(copilot_router, prefix="/api")
     
     logger.info("All modular routes loaded successfully")
 except ImportError as e:
