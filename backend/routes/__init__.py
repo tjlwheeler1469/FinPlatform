@@ -16,6 +16,7 @@ from .security import router as security_router
 from .goals import router as goals_router
 from .ai import router as ai_router
 from .timeline import router as timeline_router
+from .copilot import router as copilot_router
 
 __all__ = [
     "auth_router",
@@ -31,5 +32,6 @@ __all__ = [
     "security_router",
     "goals_router",
     "ai_router",
-    "timeline_router"
+    "timeline_router",
+    "copilot_router"
 ]
