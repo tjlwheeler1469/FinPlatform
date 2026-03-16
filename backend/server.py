@@ -3463,9 +3463,9 @@ class MFASetup(BaseModel):
     backup_codes: List[Dict[str, Any]] = []
     setup_at: Optional[datetime] = None
 
-@api_router.post("/mfa/setup")
-async def setup_mfa(setup: MFASetup):
-    """Setup or update MFA for user"""
+@api_router.post("/mfa/setup-legacy")
+async def setup_mfa_legacy(setup: MFASetup):
+    """Legacy: Setup or update MFA for user (use /mfa/setup for TOTP)"""
     setup_dict = setup.dict()
     if setup.setup_at:
         setup_dict["setup_at"] = setup.setup_at.isoformat()
