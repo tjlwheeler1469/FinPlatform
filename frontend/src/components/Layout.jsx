@@ -168,7 +168,17 @@ const adviserBaseNav = [
     icon: LayoutDashboard,
     items: [
       { path: "/adviser-dashboard", label: "Overview", icon: Briefcase, title: "Adviser Dashboard" },
+      { path: "/client-insights", label: "AI Insights", icon: Sparkles, title: "Today's AI Insights" },
       { path: "/practice-management", label: "Practice", icon: ClipboardList, title: "Practice Management" },
+    ]
+  },
+  {
+    name: "AI Tools",
+    icon: Bot,
+    items: [
+      { path: "/ai-copilot", label: "Wealth Copilot", icon: MessageSquare, title: "AI Wealth Copilot" },
+      { path: "/decision-center", label: "Decision Center", icon: Zap, title: "Real-Time Scenario Modeling" },
+      { path: "/financial-plan-generator", label: "Plan Generator", icon: FileText, title: "AI Plan Generator" },
     ]
   },
   {
@@ -176,6 +186,7 @@ const adviserBaseNav = [
     icon: Users,
     items: [
       { path: "/client-crm", label: "All Clients", icon: Users, title: "Client Relationship Management" },
+      { path: "/client-portal", label: "Client Portal View", icon: Eye, title: "View as Client" },
       { path: "/onboarding", label: "New Client", icon: UserPlus, title: "Client Onboarding" },
       { path: "/advice-workflow", label: "Workflow", icon: Activity, title: "Advice Workflow" },
     ]
