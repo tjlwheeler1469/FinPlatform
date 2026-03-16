@@ -389,10 +389,22 @@ const GoalTracker = () => {
 
                     <div className="flex items-center justify-between pt-2 border-t">
                       <div className="flex items-center gap-2">
-                        <DollarSign className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm">
-                          {formatCurrency(goal.monthly_contribution)}/month
-                        </span>
+                        {goal.monthly_contribution && (
+                          <>
+                            <DollarSign className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-sm">
+                              {formatCurrency(goal.monthly_contribution)}/month
+                            </span>
+                          </>
+                        )}
+                        {goal.target_date && (
+                          <>
+                            <Calendar className="h-4 w-4 text-muted-foreground ml-2" />
+                            <span className="text-sm">
+                              Target: {new Date(goal.target_date).toLocaleDateString('en-AU', {month: 'short', year: 'numeric'})}
+                            </span>
+                          </>
+                        )}
                       </div>
                       <Badge 
                         variant="outline"
