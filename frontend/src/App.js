@@ -94,6 +94,10 @@ const ConnectedAccounts = lazy(() => import("@/pages/ConnectedAccounts"));
 
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
+import { AuthProvider } from "@/context/AuthContext";
+
+// Auth components
+const Login = lazy(() => import("@/pages/Login"));
 
 // Compliance Modal
 import { ComplianceModal } from "@/components/ComplianceDisclaimer";
