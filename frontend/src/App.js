@@ -792,6 +792,7 @@ const AppRouter = () => {
       <Route path="/property-comparison" element={<PropertyComparison />} />
       <Route path="/scenario-comparison" element={<Suspense fallback={<PageLoader />}><ScenarioComparison /></Suspense>} />
       <Route path="/scenario-simulator" element={<Suspense fallback={<PageLoader />}><ScenarioSimulator /></Suspense>} />
+      <Route path="/market-data" element={<Suspense fallback={<PageLoader />}><MarketData /></Suspense>} />
       <Route path="/tax-loss-harvesting" element={<TaxLossHarvesting />} />
       <Route path="/dividend-reinvestment" element={<DividendReinvestment />} />
       <Route path="/income-splitting" element={<IncomeSplitting />} />
