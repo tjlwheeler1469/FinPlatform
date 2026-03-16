@@ -118,9 +118,9 @@ export default function AIInsights() {
   }
 
   const allInsights = insights?.insights || [];
-  const highPriority = filterInsights(allInsights, "high");
-  const mediumPriority = filterInsights(allInsights, "medium");
-  const lowPriority = filterInsights(allInsights, "low");
+  const highPriority = allInsights.filter(i => i.priority === "high");
+  const mediumPriority = allInsights.filter(i => i.priority === "medium");
+  const lowPriority = allInsights.filter(i => i.priority === "low");
 
   return (
     <Layout>
@@ -151,7 +151,7 @@ export default function AIInsights() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-blue-200 text-sm">Total Insights</p>
-                  <p className="text-3xl font-bold">{insights?.summary?.total || 0}</p>
+                  <p className="text-3xl font-bold">{insights?.total_insights || allInsights.length || 0}</p>
                 </div>
                 <Sparkles className="h-8 w-8 text-[#D4A84C]" />
               </div>
@@ -162,7 +162,7 @@ export default function AIInsights() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-muted-foreground text-sm">High Priority</p>
-                  <p className="text-3xl font-bold text-red-600">{insights?.summary?.high || 0}</p>
+                  <p className="text-3xl font-bold text-red-600">{insights?.critical_count || highPriority.length || 0}</p>
                 </div>
                 <AlertTriangle className="h-8 w-8 text-red-500" />
               </div>
@@ -173,7 +173,7 @@ export default function AIInsights() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-muted-foreground text-sm">Medium Priority</p>
-                  <p className="text-3xl font-bold text-amber-600">{insights?.summary?.medium || 0}</p>
+                  <p className="text-3xl font-bold text-amber-600">{mediumPriority.length || 0}</p>
                 </div>
                 <Clock className="h-8 w-8 text-amber-500" />
               </div>
@@ -184,7 +184,7 @@ export default function AIInsights() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-muted-foreground text-sm">Opportunities</p>
-                  <p className="text-3xl font-bold text-blue-600">{insights?.summary?.low || 0}</p>
+                  <p className="text-3xl font-bold text-blue-600">{lowPriority.length || 0}</p>
                 </div>
                 <TrendingUp className="h-8 w-8 text-blue-500" />
               </div>
