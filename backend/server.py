@@ -6446,19 +6446,19 @@ try:
     
     # Decision Engine - Health Score (v2 - uses new service)
     class HealthScoreRequest(BaseModel):
-        age: int
+        age: int = 45
         retirement_age: int = 65
-        current_income: float
-        annual_expenses: float
-        total_assets: float
-        total_debt: float
-        super_balance: float
-        emergency_fund: float
-        investment_portfolio: float
-        property_value: float
-        savings_rate: float
+        current_income: float = 150000
+        annual_expenses: float = 100000
+        total_assets: float = 1500000
+        total_debt: float = 500000
+        super_balance: float = 300000
+        emergency_fund: float = 30000
+        investment_portfolio: float = 200000
+        property_value: float = 800000
+        savings_rate: float = 0.15
         mortgage_rate: float = 6.5
-        mortgage_balance: float = 0
+        mortgage_balance: float = 450000
     
     @api_router.post("/decision-engine/health-score-v2")
     async def get_health_score_v2(request: HealthScoreRequest):
