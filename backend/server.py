@@ -7612,6 +7612,112 @@ try:
 except ImportError as e:
     logger.warning(f"Scenario simulator not available: {e}")
 
+# ==================== REAL-TIME MARKET DATA ENDPOINTS ====================
+
+try:
+    from services.market_data import (
+        get_stock_price, get_stock_history, get_portfolio_value,
+        get_market_indices, get_sector_performance, search_stocks,
+        get_dividend_calendar, get_portfolio_allocation
+    )
+    
+    @api_router.get("/market/quote/{symbol}")
+    async def get_quote(symbol: str):
+        """Get real-time stock quote"""
+        return get_stock_price(symbol)
+    
+    @api_router.get("/market/history/{symbol}")
+    async def get_history(symbol: str, period: str = "1mo"):
+        """Get historical price data"""
+        return get_stock_history(symbol, period)
+    
+    class PortfolioHoldingsRequest(BaseModel):
+        holdings: List[Dict]
+    
+    @api_router.post("/market/portfolio-value")
+    async def calculate_portfolio_value(request: PortfolioHoldingsRequest):
+        """Calculate real-time portfolio value"""
+        return get_portfolio_value(request.holdings)
+    
+    @api_router.get("/market/indices")
+    async def get_indices():
+        """Get major market indices"""
+        return get_market_indices()
+    
+    @api_router.get("/market/sectors")
+    async def get_sectors():
+        """Get sector performance"""
+        return get_sector_performance()
+    
+    @api_router.get("/market/search")
+    async def search(query: str, limit: int = 10):
+        """Search for stocks"""
+        return {"results": search_stocks(query, limit)}
+    
+    @api_router.post("/market/dividends")
+    async def get_dividends(symbols: List[str]):
+        """Get dividend calendar for holdings"""
+        return get_dividend_calendar(symbols)
+    
+    @api_router.post("/market/allocation")
+    async def get_allocation(request: PortfolioHoldingsRequest):
+        """Get portfolio allocation analysis"""
+        return get_portfolio_allocation(request.holdings)
+
+except ImportError as e:
+    logger.warning(f"Market data service not available: {e}")
+
+# ==================== TWILIO SMS ENDPOINTS ====================
+
+try:
+    from services.twilio_sms import (
+        send_verification_sms, verify_sms_code, get_twilio_status,
+        format_phone_number, validate_phone_number
+    )
+    
+    class TwilioSMSRequest(BaseModel):
+        phone_number: str
+    
+    class TwilioVerifyRequest(BaseModel):
+        phone_number: str
+        code: str
+    
+    @api_router.post("/sms/send-verification")
+    async def send_sms_verification(request: TwilioSMSRequest):
+        """Send SMS verification code via Twilio"""
+        return send_verification_sms(request.phone_number)
+    
+    @api_router.post("/sms/verify-code")
+    async def verify_sms(request: TwilioVerifyRequest):
+        """Verify SMS code"""
+        return verify_sms_code(request.phone_number, request.code)
+    
+    @api_router.get("/sms/status")
+    async def sms_status():
+        """Get Twilio configuration status"""
+        return get_twilio_status()
+    
+    @api_router.post("/sms/format-number")
+    async def format_number(phone: str, country_code: str = "61"):
+        """Format phone number to E.164"""
+        return {"formatted": format_phone_number(phone, country_code)}
+    
+    @api_router.post("/sms/validate-number")
+    async def validate_number(phone: str):
+        """Validate phone number format"""
+        return validate_phone_number(phone)
+
+except ImportError as e:
+    logger.warning(f"Twilio SMS service not available: {e}")
+
+# ==================== JWT AUTH ROUTES ====================
+
+try:
+    from routes.auth import router as auth_router
+    app.include_router(auth_router, prefix="/api")
+except ImportError as e:
+    logger.warning(f"Auth routes not available: {e}")
+
 # Include the router in the main app
 app.include_router(api_router)
 
