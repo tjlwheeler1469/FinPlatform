@@ -104,6 +104,11 @@ const StockResearch = lazy(() => import("@/pages/StockResearch"));
 const ComplianceCenter = lazy(() => import("@/pages/ComplianceCenter"));
 const WealthDashboard = lazy(() => import("@/pages/WealthDashboard"));
 
+// Client-Level Pages (within app, consistent design)
+const ClientWealth = lazy(() => import("@/pages/ClientWealth"));
+const ClientCompliance = lazy(() => import("@/pages/ClientCompliance"));
+const AIInsights = lazy(() => import("@/pages/AIInsights"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
