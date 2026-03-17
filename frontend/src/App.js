@@ -912,6 +912,9 @@ const AppRouter = () => {
       
       {/* Cross-Client Intelligence Engine */}
       <Route path="/intelligence" element={<IntelligenceEngine />} />
+      
+      {/* Advisor Intelligence Dashboard - The Daily Operating System */}
+      <Route path="/advisor-intelligence" element={<AdvisorIntelligenceDashboard />} />
     </Routes>
   );
 };
