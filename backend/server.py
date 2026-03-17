@@ -22,8 +22,8 @@ logger = logging.getLogger(__name__)
 # Create the main app
 app = FastAPI(
     title="Wealth Command - AI Financial Advisor OS",
-    description="Bloomberg Terminal + Salesforce + AI Copilot for Wealth Advisors",
-    version="4.0.0"
+    description="Bloomberg Terminal + Salesforce + AI Copilot for Wealth Advisors - Now with Next Best Action Engine",
+    version="5.0.0"
 )
 
 # Import database connection
