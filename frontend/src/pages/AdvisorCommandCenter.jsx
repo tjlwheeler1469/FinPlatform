@@ -97,6 +97,7 @@ const AdvisorCommandCenter = () => {
   const [copilotLoading, setCopilotLoading] = useState(false);
   const [copilotResponse, setCopilotResponse] = useState(null);
   const [selectedClient, setSelectedClient] = useState(null);
+  const [selectedAction, setSelectedAction] = useState(null);
   
   const [data, setData] = useState({
     commandCenter: null,
@@ -104,7 +105,8 @@ const AdvisorCommandCenter = () => {
     taxOpportunities: null,
     intelligence: null,
     practiceHealth: null,
-    clients: null
+    clients: null,
+    nextActions: null
   });
 
   const fetchAllData = useCallback(async (showRefreshToast = false) => {
@@ -112,22 +114,24 @@ const AdvisorCommandCenter = () => {
     else setLoading(true);
     
     try {
-      const [commandRes, monitoringRes, taxRes, intelligenceRes, practiceRes, clientsRes] = await Promise.all([
+      const [commandRes, monitoringRes, taxRes, intelligenceRes, practiceRes, clientsRes, actionsRes] = await Promise.all([
         fetch(`${API_URL}/api/command-center/daily-digest`),
         fetch(`${API_URL}/api/monitoring/daily-scan`),
         fetch(`${API_URL}/api/intelligence/tax-opportunities`),
         fetch(`${API_URL}/api/monitoring/book-insights`),
-        fetch(`${API_URL}/api/intelligence/practice-health`),
-        fetch(`${API_URL}/api/intelligence/comprehensive-analysis`)
+        fetch(`${API_URL}/api/practice-health/dashboard`),
+        fetch(`${API_URL}/api/intelligence/comprehensive-analysis`),
+        fetch(`${API_URL}/api/next-action/today?limit=8`)
       ]);
       
-      const [command, monitoring, tax, intelligence, practice, clients] = await Promise.all([
+      const [command, monitoring, tax, intelligence, practice, clients, actions] = await Promise.all([
         commandRes.ok ? commandRes.json() : null,
         monitoringRes.ok ? monitoringRes.json() : null,
         taxRes.ok ? taxRes.json() : null,
         intelligenceRes.ok ? intelligenceRes.json() : null,
         practiceRes.ok ? practiceRes.json() : null,
-        clientsRes.ok ? clientsRes.json() : null
+        clientsRes.ok ? clientsRes.json() : null,
+        actionsRes.ok ? actionsRes.json() : null
       ]);
       
       setData({ 
@@ -136,7 +140,8 @@ const AdvisorCommandCenter = () => {
         taxOpportunities: tax, 
         intelligence: intelligence,
         practiceHealth: practice,
-        clients: clients
+        clients: clients,
+        nextActions: actions
       });
       
       if (showRefreshToast) {
