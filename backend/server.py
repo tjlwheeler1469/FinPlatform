@@ -177,6 +177,14 @@ def include_all_routes():
         logger.info("FX TRADING loaded: MetaTrader 5, cTrader, Currency Hedging")
     except ImportError as e:
         logger.error(f"Failed to load FX trading routes: {e}")
+    
+    # DECISION ENGINE - Financial health and projections
+    try:
+        from routes.decision_engine import router as decision_router
+        app.include_router(decision_router, prefix="/api")
+        logger.info("DECISION ENGINE loaded: Health Score, Recommendations, Monte Carlo, Scenarios")
+    except ImportError as e:
+        logger.error(f"Failed to load decision engine routes: {e}")
 
 # Include all routes
 include_all_routes()
