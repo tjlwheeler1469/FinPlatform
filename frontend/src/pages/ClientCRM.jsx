@@ -86,8 +86,8 @@ const ClientCRM = () => {
       name: client.name,
       email: client.email
     }));
-    // Navigate to the client's financial plan
-    navigate("/financial-plan-generator");
+    // Navigate to the client's 360 view
+    navigate("/client-360");
   };
 
   useEffect(() => {
@@ -275,9 +275,9 @@ const ClientCRM = () => {
                           <Badge className={`${STATUS_COLORS[client.status]} text-white text-xs`}>
                             {client.status}
                           </Badge>
-                          {client.advice_stage && (
+                          {client.stage && (
                             <Badge variant="outline" className="text-xs">
-                              {client.advice_stage}
+                              {client.stage}
                             </Badge>
                           )}
                         </div>
@@ -299,13 +299,13 @@ const ClientCRM = () => {
                       <div className="hidden md:flex items-center gap-6">
                         <div className="text-right">
                           <p className="text-lg font-bold text-[#1a2744]">
-                            {formatCurrency(client.financial_summary.net_worth)}
+                            {formatCurrency(client.total_wealth || 0)}
                           </p>
-                          <p className="text-xs text-muted-foreground">Net Worth</p>
+                          <p className="text-xs text-muted-foreground">Total Wealth</p>
                         </div>
                         <div className="text-right">
                           <p className="font-medium">
-                            {formatCurrency(client.financial_summary.annual_income)}
+                            {formatCurrency(client.annual_income || 0)}
                           </p>
                           <p className="text-xs text-muted-foreground">Income</p>
                         </div>
@@ -316,11 +316,11 @@ const ClientCRM = () => {
                         <div className="flex flex-col items-end text-xs text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <FileText className="h-3 w-3" />
-                            {client.notes_count} notes
+                            {client.accounts_count || 0} accounts
                           </span>
                           <span className="flex items-center gap-1">
                             <ListTodo className="h-3 w-3" />
-                            {client.tasks_count} tasks
+                            {client.pending_tasks || 0} tasks
                           </span>
                         </div>
                         <ChevronRight className="h-5 w-5 text-muted-foreground" />
