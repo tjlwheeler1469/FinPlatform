@@ -224,13 +224,20 @@ const AdvisorCommandCenter = () => {
     );
   }
 
-  const { commandCenter, monitoring, taxOpportunities, intelligence, practiceHealth, clients } = data;
+  const { commandCenter, monitoring, taxOpportunities, intelligence, practiceHealth, clients, nextActions } = data;
   
-  // Key Metrics
-  const totalAUM = commandCenter?.metrics?.total_aum || 21300000;
-  const totalClients = commandCenter?.metrics?.total_clients || 164;
-  const netFlows = 3200000; // Mock - would come from real data
-  const revenue = 1800000; // Mock - would come from real data
+  // Key Metrics from Practice Health (real data)
+  const totalAUM = practiceHealth?.key_metrics?.total_aum || commandCenter?.metrics?.total_aum || 21300000;
+  const totalClients = practiceHealth?.key_metrics?.total_clients || commandCenter?.metrics?.total_clients || 164;
+  const netFlows = 3200000;
+  const revenue = practiceHealth?.key_metrics?.total_revenue || 1800000;
+  const healthScore = practiceHealth?.health_score?.overall_score || 84;
+  const healthGrade = practiceHealth?.health_score?.grade || "B+";
+  
+  // Next Best Actions data
+  const topActions = nextActions?.top_actions || [];
+  const focusMessage = nextActions?.focus_message || "Loading actions...";
+  const actionImpact = nextActions?.impact_summary || {};
   
   // Key Alerts
   const portfoliosDrifted = monitoring?.alert_summary?.allocation_drift || 11;
