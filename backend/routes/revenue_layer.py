@@ -48,7 +48,7 @@ FEE_SCHEDULES = {
             {"min": 500000, "max": 1000000, "rate": 1.00},     # 1.00% for $500k-$1M
             {"min": 1000000, "max": 2500000, "rate": 0.85},    # 0.85% for $1M-$2.5M
             {"min": 2500000, "max": 5000000, "rate": 0.70},    # 0.70% for $2.5M-$5M
-            {"min": 5000000, "max": float('inf'), "rate": 0.50} # 0.50% for $5M+
+            {"min": 5000000, "max": 999999999, "rate": 0.50}   # 0.50% for $5M+
         ],
         "billing_cycle": BillingCycle.QUARTERLY,
         "minimum_fee": 500
@@ -60,7 +60,7 @@ FEE_SCHEDULES = {
         "tiers": [
             {"min": 0, "max": 1000000, "rate": 0.95},
             {"min": 1000000, "max": 5000000, "rate": 0.75},
-            {"min": 5000000, "max": float('inf'), "rate": 0.50}
+            {"min": 5000000, "max": 999999999, "rate": 0.50}
         ],
         "billing_cycle": BillingCycle.QUARTERLY,
         "minimum_fee": 1000,
