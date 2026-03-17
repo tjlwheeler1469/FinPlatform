@@ -936,6 +936,9 @@ const AppRouter = () => {
       
       {/* Data Aggregators Research */}
       <Route path="/data-aggregators" element={<DataAggregators />} />
+      
+      {/* Stock Trading with CGT */}
+      <Route path="/stock-trading" element={<StockTrading />} />
     </Routes>
   );
 };
