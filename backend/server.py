@@ -183,9 +183,26 @@ async def health_check():
     return {
         "status": "healthy",
         "service": "wealth-command",
-        "version": "5.0.0",
+        "version": "6.0.0",
         "architecture": "modular",
-        "killer_features": ["next_best_action", "practice_health", "meeting_workflow"]
+        "execution_layer": {
+            "trading": True,
+            "portfolio_engine": True,
+            "smart_router": True,
+            "realtime_data": True,
+            "crypto": True,
+            "reconciliation": True
+        },
+        "capabilities": [
+            "next_best_action",
+            "practice_health", 
+            "meeting_workflow",
+            "block_trading",
+            "model_portfolios",
+            "auto_rebalancing",
+            "multi_asset_execution",
+            "cross_platform_reconciliation"
+        ]
     }
 
 # ==================== LIFECYCLE ====================
