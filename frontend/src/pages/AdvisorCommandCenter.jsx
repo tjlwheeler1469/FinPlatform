@@ -390,6 +390,173 @@ const AdvisorCommandCenter = () => {
           </Card>
         </div>
 
+        {/* ===== NEXT BEST ACTION ENGINE - THE KILLER FEATURE ===== */}
+        <Card className="border-2 border-emerald-500/30 bg-gradient-to-r from-emerald-50/50 to-white">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <Zap className="h-6 w-6 text-emerald-600" />
+                  Next Best Actions
+                  <Badge className="bg-emerald-500 text-white text-[10px] ml-2">AI-POWERED</Badge>
+                </CardTitle>
+                <CardDescription>{focusMessage}</CardDescription>
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="text-xs bg-white">
+                  {topActions.length} actions • {actionImpact.clients_needing_rebalance || 0} rebalance
+                </Badge>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4">
+              {topActions.slice(0, 4).map((action, i) => (
+                <div 
+                  key={action.id || i}
+                  className={`p-4 rounded-lg border-2 transition-all cursor-pointer hover:shadow-lg ${
+                    action.priority === 'critical' ? 'border-red-400 bg-red-50 hover:border-red-500' :
+                    action.priority === 'high' ? 'border-orange-400 bg-orange-50 hover:border-orange-500' :
+                    'border-blue-300 bg-blue-50 hover:border-blue-400'
+                  }`}
+                  onClick={() => setSelectedAction(action)}
+                  data-testid={`next-action-${i}`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <Badge className={`text-[10px] ${
+                      action.priority === 'critical' ? 'bg-red-500' :
+                      action.priority === 'high' ? 'bg-orange-500' :
+                      'bg-blue-500'
+                    }`}>
+                      {action.priority?.toUpperCase()}
+                    </Badge>
+                    <Badge variant="outline" className="text-[10px]">
+                      {action.category}
+                    </Badge>
+                  </div>
+                  <h4 className="font-semibold text-sm mb-1">{action.title}</h4>
+                  <p className="text-xs text-muted-foreground mb-2">{action.client_name}</p>
+                  <p className="text-xs text-gray-600 line-clamp-2">{action.description}</p>
+                  {action.impact_value && (
+                    <div className="mt-2 pt-2 border-t">
+                      <p className="text-xs font-medium text-emerald-600">
+                        Impact: {typeof action.impact_value === 'number' ? formatCurrency(action.impact_value) : action.impact_value}
+                      </p>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between mt-3">
+                    <span className="text-[10px] text-muted-foreground">
+                      {action.estimated_time}
+                    </span>
+                    <Button size="sm" variant="ghost" className="h-6 px-2 text-xs">
+                      <Play className="h-3 w-3 mr-1" />
+                      Execute
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {/* Selected Action Expanded View */}
+            {selectedAction && (
+              <div className="mt-4 p-4 bg-white rounded-lg border-2 border-emerald-200">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Badge className={`${
+                        selectedAction.priority === 'critical' ? 'bg-red-500' :
+                        selectedAction.priority === 'high' ? 'bg-orange-500' :
+                        'bg-blue-500'
+                      }`}>
+                        {selectedAction.priority?.toUpperCase()}
+                      </Badge>
+                      <h3 className="text-lg font-bold">{selectedAction.title}</h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground">{selectedAction.client_name} • {selectedAction.category}</p>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={() => setSelectedAction(null)}>
+                    <XCircle className="h-4 w-4" />
+                  </Button>
+                </div>
+                
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  <div>
+                    <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
+                      <Target className="h-4 w-4" />
+                      Action Steps
+                    </h4>
+                    <ul className="space-y-1">
+                      {selectedAction.action_steps?.map((step, i) => (
+                        <li key={i} className="text-xs flex items-start gap-2">
+                          <CheckCircle className="h-3 w-3 text-emerald-500 mt-0.5 flex-shrink-0" />
+                          <span>{step}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
+                      <DollarSign className="h-4 w-4" />
+                      Impact
+                    </h4>
+                    <div className="space-y-2">
+                      {selectedAction.impact_value && (
+                        <div className="p-2 bg-emerald-50 rounded text-xs">
+                          <span className="font-medium text-emerald-700">
+                            Value: {typeof selectedAction.impact_value === 'number' ? formatCurrency(selectedAction.impact_value) : selectedAction.impact_value}
+                          </span>
+                        </div>
+                      )}
+                      {selectedAction.deadline && (
+                        <div className="p-2 bg-orange-50 rounded text-xs">
+                          <span className="font-medium text-orange-700">
+                            Deadline: {selectedAction.deadline}
+                          </span>
+                        </div>
+                      )}
+                      <div className="p-2 bg-blue-50 rounded text-xs">
+                        <span className="font-medium text-blue-700">
+                          Time: {selectedAction.estimated_time} • Risk: {selectedAction.risk_level}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex flex-col justify-between">
+                    <div>
+                      <h4 className="text-sm font-semibold mb-2">Quick Execute</h4>
+                      <p className="text-xs text-muted-foreground mb-3">
+                        {selectedAction.one_click_action?.replace(/_/g, ' ')}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button className="flex-1 bg-emerald-600 hover:bg-emerald-700" size="sm">
+                        <Zap className="h-4 w-4 mr-2" />
+                        Execute Now
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => navigate(`/client-wealth?client=${selectedAction.client_id}`)}>
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            <div className="flex items-center justify-between mt-4 pt-4 border-t">
+              <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                <span>Tax savings available: <strong className="text-emerald-600">{formatCurrency(actionImpact.potential_tax_savings || 0)}</strong></span>
+                <span>Revenue at risk: <strong className="text-orange-600">{formatCurrency(actionImpact.revenue_at_risk || 0)}</strong></span>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => navigate('/next-actions')}>
+                View All Actions
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* ===== ZONE 3: ADVISOR INTELLIGENCE FEED ===== */}
         <Card className="border-2 border-[#D4A84C]/30 bg-gradient-to-r from-amber-50/50 to-white">
           <CardHeader className="pb-3">
