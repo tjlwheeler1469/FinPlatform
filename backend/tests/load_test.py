@@ -32,17 +32,17 @@ class AdviserUser(HttpUser):
     def login(self):
         """Authenticate adviser"""
         user = random.choice(ADVISER_USERS)
-        response = self.client.post(
+        with self.client.post(
             "/api/auth/login",
             json=user,
             catch_response=True
-        )
-        if response.status_code == 200:
-            data = response.json()
-            self.token = data.get("access_token")
-            response.success()
-        else:
-            response.failure(f"Login failed: {response.status_code}")
+        ) as response:
+            if response.status_code == 200:
+                data = response.json()
+                self.token = data.get("access_token")
+                response.success()
+            else:
+                response.failure(f"Login failed: {response.status_code}")
     
     @property
     def headers(self):
