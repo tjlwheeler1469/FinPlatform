@@ -309,11 +309,10 @@ class TestBrokerResearchAPIs:
         assert response.status_code == 200
         
         data = response.json()
-        assert "stocks" in data
-        assert "total" in data
+        assert "top_rated" in data
         assert "timestamp" in data
         
-        stocks = data["stocks"]
+        stocks = data["top_rated"]
         assert len(stocks) > 0
         
         # Verify stock structure
