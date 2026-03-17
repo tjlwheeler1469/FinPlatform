@@ -29,14 +29,54 @@ import {
  * - Financial Services Reform Act
  */
 
-const STORAGE_KEY = "halcyon_compliance_v3";  // Versioned key
-const SESSION_KEY = "halcyon_compliance_session";
+const STORAGE_KEY = "wealth_command_compliance_v5";  // Versioned key for v5.0
+const SESSION_KEY = "wealth_command_compliance_session";
 
 // Global state to track if modal has been shown this app instance
 let hasShownThisSession = false;
 
-// Compliance disclaimer content
-const COMPLIANCE_CONTENT = {
+// Check if user has permanently dismissed
+const hasPermanentlyDismissed = () => {
+  try {
+    return localStorage.getItem(STORAGE_KEY) === "permanent";
+  } catch {
+    return false;
+  }
+};
+
+// Check if user has acknowledged this session
+const hasAcknowledged = () => {
+  try {
+    // Check permanent dismissal first
+    if (hasPermanentlyDismissed()) return true;
+    
+    // Check session dismissal
+    const session = sessionStorage.getItem(SESSION_KEY);
+    if (session) return true;
+    
+    // Check if already shown this app instance
+    if (hasShownThisSession) return true;
+    
+    return false;
+  } catch {
+    return hasShownThisSession;
+  }
+};
+
+// Set acknowledgement
+const setAcknowledgement = (permanent = false) => {
+  try {
+    if (permanent) {
+      localStorage.setItem(STORAGE_KEY, "permanent");
+      console.log("Compliance modal permanently dismissed");
+    }
+    sessionStorage.setItem(SESSION_KEY, new Date().toISOString());
+    hasShownThisSession = true;
+  } catch (e) {
+    console.warn('Could not persist compliance acknowledgement:', e);
+    hasShownThisSession = true;
+  }
+};
   title: "Important Information",
   subtitle: "Please read before using this application",
   sections: [
