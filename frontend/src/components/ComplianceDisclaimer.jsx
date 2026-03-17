@@ -77,6 +77,9 @@ const setAcknowledgement = (permanent = false) => {
     hasShownThisSession = true;
   }
 };
+
+// Compliance disclaimer content
+const COMPLIANCE_CONTENT = {
   title: "Important Information",
   subtitle: "Please read before using this application",
   sections: [
@@ -89,7 +92,7 @@ const setAcknowledgement = (permanent = false) => {
     {
       icon: Scale,
       title: "No Financial Services License",
-      content: `Halcyon Wealth Platform is not licensed to provide personal financial product advice under the Corporations Act 2001 (Cth). This tool should not be used as a substitute for professional financial advice from a licensed financial adviser (AFSL holder).`,
+      content: `Wealth Command Platform is not licensed to provide personal financial product advice under the Corporations Act 2001 (Cth). This tool should not be used as a substitute for professional financial advice from a licensed financial adviser (AFSL holder).`,
       reference: "Corporations Act 2001 s911A"
     },
     {
@@ -119,8 +122,8 @@ const setAcknowledgement = (permanent = false) => {
   ]
 };
 
-// Compliance disclaimer content
-const COMPLIANCE_CONTENT = {
+// Modal component shown on first visit
+export const ComplianceModal = ({ onAccept }) => {
   const [acknowledged, setAcknowledgedState] = useState(false);
   const [dontShowAgain, setDontShowAgain] = useState(false);
   const [open, setOpen] = useState(false);
@@ -133,7 +136,7 @@ const COMPLIANCE_CONTENT = {
     
     if (!hasAcknowledged()) {
       setOpen(true);
-      hasShownThisSession = true; // Mark as shown even before accepting
+      hasShownThisSession = true;
     }
   }, []);
 
@@ -265,56 +268,32 @@ export const ComplianceFooter = ({ className = "" }) => {
         <span className="hidden sm:inline">|</span>
         <span>Consult a licensed adviser (AFSL)</span>
         <span className="hidden sm:inline">|</span>
-        <a 
-          href="https://moneysmart.gov.au" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="text-[#1a2744] hover:underline inline-flex items-center gap-1"
-        >
-          ASIC MoneySmart
-          <ExternalLink className="h-3 w-3" />
-        </a>
+        <span>Tax rates: 2024-25 FY</span>
       </div>
-      <p className="mt-2 text-[10px]">
-        © {new Date().getFullYear()} Halcyon Wealth Platform. Tax rates based on ATO 2024-25 FY. 
-        Calculations for illustrative purposes only.
+      <p className="mt-2 text-[10px] leading-relaxed">
+        The information provided is general in nature and does not take into account your personal objectives, 
+        financial situation or needs. Before acting on any information, you should consider its appropriateness 
+        having regard to your own objectives, financial situation and needs, and seek professional advice from 
+        a licensed financial adviser. Past performance is not a reliable indicator of future performance.
       </p>
     </div>
   );
 };
 
-// Inline disclaimer for calculators
-export const CalculatorDisclaimer = ({ calculatorName = "calculator" }) => {
-  return (
-    <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-sm">
-      <div className="flex items-start gap-2">
-        <Info className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
-        <div>
-          <p className="text-amber-800">
-            <strong>Disclaimer:</strong> This {calculatorName} provides estimates based on general assumptions 
-            and publicly available ATO rates. Results are for illustrative purposes only and should not be 
-            relied upon for making financial decisions. Consult a qualified professional for personal advice.
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-};
+// Inline disclaimer for specific content
+export const InlineDisclaimer = ({ type = "general", className = "" }) => {
+  const disclaimers = {
+    general: "This is general information only and not personal financial advice.",
+    tax: "Tax calculations are estimates only. Consult a registered tax agent.",
+    investment: "Past performance is not indicative of future results.",
+    projection: "Projections are estimates based on assumptions that may not eventuate."
+  };
 
-// ATO reference tooltip/badge
-export const ATOReference = ({ section, description }) => {
   return (
-    <a
-      href={`https://www.ato.gov.au/search?q=${encodeURIComponent(section)}`}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="inline-flex items-center gap-1 text-xs text-[#1a2744] hover:underline"
-      title={description}
-    >
-      <FileText className="h-3 w-3" />
-      ATO: {section}
-      <ExternalLink className="h-3 w-3" />
-    </a>
+    <div className={`flex items-start gap-2 p-2 bg-amber-50 rounded-md border border-amber-200 ${className}`}>
+      <Info className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
+      <p className="text-xs text-amber-700">{disclaimers[type]}</p>
+    </div>
   );
 };
 
