@@ -12,7 +12,7 @@ import uuid
 import logging
 
 logger = logging.getLogger(__name__)
-router = APIRouter(prefix="/compliance", tags=["Compliance & Audit"])
+router = APIRouter(prefix="/compliance-audit", tags=["Compliance & Audit"])
 
 
 class AuditAction(str, Enum):
