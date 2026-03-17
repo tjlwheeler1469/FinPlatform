@@ -545,7 +545,7 @@ async def create_task(task: TaskInput):
     }
     
     if DB_AVAILABLE:
-        await tasks_collection.insert_one(task_data)
+        await tasks_collection.insert_one(task_data.copy())  # Use copy to avoid _id mutation
     else:
         TASKS_MEMORY[task_id] = task_data
     
