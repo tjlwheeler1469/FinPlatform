@@ -338,6 +338,7 @@ What would you like to explore today?`,
         </div>
       </div>
     </div>
+    </Layout>
   );
 };
 
