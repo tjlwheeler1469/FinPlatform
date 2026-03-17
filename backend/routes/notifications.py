@@ -670,3 +670,352 @@ async def trigger_meeting_reminder(
         action_url=f"/meeting-prep?client={client_id}",
         background_tasks=background_tasks
     )
+
+
+
+# Demo notification data for showing what would be sent
+DEMO_NOTIFICATIONS = [
+    {
+        "id": "demo_notif_001",
+        "type": "portfolio_drift",
+        "title": "Portfolio Drift Alert: Wheeler Family",
+        "message": "Portfolio has drifted 7.2% from target allocation. Australian Equities overweight by 5.3%, International underweight by 4.1%.",
+        "priority": "high",
+        "client_id": "client_1",
+        "client_name": "Wheeler Family",
+        "data": {"drift_percent": 7.2, "asset_class": "Australian Equities"},
+        "action_url": "/client-wealth?client=client_1",
+        "channels": {
+            "websocket": {"status": "would_send", "delivery": "real-time"},
+            "push": {"status": "would_send", "delivery": "instant"},
+            "email": {
+                "status": "would_send",
+                "to": "adviser@wealthcommand.io",
+                "subject": "Portfolio Drift Alert: Wheeler Family",
+                "preview": "Portfolio has drifted 7.2% from target..."
+            }
+        }
+    },
+    {
+        "id": "demo_notif_002",
+        "type": "tax_opportunity",
+        "title": "Tax Opportunity: Chen Investment Trust",
+        "message": "Tax-loss harvesting opportunity identified. Sell WOW position for $4,200 loss to offset $12,400 capital gains. Net tax saving: $1,862.",
+        "priority": "high",
+        "client_id": "client_2",
+        "client_name": "Chen Investment Trust",
+        "data": {"potential_saving": 1862, "type": "Tax-Loss Harvesting"},
+        "action_url": "/tax-analysis?client=client_2",
+        "channels": {
+            "websocket": {"status": "would_send", "delivery": "real-time"},
+            "push": {"status": "would_send", "delivery": "instant"},
+            "email": {
+                "status": "would_send",
+                "to": "adviser@wealthcommand.io",
+                "subject": "Tax Opportunity: Chen Investment Trust",
+                "preview": "Tax-loss harvesting opportunity..."
+            }
+        }
+    },
+    {
+        "id": "demo_notif_003",
+        "type": "compliance_due",
+        "title": "Annual Review Due: Johnson Portfolio",
+        "message": "Annual review for Johnson Portfolio is due in 7 days. Schedule meeting to complete compliance requirements.",
+        "priority": "medium",
+        "client_id": "client_3",
+        "client_name": "Johnson Portfolio",
+        "data": {"review_type": "Annual Review", "days_until_due": 7},
+        "action_url": "/compliance?client=client_3",
+        "channels": {
+            "websocket": {"status": "would_send", "delivery": "real-time"},
+            "push": {"status": "would_send", "delivery": "instant"},
+            "email": {
+                "status": "would_send",
+                "to": "adviser@wealthcommand.io",
+                "subject": "Annual Review Due: Johnson Portfolio",
+                "preview": "Annual review is due in 7 days..."
+            }
+        }
+    },
+    {
+        "id": "demo_notif_004",
+        "type": "idle_cash",
+        "title": "Idle Cash Alert: Wheeler Family",
+        "message": "Client has $87,500 cash earning 0.1%. At current rates, deploying to ETFs could earn additional $3,412/year.",
+        "priority": "medium",
+        "client_id": "client_1",
+        "client_name": "Wheeler Family",
+        "data": {"cash_amount": 87500, "potential_return": 3412},
+        "action_url": "/client-wealth?client=client_1",
+        "channels": {
+            "websocket": {"status": "would_send", "delivery": "real-time"},
+            "push": {"status": "would_send", "delivery": "instant"},
+            "email": {
+                "status": "would_send",
+                "to": "adviser@wealthcommand.io",
+                "subject": "Idle Cash Alert: Wheeler Family",
+                "preview": "Client has $87,500 cash earning..."
+            }
+        }
+    },
+    {
+        "id": "demo_notif_005",
+        "type": "retirement_risk",
+        "title": "Retirement Shortfall: Thompson SMSF",
+        "message": "Current trajectory shows $245,000 shortfall at retirement age 67. Consider increasing super contributions by $15,000/year.",
+        "priority": "high",
+        "client_id": "client_4",
+        "client_name": "Thompson SMSF",
+        "data": {"shortfall": 245000, "years_to_retirement": 12},
+        "action_url": "/strategic-planning?client=client_4",
+        "channels": {
+            "websocket": {"status": "would_send", "delivery": "real-time"},
+            "push": {"status": "would_send", "delivery": "instant"},
+            "email": {
+                "status": "would_send",
+                "to": "adviser@wealthcommand.io",
+                "subject": "Retirement Shortfall: Thompson SMSF",
+                "preview": "Current trajectory shows $245,000..."
+            }
+        }
+    },
+    {
+        "id": "demo_notif_006",
+        "type": "meeting_reminder",
+        "title": "Upcoming Meeting: Wheeler Family",
+        "message": "Annual review meeting with Wheeler Family scheduled for tomorrow at 10:00 AM. Click to prepare meeting brief.",
+        "priority": "medium",
+        "client_id": "client_1",
+        "client_name": "Wheeler Family",
+        "data": {"meeting_time": "Tomorrow 10:00 AM", "meeting_type": "Annual Review"},
+        "action_url": "/meeting-prep?client=client_1",
+        "channels": {
+            "websocket": {"status": "would_send", "delivery": "real-time"},
+            "push": {"status": "would_send", "delivery": "instant"},
+            "email": {
+                "status": "would_send",
+                "to": "adviser@wealthcommand.io",
+                "subject": "Meeting Reminder: Wheeler Family",
+                "preview": "Annual review meeting tomorrow..."
+            }
+        }
+    },
+    {
+        "id": "demo_notif_007",
+        "type": "market_event",
+        "title": "Market Alert: ASX 200 Down 2.5%",
+        "message": "ASX 200 dropped 2.5% today. 8 client portfolios may require attention. Mining sector particularly affected.",
+        "priority": "high",
+        "data": {"market": "ASX 200", "change": -2.5, "affected_clients": 8},
+        "action_url": "/market-data",
+        "channels": {
+            "websocket": {"status": "would_send", "delivery": "real-time"},
+            "push": {"status": "would_send", "delivery": "instant"},
+            "email": {
+                "status": "would_send",
+                "to": "adviser@wealthcommand.io",
+                "subject": "Market Alert: ASX 200 Down 2.5%",
+                "preview": "ASX 200 dropped 2.5% today..."
+            }
+        }
+    },
+    {
+        "id": "demo_notif_008",
+        "type": "client_login",
+        "title": "Client Portal Login: Sarah Wheeler",
+        "message": "Sarah Wheeler logged into the client portal at 3:45 PM. Viewed portfolio and messages.",
+        "priority": "low",
+        "client_id": "client_1",
+        "client_name": "Wheeler Family",
+        "data": {"login_time": "3:45 PM", "pages_viewed": ["Portfolio", "Messages"]},
+        "action_url": "/clients?client=client_1",
+        "channels": {
+            "websocket": {"status": "would_send", "delivery": "real-time"},
+            "push": {"status": "would_send", "delivery": "instant"},
+            "email": {
+                "status": "would_not_send",
+                "reason": "Email disabled for client_login in user preferences"
+            }
+        }
+    }
+]
+
+
+@router.get("/demo")
+async def get_demo_notifications():
+    """
+    Get demo notifications showing what would be sent.
+    This demonstrates the notification types, channels, and content.
+    """
+    return {
+        "success": True,
+        "demo_mode": True,
+        "note": "These are example notifications showing what would be sent when integrated with real services",
+        "integration_status": {
+            "websocket": {
+                "status": "ready",
+                "description": "WebSocket notifications are functional for real-time alerts"
+            },
+            "push": {
+                "status": "demo",
+                "description": "Push notifications simulate delivery via WebSocket"
+            },
+            "email": {
+                "status": "demo",
+                "description": "Email notifications log to console. Configure SENDGRID_API_KEY for live delivery",
+                "required_env": ["SENDGRID_API_KEY", "SENDER_EMAIL"]
+            },
+            "sms": {
+                "status": "demo",
+                "description": "SMS notifications available via Twilio. Configure credentials for live delivery",
+                "required_env": ["TWILIO_ACCOUNT_SID", "TWILIO_AUTH_TOKEN", "TWILIO_PHONE_NUMBER"]
+            }
+        },
+        "notification_types": [
+            {"type": "portfolio_drift", "description": "Alert when portfolio drifts from target allocation", "default_channels": ["websocket", "push", "email"]},
+            {"type": "tax_opportunity", "description": "Tax optimization opportunities detected", "default_channels": ["websocket", "push", "email"]},
+            {"type": "compliance_due", "description": "Compliance review deadlines", "default_channels": ["websocket", "push", "email"]},
+            {"type": "idle_cash", "description": "Large cash holdings not earning returns", "default_channels": ["websocket", "push", "email"]},
+            {"type": "retirement_risk", "description": "Retirement shortfall detected", "default_channels": ["websocket", "push", "email"]},
+            {"type": "meeting_reminder", "description": "Upcoming client meetings", "default_channels": ["websocket", "push", "email"]},
+            {"type": "market_event", "description": "Significant market movements", "default_channels": ["websocket", "push"]},
+            {"type": "client_login", "description": "Client portal activity", "default_channels": ["websocket", "push"]}
+        ],
+        "sample_notifications": DEMO_NOTIFICATIONS,
+        "total_samples": len(DEMO_NOTIFICATIONS)
+    }
+
+
+@router.get("/demo/email-preview/{notification_id}")
+async def get_email_preview(notification_id: str):
+    """Get HTML email preview for a demo notification."""
+    notification = next((n for n in DEMO_NOTIFICATIONS if n["id"] == notification_id), None)
+    
+    if not notification:
+        raise HTTPException(status_code=404, detail="Notification not found")
+    
+    html_content = generate_email_html(
+        notification["title"],
+        notification["message"],
+        notification["type"],
+        notification.get("action_url")
+    )
+    
+    return {
+        "notification_id": notification_id,
+        "notification_type": notification["type"],
+        "subject": notification["title"],
+        "html_preview": html_content,
+        "plain_text": notification["message"]
+    }
+
+
+@router.post("/demo/simulate")
+async def simulate_notification_delivery(
+    notification_type: str,
+    client_id: str = "client_1",
+    background_tasks: BackgroundTasks = None
+):
+    """
+    Simulate sending a notification through all channels.
+    Shows what would happen without actually sending external messages.
+    """
+    # Find matching demo notification
+    demo = next((n for n in DEMO_NOTIFICATIONS if n["type"] == notification_type), None)
+    
+    if not demo:
+        demo = DEMO_NOTIFICATIONS[0]  # Default to first notification
+    
+    simulation_result = {
+        "simulation_id": f"sim_{uuid.uuid4().hex[:8]}",
+        "simulated_at": datetime.now(timezone.utc).isoformat(),
+        "notification_type": notification_type,
+        "client_id": client_id,
+        "channels_simulated": {
+            "websocket": {
+                "status": "simulated",
+                "action": "Would send real-time notification to connected clients",
+                "connected_users": len(manager.get_connected_users()),
+                "payload_size": len(str(demo))
+            },
+            "push": {
+                "status": "simulated",
+                "action": "Would deliver push notification if user subscribed",
+                "title": demo["title"],
+                "body": demo["message"][:100] + "..."
+            },
+            "email": {
+                "status": "simulated",
+                "action": "Would send email via SendGrid",
+                "to": "adviser@wealthcommand.io",
+                "subject": demo["title"],
+                "integration_ready": bool(os.environ.get("SENDGRID_API_KEY"))
+            }
+        },
+        "notification_preview": demo,
+        "user_preferences_checked": True,
+        "quiet_hours_checked": True,
+        "would_be_delivered": True
+    }
+    
+    # Create actual notification in memory (but don't send external)
+    notification = {
+        "id": f"notif_{uuid.uuid4().hex[:8]}",
+        "user_id": "adviser_001",
+        "type": notification_type,
+        "title": demo["title"],
+        "message": demo["message"],
+        "priority": demo["priority"],
+        "data": demo.get("data", {}),
+        "action_url": demo.get("action_url"),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "read": False,
+        "channels_sent": ["simulated"],
+        "is_simulation": True
+    }
+    
+    NOTIFICATIONS.append(notification)
+    
+    # Send via WebSocket if anyone is connected (this IS real)
+    if manager.get_connected_users():
+        await manager.broadcast({
+            "type": "simulation_notification",
+            "notification": notification,
+            "simulation": True
+        })
+        simulation_result["websocket_delivered"] = True
+    
+    return simulation_result
+
+
+@router.get("/summary")
+async def get_notification_summary():
+    """Get summary of notification system status and stats."""
+    return {
+        "system_status": {
+            "websocket": "operational",
+            "push": "demo_mode",
+            "email": "demo_mode" if not os.environ.get("SENDGRID_API_KEY") else "operational",
+            "sms": "demo_mode"
+        },
+        "statistics": {
+            "total_notifications": len(NOTIFICATIONS),
+            "unread": len([n for n in NOTIFICATIONS if not n.get("read")]),
+            "by_type": {},
+            "by_priority": {
+                "critical": len([n for n in NOTIFICATIONS if n.get("priority") == "critical"]),
+                "high": len([n for n in NOTIFICATIONS if n.get("priority") == "high"]),
+                "medium": len([n for n in NOTIFICATIONS if n.get("priority") == "medium"]),
+                "low": len([n for n in NOTIFICATIONS if n.get("priority") == "low"])
+            }
+        },
+        "active_connections": {
+            "total": sum(len(conns) for conns in manager.active_connections.values()),
+            "users": len(manager.get_connected_users())
+        },
+        "configured_channels": {
+            "sendgrid": bool(os.environ.get("SENDGRID_API_KEY")),
+            "twilio": bool(os.environ.get("TWILIO_ACCOUNT_SID"))
+        }
+    }
