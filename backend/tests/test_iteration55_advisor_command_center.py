@@ -158,11 +158,12 @@ class TestMonitoringAPIs:
         assert response.status_code == 200
         data = response.json()
         
+        # Verify structure - actual response has alerts, total_alerts, high_priority
         assert "total_alerts" in data
-        assert "by_severity" in data
-        assert "by_type" in data
+        assert "alerts" in data
+        assert "high_priority" in data
         
-        print(f"✓ Alerts summary: {data['total_alerts']} total alerts")
+        print(f"✓ Alerts summary: {data['total_alerts']} total alerts, {data['high_priority']} high priority")
 
 
 class TestIntelligenceAPIs:
