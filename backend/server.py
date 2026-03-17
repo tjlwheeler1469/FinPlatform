@@ -161,6 +161,14 @@ def include_all_routes():
         logger.info("EXECUTION LAYER loaded: Trading, Portfolio Engine, Smart Router, Real-Time, Crypto, Reconciliation")
     except ImportError as e:
         logger.error(f"Failed to load execution layer routes: {e}")
+    
+    # REVENUE LAYER - Phase 3
+    try:
+        from routes.revenue_layer import router as revenue_router
+        app.include_router(revenue_router, prefix="/api")
+        logger.info("REVENUE LAYER loaded: AUM Fees, Trading Fees, Subscriptions")
+    except ImportError as e:
+        logger.error(f"Failed to load revenue layer routes: {e}")
 
 # Include all routes
 include_all_routes()
