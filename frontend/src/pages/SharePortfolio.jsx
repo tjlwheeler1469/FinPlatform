@@ -118,6 +118,13 @@ const SharePortfolio = () => {
     sector: "Other"
   });
 
+  // Trade modal state
+  const [showTradeModal, setShowTradeModal] = useState(false);
+  const [tradeShare, setTradeShare] = useState(null);
+  const [tradeType, setTradeType] = useState("buy"); // "buy" or "sell"
+  const [tradeQuantity, setTradeQuantity] = useState(0);
+  const [tradePrice, setTradePrice] = useState(0);
+
   // Company dividend distribution settings
   const [companyDividendDistribution, setCompanyDividendDistribution] = useState({
     toPersonal: 0,
