@@ -118,6 +118,9 @@ const IntelligenceEngine = lazy(() => import("@/pages/IntelligenceEngine"));
 // Advisor Intelligence Dashboard - Daily Operating System
 const AdvisorIntelligenceDashboard = lazy(() => import("@/pages/AdvisorIntelligenceDashboard"));
 
+// Ultimate Advisor Command Center - The Daily Operating System
+const AdvisorCommandCenter = lazy(() => import("@/pages/AdvisorCommandCenter"));
+
 // Notification Center
 const NotificationCenter = lazy(() => import("@/pages/NotificationCenter"));
 
