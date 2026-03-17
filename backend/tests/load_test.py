@@ -178,17 +178,17 @@ class ClientPortalUser(HttpUser):
     
     def client_login(self):
         """Login as client"""
-        response = self.client.post(
+        with self.client.post(
             "/api/client-portal/auth/login",
             json={"email": "client_wheeler@email.com", "password": "wheeler2025"},
             catch_response=True
-        )
-        if response.status_code == 200:
-            data = response.json()
-            self.token = data.get("access_token")
-            response.success()
-        else:
-            response.failure(f"Client login failed: {response.status_code}")
+        ) as response:
+            if response.status_code == 200:
+                data = response.json()
+                self.token = data.get("access_token")
+                response.success()
+            else:
+                response.failure(f"Client login failed: {response.status_code}")
     
     @property
     def headers(self):
