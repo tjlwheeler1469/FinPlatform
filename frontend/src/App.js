@@ -112,6 +112,9 @@ const AIInsights = lazy(() => import("@/pages/AIInsights"));
 // Command Center - Daily Adviser Hub
 const CommandCenter = lazy(() => import("@/pages/CommandCenter"));
 
+// Cross-Client Intelligence Engine
+const IntelligenceEngine = lazy(() => import("@/pages/IntelligenceEngine"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
