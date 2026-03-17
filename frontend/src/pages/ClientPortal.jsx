@@ -1,492 +1,581 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Home,
-  TrendingUp,
-  Target,
-  Calendar,
-  DollarSign,
-  PieChart,
+import { Progress } from "@/components/ui/progress";
+import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
   ArrowUpRight,
   ArrowDownRight,
-  CheckCircle,
-  Clock,
+  Calendar,
+  ChevronRight,
+  DollarSign,
   FileText,
-  MessageCircle,
-  Sparkles,
+  Home,
+  LineChart,
+  Lock,
+  LogOut,
+  Mail,
+  MessageSquare,
+  PieChart,
+  Send,
+  Target,
+  TrendingUp,
+  User,
+  Wallet,
+  Eye,
+  EyeOff,
   Shield
 } from "lucide-react";
-import { 
-  LineChart, 
-  Line, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer,
-  AreaChart,
-  Area
-} from "recharts";
+import { toast } from "sonner";
+
+const API_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || "";
 
 const formatCurrency = (value) => {
-  if (value === undefined || value === null || isNaN(value)) return "$0";
-  if (value >= 1000000) return `$${(value / 1000000).toFixed(2)}M`;
-  if (value >= 1000) return `$${(value / 1000).toFixed(0)}K`;
-  return `$${value.toFixed(0)}`;
+  return new Intl.NumberFormat('en-AU', {
+    style: 'currency',
+    currency: 'AUD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(value);
 };
 
-// Sample client data - in production this would come from API
-const CLIENT_DATA = {
-  name: "Wheeler Family",
-  members: ["James Wheeler", "Sarah Wheeler"],
-  advisor: "James Wheeler CFP®",
-  lastReview: "2025-12-15",
-  nextReview: "2026-03-15",
-  
-  // Financial Overview
-  netWorth: 1978000,
-  netWorthChange: 45000,
-  netWorthChangePercent: 2.3,
-  
-  // Wealth Trajectory
-  wealthHistory: [
-    { month: "Jul", value: 1820000 },
-    { month: "Aug", value: 1850000 },
-    { month: "Sep", value: 1890000 },
-    { month: "Oct", value: 1920000 },
-    { month: "Nov", value: 1950000 },
-    { month: "Dec", value: 1978000 }
-  ],
-  
-  // Retirement Readiness
-  retirementReadiness: {
-    score: 72,
-    targetAge: 65,
-    currentAge: 45,
-    projectedWealth: 3250000,
-    monthlyIncomeAtRetirement: 12500,
-    successProbability: 82
-  },
-  
-  // Goals
-  goals: [
-    { name: "Emergency Fund", target: 50000, current: 35000, category: "savings", priority: "high" },
-    { name: "Investment Property", target: 200000, current: 85000, category: "property", priority: "medium" },
-    { name: "Kids Education", target: 150000, current: 45000, category: "education", priority: "medium" },
-    { name: "Early Retirement", target: 2000000, current: 580000, category: "retirement", priority: "high" }
-  ],
-  
-  // Upcoming Events
-  upcomingEvents: [
-    { date: "2026-03-15", title: "Quarterly Review Meeting", type: "meeting" },
-    { date: "2026-06-30", title: "Super Contribution Deadline", type: "tax" },
-    { date: "2027-02-01", title: "Child 1 High School Start", type: "life" }
-  ],
-  
-  // Recent Activity
-  recentActivity: [
-    { date: "2025-12-15", action: "Portfolio Rebalanced", type: "investment" },
-    { date: "2025-11-28", action: "Annual Review Completed", type: "meeting" },
-    { date: "2025-11-15", action: "Insurance Coverage Updated", type: "insurance" }
-  ]
-};
+// Client Portal Login Component
+const ClientLogin = ({ onLogin }) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-const ClientPortal = () => {
-  const [activeTab, setActiveTab] = useState("overview");
-  
-  const overallGoalProgress = CLIENT_DATA.goals.reduce((acc, goal) => acc + goal.current, 0) / 
-    CLIENT_DATA.goals.reduce((acc, goal) => acc + goal.target, 0) * 100;
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    try {
+      const response = await fetch(`${API_URL}/api/client-portal/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem("client_portal_token", data.token);
+        localStorage.setItem("client_portal_user", JSON.stringify(data.user));
+        toast.success("Welcome back!");
+        onLogin(data);
+      } else {
+        const error = await response.json();
+        toast.error(error.detail || "Login failed");
+      }
+    } catch (error) {
+      toast.error("Connection error. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100" data-testid="client-portal-page">
-      {/* Header */}
-      <div className="bg-[#1a2744] text-white">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-white/70 text-sm">Welcome back</p>
-              <h1 className="text-2xl font-bold">{CLIENT_DATA.name}</h1>
-              <p className="text-white/70 text-sm mt-1">
-                Your advisor: {CLIENT_DATA.advisor}
-              </p>
-            </div>
-            <div className="flex items-center gap-4">
-              <Button variant="outline" className="border-white/30 text-white hover:bg-white/10">
-                <MessageCircle className="h-4 w-4 mr-2" />
-                Message Advisor
-              </Button>
-              <Button className="bg-[#D4A84C] text-[#1a2744] hover:bg-[#D4A84C]/90">
-                <Calendar className="h-4 w-4 mr-2" />
-                Book Meeting
-              </Button>
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-[#1a2744] to-[#2a3754] flex items-center justify-center p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-[#1a2744] to-[#2a3754] rounded-2xl flex items-center justify-center mb-4">
+            <Shield className="h-8 w-8 text-[#D4A84C]" />
           </div>
-          
-          {/* Quick Stats */}
-          <div className="grid grid-cols-4 gap-4 mt-8">
-            <div className="bg-white/10 backdrop-blur rounded-lg p-4">
-              <p className="text-white/70 text-sm">Net Worth</p>
-              <p className="text-2xl font-bold">{formatCurrency(CLIENT_DATA.netWorth)}</p>
-              <div className={`flex items-center text-sm mt-1 ${CLIENT_DATA.netWorthChangePercent >= 0 ? "text-green-400" : "text-red-400"}`}>
-                {CLIENT_DATA.netWorthChangePercent >= 0 ? (
-                  <ArrowUpRight className="h-4 w-4" />
-                ) : (
-                  <ArrowDownRight className="h-4 w-4" />
-                )}
-                <span>{CLIENT_DATA.netWorthChangePercent}% this month</span>
+          <CardTitle className="text-2xl">Client Portal</CardTitle>
+          <CardDescription>Access your wealth dashboard</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="your@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                data-testid="client-email-input"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  data-testid="client-password-input"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-2 top-1/2 -translate-y-1/2"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </Button>
               </div>
             </div>
-            
-            <div className="bg-white/10 backdrop-blur rounded-lg p-4">
-              <p className="text-white/70 text-sm">Retirement Readiness</p>
-              <p className="text-2xl font-bold">{CLIENT_DATA.retirementReadiness.score}/100</p>
-              <p className="text-sm text-white/70 mt-1">
-                {CLIENT_DATA.retirementReadiness.successProbability}% success probability
-              </p>
+            <Button 
+              type="submit" 
+              className="w-full bg-[#1a2744] hover:bg-[#2a3754]"
+              disabled={loading}
+              data-testid="client-login-btn"
+            >
+              {loading ? "Signing in..." : "Sign In"}
+            </Button>
+          </form>
+          <div className="mt-4 text-center text-sm text-muted-foreground">
+            <p>Demo credentials:</p>
+            <p className="font-mono text-xs">client_wheeler@email.com / wheeler2025</p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+// Client Portal Dashboard
+const ClientDashboard = ({ user, token, onLogout }) => {
+  const [dashboard, setDashboard] = useState(null);
+  const [portfolio, setPortfolio] = useState(null);
+  const [goals, setGoals] = useState(null);
+  const [documents, setDocuments] = useState(null);
+  const [netWorth, setNetWorth] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("overview");
+  const [messageSubject, setMessageSubject] = useState("");
+  const [messageContent, setMessageContent] = useState("");
+  const [sendingMessage, setSendingMessage] = useState(false);
+
+  useEffect(() => {
+    fetchDashboard();
+  }, []);
+
+  const fetchDashboard = async () => {
+    setLoading(true);
+    try {
+      const [dashRes, portfolioRes, goalsRes, docsRes, nwRes] = await Promise.all([
+        fetch(`${API_URL}/api/client-portal/dashboard?token=${token}`),
+        fetch(`${API_URL}/api/client-portal/portfolio?token=${token}`),
+        fetch(`${API_URL}/api/client-portal/goals?token=${token}`),
+        fetch(`${API_URL}/api/client-portal/documents?token=${token}`),
+        fetch(`${API_URL}/api/client-portal/net-worth?token=${token}`)
+      ]);
+      
+      if (dashRes.ok) setDashboard(await dashRes.json());
+      if (portfolioRes.ok) setPortfolio(await portfolioRes.json());
+      if (goalsRes.ok) setGoals(await goalsRes.json());
+      if (docsRes.ok) setDocuments(await docsRes.json());
+      if (nwRes.ok) setNetWorth(await nwRes.json());
+    } catch (error) {
+      toast.error("Failed to load dashboard data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const sendMessage = async (e) => {
+    e.preventDefault();
+    setSendingMessage(true);
+    try {
+      const response = await fetch(`${API_URL}/api/client-portal/messages/send?token=${token}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ subject: messageSubject, message: messageContent })
+      });
+      if (response.ok) {
+        toast.success("Message sent to your adviser");
+        setMessageSubject("");
+        setMessageContent("");
+      }
+    } catch (error) {
+      toast.error("Failed to send message");
+    } finally {
+      setSendingMessage(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin h-8 w-8 border-4 border-[#1a2744] border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-gradient-to-r from-[#1a2744] to-[#2a3754] text-white">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
+                <Shield className="h-6 w-6 text-[#D4A84C]" />
+              </div>
+              <div>
+                <h1 className="font-bold">Wealth Command</h1>
+                <p className="text-xs text-white/70">Client Portal</p>
+              </div>
             </div>
-            
-            <div className="bg-white/10 backdrop-blur rounded-lg p-4">
-              <p className="text-white/70 text-sm">Goal Progress</p>
-              <p className="text-2xl font-bold">{overallGoalProgress.toFixed(0)}%</p>
-              <Progress value={overallGoalProgress} className="mt-2 bg-white/20 h-2" />
-            </div>
-            
-            <div className="bg-white/10 backdrop-blur rounded-lg p-4">
-              <p className="text-white/70 text-sm">Next Review</p>
-              <p className="text-2xl font-bold">{new Date(CLIENT_DATA.nextReview).toLocaleDateString('en-AU', { month: 'short', day: 'numeric' })}</p>
-              <p className="text-sm text-white/70 mt-1">
-                {Math.ceil((new Date(CLIENT_DATA.nextReview) - new Date()) / (1000 * 60 * 60 * 24))} days away
-              </p>
+            <div className="flex items-center gap-4">
+              <div className="text-right">
+                <p className="font-medium">{user.name}</p>
+                <p className="text-xs text-white/70">{user.email}</p>
+              </div>
+              <Button variant="ghost" size="sm" onClick={onLogout} className="text-white hover:bg-white/10">
+                <LogOut className="h-4 w-4" />
+              </Button>
             </div>
           </div>
         </div>
-      </div>
+      </header>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <main className="max-w-7xl mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="mb-6">
-            <TabsTrigger value="overview">
-              <Home className="h-4 w-4 mr-2" />
-              Overview
-            </TabsTrigger>
-            <TabsTrigger value="wealth">
-              <TrendingUp className="h-4 w-4 mr-2" />
-              Wealth Trajectory
-            </TabsTrigger>
-            <TabsTrigger value="goals">
-              <Target className="h-4 w-4 mr-2" />
-              Goals
-            </TabsTrigger>
-            <TabsTrigger value="documents">
-              <FileText className="h-4 w-4 mr-2" />
-              Documents
-            </TabsTrigger>
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="portfolio">Portfolio</TabsTrigger>
+            <TabsTrigger value="goals">Goals</TabsTrigger>
+            <TabsTrigger value="documents">Documents</TabsTrigger>
+            <TabsTrigger value="contact">Contact Adviser</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Wealth Chart */}
-              <Card className="lg:col-span-2">
-                <CardHeader>
-                  <CardTitle>Your Wealth Trajectory</CardTitle>
-                  <CardDescription>Net worth over the last 6 months</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[250px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={CLIENT_DATA.wealthHistory}>
-                        <defs>
-                          <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#D4A84C" stopOpacity={0.3}/>
-                            <stop offset="95%" stopColor="#D4A84C" stopOpacity={0}/>
-                          </linearGradient>
-                        </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-                        <XAxis dataKey="month" />
-                        <YAxis tickFormatter={(value) => formatCurrency(value)} />
-                        <Tooltip formatter={(value) => formatCurrency(value)} />
-                        <Area 
-                          type="monotone" 
-                          dataKey="value" 
-                          stroke="#D4A84C" 
-                          fillOpacity={1} 
-                          fill="url(#colorValue)" 
-                          strokeWidth={2}
-                        />
-                      </AreaChart>
-                    </ResponsiveContainer>
+            {/* Portfolio Summary */}
+            <div className="grid md:grid-cols-3 gap-4">
+              <Card className="bg-gradient-to-br from-[#1a2744] to-[#2a3754] text-white">
+                <CardContent className="pt-6">
+                  <p className="text-white/70 text-sm">Portfolio Value</p>
+                  <p className="text-3xl font-bold">{formatCurrency(dashboard?.portfolio_summary?.total_value || 0)}</p>
+                  <div className={`flex items-center gap-1 mt-2 text-sm ${dashboard?.portfolio_summary?.change_24h >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    {dashboard?.portfolio_summary?.change_24h >= 0 ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}
+                    <span>{formatCurrency(Math.abs(dashboard?.portfolio_summary?.change_24h || 0))} today</span>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Retirement Readiness */}
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Shield className="h-5 w-5 text-[#D4A84C]" />
-                    Retirement Readiness
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="text-center">
-                    <div className="relative w-32 h-32 mx-auto">
-                      <svg className="w-full h-full transform -rotate-90">
-                        <circle
-                          cx="64"
-                          cy="64"
-                          r="56"
-                          fill="none"
-                          stroke="#e5e7eb"
-                          strokeWidth="12"
-                        />
-                        <circle
-                          cx="64"
-                          cy="64"
-                          r="56"
-                          fill="none"
-                          stroke={CLIENT_DATA.retirementReadiness.score >= 70 ? "#22c55e" : CLIENT_DATA.retirementReadiness.score >= 50 ? "#eab308" : "#ef4444"}
-                          strokeWidth="12"
-                          strokeDasharray={`${CLIENT_DATA.retirementReadiness.score * 3.52} 352`}
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-3xl font-bold">{CLIENT_DATA.retirementReadiness.score}</span>
-                      </div>
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      {CLIENT_DATA.retirementReadiness.score >= 70 ? "On Track" : CLIENT_DATA.retirementReadiness.score >= 50 ? "Needs Attention" : "At Risk"}
-                    </p>
-                  </div>
-                  
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Target Age</span>
-                      <span className="font-medium">{CLIENT_DATA.retirementReadiness.targetAge}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Projected Wealth</span>
-                      <span className="font-medium">{formatCurrency(CLIENT_DATA.retirementReadiness.projectedWealth)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Monthly Income</span>
-                      <span className="font-medium">{formatCurrency(CLIENT_DATA.retirementReadiness.monthlyIncomeAtRetirement)}</span>
-                    </div>
-                  </div>
+                <CardContent className="pt-6">
+                  <p className="text-muted-foreground text-sm">YTD Return</p>
+                  <p className="text-3xl font-bold text-green-600">+{dashboard?.portfolio_summary?.change_ytd_percent?.toFixed(2) || 0}%</p>
+                  <p className="text-sm text-muted-foreground mt-2">{formatCurrency(dashboard?.portfolio_summary?.change_ytd || 0)}</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="pt-6">
+                  <p className="text-muted-foreground text-sm">Unread Messages</p>
+                  <p className="text-3xl font-bold text-[#1a2744]">{dashboard?.unread_messages || 0}</p>
+                  <Button variant="link" className="p-0 h-auto text-sm" onClick={() => setActiveTab("contact")}>
+                    View messages <ChevronRight className="h-4 w-4" />
+                  </Button>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Goals Summary & Upcoming */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Goals */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Your Goals</CardTitle>
-                  <CardDescription>Track your progress towards financial goals</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {CLIENT_DATA.goals.map((goal, index) => {
-                    const progress = (goal.current / goal.target) * 100;
-                    return (
-                      <div key={index} className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <span className="font-medium">{goal.name}</span>
-                          <span className="text-sm text-muted-foreground">
-                            {formatCurrency(goal.current)} / {formatCurrency(goal.target)}
-                          </span>
-                        </div>
-                        <Progress value={progress} className="h-2" />
-                        <div className="flex justify-between text-xs text-muted-foreground">
-                          <span>{progress.toFixed(0)}% complete</span>
-                          <Badge variant="outline" className="text-xs">{goal.priority} priority</Badge>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </CardContent>
-              </Card>
-
-              {/* Upcoming & Activity */}
-              <div className="space-y-6">
-                {/* Upcoming Events */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Upcoming</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {CLIENT_DATA.upcomingEvents.map((event, index) => (
-                      <div key={index} className="flex items-center gap-3 p-2 bg-muted/50 rounded-lg">
-                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                          event.type === "meeting" ? "bg-blue-100" :
-                          event.type === "tax" ? "bg-green-100" : "bg-purple-100"
-                        }`}>
-                          {event.type === "meeting" ? (
-                            <Calendar className="h-5 w-5 text-blue-600" />
-                          ) : event.type === "tax" ? (
-                            <DollarSign className="h-5 w-5 text-green-600" />
-                          ) : (
-                            <Clock className="h-5 w-5 text-purple-600" />
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <p className="font-medium text-sm">{event.title}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {new Date(event.date).toLocaleDateString('en-AU', { month: 'short', day: 'numeric', year: 'numeric' })}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
-
-                {/* Recent Activity */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Recent Activity</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {CLIENT_DATA.recentActivity.map((activity, index) => (
-                      <div key={index} className="flex items-center gap-3">
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                        <div className="flex-1">
-                          <p className="text-sm">{activity.action}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {new Date(activity.date).toLocaleDateString('en-AU', { month: 'short', day: 'numeric' })}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </TabsContent>
-
-          {/* Wealth Tab */}
-          <TabsContent value="wealth">
+            {/* Net Worth Summary */}
             <Card>
               <CardHeader>
-                <CardTitle>Wealth Trajectory Analysis</CardTitle>
-                <CardDescription>Your financial journey over time</CardDescription>
+                <CardTitle className="flex items-center gap-2">
+                  <Wallet className="h-5 w-5 text-[#D4A84C]" />
+                  Net Worth Summary
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-[400px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={CLIENT_DATA.wealthHistory}>
-                      <defs>
-                        <linearGradient id="colorValue2" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#D4A84C" stopOpacity={0.3}/>
-                          <stop offset="95%" stopColor="#D4A84C" stopOpacity={0}/>
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-                      <XAxis dataKey="month" />
-                      <YAxis tickFormatter={(value) => formatCurrency(value)} />
-                      <Tooltip formatter={(value) => formatCurrency(value)} />
-                      <Area 
-                        type="monotone" 
-                        dataKey="value" 
-                        stroke="#D4A84C" 
-                        fillOpacity={1} 
-                        fill="url(#colorValue2)" 
-                        strokeWidth={2}
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
+                <div className="grid md:grid-cols-4 gap-4">
+                  <div className="p-4 bg-green-50 rounded-lg">
+                    <p className="text-sm text-green-600">Total Assets</p>
+                    <p className="text-2xl font-bold text-green-700">{formatCurrency(netWorth?.summary?.total_assets || 0)}</p>
+                  </div>
+                  <div className="p-4 bg-red-50 rounded-lg">
+                    <p className="text-sm text-red-600">Total Liabilities</p>
+                    <p className="text-2xl font-bold text-red-700">{formatCurrency(netWorth?.summary?.total_liabilities || 0)}</p>
+                  </div>
+                  <div className="p-4 bg-[#1a2744] rounded-lg text-white">
+                    <p className="text-sm text-white/70">Net Worth</p>
+                    <p className="text-2xl font-bold">{formatCurrency(netWorth?.summary?.net_worth || 0)}</p>
+                  </div>
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <p className="text-sm text-muted-foreground">Change (MTD)</p>
+                    <p className="text-2xl font-bold text-green-600">+{formatCurrency(netWorth?.change_from_last_month?.amount || 0)}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Upcoming Appointments */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-[#D4A84C]" />
+                  Upcoming Appointments
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {dashboard?.upcoming_appointments?.length > 0 ? (
+                  <div className="space-y-3">
+                    {dashboard.upcoming_appointments.map((apt) => (
+                      <div key={apt.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div>
+                          <p className="font-medium">{apt.title}</p>
+                          <p className="text-sm text-muted-foreground">{apt.date} at {apt.time}</p>
+                        </div>
+                        <Badge>{apt.type}</Badge>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground">No upcoming appointments</p>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Portfolio Tab */}
+          <TabsContent value="portfolio" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <PieChart className="h-5 w-5 text-[#D4A84C]" />
+                  Asset Allocation
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {portfolio?.holdings?.map((holding, i) => (
+                    <div key={i} className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-3 h-3 rounded-full" style={{ 
+                          backgroundColor: ['#1a2744', '#D4A84C', '#4A90D9', '#50C878', '#9B59B6'][i % 5] 
+                        }}></div>
+                        <span>{holding.asset}</span>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <span className="font-medium">{formatCurrency(holding.value)}</span>
+                        <Badge variant="outline">{holding.allocation}%</Badge>
+                        <span className={holding.return_ytd >= 0 ? 'text-green-600' : 'text-red-600'}>
+                          {holding.return_ytd >= 0 ? '+' : ''}{holding.return_ytd}%
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <LineChart className="h-5 w-5 text-[#D4A84C]" />
+                  Performance
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-4 gap-4">
+                  <div className="p-4 bg-gray-50 rounded-lg text-center">
+                    <p className="text-sm text-muted-foreground">Total Value</p>
+                    <p className="text-xl font-bold">{formatCurrency(portfolio?.performance?.total_value || 0)}</p>
+                  </div>
+                  <div className="p-4 bg-green-50 rounded-lg text-center">
+                    <p className="text-sm text-green-600">YTD Return</p>
+                    <p className="text-xl font-bold text-green-700">+{portfolio?.performance?.total_return_ytd_percent?.toFixed(2) || 0}%</p>
+                  </div>
+                  <div className="p-4 bg-blue-50 rounded-lg text-center">
+                    <p className="text-sm text-blue-600">Benchmark</p>
+                    <p className="text-xl font-bold text-blue-700">{portfolio?.performance?.benchmark_return_ytd?.toFixed(2) || 0}%</p>
+                  </div>
+                  <div className="p-4 bg-purple-50 rounded-lg text-center">
+                    <p className="text-sm text-purple-600">Outperformance</p>
+                    <p className="text-xl font-bold text-purple-700">+{portfolio?.performance?.outperformance?.toFixed(2) || 0}%</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
 
           {/* Goals Tab */}
-          <TabsContent value="goals">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {CLIENT_DATA.goals.map((goal, index) => {
-                const progress = (goal.current / goal.target) * 100;
-                return (
-                  <Card key={index}>
-                    <CardHeader>
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <CardTitle>{goal.name}</CardTitle>
-                          <CardDescription>{goal.category}</CardDescription>
-                        </div>
-                        <Badge variant={goal.priority === "high" ? "destructive" : "secondary"}>
-                          {goal.priority}
-                        </Badge>
+          <TabsContent value="goals" className="space-y-6">
+            {goals?.goals?.map((goal) => (
+              <Card key={goal.id}>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="flex items-center gap-2">
+                      <Target className="h-5 w-5 text-[#D4A84C]" />
+                      {goal.name}
+                    </CardTitle>
+                    <Badge variant={goal.status === "on_track" ? "default" : "destructive"}>
+                      {goal.status === "on_track" ? "On Track" : "Needs Attention"}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <Progress value={goal.progress} className="h-3" />
+                    <div className="grid md:grid-cols-4 gap-4 text-center">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Current</p>
+                        <p className="font-bold">{formatCurrency(goal.current_amount)}</p>
                       </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        <div className="text-center">
-                          <p className="text-3xl font-bold">{progress.toFixed(0)}%</p>
-                          <p className="text-sm text-muted-foreground">complete</p>
-                        </div>
-                        <Progress value={progress} className="h-3" />
-                        <div className="flex justify-between text-sm">
-                          <div>
-                            <p className="text-muted-foreground">Current</p>
-                            <p className="font-medium">{formatCurrency(goal.current)}</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-muted-foreground">Target</p>
-                            <p className="font-medium">{formatCurrency(goal.target)}</p>
-                          </div>
-                        </div>
-                        <div className="text-center text-sm text-muted-foreground">
-                          {formatCurrency(goal.target - goal.current)} remaining
-                        </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Target</p>
+                        <p className="font-bold">{formatCurrency(goal.target_amount)}</p>
                       </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Monthly Contribution</p>
+                        <p className="font-bold">{formatCurrency(goal.monthly_contribution)}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Projected Outcome</p>
+                        <p className="font-bold text-green-600">{formatCurrency(goal.projected_outcome)}</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </TabsContent>
 
           {/* Documents Tab */}
           <TabsContent value="documents">
             <Card>
               <CardHeader>
-                <CardTitle>Your Documents</CardTitle>
-                <CardDescription>Access your financial documents securely</CardDescription>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-[#D4A84C]" />
+                  Your Documents
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  {[
-                    { name: "Financial Plan 2025", type: "PDF", date: "Dec 15, 2025" },
-                    { name: "Statement of Advice - Super Strategy", type: "PDF", date: "Nov 28, 2025" },
-                    { name: "Annual Review Summary", type: "PDF", date: "Nov 28, 2025" },
-                    { name: "Insurance Schedule", type: "PDF", date: "Oct 15, 2025" }
-                  ].map((doc, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 cursor-pointer">
-                      <div className="flex items-center gap-3">
-                        <FileText className="h-8 w-8 text-red-500" />
-                        <div>
-                          <p className="font-medium">{doc.name}</p>
-                          <p className="text-sm text-muted-foreground">{doc.type} • {doc.date}</p>
+                <ScrollArea className="h-[400px]">
+                  <div className="space-y-2">
+                    {documents?.documents?.map((doc) => (
+                      <div key={doc.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer">
+                        <div className="flex items-center gap-3">
+                          <FileText className="h-5 w-5 text-[#1a2744]" />
+                          <div>
+                            <p className="font-medium">{doc.name}</p>
+                            <p className="text-xs text-muted-foreground">{doc.date} • {doc.size}</p>
+                          </div>
                         </div>
+                        <Badge variant="outline">{doc.category}</Badge>
                       </div>
-                      <Button variant="ghost" size="sm">
-                        Download
-                      </Button>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Contact Adviser Tab */}
+          <TabsContent value="contact">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageSquare className="h-5 w-5 text-[#D4A84C]" />
+                  Message Your Adviser
+                </CardTitle>
+                <CardDescription>Send a secure message to your financial adviser</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={sendMessage} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="subject">Subject</Label>
+                    <Input
+                      id="subject"
+                      placeholder="What's this about?"
+                      value={messageSubject}
+                      onChange={(e) => setMessageSubject(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="message">Message</Label>
+                    <Textarea
+                      id="message"
+                      placeholder="Type your message here..."
+                      rows={6}
+                      value={messageContent}
+                      onChange={(e) => setMessageContent(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <Button type="submit" disabled={sendingMessage} className="bg-[#1a2744] hover:bg-[#2a3754]">
+                    <Send className="h-4 w-4 mr-2" />
+                    {sendingMessage ? "Sending..." : "Send Message"}
+                  </Button>
+                </form>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
-      </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-white border-t mt-8 py-4">
+        <div className="max-w-7xl mx-auto px-4 text-center text-xs text-muted-foreground">
+          <p>© {new Date().getFullYear()} Wealth Command. General information only - not financial advice.</p>
+          <p className="mt-1">Consult a licensed financial adviser (AFSL) for personal advice.</p>
+        </div>
+      </footer>
     </div>
   );
+};
+
+// Main Client Portal Component
+const ClientPortal = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+
+  useEffect(() => {
+    // Check for existing session
+    const savedToken = localStorage.getItem("client_portal_token");
+    const savedUser = localStorage.getItem("client_portal_user");
+    
+    if (savedToken && savedUser) {
+      setToken(savedToken);
+      setUser(JSON.parse(savedUser));
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  const handleLogin = (data) => {
+    setToken(data.token);
+    setUser(data.user);
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("client_portal_token");
+    localStorage.removeItem("client_portal_user");
+    setToken(null);
+    setUser(null);
+    setIsAuthenticated(false);
+    toast.success("Logged out successfully");
+  };
+
+  if (!isAuthenticated) {
+    return <ClientLogin onLogin={handleLogin} />;
+  }
+
+  return <ClientDashboard user={user} token={token} onLogout={handleLogout} />;
 };
 
 export default ClientPortal;
