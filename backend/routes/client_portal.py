@@ -1,439 +1,277 @@
 """
-Client Portal Authentication & Features
-Separate authentication and features for client-facing portal.
+Client Portal API - Client-Facing Experience Layer
+Provides secure endpoints for clients to view their financial data.
 """
 from fastapi import APIRouter, HTTPException, Depends
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Dict, List, Optional, Any
 from datetime import datetime, timezone, timedelta
+from enum import Enum
 import uuid
-import hashlib
 import logging
-import jwt
-import os
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/client-portal", tags=["Client Portal"])
 
-# JWT settings for client portal (separate from adviser)
-CLIENT_JWT_SECRET = os.environ.get("JWT_SECRET", "halcyon_client_portal_secret_key_2025")
-CLIENT_JWT_ALGORITHM = "HS256"
-CLIENT_JWT_EXPIRY_HOURS = 24
 
-# In-memory storage for demo
-CLIENT_USERS: Dict[str, Dict] = {
-    "client_wheeler@email.com": {
-        "id": "cuser_001",
-        "email": "client_wheeler@email.com",
-        "password_hash": hashlib.sha256("wheeler2025".encode()).hexdigest(),
+class GoalStatus(str, Enum):
+    ON_TRACK = "on_track"
+    AT_RISK = "at_risk"
+    OFF_TRACK = "off_track"
+    ACHIEVED = "achieved"
+
+
+class NotificationType(str, Enum):
+    INFO = "info"
+    ACTION_REQUIRED = "action_required"
+    MILESTONE = "milestone"
+    ALERT = "alert"
+
+
+# Demo client portal data
+PORTAL_CLIENTS = {
+    "portal_001": {
+        "client_id": "portal_001",
         "name": "James Wheeler",
-        "linked_client_id": "client_1",
-        "adviser_id": "adviser_001",
-        "created_at": "2024-01-15T00:00:00Z",
-        "last_login": None,
-        "portal_access": True,
-        "permissions": ["view_portfolio", "view_documents", "view_goals", "message_adviser"]
-    },
-    "client_chen@email.com": {
-        "id": "cuser_002",
-        "email": "client_chen@email.com",
-        "password_hash": hashlib.sha256("chen2025".encode()).hexdigest(),
-        "name": "Michael Chen",
-        "linked_client_id": "client_2",
-        "adviser_id": "adviser_001",
-        "created_at": "2024-02-20T00:00:00Z",
-        "last_login": None,
-        "portal_access": True,
-        "permissions": ["view_portfolio", "view_documents", "view_goals", "message_adviser"]
+        "email": "james.wheeler@email.com",
+        "household_name": "Wheeler Family",
+        "advisor_name": "Sarah Chen",
+        "advisor_email": "sarah.chen@wealthcommand.io",
+        "relationship_start": "2019-03-15",
+        "net_worth": {
+            "total": 2920000,
+            "change_30d": 45000,
+            "change_pct_30d": 1.56,
+            "breakdown": {
+                "investments": 2450000,
+                "property": 850000,
+                "superannuation": 680000,
+                "cash": 145000,
+                "other_assets": 95000,
+                "liabilities": -1300000
+            }
+        },
+        "portfolios": [
+            {
+                "portfolio_id": "pf_001",
+                "name": "Growth Portfolio",
+                "value": 1850000,
+                "change_ytd": 12.4,
+                "risk_profile": "Growth",
+                "holdings": [
+                    {"symbol": "AAPL", "name": "Apple Inc", "shares": 500, "value": 91000, "change_1d": 1.2},
+                    {"symbol": "MSFT", "name": "Microsoft Corp", "shares": 300, "value": 118500, "change_1d": 0.8},
+                    {"symbol": "NVDA", "name": "NVIDIA Corp", "shares": 150, "value": 180000, "change_1d": 2.1},
+                    {"symbol": "VGS", "name": "Vanguard Intl Shares", "units": 2000, "value": 180000, "change_1d": 0.5},
+                    {"symbol": "VAS", "name": "Vanguard Aus Shares", "units": 3000, "value": 285000, "change_1d": 0.3},
+                ],
+                "allocation": {"us_equities": 45, "intl_equities": 25, "aus_equities": 20, "fixed_income": 5, "cash": 5}
+            },
+            {
+                "portfolio_id": "pf_002",
+                "name": "Superannuation",
+                "value": 680000,
+                "change_ytd": 9.8,
+                "risk_profile": "Balanced",
+                "holdings": [
+                    {"symbol": "VDHG", "name": "Vanguard Diversified High Growth", "units": 5000, "value": 340000, "change_1d": 0.4},
+                    {"symbol": "IVV", "name": "iShares S&P 500", "units": 500, "value": 280000, "change_1d": 0.6},
+                ],
+                "allocation": {"growth": 70, "defensive": 30}
+            }
+        ],
+        "goals": [
+            {
+                "goal_id": "goal_001",
+                "name": "Retirement at 60",
+                "target_amount": 3500000,
+                "current_amount": 2530000,
+                "target_date": "2039-06-30",
+                "progress_pct": 72.3,
+                "status": GoalStatus.ON_TRACK,
+                "monthly_contribution": 5000,
+                "projected_amount": 3850000,
+                "confidence": 85
+            },
+            {
+                "goal_id": "goal_002",
+                "name": "Children's Education Fund",
+                "target_amount": 200000,
+                "current_amount": 125000,
+                "target_date": "2030-01-01",
+                "progress_pct": 62.5,
+                "status": GoalStatus.ON_TRACK,
+                "monthly_contribution": 1500,
+                "projected_amount": 215000,
+                "confidence": 90
+            },
+            {
+                "goal_id": "goal_003",
+                "name": "Investment Property",
+                "target_amount": 150000,
+                "current_amount": 85000,
+                "target_date": "2026-12-31",
+                "progress_pct": 56.7,
+                "status": GoalStatus.AT_RISK,
+                "monthly_contribution": 2000,
+                "projected_amount": 133000,
+                "confidence": 65
+            }
+        ],
+        "insights": [
+            {"insight_id": "ins_001", "type": "performance", "title": "Strong Quarter", "message": "Your portfolio outperformed the benchmark by 2.3% this quarter.", "date": "2025-12-01"},
+            {"insight_id": "ins_002", "type": "opportunity", "title": "Tax-Loss Harvesting Available", "message": "There's an opportunity to save approximately $2,400 in taxes through strategic selling.", "date": "2025-12-10"},
+            {"insight_id": "ins_003", "type": "milestone", "title": "Goal Progress", "message": "Your retirement fund has crossed $2.5M! You're 72% towards your goal.", "date": "2025-12-15"}
+        ],
+        "notifications": [
+            {"notification_id": "notif_001", "type": NotificationType.ACTION_REQUIRED, "title": "Document Signature Required", "message": "Please review and sign the updated Fee Disclosure Statement.", "action_url": "/documents/sign/fds_2025", "created_at": "2025-12-16T10:00:00Z", "read": False},
+            {"notification_id": "notif_002", "type": NotificationType.MILESTONE, "title": "Annual Review Scheduled", "message": "Your annual review meeting is scheduled for January 15, 2026 at 2:00 PM.", "created_at": "2025-12-14T14:30:00Z", "read": True}
+        ],
+        "documents": [
+            {"doc_id": "doc_001", "name": "Statement of Advice 2025", "type": "SOA", "date": "2025-06-15", "status": "signed"},
+            {"doc_id": "doc_002", "name": "Fee Disclosure Statement", "type": "FDS", "date": "2025-12-01", "status": "pending_signature"},
+            {"doc_id": "doc_003", "name": "Q3 2025 Portfolio Report", "type": "Report", "date": "2025-10-01", "status": "available"},
+        ],
+        "upcoming_meetings": [{"meeting_id": "meet_001", "type": "Annual Review", "date": "2026-01-15T14:00:00Z", "duration_minutes": 60, "location": "Video Call", "agenda": ["Portfolio performance review", "Goal progress assessment", "Strategy adjustments for 2026"]}],
+        "recent_activity": [
+            {"date": "2025-12-16", "activity": "Dividend received", "details": "AAPL dividend: $245.00"},
+            {"date": "2025-12-14", "activity": "Document uploaded", "details": "Q3 Portfolio Report available"},
+            {"date": "2025-12-10", "activity": "Portfolio rebalanced", "details": "Quarterly rebalancing completed"},
+        ]
     }
 }
 
-CLIENT_SESSIONS: Dict[str, Dict] = {}
 
-
-class ClientLoginRequest(BaseModel):
-    email: str
-    password: str
-
-
-class ClientRegisterRequest(BaseModel):
-    email: str
-    password: str
-    name: str
-    linked_client_id: str
-    adviser_id: str
-
-
-class MessageRequest(BaseModel):
-    subject: str
-    message: str
-
-
-# In-memory messages
-MESSAGES: List[Dict] = []
-
-
-def hash_password(password: str) -> str:
-    return hashlib.sha256(password.encode()).hexdigest()
-
-
-def create_client_token(user_id: str, email: str, client_id: str) -> str:
-    payload = {
-        "sub": user_id,
-        "email": email,
-        "client_id": client_id,
-        "type": "client_portal",
-        "exp": datetime.now(timezone.utc) + timedelta(hours=CLIENT_JWT_EXPIRY_HOURS),
-        "iat": datetime.now(timezone.utc)
-    }
-    return jwt.encode(payload, CLIENT_JWT_SECRET, algorithm=CLIENT_JWT_ALGORITHM)
-
-
-def verify_client_token(token: str) -> Dict:
-    try:
-        payload = jwt.decode(token, CLIENT_JWT_SECRET, algorithms=[CLIENT_JWT_ALGORITHM])
-        if payload.get("type") != "client_portal":
-            raise HTTPException(status_code=401, detail="Invalid token type")
-        return payload
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token expired")
-    except jwt.InvalidTokenError:
-        raise HTTPException(status_code=401, detail="Invalid token")
-
-
-@router.post("/auth/login")
-async def client_login(request: ClientLoginRequest):
-    """Login for client portal users."""
-    user = CLIENT_USERS.get(request.email)
+@router.get("/dashboard/{client_id}")
+async def get_client_dashboard(client_id: str):
+    """Get complete client dashboard data."""
+    client = PORTAL_CLIENTS.get(client_id) or PORTAL_CLIENTS.get("portal_001")
+    client = {**client, "client_id": client_id}
     
-    if not user:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
-    
-    if user["password_hash"] != hash_password(request.password):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
-    
-    if not user.get("portal_access", False):
-        raise HTTPException(status_code=403, detail="Portal access disabled")
-    
-    # Update last login
-    user["last_login"] = datetime.now(timezone.utc).isoformat()
-    
-    # Create token
-    token = create_client_token(user["id"], user["email"], user["linked_client_id"])
-    
-    return {
-        "success": True,
-        "token": token,
-        "user": {
-            "id": user["id"],
-            "email": user["email"],
-            "name": user["name"],
-            "linked_client_id": user["linked_client_id"],
-            "permissions": user["permissions"]
-        },
-        "expires_in": CLIENT_JWT_EXPIRY_HOURS * 3600
-    }
-
-
-@router.post("/auth/register")
-async def client_register(request: ClientRegisterRequest):
-    """Register new client portal user (typically initiated by adviser)."""
-    if request.email in CLIENT_USERS:
-        raise HTTPException(status_code=400, detail="Email already registered")
-    
-    user_id = f"cuser_{uuid.uuid4().hex[:8]}"
-    
-    CLIENT_USERS[request.email] = {
-        "id": user_id,
-        "email": request.email,
-        "password_hash": hash_password(request.password),
-        "name": request.name,
-        "linked_client_id": request.linked_client_id,
-        "adviser_id": request.adviser_id,
-        "created_at": datetime.now(timezone.utc).isoformat(),
-        "last_login": None,
-        "portal_access": True,
-        "permissions": ["view_portfolio", "view_documents", "view_goals", "message_adviser"]
-    }
-    
-    return {
-        "success": True,
-        "user_id": user_id,
-        "message": "Client portal access created successfully"
-    }
-
-
-@router.get("/dashboard")
-async def get_client_dashboard(token: str):
-    """Get client dashboard data."""
-    payload = verify_client_token(token)
-    client_id = payload.get("client_id")
-    
-    # Mock portfolio summary
-    portfolio_summary = {
-        "total_value": 2920000,
-        "change_24h": 12500,
-        "change_24h_percent": 0.43,
-        "change_ytd": 185000,
-        "change_ytd_percent": 6.76
-    }
-    
-    # Mock goals
-    goals = [
-        {"name": "Retirement at 65", "progress": 72, "target": 3500000, "current": 2520000},
-        {"name": "Children's Education", "progress": 45, "target": 200000, "current": 90000}
-    ]
-    
-    # Upcoming appointments
-    appointments = [
-        {
-            "id": "apt_001",
-            "title": "Quarterly Review",
-            "date": (datetime.now() + timedelta(days=14)).strftime("%Y-%m-%d"),
-            "time": "10:00",
-            "type": "video"
-        }
-    ]
-    
-    # Recent documents
-    documents = [
-        {"id": "doc_001", "name": "Statement of Advice - Q4 2024", "date": "2024-12-15", "type": "pdf"},
-        {"id": "doc_002", "name": "Portfolio Report - December 2024", "date": "2024-12-31", "type": "pdf"},
-        {"id": "doc_003", "name": "Tax Summary - FY2024", "date": "2024-07-15", "type": "pdf"}
-    ]
+    goals_on_track = len([g for g in client["goals"] if g["status"] in [GoalStatus.ON_TRACK, GoalStatus.ACHIEVED]])
+    unread = len([n for n in client["notifications"] if not n.get("read", False)])
     
     return {
         "client_id": client_id,
-        "portfolio_summary": portfolio_summary,
-        "goals": goals,
-        "upcoming_appointments": appointments,
-        "recent_documents": documents,
-        "unread_messages": len([m for m in MESSAGES if m.get("client_id") == client_id and not m.get("read")]),
-        "last_updated": datetime.now(timezone.utc).isoformat()
-    }
-
-
-@router.get("/portfolio")
-async def get_client_portfolio(token: str):
-    """Get detailed portfolio view for client."""
-    payload = verify_client_token(token)
-    client_id = payload.get("client_id")
-    
-    holdings = [
-        {"asset": "Australian Shares", "value": 1022000, "allocation": 35, "return_ytd": 8.2},
-        {"asset": "International Shares", "value": 730000, "allocation": 25, "return_ytd": 12.5},
-        {"asset": "Bonds & Fixed Income", "value": 584000, "allocation": 20, "return_ytd": 3.1},
-        {"asset": "Property", "value": 438000, "allocation": 15, "return_ytd": 5.8},
-        {"asset": "Cash", "value": 146000, "allocation": 5, "return_ytd": 4.2}
-    ]
-    
-    performance = {
-        "total_value": 2920000,
-        "total_return_ytd": 185000,
-        "total_return_ytd_percent": 6.76,
-        "total_return_inception": 520000,
-        "total_return_inception_percent": 21.67,
-        "benchmark_return_ytd": 5.8,
-        "outperformance": 0.96
-    }
-    
-    return {
-        "client_id": client_id,
-        "holdings": holdings,
-        "performance": performance,
-        "last_updated": datetime.now(timezone.utc).isoformat()
-    }
-
-
-@router.get("/goals")
-async def get_client_goals(token: str):
-    """Get client goals and progress."""
-    payload = verify_client_token(token)
-    client_id = payload.get("client_id")
-    
-    goals = [
-        {
-            "id": "goal_001",
-            "name": "Retirement at 65",
-            "target_amount": 3500000,
-            "current_amount": 2520000,
-            "progress": 72,
-            "target_date": "2045-01-01",
-            "status": "on_track",
-            "monthly_contribution": 3500,
-            "projected_outcome": 3850000
-        },
-        {
-            "id": "goal_002",
-            "name": "Children's Education Fund",
-            "target_amount": 200000,
-            "current_amount": 90000,
-            "progress": 45,
-            "target_date": "2032-01-01",
-            "status": "on_track",
-            "monthly_contribution": 800,
-            "projected_outcome": 215000
-        }
-    ]
-    
-    return {
-        "client_id": client_id,
-        "goals": goals,
-        "last_updated": datetime.now(timezone.utc).isoformat()
-    }
-
-
-@router.get("/documents")
-async def get_client_documents(token: str, category: Optional[str] = None):
-    """Get client documents."""
-    payload = verify_client_token(token)
-    client_id = payload.get("client_id")
-    
-    documents = [
-        {"id": "doc_001", "name": "Statement of Advice - Q4 2024", "date": "2024-12-15", "type": "pdf", "category": "advice", "size": "2.3 MB"},
-        {"id": "doc_002", "name": "Portfolio Report - December 2024", "date": "2024-12-31", "type": "pdf", "category": "reports", "size": "1.8 MB"},
-        {"id": "doc_003", "name": "Tax Summary - FY2024", "date": "2024-07-15", "type": "pdf", "category": "tax", "size": "456 KB"},
-        {"id": "doc_004", "name": "Insurance Policy Schedule", "date": "2024-06-01", "type": "pdf", "category": "insurance", "size": "890 KB"},
-        {"id": "doc_005", "name": "Fee Disclosure Statement", "date": "2024-01-15", "type": "pdf", "category": "compliance", "size": "234 KB"},
-    ]
-    
-    if category:
-        documents = [d for d in documents if d["category"] == category]
-    
-    return {
-        "client_id": client_id,
-        "documents": documents,
-        "categories": ["advice", "reports", "tax", "insurance", "compliance"]
-    }
-
-
-@router.post("/messages/send")
-async def send_message_to_adviser(token: str, request: MessageRequest):
-    """Send a message to the adviser."""
-    payload = verify_client_token(token)
-    client_id = payload.get("client_id")
-    user_email = payload.get("email")
-    
-    message = {
-        "id": f"msg_{uuid.uuid4().hex[:8]}",
-        "client_id": client_id,
-        "from": user_email,
-        "to": "adviser",
-        "subject": request.subject,
-        "message": request.message,
-        "sent_at": datetime.now(timezone.utc).isoformat(),
-        "read": False,
-        "type": "client_to_adviser"
-    }
-    
-    MESSAGES.append(message)
-    
-    return {
-        "success": True,
-        "message_id": message["id"],
-        "sent_at": message["sent_at"]
-    }
-
-
-@router.get("/messages")
-async def get_messages(token: str, limit: int = 20):
-    """Get client messages."""
-    payload = verify_client_token(token)
-    client_id = payload.get("client_id")
-    
-    client_messages = [m for m in MESSAGES if m.get("client_id") == client_id]
-    client_messages.sort(key=lambda x: x.get("sent_at", ""), reverse=True)
-    
-    return {
-        "messages": client_messages[:limit],
-        "unread": len([m for m in client_messages if not m.get("read") and m.get("type") == "adviser_to_client"])
-    }
-
-
-@router.get("/net-worth")
-async def get_net_worth(token: str):
-    """Get comprehensive net worth view."""
-    payload = verify_client_token(token)
-    client_id = payload.get("client_id")
-    
-    assets = {
-        "investments": {
-            "shares": 1752000,
-            "managed_funds": 584000,
-            "etfs": 438000,
-            "cash_investments": 146000,
-            "subtotal": 2920000
-        },
-        "superannuation": {
-            "personal_super": 580000,
-            "spouse_super": 320000,
-            "subtotal": 900000
-        },
-        "property": {
-            "family_home": 1850000,
-            "investment_property": 720000,
-            "subtotal": 2570000
-        },
-        "other_assets": {
-            "vehicles": 85000,
-            "collectibles": 25000,
-            "subtotal": 110000
-        }
-    }
-    
-    liabilities = {
-        "mortgage_family_home": 450000,
-        "mortgage_investment": 380000,
-        "car_loan": 15000,
-        "credit_cards": 5000,
-        "total": 850000
-    }
-    
-    total_assets = sum(cat["subtotal"] for cat in assets.values())
-    net_worth = total_assets - liabilities["total"]
-    
-    return {
-        "client_id": client_id,
-        "assets": assets,
-        "liabilities": liabilities,
+        "name": client["name"],
+        "household": client["household_name"],
+        "advisor": {"name": client["advisor_name"], "email": client["advisor_email"]},
         "summary": {
-            "total_assets": total_assets,
-            "total_liabilities": liabilities["total"],
-            "net_worth": net_worth
+            "net_worth": client["net_worth"]["total"],
+            "net_worth_change_30d": client["net_worth"]["change_30d"],
+            "net_worth_change_pct": client["net_worth"]["change_pct_30d"],
+            "goals_count": len(client["goals"]),
+            "goals_on_track": goals_on_track,
+            "unread_notifications": unread,
+            "pending_documents": len([d for d in client["documents"] if d["status"] == "pending_signature"]),
+            "upcoming_meetings": len(client["upcoming_meetings"])
         },
-        "change_from_last_month": {
-            "amount": 45000,
-            "percent": 0.71
-        },
-        "last_updated": datetime.now(timezone.utc).isoformat()
+        "latest_insight": client["insights"][0] if client["insights"] else None,
+        "timestamp": datetime.now(timezone.utc).isoformat()
     }
 
 
-@router.post("/appointment/request")
-async def request_appointment(
-    token: str,
-    preferred_date: str,
-    preferred_time: str,
-    meeting_type: str = "video",
-    notes: Optional[str] = None
-):
-    """Request an appointment with adviser."""
-    payload = verify_client_token(token)
-    client_id = payload.get("client_id")
-    
-    appointment_request = {
-        "id": f"apt_req_{uuid.uuid4().hex[:8]}",
-        "client_id": client_id,
-        "preferred_date": preferred_date,
-        "preferred_time": preferred_time,
-        "meeting_type": meeting_type,
-        "notes": notes,
-        "status": "pending",
-        "requested_at": datetime.now(timezone.utc).isoformat()
-    }
+@router.get("/net-worth/{client_id}")
+async def get_net_worth(client_id: str):
+    """Get detailed net worth breakdown."""
+    client = PORTAL_CLIENTS.get(client_id) or PORTAL_CLIENTS.get("portal_001")
+    now = datetime.now(timezone.utc)
+    history = []
+    base = client["net_worth"]["total"]
+    for i in range(12):
+        history.append({"date": (now - timedelta(days=30*(11-i))).strftime("%Y-%m"), "value": round(base * (0.85 + i*0.015), 0)})
     
     return {
-        "success": True,
-        "request": appointment_request,
-        "message": "Appointment request submitted. Your adviser will confirm shortly."
+        "client_id": client_id,
+        "current": client["net_worth"],
+        "history": history,
+        "assets": {k: v for k, v in client["net_worth"]["breakdown"].items() if v > 0},
+        "liabilities": {"total": abs(client["net_worth"]["breakdown"]["liabilities"])},
+        "timestamp": datetime.now(timezone.utc).isoformat()
     }
+
+
+@router.get("/portfolios/{client_id}")
+async def get_portfolios(client_id: str):
+    """Get all portfolios for a client."""
+    client = PORTAL_CLIENTS.get(client_id) or PORTAL_CLIENTS.get("portal_001")
+    total = sum(p["value"] for p in client["portfolios"])
+    weighted = sum(p["value"] * p["change_ytd"] for p in client["portfolios"]) / total if total else 0
+    
+    return {
+        "client_id": client_id,
+        "portfolios": client["portfolios"],
+        "summary": {"total_value": total, "portfolio_count": len(client["portfolios"]), "weighted_ytd_return": round(weighted, 2)},
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+
+
+@router.get("/goals/{client_id}")
+async def get_goals(client_id: str):
+    """Get all goals for a client."""
+    client = PORTAL_CLIENTS.get(client_id) or PORTAL_CLIENTS.get("portal_001")
+    return {
+        "client_id": client_id,
+        "goals": client["goals"],
+        "summary": {
+            "total_goals": len(client["goals"]),
+            "on_track": len([g for g in client["goals"] if g["status"] == GoalStatus.ON_TRACK]),
+            "at_risk": len([g for g in client["goals"] if g["status"] == GoalStatus.AT_RISK]),
+        },
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+
+
+@router.get("/insights/{client_id}")
+async def get_insights(client_id: str, limit: int = 10):
+    """Get personalized insights."""
+    client = PORTAL_CLIENTS.get(client_id) or PORTAL_CLIENTS.get("portal_001")
+    return {"client_id": client_id, "insights": client["insights"][:limit], "timestamp": datetime.now(timezone.utc).isoformat()}
+
+
+@router.get("/notifications/{client_id}")
+async def get_notifications(client_id: str, unread_only: bool = False):
+    """Get notifications."""
+    client = PORTAL_CLIENTS.get(client_id) or PORTAL_CLIENTS.get("portal_001")
+    notifs = [n for n in client["notifications"] if not unread_only or not n.get("read", False)]
+    return {"client_id": client_id, "notifications": notifs, "unread_count": len([n for n in client["notifications"] if not n.get("read")])}
+
+
+@router.get("/documents/{client_id}")
+async def get_documents(client_id: str):
+    """Get all documents."""
+    client = PORTAL_CLIENTS.get(client_id) or PORTAL_CLIENTS.get("portal_001")
+    return {"client_id": client_id, "documents": client["documents"], "pending_signature": len([d for d in client["documents"] if d["status"] == "pending_signature"])}
+
+
+@router.get("/meetings/{client_id}")
+async def get_meetings(client_id: str):
+    """Get meetings."""
+    client = PORTAL_CLIENTS.get(client_id) or PORTAL_CLIENTS.get("portal_001")
+    return {"client_id": client_id, "upcoming": client["upcoming_meetings"], "past": [{"date": "2025-06-15", "type": "Annual Review"}]}
+
+
+@router.get("/activity/{client_id}")
+async def get_activity(client_id: str, limit: int = 20):
+    """Get recent activity."""
+    client = PORTAL_CLIENTS.get(client_id) or PORTAL_CLIENTS.get("portal_001")
+    return {"client_id": client_id, "activity": client["recent_activity"][:limit]}
+
+
+@router.get("/performance-summary/{client_id}")
+async def get_performance(client_id: str):
+    """Get performance summary."""
+    return {
+        "client_id": client_id,
+        "performance": {"ytd_return": 11.5, "1_year_return": 14.2, "3_year_return_annualized": 9.8, "benchmark_comparison": {"portfolio": 11.5, "benchmark": 9.2, "outperformance": 2.3}},
+        "risk_metrics": {"volatility": 12.5, "sharpe_ratio": 0.85, "max_drawdown": -8.2},
+        "income": {"dividends_ytd": 28500, "distributions_ytd": 12000, "total_income_ytd": 40500},
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+
+
+@router.post("/contact-advisor/{client_id}")
+async def contact_advisor(client_id: str, subject: str, message: str):
+    """Send message to advisor."""
+    client = PORTAL_CLIENTS.get(client_id) or PORTAL_CLIENTS.get("portal_001")
+    return {"success": True, "message_id": f"msg_{uuid.uuid4().hex[:8]}", "confirmation": f"Message sent to {client['advisor_name']}"}

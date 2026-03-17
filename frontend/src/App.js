@@ -142,6 +142,15 @@ const WorkflowDashboard = lazy(() => import("@/pages/WorkflowDashboard"));
 // Book Intelligence
 const BookIntelligence = lazy(() => import("@/pages/BookIntelligence"));
 
+// Meeting Automation
+const MeetingAutomation = lazy(() => import("@/pages/MeetingAutomation"));
+
+// Batch Execution
+const BatchExecution = lazy(() => import("@/pages/BatchExecution"));
+
+// Advanced AI Copilot
+const AICopilotAdvanced = lazy(() => import("@/pages/AICopilotAdvanced"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -963,6 +972,15 @@ const AppRouter = () => {
       
       {/* Book Intelligence */}
       <Route path="/book-intelligence" element={<BookIntelligence />} />
+      
+      {/* Meeting Automation */}
+      <Route path="/meeting-automation" element={<MeetingAutomation />} />
+      
+      {/* Batch Execution */}
+      <Route path="/batch-execution" element={<BatchExecution />} />
+      
+      {/* Advanced AI Copilot */}
+      <Route path="/ai-copilot-advanced" element={<AICopilotAdvanced />} />
     </Routes>
   );
 };

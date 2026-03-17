@@ -249,6 +249,38 @@ def include_all_routes():
         logger.info("BOOK INTELLIGENCE loaded: Sector Analysis, Tax Opportunities, Engagement Health")
     except ImportError as e:
         logger.error(f"Failed to load book intelligence routes: {e}")
+    
+    # MEETING AUTOMATION ENGINE - Meeting → Everything
+    try:
+        from routes.meeting_automation_engine import router as meeting_auto_router
+        app.include_router(meeting_auto_router, prefix="/api")
+        logger.info("MEETING AUTOMATION loaded: Transcript Processing, CRM Updates, Tasks, Emails, Compliance")
+    except ImportError as e:
+        logger.error(f"Failed to load meeting automation routes: {e}")
+    
+    # BATCH EXECUTION - One-Click Execution Layer
+    try:
+        from routes.batch_execution import router as batch_exec_router
+        app.include_router(batch_exec_router, prefix="/api")
+        logger.info("BATCH EXECUTION loaded: Rebalancing, Tax Harvesting, Sector Reduction")
+    except ImportError as e:
+        logger.error(f"Failed to load batch execution routes: {e}")
+    
+    # CLIENT PORTAL - Client-Facing Experience
+    try:
+        from routes.client_portal import router as portal_router
+        app.include_router(portal_router, prefix="/api")
+        logger.info("CLIENT PORTAL loaded: Net Worth, Portfolios, Goals, Insights, Notifications")
+    except ImportError as e:
+        logger.error(f"Failed to load client portal routes: {e}")
+    
+    # ADVANCED AI COPILOT - Natural Language Queries
+    try:
+        from routes.ai_copilot_advanced import router as ai_copilot_router
+        app.include_router(ai_copilot_router, prefix="/api")
+        logger.info("AI COPILOT loaded: Natural Language Queries, Quick Insights, Action Suggestions")
+    except ImportError as e:
+        logger.error(f"Failed to load AI copilot routes: {e}")
 
 # Include all routes
 include_all_routes()
@@ -271,7 +303,7 @@ async def health_check():
     return {
         "status": "healthy",
         "service": "wealth-command",
-        "version": "7.2.0",
+        "version": "7.3.0",
         "architecture": "modular",
         "execution_layer": {
             "trading": True,
@@ -282,7 +314,8 @@ async def health_check():
             "reconciliation": True,
             "fx_trading": True,
             "action_layer": True,
-            "alpaca_paper_trading": True
+            "alpaca_paper_trading": True,
+            "batch_execution": True
         },
         "revenue_layer": {
             "aum_fees": True,
@@ -294,18 +327,28 @@ async def health_check():
             "broker_research": True,
             "decision_engine": True,
             "next_best_action": True,
-            "book_intelligence": True
+            "book_intelligence": True,
+            "ai_copilot_advanced": True
         },
         "workflow_engine": {
             "client_onboarding": True,
             "annual_review": True,
             "tax_planning": True,
-            "portfolio_rebalance": True
+            "portfolio_rebalance": True,
+            "meeting_automation": True
         },
         "crm": {
             "household_intelligence": True,
             "compliance_audit": True,
             "meeting_automation": True
+        },
+        "client_portal": {
+            "net_worth": True,
+            "portfolios": True,
+            "goals": True,
+            "insights": True,
+            "notifications": True,
+            "documents": True
         },
         "capabilities": [
             "next_best_action",
@@ -330,7 +373,12 @@ async def health_check():
             "book_intelligence",
             "alpaca_paper_trading",
             "household_management",
-            "compliance_audit"
+            "compliance_audit",
+            "meeting_to_everything",
+            "batch_execution",
+            "client_portal",
+            "ai_copilot_advanced",
+            "natural_language_queries"
         ]
     }
 

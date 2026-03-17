@@ -189,19 +189,22 @@ const adviserBaseNav = [
     name: "AI Tools",
     icon: Bot,
     items: [
+      { path: "/ai-copilot-advanced", label: "AI Copilot", icon: MessageSquare, title: "Advanced AI Copilot", badge: "NEW" },
       { path: "/ai-copilot", label: "Wealth Copilot", icon: MessageSquare, title: "AI Wealth Copilot" },
       { path: "/intelligence", label: "Cross-Client Intel", icon: Brain, title: "Cross-Client Intelligence" },
       { path: "/book-intelligence", label: "Book Intelligence", icon: Brain, title: "AI Book Analytics", badge: "NEW" },
       { path: "/decision-center", label: "Decision Center", icon: Zap, title: "Real-Time Scenario Modeling" },
       { path: "/financial-plan-generator", label: "Plan Generator", icon: FileText, title: "AI Plan Generator" },
+      { path: "/meeting-automation", label: "Meeting → Everything", icon: Sparkles, title: "Meeting Automation Engine", badge: "WOW" },
     ]
   },
   {
-    name: "Trading",
-    icon: TrendingUp,
+    name: "Execution",
+    icon: Zap,
     items: [
-      { path: "/stock-trading", label: "Buy/Sell Stocks", icon: TrendingUp, title: "Stock Trading with CGT", badge: "NEW" },
-      { path: "/broker-research", label: "Research Reports", icon: FileText, title: "Broker Research & Ratings", badge: "NEW" },
+      { path: "/batch-execution", label: "One-Click Execute", icon: Zap, title: "Batch Execution Layer", badge: "NEW" },
+      { path: "/stock-trading", label: "Buy/Sell Stocks", icon: TrendingUp, title: "Stock Trading with CGT" },
+      { path: "/broker-research", label: "Research Reports", icon: FileText, title: "Broker Research & Ratings" },
       { path: "/stock-research", label: "Stock Screener", icon: LineChart, title: "ASX Stock Research" },
       { path: "/market-data", label: "Live Prices", icon: BarChart3, title: "Live Market Data" },
     ]
