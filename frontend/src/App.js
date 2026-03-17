@@ -127,6 +127,9 @@ const NotificationCenter = lazy(() => import("@/pages/NotificationCenter"));
 // Data Aggregators Research
 const DataAggregators = lazy(() => import("@/pages/DataAggregators"));
 
+// Stock Trading with CGT
+const StockTrading = lazy(() => import("@/pages/StockTrading"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
