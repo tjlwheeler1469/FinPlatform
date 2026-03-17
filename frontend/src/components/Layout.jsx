@@ -191,6 +191,7 @@ const adviserBaseNav = [
     items: [
       { path: "/ai-copilot", label: "Wealth Copilot", icon: MessageSquare, title: "AI Wealth Copilot" },
       { path: "/intelligence", label: "Cross-Client Intel", icon: Brain, title: "Cross-Client Intelligence" },
+      { path: "/book-intelligence", label: "Book Intelligence", icon: Brain, title: "AI Book Analytics", badge: "NEW" },
       { path: "/decision-center", label: "Decision Center", icon: Zap, title: "Real-Time Scenario Modeling" },
       { path: "/financial-plan-generator", label: "Plan Generator", icon: FileText, title: "AI Plan Generator" },
     ]
@@ -211,6 +212,7 @@ const adviserBaseNav = [
     items: [
       { path: "/client-crm", label: "Client CRM", icon: Users, title: "Client Relationship Management" },
       { path: "/client-wealth", label: "Client Wealth", icon: Wallet, title: "Client Wealth Overview" },
+      { path: "/workflows", label: "Workflow Engine", icon: GitBranch, title: "Automated Workflows", badge: "NEW" },
       { path: "/onboarding", label: "New Client", icon: UserPlus, title: "Client Onboarding" },
     ]
   },

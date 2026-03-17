@@ -225,6 +225,30 @@ def include_all_routes():
         logger.info("COMPLIANCE loaded: Audit Logs, KYC/AML, Documents, Approvals")
     except ImportError as e:
         logger.error(f"Failed to load compliance routes: {e}")
+    
+    # WORKFLOW ENGINE - Multi-step workflow automation
+    try:
+        from routes.workflow_engine import router as workflow_router
+        app.include_router(workflow_router, prefix="/api")
+        logger.info("WORKFLOW ENGINE loaded: Onboarding, Reviews, Tax Planning, Rebalancing")
+    except ImportError as e:
+        logger.error(f"Failed to load workflow engine routes: {e}")
+    
+    # ALPACA TRADING - Paper trading integration
+    try:
+        from routes.alpaca_trading import router as alpaca_router
+        app.include_router(alpaca_router, prefix="/api")
+        logger.info("ALPACA TRADING loaded: Paper Trading, Orders, Positions")
+    except ImportError as e:
+        logger.error(f"Failed to load Alpaca trading routes: {e}")
+    
+    # BOOK INTELLIGENCE - Cross-client analytics
+    try:
+        from routes.book_intelligence import router as book_intel_router
+        app.include_router(book_intel_router, prefix="/api")
+        logger.info("BOOK INTELLIGENCE loaded: Sector Analysis, Tax Opportunities, Engagement Health")
+    except ImportError as e:
+        logger.error(f"Failed to load book intelligence routes: {e}")
 
 # Include all routes
 include_all_routes()
@@ -247,7 +271,7 @@ async def health_check():
     return {
         "status": "healthy",
         "service": "wealth-command",
-        "version": "7.0.0",
+        "version": "7.2.0",
         "architecture": "modular",
         "execution_layer": {
             "trading": True,
@@ -257,7 +281,8 @@ async def health_check():
             "crypto": True,
             "reconciliation": True,
             "fx_trading": True,
-            "action_layer": True
+            "action_layer": True,
+            "alpaca_paper_trading": True
         },
         "revenue_layer": {
             "aum_fees": True,
@@ -268,7 +293,19 @@ async def health_check():
             "macro_data": True,
             "broker_research": True,
             "decision_engine": True,
-            "next_best_action": True
+            "next_best_action": True,
+            "book_intelligence": True
+        },
+        "workflow_engine": {
+            "client_onboarding": True,
+            "annual_review": True,
+            "tax_planning": True,
+            "portfolio_rebalance": True
+        },
+        "crm": {
+            "household_intelligence": True,
+            "compliance_audit": True,
+            "meeting_automation": True
         },
         "capabilities": [
             "next_best_action",
@@ -288,7 +325,12 @@ async def health_check():
             "batch_rebalancing",
             "tax_loss_harvesting",
             "macro_market_data",
-            "broker_research"
+            "broker_research",
+            "workflow_automation",
+            "book_intelligence",
+            "alpaca_paper_trading",
+            "household_management",
+            "compliance_audit"
         ]
     }
 

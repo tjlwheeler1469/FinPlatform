@@ -136,6 +136,12 @@ const MacroDashboard = lazy(() => import("@/pages/MacroDashboard"));
 // Broker Research Reports
 const BrokerResearch = lazy(() => import("@/pages/BrokerResearch"));
 
+// Workflow Engine
+const WorkflowDashboard = lazy(() => import("@/pages/WorkflowDashboard"));
+
+// Book Intelligence
+const BookIntelligence = lazy(() => import("@/pages/BookIntelligence"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -951,6 +957,12 @@ const AppRouter = () => {
       
       {/* Broker Research Reports */}
       <Route path="/broker-research" element={<BrokerResearch />} />
+      
+      {/* Workflow Engine */}
+      <Route path="/workflows" element={<WorkflowDashboard />} />
+      
+      {/* Book Intelligence */}
+      <Route path="/book-intelligence" element={<BookIntelligence />} />
     </Routes>
   );
 };

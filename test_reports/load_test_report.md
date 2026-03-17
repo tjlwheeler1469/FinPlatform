@@ -10,7 +10,7 @@
 - **Users**: 1,000 concurrent
 - **Ramp-up**: 50 users/second
 - **Duration**: 60 seconds
-- **Target**: https://wealth-command-13.preview.emergentagent.com
+- **Target**: https://wealth-command-os.preview.emergentagent.com
 
 ---
 

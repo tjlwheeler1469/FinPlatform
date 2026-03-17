@@ -43,7 +43,7 @@
   "test_credentials": {
     "email": "advisor@wealthcommand.io",
     "password": "secure_password_123",
-    "api_base_url": "https://wealth-command-13.preview.emergentagent.com"
+    "api_base_url": "https://wealth-command-os.preview.emergentagent.com"
   },
   "seed_data_creation": "None - uses existing mock data in route modules",
   "retest_needed": false,

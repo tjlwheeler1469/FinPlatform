@@ -29,7 +29,7 @@
     "frontend": "N/A (backend only testing requested)"
   },
   "test_credentials": {
-    "api_base_url": "https://wealth-command-13.preview.emergentagent.com"
+    "api_base_url": "https://wealth-command-os.preview.emergentagent.com"
   },
   "seed_data_creation": "No seed data needed - all APIs use in-memory demo data",
   "retest_needed": false,
