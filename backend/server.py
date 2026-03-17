@@ -209,6 +209,22 @@ def include_all_routes():
         logger.info("BROKER RESEARCH loaded: Analyst Ratings, Price Targets, Upgrades/Downgrades")
     except ImportError as e:
         logger.error(f"Failed to load broker research routes: {e}")
+    
+    # HOUSEHOLD INTELLIGENCE - Family Trees, Entities, Professional Networks
+    try:
+        from routes.household import router as household_router
+        app.include_router(household_router, prefix="/api")
+        logger.info("HOUSEHOLD INTELLIGENCE loaded: Family Trees, Trusts, Companies, SMSFs, Professionals")
+    except ImportError as e:
+        logger.error(f"Failed to load household routes: {e}")
+    
+    # COMPLIANCE & AUDIT - KYC/AML, Documents, Approvals, Audit Logs
+    try:
+        from routes.compliance_audit import router as compliance_router
+        app.include_router(compliance_router, prefix="/api")
+        logger.info("COMPLIANCE loaded: Audit Logs, KYC/AML, Documents, Approvals")
+    except ImportError as e:
+        logger.error(f"Failed to load compliance routes: {e}")
 
 # Include all routes
 include_all_routes()
