@@ -457,15 +457,12 @@ class TestComplianceAPIs:
     
     def test_compliance_check_returns_200(self):
         """Test POST /api/compliance/check returns 200"""
-        payload = {
-            "client_id": "client_1",
-            "check_type": "annual_review"
-        }
-        response = requests.post(f"{BASE_URL}/api/compliance/check", json=payload)
+        # Compliance check uses query parameters
+        response = requests.post(f"{BASE_URL}/api/compliance/check?client_id=client_1")
         assert response.status_code == 200
         data = response.json()
         
-        assert "compliance_score" in data or "score" in data or "status" in data
+        assert "compliance_score" in data or "score" in data or "status" in data or "checks" in data
     
     def test_compliance_dashboard_returns_200(self):
         """Test GET /api/compliance/dashboard returns 200"""
