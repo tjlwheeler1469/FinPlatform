@@ -109,6 +109,9 @@ const ClientWealth = lazy(() => import("@/pages/ClientWealth"));
 const ClientCompliance = lazy(() => import("@/pages/ClientCompliance"));
 const AIInsights = lazy(() => import("@/pages/AIInsights"));
 
+// Command Center - Daily Adviser Hub
+const CommandCenter = lazy(() => import("@/pages/CommandCenter"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
