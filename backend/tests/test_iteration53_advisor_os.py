@@ -315,6 +315,11 @@ class TestTaxOptimization:
         assert "brackets" in data
         assert "medicare_levy" in data
         assert "super_concessional_cap" in data
+        
+        # Verify brackets structure
+        for bracket in data["brackets"]:
+            assert "min" in bracket
+            assert "rate" in bracket
     
     def test_tax_analysis_not_found(self):
         """Test tax analysis for unknown client"""
@@ -475,7 +480,9 @@ class TestExistingEndpoints:
         response = requests.get(f"{BASE_URL}/api/compliance/dashboard")
         assert response.status_code == 200
         data = response.json()
-        assert "compliance_score" in data
+        # Compliance dashboard has overview with compliance_rate
+        assert "overview" in data
+        assert "compliance_rate" in data["overview"]
 
 
 if __name__ == "__main__":
