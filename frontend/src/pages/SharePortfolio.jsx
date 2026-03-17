@@ -941,6 +941,109 @@ const SharePortfolio = () => {
           </div>
         )}
       </div>
+
+      {/* Trade Modal */}
+      {showTradeModal && tradeShare && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-md mx-4">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                {tradeType === "buy" ? (
+                  <>
+                    <Plus className="h-5 w-5 text-[#10B981]" />
+                    <span>Buy {tradeShare.symbol}</span>
+                  </>
+                ) : (
+                  <>
+                    <TrendingDown className="h-5 w-5 text-amber-600" />
+                    <span>Sell {tradeShare.symbol}</span>
+                  </>
+                )}
+              </CardTitle>
+              <CardDescription>
+                {tradeShare.name} • Current holdings: {tradeShare.quantity} shares
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="p-3 bg-muted rounded-lg">
+                <div className="flex justify-between text-sm">
+                  <span>Current Price</span>
+                  <span className="font-medium">{formatCurrency(tradeShare.currentPrice)}</span>
+                </div>
+                <div className="flex justify-between text-sm mt-1">
+                  <span>Your Holdings</span>
+                  <span className="font-medium">{tradeShare.quantity} shares ({formatCurrency(tradeShare.quantity * tradeShare.currentPrice)})</span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Quantity to {tradeType}</Label>
+                <Input
+                  type="number"
+                  value={tradeQuantity}
+                  onChange={(e) => setTradeQuantity(Number(e.target.value))}
+                  min="0"
+                  max={tradeType === "sell" ? tradeShare.quantity : 999999}
+                  data-testid="trade-quantity-input"
+                />
+                {tradeType === "sell" && (
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={() => setTradeQuantity(Math.floor(tradeShare.quantity * 0.25))}>
+                      25%
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => setTradeQuantity(Math.floor(tradeShare.quantity * 0.5))}>
+                      50%
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => setTradeQuantity(Math.floor(tradeShare.quantity * 0.75))}>
+                      75%
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => setTradeQuantity(tradeShare.quantity)}>
+                      100%
+                    </Button>
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label>Price per share</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={tradePrice}
+                  onChange={(e) => setTradePrice(Number(e.target.value))}
+                  data-testid="trade-price-input"
+                />
+              </div>
+
+              <div className="p-3 bg-muted rounded-lg">
+                <div className="flex justify-between font-medium">
+                  <span>Total Value</span>
+                  <span className={tradeType === "sell" ? "text-[#10B981]" : "text-amber-600"}>
+                    {formatCurrency(tradeQuantity * tradePrice)}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <Button 
+                  variant="outline" 
+                  className="flex-1"
+                  onClick={() => setShowTradeModal(false)}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  className={`flex-1 ${tradeType === "buy" ? "bg-[#10B981] hover:bg-[#10B981]/90" : "bg-amber-600 hover:bg-amber-700"}`}
+                  onClick={handleExecuteTrade}
+                  data-testid="execute-trade-btn"
+                >
+                  {tradeType === "buy" ? "Buy" : "Sell"} {tradeQuantity} shares
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </Layout>
   );
 };
