@@ -900,6 +900,9 @@ const AppRouter = () => {
       {/* Client-Level Pages (Adviser viewing client data) */}
       <Route path="/client-wealth" element={<ClientWealth />} />
       <Route path="/client-compliance" element={<ClientCompliance />} />
+      
+      {/* Command Center - Daily Adviser Hub */}
+      <Route path="/command-center" element={<CommandCenter />} />
     </Routes>
   );
 };
