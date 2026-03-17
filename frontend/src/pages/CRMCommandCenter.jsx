@@ -40,12 +40,27 @@ import {
   PiggyBank,
   Shield,
   BarChart3,
-  Activity
+  Activity,
+  CreditCard
 } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || "";
+
+// Map account types to icons
+const getAccountIcon = (type) => {
+  const typeStr = (type || "").toLowerCase();
+  if (typeStr.includes("super") || typeStr.includes("pension")) return PiggyBank;
+  if (typeStr.includes("invest") || typeStr.includes("portfolio")) return TrendingUp;
+  if (typeStr.includes("property") || typeStr.includes("home")) return Home;
+  if (typeStr.includes("cash") || typeStr.includes("savings") || typeStr.includes("term")) return DollarSign;
+  if (typeStr.includes("trust")) return Building2;
+  if (typeStr.includes("smsf")) return Shield;
+  if (typeStr.includes("business")) return Briefcase;
+  if (typeStr.includes("liability") || typeStr.includes("mortgage")) return CreditCard;
+  return Wallet;
+};
 
 const formatCurrency = (value) => {
   if (value >= 1000000) {
@@ -227,19 +242,89 @@ const DEMO_NOTIFICATIONS = [
 
 const CRMCommandCenter = () => {
   const navigate = useNavigate();
-  const [clients, setClients] = useState(DEMO_CLIENTS);
-  const [tasks, setTasks] = useState(DEMO_TASKS);
-  const [notifications, setNotifications] = useState(DEMO_NOTIFICATIONS);
+  const [clients, setClients] = useState([]);
+  const [tasks, setTasks] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+  const [summary, setSummary] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const [clientsRes, analyticsRes] = await Promise.all([
+        fetch(`${API_URL}/api/crm/clients`),
+        fetch(`${API_URL}/api/crm/analytics`)
+      ]);
+
+      if (clientsRes.ok) {
+        const data = await clientsRes.json();
+        // Map backend data to frontend format
+        const mappedClients = data.clients.map(c => ({
+          id: c.client_id,
+          name: c.name,
+          email: c.email,
+          phone: c.phone,
+          status: c.status,
+          type: c.type,
+          wealth: c.total_wealth || 0,
+          wealthChange: c.wealth_change || 0,
+          wealthChangePercent: c.wealth_change_percent || 0,
+          lastContact: c.last_contact,
+          nextReview: c.next_review,
+          advisor: c.adviser,
+          riskProfile: c.risk_profile,
+          satisfaction: c.satisfaction,
+          accounts: c.accounts || [],
+          recentActivity: c.recent_activity,
+          pendingTasks: c.pending_tasks || 0,
+          pendingDocs: c.pending_docs || 0
+        }));
+        setClients(mappedClients);
+        setSummary(data.summary);
+
+        // Extract tasks from clients
+        const allTasks = data.clients.flatMap((c, idx) => 
+          (c.pending_tasks > 0) ? [{
+            id: idx + 1,
+            title: c.recent_activity || `Review - ${c.name}`,
+            client: c.name,
+            clientId: c.client_id,
+            priority: c.status === "review" ? "urgent" : "medium",
+            dueDate: c.next_review || "2026-01-15",
+            type: "review"
+          }] : []
+        );
+        setTasks(allTasks.slice(0, 6));
+
+        // Generate notifications from client data
+        const notifs = [
+          { id: 1, message: `${data.summary.review || 0} clients due for annual review`, type: "warning", time: "Now" },
+          { id: 2, message: `${data.summary.prospect || 0} prospects in pipeline`, type: "info", time: "1 hour ago" },
+          { id: 3, message: `Total AUM: ${formatCurrency(data.summary.total_aum)}`, type: "success", time: "Today" },
+          { id: 4, message: "Market update: ASX up 0.8% today", type: "info", time: "2 hours ago" },
+        ];
+        setNotifications(notifs);
+      }
+    } catch (error) {
+      console.error("Error fetching CRM data:", error);
+      toast.error("Failed to load CRM data");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Calculate summary stats
-  const totalAUM = clients.reduce((sum, c) => sum + c.wealth, 0);
-  const activeClients = clients.filter(c => c.status === "active").length;
-  const prospects = clients.filter(c => c.status === "prospect").length;
-  const reviewsDue = clients.filter(c => c.status === "review").length;
-  const urgentTasks = tasks.filter(t => t.priority === "urgent" || t.priority === "high").length;
+  const totalAUM = summary?.total_aum || clients.reduce((sum, c) => sum + c.wealth, 0);
+  const activeClients = summary?.active || clients.filter(c => c.status === "active").length;
+  const prospects = summary?.prospect || clients.filter(c => c.status === "prospect").length;
+  const reviewsDue = summary?.review || clients.filter(c => c.status === "review").length;
+  const urgentTasks = summary?.urgent_tasks || tasks.filter(t => t.priority === "urgent" || t.priority === "high").length;
 
   const filteredClients = clients.filter(client => {
     const matchesSearch = client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -279,6 +364,19 @@ const CRMCommandCenter = () => {
         break;
     }
   };
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="w-8 h-8 border-4 border-[#1a2744] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-muted-foreground">Loading CRM data...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -439,13 +537,16 @@ const CRMCommandCenter = () => {
 
                         {/* Account Breakdown */}
                         <div className="flex flex-wrap gap-3 mt-4">
-                          {client.accounts.map((account, idx) => (
-                            <div key={idx} className="flex items-center gap-2 px-3 py-1.5 bg-muted rounded-lg">
-                              <account.icon className="h-4 w-4 text-muted-foreground" />
-                              <span className="text-sm font-medium">{account.type}</span>
-                              <span className="text-sm text-muted-foreground">{formatCurrency(account.balance)}</span>
-                            </div>
-                          ))}
+                          {client.accounts.slice(0, 4).map((account, idx) => {
+                            const AccountIcon = getAccountIcon(account.type);
+                            return (
+                              <div key={idx} className="flex items-center gap-2 px-3 py-1.5 bg-muted rounded-lg">
+                                <AccountIcon className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm font-medium">{account.type || account.name}</span>
+                                <span className="text-sm text-muted-foreground">{formatCurrency(account.balance)}</span>
+                              </div>
+                            );
+                          })}
                         </div>
 
                         {/* Quick Actions & Info */}

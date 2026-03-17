@@ -38,7 +38,7 @@
     "frontend": "100% (All pages verified, all interactions working)"
   },
   "test_credentials": {
-    "api_base_url": "https://wealth-command-os-1.preview.emergentagent.com"
+    "api_base_url": "https://advisor-command.preview.emergentagent.com"
   },
   "seed_data_creation": "None - uses mock data in trading.py with 4 clients (Wheeler Family, Chen Investment Trust, Thompson SMSF, Patel Holdings)",
   "retest_needed": false,

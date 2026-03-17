@@ -35,7 +35,7 @@
     "frontend": "100% (All pages load and function correctly)"
   },
   "test_credentials": {
-    "api_base_url": "https://wealth-command-os-1.preview.emergentagent.com"
+    "api_base_url": "https://advisor-command.preview.emergentagent.com"
   },
   "seed_data_creation": "No seed data needed - all new pages use in-memory demo data",
   "retest_needed": false,
