@@ -118,6 +118,12 @@ const IntelligenceEngine = lazy(() => import("@/pages/IntelligenceEngine"));
 // Advisor Intelligence Dashboard - Daily Operating System
 const AdvisorIntelligenceDashboard = lazy(() => import("@/pages/AdvisorIntelligenceDashboard"));
 
+// Notification Center
+const NotificationCenter = lazy(() => import("@/pages/NotificationCenter"));
+
+// Data Aggregators Research
+const DataAggregators = lazy(() => import("@/pages/DataAggregators"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
