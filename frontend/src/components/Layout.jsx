@@ -82,9 +82,20 @@ const personalNavGroups = [
     icon: LayoutDashboard,
     items: [
       { path: "/daily-briefing", label: "Daily Briefing", icon: Sun, title: "Daily Briefing" },
+      { path: "/macro-dashboard", label: "Markets Overview", icon: BarChart3, title: "Global Markets & Macro Data", badge: "NEW" },
       { path: "/dashboard", label: "Retirement Tracker", icon: Target, title: "Retirement Readiness" },
       { path: "/recommendations", label: "Recommendations", icon: Lightbulb, title: "Financial Recommendations" },
       { path: "/decision-engine", label: "Health Score", icon: Zap, title: "Financial Health Score" },
+    ]
+  },
+  {
+    name: "Trading",
+    icon: TrendingUp,
+    items: [
+      { path: "/stock-trading", label: "Buy/Sell Stocks", icon: TrendingUp, title: "Stock Trading with CGT", badge: "NEW" },
+      { path: "/broker-research", label: "Research Reports", icon: FileText, title: "Broker Research & Ratings", badge: "NEW" },
+      { path: "/stock-research", label: "Stock Screener", icon: LineChart, title: "Stock Research" },
+      { path: "/market-data", label: "Live Prices", icon: BarChart3, title: "Live Market Data" },
     ]
   },
   {
