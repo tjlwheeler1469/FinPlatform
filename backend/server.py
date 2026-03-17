@@ -231,7 +231,7 @@ async def health_check():
     return {
         "status": "healthy",
         "service": "wealth-command",
-        "version": "6.1.0",
+        "version": "7.0.0",
         "architecture": "modular",
         "execution_layer": {
             "trading": True,
@@ -240,12 +240,19 @@ async def health_check():
             "realtime_data": True,
             "crypto": True,
             "reconciliation": True,
-            "fx_trading": True
+            "fx_trading": True,
+            "action_layer": True
         },
         "revenue_layer": {
             "aum_fees": True,
             "trading_fees": True,
             "subscriptions": True
+        },
+        "intelligence": {
+            "macro_data": True,
+            "broker_research": True,
+            "decision_engine": True,
+            "next_best_action": True
         },
         "capabilities": [
             "next_best_action",
@@ -260,7 +267,12 @@ async def health_check():
             "tiered_fees",
             "invoice_generation",
             "fx_trading",
-            "currency_hedging"
+            "currency_hedging",
+            "one_click_execution",
+            "batch_rebalancing",
+            "tax_loss_harvesting",
+            "macro_market_data",
+            "broker_research"
         ]
     }
 
