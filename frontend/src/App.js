@@ -130,6 +130,12 @@ const DataAggregators = lazy(() => import("@/pages/DataAggregators"));
 // Stock Trading with CGT
 const StockTrading = lazy(() => import("@/pages/StockTrading"));
 
+// Macro Dashboard - Global Markets
+const MacroDashboard = lazy(() => import("@/pages/MacroDashboard"));
+
+// Broker Research Reports
+const BrokerResearch = lazy(() => import("@/pages/BrokerResearch"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
