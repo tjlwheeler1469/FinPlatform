@@ -284,11 +284,11 @@ async def process_meeting_notes(notes_input: MeetingNotesInput, background_tasks
         }
         
         if DB_AVAILABLE:
-            await tasks_collection.insert_one(task)
+            await tasks_collection.insert_one(task.copy())  # Use copy to avoid _id mutation
         else:
             TASKS_MEMORY[task_id] = task
         
-        created_tasks.append(serialize_doc(task) if DB_AVAILABLE else task)
+        created_tasks.append(task)  # task doesn't have _id since we used copy()
     
     # Add CRM note
     crm_entry = {
@@ -304,7 +304,7 @@ async def process_meeting_notes(notes_input: MeetingNotesInput, background_tasks
     }
     
     if DB_AVAILABLE:
-        await crm_notes_collection.insert_one(crm_entry)
+        await crm_notes_collection.insert_one(crm_entry.copy())  # Use copy to avoid _id mutation
     else:
         if meeting["client_id"] not in CRM_NOTES_MEMORY:
             CRM_NOTES_MEMORY[meeting["client_id"]] = []
