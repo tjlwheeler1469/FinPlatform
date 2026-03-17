@@ -211,6 +211,7 @@ const adviserBaseNav = [
     items: [
       { path: "/compliance", label: "Compliance Center", icon: Shield, title: "Compliance & Audit" },
       { path: "/connected-accounts", label: "Bank Feeds", icon: Link2, title: "Connected Accounts" },
+      { path: "/notifications", label: "Notifications", icon: Bell, title: "Notification Center", badge: "NEW" },
       { path: "/security", label: "Security", icon: Shield, title: "Security Settings" },
     ]
   },
@@ -219,6 +220,7 @@ const adviserBaseNav = [
     icon: Settings,
     items: [
       { path: "/data-import-export", label: "Import/Export", icon: Database, title: "Data Import & Export" },
+      { path: "/data-aggregators", label: "Data Aggregators", icon: Link2, title: "Australian CDR Aggregators", badge: "NEW" },
     ]
   }
 ];
