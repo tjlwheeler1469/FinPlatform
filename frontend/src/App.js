@@ -162,6 +162,9 @@ const BondsTrading = lazy(() => import("@/pages/BondsTrading"));
 const CashDeposits = lazy(() => import("@/pages/CashDeposits"));
 const ManagedFunds = lazy(() => import("@/pages/ManagedFunds"));
 
+// CRM Command Center
+const CRMCommandCenter = lazy(() => import("@/pages/CRMCommandCenter"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -1003,6 +1006,9 @@ const AppRouter = () => {
       <Route path="/bonds-trading" element={<BondsTrading />} />
       <Route path="/cash-deposits" element={<CashDeposits />} />
       <Route path="/managed-funds" element={<ManagedFunds />} />
+      
+      {/* CRM Command Center */}
+      <Route path="/crm-command-center" element={<CRMCommandCenter />} />
     </Routes>
   );
 };

@@ -65,7 +65,8 @@ import {
   Search,
   Command,
   MessageSquare,
-  Brain
+  Brain,
+  ListTodo
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -174,15 +175,26 @@ const personalNavGroups = [
 ];
 
 // Adviser Mode Navigation - Two-level hierarchy
-// Level 1: Adviser (no client selected) - Dashboard, Clients, Settings
+// Level 1: Adviser (no client selected) - CRM Command Center is the main hub
 // Level 2: Client Context (client selected) - Financial Plan, Investments, Documents, AI Advisor
 
 const adviserBaseNav = [
   {
+    name: "CRM",
+    icon: Users,
+    items: [
+      { path: "/crm-command-center", label: "Command Center", icon: Zap, title: "Client Command Center", badge: "HUB" },
+      { path: "/client-crm", label: "All Clients", icon: Users, title: "Client List" },
+      { path: "/client-wealth", label: "Wealth Overview", icon: Wallet, title: "Client Wealth Overview" },
+      { path: "/workflows", label: "Tasks & Workflows", icon: ListTodo, title: "Automated Workflows" },
+      { path: "/onboarding", label: "New Client", icon: UserPlus, title: "Client Onboarding" },
+    ]
+  },
+  {
     name: "Dashboard",
     icon: LayoutDashboard,
     items: [
-      { path: "/advisor-command-center", label: "Command Center", icon: Zap, title: "Advisor Command Center", badge: "DAILY" },
+      { path: "/advisor-command-center", label: "Daily Briefing", icon: Sun, title: "Advisor Daily Briefing" },
       { path: "/macro-dashboard", label: "Markets Overview", icon: BarChart3, title: "Global Markets & Macro Data", badge: "NEW" },
       { path: "/adviser-dashboard", label: "Practice Overview", icon: Briefcase, title: "Adviser Dashboard" },
       { path: "/meeting-prep", label: "Meeting Prep", icon: Clock, title: "AI Meeting Prep" },
@@ -210,18 +222,8 @@ const adviserBaseNav = [
       { path: "/realtime-data", label: "Real-Time Data", icon: Activity, title: "Real-Time Data Layer", badge: "NEW" },
       { path: "/stock-trading", label: "Buy/Sell Stocks", icon: TrendingUp, title: "Stock Trading with CGT" },
       { path: "/broker-research", label: "Research Reports", icon: FileText, title: "Broker Research & Ratings" },
-      { path: "/stock-research", label: "Stock Screener", icon: LineChart, title: "ASX Stock Research" },
+      { path: "/stock-research", label: "Stock Screener", icon: LineChart, title: "Stock Screener" },
       { path: "/market-data", label: "Live Prices", icon: BarChart3, title: "Live Market Data" },
-    ]
-  },
-  {
-    name: "Clients",
-    icon: Users,
-    items: [
-      { path: "/client-crm", label: "Client CRM", icon: Users, title: "Client Relationship Management" },
-      { path: "/client-wealth", label: "Client Wealth", icon: Wallet, title: "Client Wealth Overview" },
-      { path: "/workflows", label: "Workflow Engine", icon: GitBranch, title: "Automated Workflows", badge: "NEW" },
-      { path: "/onboarding", label: "New Client", icon: UserPlus, title: "Client Onboarding" },
     ]
   },
   {
