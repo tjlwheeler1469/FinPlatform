@@ -40,7 +40,7 @@
     "frontend": "100% (All 10 zones verified, all interactions working)"
   },
   "test_credentials": {
-    "api_base_url": "https://advisor-os.preview.emergentagent.com"
+    "api_base_url": "https://wealth-command-13.preview.emergentagent.com"
   },
   "seed_data_creation": "None - uses mock data in command_center.py, intelligence.py, portfolio_monitoring.py, meeting_prep.py",
   "retest_needed": false,
