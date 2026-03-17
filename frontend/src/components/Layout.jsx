@@ -168,10 +168,8 @@ const adviserBaseNav = [
     name: "Dashboard",
     icon: LayoutDashboard,
     items: [
-      { path: "/advisor-command-center", label: "Command Center", icon: Zap, title: "Advisor Command Center", badge: "NEW" },
-      { path: "/advisor-intelligence", label: "Intelligence Hub", icon: Brain, title: "Advisor Intelligence Dashboard" },
+      { path: "/advisor-command-center", label: "Command Center", icon: Zap, title: "Advisor Command Center", badge: "DAILY" },
       { path: "/adviser-dashboard", label: "Overview", icon: Briefcase, title: "Adviser Dashboard" },
-      { path: "/client-insights", label: "AI Insights", icon: Sparkles, title: "Today's AI Insights" },
       { path: "/practice-management", label: "Practice", icon: ClipboardList, title: "Practice Management" },
       { path: "/meeting-prep", label: "Meeting Prep", icon: Clock, title: "AI Meeting Prep" },
     ]
@@ -181,18 +179,18 @@ const adviserBaseNav = [
     icon: Bot,
     items: [
       { path: "/ai-copilot", label: "Wealth Copilot", icon: MessageSquare, title: "AI Wealth Copilot" },
+      { path: "/intelligence", label: "Cross-Client Intel", icon: Brain, title: "Cross-Client Intelligence" },
       { path: "/decision-center", label: "Decision Center", icon: Zap, title: "Real-Time Scenario Modeling" },
-      { path: "/intelligence", label: "Cross-Client Intel", icon: Brain, title: "Cross-Client Intelligence", badge: "NEW" },
       { path: "/financial-plan-generator", label: "Plan Generator", icon: FileText, title: "AI Plan Generator" },
     ]
   },
   {
-    name: "Research",
-    icon: BarChart3,
+    name: "Trading",
+    icon: TrendingUp,
     items: [
+      { path: "/stock-trading", label: "Buy/Sell Stocks", icon: TrendingUp, title: "Stock Trading with CGT", badge: "NEW" },
       { path: "/stock-research", label: "Stock Screener", icon: LineChart, title: "ASX Stock Research" },
-      { path: "/market-data", label: "Market Data", icon: TrendingUp, title: "Live Market Data" },
-      { path: "/product-marketplace", label: "Marketplace", icon: CreditCard, title: "Product Marketplace" },
+      { path: "/market-data", label: "Market Data", icon: BarChart3, title: "Live Market Data" },
     ]
   },
   {
