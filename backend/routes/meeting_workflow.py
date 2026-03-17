@@ -601,13 +601,13 @@ async def add_crm_note(client_id: str, note_type: str = "general", content: str 
     }
     
     if DB_AVAILABLE:
-        await crm_notes_collection.insert_one(note)
+        await crm_notes_collection.insert_one(note.copy())  # Use copy to avoid _id mutation
     else:
         if client_id not in CRM_NOTES_MEMORY:
             CRM_NOTES_MEMORY[client_id] = []
         CRM_NOTES_MEMORY[client_id].append(note)
     
-    return {"success": True, "note": serialize_doc(note) if DB_AVAILABLE else note}
+    return {"success": True, "note": note}
 
 
 @router.get("/workflow-stats")
