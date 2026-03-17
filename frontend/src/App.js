@@ -925,6 +925,9 @@ const AppRouter = () => {
       {/* Advisor Intelligence Dashboard - The Daily Operating System */}
       <Route path="/advisor-intelligence" element={<AdvisorIntelligenceDashboard />} />
       
+      {/* Ultimate Advisor Command Center - The $10B Platform */}
+      <Route path="/advisor-command-center" element={<AdvisorCommandCenter />} />
+      
       {/* Notification Center */}
       <Route path="/notifications" element={<NotificationCenter />} />
       
