@@ -11,7 +11,7 @@ import random
 import logging
 
 logger = logging.getLogger(__name__)
-router = APIRouter(prefix="/research", tags=["Broker Research"])
+router = APIRouter(prefix="/broker-research", tags=["Broker Research"])
 
 
 # Sample broker research data
