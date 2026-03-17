@@ -180,6 +180,7 @@ const adviserBaseNav = [
     items: [
       { path: "/ai-copilot", label: "Wealth Copilot", icon: MessageSquare, title: "AI Wealth Copilot" },
       { path: "/decision-center", label: "Decision Center", icon: Zap, title: "Real-Time Scenario Modeling" },
+      { path: "/intelligence", label: "Cross-Client Intel", icon: Brain, title: "Cross-Client Intelligence", badge: "NEW" },
       { path: "/financial-plan-generator", label: "Plan Generator", icon: FileText, title: "AI Plan Generator" },
     ]
   },
