@@ -207,7 +207,8 @@ async def health_check():
             "smart_router": True,
             "realtime_data": True,
             "crypto": True,
-            "reconciliation": True
+            "reconciliation": True,
+            "fx_trading": True
         },
         "revenue_layer": {
             "aum_fees": True,
@@ -225,7 +226,9 @@ async def health_check():
             "cross_platform_reconciliation",
             "revenue_management",
             "tiered_fees",
-            "invoice_generation"
+            "invoice_generation",
+            "fx_trading",
+            "currency_hedging"
         ]
     }
 
