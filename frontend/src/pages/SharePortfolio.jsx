@@ -592,7 +592,7 @@ const SharePortfolio = () => {
                                 </p>
                               </div>
                             </div>
-                            <div className="text-right flex items-center gap-4">
+                            <div className="text-right flex items-center gap-2">
                               <div>
                                 <p className="text-lg font-bold">{formatCurrency(value)}</p>
                                 <p className={`text-sm font-medium ${gainLoss >= 0 ? 'text-[#10B981]' : 'text-destructive'}`}>
@@ -601,6 +601,26 @@ const SharePortfolio = () => {
                                 <p className="text-xs text-[#D4A84C]">
                                   {formatCurrency(annualDividend)}/yr ({share.dividendYield}%)
                                 </p>
+                              </div>
+                              <div className="flex flex-col gap-1">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  className="text-[#10B981] border-[#10B981] hover:bg-[#10B981]/10"
+                                  onClick={() => openTradeModal(share, "buy")}
+                                  data-testid={`buy-share-${share.id}`}
+                                >
+                                  <Plus className="h-3 w-3 mr-1" /> Buy
+                                </Button>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  className="text-amber-600 border-amber-600 hover:bg-amber-50"
+                                  onClick={() => openTradeModal(share, "sell")}
+                                  data-testid={`sell-share-${share.id}`}
+                                >
+                                  <TrendingDown className="h-3 w-3 mr-1" /> Sell
+                                </Button>
                               </div>
                               <Button 
                                 variant="ghost" 
