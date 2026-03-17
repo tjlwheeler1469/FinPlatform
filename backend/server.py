@@ -141,6 +141,26 @@ def include_all_routes():
         logger.info("Killer feature routes loaded: Next Best Action, Practice Health, Meeting Workflow, White-Label")
     except ImportError as e:
         logger.error(f"Failed to load killer feature routes: {e}")
+    
+    # UNIFIED EXECUTION LAYER - Phase 1 & 2
+    try:
+        from routes.execution_layer import router as execution_router
+        from routes.portfolio_engine import router as portfolio_engine_router
+        from routes.smart_router import router as smart_router_router
+        from routes.realtime_data import router as realtime_router
+        from routes.crypto_integration import router as crypto_router
+        from routes.reconciliation import router as reconciliation_router
+        
+        app.include_router(execution_router, prefix="/api")
+        app.include_router(portfolio_engine_router, prefix="/api")
+        app.include_router(smart_router_router, prefix="/api")
+        app.include_router(realtime_router, prefix="/api")
+        app.include_router(crypto_router, prefix="/api")
+        app.include_router(reconciliation_router, prefix="/api")
+        
+        logger.info("EXECUTION LAYER loaded: Trading, Portfolio Engine, Smart Router, Real-Time, Crypto, Reconciliation")
+    except ImportError as e:
+        logger.error(f"Failed to load execution layer routes: {e}")
 
 # Include all routes
 include_all_routes()
