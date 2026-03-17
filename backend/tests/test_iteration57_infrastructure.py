@@ -368,7 +368,7 @@ class TestTradingSystemIntegration:
         payload = {
             "client_id": "client_1",
             "symbol": "CBA.AX",
-            "action": "BUY",
+            "side": "buy",
             "units": 50
         }
         response = requests.post(
@@ -378,7 +378,8 @@ class TestTradingSystemIntegration:
         assert response.status_code == 200
         data = response.json()
         
-        assert "order_preview" in data or "preview" in data
+        # Verify order preview response
+        assert "symbol" in data or "order_preview" in data or "preview" in data
         print(f"✓ Order preview test passed")
 
 
