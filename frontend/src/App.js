@@ -906,6 +906,9 @@ const AppRouter = () => {
       
       {/* Command Center - Daily Adviser Hub */}
       <Route path="/command-center" element={<CommandCenter />} />
+      
+      {/* Cross-Client Intelligence Engine */}
+      <Route path="/intelligence" element={<IntelligenceEngine />} />
     </Routes>
   );
 };
