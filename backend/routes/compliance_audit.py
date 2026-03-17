@@ -423,6 +423,41 @@ async def get_audit_summary(days: int = 7):
 
 # ==================== KYC/AML ENDPOINTS ====================
 
+@router.get("/kyc/dashboard")
+async def get_kyc_dashboard():
+    """Get KYC dashboard with status overview."""
+    statuses = {}
+    for record in KYC_RECORDS.values():
+        status = record.get("status", KYCStatus.NOT_STARTED)
+        statuses[status] = statuses.get(status, 0) + 1
+    
+    # Find expiring soon (within 90 days)
+    expiring_soon = []
+    cutoff = (datetime.now(timezone.utc) + timedelta(days=90)).isoformat()[:10]
+    for record in KYC_RECORDS.values():
+        if record.get("expiry_date") and record["expiry_date"] <= cutoff:
+            expiring_soon.append({
+                "client_id": record["client_id"],
+                "client_name": record["client_name"],
+                "expiry_date": record["expiry_date"]
+            })
+    
+    # Pending reviews
+    pending = [r for r in KYC_RECORDS.values() if r.get("status") == KYCStatus.PENDING_REVIEW]
+    
+    return {
+        "summary": {
+            "total_clients": len(KYC_RECORDS),
+            "by_status": statuses,
+            "expiring_within_90_days": len(expiring_soon),
+            "pending_review": len(pending)
+        },
+        "expiring_soon": expiring_soon,
+        "pending_reviews": pending,
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+
+
 @router.get("/kyc/{client_id}")
 async def get_kyc_status(client_id: str):
     """Get KYC status for a client."""
