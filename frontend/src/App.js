@@ -945,6 +945,12 @@ const AppRouter = () => {
       
       {/* Stock Trading with CGT */}
       <Route path="/stock-trading" element={<StockTrading />} />
+      
+      {/* Macro Dashboard - Global Markets */}
+      <Route path="/macro-dashboard" element={<MacroDashboard />} />
+      
+      {/* Broker Research Reports */}
+      <Route path="/broker-research" element={<BrokerResearch />} />
     </Routes>
   );
 };
