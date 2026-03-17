@@ -131,12 +131,14 @@ def include_all_routes():
         from routes.next_best_action import router as next_action_router
         from routes.practice_health import router as practice_health_router
         from routes.meeting_workflow import router as meeting_workflow_router
+        from routes.white_label import router as white_label_router
         
         app.include_router(next_action_router, prefix="/api")
         app.include_router(practice_health_router, prefix="/api")
         app.include_router(meeting_workflow_router, prefix="/api")
+        app.include_router(white_label_router, prefix="/api")
         
-        logger.info("Killer feature routes loaded: Next Best Action, Practice Health, Meeting Workflow")
+        logger.info("Killer feature routes loaded: Next Best Action, Practice Health, Meeting Workflow, White-Label")
     except ImportError as e:
         logger.error(f"Failed to load killer feature routes: {e}")
 
