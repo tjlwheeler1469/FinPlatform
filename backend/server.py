@@ -7763,6 +7763,7 @@ try:
     app.include_router(wealth_dashboard_router, prefix="/api")
     app.include_router(command_center_router, prefix="/api")
     app.include_router(live_data_router, prefix="/api")
+    app.include_router(holdings_router, prefix="/api")
     
     logger.info("All modular routes loaded successfully")
 except ImportError as e:
