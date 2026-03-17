@@ -167,6 +167,7 @@ const adviserBaseNav = [
     name: "Dashboard",
     icon: LayoutDashboard,
     items: [
+      { path: "/command-center", label: "Command Center", icon: Zap, title: "Daily Command Center", badge: "NEW" },
       { path: "/adviser-dashboard", label: "Overview", icon: Briefcase, title: "Adviser Dashboard" },
       { path: "/client-insights", label: "AI Insights", icon: Sparkles, title: "Today's AI Insights" },
       { path: "/practice-management", label: "Practice", icon: ClipboardList, title: "Practice Management" },
