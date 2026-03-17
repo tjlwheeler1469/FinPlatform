@@ -188,13 +188,15 @@ class TestSmartRouter:
         assert response.status_code == 200
         
         data = response.json()
-        # API returns decision_id, not routing_id
+        # Verify routing decision structure
         assert "decision_id" in data
-        assert "recommended_venue" in data
+        assert "venue" in data  # venue enum value
+        assert "venue_name" in data  # human readable name
         assert "estimated_cost" in data
         assert "compliance_checks" in data
         assert "alternatives" in data
-        print(f"✓ Route decision: venue={data['recommended_venue']}, cost=${data['estimated_cost']}")
+        assert "rationale" in data
+        print(f"✓ Route decision: venue={data['venue_name']}, cost=${data['estimated_cost']}")
     
     def test_get_venues(self):
         """GET /api/smart-router/venues returns venue configs"""
