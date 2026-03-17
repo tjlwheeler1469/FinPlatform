@@ -472,9 +472,19 @@ async def calculate_tax_endpoint(taxable_income: float):
 @router.get("/tax-rates")
 async def get_tax_rates():
     """Get current Australian tax rates."""
+    # Convert brackets to JSON-serializable format (replace inf with None)
+    serializable_brackets = []
+    for bracket in TAX_BRACKETS:
+        serializable_brackets.append({
+            "min": bracket["min"],
+            "max": None if bracket["max"] == float('inf') else bracket["max"],
+            "rate": bracket["rate"],
+            "base": bracket["base"]
+        })
+    
     return {
         "tax_year": "2024-25",
-        "brackets": TAX_BRACKETS,
+        "brackets": serializable_brackets,
         "medicare_levy": MEDICARE_LEVY,
         "super_concessional_cap": SUPER_CONCESSIONAL_CAP,
         "super_non_concessional_cap": SUPER_NON_CONCESSIONAL_CAP,
