@@ -81,8 +81,8 @@ const personalNavGroups = [
     name: "Dashboard",
     icon: LayoutDashboard,
     items: [
-      { path: "/dashboard", label: "Overview", icon: LayoutDashboard, title: "Dashboard Overview" },
       { path: "/daily-briefing", label: "Daily Briefing", icon: Sun, title: "Daily Briefing" },
+      { path: "/dashboard", label: "Retirement Tracker", icon: Target, title: "Retirement Readiness" },
       { path: "/recommendations", label: "Recommendations", icon: Lightbulb, title: "Financial Recommendations" },
       { path: "/decision-engine", label: "Health Score", icon: Zap, title: "Financial Health Score" },
     ]
