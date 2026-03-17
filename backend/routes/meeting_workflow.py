@@ -182,7 +182,7 @@ async def schedule_meeting(meeting: MeetingInput):
     
     # Store in database or memory
     if DB_AVAILABLE:
-        await meetings_collection.insert_one(meeting_data)
+        await meetings_collection.insert_one(meeting_data.copy())  # Use copy to avoid _id mutation
     else:
         MEETINGS_MEMORY[meeting_id] = meeting_data
     
@@ -204,7 +204,7 @@ async def schedule_meeting(meeting: MeetingInput):
     }
     
     if DB_AVAILABLE:
-        await tasks_collection.insert_one(prep_task)
+        await tasks_collection.insert_one(prep_task.copy())  # Use copy to avoid _id mutation
     else:
         TASKS_MEMORY[prep_task_id] = prep_task
     
