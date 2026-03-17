@@ -196,6 +196,7 @@ const adviserBaseNav = [
       { path: "/decision-center", label: "Decision Center", icon: Zap, title: "Real-Time Scenario Modeling" },
       { path: "/financial-plan-generator", label: "Plan Generator", icon: FileText, title: "AI Plan Generator" },
       { path: "/meeting-automation", label: "Meeting → Everything", icon: Sparkles, title: "Meeting Automation Engine", badge: "WOW" },
+      { path: "/feedback-analytics", label: "Learning Analytics", icon: Brain, title: "Feedback & Learning System", badge: "NEW" },
     ]
   },
   {
@@ -203,6 +204,7 @@ const adviserBaseNav = [
     icon: Zap,
     items: [
       { path: "/batch-execution", label: "One-Click Execute", icon: Zap, title: "Batch Execution Layer", badge: "NEW" },
+      { path: "/realtime-data", label: "Real-Time Data", icon: Activity, title: "Real-Time Data Layer", badge: "NEW" },
       { path: "/stock-trading", label: "Buy/Sell Stocks", icon: TrendingUp, title: "Stock Trading with CGT" },
       { path: "/broker-research", label: "Research Reports", icon: FileText, title: "Broker Research & Ratings" },
       { path: "/stock-research", label: "Stock Screener", icon: LineChart, title: "ASX Stock Research" },

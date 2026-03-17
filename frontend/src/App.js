@@ -151,6 +151,12 @@ const BatchExecution = lazy(() => import("@/pages/BatchExecution"));
 // Advanced AI Copilot
 const AICopilotAdvanced = lazy(() => import("@/pages/AICopilotAdvanced"));
 
+// Feedback & Learning Analytics
+const FeedbackAnalytics = lazy(() => import("@/pages/FeedbackAnalytics"));
+
+// Real-Time Data Layer
+const RealtimeDataDashboard = lazy(() => import("@/pages/RealtimeDataDashboard"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -981,6 +987,12 @@ const AppRouter = () => {
       
       {/* Advanced AI Copilot */}
       <Route path="/ai-copilot-advanced" element={<AICopilotAdvanced />} />
+      
+      {/* Feedback & Learning Analytics */}
+      <Route path="/feedback-analytics" element={<FeedbackAnalytics />} />
+      
+      {/* Real-Time Data Layer */}
+      <Route path="/realtime-data" element={<RealtimeDataDashboard />} />
     </Routes>
   );
 };

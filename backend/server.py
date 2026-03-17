@@ -281,6 +281,30 @@ def include_all_routes():
         logger.info("AI COPILOT loaded: Natural Language Queries, Quick Insights, Action Suggestions")
     except ImportError as e:
         logger.error(f"Failed to load AI copilot routes: {e}")
+    
+    # FEEDBACK & LEARNING SYSTEM - Close the Loop
+    try:
+        from routes.feedback_learning import router as feedback_router
+        app.include_router(feedback_router, prefix="/api")
+        logger.info("FEEDBACK LOOP loaded: Advisor Preferences, Outcome Tracking, Personalized Recommendations")
+    except ImportError as e:
+        logger.error(f"Failed to load feedback learning routes: {e}")
+    
+    # ENHANCED EXECUTION ENGINE - Complete Execution Loop
+    try:
+        from routes.execution_engine_enhanced import router as execution_enhanced_router
+        app.include_router(execution_enhanced_router, prefix="/api")
+        logger.info("EXECUTION ENGINE ENHANCED loaded: Full Loop Execution, CRM Updates, Outcome Capture")
+    except ImportError as e:
+        logger.error(f"Failed to load execution engine enhanced routes: {e}")
+    
+    # REAL-TIME DATA LAYER - Single Source of Truth
+    try:
+        from routes.realtime_data_layer import router as realtime_data_layer_router
+        app.include_router(realtime_data_layer_router, prefix="/api")
+        logger.info("REALTIME DATA LAYER loaded: Live Portfolios, Market Data, Trade Execution")
+    except ImportError as e:
+        logger.error(f"Failed to load realtime data layer routes: {e}")
 
 # Include all routes
 include_all_routes()
@@ -303,19 +327,21 @@ async def health_check():
     return {
         "status": "healthy",
         "service": "wealth-command",
-        "version": "7.3.0",
+        "version": "7.4.0",
         "architecture": "modular",
         "execution_layer": {
             "trading": True,
             "portfolio_engine": True,
             "smart_router": True,
             "realtime_data": True,
+            "realtime_data_layer": True,
             "crypto": True,
             "reconciliation": True,
             "fx_trading": True,
             "action_layer": True,
             "alpaca_paper_trading": True,
-            "batch_execution": True
+            "batch_execution": True,
+            "execution_engine_enhanced": True
         },
         "revenue_layer": {
             "aum_fees": True,
@@ -328,7 +354,8 @@ async def health_check():
             "decision_engine": True,
             "next_best_action": True,
             "book_intelligence": True,
-            "ai_copilot_advanced": True
+            "ai_copilot_advanced": True,
+            "feedback_learning": True
         },
         "workflow_engine": {
             "client_onboarding": True,
@@ -349,6 +376,12 @@ async def health_check():
             "insights": True,
             "notifications": True,
             "documents": True
+        },
+        "feedback_loop": {
+            "advisor_preferences": True,
+            "outcome_tracking": True,
+            "personalized_recommendations": True,
+            "learning_system": True
         },
         "capabilities": [
             "next_best_action",
@@ -378,7 +411,11 @@ async def health_check():
             "batch_execution",
             "client_portal",
             "ai_copilot_advanced",
-            "natural_language_queries"
+            "natural_language_queries",
+            "feedback_learning",
+            "execution_loop_closure",
+            "realtime_data_layer",
+            "single_source_of_truth"
         ]
     }
 

@@ -32,13 +32,11 @@ import {
 const STORAGE_KEY = "wealth_command_compliance_v5";  // Versioned key for v5.0
 const SESSION_KEY = "wealth_command_compliance_session";
 
-// Global state to track if modal has been shown this app instance
-let hasShownThisSession = false;
-
-// Check if user has permanently dismissed
+// Check if user has permanently dismissed (with strict check)
 const hasPermanentlyDismissed = () => {
   try {
-    return localStorage.getItem(STORAGE_KEY) === "permanent";
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored === "permanent" || stored === "true";
   } catch {
     return false;
   }
@@ -47,19 +45,20 @@ const hasPermanentlyDismissed = () => {
 // Check if user has acknowledged this session
 const hasAcknowledged = () => {
   try {
-    // Check permanent dismissal first
-    if (hasPermanentlyDismissed()) return true;
+    // Check permanent dismissal first - this is the most important
+    if (hasPermanentlyDismissed()) {
+      return true;
+    }
     
     // Check session dismissal
     const session = sessionStorage.getItem(SESSION_KEY);
-    if (session) return true;
-    
-    // Check if already shown this app instance
-    if (hasShownThisSession) return true;
+    if (session) {
+      return true;
+    }
     
     return false;
   } catch {
-    return hasShownThisSession;
+    return false;
   }
 };
 
@@ -68,13 +67,12 @@ const setAcknowledgement = (permanent = false) => {
   try {
     if (permanent) {
       localStorage.setItem(STORAGE_KEY, "permanent");
-      console.log("Compliance modal permanently dismissed");
+      console.log("[Compliance] Modal permanently dismissed");
     }
     sessionStorage.setItem(SESSION_KEY, new Date().toISOString());
-    hasShownThisSession = true;
+    console.log("[Compliance] Session acknowledgement set");
   } catch (e) {
     console.warn('Could not persist compliance acknowledgement:', e);
-    hasShownThisSession = true;
   }
 };
 
@@ -129,15 +127,20 @@ export const ComplianceModal = ({ onAccept }) => {
   const [open, setOpen] = useState(false);
   const hasChecked = useRef(false);
 
-  // Check localStorage on mount - only once
+  // Check localStorage on mount - only once, and respect permanent dismissal
   useEffect(() => {
     if (hasChecked.current) return;
     hasChecked.current = true;
     
-    if (!hasAcknowledged()) {
-      setOpen(true);
-      hasShownThisSession = true;
+    // Double-check: if already acknowledged, never show
+    if (hasAcknowledged()) {
+      console.log("[Compliance] Already acknowledged, not showing modal");
+      setOpen(false);
+      return;
     }
+    
+    console.log("[Compliance] No previous acknowledgement, showing modal");
+    setOpen(true);
   }, []);
 
   // Don't render anything if not open
