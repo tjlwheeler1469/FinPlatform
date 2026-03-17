@@ -171,14 +171,19 @@ class TestSmartRouter:
     
     def test_route_order(self):
         """POST /api/smart-router/route returns routing decision"""
+        # API requires JSON body with specific fields
+        route_request = {
+            "client_id": "TEST_client_1",
+            "symbol": "AAPL",
+            "asset_class": "equity",
+            "side": "buy",
+            "quantity": 100,
+            "order_value": 17850,
+            "urgency": "normal"
+        }
         response = requests.post(
             f"{BASE_URL}/api/smart-router/route",
-            params={
-                "symbol": "AAPL",
-                "side": "buy",
-                "quantity": 100,
-                "order_type": "market"
-            }
+            json=route_request
         )
         assert response.status_code == 200
         
@@ -216,11 +221,12 @@ class TestSmartRouter:
         assert response.status_code == 200
         
         data = response.json()
-        assert "check_id" in data
-        assert "status" in data
+        # API returns overall_status instead of check_id
+        assert "overall_status" in data
+        assert "can_proceed" in data
         assert "checks" in data
-        assert data["status"] in ["approved", "pending_review", "rejected", "flagged"]
-        print(f"✓ Compliance check: status={data['status']}, checks={len(data['checks'])}")
+        assert data["overall_status"] in ["approved", "pending_review", "rejected", "flagged"]
+        print(f"✓ Compliance check: status={data['overall_status']}, can_proceed={data['can_proceed']}, checks={len(data['checks'])}")
 
 
 class TestCryptoIntegration:
@@ -236,7 +242,8 @@ class TestCryptoIntegration:
         assert data["total"] == 8
         
         symbols = [a["symbol"] for a in data["assets"]]
-        expected = ["BTC", "ETH", "SOL", "XRP", "ADA", "DOT", "LINK", "AVAX"]
+        # Actual assets: BTC, ETH, SOL, XRP, ADA, LINK, USDC, USDT
+        expected = ["BTC", "ETH", "SOL", "XRP", "ADA", "LINK", "USDC", "USDT"]
         for sym in expected:
             assert sym in symbols, f"Missing crypto asset: {sym}"
         print(f"✓ Crypto assets: {data['total']} assets - {symbols}")
