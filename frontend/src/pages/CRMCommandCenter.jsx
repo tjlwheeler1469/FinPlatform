@@ -254,7 +254,7 @@ const CRMCommandCenter = () => {
       name: client.name,
       email: client.email
     }));
-    navigate("/client-wealth");
+    navigate("/client-360");
   };
 
   const handleQuickAction = (action, client) => {
