@@ -12,13 +12,18 @@ The platform has been transformed from a reactive tool into an indispensable **d
 
 ---
 
-## Latest Update (December 17, 2025) - Iteration 53
+## Latest Update (March 17, 2025) - Iteration 54
 
 ### ✅ All Tests Passing (100%)
-- **Backend**: 28/28 tests passed
-- **Frontend**: All pages verified
-- **Total Routes**: 31 backend modules
+- **Backend**: 35/35 tests passed
+- **Frontend**: All pages verified including new Notification Center and Data Aggregators
+- **Total Routes**: 34 backend modules
 - **Total AUM Tracked**: $21.3M (mock data)
+
+### New Features in This Iteration:
+1. **Notification System (Demo Mode)** - Shows what notifications would be sent via WebSocket, Push, Email, SMS
+2. **Australian CDR Data Aggregators Research** - 5 CDR-compliant providers with recommendations
+3. **Document Generation Service** - SOA PDFs and compliance checklists using ReportLab
 
 ---
 
@@ -32,7 +37,32 @@ The daily "must-open" landing page combining all alerts and insights.
 - **Quick Actions**: AI Copilot, Compliance, Market Overview
 - **Route**: `/advisor-intelligence`
 
-### 2. Portfolio Monitoring Engine ✅ NEW
+### 2. Notification System ✅ NEW (Iteration 54)
+Real-time alerts, email notifications, and push notifications.
+- **8 Notification Types**: portfolio_drift, tax_opportunity, compliance_due, idle_cash, retirement_risk, meeting_reminder, market_event, client_login
+- **Demo Mode**: Shows what notifications WOULD be sent via each channel
+- **Email Preview**: Professional HTML email templates with Wealth Command branding
+- **Simulation**: Test notification delivery through all channels
+- **APIs**: `/api/notifications/demo`, `/api/notifications/summary`, `/api/notifications/demo/simulate`
+- **Route**: `/notifications`
+
+### 3. Australian CDR Data Aggregators ✅ NEW (Iteration 54)
+Research and recommendations for CDR-compliant data providers.
+- **5 Providers**: Basiq, Frollo, Yodlee, Moneytree, Mastercard (Finicity)
+- **Recommendation Engine**: Use case-based provider suggestions
+- **CDR Requirements**: Compliance info, participation paths, security requirements
+- **Implementation Roadmap**: 4-phase integration plan with budget estimates ($25K-$50K)
+- **APIs**: `/api/data-aggregators/options`, `/api/data-aggregators/recommend`, `/api/data-aggregators/cdr-requirements`
+- **Route**: `/data-aggregators`
+
+### 4. Document Generation Service ✅ NEW (Iteration 54)
+Professional PDF generation for compliance documents.
+- **SOA Templates**: Statement of Advice with fees, recommendations, warnings
+- **Compliance Checklists**: Auto-generated PDF checklists for annual reviews
+- **ReportLab Integration**: Full PDF styling with Wealth Command branding
+- **APIs**: `/api/documents/generate/soa`, `/api/documents/generate/portfolio-report`, `/api/documents/generate/compliance-checklist`
+
+### 5. Portfolio Monitoring Engine
 AI continuously scans all portfolios for issues.
 - Daily scan of all client portfolios
 - Detects: allocation drift, concentration risk, idle cash, tax-loss opportunities, retirement shortfall
@@ -40,7 +70,7 @@ AI continuously scans all portfolios for issues.
 - Configurable thresholds
 - **APIs**: `/api/monitoring/daily-scan`, `/api/monitoring/book-insights`, `/api/monitoring/alerts/summary`
 
-### 3. Client Financial Graph ✅ NEW
+### 6. Client Financial Graph
 Maps entire client financial life.
 - Primary client + family members
 - Entities: Trusts, companies, SMSFs
@@ -50,7 +80,7 @@ Maps entire client financial life.
 - Cash flow analysis with surplus calculation
 - **APIs**: `/api/financial-graph/client/{id}`, `/api/financial-graph/client/{id}/cash-flow`
 
-### 4. Tax Optimization Engine ✅ NEW
+### 7. Tax Optimization Engine
 Comprehensive tax planning and strategy.
 - Super contribution optimization (calculate benefit of maximizing cap)
 - Tax-loss harvesting identification
@@ -59,7 +89,7 @@ Comprehensive tax planning and strategy.
 - EOFY checklist with priorities
 - **APIs**: `/api/tax-optimization/client/{id}/analysis`, `/api/tax-optimization/client/{id}/strategies`
 
-### 5. Automated Portfolio Rebalancing ✅ NEW
+### 8. Automated Portfolio Rebalancing
 One-click, tax-aware rebalancing.
 - Tax-aware trade recommendations (sell losers first)
 - CGT impact calculation
@@ -67,35 +97,9 @@ One-click, tax-aware rebalancing.
 - Batch rebalancing for efficiency
 - **APIs**: `/api/rebalance/preview/{id}`, `/api/rebalance/drift-report/{id}`, `/api/rebalance/execute`
 
-### 6. Cross-Client Intelligence Engine
-Book-wide analysis and pattern detection.
-- Portfolio drift patterns across clients
-- Tax opportunities across all clients
-- Engagement tracking (at-risk clients)
-- Fee optimization opportunities
-- **APIs**: `/api/intelligence/comprehensive-analysis`, `/api/intelligence/tax-opportunities`
-
-### 7. Client Portal
-Separate portal for clients to view their wealth.
-- JWT authentication for clients
-- Portfolio dashboard with performance
-- Goals tracking with progress
-- Document library
-- Secure messaging with adviser
-- Net worth overview
-- **Route**: `/client-portal`
-- **Demo**: `client_wheeler@email.com` / `wheeler2025`
-
-### 8. Meeting Automation
-AI-powered meeting documentation.
-- Generate meeting notes from topics
-- Compliance log auto-creation
-- Follow-up email generation
-- **APIs**: `/api/meeting-automation/generate-notes`
-
 ---
 
-## Architecture (31 Backend Modules)
+## Architecture (34 Backend Modules)
 
 ```
 /app/backend/routes/
@@ -109,6 +113,8 @@ AI-powered meeting documentation.
 ├── copilot.py              # AI Wealth Copilot
 ├── crm.py                  # Client CRM
 ├── dashboard.py            # Main dashboard
+├── data_aggregators.py     # CDR aggregator research ✅ NEW
+├── document_generation.py  # SOA/PDF generation ✅ REGISTERED
 ├── documents.py            # Document management
 ├── financial_graph.py      # Client financial graph
 ├── goals.py                # Goal tracking
@@ -119,6 +125,7 @@ AI-powered meeting documentation.
 ├── marketplace.py          # Product marketplace
 ├── meeting_automation.py   # Meeting notes
 ├── meeting_prep.py         # AI Meeting Prep
+├── notifications.py        # Notification system ✅ REGISTERED
 ├── portfolio.py            # Portfolio management
 ├── portfolio_monitoring.py # Daily portfolio scanning
 ├── practice.py             # Practice management
@@ -138,15 +145,18 @@ AI-powered meeting documentation.
 
 | Category | Endpoint | Status |
 |----------|----------|--------|
+| **Notifications** | GET `/api/notifications/demo` | ✅ NEW |
+| **Notifications** | GET `/api/notifications/summary` | ✅ NEW |
+| **Notifications** | POST `/api/notifications/demo/simulate` | ✅ NEW |
+| **Data Aggregators** | GET `/api/data-aggregators/options` | ✅ NEW |
+| **Data Aggregators** | POST `/api/data-aggregators/recommend` | ✅ NEW |
+| **Data Aggregators** | GET `/api/data-aggregators/cdr-requirements` | ✅ NEW |
+| **Documents** | GET `/api/documents/generate/soa/template` | ✅ NEW |
+| **Documents** | POST `/api/documents/generate/compliance-checklist` | ✅ NEW |
 | **Monitoring** | GET `/api/monitoring/daily-scan` | ✅ |
-| **Monitoring** | GET `/api/monitoring/book-insights` | ✅ |
 | **Financial Graph** | GET `/api/financial-graph/client/{id}` | ✅ |
-| **Financial Graph** | GET `/api/financial-graph/client/{id}/cash-flow` | ✅ |
 | **Tax Optimization** | GET `/api/tax-optimization/client/{id}/analysis` | ✅ |
-| **Tax Optimization** | GET `/api/tax-optimization/client/{id}/strategies` | ✅ |
-| **Tax Optimization** | GET `/api/tax-optimization/client/{id}/eofy-checklist` | ✅ |
 | **Rebalancing** | GET `/api/rebalance/preview/{id}` | ✅ |
-| **Rebalancing** | POST `/api/rebalance/execute` | ✅ |
 | **Intelligence** | GET `/api/intelligence/comprehensive-analysis` | ✅ |
 | **Client Portal** | POST `/api/client-portal/auth/login` | ✅ |
 | **Command Center** | GET `/api/command-center/daily-digest` | ✅ |
@@ -174,24 +184,18 @@ AI-powered meeting documentation.
 ### LIVE
 - ✅ AI Features via Emergent LLM Key
 - ✅ ASX Market Data via yfinance
+- ✅ PDF Generation via ReportLab
 
 ### MOCKED (Production-Ready Frameworks)
+- 🔄 Email Notifications - Requires SENDGRID_API_KEY
+- 🔄 SMS Notifications - Requires Twilio credentials
+- 🔄 Push Notifications - Via WebSocket currently
 - 🔄 Portfolio Monitoring - Mock client portfolios
 - 🔄 Financial Graph - Sample client data
 - 🔄 Tax Calculations - ATO 2024-25 rates
 - 🔄 Rebalancing - Simulation mode
-- 🔄 Account Aggregation - Plaid simulation
-- 🔄 SMS 2FA - Twilio demo mode
-
----
-
-## What Makes This an "Operating System"
-
-1. **Daily Habit Formation**: Advisor Intelligence Dashboard shows alerts that require daily attention
-2. **Book-Wide Intelligence**: Analyzes entire client book, not just one client at a time
-3. **Proactive Alerts**: AI detects issues before advisors notice them
-4. **One-Click Actions**: Tax optimization, rebalancing with single button
-5. **Complete Financial Picture**: Financial Graph maps entire client wealth structure
+- 🔄 Account Aggregation - Plaid simulation (not suitable for AU)
+- 🔄 CDR Data Aggregators - Research phase, integration required
 
 ---
 
@@ -199,25 +203,27 @@ AI-powered meeting documentation.
 
 ### P0 - Critical
 - [ ] Backend refactoring (server.py still has 7,700+ lines)
+- [ ] Choose and integrate CDR data aggregator (recommend Basiq)
 
 ### P1 - High
-- [ ] Real custodian/brokerage integrations
+- [ ] Enable live email notifications (SendGrid)
+- [ ] Enable live SMS 2FA (Twilio)
 - [ ] PostgreSQL database migration
-- [ ] Real-time WebSocket alerts
 
 ### P2 - Medium
-- [ ] Document generation (SOA PDFs)
-- [ ] Email integration (SendGrid)
-- [ ] Real Twilio SMS
+- [ ] Build Financial Graph frontend visualization
+- [ ] WebSocket notification subscriptions from frontend
+- [ ] Client Portal enhancements
 
 ### P3 - Future
-- [ ] Australian CDR integration
 - [ ] Mobile app
 - [ ] White-label version
+- [ ] Multi-tenancy
 
 ---
 
 ## Test Reports
+- `/app/test_reports/iteration_54.json` - Notifications, Data Aggregators, Documents (100%)
 - `/app/test_reports/iteration_53.json` - Portfolio Monitoring, Tax Optimization, Rebalancing (100%)
 - `/app/test_reports/iteration_52.json` - Intelligence, Client Portal, Meeting Automation (100%)
 - `/app/test_reports/iteration_51.json` - Command Center, Live Data, Holdings (100%)
@@ -225,6 +231,17 @@ AI-powered meeting documentation.
 ---
 
 ## Change Log
+
+### March 17, 2025 (Iteration 54)
+- ✅ Notification System with demo mode showing 8 notification types
+- ✅ Email preview with professional HTML templates
+- ✅ Notification simulation endpoint
+- ✅ Australian CDR Data Aggregators research page
+- ✅ 5 CDR providers with detailed info and recommendations
+- ✅ CDR requirements and implementation roadmap
+- ✅ Document generation service registered (SOA PDFs, compliance checklists)
+- ✅ Navigation updated with new routes
+- ✅ 35/35 backend tests passing
 
 ### December 17, 2025 (Iteration 53)
 - ✅ Portfolio Monitoring Engine - daily scanning
@@ -242,8 +259,23 @@ AI-powered meeting documentation.
 - ✅ Fixed Disclaimer Modal
 - ✅ 27/27 backend tests passing
 
-### December 17, 2025 (Iteration 51)
-- ✅ Command Center page and API
-- ✅ Live Market Data integration
-- ✅ Enhanced Holdings Management
-- ✅ 38/38 backend tests passing
+---
+
+## CDR Integration Decision Required
+
+**Recommended Provider**: Basiq
+- Best for Australian market focus
+- Medium integration effort (2-4 weeks)
+- 100+ supported banks
+- Sandbox available
+
+**Estimated Cost**:
+- Development: $20,000 - $40,000
+- Provider Fees: $500 - $2,000/month ongoing
+- Total Timeline: 8-12 weeks
+
+**Next Steps**:
+1. Confirm business decision to proceed
+2. Apply for Basiq sandbox access
+3. Allocate development resources
+4. Begin Phase 1 integration
