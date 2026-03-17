@@ -169,6 +169,14 @@ def include_all_routes():
         logger.info("REVENUE LAYER loaded: AUM Fees, Trading Fees, Subscriptions")
     except ImportError as e:
         logger.error(f"Failed to load revenue layer routes: {e}")
+    
+    # FX TRADING LAYER
+    try:
+        from routes.fx_trading import router as fx_router
+        app.include_router(fx_router, prefix="/api")
+        logger.info("FX TRADING loaded: MetaTrader 5, cTrader, Currency Hedging")
+    except ImportError as e:
+        logger.error(f"Failed to load FX trading routes: {e}")
 
 # Include all routes
 include_all_routes()
