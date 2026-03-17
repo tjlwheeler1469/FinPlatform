@@ -115,6 +115,9 @@ const CommandCenter = lazy(() => import("@/pages/CommandCenter"));
 // Cross-Client Intelligence Engine
 const IntelligenceEngine = lazy(() => import("@/pages/IntelligenceEngine"));
 
+// Advisor Intelligence Dashboard - Daily Operating System
+const AdvisorIntelligenceDashboard = lazy(() => import("@/pages/AdvisorIntelligenceDashboard"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
