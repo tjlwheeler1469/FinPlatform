@@ -7775,6 +7775,7 @@ try:
     from routes.rebalancing import router as rebalancing_router
     from routes.notifications import router as notifications_router
     from routes.document_generation import router as document_generation_router
+    from routes.data_aggregators import router as data_aggregators_router
     
     app.include_router(intelligence_router, prefix="/api")
     app.include_router(meeting_automation_router, prefix="/api")
@@ -7785,6 +7786,7 @@ try:
     app.include_router(rebalancing_router, prefix="/api")
     app.include_router(notifications_router, prefix="/api")
     app.include_router(document_generation_router, prefix="/api")
+    app.include_router(data_aggregators_router, prefix="/api")
     
     logger.info("All modular routes loaded successfully")
 except ImportError as e:
