@@ -7735,6 +7735,8 @@ try:
     from routes.research import router as research_router
     from routes.compliance import router as compliance_router
     from routes.wealth_dashboard import router as wealth_dashboard_router
+    from routes.command_center import router as command_center_router
+    from routes.live_data import router as live_data_router
     
     # Include all modular routers with /api prefix
     app.include_router(auth_router, prefix="/api")
@@ -7758,6 +7760,8 @@ try:
     app.include_router(research_router, prefix="/api")
     app.include_router(compliance_router, prefix="/api")
     app.include_router(wealth_dashboard_router, prefix="/api")
+    app.include_router(command_center_router, prefix="/api")
+    app.include_router(live_data_router, prefix="/api")
     
     logger.info("All modular routes loaded successfully")
 except ImportError as e:
