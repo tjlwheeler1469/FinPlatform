@@ -191,7 +191,7 @@ async def health_check():
     return {
         "status": "healthy",
         "service": "wealth-command",
-        "version": "6.0.0",
+        "version": "6.1.0",
         "architecture": "modular",
         "execution_layer": {
             "trading": True,
@@ -201,6 +201,11 @@ async def health_check():
             "crypto": True,
             "reconciliation": True
         },
+        "revenue_layer": {
+            "aum_fees": True,
+            "trading_fees": True,
+            "subscriptions": True
+        },
         "capabilities": [
             "next_best_action",
             "practice_health", 
@@ -209,7 +214,10 @@ async def health_check():
             "model_portfolios",
             "auto_rebalancing",
             "multi_asset_execution",
-            "cross_platform_reconciliation"
+            "cross_platform_reconciliation",
+            "revenue_management",
+            "tiered_fees",
+            "invoice_generation"
         ]
     }
 
