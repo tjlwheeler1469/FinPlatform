@@ -210,8 +210,9 @@ class TestEmailRoutes:
         assert response.status_code == 200
         data = response.json()
         assert "demo_mode" in data
-        assert "templates" in data
-        print(f"✓ Email status: demo_mode={data['demo_mode']}, templates={len(data['templates'])}")
+        assert "configured" in data
+        assert "sender_email" in data
+        print(f"✓ Email status: demo_mode={data['demo_mode']}, configured={data['configured']}")
     
     def test_send_test_email(self):
         """Test sending test email (demo mode)"""
