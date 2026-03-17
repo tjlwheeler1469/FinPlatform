@@ -195,6 +195,58 @@ const SharePortfolio = () => {
     toast.success("Share removed from portfolio");
   };
 
+  // Handle opening trade modal
+  const openTradeModal = (share, type) => {
+    setTradeShare(share);
+    setTradeType(type);
+    setTradeQuantity(type === "sell" ? share.quantity : 0);
+    setTradePrice(share.currentPrice);
+    setShowTradeModal(true);
+  };
+
+  // Handle executing trade
+  const handleExecuteTrade = () => {
+    if (!tradeShare || tradeQuantity <= 0) {
+      toast.error("Please enter a valid quantity");
+      return;
+    }
+
+    if (tradeType === "sell") {
+      if (tradeQuantity > tradeShare.quantity) {
+        toast.error(`Cannot sell more than ${tradeShare.quantity} shares`);
+        return;
+      }
+      
+      if (tradeQuantity === tradeShare.quantity) {
+        // Full sale - remove the holding
+        removeShare(tradeShare.id);
+        toast.success(`Sold all ${tradeQuantity} shares of ${tradeShare.symbol}`);
+      } else {
+        // Partial sale - reduce quantity
+        const newQuantity = tradeShare.quantity - tradeQuantity;
+        updateShare(tradeShare.id, { quantity: newQuantity });
+        toast.success(`Sold ${tradeQuantity} shares of ${tradeShare.symbol}. Remaining: ${newQuantity}`);
+      }
+    } else {
+      // Buy more shares
+      const oldValue = tradeShare.quantity * tradeShare.purchasePrice;
+      const newValue = tradeQuantity * tradePrice;
+      const totalQuantity = tradeShare.quantity + tradeQuantity;
+      const newAvgCost = (oldValue + newValue) / totalQuantity;
+      
+      updateShare(tradeShare.id, { 
+        quantity: totalQuantity,
+        purchasePrice: newAvgCost,
+        currentPrice: tradePrice
+      });
+      toast.success(`Bought ${tradeQuantity} shares of ${tradeShare.symbol}. New total: ${totalQuantity}`);
+    }
+
+    setShowTradeModal(false);
+    setTradeShare(null);
+    setTradeQuantity(0);
+  };
+
   // Refresh stock prices from backend
   const handleRefreshPrices = async () => {
     if (sharePortfolio.length === 0) {
