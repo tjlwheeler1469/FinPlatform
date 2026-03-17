@@ -813,9 +813,9 @@ const AppRouter = () => {
       <Route path="/login" element={<Suspense fallback={<PageLoader />}><Login /></Suspense>} />
       
       {/* Protected routes */}
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/" element={<Navigate to="/advisor-command-center" replace />} />
       <Route path="/mode-selector" element={<ModeSelector />} />
-      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/dashboard" element={<Navigate to="/advisor-command-center" replace />} />
       <Route path="/overview" element={<FamilyOverview />} />
       <Route path="/budget" element={<HouseholdBudget />} />
       <Route path="/tax-analysis" element={<TaxAnalysisSync />} />
