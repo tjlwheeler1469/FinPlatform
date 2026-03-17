@@ -1,103 +1,142 @@
-# Wealth Command v7.1.0 - World-Class CRM Foundation
+# Wealth Command v7.2.0 - Workflow Engine & Book Intelligence
 ## "The Operating System Advisors Cannot Function Without"
 
 ---
 
-## 🏆 Platform Evolution: Intelligence → Execution → CRM
+## Platform Evolution: Intelligence → Execution → CRM → Automation
 
 | Version | Focus | Status |
 |---------|-------|--------|
 | v7.0 | Execution Brain (Action Layer, Macro Data, Broker Research) | ✅ Complete |
-| **v7.1** | **CRM Foundation (Households, Compliance, Audit)** | ✅ Complete |
-| v7.2 | Workflow Engine (Onboarding, Meeting Automation) | 🔜 Next |
-| v7.3 | WOW Layer (Autonomous Advisor, Book Intelligence) | 🔜 Planned |
+| v7.1 | CRM Foundation (Households, Compliance, Audit) | ✅ Complete |
+| **v7.2** | **Workflow Engine + Book Intelligence + Alpaca Paper Trading** | ✅ Complete |
+| v7.3 | WOW Layer (Meeting Automation, Autonomous Advisor) | 🔜 Next |
 
 ---
 
-## What's New in v7.1.0 - CRM Foundation
+## What's New in v7.2.0 - Workflow Engine & Book Intelligence
 
-### 1. Household Intelligence `/api/household/*` ✅
+### 1. Workflow Engine `/api/workflow/*` ✅
 
-**Wealth is relational, not individual.**
+**Automate multi-step client processes from start to finish.**
 
-#### Family Tree Structure
-- Multi-generational tracking (parents, children, grandchildren)
-- Relationship types: spouse, child, parent, sibling, in-law, ex-spouse
-- Member profiles: income, occupation, contact info, status
+#### Workflow Templates (4 Total)
+| Template | Steps | Duration | Use Case |
+|----------|-------|----------|----------|
+| Client Onboarding | 10 | 14 days | KYC, docs, FSG, account setup |
+| Annual Review | 8 | 7 days | Performance, goals, compliance |
+| Tax Planning | 5 | 30 days | CGT harvesting, super top-up |
+| Portfolio Rebalancing | 6 | 3 days | Drift analysis, trade execution |
 
-#### Entity Mapping
-| Entity Type | Description |
-|------------|-------------|
-| Family Trust | Asset protection & income distribution |
-| Discretionary Trust | Flexible beneficiary distributions |
-| Unit Trust | Fixed entitlements |
-| SMSF | Self-managed super fund |
-| Company | Operating businesses |
-| Partnership | Business partnerships |
-
-#### Professional Network
-- Accountant (tax planning, SMSF)
-- Lawyer (estate planning, business law)
-- Mortgage Broker (residential, commercial)
-- Insurance Broker
-- Financial Planner
+#### Step Types
+- **Manual**: Requires human action
+- **Automated**: System performs automatically
+- **Approval**: Requires advisor/compliance approval
+- **Document**: Generate documents (FSG, SOA)
+- **Notification**: Send client communications
+- **Conditional**: Branch based on conditions
+- **Integration**: External system (trading, CRM)
 
 #### Endpoints
 ```
-GET  /api/household/list                    - List all households
-GET  /api/household/{id}                    - Complete household details
-GET  /api/household/{id}/family-tree        - Family tree nodes/edges
-GET  /api/household/{id}/entities           - Trusts, companies, SMSFs
-GET  /api/household/{id}/professionals      - Professional network
-GET  /api/household/{id}/net-worth          - Aggregated net worth
-POST /api/household/create                  - Create new household
-POST /api/household/{id}/members            - Add family member
-POST /api/household/{id}/entities           - Add entity
-POST /api/household/{id}/professionals      - Add professional
+GET  /api/workflow/templates              - List all templates
+GET  /api/workflow/templates/{id}         - Template details with steps
+GET  /api/workflow/dashboard              - Dashboard with action items
+GET  /api/workflow/instances              - List active workflows
+GET  /api/workflow/instances/{id}         - Workflow detail with progress
+GET  /api/workflow/stats                  - Performance statistics
+POST /api/workflow/create                 - Create custom workflow
+POST /api/workflow/quick-start/{template} - Start from template
+PUT  /api/workflow/instances/{id}/steps/{step_id} - Update step status
+POST /api/workflow/instances/{id}/pause   - Pause workflow
+POST /api/workflow/instances/{id}/resume  - Resume workflow
+POST /api/workflow/instances/{id}/cancel  - Cancel workflow
 ```
 
 ---
 
-### 2. Compliance & Audit Layer `/api/compliance-audit/*` ✅
+### 2. Book Intelligence `/api/book-intelligence/*` ✅
 
-**Enterprise-grade compliance for wealth management.**
+**AI-powered cross-client analytics for macro insights.**
 
-#### Full Audit Logging
-- All user actions tracked (login, view, edit, trade, approve)
-- IP address and user agent tracking
-- Resource type and ID tracking
-- Success/failure status
-- 7-day activity summaries
+#### Book Overview
+- 12 demo clients analyzed
+- $30.8M total AUM
+- Sector allocation breakdown
+- Risk profile distribution
+- Average engagement score: 72%
 
-#### KYC/AML Workflows
-| Status | Description |
-|--------|-------------|
-| Not Started | KYC not initiated |
-| In Progress | Documents being collected |
-| Pending Review | Documents verified, awaiting approval |
-| Approved | Full verification complete |
-| Expired | Requires renewal (2-year validity) |
-
-#### Document Management
-- Document types: SOA, ROA, FSG, PDS, Risk Profile, Tax Returns, Trust Deeds
-- Version control
-- Access logging
-- Expiry tracking
-- Tag-based organization
-
-#### Approval Workflows
-| Approval Type | Description |
-|--------------|-------------|
-| Trade | Large trade approval |
-| Transfer | Fund transfer approval |
-| New Client | Onboarding approval |
-| SOA Issue | Statement of Advice release |
-| Risk Override | Risk profile change |
-| Fee Change | Fee structure modification |
+#### AI-Generated Insights
+- **Sector Concentration Risks**: Tech overweight (28% book exposure)
+- **Tax-Loss Harvesting**: $560K harvestable losses → $218K tax savings
+- **Client Engagement**: 5 at-risk clients, $44.6K revenue at risk
+- **Retirement Readiness**: Near-retirees with aggressive profiles
 
 #### Endpoints
 ```
-GET  /api/compliance-audit/dashboard           - Compliance overview
+GET  /api/book-intelligence/overview            - Book summary
+GET  /api/book-intelligence/insights            - AI-generated insights
+GET  /api/book-intelligence/sector-analysis     - Sector allocation
+GET  /api/book-intelligence/tax-opportunities   - Tax harvesting opportunities
+GET  /api/book-intelligence/engagement-health   - Client engagement scores
+GET  /api/book-intelligence/retirement-analysis - Retirement readiness
+GET  /api/book-intelligence/risk-analysis       - Risk profile distribution
+GET  /api/book-intelligence/clients-needing-action - Action priority list
+GET  /api/book-intelligence/performance-attribution - Top/bottom performers
+POST /api/book-intelligence/generate-report     - Generate comprehensive report
+```
+
+---
+
+### 3. Alpaca Paper Trading `/api/alpaca/*` ✅
+
+**One-click execution via Alpaca brokerage integration.**
+
+#### SDK Status
+- Alpaca-py v0.43.2 installed
+- Paper trading mode enabled
+- Demo endpoints for development (when keys not configured)
+
+#### Account Operations
+- Get account balance, buying power, equity
+- View all positions with P&L
+- Check individual position details
+
+#### Order Types
+- Market orders (immediate execution)
+- Limit orders (price threshold)
+- Stop orders (trigger price)
+- Batch orders (multiple trades)
+
+#### Endpoints
+```
+GET  /api/alpaca/status              - Check SDK & connection status
+POST /api/alpaca/configure           - Set API keys
+GET  /api/alpaca/account             - Account info
+GET  /api/alpaca/positions           - All positions
+GET  /api/alpaca/positions/{symbol}  - Position by symbol
+GET  /api/alpaca/orders              - List orders
+GET  /api/alpaca/orders/{id}         - Order details
+POST /api/alpaca/orders/market       - Place market order
+POST /api/alpaca/orders/limit        - Place limit order
+POST /api/alpaca/orders/stop         - Place stop order
+POST /api/alpaca/orders/batch        - Batch orders
+DELETE /api/alpaca/orders/{id}       - Cancel order
+DELETE /api/alpaca/orders            - Cancel all orders
+DELETE /api/alpaca/positions/{symbol} - Close position
+DELETE /api/alpaca/positions         - Liquidate all
+
+# Demo endpoints (when Alpaca not configured)
+GET  /api/alpaca/demo/account        - Demo account data
+GET  /api/alpaca/demo/positions      - Demo positions (AAPL, MSFT, GOOGL)
+POST /api/alpaca/demo/orders/market  - Simulate market order
+```
+
+---
+
+## Previous Versions
+
+### v7.1.0 - CRM Foundation ✅
 GET  /api/compliance-audit/audit-log           - Audit entries (filtered)
 GET  /api/compliance-audit/audit-log/summary   - Activity summary
 GET  /api/compliance-audit/kyc/dashboard       - KYC status overview
