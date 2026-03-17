@@ -119,42 +119,8 @@ const setAcknowledgement = (permanent = false) => {
   ]
 };
 
-// Check if user has acknowledged
-const hasAcknowledged = () => {
-  try {
-    // Check permanent dismissal
-    const permanent = localStorage.getItem(STORAGE_KEY);
-    if (permanent === "permanent") return true;
-    
-    // Check session dismissal
-    const session = sessionStorage.getItem(SESSION_KEY);
-    if (session) return true;
-    
-    // Check if already shown this app instance
-    if (hasShownThisSession) return true;
-    
-    return false;
-  } catch {
-    return hasShownThisSession;
-  }
-};
-
-// Set acknowledgement
-const setAcknowledgement = (permanent = false) => {
-  try {
-    if (permanent) {
-      localStorage.setItem(STORAGE_KEY, "permanent");
-    }
-    sessionStorage.setItem(SESSION_KEY, new Date().toISOString());
-    hasShownThisSession = true;
-  } catch (e) {
-    console.warn('Could not persist compliance acknowledgement:', e);
-    hasShownThisSession = true;
-  }
-};
-
-// Modal component shown on first visit
-export const ComplianceModal = ({ onAccept }) => {
+// Compliance disclaimer content
+const COMPLIANCE_CONTENT = {
   const [acknowledged, setAcknowledgedState] = useState(false);
   const [dontShowAgain, setDontShowAgain] = useState(false);
   const [open, setOpen] = useState(false);
