@@ -7765,6 +7765,15 @@ try:
     app.include_router(live_data_router, prefix="/api")
     app.include_router(holdings_router, prefix="/api")
     
+    # New advanced routes
+    from routes.intelligence import router as intelligence_router
+    from routes.meeting_automation import router as meeting_automation_router
+    from routes.client_portal import router as client_portal_router
+    
+    app.include_router(intelligence_router, prefix="/api")
+    app.include_router(meeting_automation_router, prefix="/api")
+    app.include_router(client_portal_router, prefix="/api")
+    
     logger.info("All modular routes loaded successfully")
 except ImportError as e:
     logger.warning(f"Some modular routes not available: {e}")
