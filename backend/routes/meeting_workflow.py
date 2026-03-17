@@ -1,5 +1,5 @@
 """
-Meeting Automation & CRM Integration
+Meeting Automation & CRM Integration with MongoDB Persistence
 After every meeting: notes generated, tasks created, CRM updated, compliance logged.
 This is where hours are saved - the full meeting lifecycle automation.
 """
@@ -7,12 +7,24 @@ from fastapi import APIRouter, HTTPException, BackgroundTasks
 from pydantic import BaseModel
 from typing import Dict, List, Optional, Any
 from datetime import datetime, timezone, timedelta
+from bson import ObjectId
 import uuid
 import logging
 import os
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/meeting-automation", tags=["Meeting Automation"])
+
+# Import database
+try:
+    from db import db
+    meetings_collection = db.meetings
+    tasks_collection = db.tasks
+    crm_notes_collection = db.crm_notes
+    DB_AVAILABLE = True
+except ImportError:
+    DB_AVAILABLE = False
+    logger.warning("Database not available for meeting automation - using in-memory storage")
 
 # Try to import AI service
 try:
@@ -94,10 +106,20 @@ MEETING_TEMPLATES = {
     }
 }
 
-# In-memory storage for meetings (would be database in production)
-MEETINGS_DB: Dict[str, Dict] = {}
-TASKS_DB: Dict[str, Dict] = {}
-CRM_NOTES_DB: Dict[str, List] = {}
+# Fallback in-memory storage if DB unavailable
+MEETINGS_MEMORY: Dict[str, Dict] = {}
+TASKS_MEMORY: Dict[str, Dict] = {}
+CRM_NOTES_MEMORY: Dict[str, List] = {}
+
+
+def serialize_doc(doc):
+    """Convert MongoDB document to JSON-serializable format."""
+    if doc is None:
+        return None
+    doc = dict(doc)
+    if "_id" in doc:
+        doc["_id"] = str(doc["_id"])
+    return doc
 
 
 class MeetingInput(BaseModel):
@@ -114,7 +136,7 @@ class MeetingInput(BaseModel):
 
 class MeetingNotesInput(BaseModel):
     meeting_id: str
-    raw_notes: str  # Can be transcript, bullet points, or free text
+    raw_notes: str
     key_decisions: Optional[List[str]] = None
     client_concerns: Optional[List[str]] = None
     action_items: Optional[List[str]] = None
@@ -139,7 +161,7 @@ async def schedule_meeting(meeting: MeetingInput):
     template = MEETING_TEMPLATES.get(meeting.meeting_type, MEETING_TEMPLATES["review"])
     
     meeting_data = {
-        "id": meeting_id,
+        "meeting_id": meeting_id,
         "client_id": meeting.client_id,
         "client_name": meeting.client_name,
         "meeting_type": meeting.meeting_type,
@@ -158,15 +180,19 @@ async def schedule_meeting(meeting: MeetingInput):
         "follow_up_status": "pending"
     }
     
-    MEETINGS_DB[meeting_id] = meeting_data
+    # Store in database or memory
+    if DB_AVAILABLE:
+        await meetings_collection.insert_one(meeting_data)
+    else:
+        MEETINGS_MEMORY[meeting_id] = meeting_data
     
     # Auto-generate prep task
     prep_task_id = f"task_{uuid.uuid4().hex[:8]}"
     meeting_datetime = datetime.strptime(f"{meeting.date} {meeting.time}", "%Y-%m-%d %H:%M")
     prep_due = (meeting_datetime - timedelta(days=1)).strftime("%Y-%m-%d")
     
-    TASKS_DB[prep_task_id] = {
-        "id": prep_task_id,
+    prep_task = {
+        "task_id": prep_task_id,
         "title": f"Prepare for {meeting.client_name} {meeting.meeting_type} meeting",
         "client_id": meeting.client_id,
         "due_date": prep_due,
@@ -177,31 +203,35 @@ async def schedule_meeting(meeting: MeetingInput):
         "created_at": datetime.now(timezone.utc).isoformat()
     }
     
+    if DB_AVAILABLE:
+        await tasks_collection.insert_one(prep_task)
+    else:
+        TASKS_MEMORY[prep_task_id] = prep_task
+    
     return {
         "success": True,
         "meeting_id": meeting_id,
         "meeting": meeting_data,
         "prep_task_id": prep_task_id,
-        "message": f"Meeting scheduled and prep task created"
+        "message": f"Meeting scheduled and prep task created",
+        "storage": "mongodb" if DB_AVAILABLE else "in-memory"
     }
 
 
 @router.post("/process-notes")
 async def process_meeting_notes(notes_input: MeetingNotesInput, background_tasks: BackgroundTasks):
-    """
-    Process meeting notes using AI:
-    1. Generate structured meeting summary
-    2. Extract action items and create tasks
-    3. Update CRM with meeting record
-    4. Log compliance requirements
-    """
+    """Process meeting notes using AI."""
     meeting_id = notes_input.meeting_id
     
-    # Verify meeting exists
-    if meeting_id not in MEETINGS_DB:
-        raise HTTPException(status_code=404, detail="Meeting not found")
+    # Find meeting
+    if DB_AVAILABLE:
+        meeting = await meetings_collection.find_one({"meeting_id": meeting_id})
+        meeting = serialize_doc(meeting)
+    else:
+        meeting = MEETINGS_MEMORY.get(meeting_id)
     
-    meeting = MEETINGS_DB[meeting_id]
+    if not meeting:
+        raise HTTPException(status_code=404, detail="Meeting not found")
     
     # Process notes with AI if available
     if AI_AVAILABLE and notes_input.raw_notes:
@@ -219,19 +249,29 @@ async def process_meeting_notes(notes_input: MeetingNotesInput, background_tasks
         action_items = notes_input.action_items or []
         compliance_notes = create_basic_compliance_notes(meeting)
     
-    # Update meeting with processed notes
-    meeting["notes_status"] = "processed"
-    meeting["meeting_summary"] = summary
-    meeting["action_items"] = action_items
-    meeting["compliance_notes"] = compliance_notes
-    meeting["processed_at"] = datetime.now(timezone.utc).isoformat()
+    # Update meeting
+    update_data = {
+        "notes_status": "processed",
+        "meeting_summary": summary,
+        "action_items_list": action_items,
+        "compliance_notes": compliance_notes,
+        "processed_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    if DB_AVAILABLE:
+        await meetings_collection.update_one(
+            {"meeting_id": meeting_id},
+            {"$set": update_data}
+        )
+    else:
+        MEETINGS_MEMORY[meeting_id].update(update_data)
     
     # Create tasks from action items
     created_tasks = []
     for item in action_items:
         task_id = f"task_{uuid.uuid4().hex[:8]}"
         task = {
-            "id": task_id,
+            "task_id": task_id,
             "title": item.get("title", item) if isinstance(item, dict) else item,
             "description": item.get("description", "") if isinstance(item, dict) else "",
             "client_id": meeting["client_id"],
@@ -242,27 +282,42 @@ async def process_meeting_notes(notes_input: MeetingNotesInput, background_tasks
             "task_type": "meeting_follow_up",
             "created_at": datetime.now(timezone.utc).isoformat()
         }
-        TASKS_DB[task_id] = task
-        created_tasks.append(task)
+        
+        if DB_AVAILABLE:
+            await tasks_collection.insert_one(task)
+        else:
+            TASKS_MEMORY[task_id] = task
+        
+        created_tasks.append(serialize_doc(task) if DB_AVAILABLE else task)
     
-    # Update CRM (add to notes log)
-    if meeting["client_id"] not in CRM_NOTES_DB:
-        CRM_NOTES_DB[meeting["client_id"]] = []
-    
+    # Add CRM note
     crm_entry = {
-        "id": f"crm_{uuid.uuid4().hex[:8]}",
+        "crm_id": f"crm_{uuid.uuid4().hex[:8]}",
+        "client_id": meeting["client_id"],
         "date": meeting["date"],
         "type": "meeting",
         "meeting_type": meeting["meeting_type"],
         "summary": summary,
-        "action_items": [t["title"] for t in created_tasks],
+        "action_items": [t.get("title", t) for t in created_tasks],
         "compliance_logged": True,
         "created_at": datetime.now(timezone.utc).isoformat()
     }
-    CRM_NOTES_DB[meeting["client_id"]].append(crm_entry)
     
-    # Update meeting follow-up status
-    meeting["follow_up_status"] = "completed"
+    if DB_AVAILABLE:
+        await crm_notes_collection.insert_one(crm_entry)
+    else:
+        if meeting["client_id"] not in CRM_NOTES_MEMORY:
+            CRM_NOTES_MEMORY[meeting["client_id"]] = []
+        CRM_NOTES_MEMORY[meeting["client_id"]].append(crm_entry)
+    
+    # Update follow-up status
+    if DB_AVAILABLE:
+        await meetings_collection.update_one(
+            {"meeting_id": meeting_id},
+            {"$set": {"follow_up_status": "completed"}}
+        )
+    else:
+        MEETINGS_MEMORY[meeting_id]["follow_up_status"] = "completed"
     
     return {
         "success": True,
@@ -272,13 +327,14 @@ async def process_meeting_notes(notes_input: MeetingNotesInput, background_tasks
         "tasks": created_tasks,
         "crm_updated": True,
         "compliance_logged": True,
-        "message": "Meeting notes processed, tasks created, CRM updated, and compliance logged"
+        "message": "Meeting notes processed, tasks created, CRM updated, and compliance logged",
+        "storage": "mongodb" if DB_AVAILABLE else "in-memory"
     }
 
 
 async def generate_ai_summary(meeting: Dict, raw_notes: str) -> str:
     """Generate AI-powered meeting summary."""
-    prompt = f"""Summarize this financial planning meeting in a professional, concise format suitable for client records:
+    prompt = f"""Summarize this financial planning meeting in a professional, concise format:
 
 Meeting Type: {meeting['meeting_type']}
 Client: {meeting['client_name']}
@@ -287,13 +343,7 @@ Date: {meeting['date']}
 Notes:
 {raw_notes}
 
-Provide a 2-3 paragraph summary covering:
-1. Key topics discussed
-2. Important decisions made
-3. Client concerns addressed
-4. Next steps agreed
-
-Keep it professional and factual."""
+Provide a 2-3 paragraph summary covering key topics discussed, decisions made, and next steps."""
 
     try:
         messages = [LlmMessage(role="user", content=prompt)]
@@ -311,19 +361,13 @@ Keep it professional and factual."""
 
 async def extract_action_items(meeting: Dict, raw_notes: str) -> List[Dict]:
     """Extract action items from meeting notes using AI."""
-    prompt = f"""Extract all action items from this financial planning meeting:
+    prompt = f"""Extract all action items from this meeting:
 
-Meeting Type: {meeting['meeting_type']}
 Client: {meeting['client_name']}
+Notes: {raw_notes}
 
-Notes:
-{raw_notes}
-
-Return as JSON array with format:
-[{{"title": "action title", "description": "details", "due_date": "YYYY-MM-DD", "priority": "high/medium/low"}}]
-
-Include both adviser tasks and any client commitments. Set realistic due dates.
-Return only the JSON array, no other text."""
+Return as JSON array: [{{"title": "action", "due_date": "YYYY-MM-DD", "priority": "high/medium/low"}}]
+Return only the JSON array."""
 
     try:
         messages = [LlmMessage(role="user", content=prompt)]
@@ -334,18 +378,14 @@ Return only the JSON array, no other text."""
             temperature=0.3
         )
         
-        # Parse JSON from response
         import json
-        # Try to extract JSON from response
         content = response.content.strip()
         if content.startswith("["):
             return json.loads(content)
-        else:
-            # Try to find JSON in response
-            start = content.find("[")
-            end = content.rfind("]") + 1
-            if start >= 0 and end > start:
-                return json.loads(content[start:end])
+        start = content.find("[")
+        end = content.rfind("]") + 1
+        if start >= 0 and end > start:
+            return json.loads(content[start:end])
         return []
     except Exception as e:
         logger.error(f"AI action extraction failed: {e}")
@@ -363,8 +403,6 @@ async def generate_compliance_notes(meeting: Dict, raw_notes: str) -> Dict:
         "compliance_requirements_met": template["compliance_requirements"],
         "advice_given": meeting['meeting_type'] != "adhoc",
         "best_interest_duty_documented": True,
-        "fee_disclosure_current": True,
-        "risk_profile_confirmed": meeting['meeting_type'] == "review",
         "documentation_complete": True,
         "logged_at": datetime.now(timezone.utc).isoformat()
     }
@@ -372,29 +410,21 @@ async def generate_compliance_notes(meeting: Dict, raw_notes: str) -> Dict:
 
 def create_basic_summary(meeting: Dict, notes_input: MeetingNotesInput) -> str:
     """Create basic summary without AI."""
-    summary_parts = [
+    parts = [
         f"{meeting['meeting_type'].title()} meeting with {meeting['client_name']}",
         f"Date: {meeting['date']}",
-        f"Duration: {meeting['duration']} minutes",
-        f"Location: {meeting['location']}",
+        f"Duration: {meeting['duration']} minutes"
     ]
-    
     if notes_input.key_decisions:
-        summary_parts.append(f"Key Decisions: {', '.join(notes_input.key_decisions)}")
-    
-    if notes_input.client_concerns:
-        summary_parts.append(f"Client Concerns: {', '.join(notes_input.client_concerns)}")
-    
+        parts.append(f"Key Decisions: {', '.join(notes_input.key_decisions)}")
     if notes_input.raw_notes:
-        summary_parts.append(f"Notes: {notes_input.raw_notes[:500]}...")
-    
-    return "\n".join(summary_parts)
+        parts.append(f"Notes: {notes_input.raw_notes[:500]}...")
+    return "\n".join(parts)
 
 
 def create_basic_compliance_notes(meeting: Dict) -> Dict:
-    """Create basic compliance notes without AI."""
+    """Create basic compliance notes."""
     template = MEETING_TEMPLATES.get(meeting['meeting_type'], MEETING_TEMPLATES["review"])
-    
     return {
         "meeting_type": meeting['meeting_type'],
         "date": meeting['date'],
@@ -412,30 +442,46 @@ async def get_meetings(
     to_date: Optional[str] = None
 ):
     """Get meetings with optional filters."""
-    meetings = list(MEETINGS_DB.values())
+    if DB_AVAILABLE:
+        query = {}
+        if client_id:
+            query["client_id"] = client_id
+        if status:
+            query["status"] = status
+        
+        cursor = meetings_collection.find(query)
+        meetings = [serialize_doc(m) async for m in cursor]
+        
+        if from_date:
+            meetings = [m for m in meetings if m["date"] >= from_date]
+        if to_date:
+            meetings = [m for m in meetings if m["date"] <= to_date]
+    else:
+        meetings = list(MEETINGS_MEMORY.values())
+        if client_id:
+            meetings = [m for m in meetings if m["client_id"] == client_id]
+        if status:
+            meetings = [m for m in meetings if m["status"] == status]
+        if from_date:
+            meetings = [m for m in meetings if m["date"] >= from_date]
+        if to_date:
+            meetings = [m for m in meetings if m["date"] <= to_date]
     
-    if client_id:
-        meetings = [m for m in meetings if m["client_id"] == client_id]
-    if status:
-        meetings = [m for m in meetings if m["status"] == status]
-    if from_date:
-        meetings = [m for m in meetings if m["date"] >= from_date]
-    if to_date:
-        meetings = [m for m in meetings if m["date"] <= to_date]
-    
-    return {
-        "meetings": meetings,
-        "total": len(meetings)
-    }
+    return {"meetings": meetings, "total": len(meetings), "storage": "mongodb" if DB_AVAILABLE else "in-memory"}
 
 
 @router.get("/meetings/{meeting_id}")
 async def get_meeting(meeting_id: str):
     """Get specific meeting details."""
-    if meeting_id not in MEETINGS_DB:
-        raise HTTPException(status_code=404, detail="Meeting not found")
-    
-    return MEETINGS_DB[meeting_id]
+    if DB_AVAILABLE:
+        meeting = await meetings_collection.find_one({"meeting_id": meeting_id})
+        if not meeting:
+            raise HTTPException(status_code=404, detail="Meeting not found")
+        return serialize_doc(meeting)
+    else:
+        if meeting_id not in MEETINGS_MEMORY:
+            raise HTTPException(status_code=404, detail="Meeting not found")
+        return MEETINGS_MEMORY[meeting_id]
 
 
 @router.get("/tasks")
@@ -445,24 +491,37 @@ async def get_tasks(
     priority: Optional[str] = None
 ):
     """Get tasks with optional filters."""
-    tasks = list(TASKS_DB.values())
-    
-    if client_id:
-        tasks = [t for t in tasks if t["client_id"] == client_id]
-    if status:
-        tasks = [t for t in tasks if t["status"] == status]
-    if priority:
-        tasks = [t for t in tasks if t["priority"] == priority]
+    if DB_AVAILABLE:
+        query = {}
+        if client_id:
+            query["client_id"] = client_id
+        if status:
+            query["status"] = status
+        if priority:
+            query["priority"] = priority
+        
+        cursor = tasks_collection.find(query)
+        tasks = [serialize_doc(t) async for t in cursor]
+    else:
+        tasks = list(TASKS_MEMORY.values())
+        if client_id:
+            tasks = [t for t in tasks if t["client_id"] == client_id]
+        if status:
+            tasks = [t for t in tasks if t["status"] == status]
+        if priority:
+            tasks = [t for t in tasks if t["priority"] == priority]
     
     # Sort by due date and priority
     priority_order = {"high": 0, "medium": 1, "low": 2}
-    tasks.sort(key=lambda x: (x["due_date"], priority_order.get(x["priority"], 2)))
+    tasks.sort(key=lambda x: (x.get("due_date", ""), priority_order.get(x.get("priority", ""), 2)))
     
+    now = datetime.now().strftime("%Y-%m-%d")
     return {
         "tasks": tasks,
         "total": len(tasks),
-        "pending": len([t for t in tasks if t["status"] == "pending"]),
-        "overdue": len([t for t in tasks if t["status"] == "pending" and t["due_date"] < datetime.now().strftime("%Y-%m-%d")])
+        "pending": len([t for t in tasks if t.get("status") == "pending"]),
+        "overdue": len([t for t in tasks if t.get("status") == "pending" and t.get("due_date", "") < now]),
+        "storage": "mongodb" if DB_AVAILABLE else "in-memory"
     }
 
 
@@ -472,7 +531,7 @@ async def create_task(task: TaskInput):
     task_id = f"task_{uuid.uuid4().hex[:8]}"
     
     task_data = {
-        "id": task_id,
+        "task_id": task_id,
         "title": task.title,
         "description": task.description,
         "client_id": task.client_id,
@@ -485,76 +544,89 @@ async def create_task(task: TaskInput):
         "created_at": datetime.now(timezone.utc).isoformat()
     }
     
-    TASKS_DB[task_id] = task_data
+    if DB_AVAILABLE:
+        await tasks_collection.insert_one(task_data)
+    else:
+        TASKS_MEMORY[task_id] = task_data
     
-    return {
-        "success": True,
-        "task_id": task_id,
-        "task": task_data
-    }
+    return {"success": True, "task_id": task_id, "task": task_data, "storage": "mongodb" if DB_AVAILABLE else "in-memory"}
 
 
 @router.put("/tasks/{task_id}/complete")
 async def complete_task(task_id: str, notes: Optional[str] = None):
     """Mark a task as completed."""
-    if task_id not in TASKS_DB:
-        raise HTTPException(status_code=404, detail="Task not found")
+    if DB_AVAILABLE:
+        result = await tasks_collection.update_one(
+            {"task_id": task_id},
+            {"$set": {
+                "status": "completed",
+                "completed_at": datetime.now(timezone.utc).isoformat(),
+                "completion_notes": notes
+            }}
+        )
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Task not found")
+    else:
+        if task_id not in TASKS_MEMORY:
+            raise HTTPException(status_code=404, detail="Task not found")
+        TASKS_MEMORY[task_id]["status"] = "completed"
+        TASKS_MEMORY[task_id]["completed_at"] = datetime.now(timezone.utc).isoformat()
+        TASKS_MEMORY[task_id]["completion_notes"] = notes
     
-    TASKS_DB[task_id]["status"] = "completed"
-    TASKS_DB[task_id]["completed_at"] = datetime.now(timezone.utc).isoformat()
-    TASKS_DB[task_id]["completion_notes"] = notes
-    
-    return {
-        "success": True,
-        "task_id": task_id,
-        "status": "completed"
-    }
+    return {"success": True, "task_id": task_id, "status": "completed"}
 
 
 @router.get("/crm-notes/{client_id}")
 async def get_crm_notes(client_id: str):
     """Get CRM notes for a client."""
-    notes = CRM_NOTES_DB.get(client_id, [])
+    if DB_AVAILABLE:
+        cursor = crm_notes_collection.find({"client_id": client_id})
+        notes = [serialize_doc(n) async for n in cursor]
+    else:
+        notes = CRM_NOTES_MEMORY.get(client_id, [])
     
-    return {
-        "client_id": client_id,
-        "notes": notes,
-        "total": len(notes)
-    }
+    return {"client_id": client_id, "notes": notes, "total": len(notes)}
 
 
 @router.post("/crm-notes/{client_id}")
 async def add_crm_note(client_id: str, note_type: str = "general", content: str = ""):
     """Add a CRM note for a client."""
-    if client_id not in CRM_NOTES_DB:
-        CRM_NOTES_DB[client_id] = []
-    
     note = {
-        "id": f"crm_{uuid.uuid4().hex[:8]}",
+        "crm_id": f"crm_{uuid.uuid4().hex[:8]}",
+        "client_id": client_id,
         "date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
         "type": note_type,
         "content": content,
         "created_at": datetime.now(timezone.utc).isoformat()
     }
     
-    CRM_NOTES_DB[client_id].append(note)
+    if DB_AVAILABLE:
+        await crm_notes_collection.insert_one(note)
+    else:
+        if client_id not in CRM_NOTES_MEMORY:
+            CRM_NOTES_MEMORY[client_id] = []
+        CRM_NOTES_MEMORY[client_id].append(note)
     
-    return {
-        "success": True,
-        "note": note
-    }
+    return {"success": True, "note": serialize_doc(note) if DB_AVAILABLE else note}
 
 
 @router.get("/workflow-stats")
 async def get_workflow_stats():
     """Get meeting automation workflow statistics."""
-    total_meetings = len(MEETINGS_DB)
-    processed_meetings = len([m for m in MEETINGS_DB.values() if m["notes_status"] == "processed"])
-    
-    total_tasks = len(TASKS_DB)
-    pending_tasks = len([t for t in TASKS_DB.values() if t["status"] == "pending"])
-    completed_tasks = len([t for t in TASKS_DB.values() if t["status"] == "completed"])
-    auto_generated_tasks = len([t for t in TASKS_DB.values() if t.get("task_type") == "meeting_follow_up"])
+    if DB_AVAILABLE:
+        total_meetings = await meetings_collection.count_documents({})
+        processed_meetings = await meetings_collection.count_documents({"notes_status": "processed"})
+        total_tasks = await tasks_collection.count_documents({})
+        pending_tasks = await tasks_collection.count_documents({"status": "pending"})
+        completed_tasks = await tasks_collection.count_documents({"status": "completed"})
+        auto_generated_tasks = await tasks_collection.count_documents({"task_type": "meeting_follow_up"})
+    else:
+        total_meetings = len(MEETINGS_MEMORY)
+        processed_meetings = len([m for m in MEETINGS_MEMORY.values() if m.get("notes_status") == "processed"])
+        total_tasks = len(TASKS_MEMORY)
+        pending_tasks = len([t for t in TASKS_MEMORY.values() if t.get("status") == "pending"])
+        completed_tasks = len([t for t in TASKS_MEMORY.values() if t.get("status") == "completed"])
+        auto_generated_tasks = len([t for t in TASKS_MEMORY.values() if t.get("task_type") == "meeting_follow_up"])
     
     return {
         "meetings": {
@@ -571,6 +643,7 @@ async def get_workflow_stats():
         },
         "efficiency_metrics": {
             "avg_tasks_per_meeting": round(auto_generated_tasks / processed_meetings, 1) if processed_meetings > 0 else 0,
-            "automation_savings": f"{processed_meetings * 15} minutes"  # 15 min saved per automated meeting
-        }
+            "automation_savings": f"{processed_meetings * 15} minutes"
+        },
+        "storage": "mongodb" if DB_AVAILABLE else "in-memory"
     }
