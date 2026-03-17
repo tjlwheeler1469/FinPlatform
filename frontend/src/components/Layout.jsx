@@ -169,8 +169,8 @@ const adviserBaseNav = [
     icon: LayoutDashboard,
     items: [
       { path: "/advisor-command-center", label: "Command Center", icon: Zap, title: "Advisor Command Center", badge: "DAILY" },
-      { path: "/adviser-dashboard", label: "Overview", icon: Briefcase, title: "Adviser Dashboard" },
-      { path: "/practice-management", label: "Practice", icon: ClipboardList, title: "Practice Management" },
+      { path: "/macro-dashboard", label: "Markets Overview", icon: BarChart3, title: "Global Markets & Macro Data", badge: "NEW" },
+      { path: "/adviser-dashboard", label: "Practice Overview", icon: Briefcase, title: "Adviser Dashboard" },
       { path: "/meeting-prep", label: "Meeting Prep", icon: Clock, title: "AI Meeting Prep" },
     ]
   },
@@ -189,17 +189,17 @@ const adviserBaseNav = [
     icon: TrendingUp,
     items: [
       { path: "/stock-trading", label: "Buy/Sell Stocks", icon: TrendingUp, title: "Stock Trading with CGT", badge: "NEW" },
+      { path: "/broker-research", label: "Research Reports", icon: FileText, title: "Broker Research & Ratings", badge: "NEW" },
       { path: "/stock-research", label: "Stock Screener", icon: LineChart, title: "ASX Stock Research" },
-      { path: "/market-data", label: "Market Data", icon: BarChart3, title: "Live Market Data" },
+      { path: "/market-data", label: "Live Prices", icon: BarChart3, title: "Live Market Data" },
     ]
   },
   {
     name: "Clients",
     icon: Users,
     items: [
-      { path: "/client-crm", label: "All Clients", icon: Users, title: "Client Relationship Management" },
+      { path: "/client-crm", label: "Client CRM", icon: Users, title: "Client Relationship Management" },
       { path: "/client-wealth", label: "Client Wealth", icon: Wallet, title: "Client Wealth Overview" },
-      { path: "/client-portal", label: "Client Portal", icon: Eye, title: "View as Client" },
       { path: "/onboarding", label: "New Client", icon: UserPlus, title: "Client Onboarding" },
     ]
   },
@@ -209,7 +209,6 @@ const adviserBaseNav = [
     items: [
       { path: "/compliance", label: "Compliance Center", icon: Shield, title: "Compliance & Audit" },
       { path: "/connected-accounts", label: "Bank Feeds", icon: Link2, title: "Connected Accounts" },
-      { path: "/notifications", label: "Notifications", icon: Bell, title: "Notification Center", badge: "NEW" },
       { path: "/security", label: "Security", icon: Shield, title: "Security Settings" },
     ]
   },
@@ -218,7 +217,7 @@ const adviserBaseNav = [
     icon: Settings,
     items: [
       { path: "/data-import-export", label: "Import/Export", icon: Database, title: "Data Import & Export" },
-      { path: "/data-aggregators", label: "Data Aggregators", icon: Link2, title: "Australian CDR Aggregators", badge: "NEW" },
+      { path: "/data-aggregators", label: "Data Aggregators", icon: Link2, title: "Australian CDR Aggregators" },
     ]
   }
 ];
