@@ -55,6 +55,16 @@ class AdviserUser(HttpUser):
         """Load Command Center - Most frequent"""
         self.client.get("/api/command-center/daily-digest", headers=self.headers, name="Command Center")
     
+    @task(9)
+    def next_best_actions(self):
+        """Get next best actions - KILLER FEATURE"""
+        self.client.get("/api/next-action/today?limit=8", headers=self.headers, name="Next Best Actions")
+    
+    @task(8)
+    def practice_health(self):
+        """Get practice health dashboard - KILLER FEATURE"""
+        self.client.get("/api/practice-health/dashboard", headers=self.headers, name="Practice Health")
+    
     @task(8)
     def portfolio_monitoring(self):
         """Check daily portfolio scan"""
