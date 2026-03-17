@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { 
   Dialog, 
   DialogContent, 
@@ -29,20 +29,11 @@ import {
  * - Financial Services Reform Act
  */
 
-const STORAGE_KEY = "wheeler_compliance_acknowledged";
-const STORAGE_KEY_V2 = "halcyon_compliance_v2";  // New versioned key for better tracking
+const STORAGE_KEY = "halcyon_compliance_v3";  // Versioned key
+const SESSION_KEY = "halcyon_compliance_session";
 
-// Check once at module load if already acknowledged
-let moduleHasAcknowledged = false;
-try {
-  moduleHasAcknowledged = !!(
-    localStorage.getItem(STORAGE_KEY) || 
-    localStorage.getItem(STORAGE_KEY_V2) || 
-    sessionStorage.getItem('compliance_session')
-  );
-} catch {
-  moduleHasAcknowledged = false;
-}
+// Global state to track if modal has been shown this app instance
+let hasShownThisSession = false;
 
 // Compliance disclaimer content
 const COMPLIANCE_CONTENT = {
@@ -88,34 +79,55 @@ const COMPLIANCE_CONTENT = {
   ]
 };
 
-// Set acknowledgement in both localStorage and sessionStorage for reliability
-const setAcknowledgement = () => {
+// Check if user has acknowledged
+const hasAcknowledged = () => {
   try {
-    const timestamp = new Date().toISOString();
-    localStorage.setItem(STORAGE_KEY, timestamp);
-    localStorage.setItem(STORAGE_KEY_V2, timestamp);
-    sessionStorage.setItem('compliance_session', timestamp);
-    moduleHasAcknowledged = true;
+    // Check permanent dismissal
+    const permanent = localStorage.getItem(STORAGE_KEY);
+    if (permanent === "permanent") return true;
+    
+    // Check session dismissal
+    const session = sessionStorage.getItem(SESSION_KEY);
+    if (session) return true;
+    
+    // Check if already shown this app instance
+    if (hasShownThisSession) return true;
+    
+    return false;
+  } catch {
+    return hasShownThisSession;
+  }
+};
+
+// Set acknowledgement
+const setAcknowledgement = (permanent = false) => {
+  try {
+    if (permanent) {
+      localStorage.setItem(STORAGE_KEY, "permanent");
+    }
+    sessionStorage.setItem(SESSION_KEY, new Date().toISOString());
+    hasShownThisSession = true;
   } catch (e) {
     console.warn('Could not persist compliance acknowledgement:', e);
-    moduleHasAcknowledged = true; // Still set in memory to prevent re-showing
+    hasShownThisSession = true;
   }
 };
 
 // Modal component shown on first visit
 export const ComplianceModal = ({ onAccept }) => {
-  const [acknowledged, setAcknowledged] = useState(false);
+  const [acknowledged, setAcknowledgedState] = useState(false);
+  const [dontShowAgain, setDontShowAgain] = useState(false);
   const [open, setOpen] = useState(false);
+  const hasChecked = useRef(false);
 
-  // Check localStorage on mount to determine if modal should show
+  // Check localStorage on mount - only once
   useEffect(() => {
-    const hasAcknowledged = 
-      localStorage.getItem(STORAGE_KEY) || 
-      localStorage.getItem(STORAGE_KEY_V2) || 
-      sessionStorage.getItem('compliance_session');
+    if (hasChecked.current) return;
+    hasChecked.current = true;
     
-    if (!hasAcknowledged) {
+    if (!hasAcknowledged()) {
       setOpen(true);
+      hasShownThisSession = true; // Mark as shown even before accepting
     }
   }, []);
 
@@ -124,7 +136,7 @@ export const ComplianceModal = ({ onAccept }) => {
 
   const handleAccept = () => {
     if (acknowledged) {
-      setAcknowledgement();
+      setAcknowledgement(dontShowAgain);
       setOpen(false);
       onAccept?.();
     }
@@ -132,7 +144,12 @@ export const ComplianceModal = ({ onAccept }) => {
 
   return (
     <Dialog open={open} onOpenChange={() => {}}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" onPointerDownOutside={(e) => e.preventDefault()}>
+      <DialogContent 
+        className="max-w-2xl max-h-[90vh] overflow-y-auto" 
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
+        data-testid="compliance-modal"
+      >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
             <Shield className="h-6 w-6 text-[#1a2744]" />
@@ -187,24 +204,41 @@ export const ComplianceModal = ({ onAccept }) => {
           </div>
         </div>
 
-        <DialogFooter className="flex-col sm:flex-row gap-4">
-          <div className="flex items-start gap-2">
+        <DialogFooter className="flex-col gap-4">
+          <div className="flex items-start gap-2 w-full">
             <Checkbox 
               id="acknowledge" 
               checked={acknowledged}
-              onCheckedChange={setAcknowledged}
+              onCheckedChange={setAcknowledgedState}
+              data-testid="disclaimer-checkbox"
             />
-            <label htmlFor="acknowledge" className="text-sm leading-tight">
+            <label htmlFor="acknowledge" className="text-sm leading-tight cursor-pointer">
               I understand this application provides general information only and is not a substitute for professional financial, tax, or legal advice.
             </label>
           </div>
-          <Button 
-            onClick={handleAccept} 
-            disabled={!acknowledged}
-            className="bg-[#1a2744] hover:bg-[#1a2744]/90"
-          >
-            I Understand & Accept
-          </Button>
+          
+          <div className="flex items-center justify-between w-full gap-4">
+            <div className="flex items-center gap-2">
+              <Checkbox 
+                id="dontShowAgain" 
+                checked={dontShowAgain}
+                onCheckedChange={setDontShowAgain}
+                data-testid="dont-show-again-checkbox"
+              />
+              <label htmlFor="dontShowAgain" className="text-sm text-muted-foreground cursor-pointer">
+                Don't show this again
+              </label>
+            </div>
+            
+            <Button 
+              onClick={handleAccept} 
+              disabled={!acknowledged}
+              className="bg-[#1a2744] hover:bg-[#1a2744]/90"
+              data-testid="accept-disclaimer-btn"
+            >
+              I Understand & Accept
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -236,8 +270,8 @@ export const ComplianceFooter = ({ className = "" }) => {
         </a>
       </div>
       <p className="mt-2 text-[10px]">
-        © {new Date().getFullYear()} Wheeler Family Portfolio. Tax rates based on ATO 2024-25 FY. 
-        Calculations for illustrative purposes only. ABN: XX XXX XXX XXX
+        © {new Date().getFullYear()} Halcyon Wealth Platform. Tax rates based on ATO 2024-25 FY. 
+        Calculations for illustrative purposes only.
       </p>
     </div>
   );
