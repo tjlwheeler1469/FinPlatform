@@ -436,7 +436,7 @@ async def calculate_fee(
         "effective_rate": round(net_fee / aum * 100, 3) if aum > 0 else 0,
         "breakdown": [
             {
-                "tier": f"${tier['min']:,} - ${tier['max']:,}" if tier['max'] != float('inf') else f"${tier['min']:,}+",
+                "tier": f"${tier['min']:,} - ${tier['max']:,}" if tier['max'] < 999999999 else f"${tier['min']:,}+",
                 "rate": f"{tier['rate']}%",
                 "amount_in_tier": min(max(0, aum - tier['min']), tier['max'] - tier['min']),
                 "fee": round(min(max(0, aum - tier['min']), tier['max'] - tier['min']) * tier['rate'] / 100, 2)
