@@ -7737,6 +7737,7 @@ try:
     from routes.wealth_dashboard import router as wealth_dashboard_router
     from routes.command_center import router as command_center_router
     from routes.live_data import router as live_data_router
+    from routes.holdings import router as holdings_router
     
     # Include all modular routers with /api prefix
     app.include_router(auth_router, prefix="/api")
