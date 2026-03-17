@@ -921,6 +921,12 @@ const AppRouter = () => {
       
       {/* Advisor Intelligence Dashboard - The Daily Operating System */}
       <Route path="/advisor-intelligence" element={<AdvisorIntelligenceDashboard />} />
+      
+      {/* Notification Center */}
+      <Route path="/notifications" element={<NotificationCenter />} />
+      
+      {/* Data Aggregators Research */}
+      <Route path="/data-aggregators" element={<DataAggregators />} />
     </Routes>
   );
 };
