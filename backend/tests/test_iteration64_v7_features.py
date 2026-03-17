@@ -338,7 +338,7 @@ class TestBrokerResearchAPIs:
         assert "current_price" in data
         assert "consensus_rating" in data
         assert "price_target" in data
-        assert "analyst_ratings" in data
+        assert "ratings_breakdown" in data
         assert "recent_reports" in data
         
         # Verify price target structure
@@ -405,16 +405,19 @@ class TestBrokerResearchAPIs:
         
         print(f"✓ Sector Ratings: {len(sectors)} sectors")
     
-    def test_search_stocks(self):
-        """Test /api/broker-research/search returns search results"""
-        response = requests.get(f"{BASE_URL}/api/broker-research/search?q=Apple")
+    def test_filter_by_sector(self):
+        """Test /api/broker-research/top-rated with sector filter"""
+        response = requests.get(f"{BASE_URL}/api/broker-research/top-rated?sector=Technology")
         assert response.status_code == 200
         
         data = response.json()
-        assert "results" in data
-        assert "query" in data
+        assert "top_rated" in data
         
-        print(f"✓ Search: {len(data['results'])} results for 'Apple'")
+        # All returned stocks should be in Technology sector
+        for stock in data["top_rated"]:
+            assert stock["sector"] == "Technology"
+        
+        print(f"✓ Sector Filter: {len(data['top_rated'])} Technology stocks")
 
 
 class TestAdditionalMacroEndpoints:
