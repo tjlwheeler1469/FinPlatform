@@ -7769,10 +7769,18 @@ try:
     from routes.intelligence import router as intelligence_router
     from routes.meeting_automation import router as meeting_automation_router
     from routes.client_portal import router as client_portal_router
+    from routes.portfolio_monitoring import router as portfolio_monitoring_router
+    from routes.financial_graph import router as financial_graph_router
+    from routes.tax_optimization import router as tax_optimization_router
+    from routes.rebalancing import router as rebalancing_router
     
     app.include_router(intelligence_router, prefix="/api")
     app.include_router(meeting_automation_router, prefix="/api")
     app.include_router(client_portal_router, prefix="/api")
+    app.include_router(portfolio_monitoring_router, prefix="/api")
+    app.include_router(financial_graph_router, prefix="/api")
+    app.include_router(tax_optimization_router, prefix="/api")
+    app.include_router(rebalancing_router, prefix="/api")
     
     logger.info("All modular routes loaded successfully")
 except ImportError as e:
