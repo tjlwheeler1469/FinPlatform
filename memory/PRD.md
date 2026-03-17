@@ -1,136 +1,135 @@
-# Wealth Command - Financial Services Super App
-## The Best Wealth Management Platform for Australian Financial Advisers
-
-## Vision
-Building the **#1 AI-native financial planning platform** for Australian financial advisers. A "Wealth Operating System" combining the best of IRESS XPlan, WealthCopilot, and Moat Analyzer into one unified platform.
+# Wealth Command - Financial Advisor Operating System
+## The #1 AI-Native Wealth Management Platform for Australian Financial Advisers
 
 ---
 
-## Latest Update (December 17, 2025) - Major Feature Release
+## Product Vision - From 7.8 → 9.5
 
-### ✅ Iteration 52 - All Tests Passing (100%)
-- **Backend**: 27/27 new tests passed
-- **Frontend**: All new pages verified working
-- **Total Features**: 30+ routes across 24 backend modules
+**Previous Rating**: 7.8/10 ("AI Financial Assistant")
+**Target Rating**: 9.5/10 ("Advisor Operating System")
+
+The platform has been transformed from a reactive tool into an indispensable **daily operating system** that advisors MUST open every morning.
 
 ---
 
-## Core Features Implemented
+## Latest Update (December 17, 2025) - Iteration 53
 
-### 1. Command Center (Daily Adviser Hub) ✅
-- Actionable alerts dashboard with priority levels (Critical/High/Medium/Low)
-- Practice metrics: AUM ($21.3M), Compliance Score, Active Clients
-- Today's Schedule with meeting prep shortcuts
-- AI Cross-Client Insights and recommendations
-- Market Snapshot with key indices
-- **Route**: `/command-center`
-- **API**: `/api/command-center/*`
+### ✅ All Tests Passing (100%)
+- **Backend**: 28/28 tests passed
+- **Frontend**: All pages verified
+- **Total Routes**: 31 backend modules
+- **Total AUM Tracked**: $21.3M (mock data)
 
-### 2. Cross-Client Intelligence Engine ✅ NEW
-- Practice-wide analytics across entire client book
-- **Portfolio Drift Analysis**: Identifies clients needing rebalancing
-- **Tax Opportunities**: Tax-loss harvesting & super contributions
-- **Engagement Tracking**: At-risk clients, overdue reviews
-- **Fee Optimization**: Institutional pricing opportunities
-- **Goals Analysis**: Track goal progress across all clients
-- **Route**: `/intelligence`
-- **API**: `/api/intelligence/*`
+---
 
-### 3. Client Portal ✅ NEW
-- Separate JWT authentication for clients
-- Portfolio overview with performance metrics
-- Goals tracking with progress visualization
-- Document library (SOAs, reports, tax summaries)
+## Core Operating System Features
+
+### 1. Advisor Intelligence Dashboard ⭐ FLAGSHIP
+The daily "must-open" landing page combining all alerts and insights.
+- **Today's Alerts**: Portfolio drift, tax opportunities, retirement risks, idle cash
+- **Cross-Client Intelligence**: AI-detected patterns across entire client book
+- **Today's Meetings**: With instant meeting prep buttons
+- **Quick Actions**: AI Copilot, Compliance, Market Overview
+- **Route**: `/advisor-intelligence`
+
+### 2. Portfolio Monitoring Engine ✅ NEW
+AI continuously scans all portfolios for issues.
+- Daily scan of all client portfolios
+- Detects: allocation drift, concentration risk, idle cash, tax-loss opportunities, retirement shortfall
+- Book-wide insights showing patterns across clients
+- Configurable thresholds
+- **APIs**: `/api/monitoring/daily-scan`, `/api/monitoring/book-insights`, `/api/monitoring/alerts/summary`
+
+### 3. Client Financial Graph ✅ NEW
+Maps entire client financial life.
+- Primary client + family members
+- Entities: Trusts, companies, SMSFs
+- Assets: Property, vehicles, collectibles
+- Insurance: Life, TPD, Income Protection
+- Liabilities: Mortgages, loans
+- Cash flow analysis with surplus calculation
+- **APIs**: `/api/financial-graph/client/{id}`, `/api/financial-graph/client/{id}/cash-flow`
+
+### 4. Tax Optimization Engine ✅ NEW
+Comprehensive tax planning and strategy.
+- Super contribution optimization (calculate benefit of maximizing cap)
+- Tax-loss harvesting identification
+- Dividend imputation analysis
+- Negative gearing calculation
+- EOFY checklist with priorities
+- **APIs**: `/api/tax-optimization/client/{id}/analysis`, `/api/tax-optimization/client/{id}/strategies`
+
+### 5. Automated Portfolio Rebalancing ✅ NEW
+One-click, tax-aware rebalancing.
+- Tax-aware trade recommendations (sell losers first)
+- CGT impact calculation
+- Drift report by asset class
+- Batch rebalancing for efficiency
+- **APIs**: `/api/rebalance/preview/{id}`, `/api/rebalance/drift-report/{id}`, `/api/rebalance/execute`
+
+### 6. Cross-Client Intelligence Engine
+Book-wide analysis and pattern detection.
+- Portfolio drift patterns across clients
+- Tax opportunities across all clients
+- Engagement tracking (at-risk clients)
+- Fee optimization opportunities
+- **APIs**: `/api/intelligence/comprehensive-analysis`, `/api/intelligence/tax-opportunities`
+
+### 7. Client Portal
+Separate portal for clients to view their wealth.
+- JWT authentication for clients
+- Portfolio dashboard with performance
+- Goals tracking with progress
+- Document library
 - Secure messaging with adviser
-- Net worth dashboard
+- Net worth overview
 - **Route**: `/client-portal`
-- **API**: `/api/client-portal/*`
 - **Demo**: `client_wheeler@email.com` / `wheeler2025`
 
-### 4. Meeting Automation ✅ NEW
-- AI-powered meeting notes generation
+### 8. Meeting Automation
+AI-powered meeting documentation.
+- Generate meeting notes from topics
 - Compliance log auto-creation
 - Follow-up email generation
-- Voice transcript to notes (framework ready)
-- **API**: `/api/meeting-automation/*`
-
-### 5. Live Market Data ✅
-- Real-time ASX stock data via yfinance
-- Market indices (ASX 200, S&P 500, etc.)
-- Sector performance breakdown
-- Portfolio live value calculation
-- **API**: `/api/live/*`
-
-### 6. Holdings Management ✅
-- Complete portfolio across 8 asset types
-- Buy/sell transaction execution with cost basis tracking
-- Performance metrics (winners/losers)
-- Rebalance calculations
-- **API**: `/api/holdings/*`
-
-### 7. AI-Powered Features ✅
-- **AI Wealth Copilot**: Natural language financial advisor
-- **Decision Center**: Real-time scenario modeling
-- **Meeting Prep**: 30-second client briefings
-- **Plan Generator**: AI-generated financial plans
-
-### 8. Compliance & Security ✅
-- ASIC/ATO compliance disclaimers
-- 2FA with TOTP & SMS (demo mode, Twilio-ready)
-- Audit trail logging
-- Client review tracking
-- SOA generation framework
+- **APIs**: `/api/meeting-automation/generate-notes`
 
 ---
 
-## Architecture
+## Architecture (31 Backend Modules)
 
-### Backend Routes (27 Modules)
 ```
 /app/backend/routes/
-├── aggregation.py      # Bank feeds, Plaid simulation
-├── ai.py               # AI features
-├── analysis.py         # Data analysis
-├── auth.py             # JWT authentication
-├── client_portal.py    # NEW: Client portal
-├── command_center.py   # Daily command center
-├── compliance.py       # Audit trails, SOA
-├── copilot.py          # AI Wealth Copilot
-├── crm.py              # Client CRM
-├── dashboard.py        # Main dashboard
-├── documents.py        # Document management
-├── goals.py            # Goal tracking
-├── holdings.py         # Holdings management
-├── intelligence.py     # NEW: Cross-client intelligence
-├── live_data.py        # Live market data
-├── market.py           # Yahoo Finance data
-├── marketplace.py      # Product marketplace
-├── meeting_automation.py # NEW: Meeting notes
-├── meeting_prep.py     # AI Meeting Prep
-├── portfolio.py        # Portfolio management
-├── practice.py         # Practice management
-├── research.py         # Stock research
-├── scenarios.py        # Scenario modeling
-├── security.py         # 2FA, MFA
-├── tax.py              # Tax analysis
-├── timeline.py         # Life events
-└── wealth_dashboard.py # Comprehensive wealth
-```
-
-### Frontend Pages
-```
-/app/frontend/src/pages/
-├── CommandCenter.jsx       # Daily adviser hub
-├── IntelligenceEngine.jsx  # NEW: Cross-client analytics
-├── ClientPortal.jsx        # NEW: Client dashboard
-├── MeetingPrep.jsx         # AI meeting prep
-├── StockResearch.jsx       # ASX screener
-├── ClientWealth.jsx        # Client wealth view
-├── AIInsights.jsx          # AI insights page
-├── AICopilot.jsx           # Natural language advisor
-├── DecisionCenter.jsx      # Scenario modeling
-├── ComplianceCenter.jsx    # Compliance tracking
-└── ... (20+ more pages)
+├── aggregation.py          # Bank feeds, Plaid simulation
+├── ai.py                   # AI features
+├── analysis.py             # Data analysis
+├── auth.py                 # JWT authentication
+├── client_portal.py        # Client portal auth & dashboard
+├── command_center.py       # Daily command center
+├── compliance.py           # Audit trails, SOA
+├── copilot.py              # AI Wealth Copilot
+├── crm.py                  # Client CRM
+├── dashboard.py            # Main dashboard
+├── documents.py            # Document management
+├── financial_graph.py      # Client financial graph
+├── goals.py                # Goal tracking
+├── holdings.py             # Holdings management
+├── intelligence.py         # Cross-client intelligence
+├── live_data.py            # Live market data
+├── market.py               # Yahoo Finance data
+├── marketplace.py          # Product marketplace
+├── meeting_automation.py   # Meeting notes
+├── meeting_prep.py         # AI Meeting Prep
+├── portfolio.py            # Portfolio management
+├── portfolio_monitoring.py # Daily portfolio scanning
+├── practice.py             # Practice management
+├── rebalancing.py          # Automated rebalancing
+├── research.py             # Stock research
+├── scenarios.py            # Scenario modeling
+├── security.py             # 2FA, MFA
+├── tax.py                  # Tax analysis
+├── tax_optimization.py     # Tax optimization engine
+├── timeline.py             # Life events
+└── wealth_dashboard.py     # Comprehensive wealth
 ```
 
 ---
@@ -139,19 +138,18 @@ Building the **#1 AI-native financial planning platform** for Australian financi
 
 | Category | Endpoint | Status |
 |----------|----------|--------|
+| **Monitoring** | GET `/api/monitoring/daily-scan` | ✅ |
+| **Monitoring** | GET `/api/monitoring/book-insights` | ✅ |
+| **Financial Graph** | GET `/api/financial-graph/client/{id}` | ✅ |
+| **Financial Graph** | GET `/api/financial-graph/client/{id}/cash-flow` | ✅ |
+| **Tax Optimization** | GET `/api/tax-optimization/client/{id}/analysis` | ✅ |
+| **Tax Optimization** | GET `/api/tax-optimization/client/{id}/strategies` | ✅ |
+| **Tax Optimization** | GET `/api/tax-optimization/client/{id}/eofy-checklist` | ✅ |
+| **Rebalancing** | GET `/api/rebalance/preview/{id}` | ✅ |
+| **Rebalancing** | POST `/api/rebalance/execute` | ✅ |
 | **Intelligence** | GET `/api/intelligence/comprehensive-analysis` | ✅ |
-| **Intelligence** | GET `/api/intelligence/portfolio-drift` | ✅ |
-| **Intelligence** | GET `/api/intelligence/tax-opportunities` | ✅ |
-| **Intelligence** | GET `/api/intelligence/engagement` | ✅ |
 | **Client Portal** | POST `/api/client-portal/auth/login` | ✅ |
-| **Client Portal** | GET `/api/client-portal/dashboard` | ✅ |
-| **Client Portal** | GET `/api/client-portal/net-worth` | ✅ |
-| **Meeting Auto** | POST `/api/meeting-automation/generate-notes` | ✅ |
-| **Meeting Auto** | POST `/api/meeting-automation/generate-follow-up-email` | ✅ |
 | **Command Center** | GET `/api/command-center/daily-digest` | ✅ |
-| **Live Data** | GET `/api/live/market-summary` | ✅ |
-| **Holdings** | GET `/api/holdings/portfolio/{client_id}` | ✅ |
-| **Holdings** | POST `/api/holdings/transaction` | ✅ |
 
 ---
 
@@ -164,75 +162,88 @@ Building the **#1 AI-native financial planning platform** for Australian financi
 ### Client Portal Access
 - **Email**: `client_wheeler@email.com`
 - **Password**: `wheeler2025`
-- **Test Client ID**: `client_1`
+
+### Test Client IDs
+- `client_1` - Wheeler Family ($2.9M)
+- `client_2` - Chen Investment Trust ($4.2M)
 
 ---
 
 ## Integration Status
 
-### LIVE Integrations
-- ✅ **AI Features**: Real AI via Emergent LLM Key (OpenAI, Claude, Gemini)
-- ✅ **Market Data**: Live ASX data via yfinance
+### LIVE
+- ✅ AI Features via Emergent LLM Key
+- ✅ ASX Market Data via yfinance
 
-### MOCKED Integrations (Production-Ready Frameworks)
-- 🔄 **Account Aggregation**: Plaid simulation (Australian CDR requires ACCC accreditation)
-- 🔄 **SMS 2FA**: Twilio demo mode (add credentials for live SMS)
-- 🔄 **Client Data**: Mock client book for intelligence engine
+### MOCKED (Production-Ready Frameworks)
+- 🔄 Portfolio Monitoring - Mock client portfolios
+- 🔄 Financial Graph - Sample client data
+- 🔄 Tax Calculations - ATO 2024-25 rates
+- 🔄 Rebalancing - Simulation mode
+- 🔄 Account Aggregation - Plaid simulation
+- 🔄 SMS 2FA - Twilio demo mode
 
 ---
 
-## Bug Fixes in This Session
-- ✅ **Disclaimer Modal**: Now shows only once per session (fixed sessionStorage issue)
+## What Makes This an "Operating System"
+
+1. **Daily Habit Formation**: Advisor Intelligence Dashboard shows alerts that require daily attention
+2. **Book-Wide Intelligence**: Analyzes entire client book, not just one client at a time
+3. **Proactive Alerts**: AI detects issues before advisors notice them
+4. **One-Click Actions**: Tax optimization, rebalancing with single button
+5. **Complete Financial Picture**: Financial Graph maps entire client wealth structure
 
 ---
 
 ## Remaining Work (Prioritized)
 
-### P0 - Critical (Technical Debt)
-- [ ] **Backend Refactoring**: Move logic from `server.py` (7,700 lines) to modular route files
+### P0 - Critical
+- [ ] Backend refactoring (server.py still has 7,700+ lines)
 
-### P1 - High Priority
-- [ ] **Real Australian CDR Integration**: Requires ACCC accreditation process
-- [ ] **PostgreSQL Migration**: Move from in-memory to persistent database
-- [ ] **Real ASX Market Data API**: Secondary source to yfinance
+### P1 - High
+- [ ] Real custodian/brokerage integrations
+- [ ] PostgreSQL database migration
+- [ ] Real-time WebSocket alerts
 
-### P2 - Medium Priority
-- [ ] **Real Twilio SMS**: Add credentials for live 2FA
-- [ ] **Document Generation**: Full SOA PDF generation
-- [ ] **Email Integration**: Send follow-up emails via SendGrid
+### P2 - Medium
+- [ ] Document generation (SOA PDFs)
+- [ ] Email integration (SendGrid)
+- [ ] Real Twilio SMS
 
-### P3 - Future Enhancements
-- [ ] Mobile app (React Native)
+### P3 - Future
+- [ ] Australian CDR integration
+- [ ] Mobile app
 - [ ] White-label version
-- [ ] SOC 2 Compliance
-- [ ] Multi-tenant architecture
 
 ---
 
-## Recent Test Reports
-- `/app/test_reports/iteration_52.json` - Intelligence, Portal, Meeting Auto (100%)
+## Test Reports
+- `/app/test_reports/iteration_53.json` - Portfolio Monitoring, Tax Optimization, Rebalancing (100%)
+- `/app/test_reports/iteration_52.json` - Intelligence, Client Portal, Meeting Automation (100%)
 - `/app/test_reports/iteration_51.json` - Command Center, Live Data, Holdings (100%)
-- `/app/test_reports/iteration_50.json` - UX Refactoring (100%)
 
 ---
 
 ## Change Log
 
+### December 17, 2025 (Iteration 53)
+- ✅ Portfolio Monitoring Engine - daily scanning
+- ✅ Client Financial Graph - complete wealth mapping
+- ✅ Tax Optimization Engine - comprehensive tax planning
+- ✅ Automated Portfolio Rebalancing - one-click trades
+- ✅ Advisor Intelligence Dashboard - daily operating system
+- ✅ Fixed tax-rates JSON serialization issue
+- ✅ 28/28 backend tests passing
+
 ### December 17, 2025 (Iteration 52)
 - ✅ Cross-Client Intelligence Engine
 - ✅ Client Portal with authentication
 - ✅ Meeting Automation with AI notes
-- ✅ Fixed Disclaimer Modal (show once)
-- ✅ Updated navigation with new pages
-- ✅ All 27 backend tests passing
+- ✅ Fixed Disclaimer Modal
+- ✅ 27/27 backend tests passing
 
 ### December 17, 2025 (Iteration 51)
 - ✅ Command Center page and API
 - ✅ Live Market Data integration
 - ✅ Enhanced Holdings Management
-- ✅ All 38 backend tests passing
-
-### December 16, 2025 (Iteration 50)
-- ✅ UX improvements: Holdings editing, inline AI insights
-- ✅ Super App features: Meeting Prep, Stock Research
-- ✅ Backend tests at 100%
+- ✅ 38/38 backend tests passing
