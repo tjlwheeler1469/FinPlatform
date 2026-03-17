@@ -161,8 +161,9 @@ async def health_check():
     return {
         "status": "healthy",
         "service": "wealth-command",
-        "version": "4.0.0",
-        "architecture": "modular"
+        "version": "5.0.0",
+        "architecture": "modular",
+        "killer_features": ["next_best_action", "practice_health", "meeting_workflow"]
     }
 
 # ==================== LIFECYCLE ====================
