@@ -185,6 +185,30 @@ def include_all_routes():
         logger.info("DECISION ENGINE loaded: Health Score, Recommendations, Monte Carlo, Scenarios")
     except ImportError as e:
         logger.error(f"Failed to load decision engine routes: {e}")
+    
+    # MACRO MARKET DATA - Global indices, currencies, bonds, commodities, crypto
+    try:
+        from routes.macro_data import router as macro_router
+        app.include_router(macro_router, prefix="/api")
+        logger.info("MACRO DATA loaded: Indices, FX, Bonds, Commodities, Crypto, Futures")
+    except ImportError as e:
+        logger.error(f"Failed to load macro data routes: {e}")
+    
+    # ACTION LAYER - Execution Engine (1-Click Actions)
+    try:
+        from routes.action_layer import router as action_router
+        app.include_router(action_router, prefix="/api")
+        logger.info("ACTION LAYER loaded: Next Best Actions, Batch Execution, Tax Harvesting")
+    except ImportError as e:
+        logger.error(f"Failed to load action layer routes: {e}")
+    
+    # BROKER RESEARCH - Stock Research Reports
+    try:
+        from routes.broker_research import router as research_router
+        app.include_router(research_router, prefix="/api")
+        logger.info("BROKER RESEARCH loaded: Analyst Ratings, Price Targets, Upgrades/Downgrades")
+    except ImportError as e:
+        logger.error(f"Failed to load broker research routes: {e}")
 
 # Include all routes
 include_all_routes()
