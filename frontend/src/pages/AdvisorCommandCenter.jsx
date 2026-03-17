@@ -329,7 +329,7 @@ const AdvisorCommandCenter = () => {
         </div>
 
         {/* ===== ZONE 4: KEY METRICS ROW ===== */}
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
           <Card className="bg-gradient-to-br from-[#1a2744] to-[#2a3754] text-white">
             <CardContent className="pt-4 pb-4">
               <p className="text-white/70 text-xs font-medium">Assets Under Advice</p>
@@ -385,6 +385,21 @@ const AdvisorCommandCenter = () => {
                 <span className={`text-xs ${monitoring?.high_priority_alerts > 0 ? 'text-red-500' : 'text-green-500'}`}>
                   {monitoring?.high_priority_alerts > 0 ? 'Needs attention' : 'All clear'}
                 </span>
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* Practice Health Score */}
+          <Card className="border-emerald-200 bg-emerald-50">
+            <CardContent className="pt-4 pb-4">
+              <p className="text-muted-foreground text-xs font-medium">Practice Health</p>
+              <div className="flex items-baseline gap-2">
+                <p className="text-2xl font-bold text-emerald-600">{healthScore}</p>
+                <span className="text-lg font-bold text-emerald-700">{healthGrade}</span>
+              </div>
+              <div className="flex items-center gap-1 mt-1">
+                <TrendingUp className="h-3 w-3 text-emerald-500" />
+                <span className="text-xs text-emerald-500">+3 pts vs Q4</span>
               </div>
             </CardContent>
           </Card>
