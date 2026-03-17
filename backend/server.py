@@ -125,6 +125,20 @@ def include_all_routes():
         logger.info("Advanced routes loaded successfully")
     except ImportError as e:
         logger.error(f"Failed to load advanced routes: {e}")
+    
+    # New killer feature routes - Next Best Action Engine & Practice Health
+    try:
+        from routes.next_best_action import router as next_action_router
+        from routes.practice_health import router as practice_health_router
+        from routes.meeting_workflow import router as meeting_workflow_router
+        
+        app.include_router(next_action_router, prefix="/api")
+        app.include_router(practice_health_router, prefix="/api")
+        app.include_router(meeting_workflow_router, prefix="/api")
+        
+        logger.info("Killer feature routes loaded: Next Best Action, Practice Health, Meeting Workflow")
+    except ImportError as e:
+        logger.error(f"Failed to load killer feature routes: {e}")
 
 # Include all routes
 include_all_routes()
