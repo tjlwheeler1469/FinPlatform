@@ -7777,6 +7777,9 @@ try:
     from routes.document_generation import router as document_generation_router
     from routes.data_aggregators import router as data_aggregators_router
     from routes.trading import router as trading_router
+    from routes.market_data import router as market_data_router
+    from routes.email_routes import router as email_router
+    from routes.bank_feeds import router as bank_feeds_router
     
     app.include_router(intelligence_router, prefix="/api")
     app.include_router(meeting_automation_router, prefix="/api")
@@ -7789,6 +7792,9 @@ try:
     app.include_router(document_generation_router, prefix="/api")
     app.include_router(data_aggregators_router, prefix="/api")
     app.include_router(trading_router, prefix="/api")
+    app.include_router(market_data_router, prefix="/api")
+    app.include_router(email_router, prefix="/api")
+    app.include_router(bank_feeds_router, prefix="/api")
     
     logger.info("All modular routes loaded successfully")
 except ImportError as e:
