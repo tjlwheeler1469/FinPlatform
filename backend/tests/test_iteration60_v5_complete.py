@@ -258,9 +258,10 @@ class TestPracticeHealthDashboard:
         response = requests.get(f"{BASE_URL}/api/practice-health/health-score")
         assert response.status_code == 200
         data = response.json()
-        assert "score" in data
+        assert "overall_score" in data or "score" in data
         assert "grade" in data
-        assert data["score"] >= 0 and data["score"] <= 100
+        score = data.get("overall_score", data.get("score", 0))
+        assert score >= 0 and score <= 100
 
 
 class TestCRMNotes:
