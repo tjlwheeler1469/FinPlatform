@@ -2,7 +2,7 @@
 Analysis Routes
 Investment analysis, Monte Carlo simulations, property comparison, and scenario analysis.
 """
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 from typing import Dict, List, Optional, Any
 from datetime import datetime, timezone
@@ -327,25 +327,38 @@ def compare_investment_properties(
 
 
 @router.post("/monte-carlo")
-async def analyze_monte_carlo(request: MonteCarloRequest):
+async def analyze_monte_carlo(
+    initial_value: float = Query(...),
+    expected_return: float = Query(default=0.07),
+    volatility: float = Query(default=0.15),
+    years: int = Query(default=10),
+    simulations: int = Query(default=1000)
+):
     """Run Monte Carlo simulation."""
     return run_monte_carlo_simulation(
-        request.initial_value,
-        request.expected_return,
-        request.volatility,
-        request.years,
-        min(request.simulations, 5000)
+        initial_value,
+        expected_return,
+        volatility,
+        years,
+        min(simulations, 5000)
     )
 
 
 @router.post("/loan")
-async def analyze_loan(request: LoanCalculationRequest):
+async def analyze_loan(
+    principal: float = Query(...),
+    annual_rate: float = Query(...),
+    years: int = Query(default=30)
+):
     """Calculate loan repayment with variable rate scenarios."""
-    return calculate_loan_repayment(request.principal, request.annual_rate, request.years)
+    return calculate_loan_repayment(principal, annual_rate, years)
 
 
 @router.post("/debt-equity")
-async def analyze_debt_equity(total_assets: float, total_debt: float):
+async def analyze_debt_equity(
+    total_assets: float = Query(...),
+    total_debt: float = Query(default=0)
+):
     """Calculate debt to equity ratio."""
     return calculate_debt_to_equity(total_assets, total_debt)
 
@@ -371,3 +384,198 @@ async def analyze_property_comparison(request: PropertyComparisonRequest):
         request.investment_horizon_years,
         request.expected_capital_growth
     )
+
+
+
+# ============= SMSF OPTIMIZER =============
+
+@router.post("/smsf")
+async def analyze_smsf(
+    age: int = Query(...),
+    current_super_balance: float = Query(...),
+    taxable_income: float = Query(...),
+    employer_contribution: float = Query(default=0),
+    salary_sacrifice: float = Query(default=0),
+    personal_contribution: float = Query(default=0),
+    spouse_contribution: float = Query(default=0)
+):
+    """
+    Optimize SMSF contributions for tax efficiency.
+    """
+    # Determine marginal tax rate
+    if taxable_income <= 18200:
+        marginal_rate = 0
+    elif taxable_income <= 45000:
+        marginal_rate = 0.19
+    elif taxable_income <= 120000:
+        marginal_rate = 0.325
+    elif taxable_income <= 180000:
+        marginal_rate = 0.37
+    else:
+        marginal_rate = 0.45
+    
+    # 2024-25 contribution caps
+    concessional_cap = 30000  # Pre-tax contributions
+    non_concessional_cap = 120000  # After-tax contributions
+    
+    # Calculate current total contributions
+    total_concessional = employer_contribution + salary_sacrifice
+    remaining_concessional = max(0, concessional_cap - total_concessional)
+    
+    # Tax saving from salary sacrifice
+    tax_saving_per_dollar = max(0, marginal_rate - 0.15)
+    
+    # Optimal additional salary sacrifice
+    optimal_sacrifice = remaining_concessional
+    tax_saved = optimal_sacrifice * tax_saving_per_dollar
+    
+    # Projected balance (7% return, years to retirement)
+    years_to_retirement = max(0, 67 - age)
+    annual_contribution = employer_contribution + salary_sacrifice + personal_contribution
+    
+    projected_balance = current_super_balance
+    for _ in range(years_to_retirement):
+        projected_balance = projected_balance * 1.07 + annual_contribution
+    
+    # Generate recommendations
+    recommendations = []
+    if tax_saving_per_dollar > 0.10 and remaining_concessional > 0:
+        recommendations.append({
+            "type": "salary_sacrifice",
+            "title": "Increase Salary Sacrifice",
+            "description": f"You can contribute an additional ${remaining_concessional:,.0f} as salary sacrifice",
+            "impact": f"Save ${tax_saved:,.0f} in tax",
+            "priority": "high"
+        })
+    if age >= 60:
+        recommendations.append({
+            "type": "ttr",
+            "title": "Transition to Retirement Strategy",
+            "description": "Consider a TTR pension to reduce tax while still working",
+            "impact": "Potential tax savings of 15-30%",
+            "priority": "medium"
+        })
+    if years_to_retirement > 20:
+        recommendations.append({
+            "type": "investment",
+            "title": "Growth Investment Strategy",
+            "description": "With a long time horizon, consider a growth-oriented investment mix",
+            "impact": "Higher long-term returns potential",
+            "priority": "medium"
+        })
+    if current_super_balance < 500000 and age >= 50:
+        recommendations.append({
+            "type": "catchup",
+            "title": "Catch-up Contributions Available",
+            "description": "You may be eligible for carry-forward concessional contributions",
+            "impact": "Up to $30k additional concessional per year",
+            "priority": "high"
+        })
+    if not recommendations:
+        recommendations.append({
+            "type": "info",
+            "title": "Strategy Optimized",
+            "description": "Your SMSF strategy appears well-optimized",
+            "impact": "Maintain current approach",
+            "priority": "low"
+        })
+    
+    return {
+        "current_contributions": {
+            "employer": employer_contribution,
+            "salary_sacrifice": salary_sacrifice,
+            "personal": personal_contribution,
+            "spouse": spouse_contribution,
+            "total_concessional": total_concessional,
+            "total_non_concessional": personal_contribution + spouse_contribution
+        },
+        "caps": {
+            "concessional": concessional_cap,
+            "non_concessional": non_concessional_cap,
+            "concessional_remaining": remaining_concessional,
+            "non_concessional_remaining": non_concessional_cap - (personal_contribution + spouse_contribution)
+        },
+        "tax_analysis": {
+            "marginal_rate": marginal_rate * 100,
+            "super_tax_rate": 15,
+            "tax_saving_per_dollar": tax_saving_per_dollar * 100,
+            "potential_tax_saved": tax_saved
+        },
+        "projections": {
+            "years_to_retirement": years_to_retirement,
+            "current_balance": current_super_balance,
+            "projected_balance_at_67": projected_balance,
+            "assumed_return": 7.0
+        },
+        "recommendations": recommendations
+    }
+
+
+# ============= TAX COMPARISON =============
+
+@router.post("/tax-comparison")
+async def analyze_tax_comparison(
+    income: float = Query(...),
+    deductions: float = Query(default=0),
+    has_private_health: bool = Query(default=False)
+):
+    """
+    Compare tax across financial years.
+    """
+    taxable_income = max(0, income - deductions)
+    
+    # Calculate current year tax (2024-25 rates)
+    def calc_tax_2024(taxable):
+        if taxable <= 18200:
+            return 0
+        elif taxable <= 45000:
+            return (taxable - 18200) * 0.16
+        elif taxable <= 135000:
+            return 4288 + (taxable - 45000) * 0.30
+        elif taxable <= 190000:
+            return 31288 + (taxable - 135000) * 0.37
+        else:
+            return 51638 + (taxable - 190000) * 0.45
+    
+    # Calculate previous year tax (2023-24 rates)
+    def calc_tax_2023(taxable):
+        if taxable <= 18200:
+            return 0
+        elif taxable <= 45000:
+            return (taxable - 18200) * 0.19
+        elif taxable <= 120000:
+            return 5092 + (taxable - 45000) * 0.325
+        elif taxable <= 180000:
+            return 29467 + (taxable - 120000) * 0.37
+        else:
+            return 51667 + (taxable - 180000) * 0.45
+    
+    tax_2024 = calc_tax_2024(taxable_income)
+    tax_2023 = calc_tax_2023(taxable_income)
+    
+    # Medicare levy
+    medicare = taxable_income * 0.02 if taxable_income > 24276 else 0
+    
+    return {
+        "taxable_income": taxable_income,
+        "comparison": [
+            {
+                "year": "2024-25",
+                "tax_payable": round(tax_2024, 2),
+                "medicare_levy": round(medicare, 2),
+                "total_tax": round(tax_2024 + medicare, 2),
+                "effective_rate": round((tax_2024 + medicare) / taxable_income * 100, 2) if taxable_income > 0 else 0
+            },
+            {
+                "year": "2023-24",
+                "tax_payable": round(tax_2023, 2),
+                "medicare_levy": round(medicare, 2),
+                "total_tax": round(tax_2023 + medicare, 2),
+                "effective_rate": round((tax_2023 + medicare) / taxable_income * 100, 2) if taxable_income > 0 else 0
+            }
+        ],
+        "savings": {
+            "amount": round(tax_2023 - tax_2024, 2),
+            "percentage": round((tax_2023 - tax_2024) / tax_2023 * 100, 2) if tax_2023 > 0 else 0
+        }
+    }

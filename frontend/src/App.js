@@ -157,6 +157,11 @@ const FeedbackAnalytics = lazy(() => import("@/pages/FeedbackAnalytics"));
 // Real-Time Data Layer
 const RealtimeDataDashboard = lazy(() => import("@/pages/RealtimeDataDashboard"));
 
+// New Trading Pages
+const BondsTrading = lazy(() => import("@/pages/BondsTrading"));
+const CashDeposits = lazy(() => import("@/pages/CashDeposits"));
+const ManagedFunds = lazy(() => import("@/pages/ManagedFunds"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -843,9 +848,9 @@ const AppRouter = () => {
       <Route path="/login" element={<Suspense fallback={<PageLoader />}><Login /></Suspense>} />
       
       {/* Protected routes */}
-      <Route path="/" element={<Navigate to="/advisor-command-center" replace />} />
+      <Route path="/" element={<Navigate to="/daily-briefing" replace />} />
       <Route path="/mode-selector" element={<ModeSelector />} />
-      <Route path="/dashboard" element={<Navigate to="/advisor-command-center" replace />} />
+      <Route path="/dashboard" element={<Suspense fallback={<PageLoader />}><Dashboard /></Suspense>} />
       <Route path="/overview" element={<FamilyOverview />} />
       <Route path="/budget" element={<HouseholdBudget />} />
       <Route path="/tax-analysis" element={<TaxAnalysisSync />} />
@@ -993,6 +998,11 @@ const AppRouter = () => {
       
       {/* Real-Time Data Layer */}
       <Route path="/realtime-data" element={<RealtimeDataDashboard />} />
+      
+      {/* New Trading Pages */}
+      <Route path="/bonds-trading" element={<BondsTrading />} />
+      <Route path="/cash-deposits" element={<CashDeposits />} />
+      <Route path="/managed-funds" element={<ManagedFunds />} />
     </Routes>
   );
 };

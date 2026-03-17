@@ -82,19 +82,22 @@ const personalNavGroups = [
     icon: LayoutDashboard,
     items: [
       { path: "/daily-briefing", label: "Daily Briefing", icon: Sun, title: "Daily Briefing" },
-      { path: "/macro-dashboard", label: "Markets Overview", icon: BarChart3, title: "Global Markets & Macro Data", badge: "NEW" },
-      { path: "/dashboard", label: "Retirement Tracker", icon: Target, title: "Retirement Readiness" },
+      { path: "/macro-dashboard", label: "Markets Overview", icon: BarChart3, title: "Markets Overview", badge: "NEW" },
+      { path: "/dashboard", label: "Retirement Tracker", icon: Target, title: "Retirement Tracker" },
       { path: "/recommendations", label: "Recommendations", icon: Lightbulb, title: "Financial Recommendations" },
-      { path: "/decision-engine", label: "Health Score", icon: Zap, title: "Financial Health Score" },
+      { path: "/decision-engine", label: "Health Score", icon: Zap, title: "Health Score" },
     ]
   },
   {
     name: "Trading",
     icon: TrendingUp,
     items: [
-      { path: "/stock-trading", label: "Buy/Sell Stocks", icon: TrendingUp, title: "Stock Trading with CGT", badge: "NEW" },
-      { path: "/broker-research", label: "Research Reports", icon: FileText, title: "Broker Research & Ratings", badge: "NEW" },
-      { path: "/stock-research", label: "Stock Screener", icon: LineChart, title: "Stock Research" },
+      { path: "/stock-trading", label: "Stocks & ETFs", icon: TrendingUp, title: "Stock Trading with CGT", badge: "NEW" },
+      { path: "/bonds-trading", label: "Bonds", icon: Landmark, title: "Bonds & Fixed Income" },
+      { path: "/cash-deposits", label: "Cash & Term Deposits", icon: PiggyBank, title: "Cash & Term Deposits" },
+      { path: "/managed-funds", label: "Managed Funds", icon: PieChart, title: "Managed Funds" },
+      { path: "/broker-research", label: "Research Reports", icon: FileText, title: "Broker Research & Ratings" },
+      { path: "/stock-research", label: "Stock Screener", icon: LineChart, title: "Stock Screener" },
       { path: "/market-data", label: "Live Prices", icon: BarChart3, title: "Live Market Data" },
     ]
   },
