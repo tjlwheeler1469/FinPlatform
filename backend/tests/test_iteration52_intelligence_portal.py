@@ -473,7 +473,8 @@ class TestExistingEndpoints:
         data = response.json()
         
         assert "client_id" in data
-        assert "total_wealth" in data
+        assert "asset_allocation" in data
+        assert "cash" in data
     
     def test_compliance_dashboard(self):
         """Test compliance dashboard still works"""
@@ -481,8 +482,9 @@ class TestExistingEndpoints:
         assert response.status_code == 200
         data = response.json()
         
-        assert "overall_score" in data
-        assert "clients" in data
+        assert "overview" in data
+        assert "metrics" in data
+        assert "risk_alerts" in data
 
 
 if __name__ == "__main__":
