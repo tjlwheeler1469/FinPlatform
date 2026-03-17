@@ -1,47 +1,38 @@
-# Wealth Command v7.7.0 - Complete Financial Advisor Operating System
+# Wealth Command v7.8.0 - Complete Financial Advisor Operating System
 
 ---
 
-## What's New in v7.7.0
+## What's New in v7.8.0
 
-### Client 360 View - **Everything in One Place**
-A comprehensive single-page client summary accessible from the CRM Command Center.
+### CRM Command Center Bug Fix
+Fixed critical rendering error in CRMCommandCenter.jsx where account icons were not rendering when fetching data from the backend API.
 
-**New `/client-360` Page Features:**
+**Bug Fixed:**
+- Account icons were trying to render `account.icon` component from backend data (which doesn't exist)
+- Added `getAccountIcon()` function to map account types to Lucide React icons
+- Added CreditCard icon import for liability/mortgage accounts
 
-#### Client Header
-- ✅ Avatar with initials, name, status badge, satisfaction star
-- ✅ Contact info: email, phone, location
-- ✅ Client details: since date, advisor, risk profile
-- ✅ Total Wealth with change amount and percentage
-- ✅ Quick action buttons: Call, Email
-
-#### Quick Stats Bar
-- 8 Accounts | 4 Open Tasks | 6 Documents | 95% Satisfaction | NPS 9 | Next Review 15 Jan 2026
-
-#### 6 Comprehensive Tabs
-1. **Overview** - Financial Goals, Family Members, Asset Allocation, Insurance, Key Dates
-2. **Accounts** - All 8 accounts with balances and change percentages
-3. **Transactions** - Recent transactions color-coded by type (income, investment, expense)
-4. **Tasks** - Pending tasks with priority badges and due dates
-5. **Documents** - SOA, Risk Profile, Insurance Schedule, IPS, FDS, Meeting Notes
-6. **Timeline** - Communication history with icons (call, email, meeting, video)
+**Technical Details:**
+- File: `/app/frontend/src/pages/CRMCommandCenter.jsx`
+- Issue: `<account.icon className="..."/>` threw "Element type is invalid" error
+- Fix: Created dynamic icon mapping based on account type string
 
 ---
 
-## Demo Client Data (Wheeler Family)
+## Demo Client Data
 
-| Section | Details |
-|---------|---------|
-| **Total Wealth** | $2.85M (+$125K, +4.6%) |
-| **Accounts** | 8 (Super $890K, Investment $650K, Property $3.05M, Cash $110K, Mortgage -$850K) |
-| **Goals** | 4 (Retirement 81%, Mortgage 13%, Education 43%, Holiday 60%) |
-| **Family** | 4 (James 56, Sarah 54, Emily 24, Tom 21) |
-| **Insurance** | 4 (Life $1.5M, TPD $1M, Income Protection $15K/mo, Trauma $500K) |
-| **Transactions** | 8 recent (dividends, purchases, contributions, rental income) |
-| **Tasks** | 4 pending (Insurance Review, SOA Update, Tax Planning, Super Strategy) |
-| **Documents** | 6 (SOA 2025, Risk Profile, Insurance Schedule, IPS, FDS, Meeting Notes) |
-| **Communications** | 6 entries (calls, emails, meetings) |
+| Client | Type | Wealth | Status |
+|--------|------|--------|--------|
+| James & Sarah Wheeler | Household | $2.85M | Active |
+| Chen Family Trust | Trust | $5.20M | Active |
+| Robert Mitchell | Individual | $1.45M | Review |
+| Emma & David Williams | Household | $980K | Prospect |
+| Patel SMSF | SMSF | $3.10M | Active |
+| Anderson Partnership | Partnership | $4.20M | Active |
+| Sarah Kim | Individual | $1.85M | Active |
+| Thompson Retirees | Household | $2.65M | Active |
+
+**Total AUM:** $22.28M across 8 clients
 
 ---
 
@@ -56,19 +47,16 @@ A comprehensive single-page client summary accessible from the CRM Command Cente
 | v7.4 | Feedback & Learning Loop + Real-Time Data Layer | Dec 2025 |
 | v7.5 | Bug Fixes + New Trading Pages (Bonds, Cash, Funds) | Dec 2025 |
 | v7.6 | CRM Command Center Redesign | Dec 2025 |
-| **v7.7** | **Client 360 View - Everything in One Place** | **Dec 2025** |
+| v7.7 | Client 360 View - Everything in One Place | Dec 2025 |
+| **v7.8** | **CRM Command Center Bug Fix** | **Dec 2025** |
 
 ---
 
 ## Testing Status
 
-- **Iteration 71**: 100% pass rate (All features verified)
-- **Key Verifications**:
-  - All 6 tabs load with correct content
-  - Client header with wealth and contact info
-  - Quick stats bar metrics
-  - Navigation between CRM and Client 360
-  - All interactive elements working
+- **Iteration 73**: 100% pass rate
+  - Backend: 28/28 tests passed
+  - Frontend: All CRM features verified working
 
 ---
 
@@ -79,7 +67,7 @@ A comprehensive single-page client summary accessible from the CRM Command Cente
 | Phase 1 | Next Best Action Engine | ✅ Complete |
 | Phase 2 | Action → Execution Layer | ✅ Complete |
 | Phase 3 | Real Data Integration | ⏳ Pending (needs API keys) |
-| Phase 4 | Institution-Grade CRM | ✅ **ENHANCED** (Command Center + 360 View) |
+| Phase 4 | Institution-Grade CRM | ✅ **FIXED** (Command Center + 360 View) |
 | Phase 5 | Advisor Book Intelligence | ✅ Complete |
 | Phase 6 | Meeting Automation Engine | ✅ Complete |
 | Phase 7 | Client Experience Layer | ✅ Complete |
@@ -88,18 +76,30 @@ A comprehensive single-page client summary accessible from the CRM Command Cente
 
 ---
 
+## Known Issues
+
+### Resolved
+- ✅ **CRM Command Center broken** - Fixed account icon rendering
+
+### Acknowledged
+- **Compliance Modal on Every Page**: Shows in fresh browser sessions. This is expected behavior - localStorage persists acknowledgement for returning users.
+- **websockets Dependency Conflict**: `alpaca-trade-api` requires websockets <11, but `yfinance` and `google-genai` require >=13. Currently using websockets 13+ to support yfinance. Alpaca websocket streaming won't work until they update their library.
+
+---
+
 ## Remaining Tasks
 
 ### P0 - Required for Production
-1. **Connect Client 360 to real backend** - Replace demo data with MongoDB
+1. **Connect to real database** - Replace mock data with MongoDB
 2. **Configure Alpaca API Keys** - Enable live paper trading
 3. **Real Data Integration** - Connect custodian accounts
 
 ### P1 - High Value
-1. **Client creation/editing** from CRM
-2. **Email Service Integration** (SendGrid/Twilio)
-3. **Calendar Integration** (Google Calendar)
-4. **PDF Document Generation** (SOA/ROA)
+1. **Transaction Modeling** - Model property/fund/stock transactions with impact analysis
+2. **Client creation/editing** from CRM
+3. **Email Service Integration** (SendGrid/Twilio)
+4. **Calendar Integration** (Google Calendar)
+5. **PDF Document Generation** (SOA/ROA)
 
 ### P2 - Future
 1. Mobile App Wrapper
@@ -111,9 +111,40 @@ A comprehensive single-page client summary accessible from the CRM Command Cente
 
 ## Key Metrics
 
-- **Version:** 7.7.0
-- **Total AUM (Demo):** $13.58M
-- **Demo Clients:** 5 (3 Active, 1 Prospect, 1 Review)
+- **Version:** 7.8.0
+- **Total AUM (Demo):** $22.28M
+- **Demo Clients:** 8 (6 Active, 1 Prospect, 1 Review)
 - **Backend Routes:** 50+
 - **Frontend Pages:** 58+
 - **Test Pass Rate:** 100%
+
+---
+
+## Code Architecture
+
+```
+/app/
+├── backend/
+│   ├── server.py
+│   └── routes/
+│       ├── crm.py                  # CRM with 8 mock clients
+│       ├── analysis.py             # Financial calculators
+│       ├── trading.py              # Stock trading with CGT
+│       └── ... (50+ route files)
+└── frontend/
+    └── src/
+        ├── App.js                  # 58+ routes
+        ├── components/
+        │   └── Layout.jsx          # Navigation
+        └── pages/
+            ├── CRMCommandCenter.jsx   # FIXED - Account icons now work
+            ├── Client360View.jsx      # Client detail view
+            └── ... (58+ pages)
+```
+
+---
+
+## Credentials
+
+- **Test Adviser**: `advisor@wealthcommand.io` / `secure_password_123`
+- **Preview URL**: https://advisor-command.preview.emergentagent.com
