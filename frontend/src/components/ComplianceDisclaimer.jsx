@@ -297,4 +297,22 @@ export const InlineDisclaimer = ({ type = "general", className = "" }) => {
   );
 };
 
+// Calculator-specific disclaimer component
+export const CalculatorDisclaimer = ({ calculatorName = "calculator", className = "" }) => {
+  return (
+    <div className={`flex items-start gap-2 p-3 bg-amber-50 rounded-md border border-amber-200 ${className}`}>
+      <AlertTriangle className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
+      <div>
+        <p className="text-xs text-amber-700 font-medium">
+          This {calculatorName} provides estimates only
+        </p>
+        <p className="text-xs text-amber-600 mt-1">
+          Results are for illustrative purposes and should not be relied upon for financial decisions. 
+          Consult a licensed financial adviser for personalized advice.
+        </p>
+      </div>
+    </div>
+  );
+};
+
 export default ComplianceModal;
