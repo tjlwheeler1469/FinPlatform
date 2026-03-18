@@ -1,122 +1,211 @@
-# Wealth Command v8.4.0 - Major UI/UX Overhaul
+# Wealth Command v9.0.0 - Simplification & Live Data Release
 
 ---
 
-## Changes in v8.4.0 (Advisor Profile Feedback)
-
-### Navigation Restructured
-1. ✅ **Dashboard above CRM** - Reordered navigation
-2. ✅ **CRM combined** - Command Centre + All Clients + Portfolio Data now in single "Client Hub" page
-3. ✅ **AI Assistant merged with AI Copilot** - Reduced to single "AI Copilot" section
-4. ✅ **Risk Profile & Health Score moved** to Client Dashboard Overview section
-5. ✅ **Investments aligned** with Trading - Added Bonds to client investments
-
-### Client Hub (Combined CRM)
-- **All Clients tab**: Card view of all clients with wealth, accounts, status
-- **Portfolio Overview tab**: Asset breakdown by type across all clients with progress bars
-- **Recent Activity tab**: Latest client interactions
-- **Top Clients by AUM**: Sidebar showing top 5 clients
-- **Status filters**: All, Active, Prospect, Review
-- **New Client button**: Opens client creation modal
-
-### Transaction Modeler - Multi-Transaction Support
-- ✅ **Add to List button** - Add current transaction to scenario list
-- ✅ **Scenario Transactions panel** - Shows all added transactions with:
-  - Transaction type icon
-  - Name and amount
-  - Delete button for each
-  - Total value badge
-- ✅ **Support for multiple asset types** in same scenario
-
-### Goal Tracker - Edit Goals
-- ✅ **Edit button** on each goal card (pencil icon)
-- ✅ **Edit dialog** with fields for:
-  - Goal name
-  - Target amount
-  - Current amount
-  - Target date
-  - Monthly contribution
-  - Priority (Low/Medium/High)
-  - Goal type
-- ✅ **Delete goal** button with confirmation
-- ✅ **Save Changes** button
+## Executive Summary
+Wealth Command is an AI-driven financial operating system designed as a "System of Execution" for financial advisers. This version focuses on significant UI/UX simplification and live market data integration.
 
 ---
 
-## Navigation Structure (v8.4.0)
+## Changes in v9.0.0 (March 2026)
 
-### Adviser Mode
+### Major Changes
+
+#### 1. Navigation Consolidated
+- **Personal Mode**: Reduced from ~50 items to 7 organized groups
+  - Dashboard (4 items)
+  - Trading (4 items)
+  - Finances (5 items)
+  - Planning (4 items)
+  - Tax & Reports (4 items)
+  - Calculators (4 items)
+  - Settings (3 items)
+  
+- **Adviser Mode**: Streamlined to 5 groups
+  - Dashboard (2 items)
+  - CRM (2 items)
+  - AI Copilot (3 items)
+  - Execution (2 items)
+  - Compliance (2 items)
+
+- **Client Context**: Focused 5 groups when client selected
+  - Overview (3 items)
+  - Plan (3 items)
+  - Investments (4 items)
+  - Documents (3 items)
+  - AI (1 item)
+
+#### 2. Live Market Data (yfinance)
+- **Macro Dashboard** now uses live yfinance data instead of static mocked values
+- Endpoints updated: `/api/macro/overview`, `/api/macro/indices`, `/api/macro/crypto`
+- Added `data_source` field to responses indicating "live" or "static"
+- 60-second cache for live data to reduce API calls
+- Graceful fallback to static data if yfinance fails
+- **LIVE badge** displayed in navigation for Markets item
+
+#### 3. Bug Fixes
+- Fixed `MacroDashboard.jsx` array handling for new response format
+- Added `data_source` filtering to prevent `.map()` errors on non-array values
+
+---
+
+## Navigation Structure (v9.0.0)
+
+### Personal Mode
 ```
 Dashboard
 ├── Daily Briefing
-├── Practice Overview
-├── Markets & Research
-└── Broker Research
+├── Markets (LIVE badge)
+├── Retirement
+└── Health Score
+
+Trading
+├── Stocks & ETFs
+├── Bonds
+├── Funds
+└── Research
+
+Finances
+├── Net Worth
+├── Property
+├── Shares
+├── All Accounts
+└── Budget
+
+Planning
+├── Goals
+├── Strategy
+├── AI Advisor
+└── What-If
+
+Tax & Reports
+├── Tax Analysis
+├── Capital Gains
+├── Reports
+└── Documents
+
+Calculators
+├── Loan
+├── Monte Carlo
+├── SMSF
+└── Rebalancing
+
+Settings
+├── Security
+├── Bank Feeds
+└── Import/Export
+```
+
+### Adviser Mode (No Client)
+```
+Dashboard
+├── Command Center
+└── Markets (LIVE badge)
 
 CRM
-├── Client Hub (Combined) ← NEW
-├── Tasks & Workflows
-└── New Client
+├── Client Hub (HUB badge)
+└── Tasks
 
-AI Copilot (Consolidated)
+AI Copilot
 ├── AI Assistant
-├── Book Intelligence
-├── Decision Center
-└── Meeting Notes
+├── Meeting Prep
+└── Decision Center
 
 Execution
 ├── Batch Execute
-├── Trading
-└── Stock Screener
+└── Trading
 
-Compliance + Settings
+Compliance
+├── Compliance
+└── Security
 ```
 
-### Client Mode (After selecting client)
+### Client Context (After Selection)
 ```
 Overview
-├── Client Dashboard
-├── Risk Profile ← MOVED HERE
-├── Health Score ← MOVED HERE
-└── Next Best Actions
+├── Dashboard
+├── Actions
+└── Health Score
 
-Financial Plan
-├── Generate Plan
-├── Goals (with edit)
-├── Scenarios
-├── What-If Modeler (multi-transaction)
-└── Strategy
+Plan
+├── Goals
+├── What-If
+└── Generate Plan
 
-Investments (Expanded)
+Investments
 ├── Net Worth
-├── Shares & ETFs
-├── Managed Funds
-├── Bonds ← ADDED
-├── Cash & Term Deposits
+├── Shares
 ├── Property
-├── Trading
-├── Analysis
-└── Linked Accounts
+└── Trading
 
-Documents + AI Copilot
+Documents
+├── Vault
+├── Meeting Notes (NEW badge)
+└── Reports
+
+AI
+└── AI Chat
 ```
 
 ---
 
-## Pending Items
-- Adviser Profile work (mentioned as "lots to do")
-- Personal Reports + Adviser Documents combination
-- Client Profile refinements
+## Verified Working Features
+
+### Core Features (Tested ✅)
+1. **Macro Dashboard** - Live yfinance data (S&P 500, ASX 200, Bitcoin, Gold, etc.)
+2. **Meeting Prep** - Generate AI meeting briefs with client insights
+3. **Next Best Actions** - Interactive sliders for recommendations
+4. **Adviser Hub** - Client list with AUM, status badges
+5. **Transaction Modeler** - Multi-asset what-if scenarios with projections
+6. **Goal Tracker** - Edit goals functionality
+7. **Meeting Notes** - Fathom UI integration
+
+### API Endpoints (Working)
+- `POST /api/meeting-prep/generate` - AI meeting preparation
+- `GET /api/macro/overview` - Live market overview (yfinance)
+- `GET /api/macro/indices` - Live stock indices
+- `GET /api/macro/crypto` - Live cryptocurrency prices
+- `POST /api/transactions/model-property` - Property modeling
+- `POST /api/transactions/model-investment` - Investment modeling
 
 ---
 
-## Key Metrics
+## Pending Items / Backlog
 
-- **Version:** 8.4.0
-- **Total AUM (Demo):** $22.28M
-- **Demo Clients:** 8
-- **Backend Routes:** 55+
-- **Frontend Pages:** 65+
+### P1 (High Priority)
+- [ ] Wire up Next Best Actions "Execute Action" to actual workflows
+- [ ] Connect Goal Tracker editing to backend persistence
+- [ ] Implement Fathom API integration for meeting notes
+
+### P2 (Medium Priority)
+- [ ] Connect to persistent MongoDB database
+- [ ] Integrate Alpaca paper trading API
+- [ ] Replace remaining mock data with real API calls
+
+### P3 (Low Priority)
+- [ ] Mobile app wrapper
+- [ ] Voice interface (Whisper)
+- [ ] Additional custodian API integrations
+
+---
+
+## Technical Details
+
+### Live Data Integration
+```python
+# Backend: /app/backend/routes/macro_data.py
+# Uses yfinance for real-time market data
+# Symbols mapped:
+#   ^GSPC -> S&P 500
+#   ^AXJO -> ASX 200
+#   BTC-USD -> Bitcoin
+#   GC=F -> Gold
+```
+
+### Key Files
+- `/app/frontend/src/components/Layout.jsx` - Navigation structure
+- `/app/frontend/src/pages/MacroDashboard.jsx` - Live markets display
+- `/app/backend/routes/macro_data.py` - yfinance integration
 
 ---
 
@@ -124,3 +213,29 @@ Documents + AI Copilot
 
 - **Test Adviser**: `advisor@wealthcommand.io` / `secure_password_123`
 - **Preview URL**: https://transaction-lab-3.preview.emergentagent.com
+
+---
+
+## Key Metrics
+
+- **Version**: 9.0.0
+- **Navigation Items**: ~30 (down from 113)
+- **Total AUM (Demo)**: $22.28M
+- **Demo Clients**: 8
+- **Live Data Source**: yfinance
+
+---
+
+## 3rd Party Integrations
+
+| Integration | Status | Notes |
+|-------------|--------|-------|
+| yfinance | LIVE | Real-time market data |
+| OpenAI/Anthropic/Google | Ready | Via emergentintegrations |
+| Alpaca | Infrastructure | Needs API key |
+| Fathom | UI Ready | Needs API key |
+| Basiq/SendGrid/Twilio | Ready | Need API keys |
+
+---
+
+*Last Updated: March 18, 2026*
