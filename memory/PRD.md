@@ -1,4 +1,4 @@
-# Wealth Command v7.7 - Product Requirements Document
+# Wealth Command v7.8 - Product Requirements Document
 
 ## Original Problem Statement
 Create a "financial services super app" named "Wealth Command," evolving it from a simple dashboard into a comprehensive "Wealth Operating System" for financial advisers. The core architecture is a **Financial Knowledge Graph** using a hybrid MongoDB and Neo4j database.
@@ -17,111 +17,101 @@ Create a "financial services super app" named "Wealth Command," evolving it from
 - ✅ MongoDB integration for data persistence
 - ✅ Comprehensive dashboard system (Daily Briefing, Retirement Tracker, etc.)
 - ✅ Stock Trading with CGT calculations
-- ✅ Bonds Trading page
-- ✅ Cash & Term Deposits management
-- ✅ Managed Funds tracking
-- ✅ Property Portfolio management
+- ✅ Bonds Trading, Hybrids Trading, Crypto Portfolio pages
+- ✅ Cash & Term Deposits, Managed Funds, Property Portfolio
 - ✅ Tax Analysis & CGT tracking
-- ✅ AI Advisor integration (OpenAI/Anthropic/Google via Emergent LLM Key)
-- ✅ Knowledge Graph Dashboard with react-force-graph-2d visualization
+- ✅ AI Advisor integration (Emergent LLM Key)
 
 #### Phase 7: Advisor Mode & CRM
 - ✅ Advisor Command Center with 10-zone layout
-- ✅ Client 360 View with contact form integration
-- ✅ Transaction Modeler with multi-transaction support and plan generation
-- ✅ Meeting Notes with Fathom integration (mock mode when no API key)
+- ✅ Client 360 View with Bonds, Hybrids, Crypto asset categories
+- ✅ Transaction Modeler with 7 asset types (Property, Fund, Stock, ETF, Bonds, Hybrids, Crypto)
+- ✅ Meeting Notes with Fathom integration (mock mode)
 - ✅ Adviser Hub (Combined CRM)
 
-#### Phase 7.5-7.6: UI/UX Improvements & Asset Classes
-- ✅ Performance: Market data loading optimized (parallel yfinance)
-- ✅ Bug Fix: Percentage display corrected
-- ✅ Navigation Restructure: Net Worth first, Crypto/Hybrids added
-- ✅ Hybrids Trading page (/hybrids-trading)
-- ✅ Crypto Portfolio page (/crypto-portfolio)
+#### Phase 7.5-7.7: UI/UX & Live Price Feeds
+- ✅ Performance optimizations (parallel yfinance)
+- ✅ Navigation restructure (Net Worth first, Crypto/Hybrids added)
 - ✅ Multi-Structure Asset Viewing (Personal/Joint/Company/Trust/SMSF)
-- ✅ Client Investments expanded: Hybrids + Crypto categories
-- ✅ MongoDB Persistence: Client Contact + Financial Plans
+- ✅ MongoDB Persistence for Client Contact & Financial Plans
+- ✅ Live Crypto Prices (CoinGecko API)
+- ✅ Live Hybrid Prices (ASX via yfinance)
 
-#### Phase 7.7: Live Price Feeds (March 18, 2026)
-- ✅ **CoinGecko Crypto Integration**:
-  - Live prices for BTC, ETH, SOL, LINK, MATIC, etc.
-  - Global market data (total market cap, BTC dominance)
-  - Portfolio value calculation with live prices
-  - 60-second cache for rate limiting
-- ✅ **ASX Hybrid Prices Integration**:
-  - Live prices via yfinance for supported hybrids
-  - Simulated realistic prices for unsupported symbols
-  - Running yield calculation (BBSW + margin)
-  - Portfolio value with P/L tracking
-- ✅ **Frontend Integration**:
-  - CryptoPortfolio.jsx fetches live prices on mount
-  - HybridsTrading.jsx fetches live prices on mount
-  - Refresh buttons trigger live API calls
-  - Toast notifications for price updates
+#### Phase 7.8: UI Improvements & Client Portal (March 18, 2026)
+- ✅ **ScenarioModelling Page Redesign**:
+  - Clean card design matching FamilyWealthDashboard
+  - Light backgrounds instead of dark gradients
+  - Simple 4 tabs (Goals, Assets, Scenario, Projection) without icons
+  - Improved readability and accessibility
 
-### API Endpoints for Live Prices
+- ✅ **Knowledge Graph Dashboard**:
+  - Removed confusing "Graph" tab
+  - Now has 5 tabs: Insights, Overview, Actions, Risks, Opportunities
+  - Default tab is "Insights"
 
-**Crypto (CoinGecko)**:
-- `GET /api/crypto/prices?symbols=BTC,ETH` - Live crypto prices
-- `GET /api/crypto/global` - Global market data (dominance, market cap)
-- `GET /api/crypto/portfolio/value?holdings=BTC:0.5,ETH:2` - Portfolio calculation
+- ✅ **Transaction Modeler Expanded**:
+  - Now has 7 tabs: Property, Fund, Stock, ETF, Bonds, Hybrids, Crypto
+  - Bonds tab: bond_type, yield_to_maturity, maturity_years, credit_rating
+  - Hybrids tab: margin_over_bbsw, running_yield calculation, franking
 
-**Hybrids (ASX)**:
-- `GET /api/hybrids/prices?symbols=CBAPD,WBCPI` - Hybrid security prices
-- `GET /api/hybrids/all` - All tracked hybrids
-- `GET /api/hybrids/portfolio/value?holdings=CBAPD:300` - Portfolio calculation
-- `GET /api/hybrids/market/summary` - Market overview
+- ✅ **Client Portal - All Asset Types**:
+  - 5 portfolios: Growth Portfolio, Fixed Income & Hybrids, Cryptocurrency, Cash & Term Deposits, Superannuation
+  - Net worth breakdown: stocks, etfs, managed_funds, bonds, hybrids, crypto, cash, super, property
+  - Holdings include type field (stock, etf, fund, bond, hybrid, crypto, cash, term_deposit)
 
-### Live Data Sources
-| Source | Data | Status |
-|--------|------|--------|
-| CoinGecko | BTC, ETH, SOL, LINK, MATIC, etc. | ✅ LIVE |
-| Yahoo Finance | ASX hybrid prices (NABPH, MQGPD) | ✅ LIVE |
-| Yahoo Finance | ASX hybrids (CBAPD, WBCPI, ANZPJ) | ⚠️ SIMULATED |
-| Yahoo Finance | Market indices (SPX, ASX200) | ✅ LIVE |
+### Asset Categories Available
+| Category | Personal | Adviser Client | Client Portal |
+|----------|----------|----------------|---------------|
+| Stocks | ✅ | ✅ | ✅ |
+| ETFs | ✅ | ✅ | ✅ |
+| Managed Funds | ✅ | ✅ | ✅ |
+| Bonds | ✅ | ✅ | ✅ |
+| Hybrids | ✅ | ✅ | ✅ |
+| Crypto | ✅ | ✅ | ✅ |
+| Cash/TDs | ✅ | ✅ | ✅ |
+| Property | ✅ | ✅ | ✅ |
+| Super | ✅ | ✅ | ✅ |
 
 ### In Progress / Mocked Features
-- 🔶 Knowledge Graph data (uses mock EmbeddedGraph)
-- 🔶 Fathom Integration (mock mode - requires API key)
-- 🔶 Some ASX hybrid prices (simulated when yfinance unavailable)
+- 🔶 Knowledge Graph data (mock EmbeddedGraph)
+- 🔶 Fathom Integration (requires API key)
+- 🔶 Some ASX hybrid prices (simulated when unavailable)
 
 ### Backlog (P2/P3)
 - P2: Integrate real MongoDB data into Knowledge Graph
-- P2: Add more ASX data sources for hybrids (direct ASX feed)
-- P2: Resolve `websockets` dependency conflict
+- P2: More ASX data sources for hybrids
 - P3: Mobile app wrapper
 - P3: Voice interface (Whisper)
 
 ## Technical Architecture
 
-### Frontend
-- React 18 with React Router
-- Shadcn UI components
-- axios for API calls
-- Recharts for data visualization
-
-### Backend
-- FastAPI with async support
-- MongoDB for persistence
-- httpx for async HTTP calls
-- yfinance for market data
-
-### Key New Files
+### Frontend Pages
 ```
-/app/backend/routes/
-├── crypto_prices.py      # CoinGecko integration
-└── hybrid_prices.py      # ASX hybrid prices
-
 /app/frontend/src/pages/
-├── CryptoPortfolio.jsx   # Live crypto prices
-└── HybridsTrading.jsx    # Live hybrid prices
+├── ScenarioModelling.jsx    # REDESIGNED - clean cards
+├── KnowledgeGraphDashboard.jsx # 5 tabs, no graph
+├── TransactionModeler.jsx   # 7 asset type tabs
+├── ClientPortal.jsx         # All asset types
+├── Client360View.jsx        # Bonds, Hybrids, Crypto
+├── CryptoPortfolio.jsx      # Live prices
+├── HybridsTrading.jsx       # Live prices
+└── FamilyWealthDashboard.jsx # Multi-structure view
 ```
+
+### Key Endpoints
+- `GET /api/client-portal/portfolios/{client_id}` - All asset types
+- `GET /api/crypto/portfolio/value` - Live crypto values
+- `GET /api/hybrids/portfolio/value` - Live hybrid values
+- `POST /api/client-contact/send-message` - MongoDB persistence
+- `POST /api/financial-plan/generate` - MongoDB persistence
 
 ## Testing Status
-- ✅ Backend: 100% tests passing (iteration_84)
-- ✅ Frontend: Live price feeds verified working
-- ✅ CoinGecko: BTC $101,344 AUD, ETH $3,124 AUD
-- ✅ Hybrids: NABPH $102.93, MQGPD $100.79 (live)
+- ✅ Backend: 100% (iteration_85)
+- ✅ Frontend: All features verified
+- ✅ ScenarioModelling: Clean design verified
+- ✅ KnowledgeGraph: 5 tabs, no Graph
+- ✅ TransactionModeler: 7 tabs with Bonds/Hybrids
+- ✅ Client Portal: All asset types in portfolios
 
 ---
-*Last Updated: March 18, 2026 - Version 7.7*
+*Last Updated: March 18, 2026 - Version 7.8*
