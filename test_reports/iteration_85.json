@@ -1,0 +1,82 @@
+{
+  "summary": "Iteration 85 - Wealth Command Improvements Testing. All backend tests passed (23/23). Verified ScenarioModelling clean card design, KnowledgeGraphDashboard has 5 tabs (no Graph tab), TransactionModeler has 7 tabs including Bonds and Hybrids, and Client Portal API returns all asset types.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration85_wealth_improvements.py",
+    "/app/test_reports/pytest/pytest_iteration85.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "✅ ScenarioModelling page: Clean card design with light backgrounds, no dark gradients",
+    "✅ ScenarioModelling tabs: Simple text-only tabs (Goals, Assets, Scenario, Projection) - no icons",
+    "✅ KnowledgeGraphDashboard: Has exactly 5 tabs (Insights, Overview, Actions, Risks, Opportunities) - NO Graph tab",
+    "✅ TransactionModeler: Has all 7 tabs (Property, Fund, Stock, ETF, Bonds, Hybrids, Crypto)",
+    "✅ TransactionModeler Bonds tab: Code has bond_type, yield_to_maturity, maturity_years, credit_rating fields",
+    "✅ TransactionModeler Hybrids tab: Code has margin_over_bbsw, running_yield calculation",
+    "✅ Client Portal /api/client-portal/portfolios/portal_001: Returns portfolios with stocks, etfs, funds, bonds, hybrids, crypto, cash",
+    "✅ Client Portal net_worth breakdown: Includes stocks, etfs, managed_funds, bonds, hybrids, crypto, cash"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration85_wealth_improvements.py"
+  ],
+  "success_rate": {
+    "backend": "100% (23/23 tests passed)",
+    "frontend": "100% (all features verified)"
+  },
+  "test_credentials": {
+    "preview_url": "https://net-worth-hub-17.preview.emergentagent.com"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Iteration 85 verified all Wealth Command improvements: 1) ScenarioModelling page has clean card design without dark gradients and simple tabs without icons, 2) KnowledgeGraphDashboard has 5 tabs (Insights, Overview, Actions, Risks, Opportunities) - Graph tab was removed as requested, 3) TransactionModeler has 7 tabs including Bonds and Hybrids with proper form fields (bond_type, yield_to_maturity, maturity_years, credit_rating for Bonds; margin_over_bbsw, running_yield for Hybrids), 4) Client Portal API returns portfolios with all asset types (stocks, funds, bonds, hybrids, crypto, cash) and net_worth breakdown includes all asset categories.",
+  "features_verified": {
+    "scenario_modelling_clean_design": {
+      "status": "PASS",
+      "verification": "No dark gradients, clean card design with light backgrounds like FamilyWealthDashboard"
+    },
+    "scenario_modelling_simple_tabs": {
+      "status": "PASS",
+      "verification": "4 tabs (Goals, Assets, Scenario, Projection) - no icons, just text"
+    },
+    "knowledge_graph_no_graph_tab": {
+      "status": "PASS",
+      "verification": "5 tabs only: Insights, Overview, Actions, Risks, Opportunities - NO Graph tab"
+    },
+    "transaction_modeler_7_tabs": {
+      "status": "PASS",
+      "verification": "7 tabs: Property, Fund, Stock, ETF, Bonds, Hybrids, Crypto"
+    },
+    "transaction_modeler_bonds_fields": {
+      "status": "PASS",
+      "verification": "Code verified: bond_type, yield_to_maturity, maturity_years, credit_rating fields present"
+    },
+    "transaction_modeler_hybrids_fields": {
+      "status": "PASS",
+      "verification": "Code verified: margin_over_bbsw, running_yield calculation present"
+    },
+    "client_portal_all_assets": {
+      "status": "PASS",
+      "verification": "Portfolios include stocks, etfs, funds, bonds, hybrids, crypto, cash holdings"
+    },
+    "client_portal_net_worth_breakdown": {
+      "status": "PASS",
+      "verification": "Net worth breakdown includes: stocks=389500, etfs=1191000, managed_funds=114800, bonds=128500, hybrids=118730, crypto=85000, cash=145000"
+    }
+  },
+  "mocked_apis": {
+    "has_mocked_apis": true,
+    "mocked_apis_list": [
+      "Client portal (PORTAL_CLIENTS demo data)",
+      "Knowledge Graph (mock embedded graph)"
+    ]
+  }
+}

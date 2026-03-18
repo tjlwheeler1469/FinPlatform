@@ -398,18 +398,14 @@ const KnowledgeGraphDashboard = () => {
 
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="graph" data-testid="tab-graph">
-              <Network className="h-4 w-4 mr-2" />
-              Graph
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="insights" data-testid="tab-insights">
+              <AlertTriangle className="h-4 w-4 mr-2" />
+              Insights ({insights.length})
             </TabsTrigger>
             <TabsTrigger value="overview" data-testid="tab-overview">
               <Eye className="h-4 w-4 mr-2" />
               Overview
-            </TabsTrigger>
-            <TabsTrigger value="insights" data-testid="tab-insights">
-              <AlertTriangle className="h-4 w-4 mr-2" />
-              Insights ({insights.length})
             </TabsTrigger>
             <TabsTrigger value="actions" data-testid="tab-actions">
               <Zap className="h-4 w-4 mr-2" />
@@ -424,128 +420,6 @@ const KnowledgeGraphDashboard = () => {
               Opportunities
             </TabsTrigger>
           </TabsList>
-
-          {/* Graph Tab */}
-          <TabsContent value="graph" className="space-y-4">
-            <div className={`relative ${graphFullscreen ? 'fixed inset-0 z-50 bg-white' : ''}`}>
-              {/* Graph Controls */}
-              <div className="flex items-center justify-between mb-4 p-2 bg-muted rounded-lg">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <Filter className="h-4 w-4 text-muted-foreground" />
-                    <Select value={graphFilter} onValueChange={setGraphFilter}>
-                      <SelectTrigger className="w-[180px]" data-testid="graph-filter">
-                        <SelectValue placeholder="Filter by type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Nodes</SelectItem>
-                        <SelectItem value="Client">Clients</SelectItem>
-                        <SelectItem value="Portfolio">Portfolios</SelectItem>
-                        <SelectItem value="Asset">Assets</SelectItem>
-                        <SelectItem value="Insight">Insights</SelectItem>
-                        <SelectItem value="Action">Actions</SelectItem>
-                        <SelectItem value="Sector">Sectors</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  {/* Legend */}
-                  <div className="hidden md:flex items-center gap-3">
-                    {Object.entries(NODE_COLORS).slice(0, 5).map(([label, color]) => (
-                      <div key={label} className="flex items-center gap-1">
-                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color }} />
-                        <span className="text-xs text-muted-foreground">{label}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => graphRef.current?.zoomToFit(400)}
-                    data-testid="graph-fit-btn"
-                  >
-                    <RefreshCw className="h-4 w-4 mr-1" />
-                    Fit
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setGraphFullscreen(!graphFullscreen)}
-                    data-testid="graph-fullscreen-btn"
-                  >
-                    {graphFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-                  </Button>
-                </div>
-              </div>
-
-              {/* Graph Container */}
-              <Card className={graphFullscreen ? 'h-[calc(100vh-80px)]' : 'h-[500px]'}>
-                <CardContent className="p-0 h-full">
-                  <ForceGraph2D
-                    ref={graphRef}
-                    graphData={filteredGraphData}
-                    nodeLabel={node => `${node.label}: ${node.name}`}
-                    nodeCanvasObject={nodeCanvasObject}
-                    nodeCanvasObjectMode={() => "replace"}
-                    linkColor={() => "#CBD5E1"}
-                    linkWidth={1.5}
-                    linkDirectionalArrowLength={4}
-                    linkDirectionalArrowRelPos={1}
-                    onNodeClick={handleNodeClick}
-                    cooldownTicks={100}
-                    onEngineStop={() => graphRef.current?.zoomToFit(400)}
-                  />
-                </CardContent>
-              </Card>
-
-              {/* Selected Node Details */}
-              {selectedNode && (
-                <Card className="mt-4">
-                  <CardHeader className="pb-2">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="flex items-center gap-2 text-base">
-                        <div 
-                          className="w-4 h-4 rounded-full" 
-                          style={{ backgroundColor: NODE_COLORS[selectedNode.label] || "#6B7280" }} 
-                        />
-                        {selectedNode.name}
-                      </CardTitle>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={() => setSelectedNode(null)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <CardDescription>
-                      <Badge variant="outline">{selectedNode.label}</Badge>
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                      {selectedNode.data && Object.entries(selectedNode.data).slice(0, 8).map(([key, value]) => {
-                        if (key === 'label' || key === 'id' || key === 'holdings' || key === 'goals') return null;
-                        return (
-                          <div key={key}>
-                            <p className="text-muted-foreground text-xs capitalize">{key.replace(/_/g, ' ')}</p>
-                            <p className="font-medium">
-                              {typeof value === 'number' && key.includes('value') 
-                                ? formatCurrency(value) 
-                                : String(value)}
-                            </p>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-          </TabsContent>
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-4">

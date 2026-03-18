@@ -34,7 +34,9 @@ import {
   Coins,
   Plus,
   Trash2,
-  List
+  List,
+  Landmark,
+  ArrowLeftRight
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -299,6 +301,29 @@ const TransactionModeler = () => {
     distribution_yield: 1.5
   });
 
+  // Bond form state
+  const [bondForm, setBondForm] = useState({
+    transaction_type: "buy",
+    bond_type: "corporate",
+    bond_name: "Corporate Bond Fund",
+    amount: 50000,
+    yield_to_maturity: 5.5,
+    coupon_rate: 5.0,
+    maturity_years: 5,
+    credit_rating: "BBB+"
+  });
+
+  // Hybrid form state
+  const [hybridForm, setHybridForm] = useState({
+    transaction_type: "buy",
+    hybrid_name: "CBA PERLS XI (CBAPD)",
+    amount: 25000,
+    margin_over_bbsw: 3.0,
+    bbsw_rate: 4.35,
+    franking_percentage: 100,
+    call_date: "2026-10-15"
+  });
+
   const selectedClient = JSON.parse(localStorage.getItem("selected_client") || "{}");
   const clientName = selectedClient.name || "Wheeler Family";
 
@@ -502,7 +527,94 @@ const TransactionModeler = () => {
       case "stock": modelStock(); break;
       case "crypto": modelCrypto(); break;
       case "etf": modelETF(); break;
+      case "bonds": modelBonds(); break;
+      case "hybrids": modelHybrids(); break;
       default: break;
+    }
+  };
+
+  // Model bonds
+  const modelBonds = async () => {
+    setLoading(true);
+    setResult(null);
+    
+    try {
+      const scenarios = {
+        conservative: generateProjections(bondForm.amount, bondForm.yield_to_maturity - 1, Math.max(timeframe, 20)),
+        moderate: generateProjections(bondForm.amount, bondForm.yield_to_maturity, Math.max(timeframe, 20)),
+        aggressive: generateProjections(bondForm.amount, bondForm.yield_to_maturity + 0.5, Math.max(timeframe, 20))
+      };
+
+      setResult({ 
+        type: "bonds", 
+        data: {
+          analysis: {
+            investment_details: {
+              bond_name: bondForm.bond_name,
+              amount: bondForm.amount,
+              yield_to_maturity: bondForm.yield_to_maturity,
+              maturity_years: bondForm.maturity_years,
+              credit_rating: bondForm.credit_rating
+            },
+            scenarios,
+            initial_value: bondForm.amount,
+            summary: {
+              [`${timeframe}_year_conservative`]: scenarios.conservative.find(p => p.year === timeframe),
+              [`${timeframe}_year_moderate`]: scenarios.moderate.find(p => p.year === timeframe),
+              [`${timeframe}_year_aggressive`]: scenarios.aggressive.find(p => p.year === timeframe)
+            }
+          }
+        }
+      });
+      toast.success("Bond scenario modeled successfully");
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("Failed to model bond scenario");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Model hybrids
+  const modelHybrids = async () => {
+    setLoading(true);
+    setResult(null);
+    
+    try {
+      const runningYield = hybridForm.bbsw_rate + hybridForm.margin_over_bbsw;
+      const scenarios = {
+        conservative: generateProjections(hybridForm.amount, runningYield - 1, Math.max(timeframe, 20)),
+        moderate: generateProjections(hybridForm.amount, runningYield, Math.max(timeframe, 20)),
+        aggressive: generateProjections(hybridForm.amount, runningYield + 1, Math.max(timeframe, 20))
+      };
+
+      setResult({ 
+        type: "hybrids", 
+        data: {
+          analysis: {
+            investment_details: {
+              hybrid_name: hybridForm.hybrid_name,
+              amount: hybridForm.amount,
+              running_yield: runningYield,
+              margin_over_bbsw: hybridForm.margin_over_bbsw,
+              franking: hybridForm.franking_percentage
+            },
+            scenarios,
+            initial_value: hybridForm.amount,
+            summary: {
+              [`${timeframe}_year_conservative`]: scenarios.conservative.find(p => p.year === timeframe),
+              [`${timeframe}_year_moderate`]: scenarios.moderate.find(p => p.year === timeframe),
+              [`${timeframe}_year_aggressive`]: scenarios.aggressive.find(p => p.year === timeframe)
+            }
+          }
+        }
+      });
+      toast.success("Hybrid scenario modeled successfully");
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("Failed to model hybrid scenario");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -544,6 +656,22 @@ const TransactionModeler = () => {
           details: { ...etfForm }
         };
         break;
+      case "bonds":
+        newTransaction = {
+          id, type: "bonds",
+          name: bondForm.bond_name,
+          amount: bondForm.amount,
+          details: { ...bondForm }
+        };
+        break;
+      case "hybrids":
+        newTransaction = {
+          id, type: "hybrids",
+          name: hybridForm.hybrid_name.split('(')[0].trim(),
+          amount: hybridForm.amount,
+          details: { ...hybridForm }
+        };
+        break;
       case "crypto":
         newTransaction = {
           id, type: "crypto",
@@ -575,6 +703,8 @@ const TransactionModeler = () => {
       case "fund": return PiggyBank;
       case "stock": return TrendingUp;
       case "etf": return LineChart;
+      case "bonds": return Landmark;
+      case "hybrids": return ArrowLeftRight;
       case "crypto": return Bitcoin;
       default: return DollarSign;
     }
@@ -767,7 +897,7 @@ const TransactionModeler = () => {
             </CardHeader>
             <CardContent>
               <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v); setResult(null); }}>
-                <TabsList className="grid w-full grid-cols-5">
+                <TabsList className="grid w-full grid-cols-7">
                   <TabsTrigger value="property" className="flex items-center gap-1 text-xs">
                     <Building2 className="h-4 w-4" />
                     Property
@@ -783,6 +913,14 @@ const TransactionModeler = () => {
                   <TabsTrigger value="etf" className="flex items-center gap-1 text-xs">
                     <LineChart className="h-4 w-4" />
                     ETF
+                  </TabsTrigger>
+                  <TabsTrigger value="bonds" className="flex items-center gap-1 text-xs">
+                    <Landmark className="h-4 w-4" />
+                    Bonds
+                  </TabsTrigger>
+                  <TabsTrigger value="hybrids" className="flex items-center gap-1 text-xs">
+                    <ArrowLeftRight className="h-4 w-4" />
+                    Hybrids
                   </TabsTrigger>
                   <TabsTrigger value="crypto" className="flex items-center gap-1 text-xs">
                     <Bitcoin className="h-4 w-4" />
@@ -1055,6 +1193,163 @@ const TransactionModeler = () => {
                         onValueChange={([v]) => setEtfForm({...etfForm, management_fee: v})}
                         min={0.03} max={1} step={0.01}
                       />
+                    </div>
+                  </div>
+                </TabsContent>
+
+                {/* Bonds Tab */}
+                <TabsContent value="bonds" className="space-y-4 mt-4">
+                  <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg mb-4">
+                    <p className="text-sm text-blue-800 flex items-center gap-2">
+                      <Info className="h-4 w-4" />
+                      Fixed income investments provide stable returns. Consider credit risk and interest rate risk.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Bond Type</Label>
+                      <Select value={bondForm.bond_type} onValueChange={(v) => setBondForm({...bondForm, bond_type: v})}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="government">Government Bond</SelectItem>
+                          <SelectItem value="corporate">Corporate Bond</SelectItem>
+                          <SelectItem value="bond_fund">Bond Fund/ETF</SelectItem>
+                          <SelectItem value="term_deposit">Term Deposit</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>Investment Amount</Label>
+                      <Input
+                        type="number"
+                        value={bondForm.amount}
+                        onChange={(e) => setBondForm({...bondForm, amount: Number(e.target.value)})}
+                        data-testid="bond-amount-input"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label>Bond Selection</Label>
+                    <Select value={bondForm.bond_name} onValueChange={(v) => setBondForm({...bondForm, bond_name: v})}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Australian Govt 10Y Bond">Australian Govt 10Y Bond (4.2%)</SelectItem>
+                        <SelectItem value="Corporate Bond Fund">Corporate Bond Fund (5.1%)</SelectItem>
+                        <SelectItem value="NSW Treasury Bond">NSW Treasury Bond (4.5%)</SelectItem>
+                        <SelectItem value="Vanguard Australian Fixed Interest (VAF)">VAF - Vanguard Aus Fixed Interest</SelectItem>
+                        <SelectItem value="iShares Core Composite Bond (IAF)">IAF - iShares Composite Bond</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div>
+                      <div className="flex justify-between mb-2">
+                        <Label>Yield to Maturity: {bondForm.yield_to_maturity}% p.a.</Label>
+                      </div>
+                      <Slider
+                        value={[bondForm.yield_to_maturity]}
+                        onValueChange={([v]) => setBondForm({...bondForm, yield_to_maturity: v})}
+                        min={2} max={8} step={0.1}
+                      />
+                    </div>
+                    
+                    <div>
+                      <div className="flex justify-between mb-2">
+                        <Label>Maturity: {bondForm.maturity_years} years</Label>
+                      </div>
+                      <Slider
+                        value={[bondForm.maturity_years]}
+                        onValueChange={([v]) => setBondForm({...bondForm, maturity_years: v})}
+                        min={1} max={10} step={1}
+                      />
+                    </div>
+
+                    <div>
+                      <Label>Credit Rating</Label>
+                      <Select value={bondForm.credit_rating} onValueChange={(v) => setBondForm({...bondForm, credit_rating: v})}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="AAA">AAA (Highest Quality)</SelectItem>
+                          <SelectItem value="AA">AA (Very High Quality)</SelectItem>
+                          <SelectItem value="A">A (High Quality)</SelectItem>
+                          <SelectItem value="BBB+">BBB+ (Investment Grade)</SelectItem>
+                          <SelectItem value="BBB">BBB (Investment Grade)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                {/* Hybrids Tab */}
+                <TabsContent value="hybrids" className="space-y-4 mt-4">
+                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg mb-4">
+                    <p className="text-sm text-amber-800 flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4" />
+                      Hybrid securities have equity-like risks including conversion and non-payment of distributions.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Hybrid Security</Label>
+                      <Select value={hybridForm.hybrid_name} onValueChange={(v) => setHybridForm({...hybridForm, hybrid_name: v})}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="CBA PERLS XI (CBAPD)">CBAPD - CBA PERLS XI</SelectItem>
+                          <SelectItem value="Westpac Capital Notes 8 (WBCPI)">WBCPI - Westpac Cap Notes 8</SelectItem>
+                          <SelectItem value="ANZ Capital Notes 7 (ANZPJ)">ANZPJ - ANZ Cap Notes 7</SelectItem>
+                          <SelectItem value="NAB Capital Notes 5 (NABPH)">NABPH - NAB Cap Notes 5</SelectItem>
+                          <SelectItem value="Macquarie Cap Notes 4 (MQGPD)">MQGPD - Macquarie Cap Notes 4</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>Investment Amount</Label>
+                      <Input
+                        type="number"
+                        value={hybridForm.amount}
+                        onChange={(e) => setHybridForm({...hybridForm, amount: Number(e.target.value)})}
+                        data-testid="hybrid-amount-input"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div>
+                      <div className="flex justify-between mb-2">
+                        <Label>Margin over BBSW: {hybridForm.margin_over_bbsw}%</Label>
+                      </div>
+                      <Slider
+                        value={[hybridForm.margin_over_bbsw]}
+                        onValueChange={([v]) => setHybridForm({...hybridForm, margin_over_bbsw: v})}
+                        min={2} max={5} step={0.1}
+                      />
+                    </div>
+                    
+                    <div>
+                      <div className="flex justify-between mb-2">
+                        <Label>Current BBSW Rate: {hybridForm.bbsw_rate}%</Label>
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        Running Yield: <span className="font-semibold text-[#D4A84C]">{(hybridForm.bbsw_rate + hybridForm.margin_over_bbsw).toFixed(2)}%</span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between mb-2">
+                        <Label>Franking: {hybridForm.franking_percentage}%</Label>
+                      </div>
+                      <Slider
+                        value={[hybridForm.franking_percentage]}
+                        onValueChange={([v]) => setHybridForm({...hybridForm, franking_percentage: v})}
+                        min={0} max={100} step={5}
+                      />
+                      <div className="text-sm text-muted-foreground mt-1">
+                        Grossed-up Yield: <span className="font-semibold text-emerald-600">{((hybridForm.bbsw_rate + hybridForm.margin_over_bbsw) / (1 - 0.30 * hybridForm.franking_percentage / 100)).toFixed(2)}%</span>
+                      </div>
                     </div>
                   </div>
                 </TabsContent>

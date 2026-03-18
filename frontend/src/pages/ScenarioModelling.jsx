@@ -287,84 +287,41 @@ const ScenarioModelling = () => {
   return (
     <Layout title="Scenario Modelling" subtitle="Goals, Strategy & What-If Analysis">
       <div className="space-y-6" data-testid="scenario-modelling-page">
-        {/* Header Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="bg-gradient-to-br from-[#1a2744] to-[#2a3f5f] border-[#D4A84C]/20">
+        {/* Header Stats - Clean Card Design like FamilyWealthDashboard */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Card className="bg-[#D4A84C]/10 border-[#D4A84C]/30">
             <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-[#D4A84C]/20">
-                  <Target className="h-5 w-5 text-[#D4A84C]" />
-                </div>
-                <div>
-                  <p className="text-sm text-white/70">Active Goals</p>
-                  <p className="text-xl font-bold text-white">{goals.length}</p>
-                </div>
-              </div>
+              <p className="text-sm text-muted-foreground">Active Goals</p>
+              <p className="text-2xl font-bold text-[#D4A84C]">{goals.length}</p>
             </CardContent>
           </Card>
-          
-          <Card className="bg-gradient-to-br from-[#1a2744] to-[#2a3f5f] border-emerald-500/20">
+          <Card className="bg-emerald-500/10 border-emerald-500/30">
             <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-emerald-500/20">
-                  <Wallet className="h-5 w-5 text-emerald-400" />
-                </div>
-                <div>
-                  <p className="text-sm text-white/70">Existing Assets</p>
-                  <p className="text-xl font-bold text-white">{formatCurrency(totalExistingValue)}</p>
-                </div>
-              </div>
+              <p className="text-sm text-muted-foreground">Existing Assets</p>
+              <p className="text-2xl font-bold text-emerald-600">{formatCurrency(totalExistingValue)}</p>
             </CardContent>
           </Card>
-
-          <Card className="bg-gradient-to-br from-[#1a2744] to-[#2a3f5f] border-blue-500/20">
+          <Card className="bg-blue-500/10 border-blue-500/30">
             <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-blue-500/20">
-                  <Plus className="h-5 w-5 text-blue-400" />
-                </div>
-                <div>
-                  <p className="text-sm text-white/70">New Investment</p>
-                  <p className="text-xl font-bold text-white">{formatCurrency(totalNewInvestment)}</p>
-                </div>
-              </div>
+              <p className="text-sm text-muted-foreground">New Investment</p>
+              <p className="text-2xl font-bold text-blue-600">{formatCurrency(totalNewInvestment)}</p>
             </CardContent>
           </Card>
-
-          <Card className="bg-gradient-to-br from-[#1a2744] to-[#2a3f5f] border-purple-500/20">
+          <Card className="bg-purple-500/10 border-purple-500/30">
             <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-purple-500/20">
-                  <BarChart3 className="h-5 w-5 text-purple-400" />
-                </div>
-                <div>
-                  <p className="text-sm text-white/70">Total Scenario</p>
-                  <p className="text-xl font-bold text-white">{formatCurrency(totalExistingValue + totalNewInvestment)}</p>
-                </div>
-              </div>
+              <p className="text-sm text-muted-foreground">Total Scenario</p>
+              <p className="text-2xl font-bold text-purple-600">{formatCurrency(totalExistingValue + totalNewInvestment)}</p>
             </CardContent>
           </Card>
         </div>
 
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="bg-muted border border-border">
-            <TabsTrigger value="goals" className="data-[state=active]:bg-[#D4A84C] data-[state=active]:text-black text-foreground">
-              <Target className="h-4 w-4 mr-2" />
-              Goals
-            </TabsTrigger>
-            <TabsTrigger value="existing" className="data-[state=active]:bg-[#D4A84C] data-[state=active]:text-black text-foreground">
-              <Eye className="h-4 w-4 mr-2" />
-              Existing Assets
-            </TabsTrigger>
-            <TabsTrigger value="scenario" className="data-[state=active]:bg-[#D4A84C] data-[state=active]:text-black text-foreground">
-              <Calculator className="h-4 w-4 mr-2" />
-              Build Scenario
-            </TabsTrigger>
-            <TabsTrigger value="projection" className="data-[state=active]:bg-[#D4A84C] data-[state=active]:text-black text-foreground">
-              <LineChart className="h-4 w-4 mr-2" />
-              Projection
-            </TabsTrigger>
+          <TabsList className="grid w-full max-w-2xl grid-cols-4">
+            <TabsTrigger value="goals">Goals</TabsTrigger>
+            <TabsTrigger value="existing">Assets</TabsTrigger>
+            <TabsTrigger value="scenario">Scenario</TabsTrigger>
+            <TabsTrigger value="projection">Projection</TabsTrigger>
           </TabsList>
 
           {/* Goals Tab */}
@@ -382,13 +339,13 @@ const ScenarioModelling = () => {
               ))}
             </div>
             {selectedGoal && (
-              <Card className="bg-[#1a1a2e] border-[#D4A84C]/30">
+              <Card className="bg-card border-[#D4A84C]/30">
                 <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
+                  <CardTitle className="text-foreground flex items-center gap-2">
                     <Sparkles className="h-5 w-5 text-[#D4A84C]" />
                     Model This Goal
                   </CardTitle>
-                  <CardDescription className="text-gray-300">Create a scenario to achieve "{selectedGoal.name}"</CardDescription>
+                  <CardDescription>Create a scenario to achieve "{selectedGoal.name}"</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="flex gap-3">

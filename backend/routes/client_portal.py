@@ -39,16 +39,21 @@ PORTAL_CLIENTS = {
         "advisor_email": "sarah.chen@wealthcommand.io",
         "relationship_start": "2019-03-15",
         "net_worth": {
-            "total": 2920000,
-            "change_30d": 45000,
-            "change_pct_30d": 1.56,
+            "total": 3040000,
+            "change_30d": 52000,
+            "change_pct_30d": 1.74,
             "breakdown": {
-                "investments": 2450000,
-                "property": 850000,
-                "superannuation": 680000,
+                "stocks": 389500,
+                "etfs": 1191000,
+                "managed_funds": 114800,
+                "bonds": 128500,
+                "hybrids": 118730,
+                "crypto": 85000,
                 "cash": 145000,
+                "superannuation": 680000,
+                "property": 850000,
                 "other_assets": 95000,
-                "liabilities": -1300000
+                "liabilities": -757530
             }
         },
         "portfolios": [
@@ -59,23 +64,67 @@ PORTAL_CLIENTS = {
                 "change_ytd": 12.4,
                 "risk_profile": "Growth",
                 "holdings": [
-                    {"symbol": "AAPL", "name": "Apple Inc", "shares": 500, "value": 91000, "change_1d": 1.2},
-                    {"symbol": "MSFT", "name": "Microsoft Corp", "shares": 300, "value": 118500, "change_1d": 0.8},
-                    {"symbol": "NVDA", "name": "NVIDIA Corp", "shares": 150, "value": 180000, "change_1d": 2.1},
-                    {"symbol": "VGS", "name": "Vanguard Intl Shares", "units": 2000, "value": 180000, "change_1d": 0.5},
-                    {"symbol": "VAS", "name": "Vanguard Aus Shares", "units": 3000, "value": 285000, "change_1d": 0.3},
+                    {"symbol": "AAPL", "name": "Apple Inc", "type": "stock", "shares": 500, "value": 91000, "change_1d": 1.2},
+                    {"symbol": "MSFT", "name": "Microsoft Corp", "type": "stock", "shares": 300, "value": 118500, "change_1d": 0.8},
+                    {"symbol": "NVDA", "name": "NVIDIA Corp", "type": "stock", "shares": 150, "value": 180000, "change_1d": 2.1},
+                    {"symbol": "VGS", "name": "Vanguard Intl Shares", "type": "etf", "units": 2000, "value": 180000, "change_1d": 0.5},
+                    {"symbol": "VAS", "name": "Vanguard Aus Shares", "type": "etf", "units": 3000, "value": 285000, "change_1d": 0.3},
+                    {"symbol": "MGF", "name": "Magellan Global Fund", "type": "fund", "units": 3500, "value": 114800, "change_1d": -0.2},
                 ],
                 "allocation": {"us_equities": 45, "intl_equities": 25, "aus_equities": 20, "fixed_income": 5, "cash": 5}
             },
             {
                 "portfolio_id": "pf_002",
+                "name": "Fixed Income & Hybrids",
+                "value": 280000,
+                "change_ytd": 6.2,
+                "risk_profile": "Conservative",
+                "holdings": [
+                    {"symbol": "CBAPD", "name": "CBA PERLS XI", "type": "hybrid", "units": 500, "value": 49250, "yield": 7.35, "change_1d": 0.1},
+                    {"symbol": "WBCPI", "name": "Westpac Cap Notes 8", "type": "hybrid", "units": 300, "value": 30360, "yield": 7.25, "change_1d": 0.05},
+                    {"symbol": "ANZPJ", "name": "ANZ Cap Notes 7", "type": "hybrid", "units": 400, "value": 39120, "yield": 7.45, "change_1d": -0.1},
+                    {"symbol": "ACGB-34", "name": "Aus Govt 10Y Bond", "type": "bond", "units": 50000, "value": 51000, "yield": 4.2, "change_1d": 0.02},
+                    {"symbol": "BOND", "name": "Corporate Bond Fund", "type": "bond", "units": 30000, "value": 31500, "yield": 5.1, "change_1d": 0.0},
+                    {"symbol": "VAF", "name": "Vanguard Aus Fixed Interest", "type": "bond_etf", "units": 1000, "value": 46000, "yield": 4.8, "change_1d": 0.05},
+                ],
+                "allocation": {"hybrids": 43, "bonds": 45, "cash": 12}
+            },
+            {
+                "portfolio_id": "pf_003",
+                "name": "Cryptocurrency",
+                "value": 85000,
+                "change_ytd": 45.2,
+                "risk_profile": "Aggressive",
+                "holdings": [
+                    {"symbol": "BTC", "name": "Bitcoin", "type": "crypto", "units": 0.65, "value": 62475, "change_1d": 2.5},
+                    {"symbol": "ETH", "name": "Ethereum", "type": "crypto", "units": 5.2, "value": 15600, "change_1d": 1.8},
+                    {"symbol": "SOL", "name": "Solana", "type": "crypto", "units": 35, "value": 6125, "change_1d": 3.2},
+                ],
+                "allocation": {"btc": 74, "eth": 18, "altcoins": 8}
+            },
+            {
+                "portfolio_id": "pf_004",
+                "name": "Cash & Term Deposits",
+                "value": 145000,
+                "change_ytd": 4.8,
+                "risk_profile": "Defensive",
+                "holdings": [
+                    {"symbol": "ING-SAV", "name": "High Interest Savings", "type": "cash", "value": 65000, "rate": 5.0},
+                    {"symbol": "CBA-TD6", "name": "Term Deposit 6M", "type": "term_deposit", "value": 50000, "rate": 4.8, "maturity": "2026-06-15"},
+                    {"symbol": "WBC-TD12", "name": "Term Deposit 12M", "type": "term_deposit", "value": 30000, "rate": 5.1, "maturity": "2026-12-01"},
+                ],
+                "allocation": {"savings": 45, "term_deposits": 55}
+            },
+            {
+                "portfolio_id": "pf_005",
                 "name": "Superannuation",
                 "value": 680000,
                 "change_ytd": 9.8,
                 "risk_profile": "Balanced",
                 "holdings": [
-                    {"symbol": "VDHG", "name": "Vanguard Diversified High Growth", "units": 5000, "value": 340000, "change_1d": 0.4},
-                    {"symbol": "IVV", "name": "iShares S&P 500", "units": 500, "value": 280000, "change_1d": 0.6},
+                    {"symbol": "VDHG", "name": "Vanguard Diversified High Growth", "type": "etf", "units": 5000, "value": 340000, "change_1d": 0.4},
+                    {"symbol": "IVV", "name": "iShares S&P 500", "type": "etf", "units": 500, "value": 280000, "change_1d": 0.6},
+                    {"symbol": "IAF", "name": "iShares Composite Bond", "type": "bond_etf", "units": 500, "value": 60000, "change_1d": 0.1},
                 ],
                 "allocation": {"growth": 70, "defensive": 30}
             }
