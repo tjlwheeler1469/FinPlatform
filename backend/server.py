@@ -323,6 +323,30 @@ def include_all_routes():
     except ImportError as e:
         logger.error(f"Failed to load transaction modeling routes: {e}")
 
+    # CLIENT CONTACT - Messaging & Quick Actions
+    try:
+        from routes.client_contact import router as client_contact_router
+        app.include_router(client_contact_router, prefix="/api")
+        logger.info("CLIENT CONTACT loaded: Platform Messages, Quick Actions, Notifications")
+    except ImportError as e:
+        logger.error(f"Failed to load client contact routes: {e}")
+    
+    # FINANCIAL PLAN GENERATION - AI-Powered Plans from Scenarios
+    try:
+        from routes.financial_plan import router as financial_plan_router
+        app.include_router(financial_plan_router, prefix="/api")
+        logger.info("FINANCIAL PLAN loaded: Plan Generation, Tax Analysis, Risk Assessment, Projections")
+    except ImportError as e:
+        logger.error(f"Failed to load financial plan routes: {e}")
+    
+    # FATHOM INTEGRATION - AI Meeting Notes
+    try:
+        from routes.fathom_integration import router as fathom_router
+        app.include_router(fathom_router, prefix="/api")
+        logger.info("FATHOM INTEGRATION loaded: Meeting Transcription, AI Summaries, Action Items")
+    except ImportError as e:
+        logger.error(f"Failed to load fathom integration routes: {e}")
+
 # Include all routes
 include_all_routes()
 

@@ -38,7 +38,10 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
+import axios from 'axios';
+
 const API_URL = process.env.REACT_APP_BACKEND_URL || "";
+const API = API_URL;
 
 const formatCurrency = (value) => {
   if (value >= 1000000) {
@@ -690,19 +693,58 @@ const TransactionModeler = () => {
                 </Button>
                 <Button
                   className="bg-[#D4A84C] hover:bg-[#C49A3C] text-black"
-                  onClick={() => {
-                    toast.success("Generating financial plan...", { duration: 2000 });
-                    setTimeout(() => {
-                      // Navigate to a plan view or show plan
-                      toast.success(
-                        <div className="space-y-2">
-                          <p className="font-semibold">Financial Plan Generated!</p>
-                          <p className="text-sm">Based on {transactions.length} transactions totaling {formatCurrency(totalTransactionValue)}</p>
-                          <p className="text-sm">Projected {timeframe}-year return: {formatCurrency(totalTransactionValue * 1.08 * timeframe / 10)}</p>
-                        </div>,
-                        { duration: 5000 }
-                      );
-                    }, 1500);
+                  onClick={async () => {
+                    if (transactions.length === 0) {
+                      toast.error("Add at least one transaction to generate a plan");
+                      return;
+                    }
+                    
+                    toast.loading("Generating financial plan...", { id: "plan-gen" });
+                    
+                    try {
+                      const response = await axios.post(`${API}/api/financial-plan/generate`, {
+                        scenario: {
+                          client_id: "client_demo",
+                          client_name: clientName || "Demo Client",
+                          transactions: transactions.map((t, idx) => ({
+                            id: idx + 1,
+                            type: t.type,
+                            name: t.name,
+                            amount: t.amount,
+                            details: t.details || {}
+                          })),
+                          total_value: totalTransactionValue,
+                          timeframe: timeframe,
+                          goals: [],
+                          risk_profile: "moderate"
+                        },
+                        include_tax_analysis: true,
+                        include_risk_assessment: true,
+                        include_projections: true
+                      });
+                      
+                      toast.dismiss("plan-gen");
+                      
+                      if (response.data.success) {
+                        const plan = response.data.plan;
+                        toast.success(
+                          <div className="space-y-2">
+                            <p className="font-semibold">Financial Plan Generated!</p>
+                            <p className="text-sm">Plan ID: {plan.plan_id}</p>
+                            <p className="text-sm">Projected Value: {formatCurrency(plan.projections?.projected_final_value || 0)}</p>
+                            <p className="text-sm">Annualized Return: {plan.projections?.annualized_return || 0}%</p>
+                          </div>,
+                          { duration: 8000 }
+                        );
+                        
+                        // Store plan for reference
+                        localStorage.setItem(`plan_${plan.plan_id}`, JSON.stringify(plan));
+                      }
+                    } catch (error) {
+                      toast.dismiss("plan-gen");
+                      console.error("Error generating plan:", error);
+                      toast.error("Failed to generate plan. Please try again.");
+                    }
                   }}
                   data-testid="generate-plan-btn"
                 >

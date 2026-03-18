@@ -96,7 +96,10 @@ import {
   Legend
 } from "recharts";
 
+import axios from 'axios';
+
 const API_URL = process.env.REACT_APP_BACKEND_URL || "";
+const API = API_URL;
 
 // Performance timeframes
 const PERFORMANCE_TIMEFRAMES = ["1M", "3M", "6M", "1Y", "2Y", "3Y", "5Y", "10Y"];
@@ -1183,18 +1186,52 @@ const ContactAdvisorSection = ({ client }) => {
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
 
-  const handleSend = () => {
+  const handleSend = async () => {
+    if (!subject.trim() || !message.trim()) {
+      toast.error("Please fill in subject and message");
+      return;
+    }
+    
     setSending(true);
-    setTimeout(() => {
-      setSending(false);
-      if (contactMethod === "email") {
-        toast.success("Email sent to your advisor!");
-      } else {
-        toast.success("Message sent on platform. Your advisor will respond shortly.");
+    try {
+      const response = await axios.post(`${API}/api/client-contact/send-message`, {
+        client_id: client.id || "client_demo",
+        client_name: client.name,
+        advisor_email: "mark.thompson@wealthcommand.io",
+        advisor_name: client.advisor || "Mark Thompson",
+        subject: subject,
+        message: message,
+        contact_method: contactMethod,
+        priority: "normal"
+      });
+      
+      if (response.data.status === "delivered") {
+        toast.success(response.data.confirmation || "Message sent successfully!");
+        setSubject("");
+        setMessage("");
       }
-      setSubject("");
-      setMessage("");
-    }, 1500);
+    } catch (error) {
+      console.error("Error sending message:", error);
+      toast.error("Failed to send message. Please try again.");
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const handleQuickAction = async (actionType) => {
+    try {
+      const response = await axios.post(`${API}/api/client-contact/quick-action`, {
+        client_id: client.id || "client_demo",
+        client_name: client.name,
+        action_type: actionType,
+        details: {}
+      });
+      
+      toast.success(response.data.message || `${actionType} request submitted!`);
+    } catch (error) {
+      console.error("Error processing quick action:", error);
+      toast.error("Failed to process request. Please try again.");
+    }
   };
 
   return (
@@ -1341,19 +1378,39 @@ const ContactAdvisorSection = ({ client }) => {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Button variant="outline" className="h-auto py-4 flex-col">
+            <Button 
+              variant="outline" 
+              className="h-auto py-4 flex-col"
+              onClick={() => handleQuickAction("schedule_meeting")}
+              data-testid="quick-action-schedule-meeting"
+            >
               <Calendar className="h-6 w-6 mb-2" />
               <span>Schedule Meeting</span>
             </Button>
-            <Button variant="outline" className="h-auto py-4 flex-col">
+            <Button 
+              variant="outline" 
+              className="h-auto py-4 flex-col"
+              onClick={() => handleQuickAction("request_statement")}
+              data-testid="quick-action-request-statement"
+            >
               <FileText className="h-6 w-6 mb-2" />
               <span>Request Statement</span>
             </Button>
-            <Button variant="outline" className="h-auto py-4 flex-col">
+            <Button 
+              variant="outline" 
+              className="h-auto py-4 flex-col"
+              onClick={() => handleQuickAction("upload_document")}
+              data-testid="quick-action-upload-document"
+            >
               <Upload className="h-6 w-6 mb-2" />
               <span>Upload Document</span>
             </Button>
-            <Button variant="outline" className="h-auto py-4 flex-col">
+            <Button 
+              variant="outline" 
+              className="h-auto py-4 flex-col"
+              onClick={() => handleQuickAction("set_reminder")}
+              data-testid="quick-action-set-reminder"
+            >
               <Bell className="h-6 w-6 mb-2" />
               <span>Set Reminder</span>
             </Button>

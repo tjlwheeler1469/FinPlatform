@@ -1,0 +1,6 @@
+Method,Name,Error,Occurrences
+POST,CGT - Full (8 holdings),CatchResponseError('Status 422'),870
+POST,CGT - Medium (4-6 holdings),CatchResponseError('Status 422'),1269
+POST,CGT - With Tax Loss Harvesting,CatchResponseError('Status 422'),426
+POST,CGT - Simple (2-4 holdings),"CatchResponseError('Status 422: {""detail"":[{""type"":""missing"",""loc"":[""query"",""client_id""],""msg"":""Field required"",""input"":null,""url"":""https://errors.pydantic.dev/2.12/v/missing""},{""type"":""missing"",""loc"":[""query"",""symbol""],""msg"":""Field')",2148
+GET,Tax Summary,HTTPError('404 Client Error: Not Found for url: Tax Summary'),206
