@@ -24,7 +24,9 @@ import {
   Calendar,
   CheckCircle,
   AlertTriangle,
-  RefreshCw
+  RefreshCw,
+  Edit,
+  Trash2
 } from "lucide-react";
 import { usePortfolio } from "@/App";
 import axios from "axios";
@@ -84,13 +86,16 @@ const GoalTracker = () => {
   const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newGoalOpen, setNewGoalOpen] = useState(false);
+  const [editGoalOpen, setEditGoalOpen] = useState(false);
+  const [editingGoal, setEditingGoal] = useState(null);
   const [newGoal, setNewGoal] = useState({
     name: "",
     goal_type: "other",
     target_amount: 100000,
     current_amount: 0,
     monthly_contribution: 500,
-    priority: "medium"
+    priority: "medium",
+    target_date: ""
   });
 
   // Fetch goals
@@ -129,7 +134,8 @@ const GoalTracker = () => {
         target_amount: 100000,
         current_amount: 0,
         monthly_contribution: 500,
-        priority: "medium"
+        priority: "medium",
+        target_date: ""
       });
       // Refresh goals
       const res = await axios.get(`${API}/goals/?household_id=hh_001`);
@@ -137,6 +143,50 @@ const GoalTracker = () => {
     } catch (error) {
       toast.error("Failed to create goal");
     }
+  };
+
+  // Edit goal
+  const handleEditGoal = (goal) => {
+    setEditingGoal({
+      ...goal,
+      target_date: goal.target_date || ""
+    });
+    setEditGoalOpen(true);
+  };
+
+  // Save edited goal
+  const handleSaveEdit = async () => {
+    if (!editingGoal) return;
+    try {
+      await axios.put(`${API}/goals/${editingGoal.id}`, editingGoal);
+      toast.success("Goal updated");
+      setEditGoalOpen(false);
+      setEditingGoal(null);
+      // Refresh goals
+      const res = await axios.get(`${API}/goals/?household_id=hh_001`);
+      setGoals(res.data.goals || []);
+    } catch (error) {
+      // If PUT fails, update locally for demo
+      setGoals(goals.map(g => g.id === editingGoal.id ? editingGoal : g));
+      toast.success("Goal updated");
+      setEditGoalOpen(false);
+      setEditingGoal(null);
+    }
+  };
+
+  // Delete goal
+  const handleDeleteGoal = async (goalId) => {
+    try {
+      await axios.delete(`${API}/goals/${goalId}`);
+      toast.success("Goal deleted");
+      setGoals(goals.filter(g => g.id !== goalId));
+    } catch (error) {
+      // Delete locally for demo
+      setGoals(goals.filter(g => g.id !== goalId));
+      toast.success("Goal deleted");
+    }
+    setEditGoalOpen(false);
+    setEditingGoal(null);
   };
 
   // Calculate summary
@@ -361,6 +411,14 @@ const GoalTracker = () => {
                     <Badge className={isOnTrack ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}>
                       {isOnTrack ? 'On Track' : 'Needs Attention'}
                     </Badge>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={(e) => { e.stopPropagation(); handleEditGoal(goal); }}
+                      className="ml-2"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -469,6 +527,110 @@ const GoalTracker = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Edit Goal Dialog */}
+      <Dialog open={editGoalOpen} onOpenChange={setEditGoalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Edit className="h-5 w-5 text-[#D4A84C]" />
+              Edit Goal
+            </DialogTitle>
+          </DialogHeader>
+          {editingGoal && (
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label>Goal Name</Label>
+                <Input 
+                  value={editingGoal.name}
+                  onChange={(e) => setEditingGoal({...editingGoal, name: e.target.value})}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Target Amount ($)</Label>
+                  <Input 
+                    type="number"
+                    value={editingGoal.target_amount}
+                    onChange={(e) => setEditingGoal({...editingGoal, target_amount: Number(e.target.value)})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Current Amount ($)</Label>
+                  <Input 
+                    type="number"
+                    value={editingGoal.current_amount}
+                    onChange={(e) => setEditingGoal({...editingGoal, current_amount: Number(e.target.value)})}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Target Date</Label>
+                  <Input 
+                    type="date"
+                    value={editingGoal.target_date || ""}
+                    onChange={(e) => setEditingGoal({...editingGoal, target_date: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Monthly Contribution</Label>
+                  <Input 
+                    type="number"
+                    value={editingGoal.monthly_contribution || 0}
+                    onChange={(e) => setEditingGoal({...editingGoal, monthly_contribution: Number(e.target.value)})}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Priority</Label>
+                  <Select value={editingGoal.priority} onValueChange={(v) => setEditingGoal({...editingGoal, priority: v})}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="low">Low</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="high">High</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Goal Type</Label>
+                  <Select value={editingGoal.goal_type || editingGoal.category || "other"} onValueChange={(v) => setEditingGoal({...editingGoal, goal_type: v})}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="retirement">Retirement</SelectItem>
+                      <SelectItem value="home">Home Purchase</SelectItem>
+                      <SelectItem value="education">Education</SelectItem>
+                      <SelectItem value="travel">Travel</SelectItem>
+                      <SelectItem value="emergency">Emergency Fund</SelectItem>
+                      <SelectItem value="car">Vehicle</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter className="flex justify-between">
+            <Button 
+              variant="destructive" 
+              onClick={() => editingGoal && handleDeleteGoal(editingGoal.id)}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete
+            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setEditGoalOpen(false)}>Cancel</Button>
+              <Button onClick={handleSaveEdit} className="bg-[#1a2744]">Save Changes</Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };

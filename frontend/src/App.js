@@ -177,6 +177,9 @@ const NextBestActions = lazy(() => import("@/pages/NextBestActions"));
 // Meeting Notes with Fathom
 const MeetingNotes = lazy(() => import("@/pages/MeetingNotes"));
 
+// Adviser Hub (Combined CRM)
+const AdviserHub = lazy(() => import("@/pages/AdviserHub"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -1033,6 +1036,9 @@ const AppRouter = () => {
       
       {/* Meeting Notes with Fathom */}
       <Route path="/meeting-notes" element={<MeetingNotes />} />
+      
+      {/* Adviser Hub (Combined CRM) */}
+      <Route path="/adviser-hub" element={<AdviserHub />} />
     </Routes>
   );
 };

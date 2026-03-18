@@ -1,92 +1,122 @@
-# Wealth Command v8.3.0 - Meeting Notes with Fathom Integration
+# Wealth Command v8.4.0 - Major UI/UX Overhaul
 
 ---
 
-## What's New in v8.3.0
+## Changes in v8.4.0 (Advisor Profile Feedback)
 
-### Meeting Notes with Fathom Integration
-New feature in Client > Documents > Meeting Notes that integrates with Fathom AI meeting recorder.
+### Navigation Restructured
+1. ✅ **Dashboard above CRM** - Reordered navigation
+2. ✅ **CRM combined** - Command Centre + All Clients + Portfolio Data now in single "Client Hub" page
+3. ✅ **AI Assistant merged with AI Copilot** - Reduced to single "AI Copilot" section
+4. ✅ **Risk Profile & Health Score moved** to Client Dashboard Overview section
+5. ✅ **Investments aligned** with Trading - Added Bonds to client investments
 
-**Features:**
-- **Connect Fathom** - Enter API key to sync meeting recordings
-- **Meeting List** - Shows all recorded meetings with:
-  - Meeting title, date, duration
-  - Platform icon (Zoom, Google Meet, Teams)
-  - Transcript and AI Summary badges
-  - Search functionality
-- **AI Summary Tab** - Shows:
-  - Key discussion points (auto-extracted)
-  - Meeting sentiment (Positive/Neutral/Negative with emoji)
-  - Next meeting date
-- **Action Items Tab** - Shows:
-  - Tasks with assignee (Advisor/Client)
-  - Due dates
-  - Status (pending/completed)
-- **Transcript Tab** - Shows:
-  - Full meeting transcript
-  - Timestamps and speaker identification
-  - Copy transcript functionality
+### Client Hub (Combined CRM)
+- **All Clients tab**: Card view of all clients with wealth, accounts, status
+- **Portfolio Overview tab**: Asset breakdown by type across all clients with progress bars
+- **Recent Activity tab**: Latest client interactions
+- **Top Clients by AUM**: Sidebar showing top 5 clients
+- **Status filters**: All, Active, Prospect, Review
+- **New Client button**: Opens client creation modal
 
-**Fathom API Integration:**
-- API endpoint: `https://api.fathom.ai/external/v1/meetings`
-- Authentication via X-Api-Key header
-- Supports parameters: include_transcript, include_summary, recorded_by, created_after
+### Transaction Modeler - Multi-Transaction Support
+- ✅ **Add to List button** - Add current transaction to scenario list
+- ✅ **Scenario Transactions panel** - Shows all added transactions with:
+  - Transaction type icon
+  - Name and amount
+  - Delete button for each
+  - Total value badge
+- ✅ **Support for multiple asset types** in same scenario
 
-**Navigation:** Client > Documents > Meeting Notes (marked as NEW)
-
----
-
-## Previous Updates
-
-### v8.2.0 - Advisor Feedback
-- Navigation restructured (Dashboard above CRM)
-- Wealth Overview removed
-- AI Tools consolidated
-- Decision Center fixed (no longer pops out)
-- Next Best Actions with sliding scales
-- More asset types for clients
-
-### v8.1.0 - Projection Charts
-- Timeframe selector (1yr-20yr)
-- ETF and Crypto tabs added
-- Scenario analysis charts
-
-### v8.0.0 - Transaction Modeler
-- Property/Fund/Stock modeling
-- Client creation modal
+### Goal Tracker - Edit Goals
+- ✅ **Edit button** on each goal card (pencil icon)
+- ✅ **Edit dialog** with fields for:
+  - Goal name
+  - Target amount
+  - Current amount
+  - Target date
+  - Monthly contribution
+  - Priority (Low/Medium/High)
+  - Goal type
+- ✅ **Delete goal** button with confirmation
+- ✅ **Save Changes** button
 
 ---
 
-## Demo Meeting Data
+## Navigation Structure (v8.4.0)
 
-| Meeting | Date | Duration | Attendees |
-|---------|------|----------|-----------|
-| Annual Review - Wheeler Family | Jan 15, 2026 | 1h 0m | James, Sarah, Advisor |
-| Tax Planning Discussion | Dec 10, 2025 | 30 min | James, Advisor |
-| Initial Discovery Meeting | Jun 1, 2025 | 1h 30m | James, Sarah, Advisor, Paraplanner |
+### Adviser Mode
+```
+Dashboard
+├── Daily Briefing
+├── Practice Overview
+├── Markets & Research
+└── Broker Research
 
-**Meeting notes are stored** in the client's document vault and linked to their profile for easy access.
+CRM
+├── Client Hub (Combined) ← NEW
+├── Tasks & Workflows
+└── New Client
+
+AI Copilot (Consolidated)
+├── AI Assistant
+├── Book Intelligence
+├── Decision Center
+└── Meeting Notes
+
+Execution
+├── Batch Execute
+├── Trading
+└── Stock Screener
+
+Compliance + Settings
+```
+
+### Client Mode (After selecting client)
+```
+Overview
+├── Client Dashboard
+├── Risk Profile ← MOVED HERE
+├── Health Score ← MOVED HERE
+└── Next Best Actions
+
+Financial Plan
+├── Generate Plan
+├── Goals (with edit)
+├── Scenarios
+├── What-If Modeler (multi-transaction)
+└── Strategy
+
+Investments (Expanded)
+├── Net Worth
+├── Shares & ETFs
+├── Managed Funds
+├── Bonds ← ADDED
+├── Cash & Term Deposits
+├── Property
+├── Trading
+├── Analysis
+└── Linked Accounts
+
+Documents + AI Copilot
+```
 
 ---
 
-## Testing Status
-- Meeting Notes page: ✅ Verified
-- Meeting selection: ✅ Working
-- AI Summary tab: ✅ Working
-- Action Items tab: ✅ Working
-- Transcript tab: ✅ Working
-- Fathom connect dialog: ✅ Working
+## Pending Items
+- Adviser Profile work (mentioned as "lots to do")
+- Personal Reports + Adviser Documents combination
+- Client Profile refinements
 
 ---
 
 ## Key Metrics
 
-- **Version:** 8.3.0
+- **Version:** 8.4.0
 - **Total AUM (Demo):** $22.28M
 - **Demo Clients:** 8
 - **Backend Routes:** 55+
-- **Frontend Pages:** 63+
-- **Test Pass Rate:** Verified via screenshots
+- **Frontend Pages:** 65+
 
 ---
 
@@ -94,4 +124,3 @@ New feature in Client > Documents > Meeting Notes that integrates with Fathom AI
 
 - **Test Adviser**: `advisor@wealthcommand.io` / `secure_password_123`
 - **Preview URL**: https://advisor-command.preview.emergentagent.com
-- **Fathom API Docs**: https://developers.fathom.ai

@@ -195,8 +195,7 @@ const adviserBaseNav = [
     name: "CRM",
     icon: Users,
     items: [
-      { path: "/crm-command-center", label: "Command Center", icon: Zap, title: "Client Command Center", badge: "HUB" },
-      { path: "/client-crm", label: "All Clients", icon: Users, title: "Client List" },
+      { path: "/adviser-hub", label: "Client Hub", icon: Zap, title: "Clients & Portfolio Hub", badge: "HUB" },
       { path: "/workflows", label: "Tasks & Workflows", icon: ListTodo, title: "Automated Workflows" },
       { path: "/onboarding", label: "New Client", icon: UserPlus, title: "Client Onboarding" },
     ]
@@ -246,7 +245,8 @@ const clientContextNav = [
     icon: LayoutDashboard,
     items: [
       { path: "/client-360", label: "Client Dashboard", icon: LayoutDashboard, title: "Client 360 View" },
-      { path: "/realtime-data", label: "Portfolio Data", icon: Activity, title: "Real-Time Portfolio Data" },
+      { path: "/risk-profiler", label: "Risk Profile", icon: Shield, title: "Risk Profiler" },
+      { path: "/decision-engine", label: "Health Score", icon: Zap, title: "Financial Health Score" },
       { path: "/next-best-actions", label: "Next Best Actions", icon: Zap, title: "AI Recommendations" },
     ]
   },
@@ -268,8 +268,10 @@ const clientContextNav = [
       { path: "/family-wealth", label: "Net Worth", icon: Eye, title: "Net Worth & Balance Sheet" },
       { path: "/share-portfolio", label: "Shares & ETFs", icon: LineChart, title: "Share & ETF Portfolio" },
       { path: "/managed-funds", label: "Managed Funds", icon: PieChart, title: "Managed Funds" },
+      { path: "/bonds-trading", label: "Bonds", icon: Building2, title: "Bonds Trading" },
       { path: "/cash-deposits", label: "Cash & Term Deposits", icon: PiggyBank, title: "Cash & Term Deposits" },
       { path: "/property-portfolio", label: "Property", icon: Building2, title: "Property Portfolio" },
+      { path: "/stock-trading", label: "Trading", icon: TrendingUp, title: "Stock Trading" },
       { path: "/portfolio-analyzer", label: "Analysis", icon: BarChart3, title: "Portfolio Analysis" },
       { path: "/connected-accounts", label: "Linked Accounts", icon: Link2, title: "Connected Accounts" },
     ]
@@ -285,12 +287,10 @@ const clientContextNav = [
     ]
   },
   {
-    name: "AI Assistant",
-    icon: Sparkles,
+    name: "AI Copilot",
+    icon: MessageSquare,
     items: [
-      { path: "/ai-copilot-advanced", label: "AI Copilot", icon: MessageSquare, title: "AI Assistant Chat" },
-      { path: "/risk-profiler", label: "Risk Profile", icon: Shield, title: "Risk Profiler" },
-      { path: "/decision-engine", label: "Health Score", icon: Zap, title: "Financial Health Score" },
+      { path: "/ai-copilot-advanced", label: "AI Chat", icon: MessageSquare, title: "AI Copilot Chat" },
     ]
   }
 ];

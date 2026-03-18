@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Building2,
   TrendingUp,
@@ -30,7 +31,10 @@ import {
   BarChart3,
   ArrowLeft,
   Bitcoin,
-  Coins
+  Coins,
+  Plus,
+  Trash2,
+  List
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -234,6 +238,10 @@ const TransactionModeler = () => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [timeframe, setTimeframe] = useState(10);
+  
+  // Multi-transaction state
+  const [transactions, setTransactions] = useState([]);
+  const [showTransactionList, setShowTransactionList] = useState(false);
   
   // Property form state
   const [propertyForm, setPropertyForm] = useState({
@@ -495,6 +503,80 @@ const TransactionModeler = () => {
     }
   };
 
+  // Add transaction to list
+  const addToTransactionList = () => {
+    let newTransaction = null;
+    const id = Date.now();
+    
+    switch (activeTab) {
+      case "property":
+        newTransaction = {
+          id, type: "property", 
+          name: `Property $${(propertyForm.property_value / 1000).toFixed(0)}K`,
+          amount: propertyForm.property_value,
+          details: { ...propertyForm }
+        };
+        break;
+      case "fund":
+        newTransaction = {
+          id, type: "fund",
+          name: fundForm.fund_name.split('(')[0].trim(),
+          amount: fundForm.amount,
+          details: { ...fundForm }
+        };
+        break;
+      case "stock":
+        newTransaction = {
+          id, type: "stock",
+          name: `${stockForm.symbol} x${stockForm.shares}`,
+          amount: stockForm.shares * stockForm.price_per_share,
+          details: { ...stockForm }
+        };
+        break;
+      case "etf":
+        newTransaction = {
+          id, type: "etf",
+          name: etfForm.etf_name.split('(')[0].trim(),
+          amount: etfForm.amount,
+          details: { ...etfForm }
+        };
+        break;
+      case "crypto":
+        newTransaction = {
+          id, type: "crypto",
+          name: cryptoForm.asset,
+          amount: cryptoForm.amount,
+          details: { ...cryptoForm }
+        };
+        break;
+    }
+    
+    if (newTransaction) {
+      setTransactions([...transactions, newTransaction]);
+      toast.success(`Added ${newTransaction.name} to scenario list`);
+    }
+  };
+
+  // Remove transaction from list
+  const removeTransaction = (id) => {
+    setTransactions(transactions.filter(t => t.id !== id));
+    toast.success("Transaction removed");
+  };
+
+  // Calculate total for all transactions
+  const totalTransactionValue = transactions.reduce((sum, t) => sum + (t.amount || 0), 0);
+
+  const getTypeIcon = (type) => {
+    switch (type) {
+      case "property": return Building2;
+      case "fund": return PiggyBank;
+      case "stock": return TrendingUp;
+      case "etf": return LineChart;
+      case "crypto": return Bitcoin;
+      default: return DollarSign;
+    }
+  };
+
   return (
     <Layout>
       <div className="space-y-6" data-testid="transaction-modeler">
@@ -541,6 +623,48 @@ const TransactionModeler = () => {
             </Badge>
           </div>
         </div>
+
+        {/* Transaction List Panel */}
+        {transactions.length > 0 && (
+          <Card className="bg-gradient-to-r from-[#1a2744]/5 to-[#D4A84C]/5 border-[#D4A84C]/30">
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <List className="h-5 w-5 text-[#D4A84C]" />
+                  Scenario Transactions ({transactions.length})
+                </CardTitle>
+                <Badge className="bg-[#1a2744]">
+                  Total: {formatCurrency(totalTransactionValue)}
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-2">
+                {transactions.map(txn => {
+                  const Icon = getTypeIcon(txn.type);
+                  return (
+                    <div 
+                      key={txn.id}
+                      className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg border shadow-sm"
+                    >
+                      <Icon className="h-4 w-4 text-[#1a2744]" />
+                      <span className="font-medium text-sm">{txn.name}</span>
+                      <span className="text-sm text-muted-foreground">{formatCurrency(txn.amount)}</span>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-6 w-6 p-0 ml-1 hover:bg-red-100 hover:text-red-600"
+                        onClick={() => removeTransaction(txn.id)}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           {/* Input Panel */}
@@ -918,18 +1042,29 @@ const TransactionModeler = () => {
 
               <Separator className="my-6" />
 
-              <Button 
-                onClick={handleModel} 
-                className="w-full bg-[#1a2744] hover:bg-[#1a2744]/90"
-                disabled={loading}
-                data-testid="model-btn"
-              >
-                {loading ? (
-                  <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Modeling...</>
-                ) : (
-                  <><Calculator className="h-4 w-4 mr-2" />Model Scenario ({timeframe} Year Projection)</>
-                )}
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={handleModel} 
+                  className="flex-1 bg-[#1a2744] hover:bg-[#1a2744]/90"
+                  disabled={loading}
+                  data-testid="model-btn"
+                >
+                  {loading ? (
+                    <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Modeling...</>
+                  ) : (
+                    <><Calculator className="h-4 w-4 mr-2" />Model Scenario</>
+                  )}
+                </Button>
+                <Button 
+                  onClick={addToTransactionList} 
+                  variant="outline"
+                  className="border-[#D4A84C] text-[#D4A84C] hover:bg-[#D4A84C]/10"
+                  data-testid="add-to-list-btn"
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add to List
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
