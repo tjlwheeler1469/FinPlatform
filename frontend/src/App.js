@@ -168,6 +168,9 @@ const CRMCommandCenter = lazy(() => import("@/pages/CRMCommandCenter"));
 // Client 360 View
 const Client360View = lazy(() => import("@/pages/Client360View"));
 
+// Transaction Modeler
+const TransactionModeler = lazy(() => import("@/pages/TransactionModeler"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -1015,6 +1018,9 @@ const AppRouter = () => {
       
       {/* Client 360 View */}
       <Route path="/client-360" element={<Client360View />} />
+      
+      {/* Transaction Modeler */}
+      <Route path="/transaction-modeler" element={<TransactionModeler />} />
     </Routes>
   );
 };

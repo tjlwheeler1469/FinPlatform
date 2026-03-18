@@ -146,6 +146,7 @@ const personalNavGroups = [
     name: "Calculators",
     icon: Calculator,
     items: [
+      { path: "/transaction-modeler", label: "Transaction Modeler", icon: Calculator, title: "What-If Scenario Builder", badge: "NEW" },
       { path: "/loan-calculator", label: "Loan", icon: Landmark, title: "Loan Calculator" },
       { path: "/monte-carlo", label: "Monte Carlo", icon: BarChart3, title: "Monte Carlo Simulation" },
       { path: "/smsf-optimizer", label: "SMSF", icon: PiggyBank, title: "SMSF Optimizer" },

@@ -306,6 +306,14 @@ def include_all_routes():
     except ImportError as e:
         logger.error(f"Failed to load realtime data layer routes: {e}")
 
+    # TRANSACTION MODELING - What-If Scenario Builder
+    try:
+        from routes.transaction_modeling import router as transaction_modeling_router
+        app.include_router(transaction_modeling_router, prefix="/api")
+        logger.info("TRANSACTION MODELING loaded: Property, Fund, Stock modeling with impact analysis")
+    except ImportError as e:
+        logger.error(f"Failed to load transaction modeling routes: {e}")
+
 # Include all routes
 include_all_routes()
 

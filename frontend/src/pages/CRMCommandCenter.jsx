@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ClientModal from "@/components/ClientModal";
 import {
   Users,
   Search,
@@ -41,7 +42,8 @@ import {
   Shield,
   BarChart3,
   Activity,
-  CreditCard
+  CreditCard,
+  Calculator
 } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
@@ -249,6 +251,7 @@ const CRMCommandCenter = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [loading, setLoading] = useState(true);
+  const [showClientModal, setShowClientModal] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -396,7 +399,11 @@ const CRMCommandCenter = () => {
                 </p>
               </div>
               <div className="flex gap-3">
-                <Button className="bg-white text-[#1a2744] hover:bg-white/90" data-testid="add-client-btn">
+                <Button 
+                  className="bg-white text-[#1a2744] hover:bg-white/90" 
+                  data-testid="add-client-btn"
+                  onClick={() => setShowClientModal(true)}
+                >
                   <Plus className="h-4 w-4 mr-2" />
                   New Client
                 </Button>
@@ -741,6 +748,17 @@ const CRMCommandCenter = () => {
           </div>
         </div>
       </div>
+
+      {/* Client Create Modal */}
+      <ClientModal
+        open={showClientModal}
+        onOpenChange={setShowClientModal}
+        onSuccess={(newClient) => {
+          // Add new client to list and refresh
+          fetchData();
+          toast.success(`Client "${newClient.name}" created successfully`);
+        }}
+      />
     </Layout>
   );
 };

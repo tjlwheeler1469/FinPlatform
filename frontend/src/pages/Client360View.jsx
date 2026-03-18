@@ -58,7 +58,8 @@ import {
   GraduationCap,
   Car,
   Plane,
-  Gift
+  Gift,
+  Calculator
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -335,6 +336,18 @@ const Client360View = () => {
                   </Button>
                   <Button size="sm" variant="outline" className="border-white/30 text-white hover:bg-white/10">
                     <Mail className="h-4 w-4 mr-2" /> Email
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="border-[#D4A84C]/50 text-[#D4A84C] hover:bg-[#D4A84C]/10"
+                    onClick={() => {
+                      localStorage.setItem("selected_client", JSON.stringify(client));
+                      navigate(`/transaction-modeler?client=${client.id}`);
+                    }}
+                    data-testid="transaction-modeler-btn"
+                  >
+                    <Calculator className="h-4 w-4 mr-2" /> Model Transaction
                   </Button>
                 </div>
               </div>

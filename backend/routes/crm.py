@@ -571,6 +571,153 @@ async def get_client(client_id: str):
     }
 
 
+class ClientCreate(BaseModel):
+    """Model for creating a new client."""
+    name: str
+    email: str
+    phone: Optional[str] = None
+    address: Optional[str] = None
+    type: str = "individual"  # individual, household, trust, smsf, partnership
+    status: str = "prospect"
+    risk_profile: str = "TBD"
+    adviser: str = "Mark Thompson"
+    annual_income: Optional[float] = 0
+    notes: Optional[str] = None
+
+
+class ClientUpdate(BaseModel):
+    """Model for updating a client."""
+    name: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    address: Optional[str] = None
+    type: Optional[str] = None
+    status: Optional[str] = None
+    risk_profile: Optional[str] = None
+    adviser: Optional[str] = None
+    annual_income: Optional[float] = None
+    total_wealth: Optional[float] = None
+    notes: Optional[str] = None
+
+
+@router.post("/clients")
+async def create_client(client_data: ClientCreate):
+    """Create a new client."""
+    # Generate unique client ID
+    client_id = f"client_{uuid.uuid4().hex[:8]}"
+    
+    # Create client record
+    new_client = {
+        "client_id": client_id,
+        "name": client_data.name,
+        "email": client_data.email,
+        "phone": client_data.phone or "",
+        "mobile": client_data.phone or "",
+        "address": client_data.address or "",
+        "status": client_data.status,
+        "type": client_data.type,
+        "client_since": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        "date_of_birth": None,
+        "age": None,
+        "occupation": None,
+        "employer": None,
+        "risk_profile": client_data.risk_profile,
+        "investment_experience": "Moderate",
+        "adviser": client_data.adviser,
+        "review_frequency": "Annual",
+        "last_review": None,
+        "next_review": None,
+        "last_contact": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        "satisfaction": None,
+        "nps": None,
+        "total_wealth": 0,
+        "wealth_change": 0,
+        "wealth_change_percent": 0,
+        "annual_income": client_data.annual_income or 0,
+        "stage": "discovery",
+        "accounts_count": 0,
+        "pending_tasks": 1,  # Initial discovery task
+        "pending_docs": 3,   # Standard onboarding docs
+        "recent_activity": "Client created",
+        "family_members": [],
+        "accounts": [],
+        "goals": [],
+        "insurance": [],
+        "notes": client_data.notes
+    }
+    
+    # Store in memory
+    CLIENTS[client_id] = new_client
+    
+    # Create initial task
+    task_id = f"task_{uuid.uuid4().hex[:8]}"
+    TASKS[task_id] = {
+        "id": task_id,
+        "title": f"Discovery Meeting - {client_data.name}",
+        "client_id": client_id,
+        "client_name": client_data.name,
+        "priority": "high",
+        "due_date": (datetime.now(timezone.utc) + timedelta(days=7)).strftime("%Y-%m-%d"),
+        "status": "pending",
+        "type": "meeting"
+    }
+    
+    logger.info(f"Created new client: {client_id} - {client_data.name}")
+    
+    return {
+        "success": True,
+        "message": "Client created successfully",
+        "client": new_client,
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+
+
+@router.put("/clients/{client_id}")
+async def update_client(client_id: str, updates: ClientUpdate):
+    """Update an existing client."""
+    if client_id not in CLIENTS:
+        raise HTTPException(status_code=404, detail="Client not found")
+    
+    # Apply updates
+    update_dict = updates.model_dump(exclude_unset=True)
+    
+    for key, value in update_dict.items():
+        if value is not None:
+            CLIENTS[client_id][key] = value
+    
+    # Update timestamp
+    CLIENTS[client_id]["last_contact"] = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    CLIENTS[client_id]["recent_activity"] = "Client record updated"
+    
+    logger.info(f"Updated client: {client_id}")
+    
+    return {
+        "success": True,
+        "message": "Client updated successfully",
+        "client": CLIENTS[client_id],
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+
+
+@router.delete("/clients/{client_id}")
+async def delete_client(client_id: str):
+    """Delete a client (soft delete - marks as inactive)."""
+    if client_id not in CLIENTS:
+        raise HTTPException(status_code=404, detail="Client not found")
+    
+    # Soft delete - mark as inactive
+    CLIENTS[client_id]["status"] = "inactive"
+    CLIENTS[client_id]["recent_activity"] = "Client deactivated"
+    
+    logger.info(f"Deactivated client: {client_id}")
+    
+    return {
+        "success": True,
+        "message": "Client deactivated successfully",
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+
+
 @router.get("/analytics")
 async def get_crm_analytics():
     """Get comprehensive CRM analytics for adviser dashboard."""
