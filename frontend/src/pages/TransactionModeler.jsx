@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,7 +9,6 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import {
   Building2,
@@ -17,7 +16,6 @@ import {
   LineChart,
   DollarSign,
   Calculator,
-  ArrowRight,
   ArrowUpRight,
   ArrowDownRight,
   Home,
@@ -27,14 +25,12 @@ import {
   CheckCircle2,
   Loader2,
   Sparkles,
-  RefreshCw,
-  Save,
-  ChevronRight,
   Info,
   Wallet,
-  Calendar,
   BarChart3,
-  ArrowLeft
+  ArrowLeft,
+  Bitcoin,
+  Coins
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -44,6 +40,9 @@ const formatCurrency = (value) => {
   if (value >= 1000000) {
     return `$${(value / 1000000).toFixed(2)}M`;
   }
+  if (value >= 1000) {
+    return `$${(value / 1000).toFixed(1)}K`;
+  }
   return new Intl.NumberFormat('en-AU', {
     style: 'currency',
     currency: 'AUD',
@@ -52,14 +51,189 @@ const formatCurrency = (value) => {
   }).format(value);
 };
 
+// Projection Chart Component with Timeline Scale
+const ProjectionChart = ({ projections, initialValue, timeframe, scenarios = null }) => {
+  if (!projections && !scenarios) return null;
+
+  const data = scenarios ? scenarios : { main: projections };
+  const scenarioKeys = Object.keys(data);
+  const maxYears = timeframe;
+  
+  // Find max value for scaling
+  let maxValue = initialValue;
+  scenarioKeys.forEach(key => {
+    data[key]?.forEach(p => {
+      if (p.year <= maxYears && p.value > maxValue) {
+        maxValue = p.value;
+      }
+    });
+  });
+
+  const chartHeight = 200;
+  const chartWidth = 100; // percentage
+  const padding = 40;
+
+  const getY = (value) => {
+    return chartHeight - ((value / maxValue) * (chartHeight - padding));
+  };
+
+  const getX = (year) => {
+    return (year / maxYears) * 100;
+  };
+
+  const scenarioColors = {
+    main: "#D4A84C",
+    conservative: "#6B7280",
+    moderate: "#3B82F6",
+    aggressive: "#10B981"
+  };
+
+  const scenarioLabels = {
+    main: "Projected",
+    conservative: "Conservative (5%)",
+    moderate: "Moderate (8%)",
+    aggressive: "Aggressive (12%)"
+  };
+
+  // Generate year markers
+  const yearMarkers = [];
+  const step = maxYears <= 5 ? 1 : maxYears <= 10 ? 2 : 5;
+  for (let y = 0; y <= maxYears; y += step) {
+    yearMarkers.push(y);
+  }
+
+  return (
+    <div className="relative w-full" style={{ height: chartHeight + 60 }}>
+      {/* Y-axis labels */}
+      <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-xs text-muted-foreground pr-2" style={{ width: 60 }}>
+        <span>{formatCurrency(maxValue)}</span>
+        <span>{formatCurrency(maxValue * 0.5)}</span>
+        <span>{formatCurrency(0)}</span>
+      </div>
+
+      {/* Chart area */}
+      <div className="absolute left-16 right-4 top-0" style={{ height: chartHeight }}>
+        {/* Grid lines */}
+        <div className="absolute inset-0 flex flex-col justify-between">
+          {[0, 1, 2, 3, 4].map(i => (
+            <div key={i} className="border-t border-dashed border-muted-foreground/20 w-full" />
+          ))}
+        </div>
+
+        {/* SVG for lines */}
+        <svg className="absolute inset-0 w-full h-full overflow-visible">
+          {scenarioKeys.map(key => {
+            const points = data[key]?.filter(p => p.year <= maxYears) || [];
+            if (points.length < 2) return null;
+
+            const pathData = points.map((p, i) => {
+              const x = getX(p.year);
+              const y = getY(p.value);
+              return `${i === 0 ? 'M' : 'L'} ${x}% ${y}`;
+            }).join(' ');
+
+            return (
+              <path
+                key={key}
+                d={pathData}
+                fill="none"
+                stroke={scenarioColors[key] || "#D4A84C"}
+                strokeWidth={key === "main" ? 3 : 2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={key !== "main" ? "opacity-70" : ""}
+              />
+            );
+          })}
+          
+          {/* Data points */}
+          {scenarioKeys.map(key => {
+            const points = data[key]?.filter(p => p.year <= maxYears) || [];
+            return points.map((p, i) => (
+              <circle
+                key={`${key}-${i}`}
+                cx={`${getX(p.year)}%`}
+                cy={getY(p.value)}
+                r={key === "main" ? 5 : 4}
+                fill={scenarioColors[key] || "#D4A84C"}
+                className="hover:r-6 transition-all cursor-pointer"
+              >
+                <title>{`Year ${p.year}: ${formatCurrency(p.value)}`}</title>
+              </circle>
+            ));
+          })}
+        </svg>
+
+        {/* Initial value marker */}
+        <div 
+          className="absolute left-0 w-2 h-2 bg-white border-2 border-[#1a2744] rounded-full transform -translate-x-1/2"
+          style={{ top: getY(initialValue) - 4 }}
+        />
+      </div>
+
+      {/* X-axis labels */}
+      <div className="absolute left-16 right-4 flex justify-between text-xs text-muted-foreground" style={{ top: chartHeight + 10 }}>
+        {yearMarkers.map(year => (
+          <span key={year} style={{ marginLeft: year === 0 ? 0 : 'auto' }}>
+            {year === 0 ? "Now" : `${year}yr`}
+          </span>
+        ))}
+      </div>
+
+      {/* Legend */}
+      <div className="absolute left-16 right-4 flex flex-wrap gap-4 text-xs" style={{ top: chartHeight + 35 }}>
+        {scenarioKeys.map(key => (
+          <div key={key} className="flex items-center gap-1">
+            <div 
+              className="w-3 h-3 rounded-full" 
+              style={{ backgroundColor: scenarioColors[key] || "#D4A84C" }}
+            />
+            <span className="text-muted-foreground">{scenarioLabels[key] || key}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Value Summary Cards
+const ValueSummaryCards = ({ projections, timeframe, initialValue }) => {
+  if (!projections) return null;
+  
+  const targetYear = projections.find(p => p.year === timeframe);
+  if (!targetYear) return null;
+
+  const totalReturn = targetYear.value - initialValue;
+  const percentReturn = ((totalReturn / initialValue) * 100).toFixed(1);
+  const annualizedReturn = (Math.pow(targetYear.value / initialValue, 1 / timeframe) - 1) * 100;
+
+  return (
+    <div className="grid grid-cols-3 gap-3 mt-4">
+      <div className="bg-muted/50 rounded-lg p-3 text-center">
+        <p className="text-xs text-muted-foreground">Value at Year {timeframe}</p>
+        <p className="text-lg font-bold text-[#1a2744]">{formatCurrency(targetYear.value)}</p>
+      </div>
+      <div className="bg-emerald-50 rounded-lg p-3 text-center">
+        <p className="text-xs text-emerald-700">Total Return</p>
+        <p className="text-lg font-bold text-emerald-700">+{formatCurrency(totalReturn)}</p>
+      </div>
+      <div className="bg-blue-50 rounded-lg p-3 text-center">
+        <p className="text-xs text-blue-700">Annualized Return</p>
+        <p className="text-lg font-bold text-blue-700">{annualizedReturn.toFixed(1)}% p.a.</p>
+      </div>
+    </div>
+  );
+};
+
 const TransactionModeler = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const clientId = searchParams.get("client") || "client_1";
   
-  const [activeTab, setActiveTab] = useState("property");
+  const [activeTab, setActiveTab] = useState("fund");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
+  const [timeframe, setTimeframe] = useState(10);
   
   // Property form state
   const [propertyForm, setPropertyForm] = useState({
@@ -72,10 +246,10 @@ const TransactionModeler = () => {
     expected_capital_growth: 5.0
   });
   
-  // Fund form state
+  // Fund/ETF form state
   const [fundForm, setFundForm] = useState({
     transaction_type: "buy",
-    fund_name: "Vanguard Australian Shares Index ETF",
+    fund_name: "Vanguard Australian Shares Index ETF (VAS)",
     amount: 100000,
     expected_return: 7.0,
     management_fee: 0.10,
@@ -88,13 +262,45 @@ const TransactionModeler = () => {
     symbol: "CBA",
     shares: 100,
     price_per_share: 120,
+    expected_return: 8.0,
+    dividend_yield: 4.5,
     purchase_date: "2023-01-01",
     purchase_price: 95
   });
 
-  // Get client info from localStorage
+  // Crypto form state
+  const [cryptoForm, setCryptoForm] = useState({
+    transaction_type: "buy",
+    asset: "BTC",
+    amount: 50000,
+    expected_return_conservative: 5,
+    expected_return_moderate: 15,
+    expected_return_aggressive: 30
+  });
+
+  // ETF form state
+  const [etfForm, setEtfForm] = useState({
+    transaction_type: "buy",
+    etf_name: "iShares Core S&P 500 ETF (IVV)",
+    amount: 75000,
+    expected_return: 9.0,
+    management_fee: 0.03,
+    distribution_yield: 1.5
+  });
+
   const selectedClient = JSON.parse(localStorage.getItem("selected_client") || "{}");
   const clientName = selectedClient.name || "Wheeler Family";
+
+  // Generate projections locally for visualization
+  const generateProjections = (initial, rate, years) => {
+    const projections = [];
+    let value = initial;
+    for (let year = 0; year <= years; year++) {
+      projections.push({ year, value: Math.round(value) });
+      value *= (1 + rate / 100);
+    }
+    return projections;
+  };
 
   const modelProperty = async () => {
     setLoading(true);
@@ -130,13 +336,20 @@ const TransactionModeler = () => {
       const response = await fetch(`${API_URL}/api/transaction-modeling/fund?client_id=${clientId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(fundForm)
+        body: JSON.stringify({...fundForm, projection_years: timeframe})
       });
       
       if (response.ok) {
         const data = await response.json();
+        // Add extended projections for chart
+        const extendedProjections = generateProjections(
+          fundForm.amount, 
+          fundForm.expected_return - fundForm.management_fee, 
+          Math.max(timeframe, 20)
+        );
+        data.analysis.extended_projections = extendedProjections;
         setResult({ type: "fund", data });
-        toast.success("Fund investment modeled successfully");
+        toast.success("Fund/ETF investment modeled successfully");
       } else {
         toast.error("Failed to model fund investment");
       }
@@ -161,6 +374,14 @@ const TransactionModeler = () => {
       
       if (response.ok) {
         const data = await response.json();
+        // Generate extended projections with scenarios
+        const initial = stockForm.shares * stockForm.price_per_share;
+        data.analysis.scenarios = {
+          conservative: generateProjections(initial, 5, Math.max(timeframe, 20)),
+          moderate: generateProjections(initial, stockForm.expected_return, Math.max(timeframe, 20)),
+          aggressive: generateProjections(initial, 12, Math.max(timeframe, 20))
+        };
+        data.analysis.initial_value = initial;
         setResult({ type: "stock", data });
         toast.success("Stock trade modeled successfully");
       } else {
@@ -174,19 +395,103 @@ const TransactionModeler = () => {
     }
   };
 
+  const modelCrypto = async () => {
+    setLoading(true);
+    setResult(null);
+    
+    try {
+      // Generate crypto projections with high volatility scenarios
+      const scenarios = {
+        conservative: generateProjections(cryptoForm.amount, cryptoForm.expected_return_conservative, Math.max(timeframe, 20)),
+        moderate: generateProjections(cryptoForm.amount, cryptoForm.expected_return_moderate, Math.max(timeframe, 20)),
+        aggressive: generateProjections(cryptoForm.amount, cryptoForm.expected_return_aggressive, Math.max(timeframe, 20))
+      };
+
+      setResult({ 
+        type: "crypto", 
+        data: {
+          analysis: {
+            investment_details: {
+              asset: cryptoForm.asset,
+              amount: cryptoForm.amount,
+              scenarios: {
+                conservative: `${cryptoForm.expected_return_conservative}% p.a.`,
+                moderate: `${cryptoForm.expected_return_moderate}% p.a.`,
+                aggressive: `${cryptoForm.expected_return_aggressive}% p.a.`
+              }
+            },
+            scenarios,
+            initial_value: cryptoForm.amount,
+            summary: {
+              [`${timeframe}_year_conservative`]: scenarios.conservative.find(p => p.year === timeframe),
+              [`${timeframe}_year_moderate`]: scenarios.moderate.find(p => p.year === timeframe),
+              [`${timeframe}_year_aggressive`]: scenarios.aggressive.find(p => p.year === timeframe)
+            }
+          }
+        }
+      });
+      toast.success("Crypto scenario modeled successfully");
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("Failed to model crypto scenario");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const modelETF = async () => {
+    setLoading(true);
+    setResult(null);
+    
+    try {
+      // Generate ETF projections with scenarios
+      const netReturn = etfForm.expected_return - etfForm.management_fee;
+      const scenarios = {
+        conservative: generateProjections(etfForm.amount, netReturn - 3, Math.max(timeframe, 20)),
+        moderate: generateProjections(etfForm.amount, netReturn, Math.max(timeframe, 20)),
+        aggressive: generateProjections(etfForm.amount, netReturn + 3, Math.max(timeframe, 20))
+      };
+
+      setResult({ 
+        type: "etf", 
+        data: {
+          analysis: {
+            investment_details: {
+              etf_name: etfForm.etf_name,
+              amount: etfForm.amount,
+              expected_return: etfForm.expected_return,
+              management_fee: etfForm.management_fee,
+              distribution_yield: etfForm.distribution_yield,
+              net_return: netReturn
+            },
+            scenarios,
+            initial_value: etfForm.amount,
+            extended_projections: scenarios.moderate,
+            summary: {
+              [`${timeframe}_year_conservative`]: scenarios.conservative.find(p => p.year === timeframe),
+              [`${timeframe}_year_moderate`]: scenarios.moderate.find(p => p.year === timeframe),
+              [`${timeframe}_year_aggressive`]: scenarios.aggressive.find(p => p.year === timeframe)
+            }
+          }
+        }
+      });
+      toast.success("ETF scenario modeled successfully");
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("Failed to model ETF scenario");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleModel = () => {
     switch (activeTab) {
-      case "property":
-        modelProperty();
-        break;
-      case "fund":
-        modelFund();
-        break;
-      case "stock":
-        modelStock();
-        break;
-      default:
-        break;
+      case "property": modelProperty(); break;
+      case "fund": modelFund(); break;
+      case "stock": modelStock(); break;
+      case "crypto": modelCrypto(); break;
+      case "etf": modelETF(); break;
+      default: break;
     }
   };
 
@@ -213,10 +518,28 @@ const TransactionModeler = () => {
               Model "What If" scenarios for {clientName}
             </p>
           </div>
-          <Badge variant="outline" className="text-lg px-4 py-2">
-            <Sparkles className="h-4 w-4 mr-2 text-[#D4A84C]" />
-            Scenario Builder
-          </Badge>
+          <div className="flex items-center gap-3">
+            {/* Timeframe Selector */}
+            <div className="flex items-center gap-2 bg-muted rounded-lg p-1">
+              <span className="text-sm text-muted-foreground px-2">Timeframe:</span>
+              {[1, 3, 5, 10, 20].map(years => (
+                <Button
+                  key={years}
+                  variant={timeframe === years ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setTimeframe(years)}
+                  className={timeframe === years ? "bg-[#1a2744]" : ""}
+                  data-testid={`timeframe-${years}yr`}
+                >
+                  {years}yr
+                </Button>
+              ))}
+            </div>
+            <Badge variant="outline" className="text-lg px-4 py-2">
+              <Sparkles className="h-4 w-4 mr-2 text-[#D4A84C]" />
+              Scenario Builder
+            </Badge>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
@@ -225,23 +548,31 @@ const TransactionModeler = () => {
             <CardHeader>
               <CardTitle>Model a Transaction</CardTitle>
               <CardDescription>
-                Choose a transaction type and configure the parameters
+                Choose an asset type and configure the parameters
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="property" className="flex items-center gap-2">
+              <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v); setResult(null); }}>
+                <TabsList className="grid w-full grid-cols-5">
+                  <TabsTrigger value="property" className="flex items-center gap-1 text-xs">
                     <Building2 className="h-4 w-4" />
                     Property
                   </TabsTrigger>
-                  <TabsTrigger value="fund" className="flex items-center gap-2">
+                  <TabsTrigger value="fund" className="flex items-center gap-1 text-xs">
                     <PiggyBank className="h-4 w-4" />
                     Fund
                   </TabsTrigger>
-                  <TabsTrigger value="stock" className="flex items-center gap-2">
+                  <TabsTrigger value="stock" className="flex items-center gap-1 text-xs">
                     <TrendingUp className="h-4 w-4" />
                     Stock
+                  </TabsTrigger>
+                  <TabsTrigger value="etf" className="flex items-center gap-1 text-xs">
+                    <LineChart className="h-4 w-4" />
+                    ETF
+                  </TabsTrigger>
+                  <TabsTrigger value="crypto" className="flex items-center gap-1 text-xs">
+                    <Bitcoin className="h-4 w-4" />
+                    Crypto
                   </TabsTrigger>
                 </TabsList>
 
@@ -254,9 +585,7 @@ const TransactionModeler = () => {
                         value={propertyForm.transaction_type}
                         onValueChange={(v) => setPropertyForm({...propertyForm, transaction_type: v})}
                       >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="buy">Buy Property</SelectItem>
                           <SelectItem value="sell">Sell Property</SelectItem>
@@ -285,9 +614,7 @@ const TransactionModeler = () => {
                       <Slider
                         value={[propertyForm.deposit_percent]}
                         onValueChange={([v]) => setPropertyForm({...propertyForm, deposit_percent: v})}
-                        min={5}
-                        max={50}
-                        step={5}
+                        min={5} max={50} step={5}
                       />
                     </div>
                     
@@ -298,22 +625,7 @@ const TransactionModeler = () => {
                       <Slider
                         value={[propertyForm.loan_interest_rate]}
                         onValueChange={([v]) => setPropertyForm({...propertyForm, loan_interest_rate: v})}
-                        min={4}
-                        max={10}
-                        step={0.25}
-                      />
-                    </div>
-                    
-                    <div>
-                      <div className="flex justify-between mb-2">
-                        <Label>Expected Rental Yield: {propertyForm.expected_rental_yield}%</Label>
-                      </div>
-                      <Slider
-                        value={[propertyForm.expected_rental_yield]}
-                        onValueChange={([v]) => setPropertyForm({...propertyForm, expected_rental_yield: v})}
-                        min={2}
-                        max={8}
-                        step={0.5}
+                        min={4} max={10} step={0.25}
                       />
                     </div>
                     
@@ -324,9 +636,7 @@ const TransactionModeler = () => {
                       <Slider
                         value={[propertyForm.expected_capital_growth]}
                         onValueChange={([v]) => setPropertyForm({...propertyForm, expected_capital_growth: v})}
-                        min={0}
-                        max={10}
-                        step={0.5}
+                        min={0} max={10} step={0.5}
                       />
                     </div>
                   </div>
@@ -341,9 +651,7 @@ const TransactionModeler = () => {
                         value={fundForm.transaction_type}
                         onValueChange={(v) => setFundForm({...fundForm, transaction_type: v})}
                       >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="buy">Buy/Invest</SelectItem>
                           <SelectItem value="sell">Sell/Redeem</SelectItem>
@@ -363,16 +671,11 @@ const TransactionModeler = () => {
                   
                   <div>
                     <Label>Fund Name</Label>
-                    <Select 
-                      value={fundForm.fund_name}
-                      onValueChange={(v) => setFundForm({...fundForm, fund_name: v})}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
+                    <Select value={fundForm.fund_name} onValueChange={(v) => setFundForm({...fundForm, fund_name: v})}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Vanguard Australian Shares Index ETF">VAS - Vanguard Australian Shares</SelectItem>
-                        <SelectItem value="Vanguard International Shares ETF">VGS - Vanguard International</SelectItem>
+                        <SelectItem value="Vanguard Australian Shares Index ETF (VAS)">VAS - Vanguard Australian Shares</SelectItem>
+                        <SelectItem value="Vanguard International Shares ETF (VGS)">VGS - Vanguard International</SelectItem>
                         <SelectItem value="Magellan Global Fund">Magellan Global Fund</SelectItem>
                         <SelectItem value="Platinum International Fund">Platinum International</SelectItem>
                       </SelectContent>
@@ -382,14 +685,12 @@ const TransactionModeler = () => {
                   <div className="space-y-3">
                     <div>
                       <div className="flex justify-between mb-2">
-                        <Label>Expected Return: {fundForm.expected_return}%</Label>
+                        <Label>Expected Return: {fundForm.expected_return}% p.a.</Label>
                       </div>
                       <Slider
                         value={[fundForm.expected_return]}
                         onValueChange={([v]) => setFundForm({...fundForm, expected_return: v})}
-                        min={3}
-                        max={15}
-                        step={0.5}
+                        min={3} max={15} step={0.5}
                       />
                     </div>
                     
@@ -400,9 +701,7 @@ const TransactionModeler = () => {
                       <Slider
                         value={[fundForm.management_fee]}
                         onValueChange={([v]) => setFundForm({...fundForm, management_fee: v})}
-                        min={0.05}
-                        max={2}
-                        step={0.05}
+                        min={0.05} max={2} step={0.05}
                       />
                     </div>
                   </div>
@@ -417,9 +716,7 @@ const TransactionModeler = () => {
                         value={stockForm.transaction_type}
                         onValueChange={(v) => setStockForm({...stockForm, transaction_type: v})}
                       >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="buy">Buy Shares</SelectItem>
                           <SelectItem value="sell">Sell Shares</SelectItem>
@@ -428,20 +725,14 @@ const TransactionModeler = () => {
                     </div>
                     <div>
                       <Label>Stock Symbol</Label>
-                      <Select 
-                        value={stockForm.symbol}
-                        onValueChange={(v) => setStockForm({...stockForm, symbol: v})}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
+                      <Select value={stockForm.symbol} onValueChange={(v) => setStockForm({...stockForm, symbol: v})}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="CBA">CBA - Commonwealth Bank</SelectItem>
                           <SelectItem value="BHP">BHP - BHP Group</SelectItem>
                           <SelectItem value="CSL">CSL - CSL Limited</SelectItem>
                           <SelectItem value="WBC">WBC - Westpac</SelectItem>
                           <SelectItem value="NAB">NAB - National Australia Bank</SelectItem>
-                          <SelectItem value="ANZ">ANZ - ANZ Bank</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -466,33 +757,161 @@ const TransactionModeler = () => {
                       />
                     </div>
                   </div>
-                  
-                  {stockForm.transaction_type === "sell" && (
-                    <div className="grid grid-cols-2 gap-4 p-4 bg-muted rounded-lg">
-                      <div>
-                        <Label>Original Purchase Price</Label>
-                        <Input
-                          type="number"
-                          value={stockForm.purchase_price}
-                          onChange={(e) => setStockForm({...stockForm, purchase_price: Number(e.target.value)})}
-                        />
+
+                  <div className="space-y-3">
+                    <div>
+                      <div className="flex justify-between mb-2">
+                        <Label>Expected Return: {stockForm.expected_return}% p.a.</Label>
                       </div>
-                      <div>
-                        <Label>Purchase Date</Label>
-                        <Input
-                          type="date"
-                          value={stockForm.purchase_date}
-                          onChange={(e) => setStockForm({...stockForm, purchase_date: e.target.value})}
-                        />
-                      </div>
+                      <Slider
+                        value={[stockForm.expected_return]}
+                        onValueChange={([v]) => setStockForm({...stockForm, expected_return: v})}
+                        min={3} max={15} step={0.5}
+                      />
                     </div>
-                  )}
+                  </div>
                   
                   <div className="p-3 bg-blue-50 rounded-lg">
                     <p className="text-sm text-blue-800 flex items-center gap-2">
                       <Info className="h-4 w-4" />
                       Trade Value: {formatCurrency(stockForm.shares * stockForm.price_per_share)}
                     </p>
+                  </div>
+                </TabsContent>
+
+                {/* ETF Tab */}
+                <TabsContent value="etf" className="space-y-4 mt-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Transaction Type</Label>
+                      <Select 
+                        value={etfForm.transaction_type}
+                        onValueChange={(v) => setEtfForm({...etfForm, transaction_type: v})}
+                      >
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="buy">Buy ETF</SelectItem>
+                          <SelectItem value="sell">Sell ETF</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>Investment Amount</Label>
+                      <Input
+                        type="number"
+                        value={etfForm.amount}
+                        onChange={(e) => setEtfForm({...etfForm, amount: Number(e.target.value)})}
+                        data-testid="etf-amount-input"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label>ETF Selection</Label>
+                    <Select value={etfForm.etf_name} onValueChange={(v) => setEtfForm({...etfForm, etf_name: v})}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="iShares Core S&P 500 ETF (IVV)">IVV - iShares S&P 500</SelectItem>
+                        <SelectItem value="Vanguard Total Stock Market ETF (VTI)">VTI - Vanguard Total Market</SelectItem>
+                        <SelectItem value="SPDR S&P/ASX 200 Fund (STW)">STW - SPDR ASX 200</SelectItem>
+                        <SelectItem value="BetaShares NASDAQ 100 ETF (NDQ)">NDQ - BetaShares NASDAQ 100</SelectItem>
+                        <SelectItem value="VanEck MSCI World ex-Australia Quality ETF (QUAL)">QUAL - VanEck World Quality</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div>
+                      <div className="flex justify-between mb-2">
+                        <Label>Expected Return: {etfForm.expected_return}% p.a.</Label>
+                      </div>
+                      <Slider
+                        value={[etfForm.expected_return]}
+                        onValueChange={([v]) => setEtfForm({...etfForm, expected_return: v})}
+                        min={4} max={15} step={0.5}
+                      />
+                    </div>
+                    
+                    <div>
+                      <div className="flex justify-between mb-2">
+                        <Label>Management Fee: {etfForm.management_fee}%</Label>
+                      </div>
+                      <Slider
+                        value={[etfForm.management_fee]}
+                        onValueChange={([v]) => setEtfForm({...etfForm, management_fee: v})}
+                        min={0.03} max={1} step={0.01}
+                      />
+                    </div>
+                  </div>
+                </TabsContent>
+
+                {/* Crypto Tab */}
+                <TabsContent value="crypto" className="space-y-4 mt-4">
+                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg mb-4">
+                    <p className="text-sm text-amber-800 flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4" />
+                      Crypto assets are highly volatile. Projections show a wide range of outcomes.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Cryptocurrency</Label>
+                      <Select value={cryptoForm.asset} onValueChange={(v) => setCryptoForm({...cryptoForm, asset: v})}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="BTC">BTC - Bitcoin</SelectItem>
+                          <SelectItem value="ETH">ETH - Ethereum</SelectItem>
+                          <SelectItem value="SOL">SOL - Solana</SelectItem>
+                          <SelectItem value="XRP">XRP - Ripple</SelectItem>
+                          <SelectItem value="ADA">ADA - Cardano</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>Investment Amount</Label>
+                      <Input
+                        type="number"
+                        value={cryptoForm.amount}
+                        onChange={(e) => setCryptoForm({...cryptoForm, amount: Number(e.target.value)})}
+                        data-testid="crypto-amount-input"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div>
+                      <div className="flex justify-between mb-2">
+                        <Label>Conservative Scenario: {cryptoForm.expected_return_conservative}% p.a.</Label>
+                      </div>
+                      <Slider
+                        value={[cryptoForm.expected_return_conservative]}
+                        onValueChange={([v]) => setCryptoForm({...cryptoForm, expected_return_conservative: v})}
+                        min={-10} max={20} step={1}
+                      />
+                    </div>
+                    
+                    <div>
+                      <div className="flex justify-between mb-2">
+                        <Label>Moderate Scenario: {cryptoForm.expected_return_moderate}% p.a.</Label>
+                      </div>
+                      <Slider
+                        value={[cryptoForm.expected_return_moderate]}
+                        onValueChange={([v]) => setCryptoForm({...cryptoForm, expected_return_moderate: v})}
+                        min={0} max={40} step={1}
+                      />
+                    </div>
+                    
+                    <div>
+                      <div className="flex justify-between mb-2">
+                        <Label>Aggressive Scenario: {cryptoForm.expected_return_aggressive}% p.a.</Label>
+                      </div>
+                      <Slider
+                        value={[cryptoForm.expected_return_aggressive]}
+                        onValueChange={([v]) => setCryptoForm({...cryptoForm, expected_return_aggressive: v})}
+                        min={10} max={100} step={5}
+                      />
+                    </div>
                   </div>
                 </TabsContent>
               </Tabs>
@@ -506,15 +925,9 @@ const TransactionModeler = () => {
                 data-testid="model-btn"
               >
                 {loading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Modeling...
-                  </>
+                  <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Modeling...</>
                 ) : (
-                  <>
-                    <Calculator className="h-4 w-4 mr-2" />
-                    Model Scenario
-                  </>
+                  <><Calculator className="h-4 w-4 mr-2" />Model Scenario ({timeframe} Year Projection)</>
                 )}
               </Button>
             </CardContent>
@@ -525,30 +938,185 @@ const TransactionModeler = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BarChart3 className="h-5 w-5 text-[#D4A84C]" />
-                Impact Analysis
+                Projected Outcomes
               </CardTitle>
               <CardDescription>
-                See how this transaction affects the portfolio
+                {timeframe}-year projection with scenario analysis
               </CardDescription>
             </CardHeader>
             <CardContent>
               {!result && !loading && (
                 <div className="text-center py-12 text-muted-foreground">
-                  <Calculator className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Configure a transaction and click "Model Scenario" to see the impact analysis</p>
+                  <LineChart className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>Configure a transaction and click "Model Scenario" to see projections</p>
                 </div>
               )}
 
               {loading && (
                 <div className="text-center py-12">
                   <Loader2 className="h-8 w-8 mx-auto mb-4 animate-spin text-[#D4A84C]" />
-                  <p className="text-muted-foreground">Analyzing scenario...</p>
+                  <p className="text-muted-foreground">Calculating projections...</p>
                 </div>
               )}
 
+              {/* Fund Result with Chart */}
+              {result && result.type === "fund" && result.data.analysis && (
+                <div className="space-y-6" data-testid="fund-result">
+                  <div className="p-4 bg-muted rounded-lg">
+                    <h4 className="font-semibold mb-2 flex items-center gap-2">
+                      <PiggyBank className="h-4 w-4 text-[#D4A84C]" />
+                      {result.data.analysis.investment_details?.fund_name || fundForm.fund_name}
+                    </h4>
+                    <div className="grid grid-cols-3 gap-2 text-sm">
+                      <div><span className="text-muted-foreground">Initial:</span> <span className="font-medium">{formatCurrency(fundForm.amount)}</span></div>
+                      <div><span className="text-muted-foreground">Return:</span> <span className="font-medium">{fundForm.expected_return}% p.a.</span></div>
+                      <div><span className="text-muted-foreground">Fee:</span> <span className="font-medium">{fundForm.management_fee}%</span></div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold mb-4">Projected Growth ({timeframe} Years)</h4>
+                    <ProjectionChart 
+                      projections={result.data.analysis.extended_projections} 
+                      initialValue={fundForm.amount}
+                      timeframe={timeframe}
+                    />
+                    <ValueSummaryCards 
+                      projections={result.data.analysis.extended_projections}
+                      timeframe={timeframe}
+                      initialValue={fundForm.amount}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Stock Result with Scenarios */}
+              {result && result.type === "stock" && result.data.analysis && (
+                <div className="space-y-6" data-testid="stock-result">
+                  <div className="p-4 bg-muted rounded-lg">
+                    <h4 className="font-semibold mb-2 flex items-center gap-2">
+                      <TrendingUp className="h-4 w-4 text-[#D4A84C]" />
+                      {stockForm.symbol} - {stockForm.shares} shares @ ${stockForm.price_per_share}
+                    </h4>
+                    <div className="text-sm">
+                      <span className="text-muted-foreground">Trade Value:</span> 
+                      <span className="font-medium ml-2">{formatCurrency(result.data.analysis.initial_value)}</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold mb-4">Scenario Analysis ({timeframe} Years)</h4>
+                    <ProjectionChart 
+                      scenarios={result.data.analysis.scenarios} 
+                      initialValue={result.data.analysis.initial_value}
+                      timeframe={timeframe}
+                    />
+                    
+                    <div className="grid grid-cols-3 gap-3 mt-4">
+                      {["conservative", "moderate", "aggressive"].map(scenario => {
+                        const data = result.data.analysis.scenarios[scenario]?.find(p => p.year === timeframe);
+                        return (
+                          <div key={scenario} className={`rounded-lg p-3 text-center ${
+                            scenario === "conservative" ? "bg-gray-50" :
+                            scenario === "moderate" ? "bg-blue-50" : "bg-emerald-50"
+                          }`}>
+                            <p className="text-xs text-muted-foreground capitalize">{scenario}</p>
+                            <p className="text-lg font-bold">{data ? formatCurrency(data.value) : "-"}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ETF Result with Scenarios */}
+              {result && result.type === "etf" && result.data.analysis && (
+                <div className="space-y-6" data-testid="etf-result">
+                  <div className="p-4 bg-muted rounded-lg">
+                    <h4 className="font-semibold mb-2 flex items-center gap-2">
+                      <LineChart className="h-4 w-4 text-[#D4A84C]" />
+                      {result.data.analysis.investment_details?.etf_name}
+                    </h4>
+                    <div className="grid grid-cols-3 gap-2 text-sm">
+                      <div><span className="text-muted-foreground">Initial:</span> <span className="font-medium">{formatCurrency(etfForm.amount)}</span></div>
+                      <div><span className="text-muted-foreground">Return:</span> <span className="font-medium">{etfForm.expected_return}% p.a.</span></div>
+                      <div><span className="text-muted-foreground">Fee:</span> <span className="font-medium">{etfForm.management_fee}%</span></div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold mb-4">Scenario Analysis ({timeframe} Years)</h4>
+                    <ProjectionChart 
+                      scenarios={result.data.analysis.scenarios} 
+                      initialValue={etfForm.amount}
+                      timeframe={timeframe}
+                    />
+                    
+                    <div className="grid grid-cols-3 gap-3 mt-4">
+                      {["conservative", "moderate", "aggressive"].map(scenario => {
+                        const data = result.data.analysis.scenarios[scenario]?.find(p => p.year === timeframe);
+                        return (
+                          <div key={scenario} className={`rounded-lg p-3 text-center ${
+                            scenario === "conservative" ? "bg-gray-50" :
+                            scenario === "moderate" ? "bg-blue-50" : "bg-emerald-50"
+                          }`}>
+                            <p className="text-xs text-muted-foreground capitalize">{scenario}</p>
+                            <p className="text-lg font-bold">{data ? formatCurrency(data.value) : "-"}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Crypto Result with High Volatility Scenarios */}
+              {result && result.type === "crypto" && result.data.analysis && (
+                <div className="space-y-6" data-testid="crypto-result">
+                  <div className="p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg border border-amber-200">
+                    <h4 className="font-semibold mb-2 flex items-center gap-2">
+                      <Bitcoin className="h-4 w-4 text-orange-500" />
+                      {result.data.analysis.investment_details?.asset} Investment
+                    </h4>
+                    <div className="text-sm">
+                      <span className="text-muted-foreground">Initial Investment:</span> 
+                      <span className="font-medium ml-2">{formatCurrency(result.data.analysis.initial_value)}</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold mb-4">Volatility Scenarios ({timeframe} Years)</h4>
+                    <ProjectionChart 
+                      scenarios={result.data.analysis.scenarios} 
+                      initialValue={result.data.analysis.initial_value}
+                      timeframe={timeframe}
+                    />
+                    
+                    <div className="grid grid-cols-3 gap-3 mt-4">
+                      {["conservative", "moderate", "aggressive"].map(scenario => {
+                        const data = result.data.analysis.scenarios[scenario]?.find(p => p.year === timeframe);
+                        const rate = scenario === "conservative" ? cryptoForm.expected_return_conservative :
+                                    scenario === "moderate" ? cryptoForm.expected_return_moderate : 
+                                    cryptoForm.expected_return_aggressive;
+                        return (
+                          <div key={scenario} className={`rounded-lg p-3 text-center ${
+                            scenario === "conservative" ? "bg-gray-50" :
+                            scenario === "moderate" ? "bg-blue-50" : "bg-emerald-50"
+                          }`}>
+                            <p className="text-xs text-muted-foreground capitalize">{scenario} ({rate}% p.a.)</p>
+                            <p className="text-lg font-bold">{data ? formatCurrency(data.value) : "-"}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Property Result */}
               {result && result.type === "property" && result.data.analysis && (
                 <div className="space-y-6" data-testid="property-result">
-                  {/* Purchase Costs */}
                   <div className="p-4 bg-muted rounded-lg">
                     <h4 className="font-semibold mb-3 flex items-center gap-2">
                       <DollarSign className="h-4 w-4 text-[#D4A84C]" />
@@ -567,7 +1135,6 @@ const TransactionModeler = () => {
                     </div>
                   </div>
 
-                  {/* Cash Flow */}
                   <div className="p-4 bg-muted rounded-lg">
                     <h4 className="font-semibold mb-3 flex items-center gap-2">
                       <Wallet className="h-4 w-4 text-[#D4A84C]" />
@@ -592,160 +1159,21 @@ const TransactionModeler = () => {
                     </Badge>
                   </div>
 
-                  {/* 10-Year Summary */}
                   <div className="p-4 bg-emerald-50 rounded-lg border border-emerald-200">
                     <h4 className="font-semibold mb-3 flex items-center gap-2 text-emerald-800">
                       <Target className="h-4 w-4" />
-                      10-Year Projection
+                      {timeframe}-Year Projection
                     </h4>
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <span className="text-emerald-700">Capital Growth</span>
-                      <span className="text-right font-medium text-emerald-800">{formatCurrency(result.data.analysis.summary["10_year_capital_growth"])}</span>
+                      <span className="text-right font-medium text-emerald-800">{formatCurrency(result.data.analysis.summary["10_year_capital_growth"] * (timeframe / 10))}</span>
                       <span className="text-emerald-700">Rental Income</span>
-                      <span className="text-right font-medium text-emerald-800">{formatCurrency(result.data.analysis.summary["10_year_rental_income"])}</span>
+                      <span className="text-right font-medium text-emerald-800">{formatCurrency(result.data.analysis.summary["10_year_rental_income"] * (timeframe / 10))}</span>
                       <Separator className="col-span-2 my-1" />
                       <span className="font-semibold text-emerald-700">Total Return</span>
-                      <span className="text-right font-bold text-emerald-800">{formatCurrency(result.data.analysis.summary["10_year_total_return"])}</span>
-                      <span className="font-semibold text-emerald-700">ROI</span>
-                      <span className="text-right font-bold text-emerald-800">{result.data.analysis.summary["roi_10_year"]}%</span>
+                      <span className="text-right font-bold text-emerald-800">{formatCurrency(result.data.analysis.summary["10_year_total_return"] * (timeframe / 10))}</span>
                     </div>
                   </div>
-                </div>
-              )}
-
-              {result && result.type === "fund" && result.data.analysis && (
-                <div className="space-y-6" data-testid="fund-result">
-                  {/* Investment Details */}
-                  <div className="p-4 bg-muted rounded-lg">
-                    <h4 className="font-semibold mb-3 flex items-center gap-2">
-                      <PiggyBank className="h-4 w-4 text-[#D4A84C]" />
-                      Investment Details
-                    </h4>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <span>Initial Investment</span>
-                      <span className="text-right font-medium">{formatCurrency(result.data.analysis.investment_details.initial_investment)}</span>
-                      <span>Fund</span>
-                      <span className="text-right font-medium truncate">{result.data.analysis.investment_details.fund_name}</span>
-                      <span>Management Fee</span>
-                      <span className="text-right font-medium">{result.data.analysis.investment_details.management_fee}% p.a.</span>
-                    </div>
-                  </div>
-
-                  {/* Annual Analysis */}
-                  <div className="p-4 bg-muted rounded-lg">
-                    <h4 className="font-semibold mb-3 flex items-center gap-2">
-                      <LineChart className="h-4 w-4 text-[#D4A84C]" />
-                      Expected Returns
-                    </h4>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <span>Gross Return</span>
-                      <span className="text-right font-medium">{result.data.analysis.annual_analysis.gross_return_rate}% p.a.</span>
-                      <span>Net Return (after fees)</span>
-                      <span className="text-right font-medium text-emerald-600">{result.data.analysis.annual_analysis.net_return_rate}% p.a.</span>
-                      <span>Annual Distribution</span>
-                      <span className="text-right font-medium">{formatCurrency(result.data.analysis.annual_analysis.annual_distribution)}</span>
-                    </div>
-                  </div>
-
-                  {/* 10-Year Summary */}
-                  <div className="p-4 bg-emerald-50 rounded-lg border border-emerald-200">
-                    <h4 className="font-semibold mb-3 flex items-center gap-2 text-emerald-800">
-                      <Target className="h-4 w-4" />
-                      10-Year Projection
-                    </h4>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <span className="text-emerald-700">Fund Value</span>
-                      <span className="text-right font-medium text-emerald-800">{formatCurrency(result.data.analysis.summary["10_year_fund_value"])}</span>
-                      <span className="text-emerald-700">Distributions Received</span>
-                      <span className="text-right font-medium text-emerald-800">{formatCurrency(result.data.analysis.summary["10_year_distributions"])}</span>
-                      <Separator className="col-span-2 my-1" />
-                      <span className="font-semibold text-emerald-700">Total Value</span>
-                      <span className="text-right font-bold text-emerald-800">{formatCurrency(result.data.analysis.summary["10_year_total_value"])}</span>
-                      <span className="font-semibold text-emerald-700">ROI</span>
-                      <span className="text-right font-bold text-emerald-800">{result.data.analysis.summary["10_year_roi"]}%</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {result && result.type === "stock" && result.data.analysis && (
-                <div className="space-y-6" data-testid="stock-result">
-                  {/* Trade Details */}
-                  <div className="p-4 bg-muted rounded-lg">
-                    <h4 className="font-semibold mb-3 flex items-center gap-2">
-                      <TrendingUp className="h-4 w-4 text-[#D4A84C]" />
-                      Trade Details
-                    </h4>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <span>Symbol</span>
-                      <span className="text-right font-medium">{result.data.analysis.trade_details.symbol}</span>
-                      <span>Shares</span>
-                      <span className="text-right font-medium">{result.data.analysis.trade_details.shares}</span>
-                      <span>Price</span>
-                      <span className="text-right font-medium">${result.data.analysis.trade_details.price_per_share || result.data.analysis.trade_details.sale_price}</span>
-                      <span>Brokerage</span>
-                      <span className="text-right font-medium">{formatCurrency(result.data.analysis.trade_details.brokerage)}</span>
-                      <Separator className="col-span-2 my-1" />
-                      <span className="font-semibold">Total</span>
-                      <span className="text-right font-bold">{formatCurrency(result.data.analysis.trade_details.total_cost || result.data.analysis.trade_details.net_proceeds)}</span>
-                    </div>
-                  </div>
-
-                  {/* CGT Analysis (for sells) */}
-                  {result.data.analysis.cgt_analysis && (
-                    <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
-                      <h4 className="font-semibold mb-3 flex items-center gap-2 text-amber-800">
-                        <AlertTriangle className="h-4 w-4" />
-                        Capital Gains Tax
-                      </h4>
-                      <div className="grid grid-cols-2 gap-2 text-sm">
-                        <span className="text-amber-700">Gross Gain</span>
-                        <span className="text-right font-medium text-amber-800">{formatCurrency(result.data.analysis.cgt_analysis.gross_gain)}</span>
-                        {result.data.analysis.cgt_analysis.cgt_discount_eligible && (
-                          <>
-                            <span className="text-amber-700">50% CGT Discount</span>
-                            <span className="text-right font-medium text-emerald-600">-{formatCurrency(result.data.analysis.cgt_analysis.cgt_discount_applied)}</span>
-                          </>
-                        )}
-                        <span className="text-amber-700">Taxable Gain</span>
-                        <span className="text-right font-medium text-amber-800">{formatCurrency(result.data.analysis.cgt_analysis.taxable_gain)}</span>
-                        <Separator className="col-span-2 my-1" />
-                        <span className="font-semibold text-amber-700">Estimated Tax</span>
-                        <span className="text-right font-bold text-amber-800">{formatCurrency(result.data.analysis.cgt_analysis.tax_payable)}</span>
-                      </div>
-                      {result.data.analysis.cgt_analysis.cgt_discount_eligible && (
-                        <Badge className="mt-3 bg-emerald-100 text-emerald-800">
-                          <CheckCircle2 className="h-3 w-3 mr-1" />
-                          50% CGT Discount Applied
-                        </Badge>
-                      )}
-                    </div>
-                  )}
-
-                  {/* 5-Year Projections (for buys) */}
-                  {result.data.analysis.projections && (
-                    <div className="p-4 bg-emerald-50 rounded-lg border border-emerald-200">
-                      <h4 className="font-semibold mb-3 flex items-center gap-2 text-emerald-800">
-                        <Target className="h-4 w-4" />
-                        5-Year Projections
-                      </h4>
-                      <div className="space-y-3">
-                        {["conservative", "moderate", "aggressive"].map((scenario) => (
-                          <div key={scenario} className="flex items-center justify-between">
-                            <span className="text-sm text-emerald-700 capitalize">{scenario}</span>
-                            <div className="text-right">
-                              <span className="font-medium text-emerald-800">
-                                {formatCurrency(result.data.analysis.summary[`5_year_${scenario}`]?.value || 0)}
-                              </span>
-                              <span className="text-xs text-emerald-600 ml-2">
-                                (+{result.data.analysis.summary[`5_year_${scenario}`]?.gain_percent || 0}%)
-                              </span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
               )}
             </CardContent>

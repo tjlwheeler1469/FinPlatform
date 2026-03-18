@@ -1,0 +1,64 @@
+{
+  "summary": "Iteration 75 - Enhanced Transaction Modeler features fully tested. All timeframe selector buttons (1yr, 3yr, 5yr, 10yr, 20yr) working. ProjectionChart component displays correctly with proper Y-axis scaling (values scale up with longer timeframes) and X-axis scaling (year markers adjust based on timeframe). All 5 tabs (Property, Fund, Stock, ETF, Crypto) function correctly with scenario analysis. Crypto tab shows volatility warning. Summary cards update for selected timeframe.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_75.json"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "ProjectionChart component correctly renders SVG line charts with multiple scenarios",
+    "Y-axis scales appropriately: 1yr fund shows $106.9K max vs 20yr fund shows $379.8K max",
+    "X-axis year markers adjust correctly: 1yr shows 'Now' to '1yr', 20yr shows 'Now', '5yr', '10yr', '15yr', '20yr'",
+    "ValueSummaryCards component correctly displays 'Value at Year X' based on selected timeframe",
+    "Crypto volatility warning displays correctly: 'Crypto assets are highly volatile. Projections show a wide range of outcomes.'",
+    "3-scenario analysis (Conservative 5%, Moderate 8%, Aggressive 12%) displays correctly for Stock/ETF/Crypto tabs",
+    "Model button text dynamically updates: 'Model Scenario (X Year Projection)' based on timeframe selection",
+    "Property tab still shows upfront costs, annual cash flow, and projections correctly"
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "N/A (frontend only testing)",
+    "frontend": "100% (all features working)"
+  },
+  "test_credentials": {
+    "api_base_url": "https://advisor-command.preview.emergentagent.com"
+  },
+  "seed_data_creation": "None - using default form values",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Iteration 75 verified Enhanced Transaction Modeler features: 1) Timeframe selector with 5 buttons (1yr, 3yr, 5yr, 10yr, 20yr) all functional with data-testid='timeframe-Xyr', 2) ProjectionChart component renders SVG charts with proper scaling - Y-axis adjusts to max value (e.g., $65K for 1yr crypto vs $9.5M for 20yr aggressive), 3) X-axis shows dynamic year markers based on timeframe, 4) Fund tab shows single projection line with ValueSummaryCards showing 'Value at Year X', 'Total Return', 'Annualized Return', 5) Stock/ETF/Crypto tabs show 3-scenario analysis (Conservative/Moderate/Aggressive), 6) Crypto tab prominently displays volatility warning, 7) Model button text updates with selected timeframe, 8) Property tab unchanged - still shows upfront costs, cash flow, projections. Note: Stock/ETF/Crypto generate projections locally (MOCKED), Fund calls backend API. localStorage.setItem('wealth_command_compliance_v5', 'permanent') bypasses compliance modal.",
+  "features_verified": {
+    "timeframe_1yr_button_visible": "PASS",
+    "timeframe_3yr_button_visible": "PASS",
+    "timeframe_5yr_button_visible": "PASS",
+    "timeframe_10yr_button_visible": "PASS",
+    "timeframe_20yr_button_visible": "PASS",
+    "timeframe_buttons_clickable": "PASS",
+    "fund_tab_projection_chart": "PASS - Shows single line projection with correct timeframe scaling",
+    "stock_tab_3_scenario_chart": "PASS - Shows Conservative (5%), Moderate (8%), Aggressive (12%)",
+    "etf_tab_3_scenario_chart": "PASS - Shows Conservative, Moderate, Aggressive scenarios",
+    "crypto_tab_volatility_warning": "PASS - 'Crypto assets are highly volatile' warning displayed",
+    "crypto_tab_3_scenario_chart": "PASS - Shows 3 scenarios with configurable return rates",
+    "chart_y_axis_scaling": "PASS - Y-axis scales based on max projected value (e.g., $65K for 1yr vs $9.5M for 20yr aggressive crypto)",
+    "chart_x_axis_scaling": "PASS - X-axis shows appropriate year markers (1yr: Now-1yr, 5yr: Now-1yr-2yr-3yr-4yr-5yr, 20yr: Now-5yr-10yr-15yr-20yr)",
+    "summary_cards_timeframe_values": "PASS - Shows 'Value at Year X' matching selected timeframe",
+    "model_button_text_updates": "PASS - Button shows 'Model Scenario (X Year Projection)' based on selection",
+    "property_tab_upfront_costs": "PASS - Shows Deposit, Stamp Duty, Legal & Other, Total Cash Required",
+    "property_tab_cash_flow": "PASS - Shows Rental Income, Loan Repayments, Net Cash Flow, Gearing indicator",
+    "property_tab_projections": "PASS - Shows Capital Growth, Rental Income, Total Return for selected timeframe"
+  },
+  "mocked_apis": {
+    "fund_api": "REAL - Fund tab calls backend /api/transaction-modeling/fund",
+    "stock_projections": "MOCKED - Generated locally with generateProjections()",
+    "etf_projections": "MOCKED - Generated locally with generateProjections()",
+    "crypto_projections": "MOCKED - Generated locally with generateProjections()"
+  }
+}
