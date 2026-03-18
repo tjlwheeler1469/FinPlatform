@@ -171,6 +171,9 @@ const Client360View = lazy(() => import("@/pages/Client360View"));
 // Transaction Modeler
 const TransactionModeler = lazy(() => import("@/pages/TransactionModeler"));
 
+// Next Best Actions
+const NextBestActions = lazy(() => import("@/pages/NextBestActions"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -1021,6 +1024,9 @@ const AppRouter = () => {
       
       {/* Transaction Modeler */}
       <Route path="/transaction-modeler" element={<TransactionModeler />} />
+      
+      {/* Next Best Actions */}
+      <Route path="/next-best-actions" element={<NextBestActions />} />
     </Routes>
   );
 };

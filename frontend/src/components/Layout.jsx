@@ -181,50 +181,42 @@ const personalNavGroups = [
 
 const adviserBaseNav = [
   {
+    name: "Dashboard",
+    icon: LayoutDashboard,
+    items: [
+      { path: "/advisor-command-center", label: "Daily Briefing", icon: Sun, title: "Advisor Daily Briefing" },
+      { path: "/adviser-dashboard", label: "Practice Overview", icon: Briefcase, title: "Adviser Dashboard" },
+      { path: "/macro-dashboard", label: "Markets & Research", icon: BarChart3, title: "Markets Overview & Research" },
+      { path: "/broker-research", label: "Broker Research", icon: FileText, title: "Research Reports & Ratings" },
+    ]
+  },
+  {
     name: "CRM",
     icon: Users,
     items: [
       { path: "/crm-command-center", label: "Command Center", icon: Zap, title: "Client Command Center", badge: "HUB" },
       { path: "/client-crm", label: "All Clients", icon: Users, title: "Client List" },
-      { path: "/client-wealth", label: "Wealth Overview", icon: Wallet, title: "Client Wealth Overview" },
       { path: "/workflows", label: "Tasks & Workflows", icon: ListTodo, title: "Automated Workflows" },
       { path: "/onboarding", label: "New Client", icon: UserPlus, title: "Client Onboarding" },
     ]
   },
   {
-    name: "Dashboard",
-    icon: LayoutDashboard,
-    items: [
-      { path: "/advisor-command-center", label: "Daily Briefing", icon: Sun, title: "Advisor Daily Briefing" },
-      { path: "/macro-dashboard", label: "Markets Overview", icon: BarChart3, title: "Global Markets & Macro Data", badge: "NEW" },
-      { path: "/adviser-dashboard", label: "Practice Overview", icon: Briefcase, title: "Adviser Dashboard" },
-      { path: "/meeting-prep", label: "Meeting Prep", icon: Clock, title: "AI Meeting Prep" },
-    ]
-  },
-  {
-    name: "AI Tools",
+    name: "AI Copilot",
     icon: Bot,
     items: [
-      { path: "/ai-copilot-advanced", label: "AI Copilot", icon: MessageSquare, title: "Advanced AI Copilot", badge: "NEW" },
-      { path: "/ai-copilot", label: "Wealth Copilot", icon: MessageSquare, title: "AI Wealth Copilot" },
-      { path: "/intelligence", label: "Cross-Client Intel", icon: Brain, title: "Cross-Client Intelligence" },
-      { path: "/book-intelligence", label: "Book Intelligence", icon: Brain, title: "AI Book Analytics", badge: "NEW" },
-      { path: "/decision-center", label: "Decision Center", icon: Zap, title: "Real-Time Scenario Modeling" },
-      { path: "/financial-plan-generator", label: "Plan Generator", icon: FileText, title: "AI Plan Generator" },
-      { path: "/meeting-automation", label: "Meeting → Everything", icon: Sparkles, title: "Meeting Automation Engine", badge: "WOW" },
-      { path: "/feedback-analytics", label: "Learning Analytics", icon: Brain, title: "Feedback & Learning System", badge: "NEW" },
+      { path: "/ai-copilot-advanced", label: "AI Assistant", icon: MessageSquare, title: "AI Copilot Assistant" },
+      { path: "/book-intelligence", label: "Book Intelligence", icon: Brain, title: "AI Book Analytics" },
+      { path: "/decision-center", label: "Decision Center", icon: Zap, title: "Scenario Modeling" },
+      { path: "/meeting-automation", label: "Meeting Notes", icon: Sparkles, title: "Meeting Automation & Notes" },
     ]
   },
   {
     name: "Execution",
     icon: Zap,
     items: [
-      { path: "/batch-execution", label: "One-Click Execute", icon: Zap, title: "Batch Execution Layer", badge: "NEW" },
-      { path: "/realtime-data", label: "Real-Time Data", icon: Activity, title: "Real-Time Data Layer", badge: "NEW" },
-      { path: "/stock-trading", label: "Buy/Sell Stocks", icon: TrendingUp, title: "Stock Trading with CGT" },
-      { path: "/broker-research", label: "Research Reports", icon: FileText, title: "Broker Research & Ratings" },
+      { path: "/batch-execution", label: "Batch Execute", icon: Zap, title: "Batch Execution Layer" },
+      { path: "/stock-trading", label: "Trading", icon: TrendingUp, title: "Stock Trading with CGT" },
       { path: "/stock-research", label: "Stock Screener", icon: LineChart, title: "Stock Screener" },
-      { path: "/market-data", label: "Live Prices", icon: BarChart3, title: "Live Market Data" },
     ]
   },
   {
@@ -249,13 +241,22 @@ const adviserBaseNav = [
 // Client-specific navigation (shown when client is selected)
 const clientContextNav = [
   {
+    name: "Overview",
+    icon: LayoutDashboard,
+    items: [
+      { path: "/client-360", label: "Client Dashboard", icon: LayoutDashboard, title: "Client 360 View" },
+      { path: "/realtime-data", label: "Portfolio Data", icon: Activity, title: "Real-Time Portfolio Data" },
+      { path: "/next-best-actions", label: "Next Best Actions", icon: Zap, title: "AI Recommendations" },
+    ]
+  },
+  {
     name: "Financial Plan",
     icon: Target,
     items: [
       { path: "/financial-plan-generator", label: "Generate Plan", icon: FileText, title: "AI Financial Plan Generator" },
       { path: "/goal-tracker", label: "Goals", icon: Target, title: "Goal Progress Tracker" },
       { path: "/scenario-simulator", label: "Scenarios", icon: BarChart3, title: "Scenario Simulator" },
-      { path: "/estate-planning", label: "Estate", icon: Users, title: "Estate Planning" },
+      { path: "/transaction-modeler", label: "What-If Modeler", icon: Calculator, title: "Transaction Modeler" },
       { path: "/strategic-planning", label: "Strategy", icon: HeartPulse, title: "Strategic Planning" },
     ]
   },
@@ -264,11 +265,12 @@ const clientContextNav = [
     icon: TrendingUp,
     items: [
       { path: "/family-wealth", label: "Net Worth", icon: Eye, title: "Net Worth & Balance Sheet" },
-      { path: "/market-data", label: "Live Markets", icon: BarChart3, title: "Real-Time Market Data" },
+      { path: "/share-portfolio", label: "Shares & ETFs", icon: LineChart, title: "Share & ETF Portfolio" },
+      { path: "/managed-funds", label: "Managed Funds", icon: PieChart, title: "Managed Funds" },
+      { path: "/cash-deposits", label: "Cash & Term Deposits", icon: PiggyBank, title: "Cash & Term Deposits" },
+      { path: "/property-portfolio", label: "Property", icon: Building2, title: "Property Portfolio" },
       { path: "/portfolio-analyzer", label: "Analysis", icon: BarChart3, title: "Portfolio Analysis" },
-      { path: "/connected-accounts", label: "Accounts", icon: Link2, title: "Connected Accounts" },
-      { path: "/share-portfolio", label: "Shares", icon: LineChart, title: "Share Portfolio" },
-      { path: "/product-marketplace", label: "Products", icon: Building2, title: "Product Marketplace" },
+      { path: "/connected-accounts", label: "Linked Accounts", icon: Link2, title: "Connected Accounts" },
     ]
   },
   {
@@ -277,16 +279,15 @@ const clientContextNav = [
     items: [
       { path: "/document-vault", label: "Vault", icon: FolderOpen, title: "Secure Document Storage" },
       { path: "/statement-of-advice", label: "SOA", icon: FileText, title: "Statement of Advice" },
-      { path: "/meeting-summary", label: "Meetings", icon: ClipboardList, title: "AI Meeting Notes" },
+      { path: "/meeting-summary", label: "Meeting Notes", icon: ClipboardList, title: "AI Meeting Notes" },
       { path: "/reports", label: "Reports", icon: FileText, title: "Report Generator" },
     ]
   },
   {
-    name: "AI Advisor",
+    name: "AI Assistant",
     icon: Sparkles,
     items: [
-      { path: "/ai-advisor", label: "Advisor", icon: Sparkles, title: "AI Financial Advisor" },
-      { path: "/copilot", label: "Copilot", icon: MessageSquare, title: "AI Copilot Chat" },
+      { path: "/ai-copilot-advanced", label: "AI Copilot", icon: MessageSquare, title: "AI Assistant Chat" },
       { path: "/risk-profiler", label: "Risk Profile", icon: Shield, title: "Risk Profiler" },
       { path: "/decision-engine", label: "Health Score", icon: Zap, title: "Financial Health Score" },
     ]

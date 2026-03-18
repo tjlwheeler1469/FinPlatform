@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import Layout from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -129,7 +130,8 @@ const DecisionCenter = () => {
   };
 
   return (
-    <div className="p-6 space-y-6" data-testid="decision-center-page">
+    <Layout>
+    <div className="space-y-6" data-testid="decision-center-page">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -414,6 +416,7 @@ const DecisionCenter = () => {
         </div>
       </div>
     </div>
+    </Layout>
   );
 };
 
