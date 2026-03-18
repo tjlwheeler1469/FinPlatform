@@ -73,167 +73,128 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { usePortfolio } from "@/App";
 
-// ==================== SIMPLIFIED NAVIGATION ====================
-// Following UX best practices: 6 primary sections max
-// Dashboard → Finances → Planning → Clients → Reports → Calculators
+// ==================== CONSOLIDATED NAVIGATION ====================
+// Streamlined navigation: 5-6 primary sections per mode
+// Personal: Dashboard → Trading → Finances → Planning → Reports → Calculators
+// Adviser: Dashboard → CRM → AI Copilot → Execution → Compliance
 
-// Personal Mode Navigation (5 sections + Settings)
+// Personal Mode Navigation (Consolidated)
 const personalNavGroups = [
   {
     name: "Dashboard",
     icon: LayoutDashboard,
     items: [
       { path: "/daily-briefing", label: "Daily Briefing", icon: Sun, title: "Daily Briefing" },
-      { path: "/macro-dashboard", label: "Markets Overview", icon: BarChart3, title: "Markets Overview", badge: "NEW" },
-      { path: "/dashboard", label: "Retirement Tracker", icon: Target, title: "Retirement Tracker" },
-      { path: "/recommendations", label: "Recommendations", icon: Lightbulb, title: "Financial Recommendations" },
-      { path: "/decision-engine", label: "Health Score", icon: Zap, title: "Health Score" },
+      { path: "/macro-dashboard", label: "Markets", icon: BarChart3, title: "Live Markets", badge: "LIVE" },
+      { path: "/dashboard", label: "Retirement", icon: Target, title: "Retirement Tracker" },
+      { path: "/decision-engine", label: "Health Score", icon: Zap, title: "Financial Health" },
     ]
   },
   {
     name: "Trading",
     icon: TrendingUp,
     items: [
-      { path: "/stock-trading", label: "Stocks & ETFs", icon: TrendingUp, title: "Stock Trading with CGT", badge: "NEW" },
-      { path: "/bonds-trading", label: "Bonds", icon: Landmark, title: "Bonds & Fixed Income" },
-      { path: "/cash-deposits", label: "Cash & Term Deposits", icon: PiggyBank, title: "Cash & Term Deposits" },
-      { path: "/managed-funds", label: "Managed Funds", icon: PieChart, title: "Managed Funds" },
-      { path: "/broker-research", label: "Research Reports", icon: FileText, title: "Broker Research & Ratings" },
-      { path: "/stock-research", label: "Stock Screener", icon: LineChart, title: "Stock Screener" },
-      { path: "/market-data", label: "Live Prices", icon: BarChart3, title: "Live Market Data" },
+      { path: "/stock-trading", label: "Stocks & ETFs", icon: TrendingUp, title: "Stock Trading" },
+      { path: "/bonds-trading", label: "Bonds", icon: Landmark, title: "Bonds" },
+      { path: "/managed-funds", label: "Funds", icon: PieChart, title: "Managed Funds" },
+      { path: "/stock-research", label: "Research", icon: LineChart, title: "Stock Screener" },
     ]
   },
   {
     name: "Finances",
     icon: Wallet,
     items: [
-      { path: "/family-wealth", label: "Net Worth", icon: Eye, title: "Net Worth & Balance Sheet" },
-      { path: "/net-worth-trend", label: "Net Worth Trend", icon: TrendingUp, title: "Net Worth Over Time" },
-      { path: "/property-portfolio", label: "Property", icon: Building2, title: "Property Portfolio" },
-      { path: "/share-portfolio", label: "Shares & ETFs", icon: LineChart, title: "Share Portfolio" },
-      { path: "/holdings-performance", label: "Performance", icon: Activity, title: "Holdings Performance" },
-      { path: "/portfolio-aggregator", label: "All Accounts", icon: Link2, title: "Portfolio Aggregation" },
-      { path: "/budget", label: "Cashflow", icon: Wallet, title: "Budget & Cashflow" },
+      { path: "/family-wealth", label: "Net Worth", icon: Eye, title: "Net Worth" },
+      { path: "/property-portfolio", label: "Property", icon: Building2, title: "Property" },
+      { path: "/share-portfolio", label: "Shares", icon: LineChart, title: "Share Portfolio" },
+      { path: "/portfolio-aggregator", label: "All Accounts", icon: Link2, title: "All Accounts" },
+      { path: "/budget", label: "Budget", icon: Wallet, title: "Budget & Cashflow" },
     ]
   },
   {
     name: "Planning",
     icon: Target,
     items: [
-      { path: "/goal-tracker", label: "Goals", icon: Target, title: "Goal Progress Tracker" },
-      { path: "/scenario-comparison", label: "Scenario Compare", icon: BarChart3, title: "Scenario Comparison" },
-      { path: "/strategic-planning", label: "Strategy", icon: HeartPulse, title: "Strategic Planning" },
-      { path: "/ai-advisor", label: "AI Advisor", icon: Sparkles, title: "AI Financial Advisor" },
-      { path: "/debt-paydown", label: "Debt Paydown", icon: CreditCard, title: "Debt Paydown Strategy" },
-      { path: "/insurance-gap", label: "Insurance", icon: Shield, title: "Insurance Gap Analysis" },
-      { path: "/risk-profiler", label: "Risk Profile", icon: Shield, title: "Risk Profiler" },
-      { path: "/scenarios", label: "Saved Scenarios", icon: FolderOpen, title: "Saved Scenarios" },
+      { path: "/goal-tracker", label: "Goals", icon: Target, title: "Goals" },
+      { path: "/strategic-planning", label: "Strategy", icon: HeartPulse, title: "Strategy" },
+      { path: "/ai-advisor", label: "AI Advisor", icon: Sparkles, title: "AI Advisor" },
+      { path: "/transaction-modeler", label: "What-If", icon: Calculator, title: "What-If Modeler" },
     ]
   },
   {
-    name: "Reports",
+    name: "Tax & Reports",
     icon: FileText,
     items: [
       { path: "/tax-analysis-sync", label: "Tax Analysis", icon: Calculator, title: "Tax Analysis" },
-      { path: "/cgt", label: "Capital Gains", icon: TrendingUp, title: "Capital Gains Tax" },
-      { path: "/tax-calendar", label: "Tax Calendar", icon: CalendarDays, title: "Tax Planning Calendar" },
-      { path: "/historical-tax", label: "Tax History", icon: History, title: "Historical Tax Comparison" },
-      { path: "/reports", label: "Generate Reports", icon: FileText, title: "Report Generator" },
+      { path: "/cgt", label: "Capital Gains", icon: TrendingUp, title: "CGT" },
+      { path: "/reports", label: "Reports", icon: FileText, title: "Reports" },
       { path: "/documents", label: "Documents", icon: FileText, title: "Documents" },
-      { path: "/data-import-export", label: "Import/Export", icon: Database, title: "Data Import & Export" },
     ]
   },
   {
     name: "Calculators",
     icon: Calculator,
     items: [
-      { path: "/transaction-modeler", label: "Transaction Modeler", icon: Calculator, title: "What-If Scenario Builder", badge: "NEW" },
       { path: "/loan-calculator", label: "Loan", icon: Landmark, title: "Loan Calculator" },
-      { path: "/monte-carlo", label: "Monte Carlo", icon: BarChart3, title: "Monte Carlo Simulation" },
-      { path: "/smsf-optimizer", label: "SMSF", icon: PiggyBank, title: "SMSF Optimizer" },
-      { path: "/sg-calculator", label: "Super Guarantee", icon: Users, title: "Superannuation Guarantee" },
-      { path: "/salary-packaging", label: "Salary Packaging", icon: Briefcase, title: "Salary Packaging" },
-      { path: "/dividend-reinvestment", label: "Dividends", icon: Repeat, title: "Dividend Reinvestment" },
-      { path: "/tax-loss-harvesting", label: "Tax Harvesting", icon: Scissors, title: "Tax Loss Harvesting" },
-      { path: "/bas-calculator", label: "BAS", icon: FileCheck, title: "BAS Calculator" },
-      { path: "/division-7a", label: "Division 7A", icon: FileCheck, title: "Division 7A Calculator" },
-      { path: "/investment-comparison", label: "Compare Structures", icon: Scale, title: "Investment Structure Comparison" },
-      { path: "/property-comparison", label: "Compare Properties", icon: Home, title: "Property Comparison" },
-      { path: "/rental-yield-optimizer", label: "Rental Yield", icon: Target, title: "Rental Yield Optimizer" },
-      { path: "/portfolio-rebalancing", label: "Rebalancing", icon: ArrowLeftRight, title: "Portfolio Rebalancing" },
+      { path: "/monte-carlo", label: "Monte Carlo", icon: BarChart3, title: "Monte Carlo" },
+      { path: "/smsf-optimizer", label: "SMSF", icon: PiggyBank, title: "SMSF" },
+      { path: "/portfolio-rebalancing", label: "Rebalancing", icon: ArrowLeftRight, title: "Rebalancing" },
     ]
   },
   {
     name: "Settings",
     icon: Settings,
     items: [
-      { path: "/security", label: "Security", icon: Shield, title: "Security Settings" },
+      { path: "/security", label: "Security", icon: Shield, title: "Security" },
       { path: "/bank-feeds", label: "Bank Feeds", icon: Landmark, title: "Bank Feeds" },
-      { path: "/accounting-integrations", label: "Integrations", icon: Link2, title: "Accounting Integrations" },
-      { path: "/calculation-methodology", label: "Methodology", icon: BookOpen, title: "Calculation Methodology" },
-      { path: "/onboarding", label: "Setup Wizard", icon: Rocket, title: "Setup Wizard" },
+      { path: "/data-import-export", label: "Import/Export", icon: Database, title: "Data" },
     ]
   }
 ];
 
-// Adviser Mode Navigation - Two-level hierarchy
-// Level 1: Adviser (no client selected) - CRM Command Center is the main hub
-// Level 2: Client Context (client selected) - Financial Plan, Investments, Documents, AI Advisor
+// Adviser Mode Navigation - Simplified
+// Dashboard → CRM → AI Copilot → Execution → Compliance
 
 const adviserBaseNav = [
   {
     name: "Dashboard",
     icon: LayoutDashboard,
     items: [
-      { path: "/advisor-command-center", label: "Daily Briefing", icon: Sun, title: "Advisor Daily Briefing" },
-      { path: "/adviser-dashboard", label: "Practice Overview", icon: Briefcase, title: "Adviser Dashboard" },
-      { path: "/macro-dashboard", label: "Markets & Research", icon: BarChart3, title: "Markets Overview & Research" },
-      { path: "/broker-research", label: "Broker Research", icon: FileText, title: "Research Reports & Ratings" },
+      { path: "/advisor-command-center", label: "Command Center", icon: Sun, title: "Advisor Command Center" },
+      { path: "/macro-dashboard", label: "Markets", icon: BarChart3, title: "Live Markets", badge: "LIVE" },
     ]
   },
   {
     name: "CRM",
     icon: Users,
     items: [
-      { path: "/adviser-hub", label: "Client Hub", icon: Zap, title: "Clients & Portfolio Hub", badge: "HUB" },
-      { path: "/workflows", label: "Tasks & Workflows", icon: ListTodo, title: "Automated Workflows" },
-      { path: "/onboarding", label: "New Client", icon: UserPlus, title: "Client Onboarding" },
+      { path: "/adviser-hub", label: "Client Hub", icon: Zap, title: "Clients & Portfolio", badge: "HUB" },
+      { path: "/workflows", label: "Tasks", icon: ListTodo, title: "Tasks & Workflows" },
     ]
   },
   {
     name: "AI Copilot",
     icon: Bot,
     items: [
-      { path: "/ai-copilot-advanced", label: "AI Assistant", icon: MessageSquare, title: "AI Copilot Assistant" },
-      { path: "/book-intelligence", label: "Book Intelligence", icon: Brain, title: "AI Book Analytics" },
+      { path: "/ai-copilot-advanced", label: "AI Assistant", icon: MessageSquare, title: "AI Copilot" },
+      { path: "/meeting-prep", label: "Meeting Prep", icon: Sparkles, title: "Meeting Preparation" },
       { path: "/decision-center", label: "Decision Center", icon: Zap, title: "Scenario Modeling" },
-      { path: "/meeting-automation", label: "Meeting Notes", icon: Sparkles, title: "Meeting Automation & Notes" },
     ]
   },
   {
     name: "Execution",
     icon: Zap,
     items: [
-      { path: "/batch-execution", label: "Batch Execute", icon: Zap, title: "Batch Execution Layer" },
-      { path: "/stock-trading", label: "Trading", icon: TrendingUp, title: "Stock Trading with CGT" },
-      { path: "/stock-research", label: "Stock Screener", icon: LineChart, title: "Stock Screener" },
+      { path: "/batch-execution", label: "Batch Execute", icon: Zap, title: "Batch Execution" },
+      { path: "/stock-trading", label: "Trading", icon: TrendingUp, title: "Trading" },
     ]
   },
   {
     name: "Compliance",
     icon: Shield,
     items: [
-      { path: "/compliance", label: "Compliance Center", icon: Shield, title: "Compliance & Audit" },
-      { path: "/connected-accounts", label: "Bank Feeds", icon: Link2, title: "Connected Accounts" },
-      { path: "/security", label: "Security", icon: Shield, title: "Security Settings" },
-    ]
-  },
-  {
-    name: "Settings",
-    icon: Settings,
-    items: [
-      { path: "/data-import-export", label: "Import/Export", icon: Database, title: "Data Import & Export" },
-      { path: "/data-aggregators", label: "Data Aggregators", icon: Link2, title: "Australian CDR Aggregators" },
+      { path: "/compliance", label: "Compliance", icon: Shield, title: "Compliance" },
+      { path: "/security", label: "Security", icon: Shield, title: "Security" },
     ]
   }
 ];
@@ -244,53 +205,44 @@ const clientContextNav = [
     name: "Overview",
     icon: LayoutDashboard,
     items: [
-      { path: "/client-360", label: "Client Dashboard", icon: LayoutDashboard, title: "Client 360 View" },
-      { path: "/risk-profiler", label: "Risk Profile", icon: Shield, title: "Risk Profiler" },
-      { path: "/decision-engine", label: "Health Score", icon: Zap, title: "Financial Health Score" },
-      { path: "/next-best-actions", label: "Next Best Actions", icon: Zap, title: "AI Recommendations" },
+      { path: "/client-360", label: "Dashboard", icon: LayoutDashboard, title: "Client 360" },
+      { path: "/next-best-actions", label: "Actions", icon: Zap, title: "Next Best Actions" },
+      { path: "/decision-engine", label: "Health Score", icon: Zap, title: "Health Score" },
     ]
   },
   {
-    name: "Financial Plan",
+    name: "Plan",
     icon: Target,
     items: [
-      { path: "/financial-plan-generator", label: "Generate Plan", icon: FileText, title: "AI Financial Plan Generator" },
-      { path: "/goal-tracker", label: "Goals", icon: Target, title: "Goal Progress Tracker" },
-      { path: "/scenario-simulator", label: "Scenarios", icon: BarChart3, title: "Scenario Simulator" },
-      { path: "/transaction-modeler", label: "What-If Modeler", icon: Calculator, title: "Transaction Modeler" },
-      { path: "/strategic-planning", label: "Strategy", icon: HeartPulse, title: "Strategic Planning" },
+      { path: "/goal-tracker", label: "Goals", icon: Target, title: "Goals" },
+      { path: "/transaction-modeler", label: "What-If", icon: Calculator, title: "What-If Modeler" },
+      { path: "/financial-plan-generator", label: "Generate Plan", icon: FileText, title: "AI Plan Generator" },
     ]
   },
   {
     name: "Investments",
     icon: TrendingUp,
     items: [
-      { path: "/family-wealth", label: "Net Worth", icon: Eye, title: "Net Worth & Balance Sheet" },
-      { path: "/share-portfolio", label: "Shares & ETFs", icon: LineChart, title: "Share & ETF Portfolio" },
-      { path: "/managed-funds", label: "Managed Funds", icon: PieChart, title: "Managed Funds" },
-      { path: "/bonds-trading", label: "Bonds", icon: Building2, title: "Bonds Trading" },
-      { path: "/cash-deposits", label: "Cash & Term Deposits", icon: PiggyBank, title: "Cash & Term Deposits" },
-      { path: "/property-portfolio", label: "Property", icon: Building2, title: "Property Portfolio" },
-      { path: "/stock-trading", label: "Trading", icon: TrendingUp, title: "Stock Trading" },
-      { path: "/portfolio-analyzer", label: "Analysis", icon: BarChart3, title: "Portfolio Analysis" },
-      { path: "/connected-accounts", label: "Linked Accounts", icon: Link2, title: "Connected Accounts" },
+      { path: "/family-wealth", label: "Net Worth", icon: Eye, title: "Net Worth" },
+      { path: "/share-portfolio", label: "Shares", icon: LineChart, title: "Shares & ETFs" },
+      { path: "/property-portfolio", label: "Property", icon: Building2, title: "Property" },
+      { path: "/stock-trading", label: "Trading", icon: TrendingUp, title: "Trading" },
     ]
   },
   {
     name: "Documents",
     icon: FileText,
     items: [
-      { path: "/document-vault", label: "Vault", icon: FolderOpen, title: "Secure Document Storage" },
-      { path: "/statement-of-advice", label: "SOA", icon: FileText, title: "Statement of Advice" },
-      { path: "/meeting-notes", label: "Meeting Notes", icon: Video, title: "Fathom Meeting Records", badge: "NEW" },
-      { path: "/reports", label: "Reports", icon: FileText, title: "Report Generator" },
+      { path: "/document-vault", label: "Vault", icon: FolderOpen, title: "Document Vault" },
+      { path: "/meeting-notes", label: "Meeting Notes", icon: Video, title: "Fathom Notes", badge: "NEW" },
+      { path: "/reports", label: "Reports", icon: FileText, title: "Reports" },
     ]
   },
   {
-    name: "AI Copilot",
+    name: "AI",
     icon: MessageSquare,
     items: [
-      { path: "/ai-copilot-advanced", label: "AI Chat", icon: MessageSquare, title: "AI Copilot Chat" },
+      { path: "/ai-copilot-advanced", label: "AI Chat", icon: MessageSquare, title: "AI Copilot" },
     ]
   }
 ];

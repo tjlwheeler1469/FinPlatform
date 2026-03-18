@@ -2,6 +2,7 @@
 Macro Market Data Routes
 Global market indices, currencies, bonds, commodities, crypto, and futures.
 Covers AUS, Euro, and US markets.
+Uses yfinance for live data with fallback to static data.
 """
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
@@ -9,9 +10,190 @@ from typing import Dict, List, Optional
 from datetime import datetime, timezone
 import random
 import logging
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/macro", tags=["Macro Market Data"])
+
+# Thread pool for yfinance calls (which are blocking)
+executor = ThreadPoolExecutor(max_workers=4)
+
+# Cache for live data (expires after 60 seconds)
+_cache = {}
+_cache_ttl = 60  # seconds
+
+def get_cached(key: str):
+    """Get cached data if not expired."""
+    if key in _cache:
+        data, timestamp = _cache[key]
+        if (datetime.now(timezone.utc) - timestamp).total_seconds() < _cache_ttl:
+            return data
+    return None
+
+def set_cached(key: str, data):
+    """Cache data with timestamp."""
+    _cache[key] = (data, datetime.now(timezone.utc))
+
+def fetch_live_indices():
+    """Fetch live index data using yfinance."""
+    try:
+        import yfinance as yf
+        
+        symbols = {
+            "us": [("^GSPC", "S&P 500", "SPX"), ("^DJI", "Dow Jones", "DJI"), ("^IXIC", "NASDAQ", "IXIC"), ("^RUT", "Russell 2000", "RUT"), ("^VIX", "Volatility Index", "VIX")],
+            "europe": [("^FTSE", "FTSE 100", "FTSE"), ("^GDAXI", "DAX 40", "DAX"), ("^FCHI", "CAC 40", "CAC"), ("^STOXX50E", "Euro Stoxx 50", "STOXX")],
+            "australia": [("^AXJO", "ASX 200", "XJO"), ("^AORD", "All Ordinaries", "XAO")],
+            "asia": [("^N225", "Nikkei 225", "N225"), ("^HSI", "Hang Seng", "HSI"), ("000001.SS", "Shanghai Comp", "SSEC")]
+        }
+        
+        result = {}
+        for region, syms in symbols.items():
+            region_data = []
+            for yahoo_sym, name, display_sym in syms:
+                try:
+                    ticker = yf.Ticker(yahoo_sym)
+                    info = ticker.fast_info
+                    current = info.last_price if hasattr(info, 'last_price') else info.get('regularMarketPrice', 0)
+                    prev_close = info.previous_close if hasattr(info, 'previous_close') else info.get('regularMarketPreviousClose', current)
+                    change = current - prev_close if current and prev_close else 0
+                    change_pct = (change / prev_close * 100) if prev_close else 0
+                    
+                    region_data.append({
+                        "symbol": display_sym,
+                        "name": name,
+                        "value": round(current, 2) if current else 0,
+                        "change": round(change, 2),
+                        "change_pct": round(change_pct, 2)
+                    })
+                except Exception as e:
+                    logger.warning(f"Failed to fetch {yahoo_sym}: {e}")
+            if region_data:
+                result[region] = region_data
+        
+        return result if result else None
+    except Exception as e:
+        logger.error(f"yfinance indices fetch failed: {e}")
+        return None
+
+def fetch_live_currencies():
+    """Fetch live currency data using yfinance."""
+    try:
+        import yfinance as yf
+        
+        pairs = {
+            "major": [("EURUSD=X", "EUR/USD"), ("GBPUSD=X", "GBP/USD"), ("JPY=X", "USD/JPY"), ("CHF=X", "USD/CHF")],
+            "aud_crosses": [("AUDUSD=X", "AUD/USD"), ("AUDEUR=X", "AUD/EUR"), ("AUDJPY=X", "AUD/JPY")],
+        }
+        
+        result = {}
+        for category, pair_list in pairs.items():
+            cat_data = []
+            for yahoo_sym, display_name in pair_list:
+                try:
+                    ticker = yf.Ticker(yahoo_sym)
+                    info = ticker.fast_info
+                    current = info.last_price if hasattr(info, 'last_price') else 0
+                    prev_close = info.previous_close if hasattr(info, 'previous_close') else current
+                    change = current - prev_close if current and prev_close else 0
+                    change_pct = (change / prev_close * 100) if prev_close else 0
+                    
+                    cat_data.append({
+                        "pair": display_name,
+                        "rate": round(current, 4) if current else 0,
+                        "change": round(change, 4),
+                        "change_pct": round(change_pct, 2)
+                    })
+                except Exception as e:
+                    logger.warning(f"Failed to fetch {yahoo_sym}: {e}")
+            if cat_data:
+                result[category] = cat_data
+        
+        return result if result else None
+    except Exception as e:
+        logger.error(f"yfinance currency fetch failed: {e}")
+        return None
+
+def fetch_live_commodities():
+    """Fetch live commodity data using yfinance."""
+    try:
+        import yfinance as yf
+        
+        commodities = {
+            "energy": [("CL=F", "Crude Oil WTI", "CL", "barrel"), ("BZ=F", "Brent Crude", "BZ", "barrel"), ("NG=F", "Natural Gas", "NG", "MMBtu")],
+            "metals": [("GC=F", "Gold", "GC", "oz"), ("SI=F", "Silver", "SI", "oz"), ("HG=F", "Copper", "HG", "lb")],
+        }
+        
+        result = {}
+        for category, items in commodities.items():
+            cat_data = []
+            for yahoo_sym, name, display_sym, unit in items:
+                try:
+                    ticker = yf.Ticker(yahoo_sym)
+                    info = ticker.fast_info
+                    current = info.last_price if hasattr(info, 'last_price') else 0
+                    prev_close = info.previous_close if hasattr(info, 'previous_close') else current
+                    change = current - prev_close if current and prev_close else 0
+                    change_pct = (change / prev_close * 100) if prev_close else 0
+                    
+                    cat_data.append({
+                        "name": name,
+                        "symbol": display_sym,
+                        "price": round(current, 2) if current else 0,
+                        "change": round(change, 2),
+                        "change_pct": round(change_pct, 2),
+                        "unit": unit
+                    })
+                except Exception as e:
+                    logger.warning(f"Failed to fetch {yahoo_sym}: {e}")
+            if cat_data:
+                result[category] = cat_data
+        
+        return result if result else None
+    except Exception as e:
+        logger.error(f"yfinance commodities fetch failed: {e}")
+        return None
+
+def fetch_live_crypto():
+    """Fetch live crypto data using yfinance."""
+    try:
+        import yfinance as yf
+        
+        cryptos = [
+            ("BTC-USD", "BTC", "Bitcoin"),
+            ("ETH-USD", "ETH", "Ethereum"),
+            ("BNB-USD", "BNB", "BNB"),
+            ("SOL-USD", "SOL", "Solana"),
+            ("XRP-USD", "XRP", "XRP"),
+            ("ADA-USD", "ADA", "Cardano"),
+            ("DOGE-USD", "DOGE", "Dogecoin"),
+        ]
+        
+        result = []
+        for yahoo_sym, symbol, name in cryptos:
+            try:
+                ticker = yf.Ticker(yahoo_sym)
+                info = ticker.fast_info
+                current = info.last_price if hasattr(info, 'last_price') else 0
+                prev_close = info.previous_close if hasattr(info, 'previous_close') else current
+                change_24h = ((current - prev_close) / prev_close * 100) if prev_close else 0
+                market_cap = info.market_cap if hasattr(info, 'market_cap') else 0
+                
+                result.append({
+                    "symbol": symbol,
+                    "name": name,
+                    "price": round(current, 2) if current else 0,
+                    "change_24h": round(change_24h, 2),
+                    "market_cap": market_cap or 0,
+                    "volume_24h": 0  # yfinance doesn't provide this easily
+                })
+            except Exception as e:
+                logger.warning(f"Failed to fetch {yahoo_sym}: {e}")
+        
+        return result if result else None
+    except Exception as e:
+        logger.error(f"yfinance crypto fetch failed: {e}")
+        return None
 
 
 # ==================== MARKET DATA STRUCTURES ====================
@@ -212,9 +394,50 @@ def update_data_with_jitter(data_list: List[Dict]) -> List[Dict]:
 
 @router.get("/overview")
 async def get_macro_overview():
-    """Get a comprehensive macro overview for the dashboard."""
-    return {
+    """Get a comprehensive macro overview for the dashboard using live yfinance data."""
+    
+    # Check cache first
+    cached = get_cached("overview")
+    if cached:
+        return cached
+    
+    # Try to fetch live data
+    loop = asyncio.get_event_loop()
+    
+    try:
+        # Fetch live indices for key markets
+        live_indices = await loop.run_in_executor(executor, fetch_live_indices)
+        live_currencies = await loop.run_in_executor(executor, fetch_live_currencies)
+        live_commodities = await loop.run_in_executor(executor, fetch_live_commodities)
+        live_crypto = await loop.run_in_executor(executor, fetch_live_crypto)
+    except Exception as e:
+        logger.error(f"Live data fetch failed: {e}")
+        live_indices = live_currencies = live_commodities = live_crypto = None
+    
+    # Build highlights using live data if available, fallback to static
+    def get_index(live_data, region, idx, fallback):
+        if live_data and region in live_data and len(live_data[region]) > idx:
+            return live_data[region][idx]
+        return update_data_with_jitter([fallback])[0]
+    
+    def get_currency(live_data, category, idx, fallback):
+        if live_data and category in live_data and len(live_data[category]) > idx:
+            return live_data[category][idx]
+        return update_data_with_jitter([fallback])[0]
+    
+    def get_commodity(live_data, category, idx, fallback):
+        if live_data and category in live_data and len(live_data[category]) > idx:
+            return live_data[category][idx]
+        return update_data_with_jitter([fallback])[0]
+    
+    def get_crypto_item(live_data, idx, fallback):
+        if live_data and len(live_data) > idx:
+            return live_data[idx]
+        return update_data_with_jitter([fallback])[0]
+    
+    result = {
         "timestamp": datetime.now(timezone.utc).isoformat(),
+        "data_source": "live" if live_indices else "static",
         "market_status": {
             "us": "open" if 9 <= datetime.now().hour < 16 else "closed",
             "australia": "closed",
@@ -223,21 +446,21 @@ async def get_macro_overview():
         },
         "highlights": {
             "indices": {
-                "spx": update_data_with_jitter([INDICES["us"][0]])[0],
-                "asx200": update_data_with_jitter([INDICES["australia"][0]])[0],
-                "ftse": update_data_with_jitter([INDICES["europe"][0]])[0],
+                "spx": get_index(live_indices, "us", 0, INDICES["us"][0]),
+                "asx200": get_index(live_indices, "australia", 0, INDICES["australia"][0]),
+                "ftse": get_index(live_indices, "europe", 0, INDICES["europe"][0]),
             },
             "currencies": {
-                "aud_usd": update_data_with_jitter([CURRENCIES["aud_crosses"][0]])[0],
-                "eur_usd": update_data_with_jitter([CURRENCIES["major"][0]])[0],
+                "aud_usd": get_currency(live_currencies, "aud_crosses", 0, CURRENCIES["aud_crosses"][0]),
+                "eur_usd": get_currency(live_currencies, "major", 0, CURRENCIES["major"][0]),
             },
             "commodities": {
-                "gold": update_data_with_jitter([COMMODITIES["metals"][0]])[0],
-                "oil": update_data_with_jitter([COMMODITIES["energy"][0]])[0],
+                "gold": get_commodity(live_commodities, "metals", 0, COMMODITIES["metals"][0]),
+                "oil": get_commodity(live_commodities, "energy", 0, COMMODITIES["energy"][0]),
             },
             "crypto": {
-                "btc": update_data_with_jitter([CRYPTO[0]])[0],
-                "eth": update_data_with_jitter([CRYPTO[1]])[0],
+                "btc": get_crypto_item(live_crypto, 0, CRYPTO[0]),
+                "eth": get_crypto_item(live_crypto, 1, CRYPTO[1]),
             },
             "bonds": {
                 "us_10y": BONDS["us"][2],
@@ -247,25 +470,43 @@ async def get_macro_overview():
         "fear_greed_index": random.randint(45, 72),
         "market_sentiment": "neutral" if random.random() > 0.5 else "bullish"
     }
+    
+    # Cache the result
+    set_cached("overview", result)
+    
+    return result
 
 
 @router.get("/indices")
 async def get_indices(region: Optional[str] = None):
-    """Get global stock indices."""
+    """Get global stock indices with live data."""
+    
+    # Try live data first
+    loop = asyncio.get_event_loop()
+    try:
+        live_indices = await loop.run_in_executor(executor, fetch_live_indices)
+    except:
+        live_indices = None
+    
     if region and region in INDICES:
+        data = live_indices.get(region) if live_indices and region in live_indices else update_data_with_jitter(INDICES[region])
         return {
             "region": region,
-            "indices": update_data_with_jitter(INDICES[region]),
+            "indices": data,
+            "data_source": "live" if live_indices and region in live_indices else "static",
             "timestamp": datetime.now(timezone.utc).isoformat()
         }
     
-    return {
-        "us": update_data_with_jitter(INDICES["us"]),
-        "europe": update_data_with_jitter(INDICES["europe"]),
-        "australia": update_data_with_jitter(INDICES["australia"]),
-        "asia": update_data_with_jitter(INDICES["asia"]),
-        "timestamp": datetime.now(timezone.utc).isoformat()
-    }
+    result = {"timestamp": datetime.now(timezone.utc).isoformat()}
+    for r in ["us", "europe", "australia", "asia"]:
+        if live_indices and r in live_indices:
+            result[r] = live_indices[r]
+            result["data_source"] = "live"
+        else:
+            result[r] = update_data_with_jitter(INDICES[r])
+            result["data_source"] = result.get("data_source", "static")
+    
+    return result
 
 
 @router.get("/currencies")
@@ -324,11 +565,23 @@ async def get_commodities(category: Optional[str] = None):
 
 @router.get("/crypto")
 async def get_crypto():
-    """Get cryptocurrency prices."""
+    """Get cryptocurrency prices with live data."""
+    
+    # Try live data first
+    loop = asyncio.get_event_loop()
+    try:
+        live_crypto = await loop.run_in_executor(executor, fetch_live_crypto)
+    except:
+        live_crypto = None
+    
+    crypto_data = live_crypto if live_crypto else update_data_with_jitter(CRYPTO)
+    total_mcap = sum(c.get("market_cap", 0) for c in crypto_data)
+    
     return {
-        "cryptocurrencies": update_data_with_jitter(CRYPTO),
-        "total_market_cap": sum(c["market_cap"] for c in CRYPTO),
+        "cryptocurrencies": crypto_data,
+        "total_market_cap": total_mcap,
         "btc_dominance": 52.3,
+        "data_source": "live" if live_crypto else "static",
         "timestamp": datetime.now(timezone.utc).isoformat()
     }
 

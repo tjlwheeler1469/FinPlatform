@@ -216,13 +216,13 @@ const MacroDashboard = () => {
 
           <TabsContent value="indices" className="mt-4">
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {indices && Object.entries(indices).filter(([key]) => key !== "timestamp").map(([region, data]) => (
+              {indices && Object.entries(indices).filter(([key]) => key !== "timestamp" && key !== "data_source" && Array.isArray(indices[key])).map(([region, data]) => (
                 <Card key={region}>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg capitalize">{region}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {data.map((item, idx) => <IndexRow key={idx} item={item} />)}
+                    {Array.isArray(data) && data.map((item, idx) => <IndexRow key={idx} item={item} />)}
                   </CardContent>
                 </Card>
               ))}
@@ -231,13 +231,13 @@ const MacroDashboard = () => {
 
           <TabsContent value="currencies" className="mt-4">
             <div className="grid md:grid-cols-3 gap-4">
-              {currencies && Object.entries(currencies).filter(([key]) => key !== "timestamp").map(([category, pairs]) => (
+              {currencies && Object.entries(currencies).filter(([key]) => key !== "timestamp" && key !== "data_source" && Array.isArray(currencies[key])).map(([category, pairs]) => (
                 <Card key={category}>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg capitalize">{category.replace("_", " ")}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {pairs.map((pair, idx) => (
+                    {Array.isArray(pairs) && pairs.map((pair, idx) => (
                       <div key={idx} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                         <span className="font-medium">{pair.pair}</span>
                         <div className="text-right">
@@ -256,13 +256,13 @@ const MacroDashboard = () => {
 
           <TabsContent value="bonds" className="mt-4">
             <div className="grid md:grid-cols-3 gap-4">
-              {bonds && Object.entries(bonds).filter(([key]) => key !== "timestamp").map(([region, bondList]) => (
+              {bonds && Object.entries(bonds).filter(([key]) => key !== "timestamp" && key !== "data_source" && Array.isArray(bonds[key])).map(([region, bondList]) => (
                 <Card key={region}>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg capitalize">{region}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {bondList.map((bond, idx) => (
+                    {Array.isArray(bondList) && bondList.map((bond, idx) => (
                       <div key={idx} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                         <span className="text-sm">{bond.name}</span>
                         <div className="text-right">
@@ -281,7 +281,7 @@ const MacroDashboard = () => {
 
           <TabsContent value="commodities" className="mt-4">
             <div className="grid md:grid-cols-3 gap-4">
-              {commodities && Object.entries(commodities).filter(([key]) => key !== "timestamp").map(([category, items]) => (
+              {commodities && Object.entries(commodities).filter(([key]) => key !== "timestamp" && key !== "data_source" && Array.isArray(commodities[key])).map(([category, items]) => (
                 <Card key={category}>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg capitalize flex items-center gap-2">
@@ -292,7 +292,7 @@ const MacroDashboard = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {items.map((item, idx) => (
+                    {Array.isArray(items) && items.map((item, idx) => (
                       <div key={idx} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                         <div>
                           <span className="font-medium">{item.name}</span>
@@ -340,13 +340,13 @@ const MacroDashboard = () => {
 
           <TabsContent value="futures" className="mt-4">
             <div className="grid md:grid-cols-3 gap-4">
-              {futures && Object.entries(futures).filter(([key]) => key !== "timestamp").map(([category, items]) => (
+              {futures && Object.entries(futures).filter(([key]) => key !== "timestamp" && key !== "data_source" && Array.isArray(futures[key])).map(([category, items]) => (
                 <Card key={category}>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg capitalize">{category.replace("_", " ")}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {items.map((item, idx) => (
+                    {Array.isArray(items) && items.map((item, idx) => (
                       <div key={idx} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                         <div>
                           <span className="font-medium">{item.name}</span>
