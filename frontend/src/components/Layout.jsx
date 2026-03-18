@@ -66,7 +66,8 @@ import {
   Command,
   MessageSquare,
   Brain,
-  ListTodo
+  ListTodo,
+  Video
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -279,7 +280,7 @@ const clientContextNav = [
     items: [
       { path: "/document-vault", label: "Vault", icon: FolderOpen, title: "Secure Document Storage" },
       { path: "/statement-of-advice", label: "SOA", icon: FileText, title: "Statement of Advice" },
-      { path: "/meeting-summary", label: "Meeting Notes", icon: ClipboardList, title: "AI Meeting Notes" },
+      { path: "/meeting-notes", label: "Meeting Notes", icon: Video, title: "Fathom Meeting Records", badge: "NEW" },
       { path: "/reports", label: "Reports", icon: FileText, title: "Report Generator" },
     ]
   },

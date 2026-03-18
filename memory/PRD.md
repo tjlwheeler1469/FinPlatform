@@ -1,146 +1,92 @@
-# Wealth Command v8.2.0 - Advisor Feedback Implementation
+# Wealth Command v8.3.0 - Meeting Notes with Fathom Integration
 
 ---
 
-## Changes in v8.2.0 (Advisor Feedback)
+## What's New in v8.3.0
 
-### Navigation Restructured
-1. ✅ **Removed Wealth Overview** from CRM section
-2. ✅ **Dashboard moved above CRM** in navigation order
-3. ✅ **AI Tools consolidated** - Combined into "AI Copilot" section with reduced tools:
-   - AI Assistant (merged AI Copilot + Wealth Copilot)
-   - Book Intelligence
-   - Decision Center
-   - Meeting Notes
-4. ✅ **Broker Research moved** to Advisor Dashboard section (Markets & Research)
-5. ✅ **Live Market Data combined** into Markets Overview page
-6. ✅ **Real-time data moved** to Client profile (Portfolio Data)
+### Meeting Notes with Fathom Integration
+New feature in Client > Documents > Meeting Notes that integrates with Fathom AI meeting recorder.
 
-### UI Fixes
-7. ✅ **Decision Center fixed** - No longer pops out in new window, now sits within main layout
+**Features:**
+- **Connect Fathom** - Enter API key to sync meeting recordings
+- **Meeting List** - Shows all recorded meetings with:
+  - Meeting title, date, duration
+  - Platform icon (Zoom, Google Meet, Teams)
+  - Transcript and AI Summary badges
+  - Search functionality
+- **AI Summary Tab** - Shows:
+  - Key discussion points (auto-extracted)
+  - Meeting sentiment (Positive/Neutral/Negative with emoji)
+  - Next meeting date
+- **Action Items Tab** - Shows:
+  - Tasks with assignee (Advisor/Client)
+  - Due dates
+  - Status (pending/completed)
+- **Transcript Tab** - Shows:
+  - Full meeting transcript
+  - Timestamps and speaker identification
+  - Copy transcript functionality
 
-### New Features
-8. ✅ **Next Best Actions with Sliding Scales** - Advisers can now:
-   - View AI recommendations with priority levels
-   - Click to expand any recommendation
-   - Adjust parameters with sliding scales:
-     - Investment Amount ($5K - $50K+)
-     - Time Horizon (1 - 30 years)
-     - Expected Return Rate (4% - 12%+)
-     - Rental Yield (for property)
-   - See projected benefit update in real-time
-   - Execute or Model in Detail
+**Fathom API Integration:**
+- API endpoint: `https://api.fathom.ai/external/v1/meetings`
+- Authentication via X-Api-Key header
+- Supports parameters: include_transcript, include_summary, recorded_by, created_after
 
-### Client-Level Features
-9. ✅ **Client navigation improved** - Now includes:
-   - Overview section (Client Dashboard, Portfolio Data, Next Best Actions)
-   - Financial Plan (Goals, Scenarios, What-If Modeler, Strategy)
-   - Investments (Shares & ETFs, Managed Funds, Cash & Term Deposits, Property)
-   - Documents (Vault, SOA, Meeting Notes, Reports)
-   - AI Assistant
-
-10. ✅ **Property renamed from Estate** - Moved to Investments section
-11. ✅ **More asset types** - Client can now have Funds, Cash/Term Deposits, not just Shares/ETFs
+**Navigation:** Client > Documents > Meeting Notes (marked as NEW)
 
 ---
 
-## Pending Items (For Future)
-- Generate Prep functionality - needs endpoint implementation
-- Meeting Automation note storage documentation
-- Market Overview data - currently using mocked data (needs live API integration)
+## Previous Updates
+
+### v8.2.0 - Advisor Feedback
+- Navigation restructured (Dashboard above CRM)
+- Wealth Overview removed
+- AI Tools consolidated
+- Decision Center fixed (no longer pops out)
+- Next Best Actions with sliding scales
+- More asset types for clients
+
+### v8.1.0 - Projection Charts
+- Timeframe selector (1yr-20yr)
+- ETF and Crypto tabs added
+- Scenario analysis charts
+
+### v8.0.0 - Transaction Modeler
+- Property/Fund/Stock modeling
+- Client creation modal
 
 ---
 
-## Navigation Structure (v8.2.0)
+## Demo Meeting Data
 
-### Adviser Mode (No Client Selected)
-```
-Dashboard
-├── Daily Briefing
-├── Practice Overview
-├── Markets & Research
-└── Broker Research
+| Meeting | Date | Duration | Attendees |
+|---------|------|----------|-----------|
+| Annual Review - Wheeler Family | Jan 15, 2026 | 1h 0m | James, Sarah, Advisor |
+| Tax Planning Discussion | Dec 10, 2025 | 30 min | James, Advisor |
+| Initial Discovery Meeting | Jun 1, 2025 | 1h 30m | James, Sarah, Advisor, Paraplanner |
 
-CRM
-├── Command Center (HUB)
-├── All Clients
-├── Tasks & Workflows
-└── New Client
-
-AI Copilot
-├── AI Assistant
-├── Book Intelligence
-├── Decision Center
-└── Meeting Notes
-
-Execution
-├── Batch Execute
-├── Trading
-└── Stock Screener
-
-Compliance
-├── Compliance Center
-├── Bank Feeds
-└── Security
-
-Settings
-├── Import/Export
-└── Data Aggregators
-```
-
-### Client Context (Client Selected)
-```
-Overview
-├── Client Dashboard
-├── Portfolio Data
-└── Next Best Actions ← NEW with sliders
-
-Financial Plan
-├── Generate Plan
-├── Goals
-├── Scenarios
-├── What-If Modeler
-└── Strategy
-
-Investments
-├── Net Worth
-├── Shares & ETFs
-├── Managed Funds ← Added
-├── Cash & Term Deposits ← Added
-├── Property ← Renamed from Estate
-├── Analysis
-└── Linked Accounts
-
-Documents
-├── Vault
-├── SOA
-├── Meeting Notes
-└── Reports
-
-AI Assistant
-├── AI Copilot
-├── Risk Profile
-└── Health Score
-```
+**Meeting notes are stored** in the client's document vault and linked to their profile for easy access.
 
 ---
 
 ## Testing Status
-- Navigation changes: ✅ Verified via screenshots
-- Decision Center Layout: ✅ Fixed and verified
-- Next Best Actions: ✅ Sliders working, expand/collapse working
-- Client context navigation: ✅ Working
+- Meeting Notes page: ✅ Verified
+- Meeting selection: ✅ Working
+- AI Summary tab: ✅ Working
+- Action Items tab: ✅ Working
+- Transcript tab: ✅ Working
+- Fathom connect dialog: ✅ Working
 
 ---
 
 ## Key Metrics
 
-- **Version:** 8.2.0
+- **Version:** 8.3.0
 - **Total AUM (Demo):** $22.28M
 - **Demo Clients:** 8
 - **Backend Routes:** 55+
-- **Frontend Pages:** 62+
-- **Test Pass Rate:** Verified via manual testing
+- **Frontend Pages:** 63+
+- **Test Pass Rate:** Verified via screenshots
 
 ---
 
@@ -148,3 +94,4 @@ AI Assistant
 
 - **Test Adviser**: `advisor@wealthcommand.io` / `secure_password_123`
 - **Preview URL**: https://advisor-command.preview.emergentagent.com
+- **Fathom API Docs**: https://developers.fathom.ai

@@ -174,6 +174,9 @@ const TransactionModeler = lazy(() => import("@/pages/TransactionModeler"));
 // Next Best Actions
 const NextBestActions = lazy(() => import("@/pages/NextBestActions"));
 
+// Meeting Notes with Fathom
+const MeetingNotes = lazy(() => import("@/pages/MeetingNotes"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -1027,6 +1030,9 @@ const AppRouter = () => {
       
       {/* Next Best Actions */}
       <Route path="/next-best-actions" element={<NextBestActions />} />
+      
+      {/* Meeting Notes with Fathom */}
+      <Route path="/meeting-notes" element={<MeetingNotes />} />
     </Routes>
   );
 };
