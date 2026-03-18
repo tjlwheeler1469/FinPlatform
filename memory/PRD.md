@@ -1,61 +1,70 @@
-# Wealth Command v9.0.0 - Simplification & Live Data Release
+# Wealth Command v9.1.0 - Navigation Restructuring & Multi-Asset Support
 
 ---
 
 ## Executive Summary
-Wealth Command is an AI-driven financial operating system designed as a "System of Execution" for financial advisers. This version focuses on significant UI/UX simplification and live market data integration.
+Wealth Command is an AI-driven financial operating system designed as a "System of Execution" for financial advisers. This version focuses on navigation restructuring and comprehensive multi-asset support across CGT and Net Worth calculations.
 
 ---
 
-## Changes in v9.0.0 (March 2026)
+## Changes in v9.1.0 (March 2026)
 
-### Major Changes
+### Navigation Restructuring (User Requested)
 
-#### 1. Navigation Consolidated
-- **Personal Mode**: Reduced from ~50 items to 7 organized groups
-  - Dashboard (4 items)
-  - Trading (4 items)
-  - Finances (5 items)
-  - Planning (4 items)
-  - Tax & Reports (4 items)
-  - Calculators (4 items)
-  - Settings (3 items)
-  
-- **Adviser Mode**: Streamlined to 5 groups
-  - Dashboard (2 items)
-  - CRM (2 items)
-  - AI Copilot (3 items)
-  - Execution (2 items)
-  - Compliance (2 items)
+#### Personal Mode - Finances
+**Before:** Net Worth, Property, Shares, All Accounts, Budget
+**After:** Net Worth, Property, **Cash & TDs**, All Accounts, Budget
+- Removed "Shares" from Finances (available under Trading)
+- Added "Cash & TDs" to Finances
 
-- **Client Context**: Focused 5 groups when client selected
-  - Overview (3 items)
-  - Plan (3 items)
-  - Investments (4 items)
-  - Documents (3 items)
-  - AI (1 item)
+#### Personal Mode - Planning
+**Before:** Goals, Strategy, AI Advisor, What-If
+**After:** **Scenario Modelling (NEW)**, AI Advisor, **Rebalancing**
+- Combined Goals, Strategy, and What-If into single "Scenario Modelling" page
+- Moved Portfolio Rebalancing from Calculators to Planning
 
-#### 2. Live Market Data (yfinance)
-- **Macro Dashboard** now uses live yfinance data instead of static mocked values
-- Endpoints updated: `/api/macro/overview`, `/api/macro/indices`, `/api/macro/crypto`
-- Added `data_source` field to responses indicating "live" or "static"
-- 60-second cache for live data to reduce API calls
-- Graceful fallback to static data if yfinance fails
-- **LIVE badge** displayed in navigation for Markets item
+#### Personal Mode - Calculators
+**Before:** Loan, Monte Carlo, SMSF, Rebalancing
+**After:** Loan, Monte Carlo, SMSF
+- Rebalancing moved to Planning
 
-#### 3. Bug Fixes
-- Fixed `MacroDashboard.jsx` array handling for new response format
-- Added `data_source` filtering to prevent `.map()` errors on non-array values
+### New Scenario Modelling Page
+Location: `/scenario-modelling`
+Features:
+- **Goals Tab**: View and manage financial goals with progress tracking
+- **Existing Assets Tab**: Select which existing assets to include in projections (stocks, ETFs, bonds, property, crypto, cash, managed funds)
+- **Build Scenario Tab**: Add multiple investments across asset types with expected returns and contribution schedules
+- **Projection Tab**: View conservative/moderate/aggressive projections with interactive charts
+
+### CGT Now Includes All Assets
+The Capital Gains Tax page now tracks ALL asset types:
+- ✅ Stocks (CBA, BHP, CSL, WBC, etc.)
+- ✅ ETFs (VAS, VGS)
+- ✅ Bonds (Government & Corporate)
+- ✅ Property (Investment properties)
+- ✅ Crypto (BTC, ETH)
+- ✅ Managed Funds
+
+### Net Worth Includes All Trading Assets
+Family Wealth Dashboard now calculates:
+```javascript
+totalInvestments = shareValue + etfValue + bondsValue + fundsValue + cryptoValue
+```
+- Shares: Individual stock holdings
+- ETFs: VAS, IVV, VGS ($166K)
+- Bonds: Government & Corporate ($80K)
+- Managed Funds: Magellan, Platinum ($126K)
+- Crypto: BTC, ETH ($52.6K)
 
 ---
 
-## Navigation Structure (v9.0.0)
+## Navigation Structure (v9.1.0)
 
 ### Personal Mode
 ```
 Dashboard
 ├── Daily Briefing
-├── Markets (LIVE badge)
+├── Markets (LIVE)
 ├── Retirement
 └── Health Score
 
@@ -66,29 +75,27 @@ Trading
 └── Research
 
 Finances
-├── Net Worth
+├── Net Worth (All Assets)
 ├── Property
-├── Shares
+├── Cash & TDs        ← NEW
 ├── All Accounts
 └── Budget
 
 Planning
-├── Goals
-├── Strategy
+├── Scenario Modelling (NEW)  ← Combined Goals/Strategy/What-If
 ├── AI Advisor
-└── What-If
+└── Rebalancing       ← Moved from Calculators
 
 Tax & Reports
 ├── Tax Analysis
-├── Capital Gains
+├── Capital Gains (All Assets)  ← Enhanced
 ├── Reports
 └── Documents
 
 Calculators
 ├── Loan
 ├── Monte Carlo
-├── SMSF
-└── Rebalancing
+└── SMSF
 
 Settings
 ├── Security
@@ -96,77 +103,31 @@ Settings
 └── Import/Export
 ```
 
-### Adviser Mode (No Client)
-```
-Dashboard
-├── Command Center
-└── Markets (LIVE badge)
+---
 
-CRM
-├── Client Hub (HUB badge)
-└── Tasks
+## Key Files Modified
 
-AI Copilot
-├── AI Assistant
-├── Meeting Prep
-└── Decision Center
-
-Execution
-├── Batch Execute
-└── Trading
-
-Compliance
-├── Compliance
-└── Security
-```
-
-### Client Context (After Selection)
-```
-Overview
-├── Dashboard
-├── Actions
-└── Health Score
-
-Plan
-├── Goals
-├── What-If
-└── Generate Plan
-
-Investments
-├── Net Worth
-├── Shares
-├── Property
-└── Trading
-
-Documents
-├── Vault
-├── Meeting Notes (NEW badge)
-└── Reports
-
-AI
-└── AI Chat
-```
+| File | Change |
+|------|--------|
+| `/app/frontend/src/components/Layout.jsx` | Navigation restructuring |
+| `/app/frontend/src/pages/ScenarioModelling.jsx` | NEW - Combined page |
+| `/app/frontend/src/pages/CGT.jsx` | Added all asset types |
+| `/app/frontend/src/pages/FamilyWealthDashboard.jsx` | Added tradingAssets |
+| `/app/frontend/src/App.js` | Added /scenario-modelling route |
 
 ---
 
-## Verified Working Features
+## Verified Working Features (v9.1.0)
 
-### Core Features (Tested ✅)
-1. **Macro Dashboard** - Live yfinance data (S&P 500, ASX 200, Bitcoin, Gold, etc.)
-2. **Meeting Prep** - Generate AI meeting briefs with client insights
-3. **Next Best Actions** - Interactive sliders for recommendations
-4. **Adviser Hub** - Client list with AUM, status badges
-5. **Transaction Modeler** - Multi-asset what-if scenarios with projections
-6. **Goal Tracker** - Edit goals functionality
-7. **Meeting Notes** - Fathom UI integration
-
-### API Endpoints (Working)
-- `POST /api/meeting-prep/generate` - AI meeting preparation
-- `GET /api/macro/overview` - Live market overview (yfinance)
-- `GET /api/macro/indices` - Live stock indices
-- `GET /api/macro/crypto` - Live cryptocurrency prices
-- `POST /api/transactions/model-property` - Property modeling
-- `POST /api/transactions/model-investment` - Investment modeling
+| Feature | Status |
+|---------|--------|
+| Navigation - Finances structure | ✅ PASS |
+| Navigation - Planning structure | ✅ PASS |
+| Scenario Modelling page (4 tabs) | ✅ PASS |
+| CGT multi-asset types | ✅ PASS |
+| Net Worth all trading assets | ✅ PASS |
+| Cash & TDs route | ✅ PASS |
+| Live Market Data (yfinance) | ✅ PASS |
 
 ---
 
@@ -189,52 +150,23 @@ AI
 
 ---
 
-## Technical Details
-
-### Live Data Integration
-```python
-# Backend: /app/backend/routes/macro_data.py
-# Uses yfinance for real-time market data
-# Symbols mapped:
-#   ^GSPC -> S&P 500
-#   ^AXJO -> ASX 200
-#   BTC-USD -> Bitcoin
-#   GC=F -> Gold
-```
-
-### Key Files
-- `/app/frontend/src/components/Layout.jsx` - Navigation structure
-- `/app/frontend/src/pages/MacroDashboard.jsx` - Live markets display
-- `/app/backend/routes/macro_data.py` - yfinance integration
-
----
-
 ## Credentials
 
 - **Test Adviser**: `advisor@wealthcommand.io` / `secure_password_123`
 - **Preview URL**: https://transaction-lab-3.preview.emergentagent.com
+- **Compliance bypass**: `localStorage.setItem('wealth_command_compliance_v5', 'permanent')`
 
 ---
 
-## Key Metrics
+## Data Sources
 
-- **Version**: 9.0.0
-- **Navigation Items**: ~30 (down from 113)
-- **Total AUM (Demo)**: $22.28M
-- **Demo Clients**: 8
-- **Live Data Source**: yfinance
-
----
-
-## 3rd Party Integrations
-
-| Integration | Status | Notes |
-|-------------|--------|-------|
-| yfinance | LIVE | Real-time market data |
-| OpenAI/Anthropic/Google | Ready | Via emergentintegrations |
-| Alpaca | Infrastructure | Needs API key |
-| Fathom | UI Ready | Needs API key |
-| Basiq/SendGrid/Twilio | Ready | Need API keys |
+| Data | Source | Status |
+|------|--------|--------|
+| Market indices | yfinance | LIVE |
+| Crypto prices | yfinance | LIVE |
+| Client data | Mock arrays | MOCK |
+| CGT events | Demo data | MOCK |
+| Trading assets | Hardcoded | MOCK |
 
 ---
 
