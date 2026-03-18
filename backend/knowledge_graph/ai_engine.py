@@ -380,7 +380,7 @@ Return a JSON object with:
         - "Who should I call first this week?"
         """
         if not self.chat:
-            return f"Based on the data: {json.dumps(graph_data, indent=2)[:500]}..."
+            return self._generate_fallback_answer(question, graph_data)
         
         try:
             context = f"""
@@ -408,8 +408,65 @@ Provide a clear, concise answer. Include specific numbers and names where releva
             return response.content if hasattr(response, 'content') else str(response)
             
         except Exception as e:
-            logger.error(f"Error answering question: {e}")
-            return f"Unable to process question. Available data summary: {len(graph_data)} items."
+            logger.error(f"Error answering question with LLM: {e}")
+            return self._generate_fallback_answer(question, graph_data)
+    
+    def _generate_fallback_answer(self, question: str, graph_data: Dict[str, Any]) -> str:
+        """Generate a natural language answer without LLM"""
+        question_lower = question.lower()
+        
+        # Handle retirement risk questions
+        if "retirement" in question_lower or "risk" in question_lower:
+            risks = graph_data.get("retirement_risks", [])
+            if risks:
+                at_risk = [r for r in risks if r.get("retirement_risk", {}).get("risk_score", 0) > 50]
+                if at_risk:
+                    risk_names = [r.get("client_name", "Unknown") for r in at_risk[:3]]
+                    return f"Based on the analysis, {len(at_risk)} clients are at significant retirement risk:\n\n" + \
+                           "\n".join([f"• **{r.get('client_name')}** (Age {r.get('age')}, retiring at {r.get('retirement_age')}): " + \
+                                     f"Only {r.get('retirement_risk', {}).get('funding_ratio', 0)}% funded, " + \
+                                     f"requires {r.get('retirement_risk', {}).get('required_annual_growth', 0)}% annual growth" 
+                                     for r in at_risk[:3]])
+            return "No clients currently show significant retirement risk based on available data."
+        
+        # Handle revenue/opportunity questions
+        if "revenue" in question_lower or "opportunity" in question_lower:
+            opps = graph_data.get("opportunities", [])
+            if opps:
+                total = sum([o.get("total_potential_revenue", 0) for o in opps])
+                return f"Revenue opportunities across {len(opps)} clients total approximately **${total:,.0f}**.\n\n" + \
+                       "Top opportunities:\n" + \
+                       "\n".join([f"• **{o.get('client_name')}**: ${o.get('total_potential_revenue', 0):,.0f} potential" 
+                                 for o in opps[:3]])
+            return "No significant revenue opportunities identified at this time."
+        
+        # Handle rebalancing questions
+        if "rebalance" in question_lower or "rebalancing" in question_lower:
+            rebalance = graph_data.get("rebalance_needed", [])
+            if rebalance:
+                return f"**{len(rebalance)} portfolios** need rebalancing:\n\n" + \
+                       "\n".join([f"• **{r.get('portfolio_name')}** ({r.get('client_name')}): " + \
+                                 f"Max drift {r.get('max_drift', 0):.1f}%" for r in rebalance[:3]])
+            return "All portfolios are currently within acceptable drift thresholds."
+        
+        # Handle insights questions
+        if "insight" in question_lower or "top" in question_lower:
+            insights = graph_data.get("insights", [])
+            if insights:
+                return f"**{len(insights)} active insights** this week:\n\n" + \
+                       "\n".join([f"• **{i.get('title')}** (Severity {i.get('severity')}): {i.get('description', '')[:100]}" 
+                                 for i in insights[:4]])
+            return "No active insights at this time."
+        
+        # Handle client-specific questions
+        clients = graph_data.get("clients", [])
+        if clients:
+            return f"Your client book includes **{len(clients)} clients**:\n\n" + \
+                   "\n".join([f"• **{c.get('name')}**: ${c.get('net_worth', 0):,.0f} net worth, {c.get('risk_profile', 'unknown')} risk profile" 
+                             for c in clients[:5]]) + \
+                   f"\n\nTotal AUM: **${sum([c.get('net_worth', 0) for c in clients]):,.0f}**"
+        
+        return "I found relevant data but couldn't generate a specific answer. Please try rephrasing your question or check the tabs above for detailed information."
 
 
 # Global AI engine instance

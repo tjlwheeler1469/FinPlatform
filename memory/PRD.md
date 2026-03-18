@@ -1,13 +1,79 @@
-# Wealth Command v9.3.0 - Client View Enhancements
+# Wealth Command v9.4.0 - Financial Knowledge Graph
 
 ---
 
 ## Executive Summary
-Wealth Command is an AI-driven financial operating system for financial advisers. This version significantly enhances the Client 360 view with detailed asset breakdown, performance tracking, research reports, and advisor communication features.
+Wealth Command is an AI-driven financial operating system for financial advisers, now powered by a **Financial Knowledge Graph** architecture. This version introduces interactive graph visualization, AI-powered natural language queries, and adjustable AI recommendations with sliding scale parameters.
 
 ---
 
-## Changes in v9.3.0 (March 2026)
+## Changes in v9.4.0 (March 2026)
+
+### 1. Financial Knowledge Graph Dashboard
+New `/knowledge-graph` page with comprehensive graph intelligence:
+
+**Stats Overview**:
+- Graph Nodes (40)
+- Relationships (51)
+- Total AUM ($5.20M)
+- Active Insights (3)
+- Pending Actions (4)
+
+**AI Question Box**:
+- Natural language queries about client book
+- Quick action badges for common questions
+- Formatted natural language responses
+- Examples: "Which clients are at retirement risk?", "Revenue opportunities?"
+
+### 2. Interactive Force-Directed Graph Visualization
+Using `react-force-graph-2d` library:
+- **Node Types**: Client (blue), Portfolio (green), Asset (purple), Sector (amber), Insight (red), Action (pink), Advisor (teal), Household (indigo), FinancialPlan (cyan)
+- **Filter Dropdown**: All Nodes, Clients, Portfolios, Assets, Insights, Actions, Sectors
+- **Interactive Features**: Click nodes to select, Fit button, Fullscreen mode
+- **Node Details Panel**: Shows properties when node is selected
+
+### 3. Adjustable AI Recommendations (NEW)
+**Action Dialog with Sliding Scales**:
+When clicking "Adjust & Execute" on any action, opens dialog with:
+- **Trade Amount ($)**: Slider from $1K to 50% of portfolio
+- **Execution Timeframe**: Slider 1-90 days
+- **Price Limit (+/- %)**: Slider 0-20%
+- **Minimum Yield Target**: Slider 0-10% (for buy/rebalance)
+- **Risk Level Adjustment**: Slider -3 to +3 levels
+- **Drift Tolerance**: Slider 1-15% (for rebalance)
+- **Max Tax Impact ($)**: Slider $0-$50K (for rebalance)
+
+**Execution Summary**: Shows all adjusted parameters before execution
+
+### 4. Insights, Risks & Opportunities Tabs
+- **Insights Tab**: Active insights with severity badges and affected clients
+- **Actions Tab**: Pending actions with "Adjust & Execute" buttons
+- **Risks Tab**: Retirement risks with funding ratios, Cross-client risks
+- **Opportunities Tab**: Revenue opportunities per client
+
+---
+
+## API Endpoints (Knowledge Graph)
+
+```
+GET  /api/graph/overview              - Graph statistics
+GET  /api/graph/visualization/data    - Full graph for visualization
+GET  /api/graph/visualization/subgraph/{node_id} - Subgraph around node
+GET  /api/graph/insights              - Active insights
+GET  /api/graph/actions/pending       - Pending actions
+GET  /api/graph/actions/{id}/details  - Action with adjustable params
+POST /api/graph/actions/{id}/adjust   - Execute with adjustments
+POST /api/graph/ai/ask                - Natural language question
+GET  /api/graph/queries/retirement-risk     - Retirement risk query
+GET  /api/graph/queries/revenue-opportunities - Revenue query
+GET  /api/graph/queries/cross-client-risks  - Cross-client risks
+```
+
+---
+
+## Previous Version Changes
+
+### v9.3.0 - Client View Enhancements
 
 ### 1. Enhanced Client 360 Tabs
 Updated from 6 to 8 tabs:
