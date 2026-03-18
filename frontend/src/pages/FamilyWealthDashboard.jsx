@@ -101,16 +101,49 @@ const FamilyWealthDashboard = () => {
   const [estateTransferAge, setEstateTransferAge] = useState(85);
   const [giftingAmount, setGiftingAmount] = useState(0);
 
-  // Calculate combined family wealth
+  // Mock data for additional asset classes from Trading section
+  const tradingAssets = useMemo(() => ({
+    bonds: [
+      { name: "Aus Gov 10Y Bond", value: 50000, yield: 4.2 },
+      { name: "Corporate Bond Fund", value: 30000, yield: 5.1 },
+    ],
+    etfs: [
+      { name: "Vanguard Aus Shares (VAS)", units: 950, price: 95.50, value: 90725 },
+      { name: "iShares S&P 500 (IVV)", units: 100, price: 580, value: 58000 },
+      { name: "Vanguard Intl (VGS)", units: 150, price: 115, value: 17250 },
+    ],
+    managedFunds: [
+      { name: "Magellan Global Fund", units: 2500, nav: 32.80, value: 82000 },
+      { name: "Platinum International", units: 1800, nav: 24.50, value: 44100 },
+    ],
+    crypto: [
+      { name: "Bitcoin", symbol: "BTC", units: 0.45, price: 73000, value: 32850 },
+      { name: "Ethereum", symbol: "ETH", units: 5.2, price: 3800, value: 19760 },
+    ]
+  }), []);
+
+  // Calculate combined family wealth (including all trading assets)
   const familyWealth = useMemo(() => {
     // Property
     const propertyValue = portfolio.investments?.properties?.reduce((sum, p) => sum + p.value, 0) || 0;
     const propertyDebt = portfolio.investments?.properties?.reduce((sum, p) => sum + (p.mortgage_amount || 0), 0) || 0;
     const propertyEquity = propertyValue - propertyDebt;
     
-    // Shares
+    // Shares (individual stocks)
     const shareValue = sharePortfolio.reduce((sum, s) => sum + (s.quantity * s.currentPrice), 0);
     const shareGain = sharePortfolio.reduce((sum, s) => sum + ((s.currentPrice - s.purchasePrice) * s.quantity), 0);
+    
+    // ETFs (from trading)
+    const etfValue = tradingAssets.etfs.reduce((sum, e) => sum + e.value, 0);
+    
+    // Bonds (from trading)
+    const bondsValue = tradingAssets.bonds.reduce((sum, b) => sum + b.value, 0);
+    
+    // Managed Funds (from trading)
+    const fundsValue = tradingAssets.managedFunds.reduce((sum, f) => sum + f.value, 0);
+    
+    // Crypto (from trading)
+    const cryptoValue = tradingAssets.crypto.reduce((sum, c) => sum + c.value, 0);
     
     // Cash & Term Deposits
     const cash = portfolio.investments?.cash_savings || 0;
@@ -125,7 +158,10 @@ const FamilyWealthDashboard = () => {
     // Company
     const companyValue = company.retainedEarnings || 0;
     
-    const totalAssets = propertyValue + shareValue + cash + termDeposit + totalSuper + trustAssets + companyValue;
+    // Total investments = stocks + ETFs + bonds + funds + crypto
+    const totalInvestments = shareValue + etfValue + bondsValue + fundsValue + cryptoValue;
+    
+    const totalAssets = propertyValue + totalInvestments + cash + termDeposit + totalSuper + trustAssets + companyValue;
     const totalDebt = propertyDebt;
     const netWorth = totalAssets - totalDebt;
     
@@ -135,6 +171,11 @@ const FamilyWealthDashboard = () => {
       propertyEquity,
       shareValue,
       shareGain,
+      etfValue,
+      bondsValue,
+      fundsValue,
+      cryptoValue,
+      totalInvestments,
       cash,
       termDeposit,
       totalSuper,
@@ -144,7 +185,7 @@ const FamilyWealthDashboard = () => {
       totalDebt,
       netWorth
     };
-  }, [portfolio, sharePortfolio, familyMembers, trust, company]);
+  }, [portfolio, sharePortfolio, familyMembers, trust, company, tradingAssets]);
 
   // Calculate tax savings from current structure
   const taxSavings = useMemo(() => {

@@ -1,0 +1,76 @@
+{
+  "summary": "Iteration 77 - Frontend testing completed. All 6 requested features verified and working: 1) Finances navigation has Cash & TDs, Net Worth, Property, All Accounts, Budget (NO Shares), 2) Planning navigation has Scenario Modelling (NEW badge), AI Advisor, Rebalancing, 3) Scenario Modelling page has Goals, Existing Assets, Build Scenario, Projection tabs, 4) CGT page includes ALL asset types (stocks, ETFs, bonds, property, crypto), 5) Net Worth/Family Wealth calculates total including ETFs, bonds, funds, crypto, 6) Cash & TDs route /cash-deposits works correctly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_77.json"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Layout.jsx navigation correctly organized - Finances has Cash & TDs, Net Worth, Property, All Accounts, Budget (Shares removed)",
+    "Planning section has Scenario Modelling with NEW badge, AI Advisor, and Rebalancing (moved from elsewhere)",
+    "ScenarioModelling.jsx has 4 tabs (Goals, Existing Assets, Build Scenario, Projection) with full multi-asset support",
+    "CGT.jsx DEMO_PARCELS includes: stocks, ETFs (VAS/VGS), bonds (BOND-01/CORP-01), property (PROP-SYD/PROP-MEL), crypto (BTC/ETH), managed funds (MAG)",
+    "CGT.jsx DEMO_CGT_EVENTS covers all asset types across multiple financial years",
+    "FamilyWealthDashboard.jsx tradingAssets includes bonds ($80K), ETFs ($166K), managedFunds ($126K), crypto ($52.6K)",
+    "Net Worth calculation: totalInvestments = shareValue + etfValue + bondsValue + fundsValue + cryptoValue",
+    "CashDeposits.jsx route /cash-deposits working with savings accounts and term deposits view"
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "N/A (frontend only testing)",
+    "frontend": "100% (all 6 features verified)"
+  },
+  "test_credentials": {
+    "preview_url": "https://transaction-lab-3.preview.emergentagent.com",
+    "compliance_bypass": "localStorage.setItem('wealth_command_compliance_v5', 'permanent')"
+  },
+  "seed_data_creation": "None - using existing demo data",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Iteration 77 verified navigation restructuring: Finances (Cash & TDs, Net Worth, Property, All Accounts, Budget - NO Shares), Planning (Scenario Modelling NEW, AI Advisor, Rebalancing). ScenarioModelling.jsx is NEW combined page with 4 tabs. CGT page includes all asset types in demo data. FamilyWealthDashboard calculates net worth including tradingAssets (ETFs, bonds, funds, crypto). Cash & TDs route /cash-deposits works.",
+  "features_verified": {
+    "navigation_finances_structure": {
+      "status": "PASS",
+      "items_present": ["Cash & TDs", "Net Worth", "Property", "All Accounts", "Budget"],
+      "items_removed": ["Shares"]
+    },
+    "navigation_planning_structure": {
+      "status": "PASS",
+      "items_present": ["Scenario Modelling (NEW badge)", "AI Advisor", "Rebalancing"]
+    },
+    "scenario_modelling_page": {
+      "status": "PASS",
+      "tabs_present": ["Goals", "Existing Assets", "Build Scenario", "Projection"],
+      "data_testid": "scenario-modelling-page"
+    },
+    "cgt_multiple_asset_types": {
+      "status": "PASS",
+      "asset_types_in_holdings": ["stocks (CBA, BHP, CSL, WBC)", "ETFs (VAS, VGS)", "bonds (BOND-01, CORP-01)", "property (PROP-SYD, PROP-MEL)", "crypto (BTC, ETH)", "managed funds (MAG)"],
+      "asset_types_in_events": ["stocks", "ETFs", "bonds", "property", "crypto"]
+    },
+    "net_worth_all_trading_assets": {
+      "status": "PASS",
+      "includes": ["shares (shareValue)", "ETFs (etfValue)", "bonds (bondsValue)", "managed funds (fundsValue)", "crypto (cryptoValue)"],
+      "calculation": "totalInvestments = shareValue + etfValue + bondsValue + fundsValue + cryptoValue"
+    },
+    "cash_deposits_route": {
+      "status": "PASS",
+      "route": "/cash-deposits",
+      "page_title": "Cash & Term Deposits",
+      "content": "Savings Accounts, Term Deposits, Best Rates tabs"
+    }
+  },
+  "mocked_apis": {
+    "tradingAssets_in_FamilyWealthDashboard": "MOCK - hardcoded in component (bonds: $80K, etfs: $166K, managedFunds: $126K, crypto: $52.6K)",
+    "cgt_demo_data": "MOCK - DEMO_PARCELS and DEMO_CGT_EVENTS arrays in CGT.jsx",
+    "scenario_modelling_data": "MOCK - EXISTING_ASSETS and MOCK_GOALS in ScenarioModelling.jsx"
+  }
+}

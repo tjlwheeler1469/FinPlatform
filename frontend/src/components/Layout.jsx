@@ -104,9 +104,9 @@ const personalNavGroups = [
     name: "Finances",
     icon: Wallet,
     items: [
-      { path: "/family-wealth", label: "Net Worth", icon: Eye, title: "Net Worth" },
+      { path: "/family-wealth", label: "Net Worth", icon: Eye, title: "Net Worth (All Assets)" },
       { path: "/property-portfolio", label: "Property", icon: Building2, title: "Property" },
-      { path: "/share-portfolio", label: "Shares", icon: LineChart, title: "Share Portfolio" },
+      { path: "/cash-deposits", label: "Cash & TDs", icon: PiggyBank, title: "Cash & Term Deposits" },
       { path: "/portfolio-aggregator", label: "All Accounts", icon: Link2, title: "All Accounts" },
       { path: "/budget", label: "Budget", icon: Wallet, title: "Budget & Cashflow" },
     ]
@@ -115,10 +115,9 @@ const personalNavGroups = [
     name: "Planning",
     icon: Target,
     items: [
-      { path: "/goal-tracker", label: "Goals", icon: Target, title: "Goals" },
-      { path: "/strategic-planning", label: "Strategy", icon: HeartPulse, title: "Strategy" },
+      { path: "/scenario-modelling", label: "Scenario Modelling", icon: Calculator, title: "Goals & Scenario Modelling", badge: "NEW" },
       { path: "/ai-advisor", label: "AI Advisor", icon: Sparkles, title: "AI Advisor" },
-      { path: "/transaction-modeler", label: "What-If", icon: Calculator, title: "What-If Modeler" },
+      { path: "/portfolio-rebalancing", label: "Rebalancing", icon: ArrowLeftRight, title: "Portfolio Rebalancing" },
     ]
   },
   {
@@ -126,7 +125,7 @@ const personalNavGroups = [
     icon: FileText,
     items: [
       { path: "/tax-analysis-sync", label: "Tax Analysis", icon: Calculator, title: "Tax Analysis" },
-      { path: "/cgt", label: "Capital Gains", icon: TrendingUp, title: "CGT" },
+      { path: "/cgt", label: "Capital Gains", icon: TrendingUp, title: "CGT (All Assets)" },
       { path: "/reports", label: "Reports", icon: FileText, title: "Reports" },
       { path: "/documents", label: "Documents", icon: FileText, title: "Documents" },
     ]
@@ -138,7 +137,6 @@ const personalNavGroups = [
       { path: "/loan-calculator", label: "Loan", icon: Landmark, title: "Loan Calculator" },
       { path: "/monte-carlo", label: "Monte Carlo", icon: BarChart3, title: "Monte Carlo" },
       { path: "/smsf-optimizer", label: "SMSF", icon: PiggyBank, title: "SMSF" },
-      { path: "/portfolio-rebalancing", label: "Rebalancing", icon: ArrowLeftRight, title: "Rebalancing" },
     ]
   },
   {

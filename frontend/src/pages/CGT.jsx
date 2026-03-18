@@ -80,27 +80,52 @@ const FINANCIAL_YEARS = [
 
 // Demo share parcels (purchases) with multi-year data
 const DEMO_PARCELS = [
-  { id: 1, symbol: "CBA", name: "Commonwealth Bank", quantity: 200, purchase_price: 98.50, purchase_date: "2022-03-15", brokerage: 19.95 },
-  { id: 2, symbol: "CBA", name: "Commonwealth Bank", quantity: 100, purchase_price: 105.20, purchase_date: "2023-06-20", brokerage: 9.95 },
-  { id: 3, symbol: "BHP", name: "BHP Group", quantity: 500, purchase_price: 48.20, purchase_date: "2023-06-20", brokerage: 19.95 },
-  { id: 4, symbol: "CSL", name: "CSL Limited", quantity: 50, purchase_price: 295.00, purchase_date: "2024-01-10", brokerage: 19.95 },
-  { id: 5, symbol: "VAS", name: "Vanguard Aus Shares ETF", quantity: 300, purchase_price: 92.00, purchase_date: "2022-08-01", brokerage: 9.95 },
-  { id: 6, symbol: "WBC", name: "Westpac Banking", quantity: 800, purchase_price: 24.80, purchase_date: "2024-02-15", brokerage: 19.95 },
-  { id: 7, symbol: "VGS", name: "Vanguard Intl Shares ETF", quantity: 150, purchase_price: 108.50, purchase_date: "2023-11-20", brokerage: 9.95 }
+  { id: 1, symbol: "CBA", name: "Commonwealth Bank", quantity: 200, purchase_price: 98.50, purchase_date: "2022-03-15", brokerage: 19.95, asset_type: "stocks" },
+  { id: 2, symbol: "CBA", name: "Commonwealth Bank", quantity: 100, purchase_price: 105.20, purchase_date: "2023-06-20", brokerage: 9.95, asset_type: "stocks" },
+  { id: 3, symbol: "BHP", name: "BHP Group", quantity: 500, purchase_price: 48.20, purchase_date: "2023-06-20", brokerage: 19.95, asset_type: "stocks" },
+  { id: 4, symbol: "CSL", name: "CSL Limited", quantity: 50, purchase_price: 295.00, purchase_date: "2024-01-10", brokerage: 19.95, asset_type: "stocks" },
+  { id: 5, symbol: "VAS", name: "Vanguard Aus Shares ETF", quantity: 300, purchase_price: 92.00, purchase_date: "2022-08-01", brokerage: 9.95, asset_type: "etf" },
+  { id: 6, symbol: "WBC", name: "Westpac Banking", quantity: 800, purchase_price: 24.80, purchase_date: "2024-02-15", brokerage: 19.95, asset_type: "stocks" },
+  { id: 7, symbol: "VGS", name: "Vanguard Intl Shares ETF", quantity: 150, purchase_price: 108.50, purchase_date: "2023-11-20", brokerage: 9.95, asset_type: "etf" },
+  // Bonds
+  { id: 8, symbol: "BOND-01", name: "Aus Gov 10Y Bond", quantity: 100, purchase_price: 98.50, purchase_date: "2022-06-15", brokerage: 50, asset_type: "bonds" },
+  { id: 9, symbol: "CORP-01", name: "Corporate Bond Fund", quantity: 500, purchase_price: 60.00, purchase_date: "2023-03-10", brokerage: 25, asset_type: "bonds" },
+  // Property
+  { id: 10, symbol: "PROP-SYD", name: "Investment Unit - Sydney", quantity: 1, purchase_price: 650000, purchase_date: "2019-08-20", brokerage: 15000, asset_type: "property" },
+  { id: 11, symbol: "PROP-MEL", name: "Townhouse - Melbourne", quantity: 1, purchase_price: 520000, purchase_date: "2021-02-15", brokerage: 12000, asset_type: "property" },
+  // Crypto
+  { id: 12, symbol: "BTC", name: "Bitcoin", quantity: 0.5, purchase_price: 42000, purchase_date: "2023-01-15", brokerage: 50, asset_type: "crypto" },
+  { id: 13, symbol: "ETH", name: "Ethereum", quantity: 3.2, purchase_price: 2800, purchase_date: "2023-06-20", brokerage: 25, asset_type: "crypto" },
+  // Managed Funds
+  { id: 14, symbol: "MAG", name: "Magellan Global Fund", quantity: 2000, purchase_price: 32.50, purchase_date: "2022-09-10", brokerage: 0, asset_type: "funds" }
 ];
 
-// Demo CGT events across multiple years
+// Demo CGT events across multiple years (all asset types)
 const DEMO_CGT_EVENTS = [
-  // FY 2022-23
-  { id: 1, symbol: "ANZ", name: "ANZ Bank", quantity: 150, sale_price: 26.50, sale_date: "2023-02-10", brokerage: 9.95, parcel_id: 0, purchase_price: 22.80, purchase_date: "2021-05-15", purchase_brokerage: 9.95 },
-  // FY 2023-24
-  { id: 2, symbol: "WOW", name: "Woolworths", quantity: 200, sale_price: 38.50, sale_date: "2023-11-20", brokerage: 9.95, parcel_id: 0, purchase_price: 35.20, purchase_date: "2022-03-10", purchase_brokerage: 9.95 },
-  { id: 3, symbol: "TLS", name: "Telstra", quantity: 500, sale_price: 4.20, sale_date: "2024-03-15", brokerage: 9.95, parcel_id: 0, purchase_price: 3.85, purchase_date: "2023-01-20", purchase_brokerage: 9.95 },
-  // FY 2024-25
-  { id: 4, symbol: "CBA", name: "Commonwealth Bank", quantity: 100, sale_price: 118.50, sale_date: "2024-08-15", brokerage: 9.95, parcel_id: 1, purchase_price: 98.50, purchase_date: "2022-03-15", purchase_brokerage: 9.975 },
-  { id: 5, symbol: "BHP", name: "BHP Group", quantity: 200, sale_price: 45.80, sale_date: "2024-10-20", brokerage: 9.95, parcel_id: 3, purchase_price: 48.20, purchase_date: "2023-06-20", purchase_brokerage: 7.98 },
-  { id: 6, symbol: "VAS", name: "Vanguard Aus Shares ETF", quantity: 100, sale_price: 98.40, sale_date: "2024-12-10", brokerage: 9.95, parcel_id: 5, purchase_price: 92.00, purchase_date: "2022-08-01", purchase_brokerage: 3.32 }
+  // FY 2022-23 - Stocks
+  { id: 1, symbol: "ANZ", name: "ANZ Bank", quantity: 150, sale_price: 26.50, sale_date: "2023-02-10", brokerage: 9.95, parcel_id: 0, purchase_price: 22.80, purchase_date: "2021-05-15", purchase_brokerage: 9.95, asset_type: "stocks" },
+  // FY 2023-24 - Stocks & Crypto
+  { id: 2, symbol: "WOW", name: "Woolworths", quantity: 200, sale_price: 38.50, sale_date: "2023-11-20", brokerage: 9.95, parcel_id: 0, purchase_price: 35.20, purchase_date: "2022-03-10", purchase_brokerage: 9.95, asset_type: "stocks" },
+  { id: 3, symbol: "TLS", name: "Telstra", quantity: 500, sale_price: 4.20, sale_date: "2024-03-15", brokerage: 9.95, parcel_id: 0, purchase_price: 3.85, purchase_date: "2023-01-20", purchase_brokerage: 9.95, asset_type: "stocks" },
+  { id: 7, symbol: "BTC", name: "Bitcoin", quantity: 0.15, sale_price: 68000, sale_date: "2024-02-28", brokerage: 30, parcel_id: 12, purchase_price: 42000, purchase_date: "2023-01-15", purchase_brokerage: 15, asset_type: "crypto" },
+  // FY 2024-25 - Stocks, Bonds, Property
+  { id: 4, symbol: "CBA", name: "Commonwealth Bank", quantity: 100, sale_price: 118.50, sale_date: "2024-08-15", brokerage: 9.95, parcel_id: 1, purchase_price: 98.50, purchase_date: "2022-03-15", purchase_brokerage: 9.975, asset_type: "stocks" },
+  { id: 5, symbol: "BHP", name: "BHP Group", quantity: 200, sale_price: 45.80, sale_date: "2024-10-20", brokerage: 9.95, parcel_id: 3, purchase_price: 48.20, purchase_date: "2023-06-20", purchase_brokerage: 7.98, asset_type: "stocks" },
+  { id: 6, symbol: "VAS", name: "Vanguard Aus Shares ETF", quantity: 100, sale_price: 98.40, sale_date: "2024-12-10", brokerage: 9.95, parcel_id: 5, purchase_price: 92.00, purchase_date: "2022-08-01", purchase_brokerage: 3.32, asset_type: "etf" },
+  { id: 8, symbol: "BOND-01", name: "Aus Gov 10Y Bond", quantity: 50, sale_price: 101.20, sale_date: "2024-11-15", brokerage: 25, parcel_id: 8, purchase_price: 98.50, purchase_date: "2022-06-15", purchase_brokerage: 25, asset_type: "bonds" },
+  { id: 9, symbol: "PROP-SYD", name: "Investment Unit - Sydney", quantity: 1, sale_price: 780000, sale_date: "2024-09-30", brokerage: 18000, parcel_id: 10, purchase_price: 650000, purchase_date: "2019-08-20", purchase_brokerage: 15000, asset_type: "property" },
+  { id: 10, symbol: "ETH", name: "Ethereum", quantity: 1.5, sale_price: 3200, sale_date: "2024-12-20", brokerage: 15, parcel_id: 13, purchase_price: 2800, purchase_date: "2023-06-20", purchase_brokerage: 12, asset_type: "crypto" }
 ];
+
+// Asset type configuration
+const ASSET_TYPES = {
+  stocks: { label: "Stocks", color: "#3B82F6", icon: "📈" },
+  etf: { label: "ETFs", color: "#10B981", icon: "📊" },
+  bonds: { label: "Bonds", color: "#F59E0B", icon: "🏛️" },
+  property: { label: "Property", color: "#EF4444", icon: "🏠" },
+  crypto: { label: "Crypto", color: "#8B5CF6", icon: "₿" },
+  funds: { label: "Managed Funds", color: "#06B6D4", icon: "💼" }
+};
 
 const COLORS = ['#10B981', '#EF4444', '#D4A84C', '#3B82F6', '#8B5CF6'];
 
