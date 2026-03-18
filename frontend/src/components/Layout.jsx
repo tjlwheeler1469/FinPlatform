@@ -85,6 +85,7 @@ const personalNavGroups = [
     name: "Dashboard",
     icon: LayoutDashboard,
     items: [
+      { path: "/family-wealth", label: "Net Worth", icon: Eye, title: "Net Worth (All Assets)" },
       { path: "/daily-briefing", label: "Daily Briefing", icon: Sun, title: "Daily Briefing" },
       { path: "/macro-dashboard", label: "Markets", icon: BarChart3, title: "Live Markets", badge: "LIVE" },
       { path: "/dashboard", label: "Retirement", icon: Target, title: "Retirement Tracker" },
@@ -97,7 +98,7 @@ const personalNavGroups = [
     items: [
       { path: "/stock-trading", label: "Stocks & ETFs", icon: TrendingUp, title: "Stock Trading" },
       { path: "/bonds-trading", label: "Bonds", icon: Landmark, title: "Bonds" },
-      { path: "/managed-funds", label: "Funds", icon: PieChart, title: "Managed Funds" },
+      { path: "/hybrids-trading", label: "Hybrids", icon: ArrowLeftRight, title: "Hybrid Securities", badge: "NEW" },
       { path: "/stock-research", label: "Research", icon: LineChart, title: "Stock Screener" },
     ]
   },
@@ -105,7 +106,7 @@ const personalNavGroups = [
     name: "Finances",
     icon: Wallet,
     items: [
-      { path: "/family-wealth", label: "Net Worth", icon: Eye, title: "Net Worth (All Assets)" },
+      { path: "/managed-funds", label: "Managed Funds", icon: PieChart, title: "Managed Funds" },
       { path: "/property-portfolio", label: "Property", icon: Building2, title: "Property" },
       { path: "/cash-deposits", label: "Cash & TDs", icon: PiggyBank, title: "Cash & Term Deposits" },
       { path: "/portfolio-aggregator", label: "All Accounts", icon: Link2, title: "All Accounts" },
@@ -187,6 +188,7 @@ const adviserBaseNav = [
     items: [
       { path: "/batch-execution", label: "Batch Execute", icon: Zap, title: "Batch Execution" },
       { path: "/stock-trading", label: "Trading", icon: TrendingUp, title: "Trading" },
+      { path: "/hybrids-trading", label: "Hybrids", icon: ArrowLeftRight, title: "Hybrid Securities", badge: "NEW" },
     ]
   },
   {
@@ -839,6 +841,30 @@ const Layout = ({ children }) => {
           sidebarCollapsed ? "lg:ml-16" : "lg:ml-64"
         )}
       >
+        {/* Client Context Banner (Adviser Mode) */}
+        {appMode === "adviser" && selectedClient && (
+          <div className="bg-[#D4A84C] text-black px-4 py-2 flex items-center justify-between" data-testid="client-context-banner">
+            <div className="flex items-center gap-3">
+              <Users className="h-5 w-5" />
+              <span className="font-semibold">Viewing: {selectedClient.name}</span>
+              {selectedClient.aum && (
+                <Badge className="bg-black/10 text-black border-0">
+                  AUM: ${(selectedClient.aum / 1000000).toFixed(1)}M
+                </Badge>
+              )}
+            </div>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={handleClearClient}
+              className="hover:bg-black/10 text-black"
+              data-testid="exit-client-view-btn"
+            >
+              <X className="h-4 w-4 mr-1" />
+              Exit Client View
+            </Button>
+          </div>
+        )}
         <div className="p-4 md:p-6 lg:p-8">
           <div className="max-w-7xl mx-auto">
             {children}

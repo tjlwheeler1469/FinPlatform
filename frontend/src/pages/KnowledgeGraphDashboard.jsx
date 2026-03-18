@@ -80,7 +80,7 @@ const KnowledgeGraphDashboard = () => {
   const [retirementRisks, setRetirementRisks] = useState([]);
   const [revenueOpportunities, setRevenueOpportunities] = useState([]);
   const [crossClientRisks, setCrossClientRisks] = useState([]);
-  const [activeTab, setActiveTab] = useState("graph");
+  const [activeTab, setActiveTab] = useState("insights");
   const [aiQuestion, setAiQuestion] = useState("");
   const [aiAnswer, setAiAnswer] = useState("");
   const [aiLoading, setAiLoading] = useState(false);

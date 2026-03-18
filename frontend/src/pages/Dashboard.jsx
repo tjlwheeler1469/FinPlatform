@@ -501,11 +501,11 @@ const Dashboard = () => {
             <div className="grid grid-cols-2 gap-4 mb-4 p-4 bg-white/5 rounded-lg">
               <div>
                 <p className="text-xs text-white/60 mb-1">Your savings rate</p>
-                <p className="text-3xl font-bold">{Math.round(currentSavingsRate)}%</p>
+                <p className="text-xl font-bold">{Math.round(currentSavingsRate)}%</p>
               </div>
               <div>
                 <p className="text-xs text-white/60 mb-1">Recommended</p>
-                <p className="text-3xl font-bold text-amber-400">20%</p>
+                <p className="text-xl font-bold text-amber-400">20%</p>
               </div>
             </div>
 

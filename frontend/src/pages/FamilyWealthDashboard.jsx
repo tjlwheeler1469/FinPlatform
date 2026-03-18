@@ -100,6 +100,74 @@ const FamilyWealthDashboard = () => {
   const [projectionYears, setProjectionYears] = useState(20);
   const [estateTransferAge, setEstateTransferAge] = useState(85);
   const [giftingAmount, setGiftingAmount] = useState(0);
+  const [structureFilter, setStructureFilter] = useState("all");
+
+  // Define ownership structures with their assets
+  const ownershipStructures = useMemo(() => ({
+    personal: {
+      name: "Personal",
+      icon: "👤",
+      description: "Individually held assets",
+      assets: {
+        shares: sharePortfolio.filter(s => s.ownership === 'personal').reduce((sum, s) => sum + (s.quantity * s.currentPrice), 0),
+        cash: portfolio.investments?.cash_savings || 0,
+        termDeposit: portfolio.investments?.term_deposit_amount || 0,
+        property: portfolio.investments?.properties?.filter(p => p.ownership === 'personal')?.reduce((sum, p) => sum + p.value - (p.mortgage_amount || 0), 0) || 0,
+      }
+    },
+    joint: {
+      name: "Joint",
+      icon: "👥",
+      description: "Jointly owned with spouse",
+      assets: {
+        shares: sharePortfolio.filter(s => s.ownership === 'joint').reduce((sum, s) => sum + (s.quantity * s.currentPrice), 0),
+        cash: 0, // Would come from real data
+        property: portfolio.investments?.properties?.filter(p => p.ownership === 'joint')?.reduce((sum, p) => sum + p.value - (p.mortgage_amount || 0), 0) || 180000,
+      }
+    },
+    company: {
+      name: "Company",
+      icon: "🏢",
+      description: "Corporate structure",
+      assets: {
+        retainedEarnings: company.retainedEarnings || 0,
+        shares: sharePortfolio.filter(s => s.ownership === 'company').reduce((sum, s) => sum + (s.quantity * s.currentPrice), 0),
+        property: portfolio.investments?.properties?.filter(p => p.ownership === 'company')?.reduce((sum, p) => sum + p.value - (p.mortgage_amount || 0), 0) || 0,
+      }
+    },
+    trust: {
+      name: "Family Trust",
+      icon: "🏛️",
+      description: "Discretionary family trust",
+      assets: {
+        investments: trust.netIncome > 0 ? trust.netIncome * 10 : 250000,
+        shares: sharePortfolio.filter(s => s.ownership === 'trust').reduce((sum, s) => sum + (s.quantity * s.currentPrice), 0),
+        property: portfolio.investments?.properties?.filter(p => p.ownership === 'trust')?.reduce((sum, p) => sum + p.value - (p.mortgage_amount || 0), 0) || 0,
+      }
+    },
+    smsf: {
+      name: "SMSF",
+      icon: "💼",
+      description: "Self-managed super fund",
+      assets: {
+        super: familyMembers.reduce((sum, m) => sum + (m.superBalance || 0), 0),
+        shares: sharePortfolio.filter(s => s.ownership === 'smsf').reduce((sum, s) => sum + (s.quantity * s.currentPrice), 0),
+        property: portfolio.investments?.properties?.filter(p => p.ownership === 'smsf')?.reduce((sum, p) => sum + p.value - (p.mortgage_amount || 0), 0) || 0,
+      }
+    }
+  }), [sharePortfolio, portfolio, familyMembers, trust, company]);
+
+  // Calculate totals for each structure
+  const structureTotals = useMemo(() => {
+    return Object.entries(ownershipStructures).map(([key, struct]) => ({
+      key,
+      name: struct.name,
+      icon: struct.icon,
+      description: struct.description,
+      total: Object.values(struct.assets).reduce((sum, val) => sum + val, 0),
+      assets: struct.assets
+    }));
+  }, [ownershipStructures]);
 
   // Mock data for additional asset classes from Trading section
   const tradingAssets = useMemo(() => ({
@@ -439,11 +507,113 @@ const FamilyWealthDashboard = () => {
         </div>
 
         <Tabs defaultValue="wealth">
-          <TabsList className="grid w-full max-w-lg grid-cols-3">
+          <TabsList className="grid w-full max-w-2xl grid-cols-4">
             <TabsTrigger value="wealth">Combined Wealth</TabsTrigger>
+            <TabsTrigger value="structures" data-testid="structures-tab">By Structure</TabsTrigger>
             <TabsTrigger value="tax">Tax Savings</TabsTrigger>
             <TabsTrigger value="transfer">Wealth Transfer</TabsTrigger>
           </TabsList>
+
+          {/* By Structure Tab */}
+          <TabsContent value="structures" className="space-y-6">
+            {/* Structure Filter */}
+            <div className="flex flex-wrap gap-2">
+              <Button 
+                variant={structureFilter === "all" ? "default" : "outline"}
+                onClick={() => setStructureFilter("all")}
+                className={structureFilter === "all" ? "bg-[#1a2744]" : ""}
+                data-testid="filter-all"
+              >
+                All Structures
+              </Button>
+              {structureTotals.map(struct => (
+                <Button 
+                  key={struct.key}
+                  variant={structureFilter === struct.key ? "default" : "outline"}
+                  onClick={() => setStructureFilter(struct.key)}
+                  className={structureFilter === struct.key ? "bg-[#D4A84C] text-black hover:bg-[#C49A3C]" : ""}
+                  data-testid={`filter-${struct.key}`}
+                >
+                  <span className="mr-2">{struct.icon}</span>
+                  {struct.name}
+                </Button>
+              ))}
+            </div>
+
+            {/* Structure Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {structureTotals
+                .filter(s => structureFilter === "all" || structureFilter === s.key)
+                .map(struct => (
+                <Card key={struct.key} className="bg-card border-border" data-testid={`structure-card-${struct.key}`}>
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">{struct.icon}</span>
+                      <div>
+                        <CardTitle className="text-lg">{struct.name}</CardTitle>
+                        <CardDescription>{struct.description}</CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-3xl font-bold text-foreground mb-4">{formatCurrency(struct.total)}</p>
+                    <div className="space-y-2">
+                      {Object.entries(struct.assets)
+                        .filter(([_, val]) => val > 0)
+                        .map(([assetType, value]) => (
+                        <div key={assetType} className="flex justify-between items-center text-sm">
+                          <span className="text-muted-foreground capitalize">{assetType.replace(/([A-Z])/g, ' $1').trim()}</span>
+                          <span className="font-medium text-foreground">{formatCurrency(value)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* Aggregated Net Worth */}
+            <Card className="bg-[#1a2744] text-white">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-white/70 mb-1">
+                      {structureFilter === "all" ? "Total Net Worth (All Structures)" : `Net Worth (${structureTotals.find(s => s.key === structureFilter)?.name})`}
+                    </p>
+                    <p className="text-4xl font-bold">
+                      {formatCurrency(
+                        structureFilter === "all" 
+                          ? structureTotals.reduce((sum, s) => sum + s.total, 0)
+                          : structureTotals.find(s => s.key === structureFilter)?.total || 0
+                      )}
+                    </p>
+                  </div>
+                  <Eye className="h-12 w-12 text-white/30" />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Structure Breakdown Chart */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Wealth by Ownership Structure</CardTitle>
+                <CardDescription>How your assets are distributed across legal entities</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ChartContainer height={300}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={structureTotals.filter(s => s.total > 0)} layout="vertical">
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis type="number" tickFormatter={(v) => `$${(v/1000000).toFixed(1)}M`} />
+                      <YAxis type="category" dataKey="name" width={100} />
+                      <Tooltip formatter={(v) => formatCurrency(v)} />
+                      <Bar dataKey="total" fill="#D4A84C" radius={[0, 4, 4, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           {/* Combined Wealth Tab */}
           <TabsContent value="wealth" className="space-y-6">

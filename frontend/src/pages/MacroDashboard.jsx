@@ -236,14 +236,14 @@ const MacroDashboard = () => {
               title="S&P 500" 
               value={overview.highlights.indices.spx.value} 
               change={overview.highlights.indices.spx.change}
-              changePct={overview.highlights.indices.spx.change_pct * 100}
+              changePct={overview.highlights.indices.spx.change_pct}
               icon={BarChart3}
             />
             <PriceCard 
               title="ASX 200" 
               value={overview.highlights.indices.asx200.value}
               change={overview.highlights.indices.asx200.change}
-              changePct={overview.highlights.indices.asx200.change_pct * 100}
+              changePct={overview.highlights.indices.asx200.change_pct}
               icon={BarChart3}
             />
             <PriceCard 

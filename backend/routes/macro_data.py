@@ -17,11 +17,11 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/macro", tags=["Macro Market Data"])
 
 # Thread pool for yfinance calls (which are blocking)
-executor = ThreadPoolExecutor(max_workers=4)
+executor = ThreadPoolExecutor(max_workers=10)
 
-# Cache for live data (expires after 60 seconds)
+# Cache for live data (expires after 5 minutes for better performance)
 _cache = {}
-_cache_ttl = 60  # seconds
+_cache_ttl = 300  # 5 minutes - market data doesn't change that frequently
 
 def get_cached(key: str):
     """Get cached data if not expired."""
@@ -36,7 +36,7 @@ def set_cached(key: str, data):
     _cache[key] = (data, datetime.now(timezone.utc))
 
 def fetch_live_indices():
-    """Fetch live index data using yfinance."""
+    """Fetch live index data using yfinance with batch download for speed."""
     try:
         import yfinance as yf
         
@@ -47,37 +47,51 @@ def fetch_live_indices():
             "asia": [("^N225", "Nikkei 225", "N225"), ("^HSI", "Hang Seng", "HSI"), ("000001.SS", "Shanghai Comp", "SSEC")]
         }
         
-        result = {}
+        # Collect all tickers for batch download
+        all_tickers = []
+        ticker_map = {}  # yahoo_sym -> (region, name, display_sym)
         for region, syms in symbols.items():
-            region_data = []
             for yahoo_sym, name, display_sym in syms:
+                all_tickers.append(yahoo_sym)
+                ticker_map[yahoo_sym] = (region, name, display_sym)
+        
+        # Batch download for speed (single request instead of many)
+        try:
+            tickers = yf.Tickers(' '.join(all_tickers))
+            result = {region: [] for region in symbols.keys()}
+            
+            for yahoo_sym, (region, name, display_sym) in ticker_map.items():
                 try:
-                    ticker = yf.Ticker(yahoo_sym)
-                    info = ticker.fast_info
-                    current = info.last_price if hasattr(info, 'last_price') else info.get('regularMarketPrice', 0)
-                    prev_close = info.previous_close if hasattr(info, 'previous_close') else info.get('regularMarketPreviousClose', current)
-                    change = current - prev_close if current and prev_close else 0
-                    change_pct = (change / prev_close * 100) if prev_close else 0
-                    
-                    region_data.append({
-                        "symbol": display_sym,
-                        "name": name,
-                        "value": round(current, 2) if current else 0,
-                        "change": round(change, 2),
-                        "change_pct": round(change_pct, 2)
-                    })
+                    ticker = tickers.tickers.get(yahoo_sym)
+                    if ticker:
+                        info = ticker.fast_info
+                        current = info.last_price if hasattr(info, 'last_price') else 0
+                        prev_close = info.previous_close if hasattr(info, 'previous_close') else current
+                        change = current - prev_close if current and prev_close else 0
+                        change_pct = (change / prev_close * 100) if prev_close else 0
+                        
+                        result[region].append({
+                            "symbol": display_sym,
+                            "name": name,
+                            "value": round(current, 2) if current else 0,
+                            "change": round(change, 2),
+                            "change_pct": round(change_pct, 2)
+                        })
                 except Exception as e:
                     logger.warning(f"Failed to fetch {yahoo_sym}: {e}")
-            if region_data:
-                result[region] = region_data
-        
-        return result if result else None
+            
+            # Remove empty regions
+            result = {k: v for k, v in result.items() if v}
+            return result if result else None
+        except Exception as e:
+            logger.warning(f"Batch download failed, falling back: {e}")
+            return None
     except Exception as e:
         logger.error(f"yfinance indices fetch failed: {e}")
         return None
 
 def fetch_live_currencies():
-    """Fetch live currency data using yfinance."""
+    """Fetch live currency data using yfinance with batch download for speed."""
     try:
         import yfinance as yf
         
@@ -86,36 +100,48 @@ def fetch_live_currencies():
             "aud_crosses": [("AUDUSD=X", "AUD/USD"), ("AUDEUR=X", "AUD/EUR"), ("AUDJPY=X", "AUD/JPY")],
         }
         
-        result = {}
+        # Collect all tickers for batch download
+        all_tickers = []
+        ticker_map = {}
         for category, pair_list in pairs.items():
-            cat_data = []
             for yahoo_sym, display_name in pair_list:
+                all_tickers.append(yahoo_sym)
+                ticker_map[yahoo_sym] = (category, display_name)
+        
+        try:
+            tickers = yf.Tickers(' '.join(all_tickers))
+            result = {cat: [] for cat in pairs.keys()}
+            
+            for yahoo_sym, (category, display_name) in ticker_map.items():
                 try:
-                    ticker = yf.Ticker(yahoo_sym)
-                    info = ticker.fast_info
-                    current = info.last_price if hasattr(info, 'last_price') else 0
-                    prev_close = info.previous_close if hasattr(info, 'previous_close') else current
-                    change = current - prev_close if current and prev_close else 0
-                    change_pct = (change / prev_close * 100) if prev_close else 0
-                    
-                    cat_data.append({
-                        "pair": display_name,
-                        "rate": round(current, 4) if current else 0,
-                        "change": round(change, 4),
-                        "change_pct": round(change_pct, 2)
-                    })
+                    ticker = tickers.tickers.get(yahoo_sym)
+                    if ticker:
+                        info = ticker.fast_info
+                        current = info.last_price if hasattr(info, 'last_price') else 0
+                        prev_close = info.previous_close if hasattr(info, 'previous_close') else current
+                        change = current - prev_close if current and prev_close else 0
+                        change_pct = (change / prev_close * 100) if prev_close else 0
+                        
+                        result[category].append({
+                            "pair": display_name,
+                            "rate": round(current, 4) if current else 0,
+                            "change": round(change, 4),
+                            "change_pct": round(change_pct, 2)
+                        })
                 except Exception as e:
                     logger.warning(f"Failed to fetch {yahoo_sym}: {e}")
-            if cat_data:
-                result[category] = cat_data
-        
-        return result if result else None
+            
+            result = {k: v for k, v in result.items() if v}
+            return result if result else None
+        except Exception as e:
+            logger.warning(f"Batch currency download failed: {e}")
+            return None
     except Exception as e:
         logger.error(f"yfinance currency fetch failed: {e}")
         return None
 
 def fetch_live_commodities():
-    """Fetch live commodity data using yfinance."""
+    """Fetch live commodity data using yfinance with batch download for speed."""
     try:
         import yfinance as yf
         
@@ -124,38 +150,50 @@ def fetch_live_commodities():
             "metals": [("GC=F", "Gold", "GC", "oz"), ("SI=F", "Silver", "SI", "oz"), ("HG=F", "Copper", "HG", "lb")],
         }
         
-        result = {}
+        # Collect all tickers for batch download
+        all_tickers = []
+        ticker_map = {}
         for category, items in commodities.items():
-            cat_data = []
             for yahoo_sym, name, display_sym, unit in items:
+                all_tickers.append(yahoo_sym)
+                ticker_map[yahoo_sym] = (category, name, display_sym, unit)
+        
+        try:
+            tickers = yf.Tickers(' '.join(all_tickers))
+            result = {cat: [] for cat in commodities.keys()}
+            
+            for yahoo_sym, (category, name, display_sym, unit) in ticker_map.items():
                 try:
-                    ticker = yf.Ticker(yahoo_sym)
-                    info = ticker.fast_info
-                    current = info.last_price if hasattr(info, 'last_price') else 0
-                    prev_close = info.previous_close if hasattr(info, 'previous_close') else current
-                    change = current - prev_close if current and prev_close else 0
-                    change_pct = (change / prev_close * 100) if prev_close else 0
-                    
-                    cat_data.append({
-                        "name": name,
-                        "symbol": display_sym,
-                        "price": round(current, 2) if current else 0,
-                        "change": round(change, 2),
-                        "change_pct": round(change_pct, 2),
-                        "unit": unit
-                    })
+                    ticker = tickers.tickers.get(yahoo_sym)
+                    if ticker:
+                        info = ticker.fast_info
+                        current = info.last_price if hasattr(info, 'last_price') else 0
+                        prev_close = info.previous_close if hasattr(info, 'previous_close') else current
+                        change = current - prev_close if current and prev_close else 0
+                        change_pct = (change / prev_close * 100) if prev_close else 0
+                        
+                        result[category].append({
+                            "name": name,
+                            "symbol": display_sym,
+                            "price": round(current, 2) if current else 0,
+                            "change": round(change, 2),
+                            "change_pct": round(change_pct, 2),
+                            "unit": unit
+                        })
                 except Exception as e:
                     logger.warning(f"Failed to fetch {yahoo_sym}: {e}")
-            if cat_data:
-                result[category] = cat_data
-        
-        return result if result else None
+            
+            result = {k: v for k, v in result.items() if v}
+            return result if result else None
+        except Exception as e:
+            logger.warning(f"Batch commodity download failed: {e}")
+            return None
     except Exception as e:
         logger.error(f"yfinance commodities fetch failed: {e}")
         return None
 
 def fetch_live_crypto():
-    """Fetch live crypto data using yfinance."""
+    """Fetch live crypto data using yfinance with batch download for speed."""
     try:
         import yfinance as yf
         
@@ -169,28 +207,39 @@ def fetch_live_crypto():
             ("DOGE-USD", "DOGE", "Dogecoin"),
         ]
         
-        result = []
-        for yahoo_sym, symbol, name in cryptos:
-            try:
-                ticker = yf.Ticker(yahoo_sym)
-                info = ticker.fast_info
-                current = info.last_price if hasattr(info, 'last_price') else 0
-                prev_close = info.previous_close if hasattr(info, 'previous_close') else current
-                change_24h = ((current - prev_close) / prev_close * 100) if prev_close else 0
-                market_cap = info.market_cap if hasattr(info, 'market_cap') else 0
-                
-                result.append({
-                    "symbol": symbol,
-                    "name": name,
-                    "price": round(current, 2) if current else 0,
-                    "change_24h": round(change_24h, 2),
-                    "market_cap": market_cap or 0,
-                    "volume_24h": 0  # yfinance doesn't provide this easily
-                })
-            except Exception as e:
-                logger.warning(f"Failed to fetch {yahoo_sym}: {e}")
+        # Batch download for speed
+        all_tickers = [c[0] for c in cryptos]
+        ticker_map = {c[0]: (c[1], c[2]) for c in cryptos}
         
-        return result if result else None
+        try:
+            tickers = yf.Tickers(' '.join(all_tickers))
+            result = []
+            
+            for yahoo_sym, (symbol, name) in ticker_map.items():
+                try:
+                    ticker = tickers.tickers.get(yahoo_sym)
+                    if ticker:
+                        info = ticker.fast_info
+                        current = info.last_price if hasattr(info, 'last_price') else 0
+                        prev_close = info.previous_close if hasattr(info, 'previous_close') else current
+                        change_24h = ((current - prev_close) / prev_close * 100) if prev_close else 0
+                        market_cap = info.market_cap if hasattr(info, 'market_cap') else 0
+                        
+                        result.append({
+                            "symbol": symbol,
+                            "name": name,
+                            "price": round(current, 2) if current else 0,
+                            "change_24h": round(change_24h, 2),
+                            "market_cap": market_cap or 0,
+                            "volume_24h": 0
+                        })
+                except Exception as e:
+                    logger.warning(f"Failed to fetch {yahoo_sym}: {e}")
+            
+            return result if result else None
+        except Exception as e:
+            logger.warning(f"Batch crypto download failed: {e}")
+            return None
     except Exception as e:
         logger.error(f"yfinance crypto fetch failed: {e}")
         return None
@@ -401,18 +450,27 @@ async def get_macro_overview():
     if cached:
         return cached
     
-    # Try to fetch live data
+    # Try to fetch live data IN PARALLEL for maximum speed
     loop = asyncio.get_event_loop()
+    live_indices = live_currencies = live_commodities = live_crypto = None
     
     try:
-        # Fetch live indices for key markets
-        live_indices = await loop.run_in_executor(executor, fetch_live_indices)
-        live_currencies = await loop.run_in_executor(executor, fetch_live_currencies)
-        live_commodities = await loop.run_in_executor(executor, fetch_live_commodities)
-        live_crypto = await loop.run_in_executor(executor, fetch_live_crypto)
+        # Fetch all data sources in parallel using asyncio.gather
+        results = await asyncio.gather(
+            loop.run_in_executor(executor, fetch_live_indices),
+            loop.run_in_executor(executor, fetch_live_currencies),
+            loop.run_in_executor(executor, fetch_live_commodities),
+            loop.run_in_executor(executor, fetch_live_crypto),
+            return_exceptions=True
+        )
+        
+        # Unpack results, treating exceptions as None
+        live_indices = results[0] if not isinstance(results[0], Exception) else None
+        live_currencies = results[1] if not isinstance(results[1], Exception) else None
+        live_commodities = results[2] if not isinstance(results[2], Exception) else None
+        live_crypto = results[3] if not isinstance(results[3], Exception) else None
     except Exception as e:
         logger.error(f"Live data fetch failed: {e}")
-        live_indices = live_currencies = live_commodities = live_crypto = None
     
     # Build highlights using live data if available, fallback to static
     def get_index(live_data, region, idx, fallback):

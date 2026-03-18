@@ -226,26 +226,26 @@ const ScenarioModelling = () => {
 
     return (
       <Card 
-        className={`cursor-pointer transition-all hover:shadow-md ${selectedGoal?.id === goal.id ? 'ring-2 ring-[#D4A84C]' : ''}`}
+        className={`cursor-pointer transition-all hover:shadow-md bg-card ${selectedGoal?.id === goal.id ? 'ring-2 ring-[#D4A84C]' : ''}`}
         onClick={() => setSelectedGoal(goal)}
       >
         <CardContent className="p-4">
           <div className="flex justify-between items-start mb-3">
             <div>
-              <h3 className="font-semibold text-white">{goal.name}</h3>
-              <p className="text-sm text-gray-400">Target: {formatCurrency(goal.target)}</p>
+              <h3 className="font-semibold text-foreground">{goal.name}</h3>
+              <p className="text-sm text-muted-foreground">Target: {formatCurrency(goal.target)}</p>
             </div>
-            <Badge variant={goal.priority === "high" ? "default" : "secondary"} className={goal.priority === "high" ? "bg-[#D4A84C]" : ""}>
+            <Badge variant={goal.priority === "high" ? "default" : "secondary"} className={goal.priority === "high" ? "bg-[#D4A84C] text-black" : ""}>
               {goal.priority}
             </Badge>
           </div>
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-gray-400">Progress</span>
-              <span className="text-white">{formatCurrency(goal.current)} ({progress.toFixed(0)}%)</span>
+              <span className="text-muted-foreground">Progress</span>
+              <span className="text-foreground">{formatCurrency(goal.current)} ({progress.toFixed(0)}%)</span>
             </div>
             <Progress value={progress} className="h-2" />
-            <div className="flex justify-between text-xs text-gray-500">
+            <div className="flex justify-between text-xs text-muted-foreground">
               <span>Deadline: {goal.deadline}</span>
               <span>Need: {formatCurrency(monthlyRequired)}/mo</span>
             </div>
@@ -367,7 +367,7 @@ const ScenarioModelling = () => {
           {/* Goals Tab */}
           <TabsContent value="goals" className="space-y-4">
             <div className="flex justify-between items-center">
-              <h2 className="text-lg font-semibold text-white">Your Financial Goals</h2>
+              <h2 className="text-lg font-semibold text-foreground">Your Financial Goals</h2>
               <Button className="bg-[#D4A84C] hover:bg-[#C49A3C] text-black">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Goal

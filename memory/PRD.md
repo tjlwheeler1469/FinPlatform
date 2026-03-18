@@ -272,7 +272,7 @@ generatePerformanceData(months) → [
 
 ## Test Credentials
 
-- **Preview URL**: https://knowledge-graph-ui.preview.emergentagent.com
+- **Preview URL**: https://net-worth-hub-17.preview.emergentagent.com
 - **Test Page**: /client-360
 - **Compliance bypass**: `localStorage.setItem('wealth_command_compliance_v5', 'permanent')`
 - **Adviser mode**: `localStorage.setItem('app_mode', 'adviser')`
