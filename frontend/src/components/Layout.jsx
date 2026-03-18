@@ -68,7 +68,8 @@ import {
   Brain,
   ListTodo,
   Video,
-  Network
+  Network,
+  Bitcoin
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -109,6 +110,7 @@ const personalNavGroups = [
       { path: "/managed-funds", label: "Managed Funds", icon: PieChart, title: "Managed Funds" },
       { path: "/property-portfolio", label: "Property", icon: Building2, title: "Property" },
       { path: "/cash-deposits", label: "Cash & TDs", icon: PiggyBank, title: "Cash & Term Deposits" },
+      { path: "/crypto-portfolio", label: "Crypto", icon: Bitcoin, title: "Cryptocurrency", badge: "NEW" },
       { path: "/portfolio-aggregator", label: "All Accounts", icon: Link2, title: "All Accounts" },
       { path: "/budget", label: "Budget", icon: Wallet, title: "Budget & Cashflow" },
     ]

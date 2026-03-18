@@ -130,16 +130,31 @@ const ASSET_HOLDINGS = {
     label: "Bonds & Fixed Income",
     icon: Landmark,
     color: "#F59E0B",
-    total: 125000,
+    total: 95000,
     holdings: [
       { name: "Aus Gov 10Y Bond", symbol: "ACGB-34", units: 50000, price: 1.02, value: 51000, yield: 4.2, maturity: "2034-03-15" },
       { name: "Corporate Bond Fund", symbol: "BOND", units: 30000, price: 1.05, value: 31500, yield: 5.1, maturity: "2028-06-30" },
-      { name: "Hybrid Securities", symbol: "NABPF", units: 400, price: 98.50, value: 39400, yield: 6.8, maturity: "2027-12-15" },
-      { name: "NSW Treasury Bond", symbol: "NSWTC", units: 3000, price: 1.03, value: 3090, yield: 4.5, maturity: "2030-11-20" },
+      { name: "NSW Treasury Bond", symbol: "NSWTC", units: 12000, price: 1.04, value: 12480, yield: 4.5, maturity: "2030-11-20" },
     ],
     research: [
       { title: "Fixed Income Strategy 2026", date: "2025-12-08", source: "UBS", rating: "Overweight", target: null },
       { title: "Corporate Credit Outlook", date: "2025-11-15", source: "JP Morgan", rating: "Neutral", target: null },
+    ]
+  },
+  hybrids: {
+    label: "Hybrid Securities",
+    icon: Coins,
+    color: "#EC4899",
+    total: 85000,
+    holdings: [
+      { name: "CBA PERLS XI", symbol: "CBAPD", units: 300, price: 98.50, value: 29550, yield: 7.35, maturity: "2026-10-15", franking: 100 },
+      { name: "Westpac Capital Notes 8", symbol: "WBCPI", units: 200, price: 101.20, value: 20240, yield: 7.25, maturity: "2027-03-22", franking: 100 },
+      { name: "ANZ Capital Notes 7", symbol: "ANZPJ", units: 250, price: 97.80, value: 24450, yield: 7.45, maturity: "2028-09-20", franking: 100 },
+      { name: "NAB Capital Notes 5", symbol: "NABPH", units: 110, price: 99.00, value: 10890, yield: 7.30, maturity: "2028-06-17", franking: 100 },
+    ],
+    research: [
+      { title: "Bank Hybrids Market Update", date: "2025-12-12", source: "Bell Potter", rating: "Attractive", target: null },
+      { title: "AT1 Capital Notes Analysis", date: "2025-11-28", source: "Citi Research", rating: "Hold", target: null },
     ]
   },
   cash: {

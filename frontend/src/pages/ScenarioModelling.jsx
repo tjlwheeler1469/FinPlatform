@@ -235,7 +235,10 @@ const ScenarioModelling = () => {
               <h3 className="font-semibold text-foreground">{goal.name}</h3>
               <p className="text-sm text-muted-foreground">Target: {formatCurrency(goal.target)}</p>
             </div>
-            <Badge variant={goal.priority === "high" ? "default" : "secondary"} className={goal.priority === "high" ? "bg-[#D4A84C] text-black" : ""}>
+            <Badge 
+              variant={goal.priority === "high" ? "default" : "secondary"} 
+              className={goal.priority === "high" ? "bg-[#D4A84C] text-black font-semibold" : "bg-slate-600 text-white font-semibold"}
+            >
               {goal.priority}
             </Badge>
           </div>
@@ -262,18 +265,18 @@ const ScenarioModelling = () => {
     const totalValue = assets.reduce((s, a) => s + a.value, 0);
 
     return (
-      <Card className={`cursor-pointer transition-all ${included ? 'ring-2 ring-[#D4A84C] bg-[#1a1a2e]' : 'hover:bg-[#1a1a2e]/50'}`} onClick={onToggle}>
+      <Card className={`cursor-pointer transition-all ${included ? 'ring-2 ring-[#D4A84C] bg-[#1a1a2e]' : 'bg-card hover:bg-muted/50'}`} onClick={onToggle}>
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <div className="p-2 rounded-lg" style={{ backgroundColor: `${type.color}20` }}>
                 <Icon className="h-4 w-4" style={{ color: type.color }} />
               </div>
-              <span className="font-medium text-white">{type.label}</span>
+              <span className="font-medium text-foreground">{type.label}</span>
             </div>
             <Switch checked={included} />
           </div>
-          <div className="text-sm text-gray-400">
+          <div className="text-sm text-muted-foreground">
             {assets.length} holdings • {formatCurrency(totalValue)}
           </div>
         </CardContent>
@@ -286,56 +289,56 @@ const ScenarioModelling = () => {
       <div className="space-y-6" data-testid="scenario-modelling-page">
         {/* Header Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="bg-gradient-to-br from-[#1a1a2e] to-[#0f0f1a] border-[#D4A84C]/20">
+          <Card className="bg-gradient-to-br from-[#1a2744] to-[#2a3f5f] border-[#D4A84C]/20">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-[#D4A84C]/20">
                   <Target className="h-5 w-5 text-[#D4A84C]" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-400">Active Goals</p>
+                  <p className="text-sm text-white/70">Active Goals</p>
                   <p className="text-xl font-bold text-white">{goals.length}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
           
-          <Card className="bg-gradient-to-br from-[#1a1a2e] to-[#0f0f1a] border-emerald-500/20">
+          <Card className="bg-gradient-to-br from-[#1a2744] to-[#2a3f5f] border-emerald-500/20">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-emerald-500/20">
                   <Wallet className="h-5 w-5 text-emerald-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-400">Existing Assets</p>
+                  <p className="text-sm text-white/70">Existing Assets</p>
                   <p className="text-xl font-bold text-white">{formatCurrency(totalExistingValue)}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-[#1a1a2e] to-[#0f0f1a] border-blue-500/20">
+          <Card className="bg-gradient-to-br from-[#1a2744] to-[#2a3f5f] border-blue-500/20">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-blue-500/20">
                   <Plus className="h-5 w-5 text-blue-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-400">New Investment</p>
+                  <p className="text-sm text-white/70">New Investment</p>
                   <p className="text-xl font-bold text-white">{formatCurrency(totalNewInvestment)}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-[#1a1a2e] to-[#0f0f1a] border-purple-500/20">
+          <Card className="bg-gradient-to-br from-[#1a2744] to-[#2a3f5f] border-purple-500/20">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-purple-500/20">
                   <BarChart3 className="h-5 w-5 text-purple-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-400">Total Scenario</p>
+                  <p className="text-sm text-white/70">Total Scenario</p>
                   <p className="text-xl font-bold text-white">{formatCurrency(totalExistingValue + totalNewInvestment)}</p>
                 </div>
               </div>
@@ -345,20 +348,20 @@ const ScenarioModelling = () => {
 
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="bg-[#1a1a2e] border border-gray-700">
-            <TabsTrigger value="goals" className="data-[state=active]:bg-[#D4A84C] data-[state=active]:text-black">
+          <TabsList className="bg-muted border border-border">
+            <TabsTrigger value="goals" className="data-[state=active]:bg-[#D4A84C] data-[state=active]:text-black text-foreground">
               <Target className="h-4 w-4 mr-2" />
               Goals
             </TabsTrigger>
-            <TabsTrigger value="existing" className="data-[state=active]:bg-[#D4A84C] data-[state=active]:text-black">
+            <TabsTrigger value="existing" className="data-[state=active]:bg-[#D4A84C] data-[state=active]:text-black text-foreground">
               <Eye className="h-4 w-4 mr-2" />
               Existing Assets
             </TabsTrigger>
-            <TabsTrigger value="scenario" className="data-[state=active]:bg-[#D4A84C] data-[state=active]:text-black">
+            <TabsTrigger value="scenario" className="data-[state=active]:bg-[#D4A84C] data-[state=active]:text-black text-foreground">
               <Calculator className="h-4 w-4 mr-2" />
               Build Scenario
             </TabsTrigger>
-            <TabsTrigger value="projection" className="data-[state=active]:bg-[#D4A84C] data-[state=active]:text-black">
+            <TabsTrigger value="projection" className="data-[state=active]:bg-[#D4A84C] data-[state=active]:text-black text-foreground">
               <LineChart className="h-4 w-4 mr-2" />
               Projection
             </TabsTrigger>
@@ -385,7 +388,7 @@ const ScenarioModelling = () => {
                     <Sparkles className="h-5 w-5 text-[#D4A84C]" />
                     Model This Goal
                   </CardTitle>
-                  <CardDescription>Create a scenario to achieve "{selectedGoal.name}"</CardDescription>
+                  <CardDescription className="text-gray-300">Create a scenario to achieve "{selectedGoal.name}"</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="flex gap-3">
@@ -414,8 +417,8 @@ const ScenarioModelling = () => {
           <TabsContent value="existing" className="space-y-4">
             <div className="flex justify-between items-center">
               <div>
-                <h2 className="text-lg font-semibold text-white">Include Existing Assets</h2>
-                <p className="text-sm text-gray-400">Select which assets to include in your scenario projection</p>
+                <h2 className="text-lg font-semibold text-foreground">Include Existing Assets</h2>
+                <p className="text-sm text-muted-foreground">Select which assets to include in your scenario projection</p>
               </div>
               <Badge variant="outline" className="text-lg py-1 px-3">
                 Selected: {formatCurrency(totalExistingValue)}

@@ -1,11 +1,13 @@
 """
 Financial Plan Generation System
 Generates comprehensive financial plans from transaction scenarios.
+Persists data to MongoDB.
 """
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 from datetime import datetime, timezone, timedelta
+from pymongo import MongoClient
 import uuid
 import logging
 import os
@@ -17,8 +19,17 @@ router = APIRouter(prefix="/financial-plan", tags=["Financial Plan"])
 # LLM integration for AI-powered plan generation
 EMERGENT_LLM_KEY = os.environ.get("EMERGENT_LLM_KEY", "")
 
-# In-memory storage for plans
-GENERATED_PLANS: Dict[str, Dict] = {}
+# MongoDB connection
+MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
+DB_NAME = os.environ.get("DB_NAME", "wealth_command")
+
+def get_db():
+    """Get MongoDB database connection."""
+    client = MongoClient(MONGO_URL)
+    return client[DB_NAME]
+
+def get_plans_collection():
+    return get_db()["financial_plans"]
 
 
 class Transaction(BaseModel):
@@ -406,8 +417,12 @@ async def generate_financial_plan(request: PlanGenerationRequest, background_tas
         ]
     }
     
-    # Store the plan
-    GENERATED_PLANS[plan_id] = plan
+    # Store the plan in MongoDB
+    plans_col = get_plans_collection()
+    plans_col.insert_one(plan)
+    
+    # Remove _id for response
+    plan.pop("_id", None)
     
     return {
         "success": True,
@@ -420,19 +435,23 @@ async def generate_financial_plan(request: PlanGenerationRequest, background_tas
 @router.get("/{plan_id}")
 async def get_plan(plan_id: str):
     """Retrieve a generated financial plan."""
-    if plan_id not in GENERATED_PLANS:
+    plans_col = get_plans_collection()
+    plan = plans_col.find_one({"plan_id": plan_id}, {"_id": 0})
+    
+    if not plan:
         raise HTTPException(status_code=404, detail="Plan not found")
     
-    return GENERATED_PLANS[plan_id]
+    return plan
 
 
 @router.get("/{plan_id}/download")
 async def download_plan(plan_id: str, format: str = "pdf"):
     """Download a financial plan in various formats."""
-    if plan_id not in GENERATED_PLANS:
-        raise HTTPException(status_code=404, detail="Plan not found")
+    plans_col = get_plans_collection()
+    plan = plans_col.find_one({"plan_id": plan_id}, {"_id": 0})
     
-    plan = GENERATED_PLANS[plan_id]
+    if not plan:
+        raise HTTPException(status_code=404, detail="Plan not found")
     
     # In production, would generate actual PDF/DOCX
     return {
@@ -447,13 +466,19 @@ async def download_plan(plan_id: str, format: str = "pdf"):
 @router.post("/{plan_id}/approve")
 async def approve_plan(plan_id: str, approved_by: str):
     """Mark a plan as approved."""
-    if plan_id not in GENERATED_PLANS:
-        raise HTTPException(status_code=404, detail="Plan not found")
+    plans_col = get_plans_collection()
     
-    plan = GENERATED_PLANS[plan_id]
-    plan["status"] = "approved"
-    plan["approved_at"] = datetime.now(timezone.utc).isoformat()
-    plan["approved_by"] = approved_by
+    result = plans_col.update_one(
+        {"plan_id": plan_id},
+        {"$set": {
+            "status": "approved",
+            "approved_at": datetime.now(timezone.utc).isoformat(),
+            "approved_by": approved_by
+        }}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Plan not found")
     
     return {
         "success": True,
@@ -466,10 +491,8 @@ async def approve_plan(plan_id: str, approved_by: str):
 @router.get("/client/{client_id}/plans")
 async def get_client_plans(client_id: str):
     """Get all plans for a client."""
-    client_plans = [
-        p for p in GENERATED_PLANS.values() 
-        if p.get("client", {}).get("id") == client_id
-    ]
+    plans_col = get_plans_collection()
+    client_plans = list(plans_col.find({"client.id": client_id}, {"_id": 0}))
     
     return {
         "client_id": client_id,

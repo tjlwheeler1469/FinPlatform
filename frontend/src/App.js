@@ -189,6 +189,9 @@ const KnowledgeGraphDashboard = lazy(() => import("@/pages/KnowledgeGraphDashboa
 // Hybrids Trading
 const HybridsTrading = lazy(() => import("@/pages/HybridsTrading"));
 
+// Crypto Portfolio
+const CryptoPortfolio = lazy(() => import("@/pages/CryptoPortfolio"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -1033,6 +1036,7 @@ const AppRouter = () => {
       <Route path="/cash-deposits" element={<CashDeposits />} />
       <Route path="/managed-funds" element={<ManagedFunds />} />
       <Route path="/hybrids-trading" element={<HybridsTrading />} />
+      <Route path="/crypto-portfolio" element={<CryptoPortfolio />} />
       
       {/* CRM Command Center */}
       <Route path="/crm-command-center" element={<CRMCommandCenter />} />

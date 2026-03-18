@@ -1,11 +1,13 @@
 """
 Client Contact & Messaging System
 Handles platform messages and emails from clients to advisors.
+Persists data to MongoDB.
 """
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from pydantic import BaseModel, EmailStr
 from typing import Optional, List, Dict, Any
 from datetime import datetime, timezone
+from pymongo import MongoClient
 import uuid
 import logging
 import os
@@ -13,9 +15,21 @@ import os
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/client-contact", tags=["Client Contact"])
 
-# In-memory storage for messages (in production, use MongoDB)
-MESSAGES_STORE: List[Dict[str, Any]] = []
-NOTIFICATIONS_STORE: List[Dict[str, Any]] = []
+# MongoDB connection
+MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
+DB_NAME = os.environ.get("DB_NAME", "wealth_command")
+
+def get_db():
+    """Get MongoDB database connection."""
+    client = MongoClient(MONGO_URL)
+    return client[DB_NAME]
+
+# Collections
+def get_messages_collection():
+    return get_db()["client_messages"]
+
+def get_notifications_collection():
+    return get_db()["client_notifications"]
 
 
 class PlatformMessage(BaseModel):
@@ -53,7 +67,7 @@ async def send_message(message: PlatformMessage, background_tasks: BackgroundTas
     message_id = f"MSG-{uuid.uuid4().hex[:8].upper()}"
     sent_at = datetime.now(timezone.utc).isoformat()
     
-    # Store message
+    # Store message in MongoDB
     stored_message = {
         "message_id": message_id,
         "client_id": message.client_id,
@@ -70,7 +84,8 @@ async def send_message(message: PlatformMessage, background_tasks: BackgroundTas
         "replied": False
     }
     
-    MESSAGES_STORE.append(stored_message)
+    messages_col = get_messages_collection()
+    messages_col.insert_one(stored_message)
     
     # Create notification for advisor
     notification = {
@@ -87,7 +102,8 @@ async def send_message(message: PlatformMessage, background_tasks: BackgroundTas
         "created_at": sent_at,
         "read": False
     }
-    NOTIFICATIONS_STORE.append(notification)
+    notifications_col = get_notifications_collection()
+    notifications_col.insert_one(notification)
     
     # In production, would send actual email if contact_method == "email"
     if message.contact_method == "email":
@@ -106,7 +122,8 @@ async def send_message(message: PlatformMessage, background_tasks: BackgroundTas
 @router.get("/messages/{client_id}")
 async def get_client_messages(client_id: str, include_sent: bool = True, include_received: bool = True):
     """Get all messages for a client."""
-    messages = [m for m in MESSAGES_STORE if m["client_id"] == client_id]
+    messages_col = get_messages_collection()
+    messages = list(messages_col.find({"client_id": client_id}, {"_id": 0}))
     
     return {
         "client_id": client_id,
@@ -119,7 +136,8 @@ async def get_client_messages(client_id: str, include_sent: bool = True, include
 @router.get("/messages/advisor/{advisor_email}")
 async def get_advisor_messages(advisor_email: str):
     """Get all messages for an advisor."""
-    messages = [m for m in MESSAGES_STORE if m["advisor_email"] == advisor_email]
+    messages_col = get_messages_collection()
+    messages = list(messages_col.find({"advisor_email": advisor_email}, {"_id": 0}))
     
     return {
         "advisor_email": advisor_email,
@@ -132,13 +150,16 @@ async def get_advisor_messages(advisor_email: str):
 @router.post("/mark-read/{message_id}")
 async def mark_message_read(message_id: str):
     """Mark a message as read."""
-    for message in MESSAGES_STORE:
-        if message["message_id"] == message_id:
-            message["read"] = True
-            message["read_at"] = datetime.now(timezone.utc).isoformat()
-            return {"success": True, "message_id": message_id, "status": "read"}
+    messages_col = get_messages_collection()
+    result = messages_col.update_one(
+        {"message_id": message_id},
+        {"$set": {"read": True, "read_at": datetime.now(timezone.utc).isoformat()}}
+    )
     
-    raise HTTPException(status_code=404, detail="Message not found")
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Message not found")
+    
+    return {"success": True, "message_id": message_id, "status": "read"}
 
 
 @router.post("/quick-action")
@@ -203,10 +224,12 @@ async def process_quick_action(action: QuickAction):
 @router.get("/notifications/{advisor_email}")
 async def get_advisor_notifications(advisor_email: str, unread_only: bool = False):
     """Get notifications for an advisor."""
-    notifications = [n for n in NOTIFICATIONS_STORE if n["recipient"] == advisor_email]
-    
+    notifications_col = get_notifications_collection()
+    query = {"recipient": advisor_email}
     if unread_only:
-        notifications = [n for n in notifications if not n.get("read")]
+        query["read"] = False
+    
+    notifications = list(notifications_col.find(query, {"_id": 0}))
     
     return {
         "advisor_email": advisor_email,
@@ -219,7 +242,8 @@ async def get_advisor_notifications(advisor_email: str, unread_only: bool = Fals
 @router.post("/reply/{message_id}")
 async def reply_to_message(message_id: str, reply_text: str):
     """Reply to a client message."""
-    original_message = next((m for m in MESSAGES_STORE if m["message_id"] == message_id), None)
+    messages_col = get_messages_collection()
+    original_message = messages_col.find_one({"message_id": message_id}, {"_id": 0})
     
     if not original_message:
         raise HTTPException(status_code=404, detail="Original message not found")
@@ -242,11 +266,13 @@ async def reply_to_message(message_id: str, reply_text: str):
         "status": "delivered"
     }
     
-    MESSAGES_STORE.append(reply)
+    messages_col.insert_one(reply)
     
     # Mark original as replied
-    original_message["replied"] = True
-    original_message["replied_at"] = sent_at
+    messages_col.update_one(
+        {"message_id": message_id},
+        {"$set": {"replied": True, "replied_at": sent_at}}
+    )
     
     return {
         "success": True,
