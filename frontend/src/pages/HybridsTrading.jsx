@@ -26,115 +26,106 @@ import {
   RefreshCw
 } from "lucide-react";
 import { toast } from "sonner";
+import axios from "axios";
 
-// Demo hybrid securities data (Australian focus)
-const DEMO_HYBRIDS = [
-  {
-    id: 1,
-    name: "CBAPD",
-    fullName: "Commonwealth Bank PERLS XI",
-    issuer: "Commonwealth Bank of Australia",
-    type: "Additional Tier 1 Capital",
-    marginOverBbsw: 3.00,
-    currentYield: 7.35,
-    tradingPrice: 98.50,
-    faceValue: 100,
-    unitsHeld: 500,
-    callDate: "2026-10-15",
-    maturityDate: "2031-10-15",
-    franking: 100,
-    lastDividend: 3.67,
-    frequency: "Quarterly",
-    rating: "BBB+"
-  },
-  {
-    id: 2,
-    name: "WBCPI",
-    fullName: "Westpac Capital Notes 8",
-    issuer: "Westpac Banking Corporation",
-    type: "Additional Tier 1 Capital",
-    marginOverBbsw: 2.90,
-    currentYield: 7.25,
-    tradingPrice: 101.20,
-    faceValue: 100,
-    unitsHeld: 300,
-    callDate: "2027-03-22",
-    maturityDate: "2032-03-22",
-    franking: 100,
-    lastDividend: 3.62,
-    frequency: "Quarterly",
-    rating: "BBB+"
-  },
-  {
-    id: 3,
-    name: "ANZPJ",
-    fullName: "ANZ Capital Notes 7",
-    issuer: "Australia and New Zealand Banking Group",
-    type: "Additional Tier 1 Capital",
-    marginOverBbsw: 3.10,
-    currentYield: 7.45,
-    tradingPrice: 97.80,
-    faceValue: 100,
-    unitsHeld: 400,
-    callDate: "2028-09-20",
-    maturityDate: "2033-09-20",
-    franking: 100,
-    lastDividend: 3.72,
-    frequency: "Quarterly",
-    rating: "BBB+"
-  },
-  {
-    id: 4,
-    name: "MQGPD",
-    fullName: "Macquarie Group Capital Notes 4",
-    issuer: "Macquarie Group Limited",
-    type: "Additional Tier 1 Capital",
-    marginOverBbsw: 3.70,
-    currentYield: 8.05,
-    tradingPrice: 96.30,
-    faceValue: 100,
-    unitsHeld: 200,
-    callDate: "2027-06-14",
-    maturityDate: "2032-06-14",
-    franking: 45,
-    lastDividend: 4.02,
-    frequency: "Quarterly",
-    rating: "BBB"
-  },
-  {
-    id: 5,
-    name: "NABPH",
-    fullName: "NAB Capital Notes 5",
-    issuer: "National Australia Bank",
-    type: "Additional Tier 1 Capital",
-    marginOverBbsw: 2.95,
-    currentYield: 7.30,
-    tradingPrice: 99.50,
-    faceValue: 100,
-    unitsHeld: 350,
-    callDate: "2028-06-17",
-    maturityDate: "2033-06-17",
-    franking: 100,
-    lastDividend: 3.65,
-    frequency: "Quarterly",
-    rating: "BBB+"
-  }
+const API = process.env.REACT_APP_BACKEND_URL || "";
+
+// User's hybrid holdings (units held)
+const USER_HOLDINGS = [
+  { symbol: "CBAPD", units: 500, rating: "BBB+" },
+  { symbol: "WBCPI", units: 300, rating: "BBB+" },
+  { symbol: "ANZPJ", units: 400, rating: "BBB+" },
+  { symbol: "MQGPD", units: 200, rating: "BBB" },
+  { symbol: "NABPH", units: 350, rating: "BBB+" }
 ];
 
-const MARKET_RATES = {
-  "3m_bbsw": 4.35,
-  "rba_cash": 4.35,
-  "90d_bank_bill": 4.32
-};
-
 const HybridsTrading = () => {
-  const [hybrids, setHybrids] = useState(DEMO_HYBRIDS);
+  const [hybrids, setHybrids] = useState([]);
+  const [marketRates, setMarketRates] = useState({ "3m_bbsw": 4.35, "rba_cash": 4.35, "90d_bank_bill": 4.32 });
   const [activeTab, setActiveTab] = useState("portfolio");
   const [loading, setLoading] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const [dataSource, setDataSource] = useState("Loading...");
+
+  // Fetch live prices from ASX via backend
+  const fetchLivePrices = async () => {
+    setLoading(true);
+    try {
+      // Build holdings string for API
+      const holdingsParam = USER_HOLDINGS.map(h => `${h.symbol}:${h.units}`).join(",");
+      
+      // Fetch portfolio value with live prices
+      const portfolioRes = await axios.get(`${API}/api/hybrids/portfolio/value`, {
+        params: { holdings: holdingsParam }
+      });
+      
+      // Map live data to display format
+      const liveHybrids = portfolioRes.data.portfolio.map((item, idx) => ({
+        id: idx + 1,
+        name: item.symbol,
+        fullName: item.name,
+        issuer: item.issuer,
+        type: "Additional Tier 1 Capital",
+        marginOverBbsw: item.margin_bbsw || 3.0,
+        currentYield: item.running_yield,
+        tradingPrice: item.price,
+        faceValue: 100,
+        unitsHeld: item.units,
+        callDate: item.call_date,
+        maturityDate: "",
+        franking: item.franking,
+        lastDividend: item.quarterly_distribution,
+        frequency: "Quarterly",
+        rating: USER_HOLDINGS.find(h => h.symbol === item.symbol)?.rating || "BBB+"
+      }));
+      
+      setHybrids(liveHybrids);
+      setMarketRates({
+        "3m_bbsw": portfolioRes.data.bbsw_3m,
+        "rba_cash": 4.35,
+        "90d_bank_bill": portfolioRes.data.bbsw_3m - 0.03
+      });
+      setLastUpdated(new Date(portfolioRes.data.timestamp));
+      setDataSource(portfolioRes.data.source || "ASX via Yahoo Finance");
+      
+      toast.success("Prices updated from ASX");
+    } catch (error) {
+      console.error("Error fetching live hybrid prices:", error);
+      toast.error("Failed to fetch live prices - using fallback data");
+      
+      // Fallback to demo data
+      setHybrids(USER_HOLDINGS.map((h, idx) => ({
+        id: idx + 1,
+        name: h.symbol,
+        fullName: h.symbol,
+        issuer: "Unknown",
+        type: "Additional Tier 1 Capital",
+        marginOverBbsw: 3.0,
+        currentYield: 7.0,
+        tradingPrice: 100,
+        faceValue: 100,
+        unitsHeld: h.units,
+        callDate: "2028-01-01",
+        maturityDate: "",
+        franking: 100,
+        lastDividend: 1.75,
+        frequency: "Quarterly",
+        rating: h.rating
+      })));
+      setDataSource("Offline");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch prices on mount
+  useEffect(() => {
+    fetchLivePrices();
+  }, []);
 
   const totalFaceValue = hybrids.reduce((sum, h) => sum + (h.faceValue * h.unitsHeld), 0);
   const totalMarketValue = hybrids.reduce((sum, h) => sum + (h.tradingPrice * h.unitsHeld), 0);
-  const averageYield = hybrids.reduce((sum, h) => sum + h.currentYield, 0) / hybrids.length;
+  const averageYield = hybrids.length > 0 ? hybrids.reduce((sum, h) => sum + h.currentYield, 0) / hybrids.length : 0;
   const totalPnL = totalMarketValue - totalFaceValue;
   const annualIncome = hybrids.reduce((sum, h) => sum + (h.lastDividend * 4 * h.unitsHeld), 0);
 
@@ -160,11 +151,7 @@ const HybridsTrading = () => {
   };
 
   const handleRefresh = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      toast.success("Prices updated");
-    }, 1000);
+    fetchLivePrices();
   };
 
   return (
@@ -246,15 +233,19 @@ const HybridsTrading = () => {
             <div className="flex gap-6 flex-wrap">
               <div>
                 <span className="text-xs text-muted-foreground">3M BBSW</span>
-                <p className="font-semibold text-foreground">{MARKET_RATES["3m_bbsw"]}%</p>
+                <p className="font-semibold text-foreground">{marketRates["3m_bbsw"]}%</p>
               </div>
               <div>
                 <span className="text-xs text-muted-foreground">RBA Cash Rate</span>
-                <p className="font-semibold text-foreground">{MARKET_RATES["rba_cash"]}%</p>
+                <p className="font-semibold text-foreground">{marketRates["rba_cash"]}%</p>
               </div>
               <div>
                 <span className="text-xs text-muted-foreground">90D Bank Bill</span>
-                <p className="font-semibold text-foreground">{MARKET_RATES["90d_bank_bill"]}%</p>
+                <p className="font-semibold text-foreground">{marketRates["90d_bank_bill"].toFixed(2)}%</p>
+              </div>
+              <div>
+                <span className="text-xs text-muted-foreground">Data Source</span>
+                <p className="font-semibold text-foreground">{dataSource}</p>
               </div>
             </div>
           </CardContent>

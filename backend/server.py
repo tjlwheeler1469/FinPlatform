@@ -347,6 +347,22 @@ def include_all_routes():
     except ImportError as e:
         logger.error(f"Failed to load fathom integration routes: {e}")
 
+    # LIVE CRYPTO PRICES - CoinGecko Integration
+    try:
+        from routes.crypto_prices import router as crypto_prices_router
+        app.include_router(crypto_prices_router, prefix="/api")
+        logger.info("CRYPTO PRICES loaded: Live CoinGecko prices, Portfolio values, Market data")
+    except ImportError as e:
+        logger.error(f"Failed to load crypto prices routes: {e}")
+    
+    # LIVE HYBRID PRICES - ASX Hybrid Securities
+    try:
+        from routes.hybrid_prices import router as hybrid_prices_router
+        app.include_router(hybrid_prices_router, prefix="/api")
+        logger.info("HYBRID PRICES loaded: Live ASX hybrid prices, Portfolio values, Yield data")
+    except ImportError as e:
+        logger.error(f"Failed to load hybrid prices routes: {e}")
+
 # Include all routes
 include_all_routes()
 

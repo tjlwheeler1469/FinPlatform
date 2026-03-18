@@ -23,77 +23,100 @@ import {
   Coins
 } from "lucide-react";
 import { toast } from "sonner";
+import axios from "axios";
 
-// Demo crypto holdings
-const DEMO_CRYPTO = [
-  {
-    id: 1,
-    name: "Bitcoin",
-    symbol: "BTC",
-    units: 0.85,
-    currentPrice: 73500,
-    purchasePrice: 42000,
-    purchaseDate: "2023-06-15",
-    allocation: 45
-  },
-  {
-    id: 2,
-    name: "Ethereum",
-    symbol: "ETH",
-    units: 8.5,
-    currentPrice: 3720,
-    purchasePrice: 2100,
-    purchaseDate: "2023-08-20",
-    allocation: 25
-  },
-  {
-    id: 3,
-    name: "Solana",
-    symbol: "SOL",
-    units: 45,
-    currentPrice: 185,
-    purchasePrice: 95,
-    purchaseDate: "2024-01-10",
-    allocation: 15
-  },
-  {
-    id: 4,
-    name: "Chainlink",
-    symbol: "LINK",
-    units: 250,
-    currentPrice: 22.50,
-    purchasePrice: 15.00,
-    purchaseDate: "2024-03-05",
-    allocation: 10
-  },
-  {
-    id: 5,
-    name: "Polygon",
-    symbol: "MATIC",
-    units: 2500,
-    currentPrice: 1.15,
-    purchasePrice: 0.85,
-    purchaseDate: "2024-02-20",
-    allocation: 5
-  }
+const API = process.env.REACT_APP_BACKEND_URL || "";
+
+// User's crypto holdings (units held + purchase price for P&L)
+const USER_HOLDINGS = [
+  { symbol: "BTC", units: 0.85, purchasePrice: 42000, purchaseDate: "2023-06-15" },
+  { symbol: "ETH", units: 8.5, purchasePrice: 2100, purchaseDate: "2023-08-20" },
+  { symbol: "SOL", units: 45, purchasePrice: 95, purchaseDate: "2024-01-10" },
+  { symbol: "LINK", units: 250, purchasePrice: 15.00, purchaseDate: "2024-03-05" },
+  { symbol: "MATIC", units: 2500, purchasePrice: 0.85, purchaseDate: "2024-02-20" }
 ];
 
+// Market data for Fear & Greed and trending (placeholder, could be fetched from API)
 const MARKET_DATA = {
-  btcDominance: 52.4,
-  totalMarketCap: 2.85,
-  fearGreedIndex: 72,
-  trending: ["BTC", "ETH", "SOL", "DOGE", "XRP"]
+  fearGreedIndex: 65,
+  trending: ["BTC", "ETH", "SOL", "PEPE", "WIF"]
 };
 
 const CryptoPortfolio = () => {
-  const [holdings, setHoldings] = useState(DEMO_CRYPTO);
+  const [holdings, setHoldings] = useState([]);
+  const [globalData, setGlobalData] = useState(null);
   const [activeTab, setActiveTab] = useState("portfolio");
   const [loading, setLoading] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const [dataSource, setDataSource] = useState("Loading...");
 
-  const totalValue = holdings.reduce((sum, h) => sum + (h.units * h.currentPrice), 0);
+  // Fetch live prices from CoinGecko via backend
+  const fetchLivePrices = async () => {
+    setLoading(true);
+    try {
+      // Build holdings string for API
+      const holdingsParam = USER_HOLDINGS.map(h => `${h.symbol}:${h.units}`).join(",");
+      
+      // Fetch portfolio value with live prices
+      const portfolioRes = await axios.get(`${API}/api/crypto/portfolio/value`, {
+        params: { holdings: holdingsParam, currency: "aud" }
+      });
+      
+      // Merge live prices with user's purchase data
+      const liveHoldings = portfolioRes.data.portfolio.map((item, idx) => ({
+        id: idx + 1,
+        ...item,
+        purchasePrice: USER_HOLDINGS.find(h => h.symbol === item.symbol)?.purchasePrice || 0,
+        purchaseDate: USER_HOLDINGS.find(h => h.symbol === item.symbol)?.purchaseDate || "",
+        currentPrice: item.price,
+        units: item.amount
+      }));
+      
+      setHoldings(liveHoldings);
+      setLastUpdated(new Date(portfolioRes.data.timestamp));
+      setDataSource(portfolioRes.data.source || "CoinGecko");
+      
+      // Fetch global market data
+      try {
+        const globalRes = await axios.get(`${API}/api/crypto/global`);
+        setGlobalData(globalRes.data);
+      } catch (e) {
+        console.warn("Failed to fetch global data:", e);
+      }
+      
+      toast.success("Prices updated from CoinGecko");
+    } catch (error) {
+      console.error("Error fetching live prices:", error);
+      toast.error("Failed to fetch live prices - using cached data");
+      
+      // Fallback to demo data
+      setHoldings(USER_HOLDINGS.map((h, idx) => ({
+        id: idx + 1,
+        symbol: h.symbol,
+        name: h.symbol,
+        units: h.units,
+        currentPrice: 0,
+        purchasePrice: h.purchasePrice,
+        purchaseDate: h.purchaseDate,
+        allocation: 0,
+        value: 0,
+        change_24h: 0
+      })));
+      setDataSource("Offline");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch prices on mount and set up refresh
+  useEffect(() => {
+    fetchLivePrices();
+  }, []);
+
+  const totalValue = holdings.reduce((sum, h) => sum + (h.value || h.units * h.currentPrice), 0);
   const totalCost = holdings.reduce((sum, h) => sum + (h.units * h.purchasePrice), 0);
   const totalPnL = totalValue - totalCost;
-  const totalPnLPercent = ((totalPnL / totalCost) * 100).toFixed(2);
+  const totalPnLPercent = totalCost > 0 ? ((totalPnL / totalCost) * 100).toFixed(2) : "0.00";
 
   const formatCurrency = (value) => {
     return new Intl.NumberFormat('en-AU', {
@@ -105,11 +128,7 @@ const CryptoPortfolio = () => {
   };
 
   const handleRefresh = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      toast.success("Prices updated");
-    }, 1000);
+    fetchLivePrices();
   };
 
   return (
@@ -154,7 +173,7 @@ const CryptoPortfolio = () => {
                 <BarChart3 className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">BTC Dominance</span>
               </div>
-              <p className="text-2xl font-bold text-foreground">{MARKET_DATA.btcDominance}%</p>
+              <p className="text-2xl font-bold text-foreground">{globalData?.btc_dominance?.toFixed(1) || "52.4"}%</p>
               <p className="text-sm text-muted-foreground">Market share</p>
             </CardContent>
           </Card>
@@ -165,8 +184,10 @@ const CryptoPortfolio = () => {
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">Market Cap</span>
               </div>
-              <p className="text-2xl font-bold text-foreground">${MARKET_DATA.totalMarketCap}T</p>
-              <p className="text-sm text-muted-foreground">Total crypto</p>
+              <p className="text-2xl font-bold text-foreground">
+                ${globalData?.total_market_cap_aud ? (globalData.total_market_cap_aud / 1e12).toFixed(2) : "2.85"}T
+              </p>
+              <p className="text-sm text-muted-foreground">Total crypto (AUD)</p>
             </CardContent>
           </Card>
 
