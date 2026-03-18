@@ -283,5 +283,5 @@ def on_test_stop(environment, **kwargs):
 
 
 if __name__ == "__main__":
-    print("Run with: locust -f load_test.py --host=https://advisor-command.preview.emergentagent.com")
+    print("Run with: locust -f load_test.py --host=https://transaction-lab-3.preview.emergentagent.com")
     print("Or for headless: locust -f load_test.py --headless -u 10000 -r 100 -t 5m --host=URL")

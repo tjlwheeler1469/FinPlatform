@@ -123,4 +123,4 @@ Documents + AI Copilot
 ## Credentials
 
 - **Test Adviser**: `advisor@wealthcommand.io` / `secure_password_123`
-- **Preview URL**: https://advisor-command.preview.emergentagent.com
+- **Preview URL**: https://transaction-lab-3.preview.emergentagent.com
