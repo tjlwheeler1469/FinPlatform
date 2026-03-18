@@ -1,0 +1,91 @@
+{
+  "summary": "Iteration 78 - Frontend testing completed for Adviser Mode updates. All 7 requested features verified: 1) Market Dashboard has historical chart with 10 timeframe buttons (1d, 1w, 2w, 1m, 3m, 6m, 1y, 3y, 5y, 10y), 2) Asset selector dropdown with 6 options (S&P 500, ASX 200, FTSE 100, Bitcoin, Gold, AUD/USD), 3) Transaction Modeler shows Save Scenario and Generate Plan buttons when transactions added, 4) Client context nav order: Overview -> Investments -> Plan -> Documents -> AI Copilot, 5) Investments section has: Net Worth, Shares & Trading, Cash & TDs, Funds, Property, 6) Plan section has: Goals, What-If Modeler (no separate Generate Plan), 7) Single AI Copilot section in client context nav.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_78.json"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "MacroDashboard.jsx correctly implements TIMEFRAMES array with 10 options (1d, 1w, 2w, 1m, 3m, 6m, 1y, 3y, 5y, 10y)",
+    "MacroDashboard.jsx CHART_SYMBOLS array has 6 assets: S&P 500, ASX 200, FTSE 100, Bitcoin, Gold, AUD/USD",
+    "TransactionModeler.jsx shows Save Scenario and Generate Plan buttons only when transactions.length > 0",
+    "Layout.jsx clientContextNav order: Overview, Investments, Plan, Documents, AI Copilot",
+    "Layout.jsx Investments items: Net Worth, Shares & Trading, Cash & TDs, Funds, Property",
+    "Layout.jsx Plan items: Goals, What-If Modeler (no Generate Plan)",
+    "Backend macro_data.py has /api/macro/history endpoint for fetching historical data via yfinance"
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "N/A (frontend only testing)",
+    "frontend": "100% (all 7 features verified)"
+  },
+  "test_credentials": {
+    "preview_url": "https://transaction-lab-3.preview.emergentagent.com",
+    "adviser_mode_setup": "localStorage.setItem('app_mode', 'adviser'); localStorage.setItem('selected_client', JSON.stringify({id:'client_1',name:'Smith Family'}))",
+    "compliance_bypass": "localStorage.setItem('wealth_command_compliance_v5', 'permanent')"
+  },
+  "seed_data_creation": "None - using existing demo data",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Iteration 78 verified Adviser Mode updates: Market Dashboard has historical charts with 10 timeframes and 6 asset dropdown options. Transaction Modeler shows Save Scenario and Generate Plan buttons when transactions added. Client context nav order verified: Overview -> Investments -> Plan -> Documents -> AI Copilot. No Generate Plan in Plan section nav. Single AI Copilot section in client context.",
+  "features_verified": {
+    "market_dashboard_historical_chart": {
+      "status": "PASS",
+      "timeframes_present": ["1 Day", "1 Week", "2 Weeks", "1 Month", "3 Months", "6 Months", "1 Year", "3 Years", "5 Years", "10 Years"],
+      "component": "Historical Performance section with AreaChart"
+    },
+    "market_dashboard_asset_selector": {
+      "status": "PASS",
+      "assets_present": ["S&P 500", "ASX 200", "FTSE 100", "Bitcoin", "Gold", "AUD/USD"],
+      "component": "Select dropdown in Historical Performance section"
+    },
+    "transaction_modeler_buttons": {
+      "status": "PASS",
+      "buttons_present": ["Save Scenario", "Generate Plan"],
+      "condition": "Only visible when transactions.length > 0",
+      "data_testids": ["save-scenario-btn", "generate-plan-btn", "add-to-list-btn"]
+    },
+    "client_context_nav_order": {
+      "status": "PASS",
+      "order": ["Overview", "Investments", "Plan", "Documents", "AI Copilot"],
+      "notes": "Correct order verified - Investments before Plan"
+    },
+    "investments_section_items": {
+      "status": "PASS",
+      "items_present": ["Net Worth", "Shares & Trading", "Cash & TDs", "Funds", "Property"],
+      "notes": "All 5 items present in correct structure"
+    },
+    "plan_section_items": {
+      "status": "PASS",
+      "items_present": ["Goals", "What-If Modeler"],
+      "items_absent": ["Generate Plan"],
+      "notes": "Generate Plan correctly removed from nav"
+    },
+    "single_ai_copilot": {
+      "status": "PASS",
+      "notes": "AI Copilot appears once in client context nav (separate from AI Copilot in adviser base nav which is expected)"
+    }
+  },
+  "screenshots_taken": [
+    "01_adviser_mode_setup.png - Adviser mode with client selected",
+    "02_investments_nav.png - Investments section expanded",
+    "03_plan_nav.png - Plan section expanded",
+    "08_market_dashboard_scrolled.png - Market dashboard with historical chart",
+    "09_transaction_modeler.png - Transaction Modeler initial state",
+    "10_transaction_modeler_with_transaction.png - Transaction Modeler with transaction added showing Save/Generate buttons",
+    "12_market_dashboard_loaded.png - Market dashboard fully loaded",
+    "14_asset_selector_open.png - Asset selector dropdown showing all 6 options"
+  ],
+  "mocked_apis": {
+    "macro_history_fallback": "MacroDashboard.jsx falls back to mock data if /api/macro/history fails (generates random data points)",
+    "transaction_modeler_local": "TransactionModeler.jsx scenarios saved to localStorage, Generate Plan shows toast messages"
+  }
+}

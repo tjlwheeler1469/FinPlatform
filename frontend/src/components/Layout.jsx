@@ -198,6 +198,7 @@ const adviserBaseNav = [
 ];
 
 // Client-specific navigation (shown when client is selected)
+// Order: Overview → Investments → Plan → Documents → AI
 const clientContextNav = [
   {
     name: "Overview",
@@ -209,22 +210,22 @@ const clientContextNav = [
     ]
   },
   {
-    name: "Plan",
-    icon: Target,
-    items: [
-      { path: "/goal-tracker", label: "Goals", icon: Target, title: "Goals" },
-      { path: "/transaction-modeler", label: "What-If", icon: Calculator, title: "What-If Modeler" },
-      { path: "/financial-plan-generator", label: "Generate Plan", icon: FileText, title: "AI Plan Generator" },
-    ]
-  },
-  {
     name: "Investments",
     icon: TrendingUp,
     items: [
       { path: "/family-wealth", label: "Net Worth", icon: Eye, title: "Net Worth" },
-      { path: "/share-portfolio", label: "Shares", icon: LineChart, title: "Shares & ETFs" },
+      { path: "/stock-trading", label: "Shares & Trading", icon: TrendingUp, title: "Shares & Trading" },
+      { path: "/cash-deposits", label: "Cash & TDs", icon: PiggyBank, title: "Cash & Term Deposits" },
+      { path: "/managed-funds", label: "Funds", icon: PieChart, title: "Managed Funds" },
       { path: "/property-portfolio", label: "Property", icon: Building2, title: "Property" },
-      { path: "/stock-trading", label: "Trading", icon: TrendingUp, title: "Trading" },
+    ]
+  },
+  {
+    name: "Plan",
+    icon: Target,
+    items: [
+      { path: "/goal-tracker", label: "Goals", icon: Target, title: "Goals" },
+      { path: "/transaction-modeler", label: "What-If Modeler", icon: Calculator, title: "What-If & Plan Generator" },
     ]
   },
   {
@@ -237,10 +238,10 @@ const clientContextNav = [
     ]
   },
   {
-    name: "AI",
-    icon: MessageSquare,
+    name: "AI Copilot",
+    icon: Bot,
     items: [
-      { path: "/ai-copilot-advanced", label: "AI Chat", icon: MessageSquare, title: "AI Copilot" },
+      { path: "/ai-copilot-advanced", label: "AI Assistant", icon: MessageSquare, title: "AI Copilot" },
     ]
   }
 ];
@@ -279,7 +280,8 @@ const Layout = ({ children }) => {
     if (appMode === "adviser") {
       if (selectedClient) {
         // Show client-specific nav when client is selected
-        return [...adviserBaseNav.slice(0, 2), ...clientContextNav, adviserBaseNav[2]];
+        // Only show Dashboard + CRM from adviser base, then full client context
+        return [...adviserBaseNav.slice(0, 2), ...clientContextNav];
       }
       return adviserBaseNav;
     }

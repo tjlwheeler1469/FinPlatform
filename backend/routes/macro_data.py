@@ -663,3 +663,60 @@ async def get_sector_performance():
         "sectors": sectors,
         "timestamp": datetime.now(timezone.utc).isoformat()
     }
+
+
+
+@router.get("/history")
+async def get_historical_data(symbol: str = "^GSPC", period: str = "1mo", interval: str = "1d"):
+    """Get historical price data for a symbol using yfinance."""
+    try:
+        import yfinance as yf
+        
+        # Validate parameters
+        valid_periods = ["1d", "5d", "2wk", "1mo", "3mo", "6mo", "1y", "2y", "3y", "5y", "10y", "max"]
+        valid_intervals = ["1m", "2m", "5m", "15m", "30m", "60m", "90m", "1h", "1d", "5d", "1wk", "1mo", "3mo"]
+        
+        if period not in valid_periods:
+            period = "1mo"
+        if interval not in valid_intervals:
+            interval = "1d"
+        
+        # Fetch data
+        ticker = yf.Ticker(symbol)
+        hist = ticker.history(period=period, interval=interval)
+        
+        if hist.empty:
+            return {"history": [], "symbol": symbol, "error": "No data available"}
+        
+        # Convert to list of dicts
+        history = []
+        for idx, row in hist.iterrows():
+            history.append({
+                "date": idx.isoformat(),
+                "open": round(row["Open"], 4) if row["Open"] else None,
+                "high": round(row["High"], 4) if row["High"] else None,
+                "low": round(row["Low"], 4) if row["Low"] else None,
+                "close": round(row["Close"], 4) if row["Close"] else None,
+                "volume": int(row["Volume"]) if row["Volume"] else 0
+            })
+        
+        return {
+            "symbol": symbol,
+            "period": period,
+            "interval": interval,
+            "history": history,
+            "data_source": "live",
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Error fetching historical data for {symbol}: {e}")
+        # Return empty with error
+        return {
+            "symbol": symbol,
+            "period": period,
+            "interval": interval,
+            "history": [],
+            "error": str(e),
+            "data_source": "error",
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }

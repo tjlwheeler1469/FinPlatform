@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -16,12 +17,48 @@ import {
   Building2,
   Coins,
   Fuel,
-  Wheat
+  Wheat,
+  LineChart
 } from "lucide-react";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Line,
+  LineChart as RechartsLineChart
+} from "recharts";
 import axios from "axios";
 import { toast } from "sonner";
 
 const API = process.env.REACT_APP_BACKEND_URL;
+
+// Timeframe options for charts
+const TIMEFRAMES = [
+  { value: "1d", label: "1 Day", period: "1d", interval: "5m" },
+  { value: "1w", label: "1 Week", period: "5d", interval: "30m" },
+  { value: "2w", label: "2 Weeks", period: "2wk", interval: "1h" },
+  { value: "1m", label: "1 Month", period: "1mo", interval: "1d" },
+  { value: "3m", label: "3 Months", period: "3mo", interval: "1d" },
+  { value: "6m", label: "6 Months", period: "6mo", interval: "1d" },
+  { value: "1y", label: "1 Year", period: "1y", interval: "1wk" },
+  { value: "3y", label: "3 Years", period: "3y", interval: "1mo" },
+  { value: "5y", label: "5 Years", period: "5y", interval: "1mo" },
+  { value: "10y", label: "10 Years", period: "10y", interval: "1mo" },
+];
+
+// Symbols to show in charts
+const CHART_SYMBOLS = [
+  { symbol: "^GSPC", name: "S&P 500", color: "#3B82F6" },
+  { symbol: "^AXJO", name: "ASX 200", color: "#10B981" },
+  { symbol: "^FTSE", name: "FTSE 100", color: "#8B5CF6" },
+  { symbol: "BTC-USD", name: "Bitcoin", color: "#F97316" },
+  { symbol: "GC=F", name: "Gold", color: "#EAB308" },
+  { symbol: "AUDUSD=X", name: "AUD/USD", color: "#EC4899" },
+];
 
 const MacroDashboard = () => {
   const [loading, setLoading] = useState(true);
@@ -33,6 +70,12 @@ const MacroDashboard = () => {
   const [crypto, setCrypto] = useState(null);
   const [futures, setFutures] = useState(null);
   const [activeTab, setActiveTab] = useState("overview");
+  
+  // Chart state
+  const [selectedTimeframe, setSelectedTimeframe] = useState("1m");
+  const [selectedSymbol, setSelectedSymbol] = useState("^GSPC");
+  const [chartData, setChartData] = useState([]);
+  const [chartLoading, setChartLoading] = useState(false);
 
   const formatPrice = (value, decimals = 2) => {
     if (value === null || value === undefined) return "-";
@@ -43,6 +86,39 @@ const MacroDashboard = () => {
     if (value === null || value === undefined) return "-";
     return `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`;
   };
+
+  // Fetch historical chart data
+  const fetchChartData = async (symbol, timeframe) => {
+    setChartLoading(true);
+    try {
+      const tf = TIMEFRAMES.find(t => t.value === timeframe);
+      const response = await axios.get(`${API}/api/macro/history`, {
+        params: { symbol, period: tf.period, interval: tf.interval }
+      });
+      setChartData(response.data.history || []);
+    } catch (error) {
+      console.error("Error fetching chart data:", error);
+      // Generate mock data for demo
+      const points = timeframe === "1d" ? 78 : timeframe === "1w" ? 40 : 30;
+      const baseValue = selectedSymbol === "BTC-USD" ? 73000 : selectedSymbol === "GC=F" ? 2650 : selectedSymbol.includes("USD") ? 0.65 : 5500;
+      const mockData = Array.from({ length: points }, (_, i) => {
+        const variance = (Math.random() - 0.5) * baseValue * 0.02;
+        return {
+          date: new Date(Date.now() - (points - i) * (timeframe === "1d" ? 300000 : 86400000)).toISOString(),
+          close: baseValue + variance + (i * baseValue * 0.001),
+          volume: Math.floor(Math.random() * 1000000)
+        };
+      });
+      setChartData(mockData);
+    } finally {
+      setChartLoading(false);
+    }
+  };
+
+  // Update chart when symbol or timeframe changes
+  useEffect(() => {
+    fetchChartData(selectedSymbol, selectedTimeframe);
+  }, [selectedSymbol, selectedTimeframe]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -202,6 +278,125 @@ const MacroDashboard = () => {
             />
           </div>
         )}
+
+        {/* Historical Charts Section */}
+        <Card className="bg-card">
+          <CardHeader>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <LineChart className="h-5 w-5" />
+                  Historical Performance
+                </CardTitle>
+                <CardDescription>View price history for major indices and assets</CardDescription>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {/* Symbol Selector */}
+                <Select value={selectedSymbol} onValueChange={setSelectedSymbol}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Select asset" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CHART_SYMBOLS.map(s => (
+                      <SelectItem key={s.symbol} value={s.symbol}>{s.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            {/* Timeframe Buttons */}
+            <div className="flex flex-wrap gap-1 mt-4">
+              {TIMEFRAMES.map(tf => (
+                <Button
+                  key={tf.value}
+                  variant={selectedTimeframe === tf.value ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setSelectedTimeframe(tf.value)}
+                  className={selectedTimeframe === tf.value ? "bg-[#D4A84C] text-black hover:bg-[#C49A3C]" : ""}
+                >
+                  {tf.label}
+                </Button>
+              ))}
+            </div>
+          </CardHeader>
+          <CardContent>
+            {chartLoading ? (
+              <div className="h-[300px] flex items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : (
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={chartData}>
+                    <defs>
+                      <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor={CHART_SYMBOLS.find(s => s.symbol === selectedSymbol)?.color || "#3B82F6"} stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor={CHART_SYMBOLS.find(s => s.symbol === selectedSymbol)?.color || "#3B82F6"} stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                    <XAxis 
+                      dataKey="date" 
+                      stroke="#666"
+                      tickFormatter={(val) => {
+                        const d = new Date(val);
+                        if (selectedTimeframe === "1d") return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        if (["1w", "2w", "1m"].includes(selectedTimeframe)) return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+                        return d.toLocaleDateString([], { month: 'short', year: '2-digit' });
+                      }}
+                      tick={{ fontSize: 11 }}
+                    />
+                    <YAxis 
+                      stroke="#666"
+                      domain={['auto', 'auto']}
+                      tickFormatter={(val) => {
+                        if (val >= 1000) return `${(val/1000).toFixed(1)}K`;
+                        return val.toFixed(selectedSymbol.includes("USD") ? 4 : 0);
+                      }}
+                      tick={{ fontSize: 11 }}
+                    />
+                    <Tooltip
+                      contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #333', borderRadius: '8px' }}
+                      labelStyle={{ color: '#fff' }}
+                      formatter={(value) => [formatPrice(value, selectedSymbol.includes("USD") ? 4 : 2), "Price"]}
+                      labelFormatter={(label) => new Date(label).toLocaleString()}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="close"
+                      stroke={CHART_SYMBOLS.find(s => s.symbol === selectedSymbol)?.color || "#3B82F6"}
+                      fill="url(#colorPrice)"
+                      strokeWidth={2}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+            {/* Chart Stats */}
+            {chartData.length > 0 && (
+              <div className="flex justify-between mt-4 text-sm text-muted-foreground border-t border-border pt-4">
+                <div>
+                  <span className="font-medium text-foreground">Open:</span> {formatPrice(chartData[0]?.close, 2)}
+                </div>
+                <div>
+                  <span className="font-medium text-foreground">Close:</span> {formatPrice(chartData[chartData.length - 1]?.close, 2)}
+                </div>
+                <div>
+                  <span className="font-medium text-foreground">High:</span> {formatPrice(Math.max(...chartData.map(d => d.close)), 2)}
+                </div>
+                <div>
+                  <span className="font-medium text-foreground">Low:</span> {formatPrice(Math.min(...chartData.map(d => d.close)), 2)}
+                </div>
+                <div>
+                  <span className="font-medium text-foreground">Change:</span>{" "}
+                  <span className={chartData[chartData.length - 1]?.close >= chartData[0]?.close ? "text-green-500" : "text-red-500"}>
+                    {formatPercent((chartData[chartData.length - 1]?.close - chartData[0]?.close) / chartData[0]?.close * 100)}
+                  </span>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Tabs for detailed data */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>

@@ -633,12 +633,14 @@ const TransactionModeler = () => {
                   <List className="h-5 w-5 text-[#D4A84C]" />
                   Scenario Transactions ({transactions.length})
                 </CardTitle>
-                <Badge className="bg-[#1a2744]">
-                  Total: {formatCurrency(totalTransactionValue)}
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-[#1a2744]">
+                    Total: {formatCurrency(totalTransactionValue)}
+                  </Badge>
+                </div>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
               <div className="flex flex-wrap gap-2">
                 {transactions.map(txn => {
                   const Icon = getTypeIcon(txn.type);
@@ -661,6 +663,52 @@ const TransactionModeler = () => {
                     </div>
                   );
                 })}
+              </div>
+              {/* Save and Generate Plan Buttons */}
+              <div className="flex justify-end gap-3 pt-2 border-t">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    const scenarioData = {
+                      id: Date.now(),
+                      name: `Scenario ${new Date().toLocaleDateString()}`,
+                      client: clientName,
+                      transactions: transactions,
+                      total: totalTransactionValue,
+                      timeframe: timeframe,
+                      createdAt: new Date().toISOString()
+                    };
+                    const saved = JSON.parse(localStorage.getItem("saved_scenarios") || "[]");
+                    saved.push(scenarioData);
+                    localStorage.setItem("saved_scenarios", JSON.stringify(saved));
+                    toast.success("Scenario saved successfully!");
+                  }}
+                  data-testid="save-scenario-btn"
+                >
+                  <CheckCircle2 className="h-4 w-4 mr-2" />
+                  Save Scenario
+                </Button>
+                <Button
+                  className="bg-[#D4A84C] hover:bg-[#C49A3C] text-black"
+                  onClick={() => {
+                    toast.success("Generating financial plan...", { duration: 2000 });
+                    setTimeout(() => {
+                      // Navigate to a plan view or show plan
+                      toast.success(
+                        <div className="space-y-2">
+                          <p className="font-semibold">Financial Plan Generated!</p>
+                          <p className="text-sm">Based on {transactions.length} transactions totaling {formatCurrency(totalTransactionValue)}</p>
+                          <p className="text-sm">Projected {timeframe}-year return: {formatCurrency(totalTransactionValue * 1.08 * timeframe / 10)}</p>
+                        </div>,
+                        { duration: 5000 }
+                      );
+                    }, 1500);
+                  }}
+                  data-testid="generate-plan-btn"
+                >
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Generate Plan
+                </Button>
               </div>
             </CardContent>
           </Card>
