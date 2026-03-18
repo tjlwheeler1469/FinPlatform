@@ -1,4 +1,4 @@
-# Wealth Command v7.5 - Product Requirements Document
+# Wealth Command v7.6 - Product Requirements Document
 
 ## Original Problem Statement
 Create a "financial services super app" named "Wealth Command," evolving it from a simple dashboard into a comprehensive "Wealth Operating System" for financial advisers. The core architecture is a **Financial Knowledge Graph** using a hybrid MongoDB and Neo4j database.
@@ -28,46 +28,40 @@ Create a "financial services super app" named "Wealth Command," evolving it from
 #### Phase 7: Advisor Mode & CRM
 - ✅ Advisor Command Center with 10-zone layout
 - ✅ Client 360 View with contact form integration
-- ✅ Transaction Modeler with plan generation
-- ✅ Meeting Notes with Fathom integration (MOCKED - awaits API key)
+- ✅ Transaction Modeler with multi-transaction support and plan generation
+- ✅ Meeting Notes with Fathom integration (mock mode when no API key)
 - ✅ Adviser Hub (Combined CRM)
 
-#### Phase 7.5: UI/UX Improvements & New Features (Latest - March 18, 2026)
+#### Phase 7.5: UI/UX Improvements (March 18, 2026)
 - ✅ **Performance**: Market data loading optimized with parallel yfinance batch downloads
-  - Cache TTL increased to 300 seconds
-  - Uses asyncio.gather for concurrent API calls
-  - ThreadPoolExecutor with 10 workers
 - ✅ **Bug Fix**: Percentage display corrected (SPX shows -1.36% not -136%)
-  - Removed incorrect x100 multiplication in MacroDashboard.jsx
 - ✅ **UI Fix**: Savings rate size reduced (text-xl instead of text-3xl)
-- ✅ **UI Fix**: Text contrast improved in ScenarioModelling GoalCard
-  - Uses text-foreground/text-muted-foreground instead of text-white/text-gray-400
-- ✅ **Navigation Restructure**:
-  - Net Worth moved to first position under Dashboard
-  - Funds moved from Trading to Finances
-  - Hybrids added to Trading with NEW badge
-- ✅ **New Page**: Hybrids Trading (/hybrids-trading)
-  - Australian bank hybrids (CBAPD, WBCPI, ANZPJ, etc.)
-  - Portfolio summary with yield analysis
-  - Market overview and call schedule
-- ✅ **Multi-Structure Asset Viewing**:
-  - New "By Structure" tab in Family Wealth Dashboard
-  - Filter by: Personal, Joint, Company, Trust, SMSF
-  - Aggregated Net Worth calculation per structure
-- ✅ **Advisor UX**: Client context banner
-  - Persistent header showing "Viewing: [Client Name]" when client selected
-  - Exit button to return to CRM view
-- ✅ **Knowledge Graph**: Default tab changed to "insights" (from "graph")
+- ✅ **Navigation Restructure**: Net Worth first, Funds under Finances, Hybrids added to Trading
+- ✅ **New Page**: Hybrids Trading (/hybrids-trading) - Australian bank hybrids
+- ✅ **Multi-Structure Asset Viewing**: By Structure tab with Personal/Joint/Company/Trust/SMSF filters
+- ✅ **Advisor UX**: Client context banner showing "Viewing: [Client Name]"
+- ✅ **Knowledge Graph**: Default tab changed to "insights"
+
+#### Phase 7.6: Asset Classes & Data Persistence (March 18, 2026)
+- ✅ **Contrast Fix**: ScenarioModelling page improved with proper text-foreground/text-muted-foreground classes
+- ✅ **Client Investments - Hybrids**: Added hybrids category to Client360View ($85K, 4 holdings: CBAPD, WBCPI, ANZPJ, NABPH)
+- ✅ **Client Investments - Crypto**: Added crypto category to Client360View ($45K, 2 holdings: BTC, ETH)
+- ✅ **New Page**: CryptoPortfolio (/crypto-portfolio) - Personal crypto tracking with BTC, ETH, SOL, LINK, MATIC
+- ✅ **Navigation - Crypto**: Added Crypto under Personal Finances with NEW badge
+- ✅ **Multi-Transaction Modeller**: Verified - supports adding multiple transactions to scenarios
+- ✅ **MongoDB Persistence - Client Contact**: Messages and notifications now persist to MongoDB
+- ✅ **MongoDB Persistence - Financial Plans**: Generated plans now persist to MongoDB
 
 ### In Progress / Mocked Features
 - 🔶 Knowledge Graph data (uses mock EmbeddedGraph, not synced from MongoDB)
-- 🔶 Fathom Integration (mock mode - requires user API key)
-- 🔶 Client Contact messages (in-memory storage)
-- 🔶 Financial Plans (in-memory storage)
+- 🔶 Fathom Integration (mock mode - requires user API key in FATHOM_API_KEY env var)
+- 🔶 Crypto prices (static demo data)
+- 🔶 Hybrids data (static demo data)
 
 ### Backlog (P2/P3)
 - P2: Integrate real MongoDB data into Knowledge Graph (replace mock)
-- P2: Enable live Fathom integration with API key
+- P2: Connect live crypto price feeds
+- P2: Connect live hybrid security prices
 - P2: Resolve `websockets` dependency conflict with `alpaca-trade-api`
 - P3: Mobile app wrapper
 - P3: Voice interface (Whisper integration)
@@ -83,28 +77,35 @@ Create a "financial services super app" named "Wealth Command," evolving it from
 
 ### Backend
 - FastAPI with async support
-- MongoDB for data persistence
+- MongoDB for data persistence (collections: client_messages, client_notifications, financial_plans)
 - Route-based modular architecture (/app/backend/routes/)
 - Knowledge Graph engine (/app/backend/knowledge_graph/)
 
 ### Key Endpoints
 - `GET /api/macro/overview` - Market data with parallel yfinance fetching
-- `POST /api/contact/message` - Client 360 contact form
-- `POST /api/plans/generate` - Financial plan generation
-- `GET /api/fathom/meeting-notes` - Meeting notes (mock)
+- `POST /api/client-contact/send-message` - Persist messages to MongoDB
+- `GET /api/client-contact/messages/{client_id}` - Retrieve messages from MongoDB
+- `POST /api/financial-plan/generate` - Generate and persist plan to MongoDB
+- `GET /api/financial-plan/{plan_id}` - Retrieve plan from MongoDB
+- `GET /api/fathom/meeting-notes` - Meeting notes (mock mode when no API key)
 - `GET /api/graph/*` - Knowledge Graph queries
+
+### MongoDB Collections
+- `client_messages` - Client-to-advisor messages
+- `client_notifications` - Advisor notifications
+- `financial_plans` - Generated financial plans
 
 ### Environment Variables
 - `MONGO_URL` - MongoDB connection string
 - `DB_NAME` - Database name
 - `REACT_APP_BACKEND_URL` - Backend API URL for frontend
-- `FATHOM_API_KEY` - Fathom API key (optional, enables live integration)
+- `FATHOM_API_KEY` - Fathom API key (optional, enables live meeting transcription)
 - `ALPACA_API_KEY`, `ALPACA_SECRET_KEY` - Alpaca trading (optional)
 
 ## Testing Status
-- ✅ Backend: 100% tests passing (iteration_82)
+- ✅ Backend: 100% tests passing (iteration_83)
 - ✅ Frontend: All features verified
-- ✅ Load testing: CGT endpoint ~90 req/s (locust)
+- ✅ MongoDB persistence: Verified for client_contact and financial_plan
 
 ## File Structure
 ```
@@ -113,20 +114,37 @@ Create a "financial services super app" named "Wealth Command," evolving it from
 │   ├── server.py (main FastAPI app)
 │   ├── routes/ (modular API routes)
 │   │   ├── macro_data.py (optimized market data)
-│   │   ├── client_contact.py
-│   │   ├── financial_plan.py
-│   │   └── fathom_integration.py
+│   │   ├── client_contact.py (MongoDB persistence)
+│   │   ├── financial_plan.py (MongoDB persistence)
+│   │   └── fathom_integration.py (mock/live mode)
 │   ├── knowledge_graph/ (graph engine)
 │   └── tests/
 ├── frontend/
 │   ├── src/
 │   │   ├── App.js (routes)
 │   │   ├── components/ (Layout, UI)
-│   │   └── pages/ (all page components)
+│   │   └── pages/
+│   │       ├── ScenarioModelling.jsx (contrast fixed)
+│   │       ├── Client360View.jsx (hybrids, crypto added)
+│   │       ├── CryptoPortfolio.jsx (NEW)
+│   │       ├── HybridsTrading.jsx
+│   │       └── TransactionModeler.jsx (multi-transaction)
 │   └── .env
 └── memory/
     └── PRD.md (this file)
 ```
 
+## Recent Changes Summary (v7.6)
+| Feature | Status | Details |
+|---------|--------|---------|
+| ScenarioModelling Contrast | ✅ | Tabs use bg-muted, cards use gradient backgrounds |
+| Client Hybrids | ✅ | 4 holdings: CBAPD, WBCPI, ANZPJ, NABPH ($85K) |
+| Client Crypto | ✅ | 2 holdings: BTC, ETH ($45K) |
+| CryptoPortfolio Page | ✅ | 5 holdings with P&L tracking |
+| Navigation Crypto | ✅ | Under Finances with NEW badge |
+| Multi-Transaction Modeler | ✅ | Add to List, Save, Generate Plan |
+| MongoDB Client Contact | ✅ | Messages persist to client_messages collection |
+| MongoDB Financial Plans | ✅ | Plans persist to financial_plans collection |
+
 ---
-*Last Updated: March 18, 2026 - Version 7.5*
+*Last Updated: March 18, 2026 - Version 7.6*
