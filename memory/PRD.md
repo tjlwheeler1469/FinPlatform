@@ -1,54 +1,60 @@
-# Wealth Command v8.0.0 - Complete Financial Advisor Operating System
+# Wealth Command v8.1.0 - Complete Financial Advisor Operating System
 
 ---
 
-## What's New in v8.0.0
+## What's New in v8.1.0
 
-### 1. Transaction Modeler - "What-If" Scenario Builder
-A powerful new tool allowing advisers to model transactions and see comprehensive impact analysis.
+### Enhanced Transaction Modeler with Projection Charts
 
-**Features:**
-- **Property Tab**: Model property purchases with:
-  - Upfront costs (deposit, stamp duty, legal fees)
-  - Loan calculations (monthly/annual payments, total interest)
-  - Cash flow analysis (rental income vs loan payments, positively/negatively geared)
-  - Tax benefits (negative gearing deduction, depreciation)
-  - 10-year projections (capital growth, rental income, total return, ROI)
+**Timeframe Selector:**
+- 5 timeframe options: 1yr, 3yr, 5yr, 10yr, 20yr
+- Button group at top-right of page
+- All charts and calculations dynamically adjust to selected timeframe
 
-- **Fund Tab**: Model managed fund investments with:
-  - Investment details and fee analysis
-  - Expected returns after management fees
-  - Distribution projections
-  - 10-year value and total return projections
+**Projection Chart Component:**
+- SVG-based line charts with proper scaling
+- Y-axis: Auto-scales based on maximum projected value
+- X-axis: Shows appropriate year markers based on timeframe
+- Data points with hover tooltips showing exact values
+- Color-coded scenario lines with legend
 
-- **Stock Tab**: Model stock trades with:
-  - Buy scenarios: Trade details, brokerage, 5-year projections (conservative/moderate/aggressive)
-  - Sell scenarios: CGT calculations with 50% discount for holdings > 12 months
+**Asset Tabs:**
 
-**Access:** 
-- Navigation: Calculators → Transaction Modeler
-- Client 360 View: "Model Transaction" button
-- Direct URL: /transaction-modeler?client={client_id}
+1. **Property Tab** - Unchanged
+   - Upfront costs, cash flow analysis, projections
 
-### 2. Client Creation & Editing
-New modal accessible from CRM Command Center to create and manage clients.
+2. **Fund Tab** - Single projection line
+   - Shows fund growth over time
+   - Summary cards: Value at Year X, Total Return, Annualized Return
 
-**Fields:**
-- Client Name (required)
-- Email (required)
-- Phone
-- Address
-- Client Type (Individual, Household, Trust, SMSF, Partnership)
-- Status (Prospect, Active, Review, Inactive)
-- Risk Profile (TBD, Conservative, Balanced, Growth, Aggressive)
-- Assigned Adviser
-- Estimated Annual Income
-- Notes
+3. **Stock Tab** - 3-scenario analysis
+   - Conservative (5% p.a.) - Gray line
+   - Moderate (8% p.a.) - Blue line
+   - Aggressive (12% p.a.) - Green line
+   - Summary cards for each scenario
 
-**API Endpoints:**
-- `POST /api/crm/clients` - Create new client
-- `PUT /api/crm/clients/{id}` - Update existing client
-- `DELETE /api/crm/clients/{id}` - Soft delete (mark inactive)
+4. **ETF Tab** - NEW
+   - Popular ETFs: IVV, VTI, STW, NDQ, QUAL
+   - 3-scenario projection with fee impact
+   - Adjustable expected return and management fee
+
+5. **Crypto Tab** - NEW
+   - Volatility warning banner
+   - Configurable scenario rates (-10% to 100%)
+   - Assets: BTC, ETH, SOL, XRP, ADA
+   - Dramatic spread visualization showing high volatility
+
+---
+
+## Previous Updates
+
+### v8.0.0 - Transaction Modeler + Client Creation
+- Transaction Modeler with Property/Fund/Stock tabs
+- Client creation modal from CRM Command Center
+- CRUD API endpoints for client management
+
+### v7.8.0 - CRM Command Center Bug Fix
+- Fixed account icon rendering issue
 
 ---
 
@@ -69,132 +75,53 @@ New modal accessible from CRM Command Center to create and manage clients.
 
 ---
 
-## Version History
-
-| Version | Focus | Date |
-|---------|-------|------|
-| v7.0 | Execution Brain | Dec 2025 |
-| v7.1 | CRM Foundation | Dec 2025 |
-| v7.2 | Workflow Engine + Book Intelligence | Dec 2025 |
-| v7.3 | Meeting Automation + Client Portal + AI Copilot | Dec 2025 |
-| v7.4 | Feedback & Learning Loop + Real-Time Data Layer | Dec 2025 |
-| v7.5 | Bug Fixes + New Trading Pages (Bonds, Cash, Funds) | Dec 2025 |
-| v7.6 | CRM Command Center Redesign | Dec 2025 |
-| v7.7 | Client 360 View | Dec 2025 |
-| v7.8 | CRM Command Center Bug Fix | Dec 2025 |
-| **v8.0** | **Transaction Modeler + Client Creation** | **Dec 2025** |
-
----
-
 ## Testing Status
 
-- **Iteration 74**: 100% pass rate
-  - Backend: 18/18 tests passed
-  - Frontend: All features verified working
-  - Transaction Modeler: Property, Fund, Stock tabs working
-  - Client Modal: All fields and CRUD operations working
+- **Iteration 75**: 100% pass rate
+  - All timeframe buttons functional
+  - All 5 tabs (Property, Fund, Stock, ETF, Crypto) working
+  - Projection charts render correctly
+  - Y-axis and X-axis scaling verified
+  - Summary cards update with timeframe
 
 ---
 
-## Platform Status: All Phases Complete
+## Platform Status
 
 | Phase | Feature | Status |
 |-------|---------|--------|
-| Phase 1 | Next Best Action Engine | ✅ Complete |
-| Phase 2 | Action → Execution Layer | ✅ Complete |
-| Phase 3 | Real Data Integration | ⏳ Pending (needs API keys) |
-| Phase 4 | Institution-Grade CRM | ✅ Complete |
-| Phase 5 | Advisor Book Intelligence | ✅ Complete |
-| Phase 6 | Meeting Automation Engine | ✅ Complete |
-| Phase 7 | Client Experience Layer | ✅ Complete |
-| Phase 8 | Advanced AI Copilot | ✅ Complete |
-| Phase 9 | Feedback & Learning Loop | ✅ Complete |
-| Phase 10 | **Transaction Modeling** | ✅ **Complete** |
-| Phase 11 | **Client Management CRUD** | ✅ **Complete** |
-
----
-
-## Known Issues
-
-### Acknowledged
-- **Compliance Modal on Every Page**: Shows in fresh browser sessions. Expected behavior - localStorage persists acknowledgement for returning users.
-- **websockets Dependency Conflict**: `alpaca-trade-api` requires websockets <11, but `yfinance` and `google-genai` require >=13. Using websockets 13+ for yfinance compatibility.
+| Phase 1-9 | Core Platform | ✅ Complete |
+| Phase 10 | Transaction Modeling | ✅ Complete |
+| Phase 11 | Client Management CRUD | ✅ Complete |
+| Phase 12 | **Projection Charts & Timeframes** | ✅ **Complete** |
+| Phase 13 | **ETF & Crypto Support** | ✅ **Complete** |
 
 ---
 
 ## Remaining Tasks
 
-### P0 - Required for Production
-1. **Connect to real database** - Replace mock data with MongoDB
-2. **Configure Alpaca API Keys** - Enable live paper trading
-3. **Real Data Integration** - Connect custodian accounts
-
 ### P1 - High Value
-1. **Email Service Integration** (SendGrid/Twilio)
-2. **Calendar Integration** (Google Calendar)
-3. **PDF Document Generation** (SOA/ROA)
-4. **Transaction Execution** - Execute modeled transactions
+1. **Email/Calendar Integration** - SendGrid/Twilio, Google Calendar
+2. **PDF Document Generation** - SOA/ROA documents
+3. **Transaction Execution** - Execute modeled transactions
 
 ### P2 - Future
-1. Mobile App Wrapper
-2. Voice Interface (Whisper)
-3. Advanced ML Recommendations
-4. Multi-tenant Architecture
+1. Real database integration (MongoDB)
+2. Alpaca live trading
+3. Mobile app wrapper
+4. Voice interface (Whisper)
+5. Save & compare scenarios feature
 
 ---
 
 ## Key Metrics
 
-- **Version:** 8.0.0
+- **Version:** 8.1.0
 - **Total AUM (Demo):** $22.28M
-- **Demo Clients:** 8 (6 Active, 1 Prospect, 1 Review)
+- **Demo Clients:** 8
 - **Backend Routes:** 55+
 - **Frontend Pages:** 60+
 - **Test Pass Rate:** 100%
-
----
-
-## Code Architecture
-
-```
-/app/
-├── backend/
-│   ├── server.py
-│   └── routes/
-│       ├── crm.py                     # CRM with client CRUD
-│       ├── transaction_modeling.py    # NEW - Transaction Modeler
-│       ├── analysis.py                # Financial calculators
-│       ├── trading.py                 # Stock trading with CGT
-│       └── ... (55+ route files)
-└── frontend/
-    └── src/
-        ├── App.js                     # 60+ routes
-        ├── components/
-        │   ├── Layout.jsx             # Navigation
-        │   └── ClientModal.jsx        # NEW - Client create/edit modal
-        └── pages/
-            ├── TransactionModeler.jsx # NEW - What-If scenarios
-            ├── CRMCommandCenter.jsx   # Client list with New Client
-            ├── Client360View.jsx      # Client detail with Model Transaction
-            └── ... (60+ pages)
-```
-
----
-
-## API Endpoints (New)
-
-### Transaction Modeling
-- `POST /api/transaction-modeling/property` - Model property purchase/sale
-- `POST /api/transaction-modeling/fund` - Model fund investment
-- `POST /api/transaction-modeling/stock` - Model stock trade with CGT
-- `POST /api/transaction-modeling/comprehensive` - Combined scenario analysis
-- `POST /api/transaction-modeling/retirement-impact` - Retirement projection impact
-- `GET /api/transaction-modeling/scenarios/{client_id}` - Saved scenarios
-
-### Client Management
-- `POST /api/crm/clients` - Create client
-- `PUT /api/crm/clients/{id}` - Update client
-- `DELETE /api/crm/clients/{id}` - Soft delete client
 
 ---
 
