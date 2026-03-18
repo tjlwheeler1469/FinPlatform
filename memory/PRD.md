@@ -1,160 +1,156 @@
-# Wealth Command v9.1.0 - Navigation Restructuring & Multi-Asset Support
+# Wealth Command v9.2.0 - Adviser Mode Enhancements
 
 ---
 
 ## Executive Summary
-Wealth Command is an AI-driven financial operating system designed as a "System of Execution" for financial advisers. This version focuses on navigation restructuring and comprehensive multi-asset support across CGT and Net Worth calculations.
+Wealth Command is an AI-driven financial operating system designed as a "System of Execution" for financial advisers. This version focuses on significant enhancements to Adviser Mode, including historical market charts and improved transaction modeling workflow.
 
 ---
 
-## Changes in v9.1.0 (March 2026)
+## Changes in v9.2.0 (March 2026)
 
-### Navigation Restructuring (User Requested)
+### 1. Market Dashboard - Historical Charts
+Added comprehensive historical price charts with multiple timeframe options:
+- **Timeframes**: 1 Day, 1 Week, 2 Weeks, 1 Month, 3 Months, 6 Months, 1 Year, 3 Years, 5 Years, 10 Years
+- **Assets**: S&P 500, ASX 200, FTSE 100, Bitcoin, Gold, AUD/USD
+- **Live data** via yfinance with graceful fallback
+- **Chart stats**: Open, Close, High, Low, % Change
+- New backend endpoint: `/api/macro/history`
 
-#### Personal Mode - Finances
-**Before:** Net Worth, Property, Shares, All Accounts, Budget
-**After:** Net Worth, Property, **Cash & TDs**, All Accounts, Budget
-- Removed "Shares" from Finances (available under Trading)
-- Added "Cash & TDs" to Finances
+### 2. Transaction Modeler - Save & Generate Plan
+Enhanced the What-If Modeler to support full workflow:
+- **Multiple transactions** can be added to a scenario
+- **Save Scenario** button - saves to localStorage
+- **Generate Plan** button - generates financial plan from scenario
+- Removed separate "Generate Plan" nav item (now integrated)
 
-#### Personal Mode - Planning
-**Before:** Goals, Strategy, AI Advisor, What-If
-**After:** **Scenario Modelling (NEW)**, AI Advisor, **Rebalancing**
-- Combined Goals, Strategy, and What-If into single "Scenario Modelling" page
-- Moved Portfolio Rebalancing from Calculators to Planning
+### 3. Client Context Navigation Restructured
+**New Order** (when client selected):
+1. **Overview** - Dashboard, Actions, Health Score
+2. **Investments** (moved up) - Net Worth, Shares & Trading, Cash & TDs, Funds, Property
+3. **Plan** - Goals, What-If Modeler
+4. **Documents** - Vault, Meeting Notes, Reports
+5. **AI Copilot** - AI Assistant (combined, no duplicate)
 
-#### Personal Mode - Calculators
-**Before:** Loan, Monte Carlo, SMSF, Rebalancing
-**After:** Loan, Monte Carlo, SMSF
-- Rebalancing moved to Planning
-
-### New Scenario Modelling Page
-Location: `/scenario-modelling`
-Features:
-- **Goals Tab**: View and manage financial goals with progress tracking
-- **Existing Assets Tab**: Select which existing assets to include in projections (stocks, ETFs, bonds, property, crypto, cash, managed funds)
-- **Build Scenario Tab**: Add multiple investments across asset types with expected returns and contribution schedules
-- **Projection Tab**: View conservative/moderate/aggressive projections with interactive charts
-
-### CGT Now Includes All Assets
-The Capital Gains Tax page now tracks ALL asset types:
-- ✅ Stocks (CBA, BHP, CSL, WBC, etc.)
-- ✅ ETFs (VAS, VGS)
-- ✅ Bonds (Government & Corporate)
-- ✅ Property (Investment properties)
-- ✅ Crypto (BTC, ETH)
-- ✅ Managed Funds
-
-### Net Worth Includes All Trading Assets
-Family Wealth Dashboard now calculates:
-```javascript
-totalInvestments = shareValue + etfValue + bondsValue + fundsValue + cryptoValue
-```
-- Shares: Individual stock holdings
-- ETFs: VAS, IVV, VGS ($166K)
-- Bonds: Government & Corporate ($80K)
-- Managed Funds: Magellan, Platinum ($126K)
-- Crypto: BTC, ETH ($52.6K)
+### 4. AI Sections Combined
+- Removed duplicate AI navigation
+- Single "AI Copilot" section with "AI Assistant" item
+- Fixed Layout.jsx to not append extra AI nav group
 
 ---
 
-## Navigation Structure (v9.1.0)
+## Navigation Structure (v9.2.0)
 
-### Personal Mode
+### Adviser Mode - Base Nav (No Client)
 ```
 Dashboard
-├── Daily Briefing
-├── Markets (LIVE)
-├── Retirement
+├── Command Center
+└── Markets (LIVE)
+
+CRM
+├── Client Hub (HUB)
+└── Tasks
+
+AI Copilot
+├── AI Assistant
+├── Meeting Prep
+└── Decision Center
+
+Execution
+├── Batch Execute
+└── Trading
+
+Compliance
+├── Compliance
+└── Security
+```
+
+### Adviser Mode - Client Context (Client Selected)
+```
+[Dashboard & CRM from base nav]
+
+Overview
+├── Dashboard (Client 360)
+├── Actions
 └── Health Score
 
-Trading
-├── Stocks & ETFs
-├── Bonds
-├── Funds
-└── Research
+Investments               ← MOVED UP
+├── Net Worth
+├── Shares & Trading
+├── Cash & TDs           ← NEW
+├── Funds                ← NEW
+└── Property
 
-Finances
-├── Net Worth (All Assets)
-├── Property
-├── Cash & TDs        ← NEW
-├── All Accounts
-└── Budget
+Plan
+├── Goals
+└── What-If Modeler      ← Includes Save & Generate Plan
 
-Planning
-├── Scenario Modelling (NEW)  ← Combined Goals/Strategy/What-If
-├── AI Advisor
-└── Rebalancing       ← Moved from Calculators
+Documents
+├── Vault
+├── Meeting Notes (NEW)
+└── Reports
 
-Tax & Reports
-├── Tax Analysis
-├── Capital Gains (All Assets)  ← Enhanced
-├── Reports
-└── Documents
-
-Calculators
-├── Loan
-├── Monte Carlo
-└── SMSF
-
-Settings
-├── Security
-├── Bank Feeds
-└── Import/Export
+AI Copilot               ← COMBINED (single section)
+└── AI Assistant
 ```
 
 ---
 
-## Key Files Modified
+## Key Technical Implementations
 
-| File | Change |
-|------|--------|
-| `/app/frontend/src/components/Layout.jsx` | Navigation restructuring |
-| `/app/frontend/src/pages/ScenarioModelling.jsx` | NEW - Combined page |
-| `/app/frontend/src/pages/CGT.jsx` | Added all asset types |
-| `/app/frontend/src/pages/FamilyWealthDashboard.jsx` | Added tradingAssets |
-| `/app/frontend/src/App.js` | Added /scenario-modelling route |
+### Historical Data Endpoint
+```python
+# /api/macro/history
+GET /api/macro/history?symbol=^GSPC&period=1mo&interval=1d
+
+Response:
+{
+  "symbol": "^GSPC",
+  "period": "1mo",
+  "interval": "1d",
+  "history": [
+    {"date": "...", "open": 5500.12, "close": 5520.45, "high": 5545.00, "low": 5490.00, "volume": 12345678}
+  ],
+  "data_source": "live"
+}
+```
+
+### Transaction Modeler Buttons
+- `data-testid="save-scenario-btn"` - Saves scenario to localStorage
+- `data-testid="generate-plan-btn"` - Generates plan with toast notification
 
 ---
 
-## Verified Working Features (v9.1.0)
+## Verified Features (v9.2.0)
 
 | Feature | Status |
 |---------|--------|
-| Navigation - Finances structure | ✅ PASS |
-| Navigation - Planning structure | ✅ PASS |
-| Scenario Modelling page (4 tabs) | ✅ PASS |
-| CGT multi-asset types | ✅ PASS |
-| Net Worth all trading assets | ✅ PASS |
-| Cash & TDs route | ✅ PASS |
-| Live Market Data (yfinance) | ✅ PASS |
+| Historical chart with 10 timeframes | ✅ PASS |
+| Asset selector with 6 options | ✅ PASS |
+| Save Scenario button | ✅ PASS |
+| Generate Plan button | ✅ PASS |
+| Client nav order (Investments before Plan) | ✅ PASS |
+| Investments has Cash & TDs, Funds | ✅ PASS |
+| No duplicate AI sections | ✅ PASS |
 
 ---
 
 ## Pending Items / Backlog
 
 ### P1 (High Priority)
-- [ ] Wire up Next Best Actions "Execute Action" to actual workflows
-- [ ] Connect Goal Tracker editing to backend persistence
-- [ ] Implement Fathom API integration for meeting notes
+- [ ] Connect saved scenarios to backend persistence
+- [ ] Implement full AI plan generation with LLM
+- [ ] Wire up Goal editing to backend
 
 ### P2 (Medium Priority)
 - [ ] Connect to persistent MongoDB database
 - [ ] Integrate Alpaca paper trading API
-- [ ] Replace remaining mock data with real API calls
+- [ ] Implement Fathom API for meeting notes
 
 ### P3 (Low Priority)
 - [ ] Mobile app wrapper
 - [ ] Voice interface (Whisper)
-- [ ] Additional custodian API integrations
-
----
-
-## Credentials
-
-- **Test Adviser**: `advisor@wealthcommand.io` / `secure_password_123`
-- **Preview URL**: https://transaction-lab-3.preview.emergentagent.com
-- **Compliance bypass**: `localStorage.setItem('wealth_command_compliance_v5', 'permanent')`
+- [ ] Additional custodian APIs
 
 ---
 
@@ -163,10 +159,19 @@ Settings
 | Data | Source | Status |
 |------|--------|--------|
 | Market indices | yfinance | LIVE |
+| Historical prices | yfinance | LIVE |
 | Crypto prices | yfinance | LIVE |
+| Scenarios | localStorage | LOCAL |
 | Client data | Mock arrays | MOCK |
-| CGT events | Demo data | MOCK |
-| Trading assets | Hardcoded | MOCK |
+
+---
+
+## Credentials
+
+- **Test Adviser**: `advisor@wealthcommand.io` / `secure_password_123`
+- **Preview URL**: https://transaction-lab-3.preview.emergentagent.com
+- **Adviser mode**: `localStorage.setItem('app_mode', 'adviser')`
+- **Select client**: `localStorage.setItem('selected_client', JSON.stringify({id:'client_1',name:'Smith Family'}))`
 
 ---
 
