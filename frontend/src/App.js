@@ -183,6 +183,9 @@ const AdviserHub = lazy(() => import("@/pages/AdviserHub"));
 // Scenario Modelling (Combined Goals, Strategy, What-If)
 const ScenarioModelling = lazy(() => import("@/pages/ScenarioModelling"));
 
+// Knowledge Graph Dashboard
+const KnowledgeGraphDashboard = lazy(() => import("@/pages/KnowledgeGraphDashboard"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -939,6 +942,7 @@ const AppRouter = () => {
       <Route path="/goal-tracker" element={<GoalTracker />} />
       <Route path="/goals" element={<GoalTracker />} />
       <Route path="/scenario-modelling" element={<ScenarioModelling />} />
+      <Route path="/knowledge-graph" element={<KnowledgeGraphDashboard />} />
       <Route path="/ai-advisor" element={<AIAdvisor />} />
       <Route path="/portfolio-aggregator" element={<PortfolioAggregator />} />
       <Route path="/net-worth-trend" element={<NetWorthTrend />} />

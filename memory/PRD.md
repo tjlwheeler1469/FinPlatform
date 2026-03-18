@@ -161,7 +161,7 @@ generatePerformanceData(months) → [
 
 ## Test Credentials
 
-- **Preview URL**: https://transaction-lab-3.preview.emergentagent.com
+- **Preview URL**: https://knowledge-graph-ui.preview.emergentagent.com
 - **Test Page**: /client-360
 - **Compliance bypass**: `localStorage.setItem('wealth_command_compliance_v5', 'permanent')`
 - **Adviser mode**: `localStorage.setItem('app_mode', 'adviser')`

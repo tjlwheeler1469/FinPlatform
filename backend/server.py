@@ -234,6 +234,15 @@ def include_all_routes():
     except ImportError as e:
         logger.error(f"Failed to load workflow engine routes: {e}")
     
+    # KNOWLEDGE GRAPH - Financial relationship graph for AI reasoning
+    try:
+        from knowledge_graph import graph_router, init_knowledge_graph
+        
+        app.include_router(graph_router, prefix="/api")
+        logger.info("KNOWLEDGE GRAPH routes loaded: Graph Queries, AI Insights, Cross-Client Analysis")
+    except ImportError as e:
+        logger.error(f"Failed to load knowledge graph routes: {e}")
+    
     # ALPACA TRADING - Paper trading integration
     try:
         from routes.alpaca_trading import router as alpaca_router

@@ -10,7 +10,7 @@
 - **Users**: 1,000 concurrent
 - **Ramp-up**: 50 users/second
 - **Duration**: 60 seconds
-- **Target**: https://transaction-lab-3.preview.emergentagent.com
+- **Target**: https://knowledge-graph-ui.preview.emergentagent.com
 
 ---
 

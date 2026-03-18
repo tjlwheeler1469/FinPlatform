@@ -67,7 +67,8 @@ import {
   MessageSquare,
   Brain,
   ListTodo,
-  Video
+  Video,
+  Network
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -160,6 +161,7 @@ const adviserBaseNav = [
     items: [
       { path: "/advisor-command-center", label: "Command Center", icon: Sun, title: "Advisor Command Center" },
       { path: "/macro-dashboard", label: "Markets", icon: BarChart3, title: "Live Markets", badge: "LIVE" },
+      { path: "/knowledge-graph", label: "Knowledge Graph", icon: Network, title: "AI Intelligence", badge: "AI" },
     ]
   },
   {

@@ -29,7 +29,7 @@
     "frontend": "100% (all features working)"
   },
   "test_credentials": {
-    "api_base_url": "https://transaction-lab-3.preview.emergentagent.com"
+    "api_base_url": "https://knowledge-graph-ui.preview.emergentagent.com"
   },
   "seed_data_creation": "None - using default form values",
   "retest_needed": false,

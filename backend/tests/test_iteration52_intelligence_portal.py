@@ -7,7 +7,7 @@ import requests
 import os
 import json
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://transaction-lab-3.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://knowledge-graph-ui.preview.emergentagent.com').rstrip('/')
 
 # Test credentials
 CLIENT_PORTAL_EMAIL = "client_wheeler@email.com"
