@@ -1,146 +1,139 @@
-# Wealth Command v9.2.0 - Adviser Mode Enhancements
+# Wealth Command v9.3.0 - Client View Enhancements
 
 ---
 
 ## Executive Summary
-Wealth Command is an AI-driven financial operating system designed as a "System of Execution" for financial advisers. This version focuses on significant enhancements to Adviser Mode, including historical market charts and improved transaction modeling workflow.
+Wealth Command is an AI-driven financial operating system for financial advisers. This version significantly enhances the Client 360 view with detailed asset breakdown, performance tracking, research reports, and advisor communication features.
 
 ---
 
-## Changes in v9.2.0 (March 2026)
+## Changes in v9.3.0 (March 2026)
 
-### 1. Market Dashboard - Historical Charts
-Added comprehensive historical price charts with multiple timeframe options:
-- **Timeframes**: 1 Day, 1 Week, 2 Weeks, 1 Month, 3 Months, 6 Months, 1 Year, 3 Years, 5 Years, 10 Years
-- **Assets**: S&P 500, ASX 200, FTSE 100, Bitcoin, Gold, AUD/USD
-- **Live data** via yfinance with graceful fallback
-- **Chart stats**: Open, Close, High, Low, % Change
-- New backend endpoint: `/api/macro/history`
+### 1. Enhanced Client 360 Tabs
+Updated from 6 to 8 tabs:
+- **Overview** - Client summary & goals
+- **Holdings** (NEW) - Asset breakdown by category
+- **Performance** (NEW) - Historical returns with timeframes
+- **Accounts** - Bank & investment accounts
+- **Activity** - Transaction history
+- **Documents** - Client documents
+- **Timeline** - Communication history
+- **Contact** (NEW) - Advisor communication
 
-### 2. Transaction Modeler - Save & Generate Plan
-Enhanced the What-If Modeler to support full workflow:
-- **Multiple transactions** can be added to a scenario
-- **Save Scenario** button - saves to localStorage
-- **Generate Plan** button - generates financial plan from scenario
-- Removed separate "Generate Plan" nav item (now integrated)
+### 2. Holdings Tab - Detailed Asset Breakdown
+Removed generic "Portfolios" - now shows clickable asset categories:
+- **Stocks & ETFs** - $425K (7 holdings)
+- **Bonds & Fixed Income** - $125K (4 holdings)
+- **Cash & Term Deposits** - $185K (4 holdings)
+- **Managed Funds** - $175K (2 holdings)
+- **Cryptocurrency** - $45K (2 holdings)
+- **Property** - $3.05M (2 holdings)
 
-### 3. Client Context Navigation Restructured
-**New Order** (when client selected):
-1. **Overview** - Dashboard, Actions, Health Score
-2. **Investments** (moved up) - Net Worth, Shares & Trading, Cash & TDs, Funds, Property
-3. **Plan** - Goals, What-If Modeler
-4. **Documents** - Vault, Meeting Notes, Reports
-5. **AI Copilot** - AI Assistant (combined, no duplicate)
+**Modal Detail View** (click any category):
+- Holdings list with name, symbol, units, price
+- Cost base and P&L calculation
+- Yield/rate for fixed income
+- Debt and rental income for property
+- Research reports with source, rating, target price
 
-### 4. AI Sections Combined
-- Removed duplicate AI navigation
-- Single "AI Copilot" section with "AI Assistant" item
-- Fixed Layout.jsx to not append extra AI nav group
+### 3. Performance Tab - Historical Returns
+**Timeframe Selection**: 1M, 3M, 6M, 1Y, 2Y, 3Y, 5Y, 10Y
+
+**Chart Features**:
+- Area chart showing portfolio value over time
+- Benchmark comparison (dotted line)
+- Stats cards: Total Return %, Starting Value, Current Value, Absolute Gain/Loss
+
+### 4. Contact Tab - Advisor Communication
+**Your Advisor Section**:
+- Advisor profile (Mark Thompson)
+- Contact info (email, phone)
+- Next review date
+- Call and Video buttons
+
+**Message Section**:
+- Toggle: Platform Message vs Direct Email
+- Platform: "Encrypted and stored within Wealth Command"
+- Email: "Security warning for sensitive info"
+- Subject and Message fields
+- Send button
+
+**Quick Actions**:
+- Schedule Meeting
+- Request Statement
+- Upload Document
+- Set Reminder
 
 ---
 
-## Navigation Structure (v9.2.0)
+## Navigation Structure (Client View)
 
-### Adviser Mode - Base Nav (No Client)
 ```
-Dashboard
-├── Command Center
-└── Markets (LIVE)
-
-CRM
-├── Client Hub (HUB)
-└── Tasks
-
-AI Copilot
-├── AI Assistant
-├── Meeting Prep
-└── Decision Center
-
-Execution
-├── Batch Execute
-└── Trading
-
-Compliance
-├── Compliance
-└── Security
-```
-
-### Adviser Mode - Client Context (Client Selected)
-```
-[Dashboard & CRM from base nav]
-
-Overview
-├── Dashboard (Client 360)
-├── Actions
-└── Health Score
-
-Investments               ← MOVED UP
-├── Net Worth
-├── Shares & Trading
-├── Cash & TDs           ← NEW
-├── Funds                ← NEW
-└── Property
-
-Plan
-├── Goals
-└── What-If Modeler      ← Includes Save & Generate Plan
-
-Documents
-├── Vault
-├── Meeting Notes (NEW)
-└── Reports
-
-AI Copilot               ← COMBINED (single section)
-└── AI Assistant
+Client 360 View - 8 Tabs
+├── Overview       - Summary, stats, goals
+├── Holdings       - Asset breakdown (6 categories)
+├── Performance    - Historical charts (8 timeframes)
+├── Accounts       - Bank & investment accounts
+├── Activity       - Transaction history
+├── Documents      - Client documents
+├── Timeline       - Communication log
+└── Contact        - Advisor messaging
 ```
 
 ---
 
-## Key Technical Implementations
+## Data Structures
 
-### Historical Data Endpoint
-```python
-# /api/macro/history
-GET /api/macro/history?symbol=^GSPC&period=1mo&interval=1d
-
-Response:
+### ASSET_HOLDINGS Structure
+```javascript
 {
-  "symbol": "^GSPC",
-  "period": "1mo",
-  "interval": "1d",
-  "history": [
-    {"date": "...", "open": 5500.12, "close": 5520.45, "high": 5545.00, "low": 5490.00, "volume": 12345678}
-  ],
-  "data_source": "live"
+  stocks: {
+    label: "Stocks & ETFs",
+    total: 425000,
+    holdings: [
+      { name, symbol, units, price, value, change, costBase }
+    ],
+    research: [
+      { title, date, source, rating, target }
+    ]
+  },
+  // bonds, cash, funds, crypto, property...
 }
 ```
 
-### Transaction Modeler Buttons
-- `data-testid="save-scenario-btn"` - Saves scenario to localStorage
-- `data-testid="generate-plan-btn"` - Generates plan with toast notification
+### Performance Data
+```javascript
+generatePerformanceData(months) → [
+  { date: "Mar '25", value: 2500000, benchmark: 2400000 }
+]
+```
 
 ---
 
-## Verified Features (v9.2.0)
+## Verified Features (v9.3.0)
 
 | Feature | Status |
 |---------|--------|
-| Historical chart with 10 timeframes | ✅ PASS |
-| Asset selector with 6 options | ✅ PASS |
-| Save Scenario button | ✅ PASS |
-| Generate Plan button | ✅ PASS |
-| Client nav order (Investments before Plan) | ✅ PASS |
-| Investments has Cash & TDs, Funds | ✅ PASS |
-| No duplicate AI sections | ✅ PASS |
+| 8 tabs present | ✅ PASS |
+| Holdings: 6 asset categories | ✅ PASS |
+| Holdings: Clickable modals | ✅ PASS |
+| Holdings: Research reports | ✅ PASS |
+| Performance: 8 timeframes | ✅ PASS |
+| Performance: Chart + benchmark | ✅ PASS |
+| Contact: Advisor info | ✅ PASS |
+| Contact: Platform/Email toggle | ✅ PASS |
+| Contact: Message form | ✅ PASS |
+| Contact: Quick actions | ✅ PASS |
 
 ---
 
 ## Pending Items / Backlog
 
 ### P1 (High Priority)
-- [ ] Connect saved scenarios to backend persistence
-- [ ] Implement full AI plan generation with LLM
-- [ ] Wire up Goal editing to backend
+- [ ] Connect Holdings data to real API (currently MOCKED)
+- [ ] Connect Performance chart to real historical data
+- [ ] Implement actual email sending for Contact tab
+- [ ] Connect research reports to real data sources
 
 ### P2 (Medium Priority)
 - [ ] Connect to persistent MongoDB database
@@ -150,7 +143,7 @@ Response:
 ### P3 (Low Priority)
 - [ ] Mobile app wrapper
 - [ ] Voice interface (Whisper)
-- [ ] Additional custodian APIs
+- [ ] PDF export for research reports
 
 ---
 
@@ -158,20 +151,20 @@ Response:
 
 | Data | Source | Status |
 |------|--------|--------|
-| Market indices | yfinance | LIVE |
-| Historical prices | yfinance | LIVE |
-| Crypto prices | yfinance | LIVE |
-| Scenarios | localStorage | LOCAL |
-| Client data | Mock arrays | MOCK |
+| Holdings | ASSET_HOLDINGS object | **MOCKED** |
+| Performance | generatePerformanceData() | **MOCKED** |
+| Research Reports | Hardcoded | **MOCKED** |
+| Contact Form | Toast only | **MOCKED** |
+| Market Data | yfinance | LIVE |
 
 ---
 
-## Credentials
+## Test Credentials
 
-- **Test Adviser**: `advisor@wealthcommand.io` / `secure_password_123`
 - **Preview URL**: https://transaction-lab-3.preview.emergentagent.com
+- **Test Page**: /client-360
+- **Compliance bypass**: `localStorage.setItem('wealth_command_compliance_v5', 'permanent')`
 - **Adviser mode**: `localStorage.setItem('app_mode', 'adviser')`
-- **Select client**: `localStorage.setItem('selected_client', JSON.stringify({id:'client_1',name:'Smith Family'}))`
 
 ---
 
