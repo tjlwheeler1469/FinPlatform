@@ -8,6 +8,19 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import {
   Users,
   Phone,
@@ -59,11 +72,148 @@ import {
   Car,
   Plane,
   Gift,
-  Calculator
+  Calculator,
+  LineChart,
+  Bitcoin,
+  Coins,
+  BookOpen,
+  ExternalLink,
+  X,
+  Landmark
 } from "lucide-react";
 import { toast } from "sonner";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend
+} from "recharts";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || "";
+
+// Performance timeframes
+const PERFORMANCE_TIMEFRAMES = ["1M", "3M", "6M", "1Y", "2Y", "3Y", "5Y", "10Y"];
+
+// Detailed asset holdings by category
+const ASSET_HOLDINGS = {
+  stocks: {
+    label: "Stocks & ETFs",
+    icon: TrendingUp,
+    color: "#3B82F6",
+    total: 425000,
+    holdings: [
+      { name: "BHP Group", symbol: "BHP", units: 1200, price: 45.50, value: 54600, change: 5.2, costBase: 48000 },
+      { name: "Commonwealth Bank", symbol: "CBA", units: 400, price: 118.50, value: 47400, change: 8.1, costBase: 42000 },
+      { name: "CSL Limited", symbol: "CSL", units: 150, price: 295.00, value: 44250, change: -2.3, costBase: 46000 },
+      { name: "Vanguard Aus Shares (VAS)", symbol: "VAS", units: 1500, price: 95.50, value: 143250, change: 4.5, costBase: 135000 },
+      { name: "iShares S&P 500 (IVV)", symbol: "IVV", units: 120, price: 580.00, value: 69600, change: 12.4, costBase: 58000 },
+      { name: "Vanguard Intl (VGS)", symbol: "VGS", units: 450, price: 115.00, value: 51750, change: 9.8, costBase: 45000 },
+      { name: "Magellan Global (MGE)", symbol: "MGE", units: 350, price: 42.00, value: 14700, change: -5.2, costBase: 16500 },
+    ],
+    research: [
+      { title: "BHP Group - Mining Outlook 2026", date: "2025-12-10", source: "Macquarie Research", rating: "Outperform", target: 52.00 },
+      { title: "Australian Banks Sector Update", date: "2025-12-05", source: "Morgan Stanley", rating: "Equal Weight", target: null },
+      { title: "VAS ETF Analysis Q4 2025", date: "2025-11-28", source: "Morningstar", rating: "Gold", target: null },
+    ]
+  },
+  bonds: {
+    label: "Bonds & Fixed Income",
+    icon: Landmark,
+    color: "#F59E0B",
+    total: 125000,
+    holdings: [
+      { name: "Aus Gov 10Y Bond", symbol: "ACGB-34", units: 50000, price: 1.02, value: 51000, yield: 4.2, maturity: "2034-03-15" },
+      { name: "Corporate Bond Fund", symbol: "BOND", units: 30000, price: 1.05, value: 31500, yield: 5.1, maturity: "2028-06-30" },
+      { name: "Hybrid Securities", symbol: "NABPF", units: 400, price: 98.50, value: 39400, yield: 6.8, maturity: "2027-12-15" },
+      { name: "NSW Treasury Bond", symbol: "NSWTC", units: 3000, price: 1.03, value: 3090, yield: 4.5, maturity: "2030-11-20" },
+    ],
+    research: [
+      { title: "Fixed Income Strategy 2026", date: "2025-12-08", source: "UBS", rating: "Overweight", target: null },
+      { title: "Corporate Credit Outlook", date: "2025-11-15", source: "JP Morgan", rating: "Neutral", target: null },
+    ]
+  },
+  cash: {
+    label: "Cash & Term Deposits",
+    icon: PiggyBank,
+    color: "#10B981",
+    total: 185000,
+    holdings: [
+      { name: "High Interest Savings", symbol: "ING", units: 1, price: 85000, value: 85000, rate: 5.0, maturity: null },
+      { name: "Term Deposit 6M", symbol: "CBA-TD", units: 1, price: 50000, value: 50000, rate: 4.8, maturity: "2026-06-15" },
+      { name: "Term Deposit 12M", symbol: "WBC-TD", units: 1, price: 25000, value: 25000, rate: 5.1, maturity: "2026-12-01" },
+      { name: "Offset Account", symbol: "CBA-OFF", units: 1, price: 25000, value: 25000, rate: 0, maturity: null },
+    ],
+    research: [
+      { title: "Term Deposit Rate Comparison", date: "2025-12-12", source: "RateCity", rating: "Best Value", target: null },
+    ]
+  },
+  funds: {
+    label: "Managed Funds",
+    icon: Briefcase,
+    color: "#8B5CF6",
+    total: 175000,
+    holdings: [
+      { name: "Magellan Global Fund", symbol: "MGF", units: 3500, price: 32.80, value: 114800, change: -3.2, manager: "Magellan" },
+      { name: "Platinum International Fund", symbol: "PIF", units: 2500, price: 24.50, value: 61250, change: 2.8, manager: "Platinum" },
+    ],
+    research: [
+      { title: "Magellan Global Fund Review", date: "2025-12-01", source: "Morningstar", rating: "Silver", target: null },
+      { title: "Platinum Intl Fund Analysis", date: "2025-11-20", source: "Lonsec", rating: "Recommended", target: null },
+    ]
+  },
+  crypto: {
+    label: "Cryptocurrency",
+    icon: Bitcoin,
+    color: "#F97316",
+    total: 45000,
+    holdings: [
+      { name: "Bitcoin", symbol: "BTC", units: 0.42, price: 73500, value: 30870, change: 15.2, costBase: 22000 },
+      { name: "Ethereum", symbol: "ETH", units: 3.8, price: 3720, value: 14136, change: 8.5, costBase: 10000 },
+    ],
+    research: [
+      { title: "Bitcoin Institutional Outlook 2026", date: "2025-12-14", source: "Fidelity Digital", rating: "Positive", target: 100000 },
+    ]
+  },
+  property: {
+    label: "Property",
+    icon: Home,
+    color: "#EF4444",
+    total: 3050000,
+    holdings: [
+      { name: "Family Home - Mosman", symbol: "PROP-1", units: 1, price: 2200000, value: 2200000, change: 5.3, debt: 850000, rental: 0 },
+      { name: "Investment Unit - Parramatta", symbol: "PROP-2", units: 1, price: 850000, value: 850000, change: 3.0, debt: 0, rental: 2800 },
+    ],
+    research: [
+      { title: "Sydney Property Market Update", date: "2025-12-10", source: "CoreLogic", rating: "Moderate Growth", target: null },
+      { title: "Parramatta Growth Corridor", date: "2025-11-25", source: "Domain Research", rating: "High Potential", target: null },
+    ]
+  }
+};
+
+// Performance history data (mock)
+const generatePerformanceData = (months) => {
+  const data = [];
+  let value = 2500000;
+  for (let i = months; i >= 0; i--) {
+    const date = new Date();
+    date.setMonth(date.getMonth() - i);
+    const monthlyReturn = (Math.random() - 0.3) * 0.05; // -1.5% to +3.5%
+    value = value * (1 + monthlyReturn);
+    data.push({
+      date: date.toLocaleDateString('en-AU', { month: 'short', year: '2-digit' }),
+      value: Math.round(value),
+      benchmark: Math.round(value * (0.95 + Math.random() * 0.1))
+    });
+  }
+  return data;
+};
 
 const formatCurrency = (value) => {
   if (value >= 1000000) {
@@ -385,13 +535,15 @@ const Client360View = () => {
 
         {/* Main Content Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-8">
             <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="holdings">Holdings</TabsTrigger>
+            <TabsTrigger value="performance">Performance</TabsTrigger>
             <TabsTrigger value="accounts">Accounts</TabsTrigger>
-            <TabsTrigger value="transactions">Transactions</TabsTrigger>
-            <TabsTrigger value="tasks">Tasks</TabsTrigger>
+            <TabsTrigger value="transactions">Activity</TabsTrigger>
             <TabsTrigger value="documents">Documents</TabsTrigger>
             <TabsTrigger value="communications">Timeline</TabsTrigger>
+            <TabsTrigger value="contact">Contact</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
@@ -527,6 +679,179 @@ const Client360View = () => {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* Holdings Tab - Detailed Asset Breakdown */}
+          <TabsContent value="holdings" className="space-y-6">
+            {/* Net Worth Breakdown by Asset Class */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5 text-[#D4A84C]" />
+                  Net Worth Breakdown by Asset Class
+                </CardTitle>
+                <CardDescription>Click on any asset category to view detailed holdings and research</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                  {Object.entries(ASSET_HOLDINGS).map(([key, category]) => {
+                    const Icon = category.icon;
+                    return (
+                      <Dialog key={key}>
+                        <DialogTrigger asChild>
+                          <Card 
+                            className="cursor-pointer hover:shadow-lg transition-all hover:scale-105 border-2 hover:border-[#D4A84C]"
+                            data-testid={`asset-category-${key}`}
+                          >
+                            <CardContent className="p-4 text-center">
+                              <div 
+                                className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
+                                style={{ backgroundColor: `${category.color}20` }}
+                              >
+                                <Icon className="h-6 w-6" style={{ color: category.color }} />
+                              </div>
+                              <p className="font-semibold text-lg">{formatCurrency(category.total)}</p>
+                              <p className="text-xs text-muted-foreground">{category.label}</p>
+                              <Badge variant="outline" className="mt-2 text-xs">
+                                {category.holdings.length} holdings
+                              </Badge>
+                            </CardContent>
+                          </Card>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-4xl max-h-[80vh]">
+                          <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2">
+                              <Icon className="h-5 w-5" style={{ color: category.color }} />
+                              {category.label} - {formatCurrency(category.total)}
+                            </DialogTitle>
+                            <DialogDescription>
+                              Detailed holdings and research reports
+                            </DialogDescription>
+                          </DialogHeader>
+                          <ScrollArea className="h-[60vh] pr-4">
+                            {/* Holdings Table */}
+                            <div className="space-y-4">
+                              <h4 className="font-semibold flex items-center gap-2">
+                                <Wallet className="h-4 w-4" /> Holdings ({category.holdings.length})
+                              </h4>
+                              <div className="space-y-2">
+                                {category.holdings.map((holding, idx) => (
+                                  <Card key={idx} className="bg-muted/30">
+                                    <CardContent className="p-3">
+                                      <div className="flex items-center justify-between">
+                                        <div>
+                                          <p className="font-medium">{holding.name}</p>
+                                          <p className="text-sm text-muted-foreground">
+                                            {holding.symbol} • {holding.units.toLocaleString()} units @ ${holding.price?.toLocaleString() || 'N/A'}
+                                          </p>
+                                        </div>
+                                        <div className="text-right">
+                                          <p className="font-bold">{formatCurrency(holding.value)}</p>
+                                          {holding.change !== undefined && (
+                                            <p className={`text-sm ${holding.change >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                                              {holding.change >= 0 ? '+' : ''}{holding.change}%
+                                            </p>
+                                          )}
+                                          {holding.yield !== undefined && (
+                                            <p className="text-sm text-muted-foreground">Yield: {holding.yield}%</p>
+                                          )}
+                                          {holding.rate !== undefined && (
+                                            <p className="text-sm text-muted-foreground">Rate: {holding.rate}%</p>
+                                          )}
+                                        </div>
+                                      </div>
+                                      {holding.costBase && (
+                                        <div className="mt-2 pt-2 border-t text-sm text-muted-foreground flex justify-between">
+                                          <span>Cost Base: {formatCurrency(holding.costBase)}</span>
+                                          <span className={holding.value > holding.costBase ? 'text-emerald-600' : 'text-red-600'}>
+                                            P&L: {formatCurrency(holding.value - holding.costBase)} ({((holding.value - holding.costBase) / holding.costBase * 100).toFixed(1)}%)
+                                          </span>
+                                        </div>
+                                      )}
+                                      {holding.maturity && (
+                                        <p className="text-sm text-muted-foreground mt-1">Maturity: {formatDate(holding.maturity)}</p>
+                                      )}
+                                      {holding.debt !== undefined && holding.debt > 0 && (
+                                        <p className="text-sm text-red-600 mt-1">Outstanding Debt: {formatCurrency(holding.debt)}</p>
+                                      )}
+                                      {holding.rental !== undefined && holding.rental > 0 && (
+                                        <p className="text-sm text-emerald-600 mt-1">Monthly Rental: {formatCurrency(holding.rental)}</p>
+                                      )}
+                                    </CardContent>
+                                  </Card>
+                                ))}
+                              </div>
+
+                              {/* Research Reports */}
+                              {category.research && category.research.length > 0 && (
+                                <>
+                                  <Separator className="my-4" />
+                                  <h4 className="font-semibold flex items-center gap-2">
+                                    <BookOpen className="h-4 w-4" /> Research Reports
+                                  </h4>
+                                  <div className="space-y-2">
+                                    {category.research.map((report, idx) => (
+                                      <Card key={idx} className="bg-blue-50/50 border-blue-200">
+                                        <CardContent className="p-3">
+                                          <div className="flex items-start justify-between">
+                                            <div>
+                                              <p className="font-medium">{report.title}</p>
+                                              <p className="text-sm text-muted-foreground">
+                                                {report.source} • {formatDate(report.date)}
+                                              </p>
+                                            </div>
+                                            <div className="text-right">
+                                              <Badge variant="outline" className="bg-white">
+                                                {report.rating}
+                                              </Badge>
+                                              {report.target && (
+                                                <p className="text-sm text-emerald-600 mt-1">Target: ${report.target}</p>
+                                              )}
+                                            </div>
+                                          </div>
+                                          <Button variant="link" size="sm" className="px-0 mt-2">
+                                            <ExternalLink className="h-3 w-3 mr-1" /> View Full Report
+                                          </Button>
+                                        </CardContent>
+                                      </Card>
+                                    ))}
+                                  </div>
+                                </>
+                              )}
+                            </div>
+                          </ScrollArea>
+                        </DialogContent>
+                      </Dialog>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Total Summary */}
+            <Card className="bg-gradient-to-r from-[#1a2744] to-[#2a3f5f] text-white">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-white/70">Total Portfolio Value</p>
+                    <p className="text-3xl font-bold">
+                      {formatCurrency(Object.values(ASSET_HOLDINGS).reduce((sum, cat) => sum + cat.total, 0))}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-white/70">Total Holdings</p>
+                    <p className="text-2xl font-bold">
+                      {Object.values(ASSET_HOLDINGS).reduce((sum, cat) => sum + cat.holdings.length, 0)}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Performance Tab */}
+          <TabsContent value="performance" className="space-y-6">
+            <PerformanceSection />
           </TabsContent>
 
           {/* Accounts Tab */}
@@ -715,9 +1040,327 @@ const Client360View = () => {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* Contact Advisor Tab */}
+          <TabsContent value="contact" className="space-y-6">
+            <ContactAdvisorSection client={client} />
+          </TabsContent>
         </Tabs>
       </div>
     </Layout>
+  );
+};
+
+// Performance Section Component
+const PerformanceSection = () => {
+  const [timeframe, setTimeframe] = useState("1Y");
+  const [performanceData, setPerformanceData] = useState([]);
+
+  useEffect(() => {
+    const monthsMap = { "1M": 1, "3M": 3, "6M": 6, "1Y": 12, "2Y": 24, "3Y": 36, "5Y": 60, "10Y": 120 };
+    setPerformanceData(generatePerformanceData(monthsMap[timeframe] || 12));
+  }, [timeframe]);
+
+  const startValue = performanceData[0]?.value || 0;
+  const endValue = performanceData[performanceData.length - 1]?.value || 0;
+  const totalReturn = startValue ? ((endValue - startValue) / startValue * 100) : 0;
+
+  return (
+    <>
+      {/* Timeframe Selector */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <LineChart className="h-5 w-5 text-[#D4A84C]" />
+                Portfolio Performance
+              </CardTitle>
+              <CardDescription>Historical returns vs benchmark</CardDescription>
+            </div>
+            <div className="flex gap-1">
+              {PERFORMANCE_TIMEFRAMES.map(tf => (
+                <Button
+                  key={tf}
+                  size="sm"
+                  variant={timeframe === tf ? "default" : "outline"}
+                  onClick={() => setTimeframe(tf)}
+                  className={timeframe === tf ? "bg-[#D4A84C] text-black hover:bg-[#C49A3C]" : ""}
+                >
+                  {tf}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[350px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={performanceData}>
+                <defs>
+                  <linearGradient id="colorPortfolio" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="colorBenchmark" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#9CA3AF" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#9CA3AF" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis dataKey="date" stroke="#666" tick={{ fontSize: 11 }} />
+                <YAxis 
+                  stroke="#666" 
+                  tick={{ fontSize: 11 }}
+                  tickFormatter={(val) => `$${(val / 1000000).toFixed(1)}M`}
+                />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                  formatter={(value) => [formatCurrency(value), ""]}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="value"
+                  name="Portfolio"
+                  stroke="#3B82F6"
+                  fill="url(#colorPortfolio)"
+                  strokeWidth={2}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="benchmark"
+                  name="Benchmark"
+                  stroke="#9CA3AF"
+                  fill="url(#colorBenchmark)"
+                  strokeWidth={2}
+                  strokeDasharray="5 5"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Performance Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="p-4 text-center">
+            <p className="text-sm text-muted-foreground">Total Return ({timeframe})</p>
+            <p className={`text-2xl font-bold ${totalReturn >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+              {totalReturn >= 0 ? '+' : ''}{totalReturn.toFixed(2)}%
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <p className="text-sm text-muted-foreground">Starting Value</p>
+            <p className="text-2xl font-bold">{formatCurrency(startValue)}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <p className="text-sm text-muted-foreground">Current Value</p>
+            <p className="text-2xl font-bold">{formatCurrency(endValue)}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <p className="text-sm text-muted-foreground">Absolute Gain/Loss</p>
+            <p className={`text-2xl font-bold ${endValue >= startValue ? 'text-emerald-600' : 'text-red-600'}`}>
+              {endValue >= startValue ? '+' : ''}{formatCurrency(endValue - startValue)}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    </>
+  );
+};
+
+// Contact Advisor Section Component
+const ContactAdvisorSection = ({ client }) => {
+  const [contactMethod, setContactMethod] = useState("platform");
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
+  const [sending, setSending] = useState(false);
+
+  const handleSend = () => {
+    setSending(true);
+    setTimeout(() => {
+      setSending(false);
+      if (contactMethod === "email") {
+        toast.success("Email sent to your advisor!");
+      } else {
+        toast.success("Message sent on platform. Your advisor will respond shortly.");
+      }
+      setSubject("");
+      setMessage("");
+    }, 1500);
+  };
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Advisor Info */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <UserCircle className="h-5 w-5 text-[#D4A84C]" />
+            Your Advisor
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center gap-4">
+            <Avatar className="h-16 w-16">
+              <AvatarFallback className="bg-[#1a2744] text-white text-xl">MT</AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="font-semibold text-lg">{client.advisor}</p>
+              <p className="text-sm text-muted-foreground">Senior Financial Advisor</p>
+              <Badge className="mt-1 bg-emerald-100 text-emerald-700">Available</Badge>
+            </div>
+          </div>
+          <Separator />
+          <div className="space-y-2 text-sm">
+            <div className="flex items-center gap-2">
+              <Mail className="h-4 w-4 text-muted-foreground" />
+              <span>mark.thompson@wealthcommand.io</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Phone className="h-4 w-4 text-muted-foreground" />
+              <span>+61 2 9123 4567</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+              <span>Next Review: {formatDate(client.nextReview)}</span>
+            </div>
+          </div>
+          <div className="flex gap-2 pt-2">
+            <Button size="sm" variant="outline" className="flex-1">
+              <Phone className="h-4 w-4 mr-2" /> Call
+            </Button>
+            <Button size="sm" variant="outline" className="flex-1">
+              <Video className="h-4 w-4 mr-2" /> Video
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Contact Form */}
+      <Card className="lg:col-span-2">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MessageSquare className="h-5 w-5 text-[#D4A84C]" />
+            Send a Message
+          </CardTitle>
+          <CardDescription>Choose how you'd like to contact your advisor</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Contact Method Toggle */}
+          <div className="flex gap-2">
+            <Button
+              variant={contactMethod === "platform" ? "default" : "outline"}
+              onClick={() => setContactMethod("platform")}
+              className={contactMethod === "platform" ? "bg-[#1a2744]" : ""}
+            >
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Platform Message
+            </Button>
+            <Button
+              variant={contactMethod === "email" ? "default" : "outline"}
+              onClick={() => setContactMethod("email")}
+              className={contactMethod === "email" ? "bg-[#1a2744]" : ""}
+            >
+              <Mail className="h-4 w-4 mr-2" />
+              Direct Email
+            </Button>
+          </div>
+
+          {contactMethod === "platform" && (
+            <div className="p-3 bg-blue-50 rounded-lg text-sm text-blue-700">
+              <p className="font-medium">Secure Platform Messaging</p>
+              <p>Messages are encrypted and stored within Wealth Command. Your advisor typically responds within 24 hours.</p>
+            </div>
+          )}
+
+          {contactMethod === "email" && (
+            <div className="p-3 bg-amber-50 rounded-lg text-sm text-amber-700">
+              <p className="font-medium">Email Communication</p>
+              <p>This will send an email directly to your advisor. For sensitive information, consider using platform messaging.</p>
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <Label htmlFor="subject">Subject</Label>
+            <Input
+              id="subject"
+              placeholder="e.g., Question about portfolio rebalancing"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="message">Message</Label>
+            <Textarea
+              id="message"
+              placeholder="Type your message here..."
+              rows={6}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+            />
+          </div>
+
+          <div className="flex justify-between items-center">
+            <p className="text-sm text-muted-foreground">
+              {contactMethod === "platform" ? "Message will be visible in your timeline" : "A copy will be sent to your email"}
+            </p>
+            <Button 
+              className="bg-[#D4A84C] hover:bg-[#C49A3C] text-black"
+              onClick={handleSend}
+              disabled={!subject || !message || sending}
+            >
+              {sending ? (
+                <>
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  Sending...
+                </>
+              ) : (
+                <>
+                  <Send className="h-4 w-4 mr-2" />
+                  Send {contactMethod === "email" ? "Email" : "Message"}
+                </>
+              )}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Quick Actions */}
+      <Card className="lg:col-span-3">
+        <CardHeader>
+          <CardTitle>Quick Actions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Button variant="outline" className="h-auto py-4 flex-col">
+              <Calendar className="h-6 w-6 mb-2" />
+              <span>Schedule Meeting</span>
+            </Button>
+            <Button variant="outline" className="h-auto py-4 flex-col">
+              <FileText className="h-6 w-6 mb-2" />
+              <span>Request Statement</span>
+            </Button>
+            <Button variant="outline" className="h-auto py-4 flex-col">
+              <Upload className="h-6 w-6 mb-2" />
+              <span>Upload Document</span>
+            </Button>
+            <Button variant="outline" className="h-auto py-4 flex-col">
+              <Bell className="h-6 w-6 mb-2" />
+              <span>Set Reminder</span>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
