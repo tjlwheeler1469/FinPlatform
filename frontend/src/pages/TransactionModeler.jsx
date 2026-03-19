@@ -781,6 +781,7 @@ const TransactionModeler = () => {
                     <div 
                       key={txn.id}
                       className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg border shadow-sm"
+                      data-testid={`transaction-item-${txn.id}`}
                     >
                       <Icon className="h-4 w-4 text-[#1a2744]" />
                       <span className="font-medium text-sm">{txn.name}</span>
@@ -790,6 +791,7 @@ const TransactionModeler = () => {
                         size="sm" 
                         className="h-6 w-6 p-0 ml-1 hover:bg-red-100 hover:text-red-600"
                         onClick={() => removeTransaction(txn.id)}
+                        data-testid={`delete-transaction-${txn.id}`}
                       >
                         <Trash2 className="h-3 w-3" />
                       </Button>

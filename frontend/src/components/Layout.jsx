@@ -190,8 +190,6 @@ const adviserBaseNav = [
     icon: Zap,
     items: [
       { path: "/batch-execution", label: "Batch Execute", icon: Zap, title: "Batch Execution" },
-      { path: "/stock-trading", label: "Trading", icon: TrendingUp, title: "Trading" },
-      { path: "/hybrids-trading", label: "Hybrids", icon: ArrowLeftRight, title: "Hybrid Securities", badge: "NEW" },
     ]
   },
   {
