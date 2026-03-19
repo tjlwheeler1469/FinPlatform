@@ -1,4 +1,4 @@
-# Wealth Command v7.8 - Product Requirements Document
+# Wealth Command v7.9 - Product Requirements Document
 
 ## Original Problem Statement
 Create a "financial services super app" named "Wealth Command," evolving it from a simple dashboard into a comprehensive "Wealth Operating System" for financial advisers. The core architecture is a **Financial Knowledge Graph** using a hybrid MongoDB and Neo4j database.
@@ -13,85 +13,95 @@ Create a "financial services super app" named "Wealth Command," evolving it from
 ### Completed Features (March 2026)
 
 #### Phase 1-6: Foundation & Core Features
-- ✅ Full-stack React/FastAPI application
-- ✅ MongoDB integration for data persistence
-- ✅ Comprehensive dashboard system (Daily Briefing, Retirement Tracker, etc.)
-- ✅ Stock Trading with CGT calculations
-- ✅ Bonds Trading, Hybrids Trading, Crypto Portfolio pages
-- ✅ Cash & Term Deposits, Managed Funds, Property Portfolio
-- ✅ Tax Analysis & CGT tracking
-- ✅ AI Advisor integration (Emergent LLM Key)
+- Full-stack React/FastAPI application
+- MongoDB integration for data persistence
+- Comprehensive dashboard system (Daily Briefing, Retirement Tracker, etc.)
+- Stock Trading with CGT calculations
+- Bonds Trading, Hybrids Trading, Crypto Portfolio pages
+- Cash & Term Deposits, Managed Funds, Property Portfolio
+- Tax Analysis & CGT tracking
+- AI Advisor integration (Emergent LLM Key)
 
 #### Phase 7: Advisor Mode & CRM
-- ✅ Advisor Command Center with 10-zone layout
-- ✅ Client 360 View with Bonds, Hybrids, Crypto asset categories
-- ✅ Transaction Modeler with 7 asset types (Property, Fund, Stock, ETF, Bonds, Hybrids, Crypto)
-- ✅ Meeting Notes with Fathom integration (mock mode)
-- ✅ Adviser Hub (Combined CRM)
+- Advisor Command Center with 10-zone layout
+- Client 360 View with Bonds, Hybrids, Crypto asset categories
+- Transaction Modeler with 7 asset types (Property, Fund, Stock, ETF, Bonds, Hybrids, Crypto)
+- Meeting Notes with Fathom integration (mock mode)
+- Adviser Hub (Combined CRM)
 
-#### Phase 7.5-7.7: UI/UX & Live Price Feeds
-- ✅ Performance optimizations (parallel yfinance)
-- ✅ Navigation restructure (Net Worth first, Crypto/Hybrids added)
-- ✅ Multi-Structure Asset Viewing (Personal/Joint/Company/Trust/SMSF)
-- ✅ MongoDB Persistence for Client Contact & Financial Plans
-- ✅ Live Crypto Prices (CoinGecko API)
-- ✅ Live Hybrid Prices (ASX via yfinance)
+#### Phase 7.5-7.8: UI/UX & Live Price Feeds
+- Performance optimizations (parallel yfinance)
+- Navigation restructure (Net Worth first, Crypto/Hybrids added)
+- Multi-Structure Asset Viewing (Personal/Joint/Company/Trust/SMSF)
+- MongoDB Persistence for Client Contact & Financial Plans
+- Live Crypto Prices (CoinGecko API)
+- Live Hybrid Prices (ASX via yfinance)
+- ScenarioModelling Page Redesign (clean cards, light theme)
+- Knowledge Graph Dashboard (5 tabs, removed confusing graph)
+- Transaction Modeler Expanded (7 asset types with Bonds/Hybrids)
+- Client Portal with all asset types
 
-#### Phase 7.8: UI Improvements & Client Portal (March 18, 2026)
-- ✅ **ScenarioModelling Page Redesign**:
-  - Clean card design matching FamilyWealthDashboard
-  - Light backgrounds instead of dark gradients
-  - Simple 4 tabs (Goals, Assets, Scenario, Projection) without icons
-  - Improved readability and accessibility
+#### Phase 7.9: UI Fixes & Visualizations (March 19, 2026)
+- **ScenarioModelling Light Theme Fix**:
+  - Replaced all dark navy backgrounds (bg-[#1a1a2e]) with light themed alternatives (bg-card, bg-muted)
+  - Fixed text colors to use foreground/muted-foreground for proper contrast
+  - Updated chart tooltip styles to use light backgrounds
+  - Improved input and select field styling
 
-- ✅ **Knowledge Graph Dashboard**:
-  - Removed confusing "Graph" tab
-  - Now has 5 tabs: Insights, Overview, Actions, Risks, Opportunities
-  - Default tab is "Insights"
+- **Financial Goals CRUD**:
+  - Added "Add Goal" dialog with form fields (name, target, current, deadline, priority, category)
+  - Added edit functionality with pre-filled dialog
+  - Added delete functionality with confirmation
+  - Goal cards now show edit and delete action buttons
+  - All goals managed in React state
 
-- ✅ **Transaction Modeler Expanded**:
-  - Now has 7 tabs: Property, Fund, Stock, ETF, Bonds, Hybrids, Crypto
-  - Bonds tab: bond_type, yield_to_maturity, maturity_years, credit_rating
-  - Hybrids tab: margin_over_bbsw, running_yield calculation, franking
+- **Client Portal Visualizations**:
+  - Added Recharts pie chart for net worth breakdown with color legend
+  - Added Recharts bar chart for portfolio YTD performance comparison
+  - Visual indicators for positive/negative returns
 
-- ✅ **Client Portal - All Asset Types**:
-  - 5 portfolios: Growth Portfolio, Fixed Income & Hybrids, Cryptocurrency, Cash & Term Deposits, Superannuation
-  - Net worth breakdown: stocks, etfs, managed_funds, bonds, hybrids, crypto, cash, super, property
-  - Holdings include type field (stock, etf, fund, bond, hybrid, crypto, cash, term_deposit)
+- **Removed "Made with Emergent" Branding**:
+  - Removed HTML badge element from index.html
+  - Added CSS rule to hide dynamically injected badge
+  - Branding no longer visible on any page
 
 ### Asset Categories Available
 | Category | Personal | Adviser Client | Client Portal |
 |----------|----------|----------------|---------------|
-| Stocks | ✅ | ✅ | ✅ |
-| ETFs | ✅ | ✅ | ✅ |
-| Managed Funds | ✅ | ✅ | ✅ |
-| Bonds | ✅ | ✅ | ✅ |
-| Hybrids | ✅ | ✅ | ✅ |
-| Crypto | ✅ | ✅ | ✅ |
-| Cash/TDs | ✅ | ✅ | ✅ |
-| Property | ✅ | ✅ | ✅ |
-| Super | ✅ | ✅ | ✅ |
+| Stocks | Yes | Yes | Yes |
+| ETFs | Yes | Yes | Yes |
+| Managed Funds | Yes | Yes | Yes |
+| Bonds | Yes | Yes | Yes |
+| Hybrids | Yes | Yes | Yes |
+| Crypto | Yes | Yes | Yes |
+| Cash/TDs | Yes | Yes | Yes |
+| Property | Yes | Yes | Yes |
+| Super | Yes | Yes | Yes |
 
 ### In Progress / Mocked Features
-- 🔶 Knowledge Graph data (mock EmbeddedGraph)
-- 🔶 Fathom Integration (requires API key)
-- 🔶 Some ASX hybrid prices (simulated when unavailable)
+- Knowledge Graph data (mock EmbeddedGraph)
+- Fathom Integration (requires API key)
+- Some ASX hybrid prices (simulated when unavailable)
+- Client Portal data (PORTAL_CLIENTS demo data)
 
 ### Backlog (P2/P3)
-- P2: Integrate real MongoDB data into Knowledge Graph
+- P2: Connect Knowledge Graph to real MongoDB data
 - P2: More ASX data sources for hybrids
+- P2: Add Bonds, Crypto, Hybrids to Advisor Client 360 Investments section
+- P2: Reorder navigation (Plan above Investments) in Advisor view
 - P3: Mobile app wrapper
 - P3: Voice interface (Whisper)
+- P3: Fix websockets dependency conflict with alpaca-trade-api
 
 ## Technical Architecture
 
 ### Frontend Pages
 ```
 /app/frontend/src/pages/
-├── ScenarioModelling.jsx    # REDESIGNED - clean cards
+├── ScenarioModelling.jsx    # Light theme, Goals CRUD
 ├── KnowledgeGraphDashboard.jsx # 5 tabs, no graph
 ├── TransactionModeler.jsx   # 7 asset type tabs
-├── ClientPortal.jsx         # All asset types
+├── ClientPortal.jsx         # All assets, pie/bar charts
 ├── Client360View.jsx        # Bonds, Hybrids, Crypto
 ├── CryptoPortfolio.jsx      # Live prices
 ├── HybridsTrading.jsx       # Live prices
@@ -102,16 +112,18 @@ Create a "financial services super app" named "Wealth Command," evolving it from
 - `GET /api/client-portal/portfolios/{client_id}` - All asset types
 - `GET /api/crypto/portfolio/value` - Live crypto values
 - `GET /api/hybrids/portfolio/value` - Live hybrid values
+- `GET /api/graph/overview` - Knowledge Graph summary
+- `GET /api/graph/visualization/data` - Graph visualization data
 - `POST /api/client-contact/send-message` - MongoDB persistence
 - `POST /api/financial-plan/generate` - MongoDB persistence
 
 ## Testing Status
-- ✅ Backend: 100% (iteration_85)
-- ✅ Frontend: All features verified
-- ✅ ScenarioModelling: Clean design verified
-- ✅ KnowledgeGraph: 5 tabs, no Graph
-- ✅ TransactionModeler: 7 tabs with Bonds/Hybrids
-- ✅ Client Portal: All asset types in portfolios
+- Backend: All endpoints working
+- Frontend: All features verified (iteration_86)
+- ScenarioModelling: Light theme, Goals CRUD working
+- KnowledgeGraph: 5 tabs, no errors
+- ClientPortal: Pie chart and bar chart visualizations
+- Emergent Badge: Successfully hidden
 
 ---
-*Last Updated: March 18, 2026 - Version 7.8*
+*Last Updated: March 19, 2026 - Version 7.9*
