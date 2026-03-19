@@ -1,0 +1,62 @@
+{
+  "summary": "Iteration 87 - Frontend Testing for Wealth Command Navigation Updates. Verified all 3 requested features: 1) Plan group appears BEFORE Investments in clientContextNav, 2) Bonds, Hybrids, and Crypto navigation items added to Investments group, 3) ASSET_HOLDINGS in Client360View includes bonds, hybrids, and crypto categories.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "All pages",
+        "issues": ["Compliance modal appears on every page visit/reload - consider persisting dismissal in localStorage properly. Session acknowledgement does not persist across page reloads."]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_87.json"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "PASS: Layout.jsx clientContextNav has correct order: Overview -> Plan -> Investments -> Documents -> AI Copilot (verified at lines 209-257)",
+    "PASS: Layout.jsx Investments group includes Bonds (/bonds-trading), Hybrids (/hybrids-trading), Crypto (/crypto-portfolio) at lines 235-237",
+    "PASS: Client360View.jsx ASSET_HOLDINGS object includes bonds (line 129), hybrids (line 144), crypto (line 189) categories with proper data"
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "N/A (frontend only testing)",
+    "frontend": "100% (all 3 requested features verified)"
+  },
+  "test_credentials": {
+    "preview_url": "https://scenario-modeler.preview.emergentagent.com"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Navigation updates verified in iteration 87. To test the client context nav: 1) Switch to Adviser Mode using mode selector, 2) Set selected_client in localStorage or navigate from CRM to select a client, 3) Client context nav will show in sidebar with Plan before Investments and Investments expanded shows Bonds/Hybrids/Crypto items. Compliance modal appears on each page load.",
+  "features_verified": {
+    "navigation_order_plan_before_investments": {
+      "status": "PASS",
+      "verification": "clientContextNav array order: Overview (line 211), Plan (line 220), Investments (line 228). Sidebar groups verified in UI: ['Overview', 'Plan', 'Investments', 'Documents', 'AI Copilot']",
+      "code_reference": "Layout.jsx lines 209-257"
+    },
+    "investments_nav_includes_bonds_hybrids_crypto": {
+      "status": "PASS",
+      "verification": "Investments group includes: Bonds (/bonds-trading line 235), Hybrids (/hybrids-trading line 236), Crypto (/crypto-portfolio line 237). UI shows these items when Investments group is expanded.",
+      "code_reference": "Layout.jsx lines 228-240"
+    },
+    "asset_holdings_includes_new_categories": {
+      "status": "PASS",
+      "verification": "ASSET_HOLDINGS object includes: bonds (lines 129-143), hybrids (lines 144-159), crypto (lines 189-201) with proper holdings data, labels, icons, and colors",
+      "code_reference": "Client360View.jsx lines 108-216"
+    }
+  },
+  "mocked_apis": {
+    "has_mocked_apis": true,
+    "mocked_apis_list": [
+      "Client 360 data (DEMO_CLIENT_DATA with client_1)",
+      "Asset holdings (ASSET_HOLDINGS static data)"
+    ]
+  }
+}

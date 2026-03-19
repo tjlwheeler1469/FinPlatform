@@ -69,7 +69,8 @@ import {
   ListTodo,
   Video,
   Network,
-  Bitcoin
+  Bitcoin,
+  Coins
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -204,7 +205,7 @@ const adviserBaseNav = [
 ];
 
 // Client-specific navigation (shown when client is selected)
-// Order: Overview → Investments → Plan → Documents → AI
+// Order: Overview → Plan → Investments → Documents → AI
 const clientContextNav = [
   {
     name: "Overview",
@@ -216,6 +217,14 @@ const clientContextNav = [
     ]
   },
   {
+    name: "Plan",
+    icon: Target,
+    items: [
+      { path: "/goal-tracker", label: "Goals", icon: Target, title: "Goals" },
+      { path: "/transaction-modeler", label: "What-If Modeler", icon: Calculator, title: "What-If & Plan Generator" },
+    ]
+  },
+  {
     name: "Investments",
     icon: TrendingUp,
     items: [
@@ -223,15 +232,10 @@ const clientContextNav = [
       { path: "/stock-trading", label: "Shares & Trading", icon: TrendingUp, title: "Shares & Trading" },
       { path: "/cash-deposits", label: "Cash & TDs", icon: PiggyBank, title: "Cash & Term Deposits" },
       { path: "/managed-funds", label: "Funds", icon: PieChart, title: "Managed Funds" },
+      { path: "/bonds-trading", label: "Bonds", icon: Landmark, title: "Bonds & Fixed Income" },
+      { path: "/hybrids-trading", label: "Hybrids", icon: Coins, title: "Hybrid Securities" },
+      { path: "/crypto-portfolio", label: "Crypto", icon: Bitcoin, title: "Cryptocurrency" },
       { path: "/property-portfolio", label: "Property", icon: Building2, title: "Property" },
-    ]
-  },
-  {
-    name: "Plan",
-    icon: Target,
-    items: [
-      { path: "/goal-tracker", label: "Goals", icon: Target, title: "Goals" },
-      { path: "/transaction-modeler", label: "What-If Modeler", icon: Calculator, title: "What-If & Plan Generator" },
     ]
   },
   {
