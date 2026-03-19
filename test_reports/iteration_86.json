@@ -1,0 +1,79 @@
+{
+  "summary": "Iteration 86 - Frontend Testing for Wealth Command UI Improvements. All requested features verified: 1) ScenarioModelling page has light themed cards (no bg-[#1a1a2e]), 2) Add Goal button opens dialog with name/target/current fields, 3) Goal cards have edit/delete buttons that work, 4) Knowledge Graph page loads without errors with all required tabs (Insights, Overview, Actions, Risks, Opportunities), 5) Made with Emergent badge is NOT visible, 6) ClientPortal has pie chart for net worth and chart visualizations for portfolio.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "All pages",
+        "issues": ["Compliance modal appears on every page visit - consider persisting dismissal in localStorage properly"]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_86.json"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "✅ ScenarioModelling: Light themed cards with bg-card class, no dark bg-[#1a1a2e] backgrounds found",
+    "✅ ScenarioModelling: Add Goal button (data-testid='add-goal-btn') opens dialog with form fields",
+    "✅ ScenarioModelling: Goal cards have edit (data-testid='edit-goal-{id}') and delete (data-testid='delete-goal-{id}') buttons",
+    "✅ KnowledgeGraph: Page loads without errors, has 5 tabs (Insights, Overview, Actions, Risks, Opportunities)",
+    "✅ ClientPortal: Pie chart renders for net worth breakdown with legend showing Stocks, ETFs, Managed Funds, Bonds, Hybrids, Crypto, Cash",
+    "✅ ClientPortal: Portfolio performance chart visualization present",
+    "✅ Emergent Badge: Not visible on any page tested (checked ScenarioModelling, KnowledgeGraph, ClientPortal)"
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "N/A (frontend only testing)",
+    "frontend": "100% (all requested features verified)"
+  },
+  "test_credentials": {
+    "preview_url": "https://scenario-modeler.preview.emergentagent.com"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "All UI improvements verified in iteration 86. The compliance modal appears on each page load but can be dismissed by checking the checkbox and clicking 'I Understand & Accept'. ScenarioModelling Goals CRUD is fully functional with Add/Edit/Delete operations. Knowledge Graph has all tabs working. ClientPortal shows pie chart for net worth and charts for portfolio performance.",
+  "features_verified": {
+    "scenario_modelling_light_theme": {
+      "status": "PASS",
+      "verification": "No bg-[#1a1a2e] dark backgrounds found. Cards use bg-card class for light theme"
+    },
+    "scenario_modelling_add_goal": {
+      "status": "PASS",
+      "verification": "Add Goal button opens dialog with name, target, current amount, deadline, priority, category fields"
+    },
+    "scenario_modelling_edit_delete_goals": {
+      "status": "PASS",
+      "verification": "Found 4 edit buttons and 4 delete buttons on goal cards. Edit opens pre-filled dialog."
+    },
+    "knowledge_graph_no_errors": {
+      "status": "PASS",
+      "verification": "Page loads successfully with no error messages. All 5 tabs (Insights, Overview, Actions, Risks, Opportunities) are clickable"
+    },
+    "emergent_badge_hidden": {
+      "status": "PASS",
+      "verification": "Emergent badge element not found in DOM. 'Made with Emergent' text not visible on any tested page"
+    },
+    "client_portal_pie_chart": {
+      "status": "PASS",
+      "verification": "Recharts pie component renders in Net Worth Breakdown section with full legend (Stocks, ETFs, Managed Funds, Bonds, Hybrids, Crypto, Cash, Superannuation, Property)"
+    },
+    "client_portal_bar_chart": {
+      "status": "PASS",
+      "verification": "Recharts surface element found in Portfolios tab. Portfolio Performance section exists with chart visualization"
+    }
+  },
+  "mocked_apis": {
+    "has_mocked_apis": true,
+    "mocked_apis_list": [
+      "Client portal (PORTAL_CLIENTS demo data)",
+      "Knowledge Graph (mock embedded graph)"
+    ]
+  }
+}

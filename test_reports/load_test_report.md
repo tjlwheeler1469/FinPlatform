@@ -10,7 +10,7 @@
 - **Users**: 1,000 concurrent
 - **Ramp-up**: 50 users/second
 - **Duration**: 60 seconds
-- **Target**: https://net-worth-hub-17.preview.emergentagent.com
+- **Target**: https://scenario-modeler.preview.emergentagent.com
 
 ---
 

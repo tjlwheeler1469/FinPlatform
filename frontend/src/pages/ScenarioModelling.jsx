@@ -16,9 +16,17 @@ import {
   Building2, TrendingUp, LineChart, DollarSign, Calculator,
   ArrowUpRight, ArrowDownRight, Home, PiggyBank, Target,
   CheckCircle2, Loader2, Sparkles, Plus, Trash2, Bitcoin,
-  Coins, BarChart3, Wallet, RefreshCw, ChevronRight, Eye
+  Coins, BarChart3, Wallet, RefreshCw, ChevronRight, Eye, Edit2, X
 } from "lucide-react";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   LineChart as RechartsLineChart,
   Line,
@@ -96,6 +104,18 @@ const ScenarioModelling = () => {
   const [goals, setGoals] = useState(MOCK_GOALS);
   const [selectedGoal, setSelectedGoal] = useState(null);
   
+  // Goal CRUD state
+  const [goalDialogOpen, setGoalDialogOpen] = useState(false);
+  const [editingGoal, setEditingGoal] = useState(null);
+  const [goalForm, setGoalForm] = useState({
+    name: "",
+    target: 100000,
+    current: 0,
+    deadline: "2030",
+    category: "savings",
+    priority: "medium"
+  });
+  
   // Scenario state
   const [scenarioName, setScenarioName] = useState("My Scenario");
   const [timeframe, setTimeframe] = useState(10);
@@ -148,6 +168,72 @@ const ScenarioModelling = () => {
   // Toggle existing asset inclusion
   const toggleExistingAsset = (type) => {
     setIncludeExisting(prev => ({ ...prev, [type]: !prev[type] }));
+  };
+
+  // Goal CRUD functions
+  const openAddGoal = () => {
+    setEditingGoal(null);
+    setGoalForm({
+      name: "",
+      target: 100000,
+      current: 0,
+      deadline: "2030",
+      category: "savings",
+      priority: "medium"
+    });
+    setGoalDialogOpen(true);
+  };
+
+  const openEditGoal = (goal) => {
+    setEditingGoal(goal);
+    setGoalForm({
+      name: goal.name,
+      target: goal.target,
+      current: goal.current,
+      deadline: goal.deadline,
+      category: goal.category,
+      priority: goal.priority
+    });
+    setGoalDialogOpen(true);
+  };
+
+  const saveGoal = () => {
+    if (!goalForm.name.trim()) {
+      toast.error("Please enter a goal name");
+      return;
+    }
+    if (goalForm.target <= 0) {
+      toast.error("Target amount must be greater than 0");
+      return;
+    }
+
+    if (editingGoal) {
+      // Update existing goal
+      setGoals(goals.map(g => 
+        g.id === editingGoal.id 
+          ? { ...g, ...goalForm }
+          : g
+      ));
+      toast.success("Goal updated successfully!");
+    } else {
+      // Add new goal
+      const newGoal = {
+        id: `g${Date.now()}`,
+        ...goalForm
+      };
+      setGoals([...goals, newGoal]);
+      toast.success("Goal added successfully!");
+    }
+    setGoalDialogOpen(false);
+    setEditingGoal(null);
+  };
+
+  const deleteGoal = (goalId) => {
+    setGoals(goals.filter(g => g.id !== goalId));
+    if (selectedGoal?.id === goalId) {
+      setSelectedGoal(null);
+    }
+    toast.success("Goal deleted");
   };
 
   // Calculate projections
@@ -222,12 +308,13 @@ const ScenarioModelling = () => {
   const GoalCard = ({ goal }) => {
     const progress = (goal.current / goal.target) * 100;
     const yearsToDeadline = new Date(goal.deadline).getFullYear() - new Date().getFullYear();
-    const monthlyRequired = (goal.target - goal.current) / (yearsToDeadline * 12);
+    const monthlyRequired = yearsToDeadline > 0 ? (goal.target - goal.current) / (yearsToDeadline * 12) : 0;
 
     return (
       <Card 
         className={`cursor-pointer transition-all hover:shadow-md bg-card ${selectedGoal?.id === goal.id ? 'ring-2 ring-[#D4A84C]' : ''}`}
         onClick={() => setSelectedGoal(goal)}
+        data-testid={`goal-card-${goal.id}`}
       >
         <CardContent className="p-4">
           <div className="flex justify-between items-start mb-3">
@@ -235,12 +322,38 @@ const ScenarioModelling = () => {
               <h3 className="font-semibold text-foreground">{goal.name}</h3>
               <p className="text-sm text-muted-foreground">Target: {formatCurrency(goal.target)}</p>
             </div>
-            <Badge 
-              variant={goal.priority === "high" ? "default" : "secondary"} 
-              className={goal.priority === "high" ? "bg-[#D4A84C] text-black font-semibold" : "bg-slate-600 text-white font-semibold"}
-            >
-              {goal.priority}
-            </Badge>
+            <div className="flex items-center gap-1">
+              <Badge 
+                variant={goal.priority === "high" ? "default" : "secondary"} 
+                className={goal.priority === "high" ? "bg-[#D4A84C] text-black font-semibold" : "bg-slate-600 text-white font-semibold"}
+              >
+                {goal.priority}
+              </Badge>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openEditGoal(goal);
+                }}
+                data-testid={`edit-goal-${goal.id}`}
+              >
+                <Edit2 className="h-3.5 w-3.5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 text-red-500 hover:text-red-600 hover:bg-red-50"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deleteGoal(goal.id);
+                }}
+                data-testid={`delete-goal-${goal.id}`}
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </Button>
+            </div>
           </div>
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
@@ -265,7 +378,7 @@ const ScenarioModelling = () => {
     const totalValue = assets.reduce((s, a) => s + a.value, 0);
 
     return (
-      <Card className={`cursor-pointer transition-all ${included ? 'ring-2 ring-[#D4A84C] bg-[#1a1a2e]' : 'bg-card hover:bg-muted/50'}`} onClick={onToggle}>
+      <Card className={`cursor-pointer transition-all ${included ? 'ring-2 ring-[#D4A84C] bg-[#D4A84C]/10' : 'bg-card hover:bg-muted/50'}`} onClick={onToggle}>
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
@@ -328,7 +441,11 @@ const ScenarioModelling = () => {
           <TabsContent value="goals" className="space-y-4">
             <div className="flex justify-between items-center">
               <h2 className="text-lg font-semibold text-foreground">Your Financial Goals</h2>
-              <Button className="bg-[#D4A84C] hover:bg-[#C49A3C] text-black">
+              <Button 
+                className="bg-[#D4A84C] hover:bg-[#C49A3C] text-black"
+                onClick={openAddGoal}
+                data-testid="add-goal-btn"
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Goal
               </Button>
@@ -395,9 +512,9 @@ const ScenarioModelling = () => {
 
             {/* Show selected assets details */}
             {Object.entries(includeExisting).some(([_, v]) => v) && (
-              <Card className="bg-[#1a1a2e]">
+              <Card className="bg-card border">
                 <CardHeader>
-                  <CardTitle className="text-white text-base">Selected Assets Detail</CardTitle>
+                  <CardTitle className="text-foreground text-base">Selected Assets Detail</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ScrollArea className="h-[300px]">
@@ -409,9 +526,9 @@ const ScenarioModelling = () => {
                             <h4 className="font-medium text-[#D4A84C] capitalize">{type}</h4>
                             <div className="grid gap-2">
                               {EXISTING_ASSETS[type].map(asset => (
-                                <div key={asset.id} className="flex justify-between items-center p-2 rounded bg-[#0f0f1a]">
-                                  <span className="text-gray-300">{asset.name}</span>
-                                  <span className="text-white font-medium">{formatCurrency(asset.value)}</span>
+                                <div key={asset.id} className="flex justify-between items-center p-2 rounded bg-muted">
+                                  <span className="text-foreground">{asset.name}</span>
+                                  <span className="text-foreground font-medium">{formatCurrency(asset.value)}</span>
                                 </div>
                               ))}
                             </div>
@@ -428,18 +545,18 @@ const ScenarioModelling = () => {
           <TabsContent value="scenario" className="space-y-4">
             <div className="flex justify-between items-center">
               <div>
-                <h2 className="text-lg font-semibold text-white">Build Your Scenario</h2>
-                <p className="text-sm text-gray-400">Add multiple investments across asset classes</p>
+                <h2 className="text-lg font-semibold text-foreground">Build Your Scenario</h2>
+                <p className="text-sm text-muted-foreground">Add multiple investments across asset classes</p>
               </div>
             </div>
 
             {/* Timeframe Selector */}
-            <Card className="bg-[#1a1a2e]">
+            <Card className="bg-card border">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label className="text-white">Projection Timeframe</Label>
-                    <p className="text-sm text-gray-400">How far into the future?</p>
+                    <Label className="text-foreground">Projection Timeframe</Label>
+                    <p className="text-sm text-muted-foreground">How far into the future?</p>
                   </div>
                   <div className="flex items-center gap-4">
                     <Slider
@@ -468,7 +585,6 @@ const ScenarioModelling = () => {
                     variant="outline"
                     size="sm"
                     onClick={() => addTransaction(type.id)}
-                    className="border-gray-600"
                   >
                     <Icon className="h-4 w-4 mr-2" style={{ color: type.color }} />
                     Add {type.label}
@@ -480,11 +596,11 @@ const ScenarioModelling = () => {
             {/* Transaction List */}
             <div className="space-y-3">
               {transactions.length === 0 ? (
-                <Card className="bg-[#1a1a2e] border-dashed border-gray-600">
+                <Card className="bg-card border-dashed">
                   <CardContent className="p-8 text-center">
-                    <Calculator className="h-12 w-12 text-gray-500 mx-auto mb-3" />
-                    <p className="text-gray-400">No investments added yet</p>
-                    <p className="text-sm text-gray-500">Click the buttons above to add investments to your scenario</p>
+                    <Calculator className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                    <p className="text-muted-foreground">No investments added yet</p>
+                    <p className="text-sm text-muted-foreground">Click the buttons above to add investments to your scenario</p>
                   </CardContent>
                 </Card>
               ) : (
@@ -493,7 +609,7 @@ const ScenarioModelling = () => {
                   const Icon = assetType?.icon || TrendingUp;
                   
                   return (
-                    <Card key={transaction.id} className="bg-[#1a1a2e]">
+                    <Card key={transaction.id} className="bg-card border">
                       <CardContent className="p-4">
                         <div className="flex items-start gap-4">
                           <div className="p-2 rounded-lg" style={{ backgroundColor: `${assetType?.color || '#3B82F6'}20` }}>
@@ -502,27 +618,25 @@ const ScenarioModelling = () => {
                           
                           <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div>
-                              <Label className="text-gray-400 text-xs">Asset Name</Label>
+                              <Label className="text-muted-foreground text-xs">Asset Name</Label>
                               <Input
                                 value={transaction.name}
                                 onChange={(e) => updateTransaction(transaction.id, "name", e.target.value)}
                                 placeholder={`New ${assetType?.label || 'Investment'}`}
-                                className="bg-[#0f0f1a] border-gray-700"
                               />
                             </div>
                             
                             <div>
-                              <Label className="text-gray-400 text-xs">Investment Amount</Label>
+                              <Label className="text-muted-foreground text-xs">Investment Amount</Label>
                               <Input
                                 type="number"
                                 value={transaction.amount}
                                 onChange={(e) => updateTransaction(transaction.id, "amount", e.target.value)}
-                                className="bg-[#0f0f1a] border-gray-700"
                               />
                             </div>
                             
                             <div>
-                              <Label className="text-gray-400 text-xs">Expected Return (%)</Label>
+                              <Label className="text-muted-foreground text-xs">Expected Return (%)</Label>
                               <div className="flex items-center gap-2">
                                 <Slider
                                   value={[transaction.expectedReturn]}
@@ -532,17 +646,17 @@ const ScenarioModelling = () => {
                                   step={0.5}
                                   className="flex-1"
                                 />
-                                <span className="text-white text-sm w-12">{transaction.expectedReturn}%</span>
+                                <span className="text-foreground text-sm w-12">{transaction.expectedReturn}%</span>
                               </div>
                             </div>
 
                             <div>
-                              <Label className="text-gray-400 text-xs">Contribution</Label>
+                              <Label className="text-muted-foreground text-xs">Contribution</Label>
                               <Select 
                                 value={transaction.frequency}
                                 onValueChange={(v) => updateTransaction(transaction.id, "frequency", v)}
                               >
-                                <SelectTrigger className="bg-[#0f0f1a] border-gray-700">
+                                <SelectTrigger>
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -557,7 +671,7 @@ const ScenarioModelling = () => {
                             variant="ghost"
                             size="sm"
                             onClick={() => removeTransaction(transaction.id)}
-                            className="text-red-400 hover:text-red-300 hover:bg-red-400/10"
+                            className="text-red-500 hover:text-red-600 hover:bg-red-500/10"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -565,13 +679,13 @@ const ScenarioModelling = () => {
 
                         {transaction.frequency === "monthly" && (
                           <div className="mt-3 ml-12">
-                            <Label className="text-gray-400 text-xs">Monthly Contribution</Label>
+                            <Label className="text-muted-foreground text-xs">Monthly Contribution</Label>
                             <Input
                               type="number"
                               value={transaction.monthlyContribution}
                               onChange={(e) => updateTransaction(transaction.id, "monthlyContribution", e.target.value)}
                               placeholder="0"
-                              className="bg-[#0f0f1a] border-gray-700 w-48"
+                              className="w-48"
                             />
                           </div>
                         )}
@@ -612,11 +726,11 @@ const ScenarioModelling = () => {
           {/* Projection Tab */}
           <TabsContent value="projection" className="space-y-4">
             {!projectionData ? (
-              <Card className="bg-[#1a1a2e]">
+              <Card className="bg-card border">
                 <CardContent className="p-12 text-center">
-                  <LineChart className="h-16 w-16 text-gray-500 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-white mb-2">No Projection Yet</h3>
-                  <p className="text-gray-400 mb-4">Add assets and investments to see your projection</p>
+                  <LineChart className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-foreground mb-2">No Projection Yet</h3>
+                  <p className="text-muted-foreground mb-4">Add assets and investments to see your projection</p>
                   <Button 
                     className="bg-[#D4A84C] hover:bg-[#C49A3C] text-black"
                     onClick={() => setActiveTab("scenario")}
@@ -629,26 +743,26 @@ const ScenarioModelling = () => {
               <>
                 {/* Summary Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Card className="bg-gradient-to-br from-gray-800 to-gray-900 border-gray-600">
+                  <Card className="bg-muted/50 border">
                     <CardContent className="p-4 text-center">
-                      <p className="text-sm text-gray-400 mb-1">Conservative (5-7%)</p>
-                      <p className="text-2xl font-bold text-gray-300">
+                      <p className="text-sm text-muted-foreground mb-1">Conservative (5-7%)</p>
+                      <p className="text-2xl font-bold text-foreground">
                         {formatCurrency(projectionData[projectionData.length - 1]?.conservative || 0)}
                       </p>
                     </CardContent>
                   </Card>
-                  <Card className="bg-gradient-to-br from-blue-900 to-blue-950 border-blue-500/30">
+                  <Card className="bg-blue-50 border-blue-200">
                     <CardContent className="p-4 text-center">
-                      <p className="text-sm text-blue-300 mb-1">Moderate (7-10%)</p>
-                      <p className="text-2xl font-bold text-blue-400">
+                      <p className="text-sm text-blue-700 mb-1">Moderate (7-10%)</p>
+                      <p className="text-2xl font-bold text-blue-700">
                         {formatCurrency(projectionData[projectionData.length - 1]?.moderate || 0)}
                       </p>
                     </CardContent>
                   </Card>
-                  <Card className="bg-gradient-to-br from-emerald-900 to-emerald-950 border-emerald-500/30">
+                  <Card className="bg-emerald-50 border-emerald-200">
                     <CardContent className="p-4 text-center">
-                      <p className="text-sm text-emerald-300 mb-1">Aggressive (10-15%)</p>
-                      <p className="text-2xl font-bold text-emerald-400">
+                      <p className="text-sm text-emerald-700 mb-1">Aggressive (10-15%)</p>
+                      <p className="text-2xl font-bold text-emerald-700">
                         {formatCurrency(projectionData[projectionData.length - 1]?.aggressive || 0)}
                       </p>
                     </CardContent>
@@ -656,9 +770,9 @@ const ScenarioModelling = () => {
                 </div>
 
                 {/* Chart */}
-                <Card className="bg-[#1a1a2e]">
+                <Card className="bg-card border">
                   <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
+                    <CardTitle className="text-foreground flex items-center gap-2">
                       <BarChart3 className="h-5 w-5 text-[#D4A84C]" />
                       {timeframe}-Year Projection
                     </CardTitle>
@@ -686,19 +800,19 @@ const ScenarioModelling = () => {
                               <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
                             </linearGradient>
                           </defs>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                           <XAxis 
                             dataKey="year" 
-                            stroke="#666"
+                            stroke="#6b7280"
                             tickFormatter={(v) => `Year ${v}`}
                           />
                           <YAxis 
-                            stroke="#666"
+                            stroke="#6b7280"
                             tickFormatter={(v) => formatCurrency(v)}
                           />
                           <Tooltip 
-                            contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #333' }}
-                            labelStyle={{ color: '#fff' }}
+                            contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb' }}
+                            labelStyle={{ color: '#1f2937' }}
                             formatter={(value) => formatCurrency(value)}
                             labelFormatter={(label) => `Year ${label}`}
                           />
@@ -754,6 +868,123 @@ const ScenarioModelling = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Goal Add/Edit Dialog */}
+      <Dialog open={goalDialogOpen} onOpenChange={setGoalDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>{editingGoal ? 'Edit Goal' : 'Add New Goal'}</DialogTitle>
+            <DialogDescription>
+              {editingGoal ? 'Update your financial goal details.' : 'Create a new financial goal to track your progress.'}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="goal-name">Goal Name</Label>
+              <Input
+                id="goal-name"
+                value={goalForm.name}
+                onChange={(e) => setGoalForm({ ...goalForm, name: e.target.value })}
+                placeholder="e.g., Retirement Fund, House Deposit"
+                data-testid="goal-name-input"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="goal-target">Target Amount ($)</Label>
+                <Input
+                  id="goal-target"
+                  type="number"
+                  value={goalForm.target}
+                  onChange={(e) => setGoalForm({ ...goalForm, target: parseFloat(e.target.value) || 0 })}
+                  data-testid="goal-target-input"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="goal-current">Current Amount ($)</Label>
+                <Input
+                  id="goal-current"
+                  type="number"
+                  value={goalForm.current}
+                  onChange={(e) => setGoalForm({ ...goalForm, current: parseFloat(e.target.value) || 0 })}
+                  data-testid="goal-current-input"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="goal-deadline">Target Year</Label>
+                <Select 
+                  value={goalForm.deadline} 
+                  onValueChange={(v) => setGoalForm({ ...goalForm, deadline: v })}
+                >
+                  <SelectTrigger data-testid="goal-deadline-select">
+                    <SelectValue placeholder="Select year" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.from({ length: 30 }, (_, i) => {
+                      const year = new Date().getFullYear() + i;
+                      return (
+                        <SelectItem key={year} value={year.toString()}>
+                          {year}
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="goal-priority">Priority</Label>
+                <Select 
+                  value={goalForm.priority} 
+                  onValueChange={(v) => setGoalForm({ ...goalForm, priority: v })}
+                >
+                  <SelectTrigger data-testid="goal-priority-select">
+                    <SelectValue placeholder="Select priority" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="high">High</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="low">Low</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="goal-category">Category</Label>
+              <Select 
+                value={goalForm.category} 
+                onValueChange={(v) => setGoalForm({ ...goalForm, category: v })}
+              >
+                <SelectTrigger data-testid="goal-category-select">
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="retirement">Retirement</SelectItem>
+                  <SelectItem value="property">Property</SelectItem>
+                  <SelectItem value="education">Education</SelectItem>
+                  <SelectItem value="savings">Savings</SelectItem>
+                  <SelectItem value="investment">Investment</SelectItem>
+                  <SelectItem value="travel">Travel</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setGoalDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              className="bg-[#D4A84C] hover:bg-[#C49A3C] text-black"
+              onClick={saveGoal}
+              data-testid="save-goal-btn"
+            >
+              {editingGoal ? 'Update Goal' : 'Add Goal'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };

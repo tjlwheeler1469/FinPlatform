@@ -15,8 +15,24 @@ import {
   PieChart,
   MessageSquare
 } from "lucide-react";
+import {
+  PieChart as RechartsPie,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Legend,
+  Tooltip,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid
+} from "recharts";
 
 const API_URL = import.meta.env.VITE_API_URL || process.env.REACT_APP_BACKEND_URL;
+
+// Color palette for charts
+const CHART_COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316', '#6366F1'];
 
 const ClientPortal = () => {
   const [loading, setLoading] = useState(true);
@@ -152,18 +168,66 @@ const ClientPortal = () => {
               <Card>
                 <CardHeader><CardTitle className="flex items-center gap-2"><PieChart className="h-5 w-5 text-blue-600" />Net Worth Breakdown</CardTitle></CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
-                    {netWorth?.assets && Object.entries(netWorth.assets).map(([key, value]) => (
-                      <div key={key} className="flex items-center justify-between">
-                        <span className="capitalize text-sm">{key.replace(/_/g, ' ')}</span>
-                        <span className="font-medium">{formatCurrency(value)}</span>
+                  {netWorth?.assets && Object.keys(netWorth.assets).length > 0 ? (
+                    <>
+                      <div className="h-[200px] mb-4">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <RechartsPie>
+                            <Pie
+                              data={Object.entries(netWorth.assets)
+                                .filter(([_, v]) => v > 0)
+                                .map(([key, value], idx) => ({
+                                  name: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+                                  value,
+                                  fill: CHART_COLORS[idx % CHART_COLORS.length]
+                                }))}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={40}
+                              outerRadius={80}
+                              paddingAngle={2}
+                              dataKey="value"
+                            >
+                              {Object.entries(netWorth.assets)
+                                .filter(([_, v]) => v > 0)
+                                .map((_, idx) => (
+                                  <Cell key={`cell-${idx}`} fill={CHART_COLORS[idx % CHART_COLORS.length]} />
+                                ))}
+                            </Pie>
+                            <Tooltip formatter={(value) => formatCurrency(value)} />
+                          </RechartsPie>
+                        </ResponsiveContainer>
                       </div>
-                    ))}
-                    <div className="border-t pt-2 flex items-center justify-between text-red-600">
-                      <span className="text-sm">Liabilities</span>
-                      <span className="font-medium">-{formatCurrency(netWorth?.liabilities?.total)}</span>
+                      <div className="space-y-2">
+                        {Object.entries(netWorth.assets).map(([key, value], idx) => (
+                          <div key={key} className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: CHART_COLORS[idx % CHART_COLORS.length] }} />
+                              <span className="capitalize text-sm">{key.replace(/_/g, ' ')}</span>
+                            </div>
+                            <span className="font-medium">{formatCurrency(value)}</span>
+                          </div>
+                        ))}
+                        <div className="border-t pt-2 flex items-center justify-between text-red-600">
+                          <span className="text-sm">Liabilities</span>
+                          <span className="font-medium">-{formatCurrency(netWorth?.liabilities?.total)}</span>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="space-y-3">
+                      {netWorth?.assets && Object.entries(netWorth.assets).map(([key, value]) => (
+                        <div key={key} className="flex items-center justify-between">
+                          <span className="capitalize text-sm">{key.replace(/_/g, ' ')}</span>
+                          <span className="font-medium">{formatCurrency(value)}</span>
+                        </div>
+                      ))}
+                      <div className="border-t pt-2 flex items-center justify-between text-red-600">
+                        <span className="text-sm">Liabilities</span>
+                        <span className="font-medium">-{formatCurrency(netWorth?.liabilities?.total)}</span>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </CardContent>
               </Card>
               <Card>
@@ -198,6 +262,55 @@ const ClientPortal = () => {
               <Card><CardContent className="pt-6 text-center"><p className="text-sm text-muted-foreground">Portfolios</p><p className="text-3xl font-bold">{portfolios?.summary?.portfolio_count}</p></CardContent></Card>
               <Card><CardContent className="pt-6 text-center"><p className="text-sm text-muted-foreground">YTD Return</p><p className={`text-3xl font-bold ${portfolios?.summary?.weighted_ytd_return >= 0 ? 'text-green-600' : 'text-red-600'}`}>{portfolios?.summary?.weighted_ytd_return >= 0 ? '+' : ''}{portfolios?.summary?.weighted_ytd_return}%</p></CardContent></Card>
             </div>
+            
+            {/* Portfolio Performance Chart */}
+            {portfolios?.portfolios && portfolios.portfolios.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5 text-green-600" />
+                    Portfolio Performance (YTD)
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[200px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart 
+                        data={portfolios.portfolios.map(p => ({
+                          name: p.name.length > 15 ? p.name.substring(0, 15) + '...' : p.name,
+                          return: p.change_ytd,
+                          value: p.value
+                        }))}
+                        layout="vertical"
+                        margin={{ left: 20 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
+                        <XAxis type="number" tickFormatter={(v) => `${v}%`} />
+                        <YAxis type="category" dataKey="name" width={100} tick={{ fontSize: 12 }} />
+                        <Tooltip 
+                          formatter={(value, name) => [
+                            name === 'return' ? `${value}%` : formatCurrency(value),
+                            name === 'return' ? 'YTD Return' : 'Value'
+                          ]}
+                        />
+                        <Bar 
+                          dataKey="return" 
+                          fill="#10B981"
+                          radius={[0, 4, 4, 0]}
+                        >
+                          {portfolios.portfolios.map((entry, index) => (
+                            <Cell 
+                              key={`cell-${index}`} 
+                              fill={entry.change_ytd >= 0 ? '#10B981' : '#EF4444'} 
+                            />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
             {portfolios?.portfolios?.map((portfolio) => (
               <Card key={portfolio.portfolio_id}>
                 <CardHeader>
