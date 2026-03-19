@@ -65,6 +65,11 @@ Create a "financial services super app" named "Wealth Command," evolving it from
   - Added CSS rule to hide dynamically injected badge
   - Branding no longer visible on any page
 
+- **Advisor Navigation Updates**:
+  - Reordered clientContextNav: Plan now appears BEFORE Investments
+  - Added Bonds (/bonds-trading), Hybrids (/hybrids-trading), Crypto (/crypto-portfolio) to Investments navigation
+  - Navigation order now: Overview → Plan → Investments → Documents → AI Copilot
+
 ### Asset Categories Available
 | Category | Personal | Adviser Client | Client Portal |
 |----------|----------|----------------|---------------|
@@ -87,8 +92,6 @@ Create a "financial services super app" named "Wealth Command," evolving it from
 ### Backlog (P2/P3)
 - P2: Connect Knowledge Graph to real MongoDB data
 - P2: More ASX data sources for hybrids
-- P2: Add Bonds, Crypto, Hybrids to Advisor Client 360 Investments section
-- P2: Reorder navigation (Plan above Investments) in Advisor view
 - P3: Mobile app wrapper
 - P3: Voice interface (Whisper)
 - P3: Fix websockets dependency conflict with alpaca-trade-api
