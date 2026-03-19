@@ -70,6 +70,21 @@ Create a "financial services super app" named "Wealth Command," evolving it from
   - Added Bonds (/bonds-trading), Hybrids (/hybrids-trading), Crypto (/crypto-portfolio) to Investments navigation
   - Navigation order now: Overview → Plan → Investments → Documents → AI Copilot
   - Removed Trading and Hybrids from Execution tab (now only has Batch Execute)
+  - Added Integrations group with Xplan navigation item
+
+- **Xplan Integration** (MAJOR FEATURE):
+  - Built complete integration layer for IRESS Xplan financial planning software
+  - Each advisor practice can connect their own Xplan instance
+  - Core Principle: Xplan = System of Record, Wealth Command = System of Intelligence
+  - Phase 1 (Data Extraction): Pull clients, portfolios, assets, liabilities, goals
+  - Phase 2 (Scenario Modelling): Use extracted data for projections and analysis
+  - Phase 3 (Insights): Generate retirement probability, risk alerts, tax opportunities
+  - Phase 4 (Push Back): Send strategies, scenarios, documents back to Xplan
+  - Phase 5 (Continuous Sync): Two-way sync with conflict resolution
+  - Phase 6 (Advisor Experience): Advisors operate through Wealth Command, Xplan as backend
+  - Demo mode available for testing without real Xplan credentials
+  - Full backend API at /api/xplan/* with MongoDB persistence
+  - Frontend page at /xplan-integration with 4 tabs (Overview, Synced Clients, Sync & Push, History)
 
 ### Asset Categories Available
 | Category | Personal | Adviser Client | Client Portal |
@@ -89,6 +104,7 @@ Create a "financial services super app" named "Wealth Command," evolving it from
 - Fathom Integration (requires API key)
 - Some ASX hybrid prices (simulated when unavailable)
 - Client Portal data (PORTAL_CLIENTS demo data)
+- Xplan Integration (demo mode - uses mock data, ready for real Xplan connection)
 
 ### Backlog (P2/P3)
 - P2: Connect Knowledge Graph to real MongoDB data
