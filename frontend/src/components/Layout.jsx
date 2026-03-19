@@ -199,6 +199,13 @@ const adviserBaseNav = [
       { path: "/compliance", label: "Compliance", icon: Shield, title: "Compliance" },
       { path: "/security", label: "Security", icon: Shield, title: "Security" },
     ]
+  },
+  {
+    name: "Integrations",
+    icon: Link2,
+    items: [
+      { path: "/xplan-integration", label: "Xplan", icon: Link2, title: "Xplan Integration", badge: "NEW" },
+    ]
   }
 ];
 

@@ -363,6 +363,14 @@ def include_all_routes():
     except ImportError as e:
         logger.error(f"Failed to load hybrid prices routes: {e}")
 
+    # XPLAN INTEGRATION - System of Record Connection
+    try:
+        from routes.xplan_integration import router as xplan_router
+        app.include_router(xplan_router, prefix="/api")
+        logger.info("XPLAN INTEGRATION loaded: Client Sync, Portfolio Import, Push to Xplan, Two-Way Sync")
+    except ImportError as e:
+        logger.error(f"Failed to load Xplan integration routes: {e}")
+
 # Include all routes
 include_all_routes()
 

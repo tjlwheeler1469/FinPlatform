@@ -192,6 +192,9 @@ const HybridsTrading = lazy(() => import("@/pages/HybridsTrading"));
 // Crypto Portfolio
 const CryptoPortfolio = lazy(() => import("@/pages/CryptoPortfolio"));
 
+// Xplan Integration
+const XplanIntegration = lazy(() => import("@/pages/XplanIntegration"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -1037,6 +1040,9 @@ const AppRouter = () => {
       <Route path="/managed-funds" element={<ManagedFunds />} />
       <Route path="/hybrids-trading" element={<HybridsTrading />} />
       <Route path="/crypto-portfolio" element={<CryptoPortfolio />} />
+      
+      {/* Xplan Integration */}
+      <Route path="/xplan-integration" element={<XplanIntegration />} />
       
       {/* CRM Command Center */}
       <Route path="/crm-command-center" element={<CRMCommandCenter />} />
