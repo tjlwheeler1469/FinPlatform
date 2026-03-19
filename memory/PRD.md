@@ -69,6 +69,7 @@ Create a "financial services super app" named "Wealth Command," evolving it from
   - Reordered clientContextNav: Plan now appears BEFORE Investments
   - Added Bonds (/bonds-trading), Hybrids (/hybrids-trading), Crypto (/crypto-portfolio) to Investments navigation
   - Navigation order now: Overview → Plan → Investments → Documents → AI Copilot
+  - Removed Trading and Hybrids from Execution tab (now only has Batch Execute)
 
 ### Asset Categories Available
 | Category | Personal | Adviser Client | Client Portal |
