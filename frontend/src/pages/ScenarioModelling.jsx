@@ -27,6 +27,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useXplanSync } from "@/components/XplanSyncNotification";
 import {
   LineChart as RechartsLineChart,
   Line,
@@ -103,6 +104,7 @@ const ScenarioModelling = () => {
   const [activeTab, setActiveTab] = useState("goals");
   const [goals, setGoals] = useState(MOCK_GOALS);
   const [selectedGoal, setSelectedGoal] = useState(null);
+  const { triggerSync } = useXplanSync();
   
   // Goal CRUD state
   const [goalDialogOpen, setGoalDialogOpen] = useState(false);
@@ -215,6 +217,11 @@ const ScenarioModelling = () => {
           : g
       ));
       toast.success("Goal updated successfully!");
+      // Trigger Xplan sync for goal update
+      triggerSync("strategy", {
+        description: `Updated goal: ${goalForm.name}`,
+        goalData: goalForm
+      });
     } else {
       // Add new goal
       const newGoal = {
@@ -223,12 +230,18 @@ const ScenarioModelling = () => {
       };
       setGoals([...goals, newGoal]);
       toast.success("Goal added successfully!");
+      // Trigger Xplan sync for new goal
+      triggerSync("strategy", {
+        description: `Created new goal: ${goalForm.name}`,
+        goalData: newGoal
+      });
     }
     setGoalDialogOpen(false);
     setEditingGoal(null);
   };
 
   const deleteGoal = (goalId) => {
+    const goalToDelete = goals.find(g => g.id === goalId);
     setGoals(goals.filter(g => g.id !== goalId));
     if (selectedGoal?.id === goalId) {
       setSelectedGoal(null);

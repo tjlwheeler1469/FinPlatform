@@ -21,7 +21,7 @@ executor = ThreadPoolExecutor(max_workers=10)
 
 # Cache for live data (expires after 5 minutes for better performance)
 _cache = {}
-_cache_ttl = 300  # 5 minutes - market data doesn't change that frequently
+_cache_ttl = 300  # 5 minutes - market data doesn't change that frequently for display purposes
 
 def get_cached(key: str):
     """Get cached data if not expired."""

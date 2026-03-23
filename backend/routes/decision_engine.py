@@ -139,26 +139,30 @@ async def get_recommendations_v2(request: HealthScoreRequest):
     
     # Savings recommendations
     if request.savings_rate < 0.20:
+        savings_increase = (0.20 - request.savings_rate) * request.current_income
         recommendations.append({
             "id": "increase_savings",
             "category": "savings",
             "priority": "high",
             "title": "Increase Savings Rate",
             "description": f"Your current savings rate is {request.savings_rate*100:.0f}%. Aim for at least 20% to accelerate wealth building.",
-            "impact": f"+${int((0.20 - request.savings_rate) * request.current_income):,}/year",
+            "impact": f"+${int(savings_increase):,}/year",
+            "impact_primary": savings_increase,
             "difficulty": "medium"
         })
     
     # Emergency fund
     emergency_months = request.emergency_fund / (request.annual_expenses / 12)
     if emergency_months < 6:
+        emergency_gap = (6 - emergency_months) * request.annual_expenses / 12
         recommendations.append({
             "id": "emergency_fund",
             "category": "safety",
             "priority": "high",
             "title": "Build Emergency Fund",
             "description": f"You have {emergency_months:.1f} months of expenses. Target 6 months for financial security.",
-            "impact": f"Need ${int((6 - emergency_months) * request.annual_expenses / 12):,} more",
+            "impact": f"Need ${int(emergency_gap):,} more",
+            "impact_primary": emergency_gap,
             "difficulty": "easy"
         })
     
@@ -166,26 +170,30 @@ async def get_recommendations_v2(request: HealthScoreRequest):
     concessional_cap = 30000
     current_contrib = request.super_balance * 0.05  # Estimate
     if current_contrib < concessional_cap:
+        tax_saving = (concessional_cap - current_contrib) * 0.32
         recommendations.append({
             "id": "super_boost",
-            "category": "retirement",
+            "category": "super",
             "priority": "medium",
             "title": "Maximize Super Contributions",
             "description": "Consider salary sacrificing to maximize your concessional contribution cap of $30,000.",
-            "impact": f"Tax saving up to ${int((concessional_cap - current_contrib) * 0.32):,}",
+            "impact": f"Tax saving up to ${int(tax_saving):,}",
+            "impact_primary": tax_saving,
             "difficulty": "easy"
         })
     
     # Debt reduction
     debt_ratio = request.total_debt / request.total_assets if request.total_assets > 0 else 0
     if debt_ratio > 0.30:
+        interest_savings = request.total_debt * 0.02
         recommendations.append({
             "id": "debt_reduction",
             "category": "debt",
             "priority": "high",
             "title": "Accelerate Debt Paydown",
             "description": f"Your debt-to-asset ratio is {debt_ratio*100:.0f}%. Consider aggressive debt reduction strategies.",
-            "impact": f"Interest savings of ${int(request.total_debt * 0.02):,}/year",
+            "impact": f"Interest savings of ${int(interest_savings):,}/year",
+            "impact_primary": interest_savings,
             "difficulty": "medium"
         })
     
@@ -197,17 +205,20 @@ async def get_recommendations_v2(request: HealthScoreRequest):
         "title": "Review Portfolio Allocation",
         "description": "Regular portfolio rebalancing ensures your investments match your risk profile.",
         "impact": "Optimized risk-adjusted returns",
+        "impact_primary": request.investment_portfolio * 0.01,  # 1% improvement potential
         "difficulty": "easy"
     })
     
     # Tax optimization
+    tax_savings = request.current_income * 0.02
     recommendations.append({
         "id": "tax_optimization",
         "category": "tax",
         "priority": "medium",
         "title": "Tax Planning Review",
         "description": "Schedule an annual tax review to maximize deductions and minimize tax liability.",
-        "impact": f"Potential savings of ${int(request.current_income * 0.02):,}/year",
+        "impact": f"Potential savings of ${int(tax_savings):,}/year",
+        "impact_primary": tax_savings,
         "difficulty": "medium"
     })
     

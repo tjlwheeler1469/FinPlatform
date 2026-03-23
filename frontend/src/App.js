@@ -3,6 +3,7 @@ import "@/App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
+import { XplanSyncProvider, XplanSyncIndicator } from "@/components/XplanSyncNotification";
 
 // Loading component for lazy loaded pages
 const PageLoader = () => (
@@ -1072,11 +1073,14 @@ function App() {
         <AuthProvider>
           <PortfolioProvider>
             <NotificationsProvider>
-              <ComplianceModal />
-              <Suspense fallback={<PageLoader />}>
-                <AppRouter />
-              </Suspense>
-              <Toaster position="top-right" richColors />
+              <XplanSyncProvider>
+                <ComplianceModal />
+                <Suspense fallback={<PageLoader />}>
+                  <AppRouter />
+                </Suspense>
+                <Toaster position="top-right" richColors />
+                <XplanSyncIndicator />
+              </XplanSyncProvider>
             </NotificationsProvider>
           </PortfolioProvider>
         </AuthProvider>

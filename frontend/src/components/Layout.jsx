@@ -294,9 +294,9 @@ const Layout = ({ children }) => {
   const getActiveNavGroups = () => {
     if (appMode === "adviser") {
       if (selectedClient) {
-        // Show client-specific nav when client is selected
-        // Only show Dashboard + CRM from adviser base, then full client context
-        return [...adviserBaseNav.slice(0, 2), ...clientContextNav];
+        // When client is selected, show ONLY client-specific navigation
+        // Hide Dashboard and CRM to avoid confusion about who is being viewed
+        return clientContextNav;
       }
       return adviserBaseNav;
     }

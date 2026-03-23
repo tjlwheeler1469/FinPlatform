@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Skeleton } from "@/components/ui/skeleton";
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -18,7 +20,10 @@ import {
   Coins,
   Fuel,
   Wheat,
-  LineChart
+  LineChart,
+  Newspaper,
+  ExternalLink,
+  Clock
 } from "lucide-react";
 import {
   AreaChart,
@@ -69,6 +74,8 @@ const MacroDashboard = () => {
   const [commodities, setCommodities] = useState(null);
   const [crypto, setCrypto] = useState(null);
   const [futures, setFutures] = useState(null);
+  const [news, setNews] = useState([]);
+  const [newsLoading, setNewsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   
   // Chart state
@@ -120,9 +127,25 @@ const MacroDashboard = () => {
     fetchChartData(selectedSymbol, selectedTimeframe);
   }, [selectedSymbol, selectedTimeframe]);
 
+  // Fetch news headlines
+  const fetchNews = async () => {
+    setNewsLoading(true);
+    try {
+      const response = await axios.get(`${API}/api/news/headlines`, {
+        params: { limit: 15 }
+      });
+      setNews(response.data.headlines || []);
+    } catch (error) {
+      console.error("Error fetching news:", error);
+    } finally {
+      setNewsLoading(false);
+    }
+  };
+
   const fetchData = async () => {
     setLoading(true);
     try {
+      // Fetch market data and news in parallel for speed
       const [overviewRes, indicesRes, currenciesRes, bondsRes, commoditiesRes, cryptoRes, futuresRes] = await Promise.all([
         axios.get(`${API}/api/macro/overview`),
         axios.get(`${API}/api/macro/indices`),
@@ -149,9 +172,11 @@ const MacroDashboard = () => {
   };
 
   useEffect(() => {
+    // Fetch data and news in parallel on mount
     fetchData();
-    // Refresh every 30 seconds
-    const interval = setInterval(fetchData, 30000);
+    fetchNews();
+    // Refresh market data every 5 minutes (cached on backend)
+    const interval = setInterval(fetchData, 300000);
     return () => clearInterval(interval);
   }, []);
 
@@ -561,6 +586,86 @@ const MacroDashboard = () => {
             </div>
           </TabsContent>
         </Tabs>
+
+        {/* News Headlines Section */}
+        <Card className="bg-card">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Newspaper className="h-5 w-5 text-[#D4A84C]" />
+                  Financial News
+                </CardTitle>
+                <CardDescription>Latest headlines from CNBC, WSJ, AFR, Financial Times & more</CardDescription>
+              </div>
+              <Button variant="outline" size="sm" onClick={fetchNews} disabled={newsLoading}>
+                <RefreshCw className={`h-4 w-4 mr-2 ${newsLoading ? "animate-spin" : ""}`} />
+                Refresh
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {newsLoading ? (
+              <div className="space-y-3">
+                {[1,2,3,4,5].map(i => (
+                  <div key={i} className="flex gap-4 p-3 rounded-lg border">
+                    <Skeleton className="h-12 w-12 rounded" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-3 w-1/2" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <ScrollArea className="h-[400px] pr-4">
+                <div className="space-y-3">
+                  {news.map((item, idx) => (
+                    <a
+                      key={idx}
+                      href={item.link || "#"}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block p-4 rounded-lg border hover:bg-muted/50 transition-colors group"
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge variant="outline" className="text-xs font-normal">
+                              {item.source}
+                            </Badge>
+                            <Badge variant="secondary" className="text-xs capitalize">
+                              {item.category}
+                            </Badge>
+                          </div>
+                          <h3 className="font-medium text-foreground group-hover:text-[#D4A84C] transition-colors line-clamp-2">
+                            {item.title}
+                          </h3>
+                          {item.summary && (
+                            <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                              {item.summary}
+                            </p>
+                          )}
+                          <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
+                            <Clock className="h-3 w-3" />
+                            <span>{item.published ? new Date(item.published).toLocaleString() : "Recent"}</span>
+                          </div>
+                        </div>
+                        <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-[#D4A84C] transition-colors flex-shrink-0" />
+                      </div>
+                    </a>
+                  ))}
+                  {news.length === 0 && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Newspaper className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                      <p>No news available</p>
+                    </div>
+                  )}
+                </div>
+              </ScrollArea>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </Layout>
   );

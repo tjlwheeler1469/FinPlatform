@@ -371,6 +371,14 @@ def include_all_routes():
     except ImportError as e:
         logger.error(f"Failed to load Xplan integration routes: {e}")
 
+    # NEWS HEADLINES - Financial News from Multiple Sources
+    try:
+        from routes.news_headlines import router as news_router
+        app.include_router(news_router, prefix="/api")
+        logger.info("NEWS HEADLINES loaded: CNBC, WSJ, FT, AFR, Economist, Reuters, Bloomberg")
+    except ImportError as e:
+        logger.error(f"Failed to load news headlines routes: {e}")
+
 # Include all routes
 include_all_routes()
 

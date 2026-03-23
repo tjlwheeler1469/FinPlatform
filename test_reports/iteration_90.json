@@ -1,0 +1,97 @@
+{
+  "summary": "Iteration 90 - Testing News Headlines, Decision Engine impact_primary, Layout navigation filtering, and Xplan Sync features. All 12 backend tests passed. Frontend features verified: MacroDashboard Financial News section working with headlines from multiple sources, XplanSyncIndicator visible at bottom right, ScenarioModelling goal save triggers Xplan sync.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "All pages",
+        "issues": ["Compliance modal (Important Information) appears on every page load - requires checkbox acknowledgment. This is expected behavior for financial compliance."]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/test_reports/pytest/pytest_iteration90.xml",
+    "/app/backend/tests/test_iteration90_news_decision_xplan.py"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "PASS: GET /api/news/headlines returns news with headlines, summaries, links from multiple sources (CNBC, WSJ, FT, AFR, Economist, etc.)",
+    "PASS: GET /api/news/sources returns list of 9 available news sources with id, name, category",
+    "PASS: GET /api/news/categories returns list of news categories",
+    "PASS: POST /api/decision-engine/recommendations-v2 returns recommendations with impact_primary as numeric values",
+    "PASS: POST /api/decision-engine/health-score-v2 returns health score with grade and component scores",
+    "PASS: POST /api/xplan/enable-demo enables demo mode successfully",
+    "PASS: GET /api/xplan/status shows connected=true, mode=demo after enabling demo",
+    "PASS: POST /api/xplan/push works in demo mode for strategy data type",
+    "PASS: MacroDashboard displays Financial News section with headlines from The Economist and other sources",
+    "PASS: XplanSyncIndicator visible at bottom right showing 'Xplan Demo' connection status",
+    "PASS: Layout.jsx getActiveNavGroups() returns clientContextNav (without Dashboard/CRM) when selectedClient is truthy in Adviser mode",
+    "PASS: ScenarioModelling.jsx saveGoal() calls triggerSync('strategy', ...) to trigger Xplan sync notification"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration90_news_decision_xplan.py"
+  ],
+  "success_rate": {
+    "backend": "100% (12/12 tests passed)",
+    "frontend": "100% (all requested features verified)"
+  },
+  "test_credentials": {
+    "preview_url": "https://scenario-modeler.preview.emergentagent.com"
+  },
+  "seed_data_creation": "None - using existing demo data",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Iteration 90 verified: 1) News headlines API working with RSS feeds from 9 financial sources (CNBC, WSJ, FT, AFR, Economist, Reuters, Bloomberg, Yahoo Finance, MarketWatch) with 10-minute caching. 2) Decision Engine recommendations-v2 includes impact_primary numeric field. 3) Layout.jsx correctly filters navigation to show only clientContextNav when client is selected in Adviser mode. 4) XplanSyncIndicator shows at bottom right when Xplan is connected. 5) ScenarioModelling goal save triggers Xplan sync via triggerSync().",
+  "mocked_apis": {
+    "has_mocked_apis": true,
+    "mocked_apis_list": [
+      "News headlines use RSS feeds with fallback to static data if feeds fail",
+      "Xplan API in demo mode - uses XplanAPIClient demo methods"
+    ]
+  },
+  "features_verified": {
+    "news_headlines_api": {
+      "endpoint": "GET /api/news/headlines",
+      "status": "PASS",
+      "response_includes": ["headlines", "count", "sources", "fetched_at"],
+      "headline_fields": ["source", "title", "link", "summary", "category", "published"]
+    },
+    "news_sources_api": {
+      "endpoint": "GET /api/news/sources",
+      "status": "PASS",
+      "sources_count": 9,
+      "sources": ["cnbc", "wsj_markets", "ft", "afr", "economist", "reuters_business", "yahoo_finance", "marketwatch", "bloomberg_markets"]
+    },
+    "decision_engine_recommendations": {
+      "endpoint": "POST /api/decision-engine/recommendations-v2",
+      "status": "PASS",
+      "impact_primary_field": "numeric value present in all recommendations"
+    },
+    "macro_dashboard_news_section": {
+      "component": "MacroDashboard.jsx",
+      "status": "PASS",
+      "features": ["Financial News section with Newspaper icon", "Headlines from multiple sources", "ScrollArea with headline cards", "Source badges and category badges"]
+    },
+    "layout_navigation_filtering": {
+      "component": "Layout.jsx",
+      "status": "PASS",
+      "behavior": "When selectedClient is truthy in Adviser mode, getActiveNavGroups() returns clientContextNav which excludes Dashboard and CRM groups"
+    },
+    "xplan_sync_indicator": {
+      "component": "XplanSyncNotification.jsx",
+      "status": "PASS",
+      "location": "Fixed bottom-4 right-4",
+      "shows": "Xplan Demo when connected in demo mode"
+    },
+    "scenario_modelling_xplan_sync": {
+      "component": "ScenarioModelling.jsx",
+      "status": "PASS",
+      "behavior": "saveGoal() calls triggerSync('strategy', {...}) to trigger Xplan sync notification"
+    }
+  }
+}
