@@ -85,6 +85,31 @@ Create a "financial services super app" named "Wealth Command," evolving it from
   - Demo mode available for testing without real Xplan credentials
   - Full backend API at /api/xplan/* with MongoDB persistence
   - Frontend page at /xplan-integration with 4 tabs (Overview, Synced Clients, Sync & Push, History)
+  - **Sync Notification**: Auto-prompt to sync when changes made (goals, scenarios)
+  - **Status Indicator**: Fixed bottom-right indicator showing Xplan connection status
+
+#### Phase 8.0: Speed, News, & UX Improvements (March 2026)
+- **Performance & Speed Improvements**:
+  - Increased macro data cache TTL to 5 minutes (reduces API calls)
+  - News headlines cached for 10 minutes
+  - Parallel data fetching with Promise.all
+  - Market data refresh changed from 30s to 5min
+
+- **Financial News Headlines**:
+  - New /api/news/headlines endpoint with RSS feed aggregation
+  - 9 Sources: CNBC, WSJ, Financial Times, AFR, The Economist, Reuters, Bloomberg, Yahoo Finance, MarketWatch
+  - MacroDashboard displays Financial News section with headlines
+  - Fallback to static news if RSS feeds fail
+
+- **Decision Engine Improvements**:
+  - Added impact_primary numeric field to all recommendations
+  - Total Impact calculates correctly from recommendation values
+  - Health Score components display real calculated values
+
+- **Adviser Mode Navigation**:
+  - Dashboard and CRM now HIDDEN when a client is selected
+  - Shows only client-context navigation for clarity
+  - Prevents confusion about who is being viewed
 
 ### Asset Categories Available
 | Category | Personal | Adviser Client | Client Portal |
