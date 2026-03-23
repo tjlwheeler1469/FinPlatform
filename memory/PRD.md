@@ -110,6 +110,12 @@ Create a "financial services super app" named "Wealth Command," evolving it from
   - Dashboard and CRM now HIDDEN when a client is selected
   - Shows only client-context navigation for clarity
   - Prevents confusion about who is being viewed
+  - All client navigation stays within app (no pop-outs)
+
+- **ASX Stock Price Verification**:
+  - live_data.py correctly adds .AX suffix for ASX stocks (line 92)
+  - Verified: CBA.AX, BHP.AX fetch correct live prices from yfinance
+  - US stocks (NVDA, MSFT, AAPL) correctly have no suffix
 
 ### Asset Categories Available
 | Category | Personal | Adviser Client | Client Portal |
