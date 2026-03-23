@@ -1,0 +1,80 @@
+{
+  "summary": "Iteration 91 - Verified ASX stock prices use correct .AX suffix and client navigation stays within app (no pop-out). All 8 backend tests passed. Frontend navigation verified: clicking client card in CRM navigates to /client-360 using React Router (SPA navigation, no window.open).",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "All pages",
+        "issues": ["Compliance modal (Important Information) appears on every page load - expected behavior for financial compliance"]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/test_reports/pytest/pytest_iteration91.xml",
+    "/app/backend/tests/test_iteration91_asx_stocks_navigation.py"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "PASS: GET /api/live/stock/CBA returns live ASX stock data with correct price, sector='Financials', data_source='live' or 'mock'",
+    "PASS: GET /api/live/stock/BHP returns live ASX stock data with correct price, sector='Materials', data_source='live' or 'mock'",
+    "PASS: live_data.py line 92 correctly adds .AX suffix: ticker_symbol = f\"{symbol}.AX\" if symbol in ASX_STOCKS else symbol",
+    "PASS: CRMCommandCenter.jsx line 345 uses navigate('/client-360') - React Router SPA navigation",
+    "PASS: ClientCRM.jsx line 90 uses navigate('/client-360') - React Router SPA navigation",
+    "PASS: AdviserHub.jsx line 129 uses navigate('/client-360') - React Router SPA navigation",
+    "PASS: Layout.jsx uses useNavigate hook for all navigation - no target='_blank' for client pages",
+    "PASS: No window.open() calls for client navigation - only used for calendar integrations and OAuth flows",
+    "PASS: Frontend test confirmed URL changes from /client-crm to /client-360 on client card click (SPA navigation, no pop-out)"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration91_asx_stocks_navigation.py"
+  ],
+  "success_rate": {
+    "backend": "100% (8/8 tests passed)",
+    "frontend": "100% (navigation verified)"
+  },
+  "test_credentials": {
+    "preview_url": "https://scenario-modeler.preview.emergentagent.com"
+  },
+  "seed_data_creation": "None - using existing demo data",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Iteration 91 verified: 1) ASX stocks correctly use .AX suffix via yfinance (CBA.AX, BHP.AX) - implemented in live_data.py line 92. 2) Client navigation uses React Router navigate() function - no window.open() or target='_blank' for client pages. Navigation from CRM to Client 360 stays within the SPA. Compliance modal appears on every page load (expected financial compliance behavior).",
+  "features_verified": {
+    "asx_stock_suffix": {
+      "endpoint": "GET /api/live/stock/{symbol}",
+      "status": "PASS",
+      "implementation": "live_data.py line 92: ticker_symbol = f\"{symbol}.AX\" if symbol in ASX_STOCKS else symbol",
+      "tested_symbols": ["CBA", "BHP"],
+      "response_fields": ["symbol", "name", "sector", "price", "change", "change_percent", "data_source", "last_updated"]
+    },
+    "client_navigation": {
+      "component": "CRMCommandCenter.jsx, ClientCRM.jsx, AdviserHub.jsx",
+      "status": "PASS",
+      "implementation": "navigate('/client-360') using React Router useNavigate hook",
+      "no_popup": "Verified - no window.open() or target='_blank' for client pages",
+      "spa_navigation": "URL changes from /client-crm to /client-360 within same domain"
+    },
+    "layout_navigation": {
+      "component": "Layout.jsx",
+      "status": "PASS",
+      "implementation": "All navigation uses <Link> components and useNavigate hook",
+      "no_target_blank_for_clients": "target='_blank' only used for external links (DocuSign, Google Cloud, Azure, ATO references)"
+    }
+  },
+  "code_review_findings": {
+    "window_open_usage": [
+      "CalendarIntegration.jsx - Google/Outlook/Office365 calendar links (expected)",
+      "calendarIntegration.js - OAuth authentication flows (expected)",
+      "DataAggregators.jsx - External aggregator options (expected)"
+    ],
+    "target_blank_usage": [
+      "External documentation links only (DocuSign, Google Cloud Console, Azure Portal, ATO references)",
+      "No target='_blank' for internal client navigation"
+    ]
+  }
+}
