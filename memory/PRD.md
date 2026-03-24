@@ -1,11 +1,17 @@
-# Wealth Command v9.5 - Product Requirements Document
+# Wealth Command v10.0 - Product Requirements Document
 
 ## Original Problem Statement
 Create a "financial services super app" named "Wealth Command," evolving it from a simple dashboard into a comprehensive "Wealth Operating System" for financial advisers. The core architecture is a **Financial Knowledge Graph** using a hybrid MongoDB and Neo4j database.
 
-The latest major feature is **AdviceOS – Enterprise Architecture + Xplan Integration**, a regulator-ready system designed for AFSL holders with enterprise-grade controls. It features immutable audit trails, RBAC security, incident management, real-time event streaming, comprehensive due diligence documentation, and Phase 1 MVP Xplan integration.
+The latest major feature is **AdviceOS – Enterprise System of Record**, a regulator-ready platform designed for AFSL holders that goes beyond dashboards to provide explicit compliance oversight, cost justification, risk governance, and audit replay capabilities for enterprise procurement (ASIC/APRA CPS 230/ISO standards).
 
-**Version 9.5 completed on March 24, 2026** with Xplan Integration Phase 1 MVP:
+**Version 10.0 completed on March 24, 2026** with Enterprise System of Record Features:
+- **Replay Advice (Audit Mode)**: Full audit replay of advice sessions with ASIC-ready export
+- **Cost Reduction Dashboard**: ROI calculator with configurable industry benchmarks
+- **Risk & Control Mapping**: CPS 230 / ISO 31000 aligned GRC framework with matrix AND table views
+- **Breach Register**: CPS 230 compliant breach management with ASIC reporting and deadline tracking
+
+Previous v9.5 features:
 - Immutable Audit Service with SHA-256 hash chaining
 - Security Controls with 6 RBAC roles (CPS 234 aligned)
 - Object Storage for audit exports and document backups
@@ -13,7 +19,7 @@ The latest major feature is **AdviceOS – Enterprise Architecture + Xplan Integ
 - Real-time Event Streaming Layer (18 event types)
 - Enterprise Documentation Pack (8 docs with PDF export)
 - Enterprise Compliance Dashboard (/enterprise page)
-- **Xplan Integration Phase 1 MVP** with mock API and full audit logging
+- Xplan Integration Phase 1 MVP with mock API and full audit logging
 
 ## User Personas
 1. **Financial Advisers** - Primary users who manage multiple client portfolios
@@ -567,4 +573,126 @@ Logged fields: user_id, action, endpoint, request/response payload, status_code,
 - Two-way controlled write-back (non-destructive fields only)
 
 ---
-*Last Updated: March 24, 2026 - Version 9.5 - Xplan Integration Phase 1 MVP Complete*
+
+## Version 10.0 - Enterprise System of Record (March 24, 2026) ✅ COMPLETE
+
+### Replay Advice (Audit Mode)
+**Route**: `/replay-advice`
+**Backend**: `/app/backend/routes/replay_advice.py`
+**Frontend**: `/app/frontend/src/pages/ReplayAdvicePage.jsx`
+
+Full audit replay capability for ASIC-ready advice documentation:
+- Capture all advice session inputs (client context, current holdings, stated objectives)
+- Record scenario generation with timestamps
+- Log adviser decisions with mandatory justifications
+- Track client acknowledgments
+- Generate ASIC-ready exports (JSON with cryptographic hash)
+- Session ID format: `ADV-{date}-{uuid}`
+
+**Key Endpoints**:
+- `GET /api/replay/sessions` - List all advice sessions
+- `GET /api/replay/session/{id}` - Get full session with timeline
+- `GET /api/replay/session/{id}/export` - ASIC-ready export
+- `GET /api/replay/dashboard/stats` - Session statistics
+- `POST /api/replay/session/start` - Start new advice session
+- `POST /api/replay/demo/create-sample-session` - Create demo session
+
+### Cost Reduction Dashboard
+**Route**: `/cost-reduction`
+**Backend**: `/app/backend/routes/cost_reduction.py`
+**Frontend**: `/app/frontend/src/pages/CostReductionDashboard.jsx`
+
+Explicit ROI and efficiency tracking with configurable industry benchmarks:
+- Industry Benchmarks (configurable):
+  - Compliance officer rate: $85 AUD/hour
+  - Adviser rate: $120 AUD/hour
+  - Manual file review: 2.5 hours → Automated: 0.5 hours (80% reduction)
+  - Compliance check time reduction: 90%
+  - Audit prep time reduction: 80%
+- Live efficiency metrics (today/week/month)
+- ROI calculator with configurable inputs
+- FTE equivalent savings calculation
+
+**Key Endpoints**:
+- `GET /api/cost-reduction/dashboard` - Full cost savings dashboard
+- `GET /api/cost-reduction/metrics/live` - Today/week metrics
+- `POST /api/cost-reduction/roi-calculator` - Calculate ROI with inputs
+- `POST /api/cost-reduction/log` - Log efficiency event
+- `POST /api/cost-reduction/demo/seed-data` - Seed demo data
+
+### Risk & Control Mapping
+**Route**: `/risk-control`
+**Backend**: `/app/backend/routes/risk_control_mapping.py`
+**Frontend**: `/app/frontend/src/pages/RiskControlMapping.jsx`
+
+CPS 230 / ISO 31000 aligned enterprise GRC framework:
+- Risk Register with likelihood × impact rating
+- Control Register with effectiveness tracking
+- Risk-Control Matrix (visual mapping)
+- **Both Matrix AND Table views side by side** (per user request)
+- Control testing and review scheduling
+- Regulatory alignment tracking (CPS 230, CPS 234, ISO 31000, ASX Principle 7)
+
+**Risk Ratings**:
+| Likelihood / Impact | Insignificant | Minor | Moderate | Major | Catastrophic |
+|---------------------|---------------|-------|----------|-------|--------------|
+| Almost Certain | Medium | High | High | Extreme | Extreme |
+| Likely | Low | Medium | High | High | Extreme |
+| Possible | Low | Medium | Medium | High | High |
+| Unlikely | Low | Low | Medium | Medium | High |
+| Rare | Low | Low | Low | Medium | Medium |
+
+**Key Endpoints**:
+- `GET /api/risk-control/risks` - Risk register
+- `GET /api/risk-control/controls` - Control register
+- `GET /api/risk-control/mapping/matrix` - Risk-control matrix
+- `GET /api/risk-control/dashboard` - GRC dashboard
+- `POST /api/risk-control/risks` - Create risk
+- `POST /api/risk-control/controls` - Create control
+- `POST /api/risk-control/mapping` - Link risk to control
+
+### Breach Register
+**Route**: `/breach-register`
+**Backend**: `/app/backend/routes/breach_register.py`
+**Frontend**: `/app/frontend/src/pages/BreachRegister.jsx`
+
+CPS 230 compliant breach management with ASIC reporting:
+- Breach logging with severity classification (Low/Medium/High/Critical)
+- Category classification (Advice Quality, Documentation, Disclosure, etc.)
+- ASIC reportable flag with automatic deadline calculation
+- Reporting criteria (significant_breach, systemic_issue, client_detriment, reportable_situation)
+- Remediation tracking with client notification status
+- Compensation tracking
+- Breach ID format: `BRH-{date}-{uuid}`
+
+**ASIC Reporting Timelines**:
+- Significant Breach: 30 days
+- Systemic Issue: 10 days
+- Client Detriment: 10 days
+- Reportable Situation: Immediate
+
+**Key Endpoints**:
+- `GET /api/breaches/register` - List all breaches
+- `GET /api/breaches/dashboard` - Breach metrics and ASIC status
+- `POST /api/breaches/register` - Register new breach
+- `POST /api/breaches/register/{id}/update` - Update breach status
+- `POST /api/breaches/register/{id}/report-asic` - Record ASIC report
+- `GET /api/breaches/report/regulatory` - Generate regulatory report
+
+---
+
+## Roadmap
+
+### P1 - Upcoming Tasks
+- Xplan Integration Phase 2 (scenario upload, deeper portfolio sync)
+- Real-time WebSocket push notifications for Enterprise Dashboard
+- Wire up real Email/SMS notifications (Twilio/SendGrid currently mocked)
+- ComplianceDisclaimer "Don't show again" persistent option
+
+### P2 - Future Tasks
+- Xplan Integration Phase 3 (real-time event streaming)
+- Multi-tenant licensee data isolation
+- PDF report generation for all enterprise features
+
+---
+*Last Updated: March 24, 2026 - Version 10.0 - Enterprise System of Record Complete*
