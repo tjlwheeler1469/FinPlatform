@@ -1,7 +1,9 @@
-# Wealth Command v7.9 - Product Requirements Document
+# Wealth Command v8.0 - Product Requirements Document
 
 ## Original Problem Statement
 Create a "financial services super app" named "Wealth Command," evolving it from a simple dashboard into a comprehensive "Wealth Operating System" for financial advisers. The core architecture is a **Financial Knowledge Graph** using a hybrid MongoDB and Neo4j database.
+
+The latest major feature is **AdviceOS – Compliance-First Build & Regulatory Data Blueprint**, an AI/Logic Engine designed to provide powerful decision support WITHOUT triggering AFSL requirements. It requires generating scenarios without automated advice, strict auditability, human-in-the-loop decision-making, and compliance overlays (Approved Product Lists, risk checks).
 
 ## User Personas
 1. **Financial Advisers** - Primary users who manage multiple client portfolios
@@ -117,6 +119,80 @@ Create a "financial services super app" named "Wealth Command," evolving it from
   - Verified: CBA.AX, BHP.AX fetch correct live prices from yfinance
   - US stocks (NVDA, MSFT, AAPL) correctly have no suffix
 
+#### Phase 8.1: AdviceOS – Compliance-First Build (March 24, 2026) ✅ COMPLETE
+
+**PART A — AI / LOGIC ENGINE (SAFE DESIGN)**
+The system provides powerful decision support **without triggering AFSL requirements**:
+- ✅ No automated advice - System generates **scenarios, not advice**
+- ✅ No product recommendations - System shows **trade-offs, not conclusions**
+- ✅ Adviser remains decision-maker - Must **explicitly approve all outputs**
+- ✅ All outputs are **explainable and auditable**
+
+**1. Scenario Generator Engine** (`/app/backend/routes/scenario_generator.py`)
+- Generates 3+ scenarios: Conservative, Balanced, Growth, Income
+- Each with metrics: Expected return range, Volatility, Income yield, Drawdown risk
+- 10-year projections with confidence intervals
+- **NO "best option" identified, NO ranking as "recommended"**
+
+**2. Trade-Off Engine**
+- Shows impact without making decisions
+- Dimensions: Risk vs return, Income vs growth, Liquidity vs performance, Fees vs outcomes
+
+**3. Comparison Engine**
+- Side-by-side scenario comparison
+- Inputs used, Outputs generated, Differences highlighted
+- NO default selection
+
+**4. Compliance Overlay Engine** (`/app/backend/routes/compliance_engine.py`)
+- Evaluates scenarios against licensee and regulatory rules
+- Checks: Risk profile alignment, Asset allocation ranges, APL, Fee thresholds
+- Outputs: PASS / WARNING / BLOCK
+
+**5. Adviser Decision Layer (MANDATORY)**
+- Adviser must select final strategy
+- Required confirmations: "I have reviewed the scenarios", "This decision is in the client's best interest"
+- Override tracking with mandatory justification
+
+**6. Explainability Engine**
+- For every output: Inputs used, Rules triggered, Assumptions applied, Calculations performed
+
+**PART B — COMPLIANCE BY DESIGN**
+- Human approval required before: Finalising scenario, Exporting data, Recording advice outcome
+- Every action logs: User ID, Timestamp, Action taken, Data before/after change
+- Override tracking with permanent storage
+- 7-year data retention compliance
+- UI compliance language globally: "This tool provides decision support only", "This is not financial advice"
+
+**PART C — BACKEND DATA REQUIREMENTS**
+
+**Database Collections** (`/app/backend/models/compliance_models.py`):
+- `licensees`: id, name, afsl_number, rules_config (JSON), apl (JSON), created_at
+- `advisers`: id, licensee_id, name, status, created_at
+- `clients`: id, external_id (Xplan), licensee_id, profile_data (JSON), risk_profile, created_at
+- `scenarios`: id, client_id, inputs (JSON), outputs (JSON), created_by, created_at
+- `compliance_checks`: id, scenario_id, result (pass/warn/block), rules_triggered (JSON)
+- `adviser_decisions`: id, scenario_id, adviser_id, selected_option, justification_text, created_at
+- `audit_logs`: id, user_id, user_role, action_type, entity_type, entity_id, before_state, after_state, timestamp, hash
+- `breach_flags`: id, adviser_id, scenario_id, breach_type, severity, status, created_at
+- `reports`: id, licensee_id, report_type, generated_at, data_snapshot (JSON)
+
+**Reports Dashboard** (`/app/backend/routes/reports_dashboard.py`):
+- Dashboard summary with compliance score
+- Adviser activity reports
+- Compliance summary reports
+- Breach reports
+- Audit log exports
+- Client file exports
+- CSV download support for all report types
+
+**Frontend UI** (`/app/frontend/src/pages/AdviceOSDashboard.jsx`):
+- Compliance disclaimer banner
+- Key metrics: Compliance Score, Scenarios, Decisions, Open Breaches, Audit Entries
+- 5 Tabs: Overview, Scenarios, Compliance, Audit Trail, Reports
+- Scenario Generator dialog with client inputs
+- Adviser Decision dialog with mandatory confirmations
+- Report downloads (CSV format)
+
 ### Asset Categories Available
 | Category | Personal | Adviser Client | Client Portal |
 |----------|----------|----------------|---------------|
@@ -140,11 +216,39 @@ Create a "financial services super app" named "Wealth Command," evolving it from
 ### Backlog (P2/P3)
 - P2: Connect Knowledge Graph to real MongoDB data
 - P2: More ASX data sources for hybrids
+- P2: Fix websockets dependency conflict with alpaca-trade-api
 - P3: Mobile app wrapper
 - P3: Voice interface (Whisper)
-- P3: Fix websockets dependency conflict with alpaca-trade-api
+- P3: PDF report generation for AdviceOS (currently CSV only)
+- P3: Real-time breach notifications and escalation workflows
 
 ## Technical Architecture
+
+### AdviceOS Architecture
+```
+/app/backend/
+├── models/
+│   └── compliance_models.py       # All Pydantic schemas for compliance
+├── routes/
+│   ├── scenario_generator.py      # Scenario generation API
+│   ├── compliance_engine.py       # Compliance checks, decisions, audit logging
+│   └── reports_dashboard.py       # Reports and data exports
+└── server.py                      # Routes registered under /api/
+
+/app/frontend/src/pages/
+└── AdviceOSDashboard.jsx          # Full AdviceOS UI
+```
+
+### Key AdviceOS Endpoints
+- `POST /api/scenarios/generate` - Generate financial scenarios
+- `POST /api/compliance/scenario-check` - Check compliance for scenario
+- `POST /api/compliance/decision` - Record adviser decision with audit
+- `GET /api/reports/dashboard/summary` - Dashboard metrics
+- `GET /api/reports/adviser-activity` - Adviser activity report
+- `GET /api/reports/compliance-summary` - Compliance check summary
+- `GET /api/reports/breach-report` - Breach tracking report
+- `GET /api/reports/audit-export` - Full audit trail export
+- `GET /api/reports/download/csv/{type}` - CSV report downloads
 
 ### Frontend Pages
 ```
@@ -169,12 +273,21 @@ Create a "financial services super app" named "Wealth Command," evolving it from
 - `POST /api/financial-plan/generate` - MongoDB persistence
 
 ## Testing Status
-- Backend: All endpoints working
-- Frontend: All features verified (iteration_86)
-- ScenarioModelling: Light theme, Goals CRUD working
-- KnowledgeGraph: 5 tabs, no errors
-- ClientPortal: Pie chart and bar chart visualizations
-- Emergent Badge: Successfully hidden
+- Backend: All endpoints working (28/28 tests passed - iteration_93)
+- Frontend: All features verified
+- AdviceOS: Scenario Generator, Compliance Engine, Reports Dashboard all working
+- CRM Triple-Check: 8 clients, all APIs functioning correctly
+- No critical issues found
+
+### Test Report: iteration_93.json
+- Scenario Generator: PASS - Creates 3+ scenarios with no 'best option' ranking
+- Trade-Off Engine: PASS - Shows risk vs return comparisons
+- Compliance Overlay: PASS - Returns PASS/WARNING/BLOCK results
+- Adviser Decision Layer: PASS - Requires mandatory confirmations
+- Audit Trail: PASS - Logs all actions with user ID, timestamp, hash
+- Reports Dashboard: PASS - Shows compliance score and metrics
+- CSV Downloads: PASS - audit-logs, scenarios, breaches working
+- CRM Command Center: PASS - 8 clients loaded, no errors
 
 ---
-*Last Updated: March 19, 2026 - Version 7.9*
+*Last Updated: March 24, 2026 - Version 8.0*
