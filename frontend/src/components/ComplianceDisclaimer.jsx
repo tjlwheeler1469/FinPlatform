@@ -154,12 +154,20 @@ export const ComplianceModal = ({ onAccept }) => {
     }
   };
 
+  const handleQuickDismiss = () => {
+    // Quick dismiss for this session only (user can still use the app)
+    sessionStorage.setItem(SESSION_KEY, new Date().toISOString());
+    setOpen(false);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={() => {}}>
+    <Dialog open={open} onOpenChange={(isOpen) => {
+      if (!isOpen) {
+        handleQuickDismiss();
+      }
+    }}>
       <DialogContent 
         className="max-w-2xl max-h-[90vh] overflow-y-auto" 
-        onPointerDownOutside={(e) => e.preventDefault()}
-        onEscapeKeyDown={(e) => e.preventDefault()}
         data-testid="compliance-modal"
       >
         <DialogHeader>
