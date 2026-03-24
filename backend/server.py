@@ -423,6 +423,22 @@ def include_all_routes():
     except ImportError as e:
         logger.error(f"Failed to load licensee dashboard routes: {e}")
 
+    # GRC-LITE LAYER - Risk Register, Incidents, Controls (CPS 230 compliant)
+    try:
+        from routes.grc_lite import router as grc_router
+        app.include_router(grc_router, prefix="/api")
+        logger.info("GRC-LITE loaded: Risk Register, Incident Tracking, Control Mapping, Dashboards")
+    except ImportError as e:
+        logger.error(f"Failed to load GRC-Lite routes: {e}")
+
+    # AUTO FILE NOTE GENERATOR - Adviser Efficiency
+    try:
+        from routes.file_note_generator import router as file_note_router
+        app.include_router(file_note_router, prefix="/api")
+        logger.info("FILE NOTE GENERATOR loaded: Auto advice notes, Meeting notes, Xplan export")
+    except ImportError as e:
+        logger.error(f"Failed to load file note generator routes: {e}")
+
 # Include all routes
 include_all_routes()
 
@@ -467,7 +483,9 @@ async def health_check():
             "pdf_reports": True,
             "notification_service": True,
             "voice_interface": True,
-            "licensee_dashboard": True
+            "licensee_dashboard": True,
+            "grc_lite": True,
+            "file_note_generator": True
         },
         "revenue_layer": {
             "aum_fees": True,
