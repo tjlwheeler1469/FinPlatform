@@ -463,6 +463,30 @@ def include_all_routes():
     except ImportError as e:
         logger.error(f"Failed to load object storage routes: {e}")
 
+    # INCIDENT MANAGEMENT - CPS 230 Compliant
+    try:
+        from routes.incident_management import router as incident_router
+        app.include_router(incident_router, prefix="/api")
+        logger.info("INCIDENT MANAGEMENT loaded: Severity Classification, Escalation, Regulatory Reporting")
+    except ImportError as e:
+        logger.error(f"Failed to load incident management routes: {e}")
+
+    # EVENT STREAMING - Real-time Event Bus
+    try:
+        from routes.event_streaming import router as event_streaming_router
+        app.include_router(event_streaming_router, prefix="/api")
+        logger.info("EVENT STREAMING loaded: Real-time Events, WebSocket, Compliance Triggers")
+    except ImportError as e:
+        logger.error(f"Failed to load event streaming routes: {e}")
+
+    # ENTERPRISE DOCUMENTATION - Due Diligence Pack
+    try:
+        from routes.enterprise_docs import router as enterprise_docs_router
+        app.include_router(enterprise_docs_router, prefix="/api")
+        logger.info("ENTERPRISE DOCS loaded: Architecture, Security Policy, BCP/DR, Compliance Framework")
+    except ImportError as e:
+        logger.error(f"Failed to load enterprise docs routes: {e}")
+
 # Include all routes
 include_all_routes()
 
@@ -512,7 +536,10 @@ async def health_check():
             "file_note_generator": True,
             "audit_service": True,
             "security_controls": True,
-            "object_storage": True
+            "object_storage": True,
+            "incident_management": True,
+            "event_streaming": True,
+            "enterprise_docs": True
         },
         "revenue_layer": {
             "aum_fees": True,

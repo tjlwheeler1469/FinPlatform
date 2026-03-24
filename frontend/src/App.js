@@ -199,6 +199,9 @@ const XplanIntegration = lazy(() => import("@/pages/XplanIntegration"));
 // AdviceOS Dashboard - Compliance-First Decision Support
 const AdviceOSDashboard = lazy(() => import("@/pages/AdviceOSDashboard"));
 
+// Enterprise Compliance Dashboard - ASIC/APRA/ISO Compliance Center
+const EnterpriseComplianceDashboard = lazy(() => import("@/pages/EnterpriseComplianceDashboard"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -1050,6 +1053,9 @@ const AppRouter = () => {
       
       {/* AdviceOS Dashboard - Compliance-First Decision Support */}
       <Route path="/adviceos" element={<AdviceOSDashboard />} />
+      
+      {/* Enterprise Compliance Dashboard - ASIC/APRA/ISO Compliance Center */}
+      <Route path="/enterprise" element={<EnterpriseComplianceDashboard />} />
       
       {/* CRM Command Center */}
       <Route path="/crm-command-center" element={<CRMCommandCenter />} />
