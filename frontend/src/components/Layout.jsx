@@ -206,7 +206,7 @@ const adviserBaseNav = [
     name: "Integrations",
     icon: Link2,
     items: [
-      { path: "/xplan-integration", label: "Xplan", icon: Link2, title: "Xplan Integration", badge: "NEW" },
+      { path: "/xplan", label: "Xplan Sync", icon: Link2, title: "Xplan Integration", badge: "NEW" },
     ]
   }
 ];

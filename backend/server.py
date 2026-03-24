@@ -487,6 +487,22 @@ def include_all_routes():
     except ImportError as e:
         logger.error(f"Failed to load enterprise docs routes: {e}")
 
+    # XPLAN MOCK API - Simulated Xplan Responses
+    try:
+        from routes.xplan_mock import router as xplan_mock_router
+        app.include_router(xplan_mock_router, prefix="/api")
+        logger.info("XPLAN MOCK loaded: Simulated Xplan API for development")
+    except ImportError as e:
+        logger.error(f"Failed to load xplan mock routes: {e}")
+
+    # XPLAN INTEGRATION - Real Xplan Integration Service
+    try:
+        from routes.xplan_integration import router as xplan_integration_router
+        app.include_router(xplan_integration_router, prefix="/api")
+        logger.info("XPLAN INTEGRATION loaded: OAuth, Sync, File Notes, Audit Logging")
+    except ImportError as e:
+        logger.error(f"Failed to load xplan integration routes: {e}")
+
 # Include all routes
 include_all_routes()
 
@@ -539,7 +555,8 @@ async def health_check():
             "object_storage": True,
             "incident_management": True,
             "event_streaming": True,
-            "enterprise_docs": True
+            "enterprise_docs": True,
+            "xplan_integration": True
         },
         "revenue_layer": {
             "aum_fees": True,

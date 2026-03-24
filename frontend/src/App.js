@@ -202,6 +202,9 @@ const AdviceOSDashboard = lazy(() => import("@/pages/AdviceOSDashboard"));
 // Enterprise Compliance Dashboard - ASIC/APRA/ISO Compliance Center
 const EnterpriseComplianceDashboard = lazy(() => import("@/pages/EnterpriseComplianceDashboard"));
 
+// Xplan Integration - Sync Page
+const XplanSyncPage = lazy(() => import("@/pages/XplanSyncPage"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -1056,6 +1059,9 @@ const AppRouter = () => {
       
       {/* Enterprise Compliance Dashboard - ASIC/APRA/ISO Compliance Center */}
       <Route path="/enterprise" element={<EnterpriseComplianceDashboard />} />
+      
+      {/* Xplan Integration - Sync Page */}
+      <Route path="/xplan" element={<XplanSyncPage />} />
       
       {/* CRM Command Center */}
       <Route path="/crm-command-center" element={<CRMCommandCenter />} />

@@ -1,11 +1,11 @@
-# Wealth Command v9.0 - Product Requirements Document
+# Wealth Command v9.5 - Product Requirements Document
 
 ## Original Problem Statement
 Create a "financial services super app" named "Wealth Command," evolving it from a simple dashboard into a comprehensive "Wealth Operating System" for financial advisers. The core architecture is a **Financial Knowledge Graph** using a hybrid MongoDB and Neo4j database.
 
-The latest major feature is **AdviceOS – Enterprise Architecture + Compliance Platform**, a regulator-ready system designed for AFSL holders with enterprise-grade controls. It features immutable audit trails, RBAC security, incident management, real-time event streaming, and comprehensive due diligence documentation for licensee procurement.
+The latest major feature is **AdviceOS – Enterprise Architecture + Xplan Integration**, a regulator-ready system designed for AFSL holders with enterprise-grade controls. It features immutable audit trails, RBAC security, incident management, real-time event streaming, comprehensive due diligence documentation, and Phase 1 MVP Xplan integration.
 
-**Version 9.0 completed on March 24, 2026** with Enterprise Architecture:
+**Version 9.5 completed on March 24, 2026** with Xplan Integration Phase 1 MVP:
 - Immutable Audit Service with SHA-256 hash chaining
 - Security Controls with 6 RBAC roles (CPS 234 aligned)
 - Object Storage for audit exports and document backups
@@ -13,6 +13,7 @@ The latest major feature is **AdviceOS – Enterprise Architecture + Compliance 
 - Real-time Event Streaming Layer (18 event types)
 - Enterprise Documentation Pack (8 docs with PDF export)
 - Enterprise Compliance Dashboard (/enterprise page)
+- **Xplan Integration Phase 1 MVP** with mock API and full audit logging
 
 ## User Personas
 1. **Financial Advisers** - Primary users who manage multiple client portfolios
@@ -476,5 +477,94 @@ The system provides powerful decision support **without triggering AFSL requirem
 - **Privacy Act (APP 11)**: Compliant
 - **ISO 27001**: Partial alignment (roadmap for full certification)
 
+## Xplan Integration (Phase 1 MVP)
+
+### Overview
+Read-first, audit-driven integration with Xplan. AdviceOS acts as a workflow and compliance layer without overwriting financial data.
+
+### Data Flow Rules
+- **Xplan = System of Record**: Clients, portfolios, transactions
+- **AdviceOS = Workflow Layer**: Compliance, scenarios, decisions
+- **Critical Rule**: AdviceOS will NEVER overwrite financial data in Xplan
+
+### Phase 1 Capabilities
+
+**READ Operations:**
+- Client data (name, DOB, email, phone, address, marital status, dependents)
+- Client profile (risk profile, investment objective, time horizon, income needs, assets, liabilities)
+- Portfolio data (holdings, values, asset allocation)
+- Transactions (buy, sell, dividend, contribution, withdrawal)
+- Risk profile (score, band, last review date)
+
+**WRITE Operations:**
+- File notes (plain text format with adviser ID and timestamp)
+- Scenario summaries (to be implemented in Phase 2)
+
+### Field Mapping (Xplan → AdviceOS)
+| Xplan Field | AdviceOS Field |
+|-------------|----------------|
+| client_id | external_id |
+| risk_band | risk_profile |
+| investment_objective | goals |
+| security_code | product_id |
+| value | market_value |
+
+### API Endpoints
+
+**Mock Xplan API** (`/api/xplan-mock/*`):
+- `GET /clients` - List 5 mock clients
+- `GET /clients/{id}` - Get client by ID
+- `GET /clients/{id}/profile` - Get client profile
+- `GET /clients/{id}/portfolio` - Get portfolio with holdings
+- `GET /clients/{id}/transactions` - Get transaction history
+- `GET /clients/{id}/risk` - Get risk profile
+- `POST /clients/{id}/file_notes` - Create file note
+- `POST /oauth/token` - Mock OAuth token
+
+**Xplan Integration Service** (`/api/xplan/*`):
+- `GET /status` - Integration status (mode, phase, OAuth validity)
+- `POST /connect` - Establish OAuth connection
+- `GET /clients` - List synced clients (from cache or Xplan)
+- `GET /clients/{id}` - Get client with full profile
+- `GET /clients/{id}/portfolio` - Get mapped portfolio
+- `GET /clients/{id}/transactions` - Get mapped transactions
+- `POST /file-notes/write` - Write file note to Xplan
+- `GET /file-notes/{client_id}` - List file notes
+- `GET /logs` - API interaction logs (full audit trail)
+- `GET /sync/status` - Sync status overview
+- `POST /sync/client/{id}` - Sync single client (real-time)
+- `POST /sync/all` - Sync all clients (scheduled/fallback)
+
+### Frontend: Xplan Sync Page
+- **Route**: `/xplan`
+- **Tabs**: Status, Clients, Sync, File Notes, API Logs
+- **Features**:
+  - View connection status and OAuth validity
+  - Browse synced clients with portfolios
+  - Manually trigger sync operations
+  - Write file notes to Xplan
+  - View full API interaction audit trail
+
+### Audit Logging
+All Xplan API interactions are logged to:
+1. `xplan_api_logs` collection (detailed API call logs)
+2. Main audit service (immutable hash-chained audit trail)
+
+Logged fields: user_id, action, endpoint, request/response payload, status_code, duration_ms, timestamp
+
+### Mock Clients (Development)
+| ID | Name | Risk Profile | Assets |
+|----|------|--------------|--------|
+| XP-001 | James Mitchell | Balanced | $1.25M |
+| XP-002 | Sarah Thompson | Growth | $650K |
+| XP-003 | Michael Chen | Conservative | $2.1M |
+| XP-004 | Emma Williams | High Growth | $380K |
+| XP-005 | David Brown | Defensive | $3.5M |
+
+### Phase 2 Roadmap
+- Scenario document upload to Xplan
+- Deeper portfolio sync with event-based updates
+- Two-way controlled write-back (non-destructive fields only)
+
 ---
-*Last Updated: March 24, 2026 - Version 9.0 - Enterprise Architecture Complete*
+*Last Updated: March 24, 2026 - Version 9.5 - Xplan Integration Phase 1 MVP Complete*

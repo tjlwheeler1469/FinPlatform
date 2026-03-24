@@ -1,27 +1,29 @@
 """
-Xplan Integration Module for Wealth Command
-============================================
+Xplan Integration Service
+=========================
+Handles all communication with Xplan API (or mock).
+Implements Phase 1 MVP:
+- Client data read
+- Portfolio read
+- Transactions read
+- Risk profile read
+- File note write-back
 
-This module provides integration with IRESS Xplan financial planning software.
-Each advisor practice connects their own Xplan instance.
-
-Core Principle:
-- Xplan = System of Record (compliance, storage)
-- Wealth Command = System of Intelligence (modelling, insights, actions)
-
-Authentication Methods Supported:
-- HTTP Basic Authentication (username/password)
-- HTTP Basic + 2FA (username/password + OTP)
-- OAuth 2.0 (for user-authorized access)
+Features:
+- OAuth 2.0 authentication
+- Full audit logging of all API interactions
+- Real-time sync on client load
+- Fallback scheduled sync
+- Error handling and retry logic
 """
 
 import os
-import base64
+import uuid
 import httpx
 import asyncio
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Optional, Dict, Any, List
-from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
+from fastapi import APIRouter, HTTPException, BackgroundTasks
 from pydantic import BaseModel, Field
 from motor.motor_asyncio import AsyncIOMotorClient
 import logging
@@ -37,915 +39,748 @@ client = AsyncIOMotorClient(MONGO_URL)
 db = client[DB_NAME]
 
 # Collections
-xplan_configs = db["xplan_configs"]
-xplan_sync_logs = db["xplan_sync_logs"]
-xplan_clients = db["xplan_clients"]
-xplan_portfolios = db["xplan_portfolios"]
-xplan_assets = db["xplan_assets"]
-xplan_goals = db["xplan_goals"]
+xplan_clients_col = db["xplan_synced_clients"]
+xplan_portfolios_col = db["xplan_synced_portfolios"]
+xplan_transactions_col = db["xplan_synced_transactions"]
+xplan_api_logs_col = db["xplan_api_logs"]
+xplan_sync_status_col = db["xplan_sync_status"]
+xplan_tokens_col = db["xplan_oauth_tokens"]
+xplan_file_notes_col = db["xplan_file_notes"]
+
+# Configuration
+XPLAN_BASE_URL = os.environ.get("XPLAN_API_URL", "")  # Empty = use mock
+XPLAN_CLIENT_ID = os.environ.get("XPLAN_CLIENT_ID", "mock_client")
+XPLAN_CLIENT_SECRET = os.environ.get("XPLAN_CLIENT_SECRET", "mock_secret")
+
+# Use internal mock API if no real Xplan URL configured
+def get_xplan_base_url():
+    if XPLAN_BASE_URL:
+        return XPLAN_BASE_URL
+    # Use mock API
+    return f"http://localhost:8001/api/xplan-mock"
+
 
 # ==================== MODELS ====================
 
-class XplanConnectionConfig(BaseModel):
-    """Configuration for connecting to an Xplan instance"""
-    site_url: str = Field(..., description="Xplan site URL (e.g., yoursite.xplan.iress.com.au)")
-    username: str = Field(..., description="Xplan username")
-    password: str = Field(..., description="Xplan password")
-    app_id: Optional[str] = Field(None, description="Xplan App ID for API access")
-    use_2fa: bool = Field(False, description="Whether 2FA is enabled")
-    totp_secret: Optional[str] = Field(None, description="TOTP secret for 2FA")
-    auth_method: str = Field("basic", description="Auth method: basic, basic_2fa, oauth")
-
-class XplanTestConnectionRequest(BaseModel):
-    site_url: str
-    username: str
-    password: str
-    app_id: Optional[str] = None
-
-class XplanSyncRequest(BaseModel):
-    advisor_id: str
-    sync_type: str = Field("full", description="Sync type: full, clients, portfolios, assets, goals")
-    client_ids: Optional[List[str]] = Field(None, description="Specific client IDs to sync")
-
-class XplanPushRequest(BaseModel):
-    advisor_id: str
+class XplanOAuthConfig(BaseModel):
     client_id: str
-    data_type: str = Field(..., description="Data type: strategy, scenario, document, note")
-    data: Dict[str, Any]
+    client_secret: str
+    
+class XplanSyncRequest(BaseModel):
+    client_ids: Optional[List[str]] = None
+    sync_type: str = "full"  # full, incremental, client_only
+    
+class FileNoteRequest(BaseModel):
+    client_id: str
+    title: str
+    content: str  # Plain text
+    adviser_id: str
+    scenario_id: Optional[str] = None
+    compliance_result: Optional[str] = None
 
-class XplanClientData(BaseModel):
-    """Client data structure from Xplan"""
-    xplan_id: str
-    first_name: str
-    last_name: str
-    email: Optional[str] = None
-    phone: Optional[str] = None
-    date_of_birth: Optional[str] = None
-    address: Optional[Dict[str, str]] = None
-    risk_profile: Optional[str] = None
-    employment_status: Optional[str] = None
-    occupation: Optional[str] = None
-    employer: Optional[str] = None
-    marital_status: Optional[str] = None
-    dependants: Optional[int] = None
-    # Financial fact find
-    annual_income: Optional[float] = None
-    annual_expenses: Optional[float] = None
-    tax_residency: Optional[str] = None
-
-# ==================== XPLAN API CLIENT ====================
-
-class XplanAPIClient:
-    """
-    Client for interacting with Xplan's Resourceful API (RAPI)
-    """
-    
-    def __init__(self, config: Dict[str, Any]):
-        self.site_url = config.get("site_url", "").rstrip("/")
-        self.username = config.get("username", "")
-        self.password = config.get("password", "")
-        self.app_id = config.get("app_id", "wealth-command")
-        self.use_2fa = config.get("use_2fa", False)
-        self.totp_secret = config.get("totp_secret")
-        self.session_cookie = None
-        self.is_demo_mode = config.get("demo_mode", False)
-        
-        # Construct base URL
-        if self.site_url and not self.site_url.startswith("http"):
-            self.base_url = f"https://{self.site_url}"
-        else:
-            self.base_url = self.site_url
-            
-    def _get_auth_header(self) -> str:
-        """Generate Basic Auth header"""
-        credentials = f"{self.username}:{self.password}"
-        encoded = base64.b64encode(credentials.encode()).decode()
-        return f"Basic {encoded}"
-    
-    def _get_headers(self) -> Dict[str, str]:
-        """Get headers for Xplan API requests"""
-        headers = {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-            "x-xplan-app-id": self.app_id,
-        }
-        
-        # Add forwarded host for Xplan routing
-        if self.site_url:
-            headers["x-forwarded-host"] = self.site_url.replace("https://", "").replace("http://", "")
-        
-        # Add auth
-        if self.session_cookie:
-            headers["Cookie"] = f"XPLANID={self.session_cookie}"
-        else:
-            headers["Authorization"] = self._get_auth_header()
-            
-        return headers
-    
-    async def test_connection(self) -> Dict[str, Any]:
-        """Test connection to Xplan"""
-        if self.is_demo_mode:
-            return {
-                "success": True,
-                "mode": "demo",
-                "message": "Demo mode - connection simulated",
-                "site": self.site_url or "demo.xplan.iress.com.au"
-            }
-        
-        if not self.site_url or not self.username:
-            return {
-                "success": False,
-                "error": "Missing site URL or username"
-            }
-        
-        try:
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                # Try to authenticate and get user info
-                response = await client.get(
-                    f"{self.base_url}/resourceful/entity/user-v2/self",
-                    headers=self._get_headers()
-                )
-                
-                if response.status_code == 200:
-                    # Extract session cookie if present
-                    if "XPLANID" in response.cookies:
-                        self.session_cookie = response.cookies["XPLANID"]
-                    
-                    return {
-                        "success": True,
-                        "mode": "live",
-                        "site": self.site_url,
-                        "user_info": response.json()
-                    }
-                elif response.status_code == 401:
-                    return {
-                        "success": False,
-                        "error": "Authentication failed - check credentials"
-                    }
-                else:
-                    return {
-                        "success": False,
-                        "error": f"Connection failed: {response.status_code}"
-                    }
-                    
-        except httpx.ConnectError:
-            return {
-                "success": False,
-                "error": f"Could not connect to {self.site_url}"
-            }
-        except Exception as e:
-            return {
-                "success": False,
-                "error": str(e)
-            }
-    
-    async def get_clients(self, limit: int = 100, offset: int = 0) -> List[Dict[str, Any]]:
-        """Fetch clients from Xplan"""
-        if self.is_demo_mode:
-            return self._get_demo_clients()
-        
-        try:
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                response = await client.get(
-                    f"{self.base_url}/resourceful/entity/client-v2",
-                    headers=self._get_headers(),
-                    params={"limit": limit, "offset": offset}
-                )
-                
-                if response.status_code == 200:
-                    return response.json().get("data", [])
-                else:
-                    logger.error(f"Failed to fetch clients: {response.status_code}")
-                    return []
-                    
-        except Exception as e:
-            logger.error(f"Error fetching clients: {e}")
-            return []
-    
-    async def get_client_details(self, client_id: str) -> Optional[Dict[str, Any]]:
-        """Fetch detailed client information"""
-        if self.is_demo_mode:
-            return self._get_demo_client_details(client_id)
-        
-        try:
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                response = await client.get(
-                    f"{self.base_url}/resourceful/entity/client-v2/{client_id}",
-                    headers=self._get_headers()
-                )
-                
-                if response.status_code == 200:
-                    return response.json()
-                return None
-                
-        except Exception as e:
-            logger.error(f"Error fetching client details: {e}")
-            return None
-    
-    async def get_client_portfolios(self, client_id: str) -> List[Dict[str, Any]]:
-        """Fetch portfolios for a client"""
-        if self.is_demo_mode:
-            return self._get_demo_portfolios(client_id)
-        
-        try:
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                response = await client.get(
-                    f"{self.base_url}/resourceful/portfolio",
-                    headers=self._get_headers(),
-                    params={"client_id": client_id}
-                )
-                
-                if response.status_code == 200:
-                    return response.json().get("data", [])
-                return []
-                
-        except Exception as e:
-            logger.error(f"Error fetching portfolios: {e}")
-            return []
-    
-    async def get_portfolio_holdings(self, portfolio_id: str) -> List[Dict[str, Any]]:
-        """Fetch holdings for a portfolio"""
-        if self.is_demo_mode:
-            return self._get_demo_holdings(portfolio_id)
-        
-        try:
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                response = await client.get(
-                    f"{self.base_url}/resourceful/portfolio/{portfolio_id}/holdings",
-                    headers=self._get_headers()
-                )
-                
-                if response.status_code == 200:
-                    return response.json().get("data", [])
-                return []
-                
-        except Exception as e:
-            logger.error(f"Error fetching holdings: {e}")
-            return []
-    
-    async def get_client_assets(self, client_id: str) -> List[Dict[str, Any]]:
-        """Fetch assets for a client"""
-        if self.is_demo_mode:
-            return self._get_demo_assets(client_id)
-        
-        try:
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                response = await client.get(
-                    f"{self.base_url}/resourceful/entity/asset",
-                    headers=self._get_headers(),
-                    params={"client_id": client_id}
-                )
-                
-                if response.status_code == 200:
-                    return response.json().get("data", [])
-                return []
-                
-        except Exception as e:
-            logger.error(f"Error fetching assets: {e}")
-            return []
-    
-    async def get_client_liabilities(self, client_id: str) -> List[Dict[str, Any]]:
-        """Fetch liabilities for a client"""
-        if self.is_demo_mode:
-            return self._get_demo_liabilities(client_id)
-        
-        try:
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                response = await client.get(
-                    f"{self.base_url}/resourceful/entity/liability",
-                    headers=self._get_headers(),
-                    params={"client_id": client_id}
-                )
-                
-                if response.status_code == 200:
-                    return response.json().get("data", [])
-                return []
-                
-        except Exception as e:
-            logger.error(f"Error fetching liabilities: {e}")
-            return []
-    
-    async def get_client_goals(self, client_id: str) -> List[Dict[str, Any]]:
-        """Fetch goals/objectives for a client"""
-        if self.is_demo_mode:
-            return self._get_demo_goals(client_id)
-        
-        try:
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                response = await client.get(
-                    f"{self.base_url}/resourceful/entity/goal",
-                    headers=self._get_headers(),
-                    params={"client_id": client_id}
-                )
-                
-                if response.status_code == 200:
-                    return response.json().get("data", [])
-                return []
-                
-        except Exception as e:
-            logger.error(f"Error fetching goals: {e}")
-            return []
-    
-    async def push_strategy(self, client_id: str, strategy_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Push strategy recommendation to Xplan"""
-        if self.is_demo_mode:
-            return {
-                "success": True,
-                "mode": "demo",
-                "message": "Strategy would be pushed to Xplan",
-                "xplan_ref": f"DEMO-STR-{datetime.now().strftime('%Y%m%d%H%M%S')}"
-            }
-        
-        try:
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                response = await client.post(
-                    f"{self.base_url}/resourceful/entity/strategy",
-                    headers=self._get_headers(),
-                    json={
-                        "client_id": client_id,
-                        **strategy_data
-                    }
-                )
-                
-                if response.status_code in [200, 201]:
-                    return {
-                        "success": True,
-                        "mode": "live",
-                        "data": response.json()
-                    }
-                return {
-                    "success": False,
-                    "error": f"Failed to push strategy: {response.status_code}"
-                }
-                
-        except Exception as e:
-            return {"success": False, "error": str(e)}
-    
-    async def push_document(self, client_id: str, document_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Push document/report to Xplan"""
-        if self.is_demo_mode:
-            return {
-                "success": True,
-                "mode": "demo",
-                "message": "Document would be uploaded to Xplan",
-                "xplan_ref": f"DEMO-DOC-{datetime.now().strftime('%Y%m%d%H%M%S')}"
-            }
-        
-        try:
-            async with httpx.AsyncClient(timeout=60.0) as client:
-                response = await client.post(
-                    f"{self.base_url}/resourceful/entity/document",
-                    headers=self._get_headers(),
-                    json={
-                        "client_id": client_id,
-                        **document_data
-                    }
-                )
-                
-                if response.status_code in [200, 201]:
-                    return {
-                        "success": True,
-                        "mode": "live",
-                        "data": response.json()
-                    }
-                return {
-                    "success": False,
-                    "error": f"Failed to upload document: {response.status_code}"
-                }
-                
-        except Exception as e:
-            return {"success": False, "error": str(e)}
-    
-    async def push_note(self, client_id: str, note_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Push note/comment to Xplan"""
-        if self.is_demo_mode:
-            return {
-                "success": True,
-                "mode": "demo",
-                "message": "Note would be added to Xplan",
-                "xplan_ref": f"DEMO-NOTE-{datetime.now().strftime('%Y%m%d%H%M%S')}"
-            }
-        
-        try:
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                response = await client.post(
-                    f"{self.base_url}/resourceful/entity/note",
-                    headers=self._get_headers(),
-                    json={
-                        "client_id": client_id,
-                        **note_data
-                    }
-                )
-                
-                if response.status_code in [200, 201]:
-                    return {
-                        "success": True,
-                        "mode": "live",
-                        "data": response.json()
-                    }
-                return {
-                    "success": False,
-                    "error": f"Failed to add note: {response.status_code}"
-                }
-                
-        except Exception as e:
-            return {"success": False, "error": str(e)}
-
-    # ==================== DEMO DATA ====================
-    
-    def _get_demo_clients(self) -> List[Dict[str, Any]]:
-        """Return demo client data"""
-        return [
-            {
-                "entity_id": "xplan_001",
-                "first_name": "James",
-                "last_name": "Wheeler",
-                "email": "james.wheeler@email.com",
-                "phone": "0412 345 678",
-                "date_of_birth": "1968-07-22",
-                "risk_profile": "Growth",
-                "marital_status": "Married",
-                "occupation": "Business Owner",
-                "employer": "Wheeler Consulting",
-                "annual_income": 350000
-            },
-            {
-                "entity_id": "xplan_002",
-                "first_name": "Sarah",
-                "last_name": "Wheeler",
-                "email": "sarah.wheeler@email.com",
-                "phone": "0412 345 679",
-                "date_of_birth": "1970-03-15",
-                "risk_profile": "Balanced",
-                "marital_status": "Married",
-                "occupation": "Marketing Director",
-                "employer": "Global Media Co",
-                "annual_income": 180000
-            },
-            {
-                "entity_id": "xplan_003",
-                "first_name": "Michael",
-                "last_name": "Chen",
-                "email": "m.chen@email.com",
-                "phone": "0423 456 789",
-                "date_of_birth": "1975-11-08",
-                "risk_profile": "Aggressive",
-                "marital_status": "Single",
-                "occupation": "Software Engineer",
-                "employer": "Tech Corp",
-                "annual_income": 220000
-            },
-            {
-                "entity_id": "xplan_004",
-                "first_name": "Emma",
-                "last_name": "Thompson",
-                "email": "emma.t@email.com",
-                "phone": "0434 567 890",
-                "date_of_birth": "1982-05-20",
-                "risk_profile": "Conservative",
-                "marital_status": "Divorced",
-                "occupation": "Doctor",
-                "employer": "St Vincent's Hospital",
-                "annual_income": 420000
-            }
-        ]
-    
-    def _get_demo_client_details(self, client_id: str) -> Optional[Dict[str, Any]]:
-        """Return demo client details"""
-        clients = {c["entity_id"]: c for c in self._get_demo_clients()}
-        base = clients.get(client_id)
-        if base:
-            base.update({
-                "address": {
-                    "street": "42 Harbour View Drive",
-                    "suburb": "Mosman",
-                    "state": "NSW",
-                    "postcode": "2088",
-                    "country": "Australia"
-                },
-                "dependants": 2,
-                "annual_expenses": 120000,
-                "tax_residency": "Australia",
-                "tfn_provided": True,
-                "client_since": "2019-03-15"
-            })
-        return base
-    
-    def _get_demo_portfolios(self, client_id: str) -> List[Dict[str, Any]]:
-        """Return demo portfolio data"""
-        return [
-            {
-                "portfolio_id": f"{client_id}_super",
-                "name": "Superannuation",
-                "type": "superannuation",
-                "institution": "AustralianSuper",
-                "value": 520000,
-                "last_updated": "2026-03-18"
-            },
-            {
-                "portfolio_id": f"{client_id}_invest",
-                "name": "Investment Portfolio",
-                "type": "investment",
-                "institution": "Macquarie",
-                "value": 650000,
-                "last_updated": "2026-03-18"
-            },
-            {
-                "portfolio_id": f"{client_id}_smsf",
-                "name": "Family SMSF",
-                "type": "smsf",
-                "institution": "Self-Managed",
-                "value": 380000,
-                "last_updated": "2026-03-18"
-            }
-        ]
-    
-    def _get_demo_holdings(self, portfolio_id: str) -> List[Dict[str, Any]]:
-        """Return demo holdings data"""
-        return [
-            {"security_code": "VAS", "name": "Vanguard Australian Shares", "units": 1500, "price": 95.50, "value": 143250, "weight": 22.0},
-            {"security_code": "IVV", "name": "iShares S&P 500", "units": 120, "price": 580.00, "value": 69600, "weight": 10.7},
-            {"security_code": "BHP", "name": "BHP Group", "units": 1200, "price": 45.50, "value": 54600, "weight": 8.4},
-            {"security_code": "CBA", "name": "Commonwealth Bank", "units": 400, "price": 118.50, "value": 47400, "weight": 7.3},
-            {"security_code": "CSL", "name": "CSL Limited", "units": 150, "price": 295.00, "value": 44250, "weight": 6.8},
-            {"security_code": "CASH", "name": "Cash", "units": 1, "price": 85000, "value": 85000, "weight": 13.1}
-        ]
-    
-    def _get_demo_assets(self, client_id: str) -> List[Dict[str, Any]]:
-        """Return demo assets data"""
-        return [
-            {"asset_id": f"{client_id}_prop1", "type": "property", "name": "Family Home - Mosman", "value": 2200000, "debt": 850000},
-            {"asset_id": f"{client_id}_prop2", "type": "property", "name": "Investment Unit - Parramatta", "value": 850000, "debt": 0, "rental_income": 2800},
-            {"asset_id": f"{client_id}_car1", "type": "vehicle", "name": "Tesla Model 3", "value": 65000, "debt": 0},
-            {"asset_id": f"{client_id}_art", "type": "collectible", "name": "Art Collection", "value": 45000, "debt": 0}
-        ]
-    
-    def _get_demo_liabilities(self, client_id: str) -> List[Dict[str, Any]]:
-        """Return demo liabilities data"""
-        return [
-            {"liability_id": f"{client_id}_mort", "type": "mortgage", "name": "Home Loan - CBA", "balance": 850000, "interest_rate": 6.2, "monthly_payment": 5200},
-            {"liability_id": f"{client_id}_cc", "type": "credit_card", "name": "Amex Platinum", "balance": 8500, "interest_rate": 20.99, "limit": 25000}
-        ]
-    
-    def _get_demo_goals(self, client_id: str) -> List[Dict[str, Any]]:
-        """Return demo goals data"""
-        return [
-            {"goal_id": f"{client_id}_ret", "name": "Retirement at 62", "target": 3500000, "current": 2850000, "target_date": "2030-07-22", "priority": "high"},
-            {"goal_id": f"{client_id}_mort", "name": "Pay off mortgage", "target": 850000, "current": 110000, "target_date": "2035-01-01", "priority": "high"},
-            {"goal_id": f"{client_id}_edu", "name": "Children's education", "target": 200000, "current": 85000, "target_date": "2028-01-01", "priority": "medium"},
-            {"goal_id": f"{client_id}_travel", "name": "European holiday", "target": 25000, "current": 15000, "target_date": "2026-06-01", "priority": "low"}
-        ]
+class XplanFieldMapping(BaseModel):
+    """Xplan to AdviceOS field mapping."""
+    xplan_field: str
+    adviceos_field: str
+    transform: Optional[str] = None
 
 
-# ==================== API ROUTES ====================
+# ==================== AUDIT LOGGING ====================
 
-@router.get("/status")
-async def get_xplan_status(advisor_id: str = "default"):
-    """Get Xplan connection status for an advisor"""
-    config = await xplan_configs.find_one({"advisor_id": advisor_id}, {"_id": 0, "password": 0, "totp_secret": 0})
-    
-    if not config:
-        return {
-            "connected": False,
-            "mode": "not_configured",
-            "message": "Xplan integration not configured. Set up your connection in Settings."
-        }
-    
-    return {
-        "connected": True,
-        "mode": "demo" if config.get("demo_mode") else "live",
-        "site_url": config.get("site_url"),
-        "last_sync": config.get("last_sync"),
-        "sync_status": config.get("sync_status", "idle")
-    }
-
-
-@router.post("/configure")
-async def configure_xplan(config: XplanConnectionConfig, advisor_id: str = "default"):
-    """Configure Xplan connection for an advisor"""
-    # Test connection first
-    api_client = XplanAPIClient({
-        "site_url": config.site_url,
-        "username": config.username,
-        "password": config.password,
-        "app_id": config.app_id,
-        "demo_mode": config.site_url.lower() == "demo" or not config.site_url
-    })
-    
-    test_result = await api_client.test_connection()
-    
-    if not test_result.get("success"):
-        raise HTTPException(status_code=400, detail=test_result.get("error", "Connection failed"))
-    
-    # Save configuration (encrypt password in production)
-    config_data = {
-        "advisor_id": advisor_id,
-        "site_url": config.site_url,
-        "username": config.username,
-        "password": config.password,  # Should be encrypted in production
-        "app_id": config.app_id,
-        "use_2fa": config.use_2fa,
-        "auth_method": config.auth_method,
-        "demo_mode": config.site_url.lower() == "demo" or not config.site_url,
-        "configured_at": datetime.now(timezone.utc).isoformat(),
-        "last_sync": None,
-        "sync_status": "idle"
+async def log_api_interaction(
+    user_id: str,
+    action: str,
+    xplan_endpoint: str,
+    request_payload: Optional[Dict] = None,
+    response_payload: Optional[Dict] = None,
+    status_code: Optional[int] = None,
+    error: Optional[str] = None,
+    duration_ms: Optional[float] = None
+):
+    """Log every Xplan API interaction for audit trail."""
+    log_entry = {
+        "id": f"xlog_{uuid.uuid4().hex[:12]}",
+        "user_id": user_id,
+        "action": action,
+        "xplan_endpoint": xplan_endpoint,
+        "request_payload": request_payload,
+        "response_payload": response_payload,
+        "status_code": status_code,
+        "error": error,
+        "duration_ms": duration_ms,
+        "timestamp": datetime.now(timezone.utc).isoformat()
     }
     
-    await xplan_configs.update_one(
-        {"advisor_id": advisor_id},
-        {"$set": config_data},
-        upsert=True
-    )
+    await xplan_api_logs_col.insert_one(log_entry)
     
-    return {
-        "success": True,
-        "message": "Xplan connection configured successfully",
-        "mode": "demo" if config_data["demo_mode"] else "live",
-        "connection_test": test_result
-    }
-
-
-@router.post("/test-connection")
-async def test_xplan_connection(request: XplanTestConnectionRequest):
-    """Test Xplan connection without saving"""
-    api_client = XplanAPIClient({
-        "site_url": request.site_url,
-        "username": request.username,
-        "password": request.password,
-        "app_id": request.app_id,
-        "demo_mode": request.site_url.lower() == "demo" or not request.site_url
-    })
-    
-    result = await api_client.test_connection()
-    return result
-
-
-@router.post("/enable-demo")
-async def enable_demo_mode(advisor_id: str = "default"):
-    """Enable demo mode for Xplan integration"""
-    config_data = {
-        "advisor_id": advisor_id,
-        "site_url": "demo.xplan.iress.com.au",
-        "username": "demo_user",
-        "password": "",
-        "demo_mode": True,
-        "configured_at": datetime.now(timezone.utc).isoformat(),
-        "last_sync": None,
-        "sync_status": "idle"
-    }
-    
-    await xplan_configs.update_one(
-        {"advisor_id": advisor_id},
-        {"$set": config_data},
-        upsert=True
-    )
-    
-    return {
-        "success": True,
-        "message": "Demo mode enabled",
-        "mode": "demo"
-    }
-
-
-@router.post("/sync")
-async def sync_from_xplan(request: XplanSyncRequest, background_tasks: BackgroundTasks):
-    """Sync data from Xplan"""
-    config = await xplan_configs.find_one({"advisor_id": request.advisor_id})
-    
-    if not config:
-        raise HTTPException(status_code=404, detail="Xplan not configured for this advisor")
-    
-    # Update sync status
-    await xplan_configs.update_one(
-        {"advisor_id": request.advisor_id},
-        {"$set": {"sync_status": "syncing"}}
-    )
-    
-    # Run sync in background
-    background_tasks.add_task(
-        perform_sync,
-        request.advisor_id,
-        config,
-        request.sync_type,
-        request.client_ids
-    )
-    
-    return {
-        "success": True,
-        "message": "Sync started",
-        "sync_type": request.sync_type
-    }
-
-
-async def perform_sync(advisor_id: str, config: Dict, sync_type: str, client_ids: Optional[List[str]]):
-    """Background task to perform Xplan sync"""
-    api_client = XplanAPIClient(config)
-    sync_log = {
-        "advisor_id": advisor_id,
-        "sync_type": sync_type,
-        "started_at": datetime.now(timezone.utc).isoformat(),
-        "status": "running",
-        "records_synced": 0,
-        "errors": []
-    }
-    
+    # Also log to main audit service if available
     try:
-        # Fetch clients
-        if sync_type in ["full", "clients"]:
-            clients = await api_client.get_clients()
-            for client in clients:
-                client["advisor_id"] = advisor_id
-                client["synced_at"] = datetime.now(timezone.utc).isoformat()
-                await xplan_clients.update_one(
-                    {"advisor_id": advisor_id, "entity_id": client["entity_id"]},
-                    {"$set": client},
-                    upsert=True
-                )
-                sync_log["records_synced"] += 1
+        from routes.audit_service import log_audit_event, AuditEvent
+        await log_audit_event(AuditEvent(
+            event_type="xplan_api_call",
+            entity_type="xplan_integration",
+            entity_id=log_entry["id"],
+            user_id=user_id,
+            action_description=f"Xplan API: {action} - {xplan_endpoint}",
+            metadata={"status_code": status_code, "duration_ms": duration_ms}
+        ))
+    except Exception as e:
+        logger.warning(f"Failed to log to audit service: {e}")
+    
+    return log_entry
+
+
+# ==================== OAUTH AUTHENTICATION ====================
+
+async def get_access_token() -> str:
+    """Get or refresh OAuth access token."""
+    # Check for existing valid token
+    token_doc = await xplan_tokens_col.find_one({"active": True})
+    
+    if token_doc:
+        # Check if token is still valid (with 5 min buffer)
+        created_at = datetime.fromisoformat(token_doc["created_at"].replace("Z", "+00:00"))
+        expires_in = token_doc.get("expires_in", 3600)
+        if datetime.now(timezone.utc) < created_at + timedelta(seconds=expires_in - 300):
+            return token_doc["access_token"]
+    
+    # Request new token
+    base_url = get_xplan_base_url()
+    
+    start_time = datetime.now(timezone.utc)
+    try:
+        async with httpx.AsyncClient() as http_client:
+            response = await http_client.post(
+                f"{base_url}/oauth/token",
+                data={
+                    "client_id": XPLAN_CLIENT_ID,
+                    "client_secret": XPLAN_CLIENT_SECRET,
+                    "grant_type": "client_credentials"
+                },
+                timeout=30
+            )
+            response.raise_for_status()
+            token_data = response.json()
         
-        # Fetch portfolios and holdings
-        if sync_type in ["full", "portfolios"]:
-            clients = await xplan_clients.find({"advisor_id": advisor_id}).to_list(1000)
-            for client in clients:
-                portfolios = await api_client.get_client_portfolios(client["entity_id"])
-                for portfolio in portfolios:
-                    portfolio["advisor_id"] = advisor_id
-                    portfolio["client_id"] = client["entity_id"]
-                    portfolio["synced_at"] = datetime.now(timezone.utc).isoformat()
-                    
-                    # Fetch holdings for each portfolio
-                    holdings = await api_client.get_portfolio_holdings(portfolio["portfolio_id"])
-                    portfolio["holdings"] = holdings
-                    
-                    await xplan_portfolios.update_one(
-                        {"advisor_id": advisor_id, "portfolio_id": portfolio["portfolio_id"]},
-                        {"$set": portfolio},
-                        upsert=True
-                    )
-                    sync_log["records_synced"] += 1
+        duration = (datetime.now(timezone.utc) - start_time).total_seconds() * 1000
         
-        # Fetch assets and liabilities
-        if sync_type in ["full", "assets"]:
-            clients = await xplan_clients.find({"advisor_id": advisor_id}).to_list(1000)
-            for client in clients:
-                assets = await api_client.get_client_assets(client["entity_id"])
-                liabilities = await api_client.get_client_liabilities(client["entity_id"])
-                
-                for asset in assets:
-                    asset["advisor_id"] = advisor_id
-                    asset["client_id"] = client["entity_id"]
-                    asset["synced_at"] = datetime.now(timezone.utc).isoformat()
-                    await xplan_assets.update_one(
-                        {"advisor_id": advisor_id, "asset_id": asset["asset_id"]},
-                        {"$set": asset},
-                        upsert=True
-                    )
-                    sync_log["records_synced"] += 1
-                
-                for liability in liabilities:
-                    liability["advisor_id"] = advisor_id
-                    liability["client_id"] = client["entity_id"]
-                    liability["asset_type"] = "liability"
-                    liability["synced_at"] = datetime.now(timezone.utc).isoformat()
-                    await xplan_assets.update_one(
-                        {"advisor_id": advisor_id, "liability_id": liability["liability_id"]},
-                        {"$set": liability},
-                        upsert=True
-                    )
-                    sync_log["records_synced"] += 1
+        # Store token
+        await xplan_tokens_col.update_many({}, {"$set": {"active": False}})
+        await xplan_tokens_col.insert_one({
+            "access_token": token_data["access_token"],
+            "refresh_token": token_data.get("refresh_token"),
+            "token_type": token_data.get("token_type", "Bearer"),
+            "expires_in": token_data.get("expires_in", 3600),
+            "active": True,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        })
         
-        # Fetch goals
-        if sync_type in ["full", "goals"]:
-            clients = await xplan_clients.find({"advisor_id": advisor_id}).to_list(1000)
-            for client in clients:
-                goals = await api_client.get_client_goals(client["entity_id"])
-                for goal in goals:
-                    goal["advisor_id"] = advisor_id
-                    goal["client_id"] = client["entity_id"]
-                    goal["synced_at"] = datetime.now(timezone.utc).isoformat()
-                    await xplan_goals.update_one(
-                        {"advisor_id": advisor_id, "goal_id": goal["goal_id"]},
-                        {"$set": goal},
-                        upsert=True
-                    )
-                    sync_log["records_synced"] += 1
+        await log_api_interaction(
+            user_id="system",
+            action="OAUTH_TOKEN",
+            xplan_endpoint="/oauth/token",
+            status_code=200,
+            duration_ms=duration
+        )
         
-        sync_log["status"] = "completed"
-        sync_log["completed_at"] = datetime.now(timezone.utc).isoformat()
+        return token_data["access_token"]
         
     except Exception as e:
-        sync_log["status"] = "failed"
-        sync_log["errors"].append(str(e))
-        sync_log["completed_at"] = datetime.now(timezone.utc).isoformat()
+        await log_api_interaction(
+            user_id="system",
+            action="OAUTH_TOKEN",
+            xplan_endpoint="/oauth/token",
+            error=str(e)
+        )
+        raise HTTPException(status_code=500, detail=f"OAuth authentication failed: {str(e)}")
+
+
+async def make_xplan_request(
+    method: str,
+    endpoint: str,
+    user_id: str,
+    data: Optional[Dict] = None,
+    params: Optional[Dict] = None
+) -> Dict[str, Any]:
+    """Make authenticated request to Xplan API with logging."""
+    base_url = get_xplan_base_url()
+    token = await get_access_token()
     
-    # Save sync log
-    await xplan_sync_logs.insert_one(sync_log)
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json"
+    }
     
-    # Update config
-    await xplan_configs.update_one(
-        {"advisor_id": advisor_id},
-        {"$set": {
-            "sync_status": "idle",
-            "last_sync": datetime.now(timezone.utc).isoformat(),
-            "last_sync_result": sync_log["status"]
-        }}
-    )
+    start_time = datetime.now(timezone.utc)
+    
+    try:
+        async with httpx.AsyncClient() as http_client:
+            if method.upper() == "GET":
+                response = await http_client.get(
+                    f"{base_url}{endpoint}",
+                    headers=headers,
+                    params=params,
+                    timeout=30
+                )
+            elif method.upper() == "POST":
+                response = await http_client.post(
+                    f"{base_url}{endpoint}",
+                    headers=headers,
+                    json=data,
+                    timeout=30
+                )
+            else:
+                raise ValueError(f"Unsupported method: {method}")
+            
+            duration = (datetime.now(timezone.utc) - start_time).total_seconds() * 1000
+            response_data = response.json() if response.content else {}
+            
+            # Log the interaction
+            await log_api_interaction(
+                user_id=user_id,
+                action=f"{method.upper()}_{endpoint.split('/')[-1].upper()}",
+                xplan_endpoint=endpoint,
+                request_payload=data,
+                response_payload=response_data if response.status_code == 200 else None,
+                status_code=response.status_code,
+                duration_ms=duration
+            )
+            
+            if response.status_code >= 400:
+                raise HTTPException(
+                    status_code=response.status_code,
+                    detail=f"Xplan API error: {response_data}"
+                )
+            
+            return response_data
+            
+    except httpx.RequestError as e:
+        duration = (datetime.now(timezone.utc) - start_time).total_seconds() * 1000
+        await log_api_interaction(
+            user_id=user_id,
+            action=f"{method.upper()}_{endpoint.split('/')[-1].upper()}",
+            xplan_endpoint=endpoint,
+            request_payload=data,
+            error=str(e),
+            duration_ms=duration
+        )
+        raise HTTPException(status_code=500, detail=f"Xplan API request failed: {str(e)}")
+
+
+# ==================== FIELD MAPPING ====================
+
+def map_client_data(xplan_client: Dict) -> Dict:
+    """Map Xplan client data to AdviceOS format."""
+    return {
+        "external_id": xplan_client.get("client_id"),
+        "first_name": xplan_client.get("first_name"),
+        "last_name": xplan_client.get("last_name"),
+        "dob": xplan_client.get("date_of_birth"),
+        "email": xplan_client.get("email"),
+        "phone": xplan_client.get("phone"),
+        "address": xplan_client.get("address"),
+        "marital_status": xplan_client.get("marital_status"),
+        "dependents": xplan_client.get("dependents"),
+        "source": "xplan",
+        "last_synced": datetime.now(timezone.utc).isoformat()
+    }
+
+
+def map_client_profile(xplan_profile: Dict) -> Dict:
+    """Map Xplan client profile to AdviceOS format."""
+    return {
+        "risk_profile": xplan_profile.get("risk_profile"),
+        "goals": xplan_profile.get("investment_objective"),
+        "time_horizon": xplan_profile.get("time_horizon"),
+        "income_requirement": xplan_profile.get("income_needs"),
+        "assets": xplan_profile.get("assets"),
+        "liabilities": xplan_profile.get("liabilities")
+    }
+
+
+def map_portfolio_data(xplan_portfolio: Dict) -> Dict:
+    """Map Xplan portfolio to AdviceOS format."""
+    holdings = []
+    for h in xplan_portfolio.get("holdings", []):
+        holdings.append({
+            "product_id": h.get("security_code"),
+            "product_name": h.get("product_name"),
+            "quantity": h.get("quantity"),
+            "price": h.get("price"),
+            "market_value": h.get("value"),
+            "asset_class": h.get("asset_class")
+        })
+    
+    return {
+        "portfolio_id": xplan_portfolio.get("portfolio_id"),
+        "portfolio_value": xplan_portfolio.get("total_value"),
+        "allocation": xplan_portfolio.get("asset_class_split"),
+        "holdings": holdings,
+        "last_synced": datetime.now(timezone.utc).isoformat()
+    }
+
+
+def map_transactions(xplan_transactions: List[Dict]) -> List[Dict]:
+    """Map Xplan transactions to AdviceOS format."""
+    return [{
+        "transaction_id": t.get("transaction_id"),
+        "transaction_date": t.get("date"),
+        "transaction_type": t.get("type"),
+        "amount": t.get("amount"),
+        "product_id": t.get("product")
+    } for t in xplan_transactions]
+
+
+def map_risk_profile(xplan_risk: Dict) -> Dict:
+    """Map Xplan risk profile to AdviceOS format."""
+    return {
+        "risk_score": xplan_risk.get("risk_score"),
+        "risk_profile": xplan_risk.get("risk_band"),
+        "risk_review_date": xplan_risk.get("last_review_date")
+    }
+
+
+# ==================== READ ENDPOINTS ====================
+
+@router.get("/status")
+async def get_integration_status():
+    """Get Xplan integration status."""
+    using_mock = not XPLAN_BASE_URL
+    
+    # Get sync stats
+    total_synced = await xplan_clients_col.count_documents({})
+    recent_logs = await xplan_api_logs_col.count_documents({
+        "timestamp": {"$gte": (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()}
+    })
+    
+    # Check token status
+    token = await xplan_tokens_col.find_one({"active": True})
+    token_valid = False
+    if token:
+        created_at = datetime.fromisoformat(token["created_at"].replace("Z", "+00:00"))
+        expires_in = token.get("expires_in", 3600)
+        token_valid = datetime.now(timezone.utc) < created_at + timedelta(seconds=expires_in)
+    
+    return {
+        "status": "connected" if token_valid else "disconnected",
+        "mode": "mock" if using_mock else "production",
+        "base_url": get_xplan_base_url(),
+        "oauth_valid": token_valid,
+        "clients_synced": total_synced,
+        "api_calls_24h": recent_logs,
+        "phase": "MVP Phase 1",
+        "capabilities": {
+            "read": ["clients", "portfolios", "transactions", "risk_profiles"],
+            "write": ["file_notes", "scenario_summaries"]
+        }
+    }
+
+
+@router.post("/connect")
+async def connect_to_xplan():
+    """Establish connection to Xplan (get OAuth token)."""
+    try:
+        token = await get_access_token()
+        return {
+            "success": True,
+            "message": "Connected to Xplan successfully",
+            "token_prefix": token[:20] + "..."
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "message": str(e)
+        }
 
 
 @router.get("/clients")
-async def get_synced_clients(advisor_id: str = "default"):
-    """Get clients synced from Xplan"""
-    clients = await xplan_clients.find(
-        {"advisor_id": advisor_id},
-        {"_id": 0}
-    ).to_list(1000)
+async def list_xplan_clients(
+    user_id: str = "system",
+    sync_first: bool = False
+):
+    """List clients from Xplan."""
+    if sync_first:
+        xplan_data = await make_xplan_request("GET", "/clients", user_id)
+        
+        # Store synced clients
+        for client in xplan_data.get("clients", []):
+            mapped = map_client_data(client)
+            await xplan_clients_col.update_one(
+                {"external_id": mapped["external_id"]},
+                {"$set": mapped},
+                upsert=True
+            )
+    
+    # Return from local cache
+    clients = await xplan_clients_col.find({}, {"_id": 0}).to_list(100)
+    
+    # If no cached clients, fetch from Xplan
+    if not clients:
+        xplan_data = await make_xplan_request("GET", "/clients", user_id)
+        for client in xplan_data.get("clients", []):
+            mapped = map_client_data(client)
+            await xplan_clients_col.update_one(
+                {"external_id": mapped["external_id"]},
+                {"$set": mapped},
+                upsert=True
+            )
+        clients = await xplan_clients_col.find({}, {"_id": 0}).to_list(100)
     
     return {
         "clients": clients,
-        "count": len(clients)
+        "total": len(clients),
+        "source": "xplan_cache"
     }
 
 
-@router.get("/client/{client_id}")
-async def get_synced_client_details(client_id: str, advisor_id: str = "default"):
-    """Get detailed client data from Xplan sync"""
-    client = await xplan_clients.find_one(
-        {"advisor_id": advisor_id, "entity_id": client_id},
-        {"_id": 0}
+@router.get("/clients/{client_id}")
+async def get_xplan_client(
+    client_id: str,
+    user_id: str = "system",
+    refresh: bool = False
+):
+    """Get client data from Xplan with full profile."""
+    # Check cache first unless refresh requested
+    if not refresh:
+        cached = await xplan_clients_col.find_one({"external_id": client_id}, {"_id": 0})
+        if cached:
+            return cached
+    
+    # Fetch from Xplan
+    client_data = await make_xplan_request("GET", f"/clients/{client_id}", user_id)
+    profile_data = await make_xplan_request("GET", f"/clients/{client_id}/profile", user_id)
+    risk_data = await make_xplan_request("GET", f"/clients/{client_id}/risk", user_id)
+    
+    # Map and merge
+    mapped_client = map_client_data(client_data)
+    mapped_profile = map_client_profile(profile_data)
+    mapped_risk = map_risk_profile(risk_data)
+    
+    full_client = {
+        **mapped_client,
+        **mapped_profile,
+        **mapped_risk
+    }
+    
+    # Store in cache
+    await xplan_clients_col.update_one(
+        {"external_id": client_id},
+        {"$set": full_client},
+        upsert=True
     )
     
-    if not client:
-        raise HTTPException(status_code=404, detail="Client not found")
+    return full_client
+
+
+@router.get("/clients/{client_id}/portfolio")
+async def get_xplan_portfolio(
+    client_id: str,
+    user_id: str = "system"
+):
+    """Get client portfolio from Xplan."""
+    xplan_portfolio = await make_xplan_request("GET", f"/clients/{client_id}/portfolio", user_id)
+    mapped = map_portfolio_data(xplan_portfolio)
+    mapped["client_id"] = client_id
     
-    # Get related data
-    portfolios = await xplan_portfolios.find(
-        {"advisor_id": advisor_id, "client_id": client_id},
-        {"_id": 0}
-    ).to_list(100)
+    # Store
+    await xplan_portfolios_col.update_one(
+        {"client_id": client_id},
+        {"$set": mapped},
+        upsert=True
+    )
     
-    assets = await xplan_assets.find(
-        {"advisor_id": advisor_id, "client_id": client_id, "asset_type": {"$ne": "liability"}},
-        {"_id": 0}
-    ).to_list(100)
+    return mapped
+
+
+@router.get("/clients/{client_id}/transactions")
+async def get_xplan_transactions(
+    client_id: str,
+    limit: int = 20,
+    user_id: str = "system"
+):
+    """Get client transactions from Xplan."""
+    xplan_data = await make_xplan_request(
+        "GET", 
+        f"/clients/{client_id}/transactions",
+        user_id,
+        params={"limit": limit}
+    )
     
-    liabilities = await xplan_assets.find(
-        {"advisor_id": advisor_id, "client_id": client_id, "asset_type": "liability"},
-        {"_id": 0}
-    ).to_list(100)
+    mapped = map_transactions(xplan_data.get("transactions", []))
     
-    goals = await xplan_goals.find(
-        {"advisor_id": advisor_id, "client_id": client_id},
-        {"_id": 0}
-    ).to_list(100)
+    # Store
+    await xplan_transactions_col.update_one(
+        {"client_id": client_id},
+        {"$set": {
+            "client_id": client_id,
+            "transactions": mapped,
+            "last_synced": datetime.now(timezone.utc).isoformat()
+        }},
+        upsert=True
+    )
     
     return {
-        "client": client,
-        "portfolios": portfolios,
-        "assets": assets,
-        "liabilities": liabilities,
-        "goals": goals
+        "client_id": client_id,
+        "transactions": mapped,
+        "total": len(mapped)
     }
 
 
-@router.post("/push")
-async def push_to_xplan(request: XplanPushRequest):
-    """Push data back to Xplan"""
-    config = await xplan_configs.find_one({"advisor_id": request.advisor_id})
+# ==================== WRITE ENDPOINTS ====================
+
+@router.post("/file-notes/write")
+async def write_file_note(
+    note: FileNoteRequest,
+    user_id: str = "system"
+):
+    """Write a file note back to Xplan."""
+    # Format the content as plain text
+    content_lines = [
+        f"AdviceOS Scenario Analysis",
+        f"=" * 40,
+        f"",
+        f"Adviser: {note.adviser_id}",
+        f"Date: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}",
+        f""
+    ]
     
-    if not config:
-        raise HTTPException(status_code=404, detail="Xplan not configured")
+    if note.scenario_id:
+        content_lines.append(f"Scenario ID: {note.scenario_id}")
     
-    api_client = XplanAPIClient(config)
+    if note.compliance_result:
+        content_lines.append(f"Compliance Result: {note.compliance_result}")
     
-    if request.data_type == "strategy":
-        result = await api_client.push_strategy(request.client_id, request.data)
-    elif request.data_type == "document":
-        result = await api_client.push_document(request.client_id, request.data)
-    elif request.data_type == "note":
-        result = await api_client.push_note(request.client_id, request.data)
-    else:
-        raise HTTPException(status_code=400, detail=f"Unknown data type: {request.data_type}")
+    content_lines.extend([
+        f"",
+        f"Notes:",
+        f"-" * 40,
+        note.content,
+        f"",
+        f"-" * 40,
+        f"Generated by AdviceOS - Compliance-First Decision Support"
+    ])
     
-    # Log the push
-    push_log = {
-        "advisor_id": request.advisor_id,
-        "client_id": request.client_id,
-        "data_type": request.data_type,
-        "pushed_at": datetime.now(timezone.utc).isoformat(),
-        "result": result
+    formatted_content = "\n".join(content_lines)
+    
+    # Send to Xplan
+    result = await make_xplan_request(
+        "POST",
+        f"/clients/{note.client_id}/file_notes",
+        user_id,
+        data={
+            "title": note.title,
+            "content": formatted_content,
+            "created_by": note.adviser_id,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+    )
+    
+    # Store local record
+    local_record = {
+        "id": result.get("note_id"),
+        "xplan_note_id": result.get("note_id"),
+        "client_id": note.client_id,
+        "title": note.title,
+        "content": formatted_content,
+        "adviser_id": note.adviser_id,
+        "scenario_id": note.scenario_id,
+        "compliance_result": note.compliance_result,
+        "synced_to_xplan": True,
+        "created_at": datetime.now(timezone.utc).isoformat()
     }
-    await xplan_sync_logs.insert_one(push_log)
     
-    return result
+    await xplan_file_notes_col.insert_one(local_record)
+    
+    return {
+        "success": True,
+        "note_id": result.get("note_id"),
+        "client_id": note.client_id,
+        "synced_to_xplan": True,
+        "message": "File note written to Xplan successfully"
+    }
 
 
-@router.get("/sync-history")
-async def get_sync_history(advisor_id: str = "default", limit: int = 10):
-    """Get sync history for an advisor"""
-    logs = await xplan_sync_logs.find(
-        {"advisor_id": advisor_id},
+@router.get("/file-notes/{client_id}")
+async def list_file_notes(
+    client_id: str,
+    include_xplan: bool = True,
+    user_id: str = "system"
+):
+    """List file notes for a client."""
+    # Get local notes
+    local_notes = await xplan_file_notes_col.find(
+        {"client_id": client_id},
         {"_id": 0}
-    ).sort("started_at", -1).limit(limit).to_list(limit)
+    ).sort("created_at", -1).to_list(100)
     
-    return {"history": logs}
+    # Optionally get from Xplan too
+    xplan_notes = []
+    if include_xplan:
+        try:
+            xplan_data = await make_xplan_request("GET", f"/clients/{client_id}/file_notes", user_id)
+            xplan_notes = xplan_data.get("file_notes", [])
+        except:
+            pass
+    
+    return {
+        "client_id": client_id,
+        "local_notes": local_notes,
+        "xplan_notes": xplan_notes,
+        "total_local": len(local_notes),
+        "total_xplan": len(xplan_notes)
+    }
+
+
+# ==================== SYNC OPERATIONS ====================
+
+@router.post("/sync/client/{client_id}")
+async def sync_single_client(
+    client_id: str,
+    user_id: str = "system",
+    background_tasks: BackgroundTasks = None
+):
+    """Sync a single client from Xplan (real-time on client load)."""
+    start_time = datetime.now(timezone.utc)
+    
+    try:
+        # Fetch all client data
+        client = await get_xplan_client(client_id, user_id, refresh=True)
+        portfolio = await get_xplan_portfolio(client_id, user_id)
+        transactions = await get_xplan_transactions(client_id, 50, user_id)
+        
+        duration = (datetime.now(timezone.utc) - start_time).total_seconds()
+        
+        # Update sync status
+        await xplan_sync_status_col.update_one(
+            {"client_id": client_id},
+            {"$set": {
+                "client_id": client_id,
+                "last_sync": datetime.now(timezone.utc).isoformat(),
+                "sync_type": "real_time",
+                "duration_seconds": duration,
+                "status": "success"
+            }},
+            upsert=True
+        )
+        
+        return {
+            "success": True,
+            "client_id": client_id,
+            "synced": {
+                "client_data": True,
+                "portfolio": True,
+                "transactions": transactions["total"]
+            },
+            "duration_seconds": round(duration, 2)
+        }
+        
+    except Exception as e:
+        await xplan_sync_status_col.update_one(
+            {"client_id": client_id},
+            {"$set": {
+                "client_id": client_id,
+                "last_sync": datetime.now(timezone.utc).isoformat(),
+                "sync_type": "real_time",
+                "status": "failed",
+                "error": str(e)
+            }},
+            upsert=True
+        )
+        raise
+
+
+@router.post("/sync/all")
+async def sync_all_clients(
+    user_id: str = "system"
+):
+    """Sync all clients from Xplan (scheduled/fallback sync)."""
+    start_time = datetime.now(timezone.utc)
+    
+    # Get client list from Xplan
+    xplan_clients = await make_xplan_request("GET", "/clients", user_id)
+    client_ids = [c["client_id"] for c in xplan_clients.get("clients", [])]
+    
+    synced = 0
+    failed = 0
+    
+    for cid in client_ids:
+        try:
+            await sync_single_client(cid, user_id)
+            synced += 1
+        except:
+            failed += 1
+    
+    duration = (datetime.now(timezone.utc) - start_time).total_seconds()
+    
+    # Update global sync status
+    await xplan_sync_status_col.update_one(
+        {"type": "full_sync"},
+        {"$set": {
+            "type": "full_sync",
+            "last_sync": datetime.now(timezone.utc).isoformat(),
+            "clients_synced": synced,
+            "clients_failed": failed,
+            "duration_seconds": duration,
+            "status": "completed"
+        }},
+        upsert=True
+    )
+    
+    return {
+        "success": True,
+        "clients_synced": synced,
+        "clients_failed": failed,
+        "duration_seconds": round(duration, 2)
+    }
+
+
+# ==================== API LOGS ====================
+
+@router.get("/logs")
+async def get_api_logs(
+    limit: int = 50,
+    action: Optional[str] = None,
+    user_id: Optional[str] = None
+):
+    """Get Xplan API interaction logs."""
+    query = {}
+    if action:
+        query["action"] = {"$regex": action, "$options": "i"}
+    if user_id:
+        query["user_id"] = user_id
+    
+    logs = await xplan_api_logs_col.find(
+        query,
+        {"_id": 0}
+    ).sort("timestamp", -1).limit(limit).to_list(limit)
+    
+    return {
+        "logs": logs,
+        "total": len(logs)
+    }
+
+
+@router.get("/sync/status")
+async def get_sync_status():
+    """Get overall sync status."""
+    # Get last full sync
+    full_sync = await xplan_sync_status_col.find_one({"type": "full_sync"}, {"_id": 0})
+    
+    # Get recent client syncs
+    recent_syncs = await xplan_sync_status_col.find(
+        {"client_id": {"$exists": True}},
+        {"_id": 0}
+    ).sort("last_sync", -1).limit(10).to_list(10)
+    
+    # Count stats
+    total_clients = await xplan_clients_col.count_documents({})
+    
+    return {
+        "last_full_sync": full_sync,
+        "recent_client_syncs": recent_syncs,
+        "total_synced_clients": total_clients,
+        "sync_strategy": {
+            "primary": "real_time_on_load",
+            "fallback": "scheduled_hourly"
+        }
+    }
