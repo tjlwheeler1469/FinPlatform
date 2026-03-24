@@ -10,7 +10,7 @@
 - **Users**: 1,000 concurrent
 - **Ramp-up**: 50 users/second
 - **Duration**: 60 seconds
-- **Target**: https://wealth-adviceos.preview.emergentagent.com
+- **Target**: https://compliance-command-3.preview.emergentagent.com
 
 ---
 

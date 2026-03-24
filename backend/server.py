@@ -439,6 +439,30 @@ def include_all_routes():
     except ImportError as e:
         logger.error(f"Failed to load file note generator routes: {e}")
 
+    # IMMUTABLE AUDIT SERVICE - ASIC/APRA/ISO Compliant
+    try:
+        from routes.audit_service import router as audit_service_router
+        app.include_router(audit_service_router, prefix="/api")
+        logger.info("AUDIT SERVICE loaded: Immutable Audit Logs, Hash Chaining, Tamper Detection, Regulatory Export")
+    except ImportError as e:
+        logger.error(f"Failed to load audit service routes: {e}")
+
+    # SECURITY CONTROLS - CPS 234 Aligned
+    try:
+        from routes.security_controls import router as security_controls_router
+        app.include_router(security_controls_router, prefix="/api")
+        logger.info("SECURITY CONTROLS loaded: RBAC, Rate Limiting, Security Events, API Key Management")
+    except ImportError as e:
+        logger.error(f"Failed to load security controls routes: {e}")
+
+    # OBJECT STORAGE - Document & Audit Export Storage
+    try:
+        from routes.object_storage import router as object_storage_router
+        app.include_router(object_storage_router, prefix="/api")
+        logger.info("OBJECT STORAGE loaded: File Uploads, Audit Exports, Document Backups")
+    except ImportError as e:
+        logger.error(f"Failed to load object storage routes: {e}")
+
 # Include all routes
 include_all_routes()
 
@@ -485,7 +509,10 @@ async def health_check():
             "voice_interface": True,
             "licensee_dashboard": True,
             "grc_lite": True,
-            "file_note_generator": True
+            "file_note_generator": True,
+            "audit_service": True,
+            "security_controls": True,
+            "object_storage": True
         },
         "revenue_layer": {
             "aum_fees": True,

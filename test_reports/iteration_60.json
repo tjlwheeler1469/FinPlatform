@@ -34,7 +34,7 @@
   "test_credentials": {
     "email": "advisor@wealthcommand.io",
     "password": "secure_password_123",
-    "api_base_url": "https://wealth-adviceos.preview.emergentagent.com"
+    "api_base_url": "https://compliance-command-3.preview.emergentagent.com"
   },
   "seed_data_creation": "Created test meetings and tasks with TEST_ prefix for MongoDB persistence testing",
   "retest_needed": false,
