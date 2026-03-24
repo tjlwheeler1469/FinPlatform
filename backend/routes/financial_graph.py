@@ -1,16 +1,30 @@
 """
 Client Financial Graph
 Maps entire client financial life including relationships, entities, and cross-holdings.
+Now with MongoDB persistence for real data storage.
 """
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Dict, List, Optional, Any
 from datetime import datetime, timezone
+from motor.motor_asyncio import AsyncIOMotorClient
 import uuid
+import os
 import logging
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/financial-graph", tags=["Client Financial Graph"])
+
+# MongoDB connection
+MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
+DB_NAME = os.environ.get("DB_NAME", "wealth_command")
+client = AsyncIOMotorClient(MONGO_URL)
+db = client[DB_NAME]
+
+# Collections
+financial_graphs_col = db["financial_graphs"]
+entities_col = db["financial_entities"]
+relationships_col = db["financial_relationships"]
 
 # Complete client financial graphs
 CLIENT_GRAPHS = {
@@ -201,10 +215,48 @@ class EntityCreateRequest(BaseModel):
     details: Dict[str, Any]
 
 
+# Initialize default graph data in MongoDB on startup
+async def init_default_graph_data():
+    """Initialize default demo graph data if not exists."""
+    existing = await financial_graphs_col.find_one({"client_id": "client_1"})
+    if not existing:
+        await financial_graphs_col.insert_one({
+            "client_id": "client_1",
+            **CLIENT_GRAPHS["client_1"],
+            "created_at": datetime.now(timezone.utc).isoformat()
+        })
+        logger.info("Initialized default financial graph data for client_1")
+
+
+@router.on_event("startup")
+async def startup_init():
+    """Initialize data on router startup."""
+    try:
+        await init_default_graph_data()
+    except Exception as e:
+        logger.warning(f"Failed to init graph data: {e}")
+
+
 @router.get("/client/{client_id}")
 async def get_client_graph(client_id: str):
-    """Get complete financial graph for a client."""
-    if client_id not in CLIENT_GRAPHS:
+    """Get complete financial graph for a client from MongoDB."""
+    # Try MongoDB first
+    graph_doc = await financial_graphs_col.find_one(
+        {"client_id": client_id},
+        {"_id": 0}
+    )
+    
+    if graph_doc:
+        graph = graph_doc
+    elif client_id in CLIENT_GRAPHS:
+        # Fallback to static data and store in MongoDB
+        graph = CLIENT_GRAPHS[client_id]
+        await financial_graphs_col.update_one(
+            {"client_id": client_id},
+            {"$set": {**graph, "client_id": client_id, "created_at": datetime.now(timezone.utc).isoformat()}},
+            upsert=True
+        )
+    else:
         # Return a basic template for unknown clients
         return {
             "client_id": client_id,
@@ -219,8 +271,6 @@ async def get_client_graph(client_id: str):
                 "cash_flow": {}
             }
         }
-    
-    graph = CLIENT_GRAPHS[client_id]
     
     # Calculate totals
     total_assets = (
@@ -246,17 +296,52 @@ async def get_client_graph(client_id: str):
             "property_count": len(graph.get("assets", {}).get("property", [])),
             "family_members": len(graph.get("family", [])) + 1  # +1 for primary
         },
+        "source": "mongodb" if graph_doc else "static",
         "generated_at": datetime.now(timezone.utc).isoformat()
+    }
+
+
+@router.post("/client/{client_id}/save")
+async def save_client_graph(client_id: str, graph_data: Dict[str, Any]):
+    """Save or update a client's financial graph in MongoDB."""
+    await financial_graphs_col.update_one(
+        {"client_id": client_id},
+        {
+            "$set": {
+                **graph_data,
+                "client_id": client_id,
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            },
+            "$setOnInsert": {
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+        },
+        upsert=True
+    )
+    
+    return {
+        "success": True,
+        "client_id": client_id,
+        "message": "Financial graph saved to database"
     }
 
 
 @router.get("/client/{client_id}/entities")
 async def get_client_entities(client_id: str):
-    """Get all entities related to a client."""
-    if client_id not in CLIENT_GRAPHS:
+    """Get all entities related to a client from MongoDB."""
+    # Try MongoDB first
+    graph_doc = await financial_graphs_col.find_one(
+        {"client_id": client_id},
+        {"_id": 0, "entities": 1}
+    )
+    
+    if graph_doc and "entities" in graph_doc:
+        entities = graph_doc["entities"]
+    elif client_id in CLIENT_GRAPHS:
+        entities = CLIENT_GRAPHS[client_id].get("entities", [])
+    else:
         raise HTTPException(status_code=404, detail="Client not found")
     
-    entities = CLIENT_GRAPHS[client_id].get("entities", [])
     return {
         "client_id": client_id,
         "entities": entities,
@@ -266,11 +351,20 @@ async def get_client_entities(client_id: str):
 
 @router.get("/client/{client_id}/cash-flow")
 async def get_client_cash_flow(client_id: str):
-    """Get detailed cash flow analysis."""
-    if client_id not in CLIENT_GRAPHS:
+    """Get detailed cash flow analysis from MongoDB."""
+    # Try MongoDB first
+    graph_doc = await financial_graphs_col.find_one(
+        {"client_id": client_id},
+        {"_id": 0, "cash_flow": 1}
+    )
+    
+    if graph_doc and "cash_flow" in graph_doc:
+        cash_flow = graph_doc["cash_flow"]
+    elif client_id in CLIENT_GRAPHS:
+        cash_flow = CLIENT_GRAPHS[client_id].get("cash_flow", {})
+    else:
         raise HTTPException(status_code=404, detail="Client not found")
     
-    cash_flow = CLIENT_GRAPHS[client_id].get("cash_flow", {})
     income = cash_flow.get("income", {})
     expenses = cash_flow.get("expenses", {})
     

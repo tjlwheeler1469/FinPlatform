@@ -391,6 +391,38 @@ def include_all_routes():
     except ImportError as e:
         logger.error(f"Failed to load AdviceOS routes: {e}")
 
+    # PDF REPORTS - Generate compliance reports in PDF format
+    try:
+        from routes.pdf_reports import router as pdf_reports_router
+        app.include_router(pdf_reports_router, prefix="/api")
+        logger.info("PDF REPORTS loaded: Compliance Summary, Audit Trail, Breach Reports, Client Files")
+    except ImportError as e:
+        logger.error(f"Failed to load PDF reports routes: {e}")
+
+    # NOTIFICATION SERVICE - Email & SMS alerts for compliance breaches
+    try:
+        from routes.notification_service import router as notification_router
+        app.include_router(notification_router, prefix="/api")
+        logger.info("NOTIFICATION SERVICE loaded: Email (SendGrid), SMS (Twilio), Breach Alerts")
+    except ImportError as e:
+        logger.error(f"Failed to load notification service routes: {e}")
+
+    # VOICE INTERFACE - Whisper speech-to-text for voice commands
+    try:
+        from routes.voice_interface import router as voice_router
+        app.include_router(voice_router, prefix="/api")
+        logger.info("VOICE INTERFACE loaded: Whisper STT, Voice Commands, Natural Language")
+    except ImportError as e:
+        logger.error(f"Failed to load voice interface routes: {e}")
+
+    # LICENSEE MULTI-TENANT DASHBOARD - AFSL holder management
+    try:
+        from routes.licensee_dashboard import router as licensee_router
+        app.include_router(licensee_router, prefix="/api")
+        logger.info("LICENSEE DASHBOARD loaded: Multi-tenant, APL, Compliance Rules, Adviser Management")
+    except ImportError as e:
+        logger.error(f"Failed to load licensee dashboard routes: {e}")
+
 # Include all routes
 include_all_routes()
 
@@ -412,7 +444,7 @@ async def health_check():
     return {
         "status": "healthy",
         "service": "wealth-command",
-        "version": "7.4.0",
+        "version": "8.0.0",
         "architecture": "modular",
         "execution_layer": {
             "trading": True,
@@ -427,6 +459,15 @@ async def health_check():
             "alpaca_paper_trading": True,
             "batch_execution": True,
             "execution_engine_enhanced": True
+        },
+        "adviceos": {
+            "scenario_generator": True,
+            "compliance_engine": True,
+            "reports_dashboard": True,
+            "pdf_reports": True,
+            "notification_service": True,
+            "voice_interface": True,
+            "licensee_dashboard": True
         },
         "revenue_layer": {
             "aum_fees": True,
