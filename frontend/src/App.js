@@ -199,7 +199,7 @@ const XplanIntegration = lazy(() => import("@/pages/XplanIntegration"));
 // AdviceOS Dashboard - Compliance-First Decision Support
 const AdviceOSDashboard = lazy(() => import("@/pages/AdviceOSDashboard"));
 
-// Enterprise Compliance Dashboard - ASIC/APRA/ISO Compliance Center
+// Compliance Dashboard - ASIC/APRA/ISO Compliance Center
 const EnterpriseComplianceDashboard = lazy(() => import("@/pages/EnterpriseComplianceDashboard"));
 
 // Xplan Integration - Sync Page

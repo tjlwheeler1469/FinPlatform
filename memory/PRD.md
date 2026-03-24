@@ -696,3 +696,10 @@ CPS 230 compliant breach management with ASIC reporting:
 
 ---
 *Last Updated: March 24, 2026 - Version 10.0 - Enterprise System of Record Complete*
+
+## Version 10.0.1 Fixes (March 24, 2026)
+- Renamed "Enterprise Compliance Dashboard" to "Compliance Dashboard"
+- Fixed document downloads to stay within platform (no pop-outs)
+- Fixed View button to download inline instead of opening new tab
+- Verified all 20 System Health reports showing as "Active"
+- Verified Client View navigation stays within the platform

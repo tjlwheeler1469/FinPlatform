@@ -103,7 +103,15 @@ export default function EnterpriseComplianceDashboard() {
         : `${API_URL}/api/enterprise/docs/${docType}`;
       
       if (format === 'pdf') {
-        window.open(url, '_blank');
+        // Download PDF inline instead of opening in new tab
+        const response = await fetch(url);
+        const blob = await response.blob();
+        const downloadUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = `${docType}.pdf`;
+        a.click();
+        URL.revokeObjectURL(downloadUrl);
       } else {
         const data = await fetch(url).then(r => r.json());
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -155,7 +163,7 @@ export default function EnterpriseComplianceDashboard() {
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Enterprise Compliance Dashboard</h1>
+          <h1 className="text-3xl font-bold text-foreground">Compliance Dashboard</h1>
           <p className="text-muted-foreground">ASIC/APRA/ISO Regulatory Compliance Center</p>
         </div>
         <div className="flex gap-2">
@@ -626,7 +634,7 @@ export default function EnterpriseComplianceDashboard() {
                           <FileDown className="w-3 h-3 mr-1" /> PDF
                         </Button>
                       )}
-                      <Button size="sm" variant="ghost" onClick={() => window.open(`${API_URL}${doc.endpoints?.json}`, '_blank')}>
+                      <Button size="sm" variant="ghost" onClick={() => downloadDocument(doc.id, 'json')}>
                         <Eye className="w-3 h-3 mr-1" /> View
                       </Button>
                     </div>
