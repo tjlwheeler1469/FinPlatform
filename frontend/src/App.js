@@ -196,6 +196,9 @@ const CryptoPortfolio = lazy(() => import("@/pages/CryptoPortfolio"));
 // Xplan Integration
 const XplanIntegration = lazy(() => import("@/pages/XplanIntegration"));
 
+// AdviceOS Dashboard - Compliance-First Decision Support
+const AdviceOSDashboard = lazy(() => import("@/pages/AdviceOSDashboard"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -1044,6 +1047,9 @@ const AppRouter = () => {
       
       {/* Xplan Integration */}
       <Route path="/xplan-integration" element={<XplanIntegration />} />
+      
+      {/* AdviceOS Dashboard - Compliance-First Decision Support */}
+      <Route path="/adviceos" element={<AdviceOSDashboard />} />
       
       {/* CRM Command Center */}
       <Route path="/crm-command-center" element={<CRMCommandCenter />} />

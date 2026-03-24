@@ -379,6 +379,18 @@ def include_all_routes():
     except ImportError as e:
         logger.error(f"Failed to load news headlines routes: {e}")
 
+    # ADVICEOS - Compliance-First Scenario Generator & Compliance Engine
+    try:
+        from routes.scenario_generator import router as scenario_gen_router
+        from routes.compliance_engine import router as compliance_eng_router
+        from routes.reports_dashboard import router as reports_dashboard_router
+        app.include_router(scenario_gen_router, prefix="/api")
+        app.include_router(compliance_eng_router, prefix="/api")
+        app.include_router(reports_dashboard_router, prefix="/api")
+        logger.info("ADVICEOS loaded: Scenario Generator, Compliance Engine, Reports Dashboard, Audit Trails")
+    except ImportError as e:
+        logger.error(f"Failed to load AdviceOS routes: {e}")
+
 # Include all routes
 include_all_routes()
 
