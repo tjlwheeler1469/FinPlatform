@@ -1,23 +1,25 @@
-# Wealth Command v8.0 - Product Requirements Document
+# Wealth Command v9.0 - Product Requirements Document
 
 ## Original Problem Statement
 Create a "financial services super app" named "Wealth Command," evolving it from a simple dashboard into a comprehensive "Wealth Operating System" for financial advisers. The core architecture is a **Financial Knowledge Graph** using a hybrid MongoDB and Neo4j database.
 
-The latest major feature is **AdviceOS – Compliance-First Build & Regulatory Data Blueprint**, an AI/Logic Engine designed to provide powerful decision support WITHOUT triggering AFSL requirements. It requires generating scenarios without automated advice, strict auditability, human-in-the-loop decision-making, and compliance overlays (Approved Product Lists, risk checks).
+The latest major feature is **AdviceOS – Enterprise Architecture + Compliance Platform**, a regulator-ready system designed for AFSL holders with enterprise-grade controls. It features immutable audit trails, RBAC security, incident management, real-time event streaming, and comprehensive due diligence documentation for licensee procurement.
 
-**Version 8.0 completed on March 24, 2026** with all remaining tasks from the backlog:
-- Knowledge Graph connected to MongoDB
-- Improved hybrid securities data sources
-- Websockets dependency conflict resolved
-- PDF report generation for AdviceOS
-- Voice interface (Whisper)
-- Email/SMS breach notifications
-- Licensee multi-tenant dashboard
+**Version 9.0 completed on March 24, 2026** with Enterprise Architecture:
+- Immutable Audit Service with SHA-256 hash chaining
+- Security Controls with 6 RBAC roles (CPS 234 aligned)
+- Object Storage for audit exports and document backups
+- Enhanced Incident Management (P1-P5 severity, CPS 230)
+- Real-time Event Streaming Layer (18 event types)
+- Enterprise Documentation Pack (8 docs with PDF export)
+- Enterprise Compliance Dashboard (/enterprise page)
 
 ## User Personas
 1. **Financial Advisers** - Primary users who manage multiple client portfolios
 2. **Individual Investors** - Users managing their own wealth with personal/joint/company/trust/SMSF structures
 3. **High Net Worth Clients** - Clients of advisers who use the client portal
+4. **Compliance Officers** - Users monitoring audit trails and compliance status
+5. **Licensee Administrators** - AFSL holders managing adviser teams and rules
 
 ## Core Requirements
 
@@ -396,17 +398,59 @@ The system provides powerful decision support **without triggering AFSL requirem
 - **Audit Service**: Immutable logging with SHA-256 hash chaining - OPERATIONAL
 - **Security Controls**: 6 RBAC roles, CPS 234/230 aligned - OPERATIONAL
 - **Object Storage**: Emergent storage for audit exports - OPERATIONAL
+- **Incident Management**: P1-P5 severity with escalation - OPERATIONAL
+- **Event Streaming**: 18 event types with WebSocket - OPERATIONAL
+- **Enterprise Docs**: 8 documents with PDF export - OPERATIONAL
 
-### Test Report: iteration_95.json
-- Health Check: PASS - audit_service, security_controls, object_storage confirmed
-- Audit Service - Hash Chaining: PASS - Creates immutable logs with SHA-256
-- Audit Service - Chain Integrity: PASS - Tamper detection active
-- Audit Service - Regulatory Summary: PASS - ASIC=MET, APRA_CPS234=MET
-- Security Controls - RBAC Init: PASS - 6 default roles created
-- Security Controls - Permissions: PASS - Role-based permission checking works
-- Security Controls - CPS Alignment: PASS - CPS_234=aligned, CPS_230=aligned
-- Object Storage - Init: PASS - Emergent storage connection successful
-- Object Storage - Audit Exports: PASS - Exports saved to cloud storage
+### Test Report: iteration_96.json (Latest)
+- Health Check: PASS - All services confirmed including new enterprise features
+- Incident Management - Severity: PASS - P1-P5 levels with response times
+- Incident Management - Dashboard: PASS - MTTR, resolution rate, escalation status
+- Incident Management - Regulatory: PASS - ASIC/APRA report generation
+- Event Streaming - Types: PASS - 18 event types across 6 categories
+- Event Streaming - Publish: PASS - Events persisted with evt_{uuid} IDs
+- Event Streaming - Metrics: PASS - Real-time metrics and WebSocket support
+- Enterprise Docs - List: PASS - 8 documents available
+- Enterprise Docs - PDF: PASS - PDF generation for all document types
+- Enterprise Docs - Pack: PASS - Complete due diligence pack with hash
+- Frontend - Enterprise Page: PASS - 6 tabs functional
+
+## Enterprise Architecture (v9.0)
+
+### Incident Management (CPS 230 Compliant)
+- **Severity Levels**: P1 (Critical), P2 (High), P3 (Medium), P4 (Low), P5 (Info)
+- **Response Times**: P1: 15min, P2: 30min, P3: 2hr, P4: 8hr, P5: Next day
+- **Features**: Escalation workflows, regulatory reporting, timeline tracking
+- **Endpoints**: `/api/incidents/*`
+
+### Event Streaming Layer
+- **Event Types**: 18 (audit, compliance, security, incident, workflow, system)
+- **Features**: In-memory buffer, WebSocket push, event rules
+- **Production Path**: Kafka / AWS Kinesis compatible
+- **Endpoints**: `/api/events/*`
+
+### Enterprise Documentation Pack
+- **Documents**: 8 types available
+  1. Architecture Overview
+  2. Security Policy
+  3. Incident Response Plan
+  4. BCP/DR Plan
+  5. Compliance Framework
+  6. Due Diligence Checklist
+  7. Technology Stack (with regulatory mapping)
+  8. Complete Pack (all documents)
+- **Formats**: JSON and PDF
+- **Endpoints**: `/api/enterprise/docs/*`
+
+### Frontend: Enterprise Compliance Dashboard
+- **Route**: `/enterprise`
+- **Tabs**: Overview, Audit Trail, Security, Incidents, Events, Documents
+- **Features**:
+  - Real-time metric cards (Audit Chain, Security, Incidents, Events, MTTR)
+  - Audit chain verification with tamper detection
+  - Incident creation and tracking
+  - Document download (JSON/PDF)
+  - Regulatory compliance status
 
 ## ASIC/APRA/ISO Compliance Features
 
@@ -428,7 +472,9 @@ The system provides powerful decision support **without triggering AFSL requirem
 - **ASIC RG 271**: Compliant
 - **APRA CPS 234**: Aligned (information security)
 - **APRA CPS 230**: Aligned (operational risk)
-- **ISO 27001**: Partial alignment
+- **Corporations Act**: Compliant (7-year record keeping)
+- **Privacy Act (APP 11)**: Compliant
+- **ISO 27001**: Partial alignment (roadmap for full certification)
 
 ---
-*Last Updated: March 24, 2026 - Version 8.5 - ASIC/APRA/ISO Technical Controls Complete*
+*Last Updated: March 24, 2026 - Version 9.0 - Enterprise Architecture Complete*
