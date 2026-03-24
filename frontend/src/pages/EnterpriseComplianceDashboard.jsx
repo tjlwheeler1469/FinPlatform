@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Layout from '../components/Layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Button } from '../components/ui/button';
@@ -149,44 +150,78 @@ export default function EnterpriseComplianceDashboard() {
     return colors[status] || 'bg-gray-100 text-gray-800';
   };
 
+  const downloadSystemHealthReport = () => {
+    if (!healthData?.adviceos) {
+      alert('No health data available');
+      return;
+    }
+    
+    const report = {
+      report_type: 'System Health Report',
+      generated_at: new Date().toISOString(),
+      system_status: healthData.status,
+      services: Object.entries(healthData.adviceos).map(([service, status]) => ({
+        service: service.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+        status: status ? 'Active' : 'Inactive',
+        health: status ? 'Healthy' : 'Degraded'
+      })),
+      summary: {
+        total_services: Object.keys(healthData.adviceos).length,
+        active_services: Object.values(healthData.adviceos).filter(v => v).length,
+        inactive_services: Object.values(healthData.adviceos).filter(v => !v).length
+      }
+    };
+    
+    const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `system_health_report_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <RefreshCw className="w-8 h-8 animate-spin text-primary" />
-        <span className="ml-2">Loading Enterprise Dashboard...</span>
-      </div>
+      <Layout>
+        <div className="flex items-center justify-center h-screen">
+          <RefreshCw className="w-8 h-8 animate-spin text-primary" />
+          <span className="ml-2">Loading Compliance Dashboard...</span>
+        </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background p-6" data-testid="enterprise-dashboard">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Compliance Dashboard</h1>
-          <p className="text-muted-foreground">ASIC/APRA/ISO Regulatory Compliance Center</p>
+    <Layout>
+      <div className="space-y-6" data-testid="enterprise-dashboard">
+        {/* Header */}
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Compliance Dashboard</h1>
+            <p className="text-muted-foreground">ASIC/APRA/ISO Regulatory Compliance Center</p>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={loadDashboardData} data-testid="refresh-btn">
+              <RefreshCw className="w-4 h-4 mr-2" /> Refresh
+            </Button>
+            <Button onClick={() => downloadDocument('complete-pack')} data-testid="download-pack-btn">
+              <Download className="w-4 h-4 mr-2" /> Download Due Diligence Pack
+            </Button>
+          </div>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={loadDashboardData} data-testid="refresh-btn">
-            <RefreshCw className="w-4 h-4 mr-2" /> Refresh
-          </Button>
-          <Button onClick={() => downloadDocument('complete-pack')} data-testid="download-pack-btn">
-            <Download className="w-4 h-4 mr-2" /> Download Due Diligence Pack
-          </Button>
-        </div>
-      </div>
 
-      {/* Compliance Status Banner */}
-      <Alert className="mb-6 border-green-500 bg-green-50">
-        <CheckCircle2 className="h-4 w-4 text-green-600" />
-        <AlertTitle className="text-green-800">System Compliant</AlertTitle>
-        <AlertDescription className="text-green-700">
-          All regulatory controls operational. APRA CPS 234/230 aligned. Audit chain integrity verified.
-        </AlertDescription>
-      </Alert>
+        {/* Compliance Status Banner */}
+        <Alert className="border-green-500 bg-green-50">
+          <CheckCircle2 className="h-4 w-4 text-green-600" />
+          <AlertTitle className="text-green-800">System Compliant</AlertTitle>
+          <AlertDescription className="text-green-700">
+            All regulatory controls operational. APRA CPS 234/230 aligned. Audit chain integrity verified.
+          </AlertDescription>
+        </Alert>
 
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+        {/* Key Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <Card data-testid="metric-audit-chain">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -312,12 +347,15 @@ export default function EnterpriseComplianceDashboard() {
 
             {/* System Health */}
             <Card>
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
                   <Server className="w-5 h-5" /> System Health
                 </CardTitle>
+                <Button variant="outline" size="sm" onClick={downloadSystemHealthReport} data-testid="download-health-btn">
+                  <Download className="w-4 h-4 mr-2" /> Download Report
+                </Button>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-3 max-h-[400px] overflow-y-auto">
                 {healthData?.adviceos && Object.entries(healthData.adviceos).map(([key, value]) => (
                   <div key={key} className="flex justify-between items-center p-2 bg-muted rounded">
                     <span className="text-sm capitalize">{key.replace(/_/g, ' ')}</span>
@@ -645,6 +683,7 @@ export default function EnterpriseComplianceDashboard() {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
+      </div>
+    </Layout>
   );
 }

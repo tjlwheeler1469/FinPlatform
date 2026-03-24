@@ -703,3 +703,6 @@ CPS 230 compliant breach management with ASIC reporting:
 - Fixed View button to download inline instead of opening new tab
 - Verified all 20 System Health reports showing as "Active"
 - Verified Client View navigation stays within the platform
+- Combined duplicate compliance tabs (removed `/compliance`, kept AdviceOS + Compliance Dashboard + Security)
+- Added "Download Report" button to System Health section for generating JSON health reports
+- Wrapped Compliance Dashboard with Layout component to match AdvisorCommandCenter styling

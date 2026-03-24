@@ -197,8 +197,7 @@ const adviserBaseNav = [
     icon: Shield,
     items: [
       { path: "/adviceos", label: "AdviceOS", icon: Shield, title: "Compliance-First Decisions", badge: "NEW" },
-      { path: "/enterprise", label: "Compliance", icon: Shield, title: "Compliance Dashboard", badge: "NEW" },
-      { path: "/compliance", label: "Compliance", icon: Shield, title: "Compliance" },
+      { path: "/enterprise", label: "Compliance Dashboard", icon: Shield, title: "Compliance Dashboard", badge: "NEW" },
       { path: "/security", label: "Security", icon: Shield, title: "Security" },
     ]
   },
