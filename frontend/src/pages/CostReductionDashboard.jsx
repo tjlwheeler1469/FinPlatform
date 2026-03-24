@@ -118,7 +118,7 @@ export default function CostReductionDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-3xl font-bold text-green-700">
-                    ${Math.round(dashboardData.summary.yearly_cost_saved_aud).toLocaleString()}
+                    AUD ${Math.round(dashboardData.summary.yearly_cost_saved_aud).toLocaleString()}
                   </div>
                   <div className="text-sm text-green-600">Annual Cost Savings</div>
                 </div>
@@ -175,8 +175,8 @@ export default function CostReductionDashboard() {
           <AlertTitle className="text-emerald-800">Live Efficiency Metrics</AlertTitle>
           <AlertDescription className="text-emerald-700">
             <div className="flex gap-8 mt-2">
-              <span><strong>Today:</strong> {liveMetrics.today.time_saved_hours}h saved | ${liveMetrics.today.cost_saved_aud.toLocaleString()} saved</span>
-              <span><strong>This Week:</strong> {liveMetrics.this_week.time_saved_hours}h saved | ${liveMetrics.this_week.cost_saved_aud.toLocaleString()} saved</span>
+              <span><strong>Today:</strong> {liveMetrics.today.time_saved_hours}h saved | AUD ${liveMetrics.today.cost_saved_aud.toLocaleString()} saved</span>
+              <span><strong>This Week:</strong> {liveMetrics.this_week.time_saved_hours}h saved | AUD ${liveMetrics.this_week.cost_saved_aud.toLocaleString()} saved</span>
             </div>
           </AlertDescription>
         </Alert>
@@ -227,7 +227,7 @@ export default function CostReductionDashboard() {
                       <div className="text-sm text-gray-500">Remediation costs saved</div>
                     </div>
                     <div className="text-2xl font-bold text-purple-600">
-                      ${(dashboardData?.compliance_efficiency.breach_cost_avoided_aud || 0).toLocaleString()}
+                      AUD ${(dashboardData?.compliance_efficiency.breach_cost_avoided_aud || 0).toLocaleString()}
                     </div>
                   </div>
                 </div>
@@ -299,7 +299,7 @@ export default function CostReductionDashboard() {
                   </div>
                   <div className="text-center p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg">
                     <div className="text-4xl font-bold text-green-600">
-                      ${Math.round((dashboardData?.summary.monthly_cost_saved_aud || 0)).toLocaleString()}
+                      AUD ${Math.round((dashboardData?.summary.monthly_cost_saved_aud || 0)).toLocaleString()}
                     </div>
                     <div className="text-sm text-gray-600 mt-2">Monthly Cost Savings</div>
                   </div>
@@ -487,23 +487,23 @@ export default function CostReductionDashboard() {
                     <div className="space-y-3">
                       <div className="flex justify-between p-2 bg-red-50 rounded">
                         <span>File Review</span>
-                        <span className="font-medium">${roiResult.current_costs_annual.file_review.toLocaleString()}</span>
+                        <span className="font-medium">AUD ${roiResult.current_costs_annual.file_review.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between p-2 bg-red-50 rounded">
                         <span>Compliance Checks</span>
-                        <span className="font-medium">${roiResult.current_costs_annual.compliance_checks.toLocaleString()}</span>
+                        <span className="font-medium">AUD ${roiResult.current_costs_annual.compliance_checks.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between p-2 bg-red-50 rounded">
                         <span>Audit Preparation</span>
-                        <span className="font-medium">${roiResult.current_costs_annual.audit_preparation.toLocaleString()}</span>
+                        <span className="font-medium">AUD ${roiResult.current_costs_annual.audit_preparation.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between p-2 bg-red-50 rounded">
                         <span>Breach Remediation</span>
-                        <span className="font-medium">${roiResult.current_costs_annual.breach_remediation.toLocaleString()}</span>
+                        <span className="font-medium">AUD ${roiResult.current_costs_annual.breach_remediation.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between p-3 bg-red-100 rounded font-bold text-red-700">
                         <span>Total Annual Cost</span>
-                        <span>${roiResult.current_costs_annual.total.toLocaleString()}</span>
+                        <span>AUD ${roiResult.current_costs_annual.total.toLocaleString()}</span>
                       </div>
                     </div>
                   </CardContent>
@@ -517,23 +517,23 @@ export default function CostReductionDashboard() {
                     <div className="space-y-3">
                       <div className="flex justify-between p-2 bg-green-50 rounded">
                         <span>File Review</span>
-                        <span className="font-medium">${roiResult.with_adviceos_annual.file_review.toLocaleString()}</span>
+                        <span className="font-medium">AUD ${roiResult.with_adviceos_annual.file_review.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between p-2 bg-green-50 rounded">
                         <span>Compliance Checks</span>
-                        <span className="font-medium">${roiResult.with_adviceos_annual.compliance_checks.toLocaleString()}</span>
+                        <span className="font-medium">AUD ${roiResult.with_adviceos_annual.compliance_checks.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between p-2 bg-green-50 rounded">
                         <span>Audit Preparation</span>
-                        <span className="font-medium">${roiResult.with_adviceos_annual.audit_preparation.toLocaleString()}</span>
+                        <span className="font-medium">AUD ${roiResult.with_adviceos_annual.audit_preparation.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between p-2 bg-green-50 rounded">
                         <span>Breach Remediation (70% reduced)</span>
-                        <span className="font-medium">${roiResult.with_adviceos_annual.breach_remediation.toLocaleString()}</span>
+                        <span className="font-medium">AUD ${roiResult.with_adviceos_annual.breach_remediation.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between p-3 bg-green-100 rounded font-bold text-green-700">
                         <span>Total Annual Cost</span>
-                        <span>${roiResult.with_adviceos_annual.total.toLocaleString()}</span>
+                        <span>AUD ${roiResult.with_adviceos_annual.total.toLocaleString()}</span>
                       </div>
                     </div>
                   </CardContent>
@@ -552,7 +552,7 @@ export default function CostReductionDashboard() {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="text-center p-4 bg-green-50 rounded-lg">
                       <div className="text-3xl font-bold text-green-600">
-                        ${roiResult.savings.annual_cost_savings_aud.toLocaleString()}
+                        AUD ${roiResult.savings.annual_cost_savings_aud.toLocaleString()}
                       </div>
                       <div className="text-sm text-gray-600">Annual Savings</div>
                     </div>

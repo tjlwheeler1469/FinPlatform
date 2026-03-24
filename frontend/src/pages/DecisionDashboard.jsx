@@ -198,7 +198,7 @@ const DecisionDashboard = () => {
                   <p className="text-sm font-medium text-muted-foreground">Financial Health Score</p>
                   <div className="flex items-baseline gap-2 mt-1">
                     <span className="text-4xl font-bold" data-testid="health-score">
-                      {analysisData?.health_score?.total_score}
+                      {analysisData?.health_score?.total_score ?? 0}
                     </span>
                     <span className="text-xl text-muted-foreground">/ 100</span>
                   </div>

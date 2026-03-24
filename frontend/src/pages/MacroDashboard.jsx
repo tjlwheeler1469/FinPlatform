@@ -454,7 +454,9 @@ const MacroDashboard = () => {
               {currencies && Object.entries(currencies).filter(([key]) => key !== "timestamp" && key !== "data_source" && Array.isArray(currencies[key])).map(([category, pairs]) => (
                 <Card key={category}>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-lg capitalize">{category.replace("_", " ")}</CardTitle>
+                    <CardTitle className="text-lg">
+                      {category === "aud_crosses" ? "AUD Crosses" : category.replace("_", " ").replace(/\b\w/g, l => l.toUpperCase())}
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     {Array.isArray(pairs) && pairs.map((pair, idx) => (

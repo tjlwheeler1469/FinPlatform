@@ -9,9 +9,10 @@ import { Textarea } from '../components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
 import { Alert, AlertDescription, AlertTitle } from '../components/ui/alert';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../components/ui/dropdown-menu';
 import {
   Shield, Lock, FileText, AlertTriangle, Activity, Download, CheckCircle2,
-  XCircle, Clock, Users, Server, Database, Zap, Eye, RefreshCw, FileDown
+  XCircle, Clock, Users, Server, Database, Zap, Eye, RefreshCw, FileDown, ChevronDown
 } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
@@ -150,7 +151,7 @@ export default function EnterpriseComplianceDashboard() {
     return colors[status] || 'bg-gray-100 text-gray-800';
   };
 
-  const downloadSystemHealthReport = () => {
+  const downloadSystemHealthReport = (format = 'json') => {
     if (!healthData?.adviceos) {
       alert('No health data available');
       return;
@@ -172,13 +173,96 @@ export default function EnterpriseComplianceDashboard() {
       }
     };
     
-    const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `system_health_report_${new Date().toISOString().split('T')[0]}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    if (format === 'excel') {
+      // Create CSV format for Excel
+      const headers = ['Service', 'Status', 'Health'];
+      const rows = report.services.map(s => [s.service, s.status, s.health]);
+      const csvContent = [
+        headers.join(','),
+        ...rows.map(row => row.join(','))
+      ].join('\n');
+      
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `system_health_report_${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } else if (format === 'pdf') {
+      // Create a printable HTML document and trigger print
+      const printContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>System Health Report</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 40px; }
+            h1 { color: #333; border-bottom: 2px solid #333; padding-bottom: 10px; }
+            h2 { color: #666; margin-top: 30px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+            th { background-color: #f5f5f5; font-weight: bold; }
+            .active { color: #22c55e; font-weight: bold; }
+            .inactive { color: #ef4444; font-weight: bold; }
+            .summary { background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin-top: 20px; }
+            .summary-item { display: inline-block; margin-right: 30px; }
+            .footer { margin-top: 40px; font-size: 12px; color: #888; border-top: 1px solid #ddd; padding-top: 20px; }
+          </style>
+        </head>
+        <body>
+          <h1>System Health Report</h1>
+          <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
+          <p><strong>System Status:</strong> ${report.system_status}</p>
+          
+          <div class="summary">
+            <span class="summary-item"><strong>Total Services:</strong> ${report.summary.total_services}</span>
+            <span class="summary-item"><strong>Active:</strong> ${report.summary.active_services}</span>
+            <span class="summary-item"><strong>Inactive:</strong> ${report.summary.inactive_services}</span>
+          </div>
+          
+          <h2>Service Details</h2>
+          <table>
+            <thead>
+              <tr><th>Service</th><th>Status</th><th>Health</th></tr>
+            </thead>
+            <tbody>
+              ${report.services.map(s => `
+                <tr>
+                  <td>${s.service}</td>
+                  <td class="${s.status === 'Active' ? 'active' : 'inactive'}">${s.status}</td>
+                  <td>${s.health}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          
+          <div class="footer">
+            <p>AdviceOS - Enterprise Compliance Platform</p>
+            <p>Report ID: SHR-${Date.now()}</p>
+          </div>
+        </body>
+        </html>
+      `;
+      
+      const printWindow = window.open('', '_blank', 'width=800,height=600');
+      printWindow.document.write(printContent);
+      printWindow.document.close();
+      printWindow.focus();
+      setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+      }, 250);
+    } else {
+      // JSON format
+      const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `system_health_report_${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
   };
 
   if (loading) {
@@ -351,9 +435,24 @@ export default function EnterpriseComplianceDashboard() {
                 <CardTitle className="flex items-center gap-2">
                   <Server className="w-5 h-5" /> System Health
                 </CardTitle>
-                <Button variant="outline" size="sm" onClick={downloadSystemHealthReport} data-testid="download-health-btn">
-                  <Download className="w-4 h-4 mr-2" /> Download Report
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" data-testid="download-health-btn">
+                      <Download className="w-4 h-4 mr-2" /> Download <ChevronDown className="w-4 h-4 ml-1" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => downloadSystemHealthReport('pdf')}>
+                      <FileText className="w-4 h-4 mr-2" /> PDF Report
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => downloadSystemHealthReport('excel')}>
+                      <FileDown className="w-4 h-4 mr-2" /> Excel (CSV)
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => downloadSystemHealthReport('json')}>
+                      <Database className="w-4 h-4 mr-2" /> JSON Data
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </CardHeader>
               <CardContent className="space-y-3 max-h-[400px] overflow-y-auto">
                 {healthData?.adviceos && Object.entries(healthData.adviceos).map(([key, value]) => (
