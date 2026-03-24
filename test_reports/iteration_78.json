@@ -28,7 +28,7 @@
     "frontend": "100% (all 7 features verified)"
   },
   "test_credentials": {
-    "preview_url": "https://compliance-command-3.preview.emergentagent.com",
+    "preview_url": "https://cost-governance.preview.emergentagent.com",
     "adviser_mode_setup": "localStorage.setItem('app_mode', 'adviser'); localStorage.setItem('selected_client', JSON.stringify({id:'client_1',name:'Smith Family'}))",
     "compliance_bypass": "localStorage.setItem('wealth_command_compliance_v5', 'permanent')"
   },

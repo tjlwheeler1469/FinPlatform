@@ -33,7 +33,7 @@
     "frontend": "100% (all requested features working)"
   },
   "test_credentials": {
-    "api_base_url": "https://compliance-command-3.preview.emergentagent.com"
+    "api_base_url": "https://cost-governance.preview.emergentagent.com"
   },
   "seed_data_creation": "None - using existing data",
   "retest_needed": false,

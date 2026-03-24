@@ -35,7 +35,7 @@
     "frontend": "100% (all features verified working)"
   },
   "test_credentials": {
-    "api_base_url": "https://compliance-command-3.preview.emergentagent.com"
+    "api_base_url": "https://cost-governance.preview.emergentagent.com"
   },
   "seed_data_creation": "Used existing demo/fallback data. Decision Engine uses calculated dummy data based on input parameters.",
   "retest_needed": false,

@@ -503,6 +503,22 @@ def include_all_routes():
     except ImportError as e:
         logger.error(f"Failed to load xplan integration routes: {e}")
 
+    # ENTERPRISE SYSTEM OF RECORD - Replay Advice, Cost Reduction, Risk/Control, Breach Register
+    try:
+        from routes.replay_advice import router as replay_advice_router
+        from routes.cost_reduction import router as cost_reduction_router
+        from routes.risk_control_mapping import router as risk_control_router
+        from routes.breach_register import router as breach_register_router
+        
+        app.include_router(replay_advice_router, prefix="/api")
+        app.include_router(cost_reduction_router, prefix="/api")
+        app.include_router(risk_control_router, prefix="/api")
+        app.include_router(breach_register_router, prefix="/api")
+        
+        logger.info("ENTERPRISE SYSTEM OF RECORD loaded: Replay Advice, Cost Reduction, Risk/Control Mapping, Breach Register")
+    except ImportError as e:
+        logger.error(f"Failed to load enterprise system of record routes: {e}")
+
 # Include all routes
 include_all_routes()
 
@@ -556,7 +572,11 @@ async def health_check():
             "incident_management": True,
             "event_streaming": True,
             "enterprise_docs": True,
-            "xplan_integration": True
+            "xplan_integration": True,
+            "replay_advice": True,
+            "cost_reduction": True,
+            "risk_control_mapping": True,
+            "breach_register": True
         },
         "revenue_layer": {
             "aum_fees": True,

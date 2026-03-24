@@ -205,6 +205,12 @@ const EnterpriseComplianceDashboard = lazy(() => import("@/pages/EnterpriseCompl
 // Xplan Integration - Sync Page
 const XplanSyncPage = lazy(() => import("@/pages/XplanSyncPage"));
 
+// Enterprise System of Record Features
+const ReplayAdvicePage = lazy(() => import("@/pages/ReplayAdvicePage"));
+const CostReductionDashboard = lazy(() => import("@/pages/CostReductionDashboard"));
+const RiskControlMapping = lazy(() => import("@/pages/RiskControlMapping"));
+const BreachRegister = lazy(() => import("@/pages/BreachRegister"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -1062,6 +1068,12 @@ const AppRouter = () => {
       
       {/* Xplan Integration - Sync Page */}
       <Route path="/xplan" element={<XplanSyncPage />} />
+      
+      {/* Enterprise System of Record Features */}
+      <Route path="/replay-advice" element={<ReplayAdvicePage />} />
+      <Route path="/cost-reduction" element={<CostReductionDashboard />} />
+      <Route path="/risk-control" element={<RiskControlMapping />} />
+      <Route path="/breach-register" element={<BreachRegister />} />
       
       {/* CRM Command Center */}
       <Route path="/crm-command-center" element={<CRMCommandCenter />} />
