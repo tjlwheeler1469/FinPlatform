@@ -345,24 +345,90 @@ The system provides powerful decision support **without triggering AFSL requirem
 - `POST /api/licensee/{id}/apl` - Add APL product
 - `GET /api/licensee/{id}/rules` - Get compliance rules
 
+### New v8.5 Endpoints - ASIC/APRA/ISO Technical Controls
+
+**Immutable Audit Service** (`/app/backend/routes/audit_service.py`):
+- `POST /api/audit/log` - Create immutable audit log with hash chaining
+- `GET /api/audit/events` - Query audit events with filtering
+- `GET /api/audit/chain/verify` - Verify hash chain integrity (tamper detection)
+- `GET /api/audit/chain/status` - Get chain status and last hash
+- `POST /api/audit/export` - Export audit pack with certificate
+- `POST /api/audit/export?save_to_storage=true` - Export and save to object storage
+- `GET /api/audit/regulatory/summary` - ASIC/APRA regulatory compliance summary
+- `GET /api/audit/statistics` - Audit metrics (retention: 7 years)
+- `GET /api/audit/user/{user_id}/activity` - User activity timeline
+- `GET /api/audit/replay/{entity_type}/{entity_id}` - Full entity history replay
+
+**Security Controls** (`/app/backend/routes/security_controls.py`):
+- `POST /api/security/roles/init` - Initialize 6 default RBAC roles
+- `GET /api/security/roles` - List all roles
+- `GET /api/security/roles/{role_name}` - Get role with permissions
+- `POST /api/security/roles` - Create custom role
+- `POST /api/security/check-permission` - Check user permission
+- `GET /api/security/controls/status` - CPS 234/230 aligned controls status
+- `GET /api/security/dashboard` - Security dashboard (threat level, events)
+- `POST /api/security/api-keys/generate` - Generate API key (wc_* format)
+- `DELETE /api/security/api-keys/{key_id}` - Revoke API key
+- `GET /api/security/rate-limit/status` - Rate limiting status (100/60s)
+- `POST /api/security/events/log` - Log security event
+- `GET /api/security/events` - Query security events
+
+**Object Storage** (`/app/backend/routes/object_storage.py`):
+- `GET /api/storage/status` - Storage service status
+- `POST /api/storage/init` - Initialize Emergent storage connection
+- `POST /api/storage/upload` - Upload file (audit, document, compliance, report)
+- `POST /api/storage/audit-export/upload` - Upload audit export pack
+- `POST /api/storage/audit-export/save-json` - Save audit export as JSON
+- `GET /api/storage/files/{file_id}` - Download file
+- `GET /api/storage/audit-exports` - List audit exports
+- `GET /api/storage/files` - List files by category
+- `DELETE /api/storage/files/{file_id}` - Soft delete file
+- `GET /api/storage/document-backup/status` - Backup status
+
 ## Testing Status
-- Backend: All endpoints working (32/32 tests passed - iteration_94)
+- Backend: All endpoints working (30/30 new tests + 32 existing = 62 total - iteration_95)
 - Frontend: All features verified
 - AdviceOS: Full suite operational with PDF exports
 - Websockets: Dependency conflict resolved
 - Voice Interface: Configured and ready (Whisper integration)
 - Notification Service: Ready (requires SendGrid/Twilio API keys)
 - Licensee Dashboard: Multi-tenant fully operational
+- **Audit Service**: Immutable logging with SHA-256 hash chaining - OPERATIONAL
+- **Security Controls**: 6 RBAC roles, CPS 234/230 aligned - OPERATIONAL
+- **Object Storage**: Emergent storage for audit exports - OPERATIONAL
 
-### Test Report: iteration_94.json
-- Health Check v8.0.0: PASS
-- Knowledge Graph MongoDB: PASS - Persists and retrieves client graphs
-- Hybrid Prices BBSW: PASS - Returns 10 securities with 4.35% BBSW
-- PDF Reports: PASS - All 3 report types generate valid PDFs
-- Voice Interface: PASS - 9 intents recognized, commands parsed
-- Notification Service: PASS - Graceful degradation when not configured
-- Licensee Dashboard: PASS - Full CRUD, APL, compliance rules working
-- Websockets Compatibility: PASS - No import errors
+### Test Report: iteration_95.json
+- Health Check: PASS - audit_service, security_controls, object_storage confirmed
+- Audit Service - Hash Chaining: PASS - Creates immutable logs with SHA-256
+- Audit Service - Chain Integrity: PASS - Tamper detection active
+- Audit Service - Regulatory Summary: PASS - ASIC=MET, APRA_CPS234=MET
+- Security Controls - RBAC Init: PASS - 6 default roles created
+- Security Controls - Permissions: PASS - Role-based permission checking works
+- Security Controls - CPS Alignment: PASS - CPS_234=aligned, CPS_230=aligned
+- Object Storage - Init: PASS - Emergent storage connection successful
+- Object Storage - Audit Exports: PASS - Exports saved to cloud storage
+
+## ASIC/APRA/ISO Compliance Features
+
+### Immutable Audit Trail
+- **Hash Algorithm**: SHA-256
+- **Chain Type**: Append-only (no delete, no update)
+- **Tamper Detection**: Hash chaining with previous_hash linking
+- **Retention Policy**: 7 years
+- **Export Format**: JSON with cryptographic certificate
+- **Cloud Backup**: Automatic save to Emergent Object Storage
+
+### RBAC Security Model
+- **Roles**: super_admin, licensee_admin, compliance_officer, adviser, support_staff, auditor
+- **Permissions**: Granular action-level (client:read, scenario:create, compliance:override_review)
+- **Rate Limiting**: 100 requests per 60 seconds per IP
+- **API Keys**: Secure generation with wc_* prefix, revocation support
+
+### Regulatory Alignment
+- **ASIC RG 271**: Compliant
+- **APRA CPS 234**: Aligned (information security)
+- **APRA CPS 230**: Aligned (operational risk)
+- **ISO 27001**: Partial alignment
 
 ---
-*Last Updated: March 24, 2026 - Version 8.0 - All Backlog Items Complete*
+*Last Updated: March 24, 2026 - Version 8.5 - ASIC/APRA/ISO Technical Controls Complete*
