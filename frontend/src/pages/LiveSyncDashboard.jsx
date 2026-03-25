@@ -122,8 +122,9 @@ export default function LiveSyncDashboard() {
   };
 
   const addLiveEvent = (type, message, severity = 'info') => {
+    const eventId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     setLiveEvents(prev => [{
-      id: Date.now(),
+      id: eventId,
       type,
       message,
       severity,

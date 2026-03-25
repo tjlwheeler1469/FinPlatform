@@ -920,3 +920,118 @@ Calculate retirement projections across multiple structures combined:
 **Testing**: Iteration 100 - All 21 backend tests passed, all frontend features verified
 
 **Note**: Platform APIs are currently MOCK implementations for demo purposes. Real API connections require production credentials from each platform provider.
+
+## Version 10.4 - Enterprise Enhancements (March 25, 2026) ✅ COMPLETE
+
+### Feature 1: Xplan Integration Phase 2
+
+**Backend**: `/app/backend/routes/xplan_integration.py` (extended)
+
+Enhanced Xplan integration with scenario upload and deep portfolio sync:
+
+#### Scenario Document Upload
+- Upload retirement projections, insurance needs, estate plans to Xplan
+- Scenario types: retirement, insurance, estate, investment
+- Document types: SOA, ROP, Fact Find, Advice Document
+- Auto-generated scenario IDs with sync status tracking
+- WebSocket broadcast on successful upload
+
+#### Deep Portfolio Sync
+- Detailed holdings data (security, units, price, value)
+- Transaction history (configurable date range)
+- Performance metrics
+- Tax lot tracking
+- Stored locally with automatic Xplan sync
+
+**Key Endpoints**:
+- `POST /api/xplan/scenarios/upload` - Upload scenario document
+- `GET /api/xplan/scenarios/{client_id}` - Get client scenarios
+- `POST /api/xplan/portfolio/deep-sync` - Deep portfolio sync
+- `GET /api/xplan/portfolio/deep/{client_id}` - Get deep sync data
+
+### Feature 2: WebSocket Real-Time Notifications
+
+**Backend**: `/app/backend/routes/websocket_service.py`
+**Frontend**: Uses WebSocket connections for live updates
+
+Real-time push notifications for Enterprise Dashboard:
+
+#### Channels
+- `enterprise` - Enterprise dashboard updates
+- `platform_sync` - Platform sync status
+- `compliance` - Compliance alerts
+- `notifications` - General notifications
+- `incidents` - Incident updates
+- `breaches` - Breach alerts
+
+#### Features
+- Auto-reconnect on disconnect (5 second delay)
+- Connection status indicator (Live/Offline badge)
+- Broadcast functions for other modules to trigger notifications
+- Connection statistics endpoint
+
+**Key Endpoints**:
+- `WS /api/ws/enterprise` - Enterprise dashboard
+- `WS /api/ws/platform-sync` - Platform sync updates
+- `WS /api/ws/compliance` - Compliance alerts
+- `GET /api/ws/stats` - Connection statistics
+- `POST /api/ws/test-notification` - Test broadcast
+
+### Feature 3: Enhanced Mock Mode for Email/SMS
+
+**Backend**: `/app/backend/routes/notification_service.py` (enhanced)
+
+Mock mode for Twilio SMS and SendGrid Email:
+
+#### Mock Mode Features
+- Logs all notifications to database (`mock_notifications` collection)
+- Includes full message content, recipients, timestamps
+- Broadcasts via WebSocket for real-time display
+- Ready to swap in real API keys when available
+
+#### Status Endpoint Shows
+- `status: "mock_mode"` when API keys not configured
+- `status: "ready"` when real API keys present
+
+**Key Endpoints**:
+- `GET /api/notifications/status` - Shows mock/ready status
+- `GET /api/notifications/mock-notifications` - View logged notifications
+- `POST /api/notifications/send-test-mock` - Test mock mode
+
+### Feature 4: Live Sync Dashboard
+
+**Route**: `/live-sync`
+**Frontend**: `/app/frontend/src/pages/LiveSyncDashboard.jsx`
+
+Real-time dashboard with automatic updates:
+
+#### Features
+- **Live/Offline badge** - Shows WebSocket connection status
+- **Auto-refresh toggle** - Polls every 30 seconds when ON
+- **Platform status bar** - Shows all 5 platforms with quick connect/sync
+- **Live Event Stream** - Real-time events with severity colors
+- **4 Tabs**:
+  - Live Events - Real-time event stream
+  - Sync Logs - All bi-directional sync operations
+  - Notifications - Mock email/SMS log with Send Test button
+  - Portfolio - Summary by platform and clients by platform
+
+### Feature 5: Save to Client Profile
+
+**Frontend**: Added to both calculators
+
+Both Accumulation and Decumulation calculators now have "Save to Client Profile" button:
+
+#### Dialog Features
+- Client ID field (auto-generated if blank)
+- Client Name field
+- Platform selection (AMP North, Netwealth, Hub24, Class, IRESS)
+- Save & Push button - saves locally and pushes to selected platforms
+- Cancel button
+
+#### Backend Integration
+- Uses `/api/client-profile/retirement/save` endpoint
+- Supports multi-structure data
+- Optional platform push via platform integrations API
+
+**Testing**: Iteration 101 - All 18 backend tests passed, all frontend features verified
