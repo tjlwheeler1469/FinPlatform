@@ -782,3 +782,71 @@ Full accumulation phase retirement planning with:
 - `POST /api/retirement/compare-scenarios` - Compare up to 5 scenarios
 - `POST /api/retirement/smsf-viability` - Check SMSF cost-effectiveness
 - `GET /api/retirement/demo/sample-calculation` - Demo calculation
+
+## Version 10.2 - Decumulation Calculator (March 25, 2026) ✅ COMPLETE
+
+### Feature: Comprehensive Decumulation Calculator for Pension Phase Planning
+
+**Route**: `/decumulation-calculator`
+**Backend**: `/app/backend/routes/decumulation_calculator.py`
+**Frontend**: `/app/frontend/src/pages/DecumulationCalculator.jsx`
+
+Full pension phase planning with drawdown modeling:
+
+#### Assets by Type & Entity
+- 14 asset types: Cash, Term Deposit, Australian Shares, International Shares, Managed Funds, ETF, Investment Property, Residential Property, Super Accumulation, Super Pension, Annuity, Bonds, Business Assets, Cryptocurrency, Collectibles
+- 6 entity types: Individual, Joint, SMSF, Trust, Company, Super Fund
+- Assessable vs exempt assets for Age Pension calculation
+- Pie charts for Assets by Type and Assets by Entity
+
+#### Liabilities Tracking
+- 8 liability types: Home Mortgage, Investment Loan, Personal Loan, Car Loan, Credit Card, Margin Loan, SMSF Limited Recourse, Other
+- Interest rate and minimum payment tracking
+- Secured asset linking
+
+#### SMSF Minimum Drawdown Rules (FY 2024-25)
+- Under 65: 4%
+- 65-74: 5%
+- 75-79: 6%
+- 80-84: 7%
+- 85-89: 9%
+- 90-94: 11%
+- 95+: 14%
+
+#### Drawdown Strategies
+- Minimum Required (SMSF minimum only)
+- Fixed Percentage (user-defined %)
+- Fixed Amount (target dollar amount)
+- Strategy comparison with recommendations
+
+#### Age Pension Calculation
+- Assets test (homeowner/non-homeowner thresholds)
+- Income test with deeming rates (0.25% below threshold, 2.25% above)
+- Pension taper rates
+- Full/part pension eligibility
+- FY 2024-25 rates:
+  - Single max: $28,514/year
+  - Couple max: $42,988/year combined
+
+#### Key Thresholds (FY 2024-25)
+- Transfer Balance Cap: $1,900,000
+- Pension Age: 67
+- Deeming Threshold (Single): $60,400
+- Assets Cut-off (Homeowner Single): $656,500
+
+#### Output Features
+- Summary cards: Total Assets, Super Pension, Liabilities, Net Position
+- Longevity Analysis: Life expectancy, fund exhaustion age, final net position
+- Year-by-year projections: Age, Super balance, Other assets, Liabilities, Net position, Drawdown, Age Pension, Total income, Expenses, Surplus/deficit
+- Net Position Over Time area chart
+- Assets breakdown pie charts
+- Rules reference tab with SMSF and Age Pension thresholds
+
+**Key Endpoints**:
+- `POST /api/decumulation/calculate` - Main calculation with projections
+- `GET /api/decumulation/rules` - Pension rules and thresholds
+- `GET /api/decumulation/asset-assumptions` - Return assumptions by asset type
+- `POST /api/decumulation/compare-strategies` - Compare drawdown strategies
+- `GET /api/decumulation/demo/sample-calculation` - Demo calculation
+
+**Testing**: Iteration 99 - All 11 backend tests passed, all frontend features verified
