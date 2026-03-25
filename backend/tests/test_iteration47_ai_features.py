@@ -7,7 +7,7 @@ import requests
 import os
 import time
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://cost-governance.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://smsf-pension-plan.preview.emergentagent.com')
 
 class TestHealthAndBasics:
     """Basic health check tests"""

@@ -6,7 +6,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://cost-governance.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://smsf-pension-plan.preview.emergentagent.com').rstrip('/')
 
 # Test data for Decision Engine
 DECISION_ENGINE_PROFILE = {

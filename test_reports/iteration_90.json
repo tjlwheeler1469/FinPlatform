@@ -41,7 +41,7 @@
     "frontend": "100% (all requested features verified)"
   },
   "test_credentials": {
-    "preview_url": "https://cost-governance.preview.emergentagent.com"
+    "preview_url": "https://smsf-pension-plan.preview.emergentagent.com"
   },
   "seed_data_creation": "None - using existing demo data",
   "retest_needed": false,

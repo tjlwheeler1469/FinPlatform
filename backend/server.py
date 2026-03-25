@@ -527,6 +527,14 @@ def include_all_routes():
     except ImportError as e:
         logger.error(f"Failed to load retirement calculator routes: {e}")
 
+    # DECUMULATION CALCULATOR - Pension Phase Planning
+    try:
+        from routes.decumulation_calculator import router as decumulation_router
+        app.include_router(decumulation_router, prefix="/api")
+        logger.info("DECUMULATION CALCULATOR loaded: Pension Phase, Drawdown, Age Pension, Assets/Liabilities")
+    except ImportError as e:
+        logger.error(f"Failed to load decumulation calculator routes: {e}")
+
 # Include all routes
 include_all_routes()
 
@@ -585,7 +593,8 @@ async def health_check():
             "cost_reduction": True,
             "risk_control_mapping": True,
             "breach_register": True,
-            "retirement_calculator": True
+            "retirement_calculator": True,
+            "decumulation_calculator": True
         },
         "revenue_layer": {
             "aum_fees": True,

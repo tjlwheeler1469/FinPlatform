@@ -1,0 +1,91 @@
+{
+  "summary": "Decumulation Calculator (Pension Phase) Testing - Iteration 99. All 11 backend API tests passed (100%). All frontend features verified working: 6 tabs (Setup, Assets, Income, Results, Projections, Rules), 4 summary cards, pie charts, year-by-year projections table, Load Sample and Calculate buttons.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "All pages",
+        "issues": ["Important Information modal appears on every page load - consider adding 'Don't show again' option or localStorage persistence (noted in previous iterations)"]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration99_decumulation_calculator.py",
+    "/app/test_reports/pytest/pytest_iteration99.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [
+    "/app/backend/tests/test_iteration99_decumulation_calculator.py"
+  ],
+  "success_rate": {
+    "backend": "100% (11/11 tests passed)",
+    "frontend": "100% (all tabs, buttons, charts, and navigation working)"
+  },
+  "seed_data_creation": "Test data created with TEST_ prefix for assets, liabilities, and super pensions during API testing.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Decumulation Calculator fully functional. Backend implements Australian SMSF rules including minimum drawdown rates by age (4% under 65 to 14% at 95+), Transfer Balance Cap ($1.9M), Age Pension calculation with assets and income tests, deeming rates. Frontend has 6 tabs with comprehensive UI for pension phase planning.",
+  "features_verified": {
+    "GET /api/decumulation/rules": "PASS - Returns minimum_drawdown_rates, transfer_balance_cap ($1.9M), age_pension_rates, life_expectancy, pension_age (67)",
+    "GET /api/decumulation/asset-assumptions": "PASS - Returns return assumptions by asset type (cash, shares, property, etc.), entity_types, asset_types, liability_types",
+    "GET /api/decumulation/demo/sample-calculation": "PASS - Returns full sample calculation with calculation_id (DEC-{date}-{uuid}), summary, current_position, assets_by_type, assets_by_entity, income_analysis, drawdown_analysis, age_pension, longevity_analysis, projections",
+    "POST /api/decumulation/calculate - basic request": "PASS - Accepts person, assets, liabilities, super_pensions, expenses and returns projections",
+    "POST /api/decumulation/calculate - with liabilities": "PASS - Correctly includes liabilities in net position calculation",
+    "POST /api/decumulation/calculate - drawdown strategies": "PASS - Supports minimum, percentage, and fixed_amount strategies",
+    "POST /api/decumulation/calculate - age pension eligibility": "PASS - Correctly calculates age pension for those 67+ and excludes for under 67",
+    "POST /api/decumulation/compare-strategies": "PASS - Compares minimum, percentage, fixed_amount strategies with recommendation",
+    "Validation - invalid age": "PASS - Returns 422 for age below 55",
+    "Validation - missing person": "PASS - Returns 422 for missing person field",
+    "Health Check": "PASS - Server healthy",
+    "Frontend - /decumulation-calculator page loads": "PASS - Shows header, summary cards, 6 tabs",
+    "Frontend - Summary cards": "PASS - Total Assets, Super Pension, Liabilities, Net Position all displayed",
+    "Frontend - Setup tab": "PASS - Personal Details, Drawdown Strategy, Settings, Super Pensions sections",
+    "Frontend - Assets tab": "PASS - Assets and Liabilities sections with add/remove functionality",
+    "Frontend - Income tab": "PASS - Other Income Streams, Expenses sections, Calculate button",
+    "Frontend - Results tab": "PASS - Key metrics, Assets by Type pie chart, Assets by Entity pie chart, Longevity Analysis, Net Position Over Time chart",
+    "Frontend - Projections tab": "PASS - Year-by-Year Projections table with Age, Super, Other Assets, Liabilities, Net Position, Drawdown, Age Pension, Total Income, Expenses, +/- columns",
+    "Frontend - Rules tab": "PASS - Minimum Drawdown Rates table, Age Pension Thresholds (FY 2024-25), Deeming Rates, Key Rules",
+    "Frontend - Load Sample button": "PASS - Triggers sample calculation and shows results",
+    "Frontend - Calculate button": "PASS - Triggers calculation and redirects to Results tab",
+    "Frontend - Navigation": "PASS - Decumulation Calculator link in Calculators section (Personal Mode) with NEW badge"
+  },
+  "decumulation_calculator_summary": {
+    "description": "Comprehensive pension phase planning module for AdviceOS platform",
+    "backend_features": [
+      "Minimum drawdown rates by age (4% under 65 to 14% at 95+)",
+      "Transfer Balance Cap ($1.9M as of July 2024)",
+      "Age Pension calculation with assets and income tests",
+      "Deeming rates (0.25% below threshold, 2.25% above)",
+      "Life expectancy tables (ABS 2020-22)",
+      "Asset return assumptions by type",
+      "Multiple drawdown strategies (minimum, percentage, fixed_amount)",
+      "Year-by-year projections with longevity analysis",
+      "Strategy comparison with recommendations"
+    ],
+    "frontend_features": [
+      "6 tabs: Setup, Assets, Income, Results, Projections, Rules",
+      "4 summary cards: Total Assets, Super Pension, Liabilities, Net Position",
+      "Personal Details with age slider, gender, homeowner status, relationship status",
+      "Drawdown Strategy selector with target percentage/amount options",
+      "Assets and Liabilities management with add/remove",
+      "Super Pensions management",
+      "Other Income Streams and Expenses tracking",
+      "Assets by Type and Assets by Entity pie charts",
+      "Longevity Analysis with life expectancy, funds duration, final net position",
+      "Year-by-Year Projections table with all financial metrics",
+      "Rules reference with minimum drawdown rates and age pension thresholds",
+      "Load Sample and Calculate buttons"
+    ],
+    "navigation": [
+      "Personal Mode: Calculators > Decumulation (with NEW badge)",
+      "Adviser Mode: Execution > Decumulation Calc (with NEW badge)",
+      "Client Context: Plan > Decumulation (with NEW badge)"
+    ]
+  }
+}

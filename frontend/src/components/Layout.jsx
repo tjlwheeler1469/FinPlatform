@@ -142,7 +142,8 @@ const personalNavGroups = [
       { path: "/loan-calculator", label: "Loan", icon: Landmark, title: "Loan Calculator" },
       { path: "/monte-carlo", label: "Monte Carlo", icon: BarChart3, title: "Monte Carlo" },
       { path: "/smsf-optimizer", label: "SMSF", icon: PiggyBank, title: "SMSF" },
-      { path: "/retirement-calculator", label: "Retirement", icon: Target, title: "Retirement Calculator", badge: "NEW" },
+      { path: "/retirement-calculator", label: "Accumulation", icon: Target, title: "Retirement Calculator (Accumulation)", badge: "NEW" },
+      { path: "/decumulation-calculator", label: "Decumulation", icon: TrendingUp, title: "Decumulation Calculator (Pension)", badge: "NEW" },
     ]
   },
   {
@@ -191,7 +192,8 @@ const adviserBaseNav = [
     icon: Zap,
     items: [
       { path: "/batch-execution", label: "Batch Execute", icon: Zap, title: "Batch Execution" },
-      { path: "/retirement-calculator", label: "Retirement Calc", icon: Calculator, title: "Retirement Calculator", badge: "NEW" },
+      { path: "/retirement-calculator", label: "Accumulation Calc", icon: Calculator, title: "Retirement Calculator (Accumulation)", badge: "NEW" },
+      { path: "/decumulation-calculator", label: "Decumulation Calc", icon: TrendingUp, title: "Decumulation Calculator (Pension)", badge: "NEW" },
     ]
   },
   {
@@ -230,7 +232,8 @@ const clientContextNav = [
     items: [
       { path: "/goal-tracker", label: "Goals", icon: Target, title: "Goals" },
       { path: "/transaction-modeler", label: "What-If Modeler", icon: Calculator, title: "What-If & Plan Generator" },
-      { path: "/retirement-calculator", label: "Retirement", icon: PiggyBank, title: "Retirement Calculator", badge: "NEW" },
+      { path: "/retirement-calculator", label: "Accumulation", icon: PiggyBank, title: "Retirement Calculator (Accumulation)", badge: "NEW" },
+      { path: "/decumulation-calculator", label: "Decumulation", icon: TrendingUp, title: "Decumulation Calculator (Pension)", badge: "NEW" },
     ]
   },
   {

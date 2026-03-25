@@ -214,6 +214,9 @@ const BreachRegister = lazy(() => import("@/pages/BreachRegister"));
 // Retirement Calculator - SMSF Planning
 const RetirementCalculator = lazy(() => import("@/pages/RetirementCalculator"));
 
+// Decumulation Calculator - Pension Phase Planning
+const DecumulationCalculator = lazy(() => import("@/pages/DecumulationCalculator"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -1080,6 +1083,9 @@ const AppRouter = () => {
       
       {/* Retirement Calculator - SMSF Planning */}
       <Route path="/retirement-calculator" element={<RetirementCalculator />} />
+      
+      {/* Decumulation Calculator - Pension Phase Planning */}
+      <Route path="/decumulation-calculator" element={<DecumulationCalculator />} />
       
       {/* CRM Command Center */}
       <Route path="/crm-command-center" element={<CRMCommandCenter />} />
