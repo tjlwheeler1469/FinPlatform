@@ -850,3 +850,73 @@ Full pension phase planning with drawdown modeling:
 - `GET /api/decumulation/demo/sample-calculation` - Demo calculation
 
 **Testing**: Iteration 99 - All 11 backend tests passed, all frontend features verified
+
+## Version 10.3 - Platform Integrations & Multi-Structure Support (March 25, 2026) ✅ COMPLETE
+
+### Feature: Platform API Integrations with Bi-Directional Sync
+
+**Route**: `/platform-integrations`
+**Backend**: `/app/backend/routes/platform_integrations.py`
+**Frontend**: `/app/frontend/src/pages/PlatformIntegrations.jsx`
+
+Bi-directional data sync with 5 enterprise wealth platforms:
+
+#### Supported Platforms
+| Platform | READ Capabilities | WRITE Capabilities |
+|----------|-------------------|-------------------|
+| AMP North | clients, portfolios, transactions, balances, pension_accounts, insurance | file_notes, scenarios, documents |
+| Netwealth | clients, portfolios, transactions, balances, pension_accounts, documents | file_notes, scenarios, documents, model_portfolios |
+| HUB24 | clients, portfolios, transactions, balances, pension_accounts, insurance | file_notes, scenarios, rebalance_orders |
+| Class Super | smsf_funds, members, investments, transactions, compliance_status, documents | file_notes, documents, pension_commencements |
+| IRESS (Xplan) | clients, portfolios, transactions, balances, risk_profiles, insurance_needs, scenarios | file_notes, scenarios, documents, soa_data, risk_profiles |
+
+#### Key Features
+- Demo mode connection (no credentials required)
+- Production mode with OAuth credentials
+- Bi-directional sync (READ from platforms, WRITE back to platforms)
+- Write-back support for file_notes, scenarios, documents
+- Audit logging for all sync operations
+- Mock client and portfolio data for testing
+
+**Key Endpoints**:
+- `GET /api/platforms/available` - List available platforms with capabilities
+- `POST /api/platforms/connect/{platform}` - Connect (demo or production)
+- `GET /api/platforms/status` - All connection statuses
+- `GET /api/platforms/{platform}/clients` - Fetch clients from platform
+- `POST /api/platforms/sync` - Bi-directional sync
+- `POST /api/platforms/write-back` - Push data back to platform
+- `GET /api/platforms/sync-logs` - Audit logs
+
+### Feature: Multi-Structure Retirement Calculations
+
+**Backend**: `/app/backend/routes/client_profile_retirement.py`
+
+Calculate retirement projections across multiple structures combined:
+
+#### Supported Structures
+| Structure | Tax Treatment | Asset Protection |
+|-----------|--------------|-----------------|
+| Personal | Personal tax rates | Limited |
+| Joint | Income split 50/50 | Limited |
+| Company | 30%/25% company tax | Good (separate entity) |
+| Trust | Distributed to beneficiaries | Good (trustee holds) |
+| SMSF | 15% accum, 0% pension | Excellent (protected) |
+| Super Fund | 15% accum, 0% pension | Excellent (protected) |
+
+#### Key Features
+- Calculate for one structure OR multiple combined
+- Asset breakdown: super, investments, property, cash
+- Liability tracking across structures
+- Projected net position at retirement
+- Save to client profiles
+- Push to connected platforms
+
+**Key Endpoints**:
+- `GET /api/client-profile/structures` - Available structures with descriptions
+- `POST /api/client-profile/multi-structure/calculate` - Combined calculation
+- `POST /api/client-profile/retirement/save` - Save to client profile
+- `GET /api/client-profile/retirement/{client_id}` - Get client profile
+
+**Testing**: Iteration 100 - All 21 backend tests passed, all frontend features verified
+
+**Note**: Platform APIs are currently MOCK implementations for demo purposes. Real API connections require production credentials from each platform provider.
