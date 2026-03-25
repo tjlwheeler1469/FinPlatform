@@ -535,6 +535,22 @@ def include_all_routes():
     except ImportError as e:
         logger.error(f"Failed to load decumulation calculator routes: {e}")
 
+    # PLATFORM INTEGRATIONS - AMP North, Netwealth, Hub24, Class, IRESS
+    try:
+        from routes.platform_integrations import router as platforms_router
+        app.include_router(platforms_router, prefix="/api")
+        logger.info("PLATFORM INTEGRATIONS loaded: AMP North, Netwealth, Hub24, Class, IRESS - Bi-directional Sync")
+    except ImportError as e:
+        logger.error(f"Failed to load platform integrations routes: {e}")
+
+    # CLIENT PROFILE RETIREMENT - Save & Sync Retirement Data to Client Profiles
+    try:
+        from routes.client_profile_retirement import router as client_profile_router
+        app.include_router(client_profile_router, prefix="/api")
+        logger.info("CLIENT PROFILE RETIREMENT loaded: Multi-Structure Calculations, Profile Sync, Platform Push")
+    except ImportError as e:
+        logger.error(f"Failed to load client profile retirement routes: {e}")
+
 # Include all routes
 include_all_routes()
 
@@ -594,7 +610,9 @@ async def health_check():
             "risk_control_mapping": True,
             "breach_register": True,
             "retirement_calculator": True,
-            "decumulation_calculator": True
+            "decumulation_calculator": True,
+            "platform_integrations": True,
+            "client_profile_retirement": True
         },
         "revenue_layer": {
             "aum_fees": True,

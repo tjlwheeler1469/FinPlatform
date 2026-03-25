@@ -70,7 +70,8 @@ import {
   Video,
   Network,
   Bitcoin,
-  Coins
+  Coins,
+  Cable
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -209,7 +210,8 @@ const adviserBaseNav = [
     name: "Integrations",
     icon: Link2,
     items: [
-      { path: "/xplan", label: "Xplan Sync", icon: Link2, title: "Xplan Integration", badge: "NEW" },
+      { path: "/xplan", label: "Xplan Sync", icon: Link2, title: "Xplan Integration" },
+      { path: "/platform-integrations", label: "Platforms", icon: Cable, title: "Platform Integrations (AMP, Netwealth, Hub24)", badge: "NEW" },
     ]
   }
 ];
