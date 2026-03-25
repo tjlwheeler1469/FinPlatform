@@ -211,6 +211,9 @@ const CostReductionDashboard = lazy(() => import("@/pages/CostReductionDashboard
 const RiskControlMapping = lazy(() => import("@/pages/RiskControlMapping"));
 const BreachRegister = lazy(() => import("@/pages/BreachRegister"));
 
+// Retirement Calculator - SMSF Planning
+const RetirementCalculator = lazy(() => import("@/pages/RetirementCalculator"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -1074,6 +1077,9 @@ const AppRouter = () => {
       <Route path="/cost-reduction" element={<CostReductionDashboard />} />
       <Route path="/risk-control" element={<RiskControlMapping />} />
       <Route path="/breach-register" element={<BreachRegister />} />
+      
+      {/* Retirement Calculator - SMSF Planning */}
+      <Route path="/retirement-calculator" element={<RetirementCalculator />} />
       
       {/* CRM Command Center */}
       <Route path="/crm-command-center" element={<CRMCommandCenter />} />

@@ -704,5 +704,81 @@ CPS 230 compliant breach management with ASIC reporting:
 - Verified all 20 System Health reports showing as "Active"
 - Verified Client View navigation stays within the platform
 - Combined duplicate compliance tabs (removed `/compliance`, kept AdviceOS + Compliance Dashboard + Security)
-- Added "Download Report" button to System Health section for generating JSON health reports
+- Added "Download" dropdown to System Health (PDF, Excel/CSV, JSON formats)
 - Wrapped Compliance Dashboard with Layout component to match AdvisorCommandCenter styling
+- Fixed "Aud" → "AUD" capitalization in currency labels
+- Fixed Financial Health Score to always show a number (added fallback)
+- Updated all cost displays to show "AUD $X,XXX" format
+
+## Version 10.1 - Retirement Calculator (March 25, 2026) ✅ COMPLETE
+
+### Feature: Comprehensive Retirement Calculator with SMSF Planning
+
+**Route**: `/retirement-calculator`
+**Backend**: `/app/backend/routes/retirement_calculator.py`
+**Frontend**: `/app/frontend/src/pages/RetirementCalculator.jsx`
+
+Full accumulation phase retirement planning with:
+
+#### Personal & Client Modes
+- Personal Mode for individual users
+- Adviser Mode for client planning (enter client name)
+- Toggle switch in header
+
+#### Investment Profiles
+- Conservative (5% target, 4% volatility)
+- Moderately Conservative (6% target, 6% volatility)
+- Balanced (7% target, 9% volatility) - Default
+- Growth (8% target, 12% volatility)
+- Aggressive/High Growth (9.5% target, 16% volatility)
+- Custom allocation option with override return rates
+
+#### Fund Types Supported
+- Industry Fund (lowest fees)
+- Retail Fund (more options)
+- SMSF (fixed costs, best for $400k+)
+- SMA (Separately Managed Account)
+- Managed Account/MDA
+
+#### Contribution Types (FY 2024-25 Caps)
+- Employer SG (11.5% auto-calculated)
+- Salary Sacrifice (pre-tax)
+- Personal Deductible contributions
+- Non-Concessional (after-tax) - $120k cap
+- Spouse contributions
+- Government co-contribution
+- Annual contribution growth rate
+
+#### Cost Modeling
+- Admin fees (% + flat)
+- Investment management fees
+- Platform fees (SMA/managed)
+- Advice fees
+- Insurance premiums
+- SMSF costs (accounting, audit, ASIC, ATO levy)
+
+#### Asset Classes
+- Cash, Fixed Income, Australian Shares
+- International Shares, Property
+- Infrastructure, Alternatives, Commodities
+- Customizable returns, yields, volatility per asset
+
+#### Output Features
+- Projected balance at retirement (nominal & real)
+- Monthly retirement income calculation
+- Sustainable withdrawal rate
+- Scenario comparison (pessimistic/expected/optimistic)
+- Year-by-year projections table
+- Balance growth chart
+- Asset allocation pie chart
+- Contribution & cost summaries
+- Export to CSV/JSON
+
+**Key Endpoints**:
+- `POST /api/retirement/calculate` - Main calculation
+- `GET /api/retirement/profiles` - Investment profiles
+- `GET /api/retirement/super-caps` - Current FY caps
+- `GET /api/retirement/fund-costs` - Fund type costs
+- `POST /api/retirement/compare-scenarios` - Compare up to 5 scenarios
+- `POST /api/retirement/smsf-viability` - Check SMSF cost-effectiveness
+- `GET /api/retirement/demo/sample-calculation` - Demo calculation

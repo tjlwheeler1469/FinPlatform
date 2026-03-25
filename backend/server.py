@@ -519,6 +519,14 @@ def include_all_routes():
     except ImportError as e:
         logger.error(f"Failed to load enterprise system of record routes: {e}")
 
+    # RETIREMENT CALCULATOR - SMSF Planning Module
+    try:
+        from routes.retirement_calculator import router as retirement_router
+        app.include_router(retirement_router, prefix="/api")
+        logger.info("RETIREMENT CALCULATOR loaded: SMSF Planning, Super Contributions, Investment Profiles, Projections")
+    except ImportError as e:
+        logger.error(f"Failed to load retirement calculator routes: {e}")
+
 # Include all routes
 include_all_routes()
 
@@ -576,7 +584,8 @@ async def health_check():
             "replay_advice": True,
             "cost_reduction": True,
             "risk_control_mapping": True,
-            "breach_register": True
+            "breach_register": True,
+            "retirement_calculator": True
         },
         "revenue_layer": {
             "aum_fees": True,
