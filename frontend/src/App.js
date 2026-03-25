@@ -220,6 +220,9 @@ const DecumulationCalculator = lazy(() => import("@/pages/DecumulationCalculator
 // Platform Integrations - AMP North, Netwealth, Hub24, Class, IRESS
 const PlatformIntegrations = lazy(() => import("@/pages/PlatformIntegrations"));
 
+// Live Sync Dashboard - Real-time platform updates
+const LiveSyncDashboard = lazy(() => import("@/pages/LiveSyncDashboard"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -1092,6 +1095,9 @@ const AppRouter = () => {
       
       {/* Platform Integrations - AMP North, Netwealth, Hub24, Class, IRESS */}
       <Route path="/platform-integrations" element={<PlatformIntegrations />} />
+      
+      {/* Live Sync Dashboard */}
+      <Route path="/live-sync" element={<LiveSyncDashboard />} />
       
       {/* CRM Command Center */}
       <Route path="/crm-command-center" element={<CRMCommandCenter />} />

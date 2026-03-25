@@ -784,3 +784,249 @@ async def get_sync_status():
             "fallback": "scheduled_hourly"
         }
     }
+
+
+# ==================== PHASE 2: SCENARIO DOCUMENTS & DEEP PORTFOLIO SYNC ====================
+
+class ScenarioDocument(BaseModel):
+    """Model for scenario document upload to Xplan."""
+    client_id: str
+    scenario_name: str
+    scenario_type: str = "retirement"  # retirement, insurance, estate, investment
+    document_type: str = "soa"  # soa, rop, fact_find, advice_document
+    content: Dict[str, Any]  # Structured scenario data
+    projections: Optional[List[Dict]] = None
+    recommendations: Optional[List[str]] = None
+    adviser_id: str
+    notes: Optional[str] = None
+
+class DeepPortfolioSyncRequest(BaseModel):
+    """Request for deep portfolio sync with detailed holdings."""
+    client_id: str
+    include_transactions: bool = True
+    include_performance: bool = True
+    include_tax_lots: bool = True
+    date_range_days: int = 365
+
+# Collections for Phase 2
+xplan_scenarios_col = db["xplan_scenarios"]
+xplan_portfolio_deep_col = db["xplan_portfolio_deep"]
+
+@router.post("/scenarios/upload")
+async def upload_scenario_document(scenario: ScenarioDocument):
+    """
+    Phase 2: Upload scenario document to Xplan.
+    Supports retirement projections, insurance needs, estate plans.
+    """
+    user_id = scenario.adviser_id
+    
+    # Generate scenario ID
+    scenario_id = f"SCN-{datetime.now(timezone.utc).strftime('%Y%m%d')}-{os.urandom(3).hex().upper()}"
+    
+    # Prepare scenario data for Xplan
+    xplan_scenario = {
+        "scenario_id": scenario_id,
+        "client_id": scenario.client_id,
+        "scenario_name": scenario.scenario_name,
+        "scenario_type": scenario.scenario_type,
+        "document_type": scenario.document_type,
+        "content": scenario.content,
+        "projections": scenario.projections,
+        "recommendations": scenario.recommendations,
+        "adviser_id": scenario.adviser_id,
+        "notes": scenario.notes,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "sync_status": "pending"
+    }
+    
+    # Store locally
+    await xplan_scenarios_col.insert_one(xplan_scenario)
+    
+    # Attempt to push to Xplan
+    try:
+        result = await make_xplan_request(
+            "POST",
+            f"/clients/{scenario.client_id}/scenarios",
+            user_id,
+            payload=xplan_scenario
+        )
+        
+        # Update sync status
+        await xplan_scenarios_col.update_one(
+            {"scenario_id": scenario_id},
+            {"$set": {"sync_status": "synced", "xplan_ref": result.get("xplan_scenario_id")}}
+        )
+        
+        # Broadcast update via WebSocket
+        try:
+            from .websocket_service import broadcast_platform_sync_event
+            await broadcast_platform_sync_event("xplan", "scenario_uploaded", {
+                "scenario_id": scenario_id,
+                "client_id": scenario.client_id,
+                "scenario_name": scenario.scenario_name
+            })
+        except Exception:
+            pass
+        
+        return {
+            "success": True,
+            "scenario_id": scenario_id,
+            "xplan_ref": result.get("xplan_scenario_id"),
+            "message": f"Scenario '{scenario.scenario_name}' uploaded to Xplan"
+        }
+    except Exception as e:
+        logger.error(f"Failed to upload scenario to Xplan: {e}")
+        return {
+            "success": False,
+            "scenario_id": scenario_id,
+            "error": str(e),
+            "message": "Scenario saved locally, pending Xplan sync"
+        }
+
+@router.get("/scenarios/{client_id}")
+async def get_client_scenarios(client_id: str):
+    """Get all scenarios for a client."""
+    scenarios = await xplan_scenarios_col.find(
+        {"client_id": client_id},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(length=100)
+    
+    return {
+        "client_id": client_id,
+        "scenarios": scenarios,
+        "total": len(scenarios)
+    }
+
+@router.post("/portfolio/deep-sync")
+async def deep_portfolio_sync(request: DeepPortfolioSyncRequest):
+    """
+    Phase 2: Deep portfolio sync with detailed holdings, transactions, and performance.
+    """
+    user_id = "system"
+    client_id = request.client_id
+    
+    sync_result = {
+        "client_id": client_id,
+        "sync_id": f"DEEP-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}-{os.urandom(3).hex().upper()}",
+        "started_at": datetime.now(timezone.utc).isoformat(),
+        "components": {}
+    }
+    
+    # Sync detailed holdings
+    holdings_data = await make_xplan_request(
+        "GET",
+        f"/clients/{client_id}/portfolios/holdings",
+        user_id
+    )
+    sync_result["components"]["holdings"] = {
+        "count": len(holdings_data.get("holdings", [])),
+        "status": "synced"
+    }
+    
+    # Sync transactions if requested
+    if request.include_transactions:
+        transactions_data = await make_xplan_request(
+            "GET",
+            f"/clients/{client_id}/portfolios/transactions?days={request.date_range_days}",
+            user_id
+        )
+        sync_result["components"]["transactions"] = {
+            "count": len(transactions_data.get("transactions", [])),
+            "status": "synced"
+        }
+    
+    # Sync performance if requested
+    if request.include_performance:
+        performance_data = await make_xplan_request(
+            "GET",
+            f"/clients/{client_id}/portfolios/performance?days={request.date_range_days}",
+            user_id
+        )
+        sync_result["components"]["performance"] = {
+            "metrics": list(performance_data.get("metrics", {}).keys()),
+            "status": "synced"
+        }
+    
+    # Sync tax lots if requested
+    if request.include_tax_lots:
+        tax_lots_data = await make_xplan_request(
+            "GET",
+            f"/clients/{client_id}/portfolios/tax-lots",
+            user_id
+        )
+        sync_result["components"]["tax_lots"] = {
+            "count": len(tax_lots_data.get("lots", [])),
+            "status": "synced"
+        }
+    
+    # Store deep sync data
+    deep_sync_record = {
+        **sync_result,
+        "holdings": holdings_data.get("holdings", []),
+        "transactions": transactions_data.get("transactions", []) if request.include_transactions else [],
+        "performance": performance_data.get("metrics", {}) if request.include_performance else {},
+        "tax_lots": tax_lots_data.get("lots", []) if request.include_tax_lots else [],
+        "completed_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await xplan_portfolio_deep_col.update_one(
+        {"client_id": client_id},
+        {"$set": deep_sync_record},
+        upsert=True
+    )
+    
+    sync_result["completed_at"] = deep_sync_record["completed_at"]
+    sync_result["status"] = "completed"
+    
+    # Broadcast update
+    try:
+        from .websocket_service import broadcast_platform_sync_event
+        await broadcast_platform_sync_event("xplan", "deep_sync_completed", {
+            "client_id": client_id,
+            "sync_id": sync_result["sync_id"],
+            "components": list(sync_result["components"].keys())
+        })
+    except Exception:
+        pass
+    
+    return sync_result
+
+@router.get("/portfolio/deep/{client_id}")
+async def get_deep_portfolio_data(client_id: str):
+    """Get deep portfolio data for a client."""
+    data = await xplan_portfolio_deep_col.find_one(
+        {"client_id": client_id},
+        {"_id": 0}
+    )
+    
+    if not data:
+        return {"client_id": client_id, "message": "No deep sync data found. Run deep-sync first."}
+    
+    return data
+
+@router.post("/scenarios/sync-retirement/{client_id}")
+async def sync_retirement_calculation_to_xplan(
+    client_id: str,
+    calculation_type: str = "accumulation",
+    calculation_data: Dict[str, Any] = None
+):
+    """
+    Sync retirement calculator results directly to Xplan as a scenario.
+    """
+    if not calculation_data:
+        calculation_data = {}
+    
+    scenario = ScenarioDocument(
+        client_id=client_id,
+        scenario_name=f"Retirement Projection - {calculation_type.title()}",
+        scenario_type="retirement",
+        document_type="advice_document",
+        content=calculation_data,
+        projections=calculation_data.get("projections", []),
+        recommendations=calculation_data.get("recommendations", []),
+        adviser_id=calculation_data.get("adviser_id", "system"),
+        notes=f"Auto-generated from AdviceOS {calculation_type} calculator"
+    )
+    
+    return await upload_scenario_document(scenario)
+

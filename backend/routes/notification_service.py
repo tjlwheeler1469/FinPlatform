@@ -64,10 +64,39 @@ async def send_email_notification(
     body_text: str,
     body_html: str
 ) -> Dict[str, Any]:
-    """Send email via SendGrid."""
+    """Send email via SendGrid or mock mode."""
+    db = await get_mock_db()
+    
     if not SENDGRID_API_KEY:
-        logger.warning("SendGrid API key not configured - email notification skipped")
-        return {"success": False, "error": "SendGrid not configured", "mock": True}
+        # MOCK MODE - Log to database instead of sending
+        logger.info(f"MOCK EMAIL: Sending to {to_emails}")
+        mock_log = {
+            "log_id": f"EMAIL-MOCK-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}-{os.urandom(3).hex().upper()}",
+            "type": "email",
+            "mode": "mock",
+            "to": to_emails,
+            "subject": subject,
+            "body_text": body_text[:500],  # Truncate for storage
+            "body_html_preview": body_html[:500] if body_html else None,
+            "status": "mock_sent",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "note": "Mock mode - Email logged but not actually sent. Add SENDGRID_API_KEY for real emails."
+        }
+        await db.mock_notifications.insert_one(mock_log)
+        
+        # Broadcast via WebSocket for real-time display
+        try:
+            from .websocket_service import broadcast_notification
+            await broadcast_notification(
+                "email",
+                f"Email: {subject}",
+                f"Mock email to: {', '.join(to_emails)}",
+                {"recipients": to_emails, "subject": subject}
+            )
+        except Exception:
+            pass
+        
+        return {"success": True, "mock": True, "log_id": mock_log["log_id"], "recipients": to_emails}
     
     try:
         from sendgrid import SendGridAPIClient
@@ -94,14 +123,46 @@ async def send_email_notification(
         logger.error(f"SendGrid error: {e}")
         return {"success": False, "error": str(e)}
 
+async def get_mock_db():
+    """Get database for mock notifications"""
+    client = AsyncIOMotorClient(MONGO_URL)
+    return client[DB_NAME]
+
 async def send_sms_notification(
     to_numbers: List[str],
     message: str
 ) -> Dict[str, Any]:
-    """Send SMS via Twilio."""
+    """Send SMS via Twilio or mock mode."""
+    db = await get_mock_db()
+    
     if not all([TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER]):
-        logger.warning("Twilio not fully configured - SMS notification skipped")
-        return {"success": False, "error": "Twilio not configured", "mock": True}
+        # MOCK MODE - Log to database instead of sending
+        logger.info(f"MOCK SMS: Sending to {to_numbers}")
+        mock_log = {
+            "log_id": f"SMS-MOCK-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}-{os.urandom(3).hex().upper()}",
+            "type": "sms",
+            "mode": "mock",
+            "to": to_numbers,
+            "message": message[:160],  # SMS character limit
+            "status": "mock_sent",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "note": "Mock mode - SMS logged but not actually sent. Add TWILIO credentials for real SMS."
+        }
+        await db.mock_notifications.insert_one(mock_log)
+        
+        # Broadcast via WebSocket for real-time display
+        try:
+            from .websocket_service import broadcast_notification
+            await broadcast_notification(
+                "sms",
+                "SMS Notification",
+                f"Mock SMS to: {', '.join(to_numbers)}",
+                {"recipients": to_numbers, "message_preview": message[:50]}
+            )
+        except Exception:
+            pass
+        
+        return {"success": True, "mock": True, "log_id": mock_log["log_id"], "recipients": to_numbers}
     
     try:
         from twilio.rest import Client
@@ -397,12 +458,56 @@ async def get_notification_status():
         "email": {
             "provider": "SendGrid",
             "configured": bool(SENDGRID_API_KEY),
-            "status": "ready" if SENDGRID_API_KEY else "not_configured"
+            "status": "ready" if SENDGRID_API_KEY else "mock_mode"
         },
         "sms": {
             "provider": "Twilio",
             "configured": all([TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER]),
-            "status": "ready" if all([TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER]) else "not_configured"
+            "status": "ready" if all([TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER]) else "mock_mode"
         },
+        "mock_mode_note": "When not configured, notifications are logged to database and broadcast via WebSocket for real-time display. Add API keys to send real notifications.",
         "timestamp": datetime.now(timezone.utc).isoformat()
     }
+
+@router.get("/mock-notifications")
+async def get_mock_notifications(limit: int = 50, notification_type: Optional[str] = None):
+    """Get mock notifications (sent in mock mode)."""
+    db = await get_mock_db()
+    
+    query = {}
+    if notification_type:
+        query["type"] = notification_type
+    
+    notifications = await db.mock_notifications.find(
+        query,
+        {"_id": 0}
+    ).sort("timestamp", -1).limit(limit).to_list(length=limit)
+    
+    return {
+        "notifications": notifications,
+        "total": len(notifications),
+        "mode": "mock",
+        "note": "These notifications were logged but not actually sent. Add SendGrid/Twilio API keys for real delivery."
+    }
+
+@router.post("/send-test-mock")
+async def send_test_mock_notification(email: str = "test@example.com", phone: str = "+61400000000"):
+    """Send test notifications in mock mode to verify logging works."""
+    email_result = await send_email_notification(
+        [email],
+        "Test: AdviceOS Mock Email Notification",
+        "This is a test mock email from AdviceOS. If you see this in the logs, mock mode is working correctly.",
+        "<h2>Test Mock Email</h2><p>This is a test mock email from AdviceOS.</p><p>Mock mode is working correctly.</p>"
+    )
+    
+    sms_result = await send_sms_notification(
+        [phone],
+        "Test: AdviceOS Mock SMS - If you see this in logs, mock mode is working."
+    )
+    
+    return {
+        "email_result": email_result,
+        "sms_result": sms_result,
+        "message": "Test notifications sent in mock mode. Check /api/notifications/mock-notifications to see logged messages."
+    }
+

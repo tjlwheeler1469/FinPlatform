@@ -212,6 +212,7 @@ const adviserBaseNav = [
     items: [
       { path: "/xplan", label: "Xplan Sync", icon: Link2, title: "Xplan Integration" },
       { path: "/platform-integrations", label: "Platforms", icon: Cable, title: "Platform Integrations (AMP, Netwealth, Hub24)", badge: "NEW" },
+      { path: "/live-sync", label: "Live Sync", icon: Activity, title: "Live Sync Dashboard - Real-time Updates", badge: "LIVE" },
     ]
   }
 ];

@@ -508,6 +508,110 @@ async def upload_mock_document(
     }
 
 
+# ==================== PHASE 2: SCENARIOS & DEEP PORTFOLIO ====================
+
+@router.post("/clients/{client_id}/scenarios")
+async def create_mock_scenario(
+    client_id: str,
+    payload: Dict[str, Any] = None,
+    authorization: Optional[str] = Header(None)
+):
+    """Create a scenario in mock Xplan (Phase 2)."""
+    xplan_scenario_id = f"XSCN-{client_id}-{uuid.uuid4().hex[:8].upper()}"
+    
+    return {
+        "success": True,
+        "xplan_scenario_id": xplan_scenario_id,
+        "client_id": client_id,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "message": "Scenario created successfully in Xplan"
+    }
+
+
+@router.get("/clients/{client_id}/portfolios/holdings")
+async def get_mock_portfolio_holdings(
+    client_id: str,
+    authorization: Optional[str] = Header(None)
+):
+    """Get detailed portfolio holdings (Phase 2 deep sync)."""
+    portfolio = generate_portfolio(client_id)
+    
+    return {
+        "client_id": client_id,
+        "holdings": portfolio.get("holdings", []),
+        "total_value": portfolio.get("total_value", 0),
+        "last_updated": datetime.now(timezone.utc).isoformat()
+    }
+
+
+@router.get("/clients/{client_id}/portfolios/transactions")
+async def get_mock_portfolio_transactions(
+    client_id: str,
+    days: int = 365,
+    authorization: Optional[str] = Header(None)
+):
+    """Get portfolio transactions (Phase 2 deep sync)."""
+    transactions = generate_transactions(client_id, min(days // 10, 50))
+    
+    return {
+        "client_id": client_id,
+        "transactions": transactions,
+        "period_days": days,
+        "total": len(transactions)
+    }
+
+
+@router.get("/clients/{client_id}/portfolios/performance")
+async def get_mock_portfolio_performance(
+    client_id: str,
+    days: int = 365,
+    authorization: Optional[str] = Header(None)
+):
+    """Get portfolio performance metrics (Phase 2 deep sync)."""
+    random.seed(hash(client_id) + 100)
+    
+    return {
+        "client_id": client_id,
+        "metrics": {
+            "total_return": round(random.uniform(5, 15), 2),
+            "annualized_return": round(random.uniform(6, 12), 2),
+            "volatility": round(random.uniform(8, 18), 2),
+            "sharpe_ratio": round(random.uniform(0.5, 1.5), 2),
+            "max_drawdown": round(random.uniform(-15, -5), 2),
+            "benchmark_return": round(random.uniform(7, 10), 2)
+        },
+        "period_days": days,
+        "calculated_at": datetime.now(timezone.utc).isoformat()
+    }
+
+
+@router.get("/clients/{client_id}/portfolios/tax-lots")
+async def get_mock_tax_lots(
+    client_id: str,
+    authorization: Optional[str] = Header(None)
+):
+    """Get tax lot information (Phase 2 deep sync)."""
+    random.seed(hash(client_id) + 200)
+    portfolio = generate_portfolio(client_id)
+    
+    lots = []
+    for holding in portfolio.get("holdings", [])[:5]:
+        lots.append({
+            "lot_id": f"LOT-{uuid.uuid4().hex[:6].upper()}",
+            "security_code": holding["security_code"],
+            "quantity": holding["quantity"],
+            "cost_basis": round(holding["value"] * random.uniform(0.7, 1.1), 2),
+            "acquisition_date": (datetime.now(timezone.utc) - timedelta(days=random.randint(100, 1000))).strftime("%Y-%m-%d"),
+            "unrealized_gain": round(holding["value"] * random.uniform(-0.1, 0.3), 2)
+        })
+    
+    return {
+        "client_id": client_id,
+        "lots": lots,
+        "total_lots": len(lots)
+    }
+
+
 # ==================== HEALTH CHECK ====================
 
 @router.get("/health")

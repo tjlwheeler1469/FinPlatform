@@ -551,6 +551,14 @@ def include_all_routes():
     except ImportError as e:
         logger.error(f"Failed to load client profile retirement routes: {e}")
 
+    # WEBSOCKET SERVICE - Real-time Push Notifications
+    try:
+        from routes.websocket_service import router as websocket_router
+        app.include_router(websocket_router, prefix="/api")
+        logger.info("WEBSOCKET SERVICE loaded: Real-time notifications for Enterprise, Platform Sync, Compliance")
+    except ImportError as e:
+        logger.error(f"Failed to load websocket service routes: {e}")
+
 # Include all routes
 include_all_routes()
 
@@ -612,7 +620,9 @@ async def health_check():
             "retirement_calculator": True,
             "decumulation_calculator": True,
             "platform_integrations": True,
-            "client_profile_retirement": True
+            "client_profile_retirement": True,
+            "websocket_service": True,
+            "xplan_phase2": True
         },
         "revenue_layer": {
             "aum_fees": True,

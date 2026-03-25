@@ -13,10 +13,12 @@ import { Alert, AlertDescription, AlertTitle } from '../components/ui/alert';
 import { ScrollArea } from '../components/ui/scroll-area';
 import { Separator } from '../components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
+import { toast } from 'sonner';
 import {
   Calculator, TrendingUp, DollarSign, PiggyBank, Building, Users, Calendar,
   Target, Briefcase, ChevronRight, Download, RefreshCw, AlertTriangle,
-  CheckCircle2, Info, BarChart3, Wallet, Shield, Clock
+  CheckCircle2, Info, BarChart3, Wallet, Shield, Clock, Save, Upload
 } from 'lucide-react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -78,6 +80,12 @@ export default function RetirementCalculator() {
   // Advanced Settings
   const [inflationRate, setInflationRate] = useState(2.5);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  
+  // Save to Profile
+  const [saving, setSaving] = useState(false);
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [saveClientId, setSaveClientId] = useState('');
+  const [savePlatforms, setSavePlatforms] = useState([]);
   
   // Custom Asset Allocation (for custom profile)
   const [customAllocation, setCustomAllocation] = useState({
@@ -156,6 +164,46 @@ export default function RetirementCalculator() {
     setCalculating(false);
   };
 
+  const saveToClientProfile = async () => {
+    if (!result) {
+      toast.error('No calculation to save. Run a calculation first.');
+      return;
+    }
+    
+    setSaving(true);
+    try {
+      const clientId = saveClientId || `CLIENT-${Date.now()}`;
+      const response = await fetch(`${API_URL}/api/client-profile/retirement/save`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          client_id: clientId,
+          client_name: clientName || 'Unnamed Client',
+          calculation_type: 'accumulation',
+          calculation_id: result.calculation_id || `CALC-${Date.now()}`,
+          calculation_data: result,
+          push_to_platforms: savePlatforms.length > 0 ? savePlatforms : null
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.status === 'success') {
+        toast.success(`Saved to client profile: ${clientId}`);
+        if (data.platform_push_results?.length > 0) {
+          toast.success(`Pushed to ${data.platform_push_results.length} platform(s)`);
+        }
+        setShowSaveDialog(false);
+      } else {
+        toast.error('Failed to save: ' + (data.message || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Save failed:', error);
+      toast.error('Failed to save to client profile');
+    }
+    setSaving(false);
+  };
+
   const loadSampleCalculation = async () => {
     setCalculating(true);
     try {
@@ -167,6 +215,10 @@ export default function RetirementCalculator() {
       console.error('Failed to load sample:', error);
     }
     setCalculating(false);
+  };
+
+  const formatCurrency = (value) => {
+    return `AUD $${value?.toLocaleString() || 0}`;
   };
 
   const exportResults = (format) => {
@@ -194,10 +246,6 @@ export default function RetirementCalculator() {
       a.click();
       URL.revokeObjectURL(url);
     }
-  };
-
-  const formatCurrency = (value) => {
-    return `AUD $${value?.toLocaleString() || 0}`;
   };
 
   const getAllocationData = () => {
@@ -586,6 +634,73 @@ export default function RetirementCalculator() {
                       </div>
                     </CardContent>
                   </Card>
+                </div>
+
+                {/* Save to Profile Button */}
+                <div className="flex justify-end gap-2">
+                  <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" data-testid="save-to-profile-btn">
+                        <Save className="h-4 w-4 mr-2" /> Save to Client Profile
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Save Calculation to Client Profile</DialogTitle>
+                        <DialogDescription>
+                          Save this retirement calculation to a client profile and optionally push to connected platforms.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4 py-4">
+                        <div>
+                          <Label htmlFor="client-id">Client ID</Label>
+                          <Input
+                            id="client-id"
+                            value={saveClientId}
+                            onChange={(e) => setSaveClientId(e.target.value)}
+                            placeholder="e.g., CLIENT-001 (auto-generated if blank)"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="client-name">Client Name</Label>
+                          <Input
+                            id="client-name"
+                            value={clientName}
+                            onChange={(e) => setClientName(e.target.value)}
+                            placeholder="e.g., John Smith"
+                          />
+                        </div>
+                        <div>
+                          <Label>Push to Platforms (optional)</Label>
+                          <div className="flex flex-wrap gap-2 mt-2">
+                            {['amp_north', 'netwealth', 'hub24', 'class', 'iress'].map(platform => (
+                              <Button
+                                key={platform}
+                                variant={savePlatforms.includes(platform) ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => {
+                                  if (savePlatforms.includes(platform)) {
+                                    setSavePlatforms(savePlatforms.filter(p => p !== platform));
+                                  } else {
+                                    setSavePlatforms([...savePlatforms, platform]);
+                                  }
+                                }}
+                              >
+                                {platform.replace('_', ' ').toUpperCase()}
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => setShowSaveDialog(false)}>Cancel</Button>
+                        <Button onClick={saveToClientProfile} disabled={saving}>
+                          {saving ? <RefreshCw className="h-4 w-4 mr-2 animate-spin" /> : <Upload className="h-4 w-4 mr-2" />}
+                          {saving ? 'Saving...' : 'Save & Push'}
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                 </div>
 
                 {/* Scenarios Comparison */}
