@@ -194,8 +194,6 @@ const adviserBaseNav = [
     icon: Zap,
     items: [
       { path: "/batch-execution", label: "Batch Execute", icon: Zap, title: "Batch Execution" },
-      { path: "/retirement-calculator", label: "Accumulation Calc", icon: Calculator, title: "Retirement Calculator (Accumulation)", badge: "NEW" },
-      { path: "/decumulation-calculator", label: "Decumulation Calc", icon: TrendingUp, title: "Decumulation Calculator (Pension)", badge: "NEW" },
     ]
   },
   {
@@ -243,9 +241,7 @@ const clientContextNav = [
     icon: Target,
     items: [
       { path: "/goal-tracker", label: "Goals", icon: Target, title: "Goals" },
-      { path: "/transaction-modeler", label: "What-If Modeler", icon: Calculator, title: "What-If & Plan Generator" },
-      { path: "/retirement-calculator", label: "Accumulation", icon: PiggyBank, title: "Retirement Calculator (Accumulation)", badge: "NEW" },
-      { path: "/decumulation-calculator", label: "Decumulation", icon: TrendingUp, title: "Decumulation Calculator (Pension)", badge: "NEW" },
+      { path: "/retirement", label: "Retirement", icon: PiggyBank, title: "Retirement Planning (Accumulation & Decumulation)", badge: "NEW" },
     ]
   },
   {
@@ -253,6 +249,7 @@ const clientContextNav = [
     icon: TrendingUp,
     items: [
       { path: "/family-wealth", label: "Net Worth", icon: Eye, title: "Net Worth" },
+      { path: "/transaction-modeler", label: "Transaction Modeler", icon: Calculator, title: "Transaction Modeler & What-If Analysis" },
       { path: "/stock-trading", label: "Shares & Trading", icon: TrendingUp, title: "Shares & Trading" },
       { path: "/cash-deposits", label: "Cash & TDs", icon: PiggyBank, title: "Cash & Term Deposits" },
       { path: "/managed-funds", label: "Funds", icon: PieChart, title: "Managed Funds" },

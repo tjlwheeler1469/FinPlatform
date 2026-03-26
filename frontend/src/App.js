@@ -217,6 +217,9 @@ const RetirementCalculator = lazy(() => import("@/pages/RetirementCalculator"));
 // Decumulation Calculator - Pension Phase Planning
 const DecumulationCalculator = lazy(() => import("@/pages/DecumulationCalculator"));
 
+// Unified Retirement Planner - Comprehensive retirement planning
+const RetirementPlanner = lazy(() => import("@/pages/RetirementPlanner"));
+
 // Platform Integrations - AMP North, Netwealth, Hub24, Class, IRESS
 const PlatformIntegrations = lazy(() => import("@/pages/PlatformIntegrations"));
 
@@ -1104,6 +1107,9 @@ const AppRouter = () => {
       
       {/* Decumulation Calculator - Pension Phase Planning */}
       <Route path="/decumulation-calculator" element={<DecumulationCalculator />} />
+      
+      {/* Unified Retirement Planner - Comprehensive retirement planning */}
+      <Route path="/retirement" element={<RetirementPlanner />} />
       
       {/* Platform Integrations - AMP North, Netwealth, Hub24, Class, IRESS */}
       <Route path="/platform-integrations" element={<PlatformIntegrations />} />
