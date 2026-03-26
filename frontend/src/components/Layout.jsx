@@ -75,7 +75,8 @@ import {
   Gauge,
   Lock,
   Unlock,
-  Presentation
+  Presentation,
+  Calendar
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -172,6 +173,7 @@ const adviserBaseNav = [
     icon: LayoutDashboard,
     items: [
       { path: "/advisor-command-center", label: "Command Center", icon: Sun, title: "Advisor Command Center" },
+      { path: "/daily-briefing", label: "Daily Briefing", icon: Calendar, title: "Daily Briefing", badge: "NEW" },
       { path: "/macro-dashboard", label: "Markets", icon: BarChart3, title: "Live Markets", badge: "LIVE" },
       { path: "/knowledge-graph", label: "Knowledge Graph", icon: Network, title: "AI Intelligence", badge: "AI" },
     ]

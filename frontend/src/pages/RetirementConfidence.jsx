@@ -27,6 +27,395 @@ import {
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || '';
 
+// ==================== PHASE 1: CLIENT POSITION SUMMARY ====================
+
+const PositionSummary = ({ result, baselineResult }) => {
+  if (!result) return null;
+
+  const confidence = result.confidence_score || result.display?.today || 0;
+  const getPosition = () => {
+    if (confidence >= 80) return { status: 'On Track', color: 'text-green-600', bg: 'bg-green-50', border: 'border-green-200' };
+    if (confidence >= 60) return { status: 'Good', color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200' };
+    if (confidence >= 40) return { status: 'At Risk', color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-200' };
+    return { status: 'Critical', color: 'text-red-600', bg: 'bg-red-50', border: 'border-red-200' };
+  };
+
+  const position = getPosition();
+  
+  // Identify risks and strengths from the result
+  const risks = [];
+  const strengths = [];
+  const actions = [];
+
+  const factors = result.confidence_breakdown?.raw_factors || {};
+  
+  if ((result.monte_carlo?.success_rate_percent || 0) < 75) risks.push('Low Monte Carlo success rate');
+  if ((factors.income_stability || 0) < 0.5) risks.push('Unstable income sources');
+  if ((factors.spending_flexibility || 0) < 0.4) risks.push('High essential spending');
+  if ((factors.diversification || 0) < 0.5) risks.push('Concentrated portfolio');
+  if ((factors.longevity_protection || 0) < 0.5) risks.push('Longevity risk exposure');
+  
+  if ((factors.monte_carlo_success || 0) >= 0.9) strengths.push('Strong success probability');
+  if ((factors.income_stability || 0) >= 0.7) strengths.push('Stable income sources');
+  if ((factors.diversification || 0) >= 0.7) strengths.push('Well diversified portfolio');
+  if ((factors.spending_flexibility || 0) >= 0.5) strengths.push('Flexible spending capacity');
+
+  // Generate actions based on weakest factors
+  if ((factors.monte_carlo_success || 0) < 0.8) actions.push({ action: 'Delay retirement by 2 years', impact: '+13%' });
+  if ((factors.spending_flexibility || 0) < 0.5) actions.push({ action: 'Reduce spending by 15%', impact: '+8%' });
+  if ((factors.diversification || 0) < 0.6) actions.push({ action: 'Diversify into bonds', impact: '+5%' });
+
+  return (
+    <Card className={`border-2 ${position.border} ${position.bg}`}>
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2">
+          <Brain className="h-5 w-5 text-purple-500" />
+          Position Summary
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Main Summary */}
+        <div className={`p-4 rounded-lg bg-white border ${position.border}`}>
+          <p className="text-lg">
+            <span className={`font-bold ${position.color}`}>You are {position.status.toLowerCase()}</span> for retirement 
+            {confidence >= 60 ? ' with moderate risk.' : confidence >= 40 ? ' with elevated risk.' : ' and need immediate attention.'}
+          </p>
+          {risks.length > 0 && (
+            <p className="text-sm text-muted-foreground mt-2">
+              <span className="font-medium text-red-600">Main risks:</span> {risks.slice(0, 2).join(', ')}.
+            </p>
+          )}
+          {actions.length > 0 && (
+            <p className="text-sm mt-2">
+              <span className="font-medium text-green-600">Biggest improvement:</span> {actions[0]?.action} 
+              <Badge className="ml-2 bg-green-500">{actions[0]?.impact}</Badge>
+            </p>
+          )}
+        </div>
+
+        {/* Risks & Strengths Grid */}
+        <div className="grid md:grid-cols-2 gap-4">
+          <div>
+            <p className="text-sm font-medium mb-2 flex items-center gap-1">
+              <AlertTriangle className="h-4 w-4 text-red-500" />
+              Key Risks
+            </p>
+            <div className="space-y-1">
+              {risks.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No significant risks identified</p>
+              ) : (
+                risks.slice(0, 3).map((risk, i) => (
+                  <div key={i} className="flex items-center gap-2 text-sm">
+                    <XCircle className="h-3 w-3 text-red-500" />
+                    {risk}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+          <div>
+            <p className="text-sm font-medium mb-2 flex items-center gap-1">
+              <Shield className="h-4 w-4 text-green-500" />
+              Key Strengths
+            </p>
+            <div className="space-y-1">
+              {strengths.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Building towards stability</p>
+              ) : (
+                strengths.slice(0, 3).map((strength, i) => (
+                  <div key={i} className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-3 w-3 text-green-500" />
+                    {strength}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Top Improvement Actions */}
+        {actions.length > 0 && (
+          <div>
+            <p className="text-sm font-medium mb-2 flex items-center gap-1">
+              <Lightbulb className="h-4 w-4 text-amber-500" />
+              Improvement Actions
+            </p>
+            <div className="space-y-2">
+              {actions.slice(0, 3).map((action, i) => (
+                <div key={i} className="flex items-center justify-between p-2 bg-white rounded border">
+                  <span className="text-sm">{action.action}</span>
+                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                    {action.impact}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+// ==================== PHASE 2: CONFIDENCE DRIVER VISUALIZATION ====================
+
+const ConfidenceDrivers = ({ factors }) => {
+  if (!factors) return null;
+
+  const drivers = [
+    { 
+      name: 'Savings Strength', 
+      key: 'monte_carlo_success',
+      value: (factors.monte_carlo_success || 0) * 100,
+      description: 'Probability of not running out of money',
+      color: '#3b82f6'
+    },
+    { 
+      name: 'Market Risk', 
+      key: 'downside_protection',
+      value: (factors.downside_protection || 0) * 100,
+      description: 'Protection against market downturns',
+      color: '#22c55e'
+    },
+    { 
+      name: 'Longevity Risk', 
+      key: 'longevity_protection',
+      value: (factors.longevity_protection || 0) * 100,
+      description: 'Runway beyond life expectancy',
+      color: '#ec4899'
+    },
+    { 
+      name: 'Spending Flexibility', 
+      key: 'spending_flexibility',
+      value: (factors.spending_flexibility || 0) * 100,
+      description: 'Ability to reduce spending if needed',
+      color: '#f59e0b'
+    },
+    { 
+      name: 'Diversification', 
+      key: 'diversification',
+      value: (factors.diversification || 0) * 100,
+      description: 'Asset allocation spread',
+      color: '#06b6d4'
+    },
+  ];
+
+  const getStatus = (value) => {
+    if (value >= 80) return { label: 'Strong', icon: <ArrowUp className="h-3 w-3" />, color: 'text-green-600' };
+    if (value >= 50) return { label: 'Moderate', icon: <Activity className="h-3 w-3" />, color: 'text-blue-600' };
+    return { label: 'Weak', icon: <ArrowDown className="h-3 w-3" />, color: 'text-red-600' };
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <BarChart3 className="h-5 w-5 text-blue-500" />
+          Confidence Drivers
+        </CardTitle>
+        <CardDescription>
+          Visual breakdown of your confidence score components
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {drivers.map((driver) => {
+            const status = getStatus(driver.value);
+            return (
+              <div key={driver.key} className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-medium text-sm">{driver.name}</span>
+                    <p className="text-xs text-muted-foreground">{driver.description}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-sm font-bold ${status.color}`}>
+                      {driver.value.toFixed(0)}%
+                    </span>
+                    <Badge variant="outline" className={status.color}>
+                      {status.icon}
+                      <span className="ml-1">{status.label}</span>
+                    </Badge>
+                  </div>
+                </div>
+                <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{ 
+                      width: `${driver.value}%`, 
+                      backgroundColor: driver.value >= 80 ? '#22c55e' : driver.value >= 50 ? driver.color : '#ef4444'
+                    }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+// ==================== PHASE 3: SCENARIO DELTA ENGINE ====================
+
+const ScenarioDelta = ({ baselineResult, currentResult, scenarios }) => {
+  if (!currentResult) return null;
+
+  const baseConfidence = baselineResult?.confidence_score || baselineResult?.display?.today || 0;
+  const currentConfidence = currentResult?.confidence_score || currentResult?.display?.today || 0;
+  const delta = currentConfidence - baseConfidence;
+  
+  const baseMedian = baselineResult?.monte_carlo?.percentiles?.p50_median || 0;
+  const currentMedian = currentResult?.monte_carlo?.percentiles?.p50_median || 0;
+  const surplusDelta = currentMedian - baseMedian;
+
+  const formatCurrency = (value) => {
+    if (Math.abs(value) >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
+    if (Math.abs(value) >= 1000) return `$${(value / 1000).toFixed(0)}K`;
+    return `$${value.toFixed(0)}`;
+  };
+
+  return (
+    <Card className={delta !== 0 ? (delta > 0 ? 'border-green-200 bg-green-50/50' : 'border-red-200 bg-red-50/50') : ''}>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Target className="h-5 w-5 text-purple-500" />
+          Scenario Impact
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-3 gap-4 mb-4">
+          {/* Confidence Change */}
+          <div className="text-center p-4 bg-white rounded-lg border">
+            <p className="text-xs text-muted-foreground mb-1">Confidence Change</p>
+            <p className={`text-3xl font-bold ${delta > 0 ? 'text-green-600' : delta < 0 ? 'text-red-600' : 'text-gray-600'}`}>
+              {delta > 0 ? '+' : ''}{delta.toFixed(1)}%
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {baseConfidence.toFixed(0)}% → {currentConfidence.toFixed(0)}%
+            </p>
+          </div>
+          
+          {/* Surplus/Shortfall Change */}
+          <div className="text-center p-4 bg-white rounded-lg border">
+            <p className="text-xs text-muted-foreground mb-1">Surplus Change</p>
+            <p className={`text-3xl font-bold ${surplusDelta > 0 ? 'text-green-600' : surplusDelta < 0 ? 'text-red-600' : 'text-gray-600'}`}>
+              {surplusDelta > 0 ? '+' : ''}{formatCurrency(surplusDelta)}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Median outcome change
+            </p>
+          </div>
+          
+          {/* Key Driver */}
+          <div className="text-center p-4 bg-white rounded-lg border">
+            <p className="text-xs text-muted-foreground mb-1">Primary Driver</p>
+            <p className="text-lg font-bold text-purple-600">
+              {delta > 0 ? 'Extended runway' : delta < 0 ? 'Increased risk' : 'No change'}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Impact source
+            </p>
+          </div>
+        </div>
+
+        {/* Scenario Comparison */}
+        {scenarios && scenarios.length > 0 && (
+          <div className="space-y-2">
+            <p className="text-sm font-medium">Scenario Comparison:</p>
+            {scenarios.slice(0, 4).map((scenario, i) => (
+              <div key={i} className="flex items-center justify-between p-2 bg-white rounded border">
+                <span className="text-sm">{scenario.name}</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold">{scenario.confidence?.toFixed(0)}%</span>
+                  {scenario.delta_vs_base !== undefined && (
+                    <Badge className={scenario.delta_vs_base > 0 ? 'bg-green-500' : scenario.delta_vs_base < 0 ? 'bg-red-500' : 'bg-gray-500'}>
+                      {scenario.delta_vs_base > 0 ? '+' : ''}{scenario.delta_vs_base?.toFixed(1)}%
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+// ==================== PHASE 4: LIVE VS PLAN CONFIDENCE ====================
+
+const LiveVsPlanConfidence = ({ liveConfidence, planConfidence, mode }) => {
+  const diff = (planConfidence || 0) - (liveConfidence || 0);
+  
+  const getColor = (score) => {
+    if (score >= 80) return '#22c55e';
+    if (score >= 60) return '#3b82f6';
+    if (score >= 40) return '#f59e0b';
+    return '#ef4444';
+  };
+
+  return (
+    <Card className="border-2 border-dashed border-purple-200">
+      <CardHeader className="pb-2">
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Eye className="h-5 w-5 text-purple-500" />
+          Live vs Planned Confidence
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-2 gap-4">
+          {/* Live Confidence */}
+          <div className={`p-4 rounded-lg ${mode === 'background' ? 'ring-2 ring-blue-500' : 'bg-slate-50'}`}>
+            <div className="flex items-center gap-2 mb-2">
+              <Activity className="h-4 w-4 text-blue-500" />
+              <span className="text-sm font-medium">Live Confidence</span>
+              {mode === 'background' && <Badge className="bg-blue-500 text-xs">Active</Badge>}
+            </div>
+            <p className="text-3xl font-bold" style={{ color: getColor(liveConfidence) }}>
+              {(liveConfidence || 0).toFixed(0)}%
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Real-time market conditions
+            </p>
+          </div>
+          
+          {/* Plan Confidence */}
+          <div className={`p-4 rounded-lg ${mode === 'presentation' ? 'ring-2 ring-purple-500' : 'bg-slate-50'}`}>
+            <div className="flex items-center gap-2 mb-2">
+              <UserCog className="h-4 w-4 text-purple-500" />
+              <span className="text-sm font-medium">Planned Confidence</span>
+              {mode === 'presentation' && <Badge className="bg-purple-500 text-xs">Active</Badge>}
+            </div>
+            <p className="text-3xl font-bold" style={{ color: getColor(planConfidence) }}>
+              {(planConfidence || 0).toFixed(0)}%
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Advisor scenario
+            </p>
+          </div>
+        </div>
+        
+        {/* Difference Indicator */}
+        {Math.abs(diff) > 0.5 && (
+          <div className={`mt-4 p-3 rounded-lg ${diff > 0 ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+            <div className="flex items-center gap-2">
+              {diff > 0 ? (
+                <ArrowUp className="h-4 w-4 text-green-600" />
+              ) : (
+                <ArrowDown className="h-4 w-4 text-red-600" />
+              )}
+              <span className={`text-sm font-medium ${diff > 0 ? 'text-green-700' : 'text-red-700'}`}>
+                Planned scenario is {Math.abs(diff).toFixed(1)}% {diff > 0 ? 'higher' : 'lower'} than live
+              </span>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
 // ==================== CONFIDENCE GAUGE COMPONENT ====================
 
 const ConfidenceGauge = ({ today, afterChanges, afterStress, isAdvanced }) => {
@@ -576,6 +965,36 @@ const RetirementConfidence = () => {
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
+            {/* Phase 1: Position Summary */}
+            {result && (
+              <PositionSummary result={result} baselineResult={baselineResult} />
+            )}
+
+            {/* Phase 4: Live vs Plan Confidence */}
+            {engineMode === 'advanced' && result && (
+              <LiveVsPlanConfidence 
+                liveConfidence={result.display?.today || result.confidence_score}
+                planConfidence={baselineResult?.display?.today || baselineResult?.confidence_score || result.display?.today || result.confidence_score}
+                mode={mode}
+              />
+            )}
+
+            <div className="grid lg:grid-cols-2 gap-6">
+              {/* Phase 2: Confidence Drivers */}
+              {engineMode === 'advanced' && result?.confidence_breakdown?.raw_factors && (
+                <ConfidenceDrivers factors={result.confidence_breakdown.raw_factors} />
+              )}
+
+              {/* Phase 3: Scenario Delta */}
+              {result && (
+                <ScenarioDelta 
+                  baselineResult={baselineResult || result}
+                  currentResult={result}
+                  scenarios={scenarios}
+                />
+              )}
+            </div>
+
             <div className="grid lg:grid-cols-2 gap-6">
               {/* Stress Tests */}
               <Card>
