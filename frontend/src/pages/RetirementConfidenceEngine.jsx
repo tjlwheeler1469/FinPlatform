@@ -21,7 +21,7 @@ import {
   AlertTriangle, Plus, Trash2, Play, RefreshCw, Info, BarChart3, Zap, ChevronRight,
   Clock, Activity, Brain, Lightbulb, CheckCircle2, XCircle, ArrowRight, ArrowUp, ArrowDown,
   Gauge, CircleDollarSign, Building2, Briefcase, Heart, Flame, Snowflake, Download, FileDown,
-  Eye, UserCog
+  Eye, UserCog, History, UsersRound
 } from 'lucide-react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -268,6 +268,64 @@ export default function RetirementConfidenceEngine() {
   // View mode (advisor vs client)
   const [viewMode, setViewMode] = useState('advisor'); // 'advisor' or 'client'
   const [generatingPdf, setGeneratingPdf] = useState(false);
+  
+  // History state
+  const [historyData, setHistoryData] = useState(null);
+  const [loadingHistory, setLoadingHistory] = useState(false);
+  
+  // Partner comparison state
+  const [showPartnerModal, setShowPartnerModal] = useState(false);
+  const [partnerComparison, setPartnerComparison] = useState(null);
+  const [comparingPartner, setComparingPartner] = useState(false);
+  const [partner2Assets, setPartner2Assets] = useState(800000);
+  const [partner2Expenses, setPartner2Expenses] = useState(60000);
+  const [partner2Age, setPartner2Age] = useState(43);
+
+  // ==================== FETCH HISTORY ====================
+  
+  const fetchHistory = useCallback(async () => {
+    setLoadingHistory(true);
+    try {
+      const response = await fetch(`${API_URL}/api/confidence-history/client/demo_client/chart-data?interval=monthly&periods=12`);
+      if (response.ok) {
+        const data = await response.json();
+        setHistoryData(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch history:', error);
+    }
+    setLoadingHistory(false);
+  }, []);
+  
+  // ==================== PARTNER COMPARISON ====================
+  
+  const runPartnerComparison = async () => {
+    setComparingPartner(true);
+    try {
+      const myAssets = netWorth + superBalance + investmentBalance;
+      const response = await fetch(
+        `${API_URL}/api/partner-comparison/quick-compare?` +
+        `person1_assets=${myAssets}&person1_expenses=${annualExpenses}&person1_age=${currentAge}` +
+        `&person2_assets=${partner2Assets}&person2_expenses=${partner2Expenses}&person2_age=${partner2Age}`,
+        { method: 'POST' }
+      );
+      
+      if (response.ok) {
+        const data = await response.json();
+        setPartnerComparison(data);
+        toast.success('Partner comparison complete!');
+      }
+    } catch (error) {
+      console.error('Failed to compare:', error);
+      toast.error('Failed to run comparison');
+    }
+    setComparingPartner(false);
+  };
+  
+  // Fetch history on mount
+  useEffect(() => {
+    fetchHistory();
+  }, [fetchHistory]);
 
   // ==================== IMPORT FROM NET WORTH ====================
   
@@ -782,15 +840,21 @@ export default function RetirementConfidenceEngine() {
         {/* Tabs for different features - Advisor Only */}
         {viewMode === 'advisor' && (
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="confidence" data-testid="confidence-tab">
-              <Gauge className="h-4 w-4 mr-2" /> Real-Time Modeling
+              <Gauge className="h-4 w-4 mr-2" /> Modeling
             </TabsTrigger>
             <TabsTrigger value="scenarios" data-testid="scenarios-tab">
-              <Activity className="h-4 w-4 mr-2" /> Multi-Scenario
+              <Activity className="h-4 w-4 mr-2" /> Scenarios
+            </TabsTrigger>
+            <TabsTrigger value="history" data-testid="history-tab">
+              <History className="h-4 w-4 mr-2" /> History
+            </TabsTrigger>
+            <TabsTrigger value="partner" data-testid="partner-tab">
+              <UsersRound className="h-4 w-4 mr-2" /> Partner
             </TabsTrigger>
             <TabsTrigger value="explanation" data-testid="explanation-tab">
-              <Brain className="h-4 w-4 mr-2" /> AI Insights
+              <Brain className="h-4 w-4 mr-2" /> AI
             </TabsTrigger>
             <TabsTrigger value="settings" data-testid="settings-tab">
               <Zap className="h-4 w-4 mr-2" /> Settings
@@ -1108,6 +1172,211 @@ export default function RetirementConfidenceEngine() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* History Tab */}
+          <TabsContent value="history" className="space-y-6">
+            <div className="grid grid-cols-1 gap-6">
+              {/* History Chart */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <History className="h-5 w-5" />
+                    Confidence Score History
+                  </CardTitle>
+                  <CardDescription>Track your retirement confidence over time</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {loadingHistory ? (
+                    <div className="h-64 flex items-center justify-center">
+                      <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
+                    </div>
+                  ) : historyData?.chart_data?.length > 0 ? (
+                    <div className="h-64">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={historyData.chart_data}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="period" />
+                          <YAxis domain={[0, 100]} />
+                          <Tooltip />
+                          <Area
+                            type="monotone"
+                            dataKey="confidence_score"
+                            stroke="#22c55e"
+                            fill="#22c55e"
+                            fillOpacity={0.3}
+                            name="Confidence Score"
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                  ) : (
+                    <div className="h-64 flex items-center justify-center text-muted-foreground">
+                      <p>No historical data available yet. Run some calculations to build history.</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Risk Trend */}
+              {historyData?.chart_data?.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Risk Factors Over Time</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-64">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={historyData.chart_data}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="period" />
+                          <YAxis domain={[0, 30]} />
+                          <Tooltip />
+                          <Legend />
+                          <Line type="monotone" dataKey="longevity_risk" stroke="#8b5cf6" name="Longevity" />
+                          <Line type="monotone" dataKey="market_risk" stroke="#ef4444" name="Market" />
+                          <Line type="monotone" dataKey="spending_risk" stroke="#f59e0b" name="Spending" />
+                          <Line type="monotone" dataKey="inflation_risk" stroke="#f97316" name="Inflation" />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              <Button onClick={fetchHistory} disabled={loadingHistory}>
+                <RefreshCw className={`h-4 w-4 mr-2 ${loadingHistory ? 'animate-spin' : ''}`} />
+                Refresh History
+              </Button>
+            </div>
+          </TabsContent>
+
+          {/* Partner Comparison Tab */}
+          <TabsContent value="partner" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Partner Input */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <UsersRound className="h-5 w-5" />
+                    Compare with Partner
+                  </CardTitle>
+                  <CardDescription>See how planning together improves confidence</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Alert>
+                    <Info className="h-4 w-4" />
+                    <AlertDescription>
+                      Your details (Person 1) are pre-filled from the sliders above.
+                      Enter your partner's details below.
+                    </AlertDescription>
+                  </Alert>
+                  
+                  <div className="space-y-2">
+                    <Label>Partner's Total Assets</Label>
+                    <Input
+                      type="number"
+                      value={partner2Assets}
+                      onChange={(e) => setPartner2Assets(Number(e.target.value))}
+                      placeholder="Total assets including super"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Partner's Annual Expenses</Label>
+                    <Input
+                      type="number"
+                      value={partner2Expenses}
+                      onChange={(e) => setPartner2Expenses(Number(e.target.value))}
+                      placeholder="Annual living expenses"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Partner's Age</Label>
+                    <Input
+                      type="number"
+                      value={partner2Age}
+                      onChange={(e) => setPartner2Age(Number(e.target.value))}
+                      min={25}
+                      max={80}
+                    />
+                  </div>
+                  
+                  <Button onClick={runPartnerComparison} disabled={comparingPartner} className="w-full">
+                    <UsersRound className={`h-4 w-4 mr-2 ${comparingPartner ? 'animate-pulse' : ''}`} />
+                    {comparingPartner ? 'Comparing...' : 'Compare Scenarios'}
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Comparison Results */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Comparison Results</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {partnerComparison ? (
+                    <div className="space-y-4">
+                      {/* Confidence Bars */}
+                      <div className="space-y-3">
+                        <div>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span>You Alone</span>
+                            <span className="font-bold">{partnerComparison.person1_confidence?.toFixed(1)}%</span>
+                          </div>
+                          <Progress value={partnerComparison.person1_confidence} className="h-3" />
+                        </div>
+                        
+                        <div>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span>Partner Alone</span>
+                            <span className="font-bold">{partnerComparison.person2_confidence?.toFixed(1)}%</span>
+                          </div>
+                          <Progress value={partnerComparison.person2_confidence} className="h-3" />
+                        </div>
+                        
+                        <div>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span className="font-semibold text-green-600">Together</span>
+                            <span className="font-bold text-green-600">{partnerComparison.together_confidence?.toFixed(1)}%</span>
+                          </div>
+                          <Progress value={partnerComparison.together_confidence} className="h-3 bg-green-100" />
+                        </div>
+                      </div>
+                      
+                      <Separator />
+                      
+                      {/* Synergy Benefits */}
+                      <div className="p-4 rounded-lg bg-green-50 border border-green-200">
+                        <h4 className="font-semibold text-green-800 mb-2">
+                          {partnerComparison.synergy_benefit > 0 ? '✨ ' : ''}
+                          Synergy Benefit: +{partnerComparison.synergy_benefit?.toFixed(1)}%
+                        </h4>
+                        <p className="text-sm text-green-700">
+                          Planning together saves ~${partnerComparison.expense_savings?.toLocaleString()}/year
+                          through shared expenses.
+                        </p>
+                      </div>
+                      
+                      <Alert>
+                        <Lightbulb className="h-4 w-4" />
+                        <AlertDescription>
+                          {partnerComparison.recommendation}
+                        </AlertDescription>
+                      </Alert>
+                    </div>
+                  ) : (
+                    <div className="h-48 flex items-center justify-center text-muted-foreground">
+                      <div className="text-center">
+                        <UsersRound className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                        <p>Enter partner details and click Compare to see results</p>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           {/* AI Insights Tab */}

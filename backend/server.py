@@ -647,6 +647,46 @@ def include_all_routes():
     except ImportError as e:
         logger.error(f"Failed to load adviser intelligence routes: {e}")
 
+    # SCALING INFRASTRUCTURE - Caching, rate limiting, background jobs
+    try:
+        from routes.scaling_infrastructure import router as scaling_router
+        app.include_router(scaling_router, prefix="/api")
+        logger.info("SCALING INFRASTRUCTURE loaded: Cache, rate limiter, job queue, metrics")
+    except ImportError as e:
+        logger.error(f"Failed to load scaling infrastructure routes: {e}")
+
+    # CONFIDENCE HISTORY - Historical score tracking and trends
+    try:
+        from routes.confidence_history import router as history_router
+        app.include_router(history_router, prefix="/api")
+        logger.info("CONFIDENCE HISTORY loaded: Historical tracking, trends, milestones")
+    except ImportError as e:
+        logger.error(f"Failed to load confidence history routes: {e}")
+
+    # SERVICES AUSTRALIA - Age Pension API integration
+    try:
+        from routes.services_australia import router as services_aus_router
+        app.include_router(services_aus_router, prefix="/api")
+        logger.info("SERVICES AUSTRALIA loaded: Age Pension assessment, rates, projections")
+    except ImportError as e:
+        logger.error(f"Failed to load Services Australia routes: {e}")
+
+    # CGT OPTIMIZER - Capital gains tax optimization
+    try:
+        from routes.cgt_optimizer import router as cgt_router
+        app.include_router(cgt_router, prefix="/api")
+        logger.info("CGT OPTIMIZER loaded: Tax-loss harvesting, disposal planning, scenarios")
+    except ImportError as e:
+        logger.error(f"Failed to load CGT optimizer routes: {e}")
+
+    # PARTNER COMPARISON - Compare individual vs couple retirement
+    try:
+        from routes.partner_comparison import router as partner_router
+        app.include_router(partner_router, prefix="/api")
+        logger.info("PARTNER COMPARISON loaded: Individual vs couple confidence analysis")
+    except ImportError as e:
+        logger.error(f"Failed to load partner comparison routes: {e}")
+
 # Include all routes
 include_all_routes()
 
