@@ -1148,3 +1148,126 @@ Draft → Pending Review → Reviewed → Pending Signature → Signed → Imple
 - `GET /api/compliance-docs/audit-trail/{id}` - Full audit trail
 
 **Testing**: Iteration 102 - All 19 backend tests passed, all frontend features verified
+
+---
+
+## Latest Implementation: March 26, 2026
+
+### Feature 4: Comprehensive Push Notification System
+
+**Route**: `/notification-center`
+**Backend**: `/app/backend/routes/push_notifications.py`
+**Frontend**: `/app/frontend/src/pages/NotificationCenterPage.jsx`
+
+Multi-channel notification system supporting:
+
+#### Notification Channels
+- **In-App Notifications**: Real-time notification bell/center with WebSocket delivery
+- **Desktop Push**: Browser notifications (Web Push API)
+- **Mobile Push**: Firebase Cloud Messaging (FCM) for Android/iOS
+- **Email**: SendGrid integration (MOCKED - logs to DB)
+- **SMS**: Twilio integration (MOCKED - logs to DB)
+
+#### Notification Types
+- `breach` - Compliance breach alerts (urgent priority)
+- `sync` - Platform sync complete/failed
+- `portfolio` - Portfolio alerts (drops, thresholds)
+- `meeting` - Meeting reminders
+- `document` - SOA/ROA review required
+- `info`, `warning`, `success`, `alert` - General notifications
+
+#### User Preferences
+- Channel toggles (in-app, desktop, mobile, email, SMS)
+- Category-specific on/off switches
+- Quiet hours configuration (start/end time)
+- Digest mode (hourly, daily, weekly batching)
+
+#### Frontend Features
+- 4 tabs: Notifications, Preferences, Devices, Status
+- Filter by type (all/unread) and category
+- Priority badges (urgent, high, normal, low)
+- Mark as read (single/all), dismiss, clear all
+- Real-time WebSocket connection status indicator
+- Desktop notification permission request
+
+**Key Endpoints**:
+- `GET /api/push/status` - Service status
+- `GET /api/push/notifications/{user_id}` - Get notifications
+- `POST /api/push/send` - Send notification
+- `POST /api/push/broadcast` - Broadcast to multiple users
+- `POST /api/push/preferences` - Save preferences
+- `POST /api/push/subscribe` - Register device for push
+- `POST /api/push/trigger/breach` - Trigger breach alert
+- `POST /api/push/trigger/sync-complete` - Trigger sync notification
+- `POST /api/push/trigger/portfolio-alert` - Trigger portfolio alert
+
+### Feature 5: Stress Testing Dashboard (20,000 Users)
+
+**Route**: `/stress-test`
+**Backend**: `/app/backend/routes/stress_testing.py`
+**Frontend**: `/app/frontend/src/pages/StressTestDashboard.jsx`
+
+Load testing infrastructure for enterprise-scale deployments:
+
+#### System Metrics Monitoring
+- CPU usage percentage
+- Memory usage (MB and %)
+- Disk usage
+- Estimated user capacity (calculated from available resources)
+
+#### Stress Test Configuration
+- Concurrent users slider: 10 - 20,000
+- Duration: 10 - 300 seconds
+- Ramp-up time: 1 - 60 seconds
+- Endpoint selection
+
+#### Quick Test Presets
+- Light: 100 users, 30 seconds
+- Medium: 1,000 users, 60 seconds
+- Heavy: 5,000 users, 120 seconds
+- Extreme: 20,000 users, 180 seconds
+
+#### Results Analytics
+- Total requests, success/failure counts
+- Requests per second (RPS)
+- Latency percentiles (min, avg, P50, P95, P99, max)
+- Per-endpoint breakdown
+- Error type categorization
+
+#### Notification Flood Test
+- Creates 10,000 notifications (1,000 users × 10 each)
+- Measures throughput (notifications/second)
+
+**Key Endpoints**:
+- `GET /api/stress-test/system/metrics` - Current system metrics
+- `GET /api/stress-test/system/capacity-estimate` - User capacity estimate
+- `POST /api/stress-test/start` - Start custom test
+- `POST /api/stress-test/quick/{preset}` - Run preset test
+- `GET /api/stress-test/status/{test_id}` - Test status
+- `GET /api/stress-test/results/{test_id}` - Full results
+- `GET /api/stress-test/history` - Test history
+- `POST /api/stress-test/notifications/flood` - Notification throughput test
+
+**Testing**: Iteration 103 - Backend 100%, Frontend 100%
+- Light stress test (100 users): 100% success rate, 210 RPS
+- System capacity estimate: ~11,000 concurrent users (memory-limited)
+
+---
+
+## Backlog / Future Tasks
+
+### P1 (High Priority)
+- Wire up real Email/SMS notifications (requires Twilio/SendGrid API keys)
+- PDF Document Generation for SOA/ROA records
+
+### P2 (Medium Priority)
+- Multi-tenant licensee data isolation for AFSL management
+- Horizontal scaling architecture for 20,000+ users
+
+### P3 (Low Priority)
+- Age Pension modeling with Services Australia integration
+- Mobile app with native push notifications
+
+### Refactoring Needed
+- `server.py` → Modular `routes/__init__.py` registry pattern
+- `RetirementCalculator.jsx` and `DecumulationCalculator.jsx` → Break into smaller components
