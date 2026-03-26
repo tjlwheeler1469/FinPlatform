@@ -257,10 +257,12 @@ const clientContextNav = [
     icon: TrendingUp,
     items: [
       { path: "/stock-trading", label: "Shares & ETFs", icon: TrendingUp, title: "Shares & Trading" },
-      { path: "/bonds-trading", label: "Fixed Income", icon: Landmark, title: "Bonds, TDs & Cash" },
+      { path: "/bonds-trading", label: "Bonds", icon: Landmark, title: "Bonds & Fixed Income" },
+      { path: "/hybrids-trading", label: "Hybrids", icon: Coins, title: "Hybrid Securities" },
       { path: "/property-portfolio", label: "Property", icon: Building2, title: "Property Portfolio" },
+      { path: "/cash-deposits", label: "Cash & TDs", icon: PiggyBank, title: "Cash & Term Deposits" },
       { path: "/managed-funds", label: "Managed Funds", icon: PieChart, title: "Managed Funds" },
-      { path: "/crypto-portfolio", label: "Alternatives", icon: Bitcoin, title: "Crypto & Hybrids" },
+      { path: "/crypto-portfolio", label: "Crypto", icon: Bitcoin, title: "Cryptocurrency" },
     ]
   },
   {

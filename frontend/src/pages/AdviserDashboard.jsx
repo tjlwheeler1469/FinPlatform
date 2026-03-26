@@ -268,7 +268,16 @@ const AdviserDashboard = () => {
 
   const viewClientPortal = (clientId) => {
     localStorage.setItem("active_client_id", clientId.toString());
-    navigate("/client-wealth");
+    // Find the client data to set the selected client
+    const client = mockClients.find(c => c.id === clientId);
+    if (client) {
+      localStorage.setItem("selected_client", JSON.stringify({
+        id: client.id,
+        name: client.name,
+        aum: client.aum
+      }));
+    }
+    navigate("/client-360");
   };
 
   const viewClientCompliance = (clientId) => {
