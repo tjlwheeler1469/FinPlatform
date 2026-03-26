@@ -687,6 +687,22 @@ def include_all_routes():
     except ImportError as e:
         logger.error(f"Failed to load partner comparison routes: {e}")
 
+    # REAL-TIME COLLABORATION - WebSocket-based advisor-client sessions
+    try:
+        from routes.realtime_collaboration import router as collab_router
+        app.include_router(collab_router, prefix="/api")
+        logger.info("REAL-TIME COLLABORATION loaded: WebSocket sessions, chat, shared inputs")
+    except ImportError as e:
+        logger.error(f"Failed to load collaboration routes: {e}")
+
+    # SCENARIO TEMPLATES - Pre-built retirement scenarios
+    try:
+        from routes.scenario_templates import router as templates_router
+        app.include_router(templates_router, prefix="/api")
+        logger.info("SCENARIO TEMPLATES loaded: Early retirement, sabbatical, inheritance, etc.")
+    except ImportError as e:
+        logger.error(f"Failed to load scenario templates routes: {e}")
+
 # Include all routes
 include_all_routes()
 

@@ -280,6 +280,71 @@ export default function RetirementConfidenceEngine() {
   const [partner2Assets, setPartner2Assets] = useState(800000);
   const [partner2Expenses, setPartner2Expenses] = useState(60000);
   const [partner2Age, setPartner2Age] = useState(43);
+  
+  // Scenario templates state
+  const [templates, setTemplates] = useState([]);
+  const [loadingTemplates, setLoadingTemplates] = useState(false);
+  const [applyingTemplate, setApplyingTemplate] = useState(null);
+
+  // ==================== FETCH TEMPLATES ====================
+  
+  const fetchTemplates = useCallback(async () => {
+    setLoadingTemplates(true);
+    try {
+      const response = await fetch(`${API_URL}/api/scenario-templates/list`);
+      if (response.ok) {
+        const data = await response.json();
+        setTemplates(data.templates || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch templates:', error);
+    }
+    setLoadingTemplates(false);
+  }, []);
+  
+  // ==================== APPLY TEMPLATE ====================
+  
+  const applyTemplate = async (templateId) => {
+    setApplyingTemplate(templateId);
+    try {
+      const myAssets = netWorth + superBalance + investmentBalance;
+      const response = await fetch(
+        `${API_URL}/api/scenario-templates/${templateId}/apply?` +
+        `current_age=${currentAge}&retirement_age=${retirementAge}` +
+        `&net_worth=${myAssets}&annual_income=${annualIncome}&annual_expenses=${annualExpenses}` +
+        `&super_balance=${superBalance}&is_couple=${isCouple}`,
+        { method: 'POST' }
+      );
+      
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Apply adjusted values
+        if (data.adjusted_inputs) {
+          const adj = data.adjusted_inputs;
+          if (adj.retirement_age) setRetirementAge(adj.retirement_age);
+          if (adj.annual_expenses) setAnnualExpenses(Math.round(adj.annual_expenses));
+          if (adj.net_worth) setNetWorth(Math.round(adj.net_worth));
+        }
+        
+        toast.success(`Applied "${data.template_name}" scenario!`);
+        
+        // Show considerations
+        if (data.considerations?.length > 0) {
+          setTimeout(() => {
+            toast.info(data.considerations[0], { duration: 5000 });
+          }, 1000);
+        }
+        
+        // Recalculate
+        setTimeout(() => calculateConfidence(), 100);
+      }
+    } catch (error) {
+      console.error('Failed to apply template:', error);
+      toast.error('Failed to apply scenario template');
+    }
+    setApplyingTemplate(null);
+  };
 
   // ==================== FETCH HISTORY ====================
   
@@ -325,7 +390,8 @@ export default function RetirementConfidenceEngine() {
   // Fetch history on mount
   useEffect(() => {
     fetchHistory();
-  }, [fetchHistory]);
+    fetchTemplates();
+  }, [fetchHistory, fetchTemplates]);
 
   // ==================== IMPORT FROM NET WORTH ====================
   
@@ -1134,41 +1200,78 @@ export default function RetirementConfidenceEngine() {
               )}
             </div>
 
-            {/* Preset Scenarios */}
+            {/* Advanced Scenario Templates */}
             <Card>
               <CardHeader>
-                <CardTitle>Quick Scenario Templates</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <Zap className="h-5 w-5" />
+                  Advanced Scenario Templates
+                </CardTitle>
+                <CardDescription>Apply pre-built scenarios with one click</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <Button variant="outline" onClick={() => {
-                    setNewScenarioName('Retire at 60');
-                    setScenarioRetirementAge(60);
-                    setScenarioSpendingAdjust(0);
-                  }}>
-                    Early Retirement (60)
-                  </Button>
-                  <Button variant="outline" onClick={() => {
-                    setNewScenarioName('Work until 70');
-                    setScenarioRetirementAge(70);
-                    setScenarioSpendingAdjust(0);
-                  }}>
-                    Work Longer (70)
-                  </Button>
-                  <Button variant="outline" onClick={() => {
-                    setNewScenarioName('Frugal Retirement');
-                    setScenarioRetirementAge(retirementAge);
-                    setScenarioSpendingAdjust(-20);
-                  }}>
-                    Reduce Spending 20%
-                  </Button>
-                  <Button variant="outline" onClick={() => {
-                    setNewScenarioName('Boost Savings');
-                    setScenarioRetirementAge(retirementAge);
-                    setScenarioContribAdjust(20000);
-                  }}>
-                    +$20k/yr Savings
-                  </Button>
+                {loadingTemplates ? (
+                  <div className="flex items-center justify-center py-8">
+                    <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {templates.slice(0, 9).map((template) => (
+                      <button
+                        key={template.id}
+                        onClick={() => applyTemplate(template.id)}
+                        disabled={applyingTemplate === template.id}
+                        className="scenario-card p-4 rounded-lg border text-left hover:border-primary transition-all disabled:opacity-50"
+                        style={{ borderLeftColor: template.color, borderLeftWidth: '4px' }}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <h4 className="font-medium text-sm">{template.name}</h4>
+                            <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                              {template.description}
+                            </p>
+                          </div>
+                          {applyingTemplate === template.id && (
+                            <RefreshCw className="h-4 w-4 animate-spin flex-shrink-0" />
+                          )}
+                        </div>
+                        <Badge variant="outline" className="mt-2 text-xs">
+                          {template.category?.replace('_', ' ')}
+                        </Badge>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                
+                {/* Quick Presets */}
+                <div className="mt-4 pt-4 border-t">
+                  <h4 className="text-sm font-medium mb-3">Quick Adjustments</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                    <Button variant="outline" size="sm" onClick={() => {
+                      setNewScenarioName('Retire at 60');
+                      setScenarioRetirementAge(60);
+                    }}>
+                      Early Retirement (60)
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => {
+                      setNewScenarioName('Work until 70');
+                      setScenarioRetirementAge(70);
+                    }}>
+                      Work Longer (70)
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => {
+                      setNewScenarioName('Frugal');
+                      setScenarioSpendingAdjust(-20);
+                    }}>
+                      -20% Spending
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => {
+                      setNewScenarioName('Boost Savings');
+                      setScenarioContribAdjust(20000);
+                    }}>
+                      +$20k/yr Savings
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
