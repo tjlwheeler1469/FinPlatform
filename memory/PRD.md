@@ -1763,6 +1763,51 @@ The most advanced retirement planning engine combining Deterministic Modeling, M
 
 ---
 
+## Version 10.7 - UI/UX Navigation Restructuring (March 26, 2026) ✅ COMPLETE
+
+### Feature: Unified Navigation & Bottom-Up Client Flow
+
+**Changes Made:**
+
+1. **Combined Retirement Confidence Page** (`/retirement-confidence`)
+   - Merged old Confidence Engine + Hybrid Engine into single page
+   - Quick/Advanced toggle for different calculation depths
+   - Quick mode: Simplified inputs, faster calculation
+   - Advanced mode: Full 19-section hybrid engine with Advisor/Live toggle
+   - Both modes show: Today / After Changes / After Stress display
+
+2. **Unified Retirement Planner** (`/retirement`)
+   - Removed separate Accumulation/Decumulation links from navigation
+   - Single Retirement Planner that combines both phases
+
+3. **Net Worth Retirement Overview Card**
+   - Added to Family Wealth Dashboard (`/family-wealth`)
+   - Shows: Retirement Confidence %, Monte Carlo Success %, Years to Retirement, Projected Balance
+   - On Track / Good / Needs Attention / At Risk status badges
+   - Progress bar showing Overall Retirement Readiness
+   - "View Details" button linking to `/retirement-confidence`
+
+4. **Adviser Client Navigation - Bottom-Up Flow**
+   - Investments (Assets) → Net Worth (Portfolio) → Retirement (Planning)
+   - Flow represents: Asset holdings → Combined positions → Retirement projections
+   - Clearer mental model for advisors during client meetings
+
+5. **Client Portal Enhancement**
+   - Added Retirement Confidence to welcome banner
+   - Shows confidence %, On Track status
+   - High-level summary alongside Net Worth, Goals, Pending Actions
+
+**Files Updated:**
+- `/app/frontend/src/pages/RetirementConfidence.jsx` (NEW - combined page)
+- `/app/frontend/src/pages/FamilyWealthDashboard.jsx` (Retirement Overview card)
+- `/app/frontend/src/pages/ClientPortal.jsx` (Retirement confidence in banner)
+- `/app/frontend/src/components/Layout.jsx` (Navigation structure)
+- `/app/frontend/src/App.js` (Route registration)
+
+**Testing**: Iteration 112 - Frontend 100%
+
+---
+
 ### Future Potential Enhancements
 - Integration with real Services Australia API (requires government partnership)
 - AI-powered personalized recommendations using GPT
@@ -1773,4 +1818,5 @@ The most advanced retirement planning engine combining Deterministic Modeling, M
 ### Refactoring Needed
 - `server.py` → Modular `routes/__init__.py` registry pattern
 - `RetirementCalculator.jsx` and `DecumulationCalculator.jsx` → Break into smaller components
+
 
