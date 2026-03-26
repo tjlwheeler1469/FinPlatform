@@ -1471,12 +1471,58 @@ The engine feeds from existing:
 
 **Testing**: Iteration 106 - Backend 100% (18/18), Frontend 100%
 
+### Phase 12: Import from Net Worth, View Modes & PDF Reports (March 26, 2026)
+
+**COMPLETED** - Enhanced Confidence Engine with bottom-up data integration and distinct user views
+
+#### Features Implemented:
+
+1. **Import from Net Worth Button**
+   - Fetches wealth data from `/api/wealth-data/snapshot/{client_id}`
+   - Pre-populates sliders with real client data (net worth, super, investments, ages)
+   - Shows success toast on completion
+   - Triggers automatic confidence recalculation
+
+2. **Advisor/Client View Toggle**
+   - Toggle buttons in header: "Advisor" (full technical view) | "Client" (simplified view)
+   - **Client View** shows:
+     - "Your Retirement Readiness" hero card with gauge
+     - 3 key metrics: Years Until Retirement, Expected Savings, Retirement Years
+     - "What You Can Do" actionable recommendations (work longer, reduce expenses, boost super)
+     - "Contact Advisor" CTA card
+   - **Advisor View** shows:
+     - Full technical dashboard with all 4 tabs
+     - Real-time sliders for all parameters
+     - Multi-scenario comparison
+     - AI Insights and Settings
+
+3. **PDF Report Generation**
+   - "Download PDF" button in header
+   - Generates professional Confidence Report PDF using ReportLab
+   - Includes: confidence score, risk breakdown, projections, client profile, assumptions, AI analysis
+   - Endpoint: `POST /api/documents/generate/confidence-report`
+
+4. **Fixed Issues**
+   - Confidence gauge redesigned with clean SVG semicircle (no text overlap)
+   - Client Portal now uses Layout component (no separate external header)
+   - Fixed Expected Retirement Savings showing correct median_final_wealth
+
+#### Files Modified:
+- `/app/frontend/src/pages/RetirementConfidenceEngine.jsx` - Added import function, view toggle, PDF generation
+- `/app/backend/routes/document_generation.py` - Added ConfidenceReportRequest and generate_confidence_report_pdf
+- `/app/frontend/src/pages/ClientPortal.jsx` - Wrapped with Layout component
+
+**Testing**: Iteration 107 & 108 - Backend 100%, Frontend 100%
+
 ---
 
 ## Backlog / Future Tasks
 
 ### P0 (Completed in This Session)
 - ✅ COMPLETED: Retirement Confidence Engine - 7-phase Monte Carlo simulation with real-time sliders, multi-scenario comparison, AI explanations, and adviser intelligence dashboard
+- ✅ COMPLETED: Import from Net Worth - Pre-populate Confidence Engine from Family Wealth data
+- ✅ COMPLETED: Advisor/Client View Toggle - Distinct views for different user types
+- ✅ COMPLETED: PDF Report Generation - Download professional Confidence Reports
 
 ### P1 (High Priority)
 - ✅ COMPLETED: Connect Family Wealth Dashboard to Retirement Planner
@@ -1484,18 +1530,17 @@ The engine feeds from existing:
 - ✅ COMPLETED: PDF Document Generation for SOA/ROA
 - ✅ COMPLETED: Multi-tenant licensee data isolation
 - ✅ COMPLETED: Age Pension deep modeling
-- Create distinct Client vs Advisor views within Confidence Engine workflow
-- Wire PDF Document Generation frontend for Confidence Engine reports
+- ✅ COMPLETED: Create distinct Client vs Advisor views within Confidence Engine workflow
+- ✅ COMPLETED: Wire PDF Document Generation frontend for Confidence Engine reports
 
 ### P2 (Medium Priority)
 - Horizontal scaling architecture for 20,000+ users
 - Mobile app with native push notifications
-- Import from Family Wealth to Confidence Engine (pre-populate sliders from actual net worth)
+- Historical confidence score tracking and trending over time
 
 ### P3 (Low Priority)
 - Direct Services Australia API integration for Age Pension
 - Advanced CGT optimization scenarios within Confidence Engine
-- Historical confidence score tracking and trending
 
 ### Refactoring Needed
 - `server.py` → Modular `routes/__init__.py` registry pattern
