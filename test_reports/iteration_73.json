@@ -30,7 +30,7 @@
     "frontend": "100% (all CRM features working)"
   },
   "test_credentials": {
-    "api_base_url": "https://smsf-pension-plan.preview.emergentagent.com"
+    "api_base_url": "https://adviser-hub-9.preview.emergentagent.com"
   },
   "seed_data_creation": "None needed - backend has 8 hardcoded demo clients in /app/backend/routes/crm.py",
   "retest_needed": false,

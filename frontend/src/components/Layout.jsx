@@ -215,6 +215,14 @@ const adviserBaseNav = [
       { path: "/platform-integrations", label: "Platforms", icon: Cable, title: "Platform Integrations (AMP, Netwealth, Hub24)", badge: "NEW" },
       { path: "/live-sync", label: "Live Sync", icon: Activity, title: "Live Sync Dashboard - Real-time Updates", badge: "LIVE" },
     ]
+  },
+  {
+    name: "Tools",
+    icon: Settings,
+    items: [
+      { path: "/notification-center", label: "Notifications", icon: Bell, title: "Notification Center", badge: "NEW" },
+      { path: "/stress-test", label: "Stress Test", icon: Zap, title: "Stress Test (20K users)", badge: "NEW" },
+    ]
   }
 ];
 

@@ -1035,3 +1035,116 @@ Both Accumulation and Decumulation calculators now have "Save to Client Profile"
 - Optional platform push via platform integrations API
 
 **Testing**: Iteration 101 - All 18 backend tests passed, all frontend features verified
+
+## Version 10.5 - Client Financial Dashboard & Adviser Compliance (March 26, 2026) ✅ COMPLETE
+
+### Feature 1: Budget & Expenses Module
+
+**Route**: `/financial-dashboard`
+**Backend**: `/app/backend/routes/budget_expenses.py`
+**Frontend**: `/app/frontend/src/pages/ClientFinancialDashboard.jsx`
+
+Comprehensive budgeting with goals and alerts:
+
+#### Income Tracking
+- 9 income categories: Salary, Bonus, Rental, Dividends, Interest, Business, Pension, Government, Other
+- Multiple frequencies: Weekly, Fortnightly, Monthly, Quarterly, Annual, One-off
+- Taxable/non-taxable flag
+
+#### Expense Tracking
+- 17 expense categories with icons: Housing, Utilities, Groceries, Transport, Insurance, Healthcare, Education, Entertainment, Dining, Shopping, Subscriptions, Personal, Savings, Debt Repayment, Investments, Superannuation, Other
+- Essential vs discretionary classification
+- Budget limits per category with alerts
+
+#### Budget Goals
+- Custom savings goals with targets and deadlines
+- Monthly contribution tracking
+- Progress percentage and status (active, on_track, at_risk, achieved)
+
+#### Alerts System
+- Over budget alerts
+- Approaching limit warnings (80% threshold)
+- Goal achieved notifications
+- Goal at risk warnings
+
+**Key Endpoints**:
+- `GET /api/budget/categories` - All categories with icons
+- `GET /api/budget/demo/sample` - Demo budget data
+- `GET /api/budget/client/{client_id}` - Client budget with summary
+- `POST /api/budget/client/{client_id}` - Create/update budget
+- `GET /api/budget/client/{client_id}/spending-analysis` - Spending analysis
+
+### Feature 2: Retirement Milestones
+
+**Backend**: `/app/backend/routes/retirement_milestones.py`
+
+Track key milestones for ideal client retirement:
+
+#### Standard Milestones (6 Categories)
+| Category | Milestones |
+|----------|-----------|
+| Accumulation | Super balance target, Max concessional contributions, Emergency fund |
+| Debt Reduction | Pay off mortgage, Eliminate high-interest debt |
+| Insurance | Life insurance, Income protection, TPD review |
+| Pension | Commence pension, Optimize drawdown, TBC check |
+| Estate | Update will, EPA in place, Binding death nomination |
+| Transition | TTR strategy, Centrelink assessment |
+
+#### Features
+- Initialize client with standard or custom milestones
+- Progress tracking with percentage complete
+- Status determination (not_started, in_progress, on_track, at_risk, completed, overdue)
+- Retirement readiness score (weighted by priority)
+- Category-level scoring
+
+**Key Endpoints**:
+- `GET /api/milestones/templates` - Standard milestone templates
+- `POST /api/milestones/client/{client_id}/initialize` - Initialize milestones
+- `GET /api/milestones/client/{client_id}` - Get client milestones
+- `GET /api/milestones/client/{client_id}/retirement-readiness` - Readiness score
+
+### Feature 3: SOA/ROA Compliance Tracking
+
+**Route**: `/adviser-compliance`
+**Backend**: `/app/backend/routes/soa_roa_compliance.py`
+**Frontend**: `/app/frontend/src/pages/AdviserComplianceDashboard.jsx`
+
+Track Statement of Advice and Record of Advice documents:
+
+#### Document Types
+- SOA (Statement of Advice) - Comprehensive
+- ROA (Record of Advice) - Ongoing/simple
+- SOA Supplementary
+- FSG (Financial Services Guide)
+- IPS (Investment Policy Statement)
+
+#### Workflow States
+```
+Draft → Pending Review → Reviewed → Pending Signature → Signed → Implemented
+                ↓
+        Requires Changes (back to Draft)
+```
+
+#### Compliance Features
+- Advice type tracking (Personal, General, Scaled, Comprehensive)
+- Review due date calculation (12 months)
+- Overdue review alerts
+- Compliance review submission with outcomes (Approved, Approved with Conditions, Requires Changes, Rejected)
+- Full audit trail with status history
+
+#### Risk Acknowledgements
+- Risk profile confirmed
+- Conflicts disclosed
+- Fees disclosed
+- Cooling off explained
+
+**Key Endpoints**:
+- `POST /api/compliance-docs/document` - Create document
+- `GET /api/compliance-docs/client/{client_id}` - Client documents
+- `PUT /api/compliance-docs/document/{id}/status` - Update status
+- `POST /api/compliance-docs/document/{id}/review` - Submit review
+- `GET /api/compliance-docs/reviews/pending` - Pending reviews
+- `GET /api/compliance-docs/reviews/due` - Due/overdue reviews
+- `GET /api/compliance-docs/audit-trail/{id}` - Full audit trail
+
+**Testing**: Iteration 102 - All 19 backend tests passed, all frontend features verified

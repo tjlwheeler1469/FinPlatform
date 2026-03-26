@@ -229,6 +229,12 @@ const ClientFinancialDashboard = lazy(() => import("@/pages/ClientFinancialDashb
 // Adviser Compliance Dashboard - SOA/ROA tracking
 const AdviserComplianceDashboard = lazy(() => import("@/pages/AdviserComplianceDashboard"));
 
+// Notification Center - Push notifications management
+const NotificationCenterPage = lazy(() => import("@/pages/NotificationCenterPage"));
+
+// Stress Test Dashboard - Load testing for 20,000+ users
+const StressTestDashboard = lazy(() => import("@/pages/StressTestDashboard"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -1110,6 +1116,12 @@ const AppRouter = () => {
       
       {/* Adviser Compliance Dashboard */}
       <Route path="/adviser-compliance" element={<AdviserComplianceDashboard />} />
+      
+      {/* Notification Center */}
+      <Route path="/notification-center" element={<NotificationCenterPage />} />
+      
+      {/* Stress Test Dashboard */}
+      <Route path="/stress-test" element={<StressTestDashboard />} />
       
       {/* CRM Command Center */}
       <Route path="/crm-command-center" element={<CRMCommandCenter />} />

@@ -33,7 +33,7 @@
     "frontend": "100% (all features working)"
   },
   "test_credentials": {
-    "api_base_url": "https://smsf-pension-plan.preview.emergentagent.com"
+    "api_base_url": "https://adviser-hub-9.preview.emergentagent.com"
   },
   "seed_data_creation": "Test clients created with TEST_ prefix for cleanup identification",
   "retest_needed": false,

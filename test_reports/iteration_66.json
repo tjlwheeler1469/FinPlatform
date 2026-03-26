@@ -35,7 +35,7 @@
     "frontend": "100% (Both /workflows and /book-intelligence pages load correctly)"
   },
   "test_credentials": {
-    "api_base_url": "https://smsf-pension-plan.preview.emergentagent.com"
+    "api_base_url": "https://adviser-hub-9.preview.emergentagent.com"
   },
   "seed_data_creation": "No seed data needed - all APIs use in-memory demo data",
   "retest_needed": false,

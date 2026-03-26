@@ -583,6 +583,22 @@ def include_all_routes():
     except ImportError as e:
         logger.error(f"Failed to load budget expenses routes: {e}")
 
+    # PUSH NOTIFICATIONS - In-app, desktop, mobile push notifications
+    try:
+        from routes.push_notifications import router as push_router
+        app.include_router(push_router, prefix="/api")
+        logger.info("PUSH NOTIFICATIONS loaded: In-app, desktop push, mobile push (FCM), notification center")
+    except ImportError as e:
+        logger.error(f"Failed to load push notifications routes: {e}")
+
+    # STRESS TESTING - Load testing for 20,000+ concurrent users
+    try:
+        from routes.stress_testing import router as stress_router
+        app.include_router(stress_router, prefix="/api")
+        logger.info("STRESS TESTING loaded: Load testing, capacity estimation, notification flood tests")
+    except ImportError as e:
+        logger.error(f"Failed to load stress testing routes: {e}")
+
 # Include all routes
 include_all_routes()
 

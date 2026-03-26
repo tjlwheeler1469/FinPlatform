@@ -10,7 +10,7 @@
 - **Users**: 1,000 concurrent
 - **Ramp-up**: 50 users/second
 - **Duration**: 60 seconds
-- **Target**: https://smsf-pension-plan.preview.emergentagent.com
+- **Target**: https://adviser-hub-9.preview.emergentagent.com
 
 ---
 
