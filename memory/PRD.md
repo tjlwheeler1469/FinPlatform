@@ -1698,6 +1698,70 @@ Features:
 - ✅ Advanced Scenario Templates (14 templates)
 - ✅ Mobile Responsiveness Improvements
 - ✅ Real-Time Market Data Feeds
+- ✅ **19-Section World-Class Hybrid Retirement Calculation Engine** (March 26, 2026)
+
+## Version 10.6 - Hybrid Retirement Calculation Engine (March 26, 2026) ✅ COMPLETE
+
+### Feature: World-Class Hybrid Confidence Engine
+
+**Route**: `/hybrid-engine`
+**Backend**: `/app/backend/routes/hybrid_engine.py`, `/app/backend/routes/hybrid_engine_api.py`
+**Frontend**: `/app/frontend/src/pages/HybridEngineView.jsx`
+
+The most advanced retirement planning engine combining Deterministic Modeling, Monte Carlo simulations (10,000 runs), and Behavioral Adjustments.
+
+#### 19-Section Architecture
+
+**Math & Scoring (Sections 1-12):**
+1. **Deterministic Model** - Year-by-year portfolio projection
+2. **Monte Carlo Engine** - 10,000 simulations with random returns/inflation
+3. **Downside Risk** - 10th/50th/90th percentile analysis
+4. **Dynamic Spending Model** - Adjusts withdrawals (0.9/1.05) based on thresholds
+5. **Longevity Risk** - Stress test with +5 years life expectancy
+6. **Income Stability Score** - Weighted by source (pension=1.0, salary=0.7, dividends=0.4)
+7. **Spending Flexibility Score** - Essential vs discretionary ratio
+8. **Diversification Score** - Asset concentration analysis
+9. **Confidence Score** - Multi-factor weighted formula:
+   ```
+   ConfidenceScore = (0.35 × MC Success) + (0.20 × Downside Protection) 
+                   + (0.15 × Income Stability) + (0.10 × Spending Flexibility) 
+                   + (0.10 × Diversification) + (0.10 × Longevity Protection)
+   ```
+10. **Stress Testing** - Market crash (-30%), High inflation (6%), Longevity (+5yrs)
+11. **AI Explanation Engine** - Risk identification and actionable recommendations
+12. **Scenario Comparison** - Side-by-side analysis of alternative strategies
+
+**Real-Time Features (Sections 13-19):**
+13. **Real-Time Data Engine** - Live portfolio value updates
+14. **Background vs Presentation Mode** - Dual system states
+15. **Advisor Control Layer** - Manual input control, no auto-overwriting
+16. **Real-Time Confidence Engine** - Live vs Presentation confidence states
+17. **Change Impact Engine** - Instant delta calculation on input changes
+18. **Event-Driven Updates** - WebSocket support for real-time push
+19. **AI Assist (Not Auto-Control)** - Suggestions require advisor approval
+
+#### UI Features
+- **Triple Confidence Display**: "Today: X%", "After Changes: Y%", "After Market Stress: Z%"
+- **Mode Toggle**: Advisor (Presentation) vs Live (Background) modes
+- **5 Tabs**: Overview, Inputs, Factors, Scenarios, AI Assist
+- **Factor Breakdown**: Weighted percentages with horizontal bar charts
+- **Stress Test Results**: Visual progress bars with impact percentages
+- **Import Net Worth**: Button to pull data from Family Wealth Dashboard
+- **PDF Report**: Download professional confidence report
+
+#### Key Endpoints
+- `GET /api/hybrid-engine/defaults` - Default parameters and weights
+- `POST /api/hybrid-engine/calculate` - Full calculation with all 19 sections
+- `POST /api/hybrid-engine/compare-scenarios` - Multi-scenario comparison
+- `GET /api/hybrid-engine/confidence/{client_id}` - Dual confidence states
+- `POST /api/hybrid-engine/ai-suggestions` - AI recommendations (auto_applied=false)
+- `POST /api/hybrid-engine/impact` - Change impact calculation
+- `GET /api/hybrid-engine/quick-calculate` - Simplified calculation
+- `WS /api/hybrid-engine/ws/{client_id}` - WebSocket for real-time updates
+
+**Testing**: Iteration 111 - Backend 100% (20/20), Frontend 100%
+
+---
 
 ### Future Potential Enhancements
 - Integration with real Services Australia API (requires government partnership)
@@ -1709,3 +1773,4 @@ Features:
 ### Refactoring Needed
 - `server.py` → Modular `routes/__init__.py` registry pattern
 - `RetirementCalculator.jsx` and `DecumulationCalculator.jsx` → Break into smaller components
+
