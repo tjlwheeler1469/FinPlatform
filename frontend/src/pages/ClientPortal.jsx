@@ -161,7 +161,7 @@ const ClientPortal = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-center mb-4">
-                    <p className="text-4xl font-bold text-blue-600">{formatCurrency(netWorth?.net_worth)}</p>
+                    <p className="text-4xl font-bold text-blue-600">{formatCurrency(dashboard?.summary?.net_worth || netWorth?.net_worth)}</p>
                     <p className="text-sm text-muted-foreground">Total Net Worth</p>
                   </div>
                   {netWorth?.assets && (

@@ -1819,4 +1819,69 @@ The most advanced retirement planning engine combining Deterministic Modeling, M
 - `server.py` → Modular `routes/__init__.py` registry pattern
 - `RetirementCalculator.jsx` and `DecumulationCalculator.jsx` → Break into smaller components
 
+---
 
+## Version 10.8 - Client Meeting Mode & Navigation Restructure (March 26, 2026) ✅ COMPLETE
+
+### Feature: Client Meeting Mode
+
+**Purpose**: Locks all live data updates during client presentations, giving advisors full control during meetings.
+
+**Implementation**:
+- **Toggle Button**: In Adviser Mode sidebar, shows "Enter Meeting Mode" / "Meeting Mode ON"
+- **Banner**: Amber banner at top: "MEETING MODE - Live data updates paused • Manual scenario changes only"
+- **Persistence**: State saved to localStorage, persists across page navigation
+- **Event System**: Custom event `meetingModeChange` dispatched for other components to react
+
+### Feature: Top-to-Bottom Navigation Hierarchy
+
+**Client Context Navigation** (when client selected):
+```
+OVERVIEW (Big Picture)
+├── Net Worth           
+├── Retirement (PRO)    
+├── Health Score        
+└── Client 360          
+
+PLANNING (Action/Analysis)
+├── Retirement Planner  
+├── Scenarios           
+├── Goals               
+├── Actions             
+└── Tax Analysis        
+
+INVESTMENTS (Asset Details)
+├── Shares & ETFs       
+├── Fixed Income        
+├── Property            
+├── Managed Funds       
+└── Alternatives        
+
+DOCUMENTS
+├── Vault               
+├── Meeting Notes       
+├── Reports             
+└── SOA/ROA             
+```
+
+### Feature: Simplified Client Portal (3 Tabs)
+
+**Tab 1: Overview**
+- Net Worth Summary with pie chart
+- Retirement Confidence (84% On Track)
+- Monte Carlo Success, Years to Retirement, Projected Balance
+
+**Tab 2: Investments**
+- Portfolio summary (Total Value, Count, YTD Return)
+- Portfolio cards with holdings
+
+**Tab 3: Actions**
+- Goals progress (On Track / At Risk / Total)
+- Pending Actions with action buttons
+- Recent Documents
+
+**Files Updated**:
+- `/app/frontend/src/components/Layout.jsx` (Meeting Mode + Navigation)
+- `/app/frontend/src/pages/ClientPortal.jsx` (3-tab simplification)
+
+**Testing**: Iteration 113 - Frontend 100%
