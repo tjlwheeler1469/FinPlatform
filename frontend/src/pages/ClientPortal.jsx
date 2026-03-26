@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import Layout from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -72,48 +73,21 @@ const ClientPortal = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">Loading your financial dashboard...</p>
+      <Layout>
+        <div className="min-h-[60vh] flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-muted-foreground">Loading your financial dashboard...</p>
+          </div>
         </div>
-      </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50" data-testid="client-portal">
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-              <Wallet className="h-5 w-5 text-white" />
-            </div>
-            <div>
-              <h1 className="font-bold text-lg">Wealth Command</h1>
-              <p className="text-xs text-muted-foreground">Client Portal</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" className="relative">
-              <Bell className="h-5 w-5" />
-              {dashboard?.summary?.unread_notifications > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">
-                  {dashboard.summary.unread_notifications}
-                </span>
-              )}
-            </Button>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center">
-                <User className="h-4 w-4" />
-              </div>
-              <span className="text-sm font-medium">{dashboard?.name}</span>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+    <Layout>
+      <div className="space-y-6" data-testid="client-portal">
+        {/* Welcome Banner */}
         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white">
           <h2 className="text-2xl font-bold mb-2">Welcome back, {dashboard?.name?.split(' ')[0]}!</h2>
           <p className="text-blue-100 mb-4">Your advisor: {dashboard?.advisor?.name}</p>
@@ -385,8 +359,8 @@ const ClientPortal = () => {
             <Button><MessageSquare className="h-4 w-4 mr-2" />Contact Advisor</Button>
           </CardContent>
         </Card>
-      </main>
-    </div>
+      </div>
+    </Layout>
   );
 };
 

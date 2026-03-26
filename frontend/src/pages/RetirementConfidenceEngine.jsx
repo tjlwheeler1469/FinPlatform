@@ -20,7 +20,7 @@ import {
   Target, TrendingUp, TrendingDown, DollarSign, PiggyBank, Shield, Users, Calendar,
   AlertTriangle, Plus, Trash2, Play, RefreshCw, Info, BarChart3, Zap, ChevronRight,
   Clock, Activity, Brain, Lightbulb, CheckCircle2, XCircle, ArrowRight, ArrowUp, ArrowDown,
-  Gauge, CircleDollarSign, Building2, Briefcase, Heart, Flame, Snowflake
+  Gauge, CircleDollarSign, Building2, Briefcase, Heart, Flame, Snowflake, Download
 } from 'lucide-react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -31,7 +31,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 // ==================== CONFIDENCE GAUGE COMPONENT ====================
 
-const ConfidenceGauge = ({ score, size = 200 }) => {
+const ConfidenceGauge = ({ score, size = 220 }) => {
   const getColor = (s) => {
     if (s >= 90) return '#22c55e';
     if (s >= 75) return '#3b82f6';
@@ -48,35 +48,82 @@ const ConfidenceGauge = ({ score, size = 200 }) => {
     return 'Critical';
   };
 
-  const data = [{ name: 'score', value: score, fill: getColor(score) }];
+  const color = getColor(score);
+  const status = getStatus(score);
+  
+  // Calculate the arc for the gauge (semi-circle)
+  const radius = 80;
+  const strokeWidth = 16;
+  const normalizedScore = Math.min(100, Math.max(0, score));
+  const angle = (normalizedScore / 100) * 180; // 0 to 180 degrees
+  
+  // SVG arc calculation
+  const startX = 20;
+  const startY = 100;
+  const endAngleRad = (180 - angle) * (Math.PI / 180);
+  const endX = 100 + radius * Math.cos(endAngleRad);
+  const endY = 100 - radius * Math.sin(endAngleRad);
+  const largeArc = angle > 90 ? 1 : 0;
+  
+  // Background arc (full semi-circle)
+  const bgPath = `M ${20} ${100} A ${radius} ${radius} 0 0 1 ${180} ${100}`;
+  // Score arc
+  const scorePath = normalizedScore > 0 
+    ? `M ${startX} ${startY} A ${radius} ${radius} 0 ${largeArc} 1 ${endX} ${endY}`
+    : '';
 
   return (
-    <div className="flex flex-col items-center">
-      <div style={{ width: size, height: size / 2 + 40 }}>
-        <ResponsiveContainer width="100%" height="100%">
-          <RadialBarChart
-            cx="50%"
-            cy="100%"
-            innerRadius="60%"
-            outerRadius="100%"
-            barSize={20}
-            data={data}
-            startAngle={180}
-            endAngle={0}
-          >
-            <RadialBar
-              background={{ fill: '#e5e7eb' }}
-              dataKey="value"
-              cornerRadius={10}
+    <div className="flex flex-col items-center" data-testid="confidence-gauge">
+      <div className="relative" style={{ width: size, height: size / 2 + 50 }}>
+        <svg viewBox="0 0 200 130" className="w-full h-full">
+          {/* Background arc */}
+          <path
+            d={bgPath}
+            fill="none"
+            stroke="#e5e7eb"
+            strokeWidth={strokeWidth}
+            strokeLinecap="round"
+          />
+          {/* Score arc */}
+          {normalizedScore > 0 && (
+            <path
+              d={scorePath}
+              fill="none"
+              stroke={color}
+              strokeWidth={strokeWidth}
+              strokeLinecap="round"
+              style={{
+                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))'
+              }}
             />
-          </RadialBarChart>
-        </ResponsiveContainer>
-      </div>
-      <div className="text-center -mt-8">
-        <span className="text-5xl font-bold" style={{ color: getColor(score) }}>
-          {score.toFixed(0)}%
-        </span>
-        <p className="text-lg font-medium text-muted-foreground mt-1">{getStatus(score)}</p>
+          )}
+          {/* Center text */}
+          <text
+            x="100"
+            y="95"
+            textAnchor="middle"
+            className="font-bold"
+            style={{ fontSize: '36px', fill: color }}
+          >
+            {score.toFixed(0)}%
+          </text>
+          <text
+            x="100"
+            y="120"
+            textAnchor="middle"
+            className="font-medium"
+            style={{ fontSize: '14px', fill: '#6b7280' }}
+          >
+            {status}
+          </text>
+        </svg>
+        
+        {/* Tick marks */}
+        <div className="absolute bottom-8 left-0 right-0 flex justify-between px-4 text-xs text-muted-foreground">
+          <span>0%</span>
+          <span>50%</span>
+          <span>100%</span>
+        </div>
       </div>
     </div>
   );
@@ -213,8 +260,83 @@ export default function RetirementConfidenceEngine() {
   const [scenarioRetirementAge, setScenarioRetirementAge] = useState(65);
   const [scenarioSpendingAdjust, setScenarioSpendingAdjust] = useState(0);
   const [scenarioContribAdjust, setScenarioContribAdjust] = useState(0);
+  
+  // Import state
+  const [importing, setImporting] = useState(false);
 
-  // ==================== CALCULATIONS ====================
+  // ==================== IMPORT FROM NET WORTH ====================
+  
+  const importFromNetWorth = async () => {
+    setImporting(true);
+    try {
+      // Fetch wealth data from the client wealth endpoint
+      const response = await fetch(`${API_URL}/api/wealth-data/snapshot/demo_client`);
+      if (!response.ok) throw new Error('Failed to fetch wealth data');
+      
+      const wealthData = await response.json();
+      
+      // Pre-populate the sliders with real data
+      if (wealthData.summary) {
+        const summary = wealthData.summary;
+        
+        // Set net worth (total assets minus liabilities)
+        if (summary.total_assets && summary.total_liabilities !== undefined) {
+          const calculatedNetWorth = summary.total_assets - (summary.total_liabilities || 0);
+          setNetWorth(Math.round(calculatedNetWorth));
+        } else if (summary.net_worth) {
+          setNetWorth(Math.round(summary.net_worth));
+        }
+        
+        // Set super balance if available
+        if (summary.super_balance) {
+          setSuperBalance(Math.round(summary.super_balance));
+        }
+        
+        // Set investment balance (shares + funds)
+        if (summary.shares_value || summary.funds_value) {
+          const investments = (summary.shares_value || 0) + (summary.funds_value || 0);
+          setInvestmentBalance(Math.round(investments));
+        }
+      }
+      
+      // Set income from budgets if available
+      if (wealthData.annual_income) {
+        setAnnualIncome(Math.round(wealthData.annual_income));
+      }
+      
+      // Set expenses from budgets if available
+      if (wealthData.annual_expenses) {
+        setAnnualExpenses(Math.round(wealthData.annual_expenses));
+      }
+      
+      // Set ages if profile data available
+      if (wealthData.primary_member) {
+        if (wealthData.primary_member.age) {
+          setCurrentAge(wealthData.primary_member.age);
+        }
+        if (wealthData.primary_member.retirement_age) {
+          setRetirementAge(wealthData.primary_member.retirement_age);
+        }
+      }
+      
+      // Check if couple
+      if (wealthData.is_couple !== undefined) {
+        setIsCouple(wealthData.is_couple);
+      }
+      
+      toast.success('Imported wealth data successfully! Recalculating confidence...');
+      
+      // Trigger recalculation after a short delay to ensure state is updated
+      setTimeout(() => {
+        calculateConfidence();
+      }, 100);
+      
+    } catch (error) {
+      console.error('Failed to import wealth data:', error);
+      toast.error('Failed to import wealth data. Using sample data.');
+    }
+    setImporting(false);
+  };
 
   const calculateConfidence = useCallback(async () => {
     setCalculating(true);
@@ -360,6 +482,15 @@ export default function RetirementConfidenceEngine() {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            <Button 
+              variant="outline" 
+              onClick={importFromNetWorth} 
+              disabled={importing}
+              data-testid="import-net-worth-btn"
+            >
+              <Download className={`h-4 w-4 mr-2 ${importing ? 'animate-pulse' : ''}`} />
+              Import from Net Worth
+            </Button>
             <Badge variant="outline" className="text-sm">
               {numSimulations.toLocaleString()} simulations
             </Badge>
