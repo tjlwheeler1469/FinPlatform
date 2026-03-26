@@ -10,7 +10,7 @@
 - **Users**: 1,000 concurrent
 - **Ramp-up**: 50 users/second
 - **Duration**: 60 seconds
-- **Target**: https://confidence-calc.preview.emergentagent.com
+- **Target**: https://monte-carlo-hub.preview.emergentagent.com
 
 ---
 

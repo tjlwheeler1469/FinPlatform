@@ -148,6 +148,7 @@ const personalNavGroups = [
       { path: "/retirement-calculator", label: "Accumulation", icon: Target, title: "Retirement Calculator (Accumulation)", badge: "NEW" },
       { path: "/decumulation-calculator", label: "Decumulation", icon: TrendingUp, title: "Decumulation Calculator (Pension)", badge: "NEW" },
       { path: "/confidence-engine", label: "Confidence Engine", icon: Gauge, title: "Retirement Confidence Engine", badge: "NEW" },
+      { path: "/hybrid-engine", label: "Hybrid Engine", icon: Gauge, title: "World-Class Hybrid Confidence Engine", badge: "PRO" },
     ]
   },
   {
@@ -245,6 +246,7 @@ const clientContextNav = [
       { path: "/goal-tracker", label: "Goals", icon: Target, title: "Goals" },
       { path: "/retirement", label: "Retirement", icon: PiggyBank, title: "Retirement Planning (Accumulation & Decumulation)", badge: "NEW" },
       { path: "/confidence-engine", label: "Confidence Engine", icon: Gauge, title: "Retirement Confidence Engine - Monte Carlo", badge: "NEW" },
+      { path: "/hybrid-engine", label: "Hybrid Engine", icon: Gauge, title: "World-Class Hybrid Confidence Engine", badge: "PRO" },
     ]
   },
   {

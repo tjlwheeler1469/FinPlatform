@@ -703,6 +703,14 @@ def include_all_routes():
     except ImportError as e:
         logger.error(f"Failed to load scenario templates routes: {e}")
 
+    # HYBRID ENGINE - World-class retirement calculation engine
+    try:
+        from routes.hybrid_engine_api import router as hybrid_router
+        app.include_router(hybrid_router, prefix="/api")
+        logger.info("HYBRID ENGINE loaded: Monte Carlo, multi-factor confidence, stress testing")
+    except ImportError as e:
+        logger.error(f"Failed to load hybrid engine routes: {e}")
+
 # Include all routes
 include_all_routes()
 

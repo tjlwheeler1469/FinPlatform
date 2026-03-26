@@ -36,7 +36,7 @@
     "frontend": "100% (both pages load live data, refresh works)"
   },
   "test_credentials": {
-    "preview_url": "https://confidence-calc.preview.emergentagent.com",
+    "preview_url": "https://monte-carlo-hub.preview.emergentagent.com",
     "crypto_page": "/crypto-portfolio",
     "hybrids_page": "/hybrids-trading"
   },

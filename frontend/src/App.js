@@ -241,6 +241,9 @@ const StressTestDashboard = lazy(() => import("@/pages/StressTestDashboard"));
 // Retirement Confidence Engine - Monte Carlo simulations, 7-phase retirement planning
 const RetirementConfidenceEngine = lazy(() => import("@/pages/RetirementConfidenceEngine"));
 
+// Hybrid Engine - World-class 19-section retirement calculation engine
+const HybridEngineView = lazy(() => import("@/pages/HybridEngineView"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -1134,6 +1137,9 @@ const AppRouter = () => {
       
       {/* Retirement Confidence Engine - Monte Carlo simulations */}
       <Route path="/confidence-engine" element={<RetirementConfidenceEngine />} />
+      
+      {/* Hybrid Engine - World-class 19-section retirement calculation */}
+      <Route path="/hybrid-engine" element={<HybridEngineView />} />
       
       {/* CRM Command Center */}
       <Route path="/crm-command-center" element={<CRMCommandCenter />} />

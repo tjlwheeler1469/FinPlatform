@@ -7,7 +7,7 @@ import requests
 import os
 import time
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://confidence-calc.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://monte-carlo-hub.preview.emergentagent.com')
 
 class TestHealthAndBasics:
     """Basic health check tests"""
