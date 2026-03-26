@@ -559,3 +559,246 @@ async def generate_compliance_checklist(client_id: str, review_type: str = "annu
             "Content-Disposition": f"attachment; filename=Compliance_Checklist_{client_id}.pdf"
         }
     )
+
+
+
+# ==================== CONFIDENCE ENGINE REPORT ====================
+
+class ConfidenceReportRequest(BaseModel):
+    client_id: str
+    client_name: str
+    adviser_name: str
+    report_date: str
+    confidence_score: float
+    risk_breakdown: Dict
+    projections: Dict
+    inputs: Dict
+    assumptions: Dict
+    scenarios: Optional[List[Dict]] = []
+    ai_explanation: Optional[str] = ""
+
+
+def generate_confidence_report_pdf(request: ConfidenceReportRequest) -> bytes:
+    """Generate Retirement Confidence Report PDF."""
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=A4,
+        rightMargin=2*cm,
+        leftMargin=2*cm,
+        topMargin=2*cm,
+        bottomMargin=2*cm
+    )
+    
+    styles = getSampleStyleSheet()
+    
+    # Custom styles
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=24,
+        spaceAfter=30,
+        textColor=COLORS["primary"],
+        alignment=TA_CENTER
+    )
+    
+    section_style = ParagraphStyle(
+        'SectionHeader',
+        parent=styles['Heading2'],
+        fontSize=14,
+        spaceBefore=20,
+        spaceAfter=10,
+        textColor=COLORS["primary"]
+    )
+    
+    body_style = ParagraphStyle(
+        'BodyText',
+        parent=styles['Normal'],
+        fontSize=10,
+        spaceAfter=8,
+        textColor=COLORS["text"]
+    )
+    
+    story = []
+    
+    # Header
+    story.append(Paragraph("Retirement Confidence Report", title_style))
+    story.append(Paragraph(f"Prepared for: {request.client_name}", body_style))
+    story.append(Paragraph(f"Prepared by: {request.adviser_name}", body_style))
+    story.append(Paragraph(f"Date: {request.report_date}", body_style))
+    story.append(Spacer(1, 20))
+    
+    # Confidence Score Section
+    story.append(Paragraph("Retirement Confidence Score", section_style))
+    
+    score = request.confidence_score
+    status = "Excellent" if score >= 90 else "Good" if score >= 75 else "Moderate" if score >= 50 else "Concerning" if score >= 25 else "Critical"
+    score_color = COLORS["success"] if score >= 75 else COLORS["warning"] if score >= 50 else COLORS["danger"]
+    
+    score_text = f"<font color='{score_color}'><b>{score:.0f}%</b></font> - {status}"
+    story.append(Paragraph(score_text, ParagraphStyle('Score', fontSize=18, alignment=TA_CENTER)))
+    story.append(Spacer(1, 10))
+    story.append(Paragraph(
+        f"Based on {request.assumptions.get('num_simulations', 1000):,} Monte Carlo simulations",
+        ParagraphStyle('SimNote', fontSize=9, alignment=TA_CENTER, textColor=COLORS["muted"])
+    ))
+    story.append(Spacer(1, 20))
+    
+    # Client Inputs Summary
+    story.append(Paragraph("Client Profile Summary", section_style))
+    inputs = request.inputs
+    profile_data = [
+        ["Current Age", f"{inputs.get('current_age', 45)} years"],
+        ["Retirement Age", f"{inputs.get('retirement_age', 65)} years"],
+        ["Life Expectancy", f"{inputs.get('life_expectancy', 90)} years"],
+        ["Household Type", "Couple" if inputs.get('is_couple') else "Single"],
+        ["Entity Type", inputs.get('entity_type', 'personal').title()],
+    ]
+    profile_table = Table(profile_data, colWidths=[8*cm, 8*cm])
+    profile_table.setStyle(TableStyle([
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('GRID', (0, 0), (-1, -1), 0.5, COLORS["border"]),
+        ('BACKGROUND', (0, 0), (0, -1), colors.HexColor("#f3f4f6")),
+    ]))
+    story.append(profile_table)
+    story.append(Spacer(1, 15))
+    
+    # Financial Summary
+    story.append(Paragraph("Financial Summary", section_style))
+    
+    def fmt_currency(val):
+        return f"${val:,.0f}"
+    
+    financial_data = [
+        ["Net Worth", fmt_currency(inputs.get('net_worth', 0))],
+        ["Superannuation", fmt_currency(inputs.get('super_balance', 0))],
+        ["Other Investments", fmt_currency(inputs.get('investment_balance', 0))],
+        ["Annual Income", fmt_currency(inputs.get('annual_income', 0))],
+        ["Annual Expenses", fmt_currency(inputs.get('annual_expenses', 0))],
+    ]
+    financial_table = Table(financial_data, colWidths=[8*cm, 8*cm])
+    financial_table.setStyle(TableStyle([
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('GRID', (0, 0), (-1, -1), 0.5, COLORS["border"]),
+        ('BACKGROUND', (0, 0), (0, -1), colors.HexColor("#f3f4f6")),
+        ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
+    ]))
+    story.append(financial_table)
+    story.append(Spacer(1, 15))
+    
+    # Risk Breakdown
+    story.append(Paragraph("Risk Analysis", section_style))
+    risk = request.risk_breakdown
+    risk_data = [
+        ["Risk Factor", "Score"],
+        ["Longevity Risk", f"{risk.get('longevity_risk', 0):.1f}%"],
+        ["Market Risk", f"{risk.get('market_risk', 0):.1f}%"],
+        ["Spending Risk", f"{risk.get('spending_risk', 0):.1f}%"],
+        ["Inflation Risk", f"{risk.get('inflation_risk', 0):.1f}%"],
+    ]
+    risk_table = Table(risk_data, colWidths=[8*cm, 8*cm])
+    risk_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('GRID', (0, 0), (-1, -1), 0.5, COLORS["border"]),
+        ('BACKGROUND', (0, 0), (-1, 0), COLORS["primary"]),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
+    ]))
+    story.append(risk_table)
+    story.append(Spacer(1, 15))
+    
+    # Projections
+    story.append(Paragraph("Projected Outcomes", section_style))
+    proj = request.projections
+    projection_data = [
+        ["Scenario", "Projected Wealth at Retirement"],
+        ["Best Case (90th Percentile)", fmt_currency(proj.get('best_case_wealth', 0))],
+        ["Median Outcome", fmt_currency(proj.get('median_wealth', 0))],
+        ["Worst Case (10th Percentile)", fmt_currency(proj.get('worst_case_wealth', 0))],
+    ]
+    proj_table = Table(projection_data, colWidths=[8*cm, 8*cm])
+    proj_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('GRID', (0, 0), (-1, -1), 0.5, COLORS["border"]),
+        ('BACKGROUND', (0, 0), (-1, 0), COLORS["primary"]),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
+    ]))
+    story.append(proj_table)
+    story.append(Spacer(1, 15))
+    
+    # Assumptions
+    story.append(Paragraph("Modelling Assumptions", section_style))
+    assumptions = request.assumptions
+    assumption_data = [
+        ["Inflation Rate", f"{assumptions.get('inflation_rate', 2.5)}% p.a."],
+        ["Expected Investment Return", f"{assumptions.get('expected_return', 7.0)}% p.a."],
+        ["Monte Carlo Simulations", f"{assumptions.get('num_simulations', 1000):,}"],
+    ]
+    assumption_table = Table(assumption_data, colWidths=[8*cm, 8*cm])
+    assumption_table.setStyle(TableStyle([
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('GRID', (0, 0), (-1, -1), 0.5, COLORS["border"]),
+        ('BACKGROUND', (0, 0), (0, -1), colors.HexColor("#f3f4f6")),
+    ]))
+    story.append(assumption_table)
+    
+    # AI Explanation (if available)
+    if request.ai_explanation:
+        story.append(Spacer(1, 15))
+        story.append(Paragraph("AI Analysis", section_style))
+        story.append(Paragraph(request.ai_explanation, body_style))
+    
+    # Disclaimer
+    story.append(Spacer(1, 30))
+    disclaimer_style = ParagraphStyle(
+        'Disclaimer',
+        parent=styles['Normal'],
+        fontSize=8,
+        textColor=COLORS["muted"],
+        spaceAfter=4
+    )
+    story.append(Paragraph(
+        "<b>Important Information:</b> This report is based on the information provided and various assumptions about future economic conditions. "
+        "Actual results may vary significantly from projections. Past performance is not a reliable indicator of future performance. "
+        "This report does not constitute personal financial advice. Please consult your financial adviser before making any decisions.",
+        disclaimer_style
+    ))
+    
+    doc.build(story)
+    buffer.seek(0)
+    return buffer.getvalue()
+
+
+@router.post("/confidence-report")
+async def generate_confidence_report(request: ConfidenceReportRequest):
+    """Generate PDF report for Retirement Confidence Engine results."""
+    if not PDF_AVAILABLE:
+        raise HTTPException(status_code=500, detail="PDF generation not available")
+    
+    try:
+        pdf_bytes = generate_confidence_report_pdf(request)
+        filename = f"Confidence_Report_{request.client_id}_{request.report_date}.pdf"
+        
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f"attachment; filename={filename}"
+            }
+        )
+    except Exception as e:
+        logger.error(f"Failed to generate confidence report: {e}")
+        raise HTTPException(status_code=500, detail=str(e))

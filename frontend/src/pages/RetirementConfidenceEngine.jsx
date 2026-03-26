@@ -20,7 +20,8 @@ import {
   Target, TrendingUp, TrendingDown, DollarSign, PiggyBank, Shield, Users, Calendar,
   AlertTriangle, Plus, Trash2, Play, RefreshCw, Info, BarChart3, Zap, ChevronRight,
   Clock, Activity, Brain, Lightbulb, CheckCircle2, XCircle, ArrowRight, ArrowUp, ArrowDown,
-  Gauge, CircleDollarSign, Building2, Briefcase, Heart, Flame, Snowflake, Download
+  Gauge, CircleDollarSign, Building2, Briefcase, Heart, Flame, Snowflake, Download, FileDown,
+  Eye, UserCog
 } from 'lucide-react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -263,6 +264,10 @@ export default function RetirementConfidenceEngine() {
   
   // Import state
   const [importing, setImporting] = useState(false);
+  
+  // View mode (advisor vs client)
+  const [viewMode, setViewMode] = useState('advisor'); // 'advisor' or 'client'
+  const [generatingPdf, setGeneratingPdf] = useState(false);
 
   // ==================== IMPORT FROM NET WORTH ====================
   
@@ -336,6 +341,69 @@ export default function RetirementConfidenceEngine() {
       toast.error('Failed to import wealth data. Using sample data.');
     }
     setImporting(false);
+  };
+
+  // ==================== PDF REPORT GENERATION ====================
+  
+  const generatePdfReport = async () => {
+    setGeneratingPdf(true);
+    try {
+      const reportData = {
+        client_id: 'demo_client',
+        client_name: isCouple ? 'James & Sarah Mitchell' : 'James Mitchell',
+        adviser_name: 'Sarah Chen',
+        report_date: new Date().toISOString().split('T')[0],
+        confidence_score: confidenceResult?.confidence_score || 0,
+        risk_breakdown: confidenceResult?.risk_breakdown || {},
+        projections: confidenceResult?.projections || {},
+        inputs: {
+          current_age: currentAge,
+          retirement_age: retirementAge,
+          life_expectancy: lifeExpectancy,
+          net_worth: netWorth,
+          annual_income: annualIncome,
+          annual_expenses: annualExpenses,
+          super_balance: superBalance,
+          investment_balance: investmentBalance,
+          is_couple: isCouple,
+          entity_type: 'personal'
+        },
+        assumptions: {
+          inflation_rate: inflationRate,
+          expected_return: expectedReturn,
+          num_simulations: numSimulations
+        },
+        scenarios: scenarios,
+        ai_explanation: explanation?.explanation || ''
+      };
+
+      const response = await fetch(`${API_URL}/api/documents/generate/confidence-report`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(reportData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF');
+      }
+
+      // Download the PDF
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `confidence_report_${new Date().toISOString().split('T')[0]}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      
+      toast.success('PDF report downloaded successfully!');
+    } catch (error) {
+      console.error('Failed to generate PDF:', error);
+      toast.error('Failed to generate PDF report');
+    }
+    setGeneratingPdf(false);
   };
 
   const calculateConfidence = useCallback(async () => {
@@ -491,9 +559,44 @@ export default function RetirementConfidenceEngine() {
               <Download className={`h-4 w-4 mr-2 ${importing ? 'animate-pulse' : ''}`} />
               Import from Net Worth
             </Button>
+            
+            {/* View Mode Toggle */}
+            <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+              <Button
+                variant={viewMode === 'advisor' ? 'secondary' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('advisor')}
+                data-testid="view-mode-advisor"
+              >
+                <UserCog className="h-4 w-4 mr-1" />
+                Advisor
+              </Button>
+              <Button
+                variant={viewMode === 'client' ? 'secondary' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('client')}
+                data-testid="view-mode-client"
+              >
+                <Eye className="h-4 w-4 mr-1" />
+                Client
+              </Button>
+            </div>
+            
             <Badge variant="outline" className="text-sm">
               {numSimulations.toLocaleString()} simulations
             </Badge>
+            
+            {/* PDF Download */}
+            <Button 
+              variant="outline" 
+              onClick={generatePdfReport} 
+              disabled={generatingPdf || !confidenceResult}
+              data-testid="generate-pdf-btn"
+            >
+              <FileDown className={`h-4 w-4 mr-2 ${generatingPdf ? 'animate-pulse' : ''}`} />
+              Download PDF
+            </Button>
+            
             <Button onClick={calculateConfidence} disabled={calculating}>
               <RefreshCw className={`h-4 w-4 mr-2 ${calculating ? 'animate-spin' : ''}`} />
               Recalculate
@@ -501,8 +604,110 @@ export default function RetirementConfidenceEngine() {
           </div>
         </div>
 
-        {/* Main Confidence Display */}
-        {confidenceResult && (
+        {/* Client View - Simplified */}
+        {viewMode === 'client' && confidenceResult && (
+          <div className="space-y-6">
+            {/* Simple Confidence Display */}
+            <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+              <CardContent className="pt-6">
+                <div className="text-center space-y-4">
+                  <h2 className="text-2xl font-bold text-slate-800">Your Retirement Readiness</h2>
+                  <div className="max-w-xs mx-auto">
+                    <ConfidenceGauge score={confidenceResult.confidence_score} size={200} />
+                  </div>
+                  <p className="text-lg text-muted-foreground max-w-md mx-auto">
+                    Based on your current financial situation, you're on track for 
+                    <span className="font-semibold text-slate-800"> {retirementYears} years </span>
+                    of comfortable retirement.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Simple Summary Cards */}
+            <div className="grid md:grid-cols-3 gap-4">
+              <Card>
+                <CardContent className="pt-6 text-center">
+                  <Clock className="h-8 w-8 mx-auto mb-2 text-blue-600" />
+                  <p className="text-3xl font-bold">{yearsToRetirement}</p>
+                  <p className="text-sm text-muted-foreground">Years Until Retirement</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-6 text-center">
+                  <DollarSign className="h-8 w-8 mx-auto mb-2 text-green-600" />
+                  <p className="text-3xl font-bold">{formatCurrency(confidenceResult.statistics?.median_final_wealth || confidenceResult.projections?.median_wealth || 0)}</p>
+                  <p className="text-sm text-muted-foreground">Expected Retirement Savings</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-6 text-center">
+                  <Heart className="h-8 w-8 mx-auto mb-2 text-red-500" />
+                  <p className="text-3xl font-bold">{retirementYears}</p>
+                  <p className="text-sm text-muted-foreground">Years of Retirement</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Simple Recommendations */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Lightbulb className="h-5 w-5 text-yellow-500" />
+                  What You Can Do
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg">
+                    <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5" />
+                    <div>
+                      <p className="font-medium">Consider working 2 more years</p>
+                      <p className="text-sm text-muted-foreground">This could increase your confidence by 5-10%</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
+                    <CheckCircle2 className="h-5 w-5 text-blue-600 mt-0.5" />
+                    <div>
+                      <p className="font-medium">Reduce expenses by 10%</p>
+                      <p className="text-sm text-muted-foreground">This could increase your confidence by 5-8%</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-3 bg-purple-50 rounded-lg">
+                    <CheckCircle2 className="h-5 w-5 text-purple-600 mt-0.5" />
+                    <div>
+                      <p className="font-medium">Boost super contributions</p>
+                      <p className="text-sm text-muted-foreground">An extra $10k/year could increase confidence by 3-5%</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Contact Advisor */}
+            <Card className="bg-slate-800 text-white">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                      <Users className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <p className="font-semibold">Have questions about your retirement plan?</p>
+                      <p className="text-sm text-slate-300">Your advisor is here to help.</p>
+                    </div>
+                  </div>
+                  <Button className="bg-white text-slate-800 hover:bg-slate-100">
+                    Contact Advisor
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Advisor View - Full Details */}
+        {viewMode === 'advisor' && confidenceResult && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Confidence Score */}
             <Card className="lg:col-span-1">
@@ -574,7 +779,8 @@ export default function RetirementConfidenceEngine() {
           </div>
         )}
 
-        {/* Tabs for different features */}
+        {/* Tabs for different features - Advisor Only */}
+        {viewMode === 'advisor' && (
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="confidence" data-testid="confidence-tab">
@@ -1138,6 +1344,7 @@ export default function RetirementConfidenceEngine() {
             </div>
           </TabsContent>
         </Tabs>
+        )}
       </div>
     </Layout>
   );
