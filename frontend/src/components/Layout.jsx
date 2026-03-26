@@ -109,6 +109,7 @@ const personalNavGroups = [
     name: "Finances",
     icon: Wallet,
     items: [
+      { path: "/financial-dashboard", label: "Overview", icon: BarChart3, title: "Financial Dashboard", badge: "NEW" },
       { path: "/managed-funds", label: "Managed Funds", icon: PieChart, title: "Managed Funds" },
       { path: "/property-portfolio", label: "Property", icon: Building2, title: "Property" },
       { path: "/cash-deposits", label: "Cash & TDs", icon: PiggyBank, title: "Cash & Term Deposits" },
@@ -260,6 +261,7 @@ const clientContextNav = [
       { path: "/document-vault", label: "Vault", icon: FolderOpen, title: "Document Vault" },
       { path: "/meeting-notes", label: "Meeting Notes", icon: Video, title: "Fathom Notes", badge: "NEW" },
       { path: "/reports", label: "Reports", icon: FileText, title: "Reports" },
+      { path: "/adviser-compliance", label: "SOA/ROA", icon: Shield, title: "SOA/ROA Compliance", badge: "NEW" },
     ]
   },
   {

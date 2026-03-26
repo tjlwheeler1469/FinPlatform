@@ -223,6 +223,12 @@ const PlatformIntegrations = lazy(() => import("@/pages/PlatformIntegrations"));
 // Live Sync Dashboard - Real-time platform updates
 const LiveSyncDashboard = lazy(() => import("@/pages/LiveSyncDashboard"));
 
+// Client Financial Dashboard - Budget, expenses, goals, milestones
+const ClientFinancialDashboard = lazy(() => import("@/pages/ClientFinancialDashboard"));
+
+// Adviser Compliance Dashboard - SOA/ROA tracking
+const AdviserComplianceDashboard = lazy(() => import("@/pages/AdviserComplianceDashboard"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -1098,6 +1104,12 @@ const AppRouter = () => {
       
       {/* Live Sync Dashboard */}
       <Route path="/live-sync" element={<LiveSyncDashboard />} />
+      
+      {/* Client Financial Dashboard */}
+      <Route path="/financial-dashboard" element={<ClientFinancialDashboard />} />
+      
+      {/* Adviser Compliance Dashboard */}
+      <Route path="/adviser-compliance" element={<AdviserComplianceDashboard />} />
       
       {/* CRM Command Center */}
       <Route path="/crm-command-center" element={<CRMCommandCenter />} />

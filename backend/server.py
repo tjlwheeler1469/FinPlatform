@@ -559,6 +559,30 @@ def include_all_routes():
     except ImportError as e:
         logger.error(f"Failed to load websocket service routes: {e}")
 
+    # RETIREMENT MILESTONES - Track client retirement milestones
+    try:
+        from routes.retirement_milestones import router as milestones_router
+        app.include_router(milestones_router, prefix="/api")
+        logger.info("RETIREMENT MILESTONES loaded: Track accumulation, debt, insurance, pension milestones")
+    except ImportError as e:
+        logger.error(f"Failed to load retirement milestones routes: {e}")
+
+    # SOA/ROA COMPLIANCE - Track compliance documents
+    try:
+        from routes.soa_roa_compliance import router as soa_roa_router
+        app.include_router(soa_roa_router, prefix="/api")
+        logger.info("SOA/ROA COMPLIANCE loaded: Statement/Record of Advice tracking, reviews, audit trail")
+    except ImportError as e:
+        logger.error(f"Failed to load SOA/ROA compliance routes: {e}")
+
+    # BUDGET & EXPENSES - Comprehensive budgeting with goals and alerts
+    try:
+        from routes.budget_expenses import router as budget_router
+        app.include_router(budget_router, prefix="/api")
+        logger.info("BUDGET & EXPENSES loaded: Income/expense tracking, goals, alerts, spending analysis")
+    except ImportError as e:
+        logger.error(f"Failed to load budget expenses routes: {e}")
+
 # Include all routes
 include_all_routes()
 
@@ -622,7 +646,10 @@ async def health_check():
             "platform_integrations": True,
             "client_profile_retirement": True,
             "websocket_service": True,
-            "xplan_phase2": True
+            "xplan_phase2": True,
+            "retirement_milestones": True,
+            "soa_roa_compliance": True,
+            "budget_expenses": True
         },
         "revenue_layer": {
             "aum_fees": True,
