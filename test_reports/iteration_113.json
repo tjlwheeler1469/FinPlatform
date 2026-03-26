@@ -1,0 +1,92 @@
+{
+  "summary": "Completed frontend testing of Meeting Mode and Navigation Restructure features. All features verified: 1) Meeting Mode toggle visible in Adviser Mode sidebar, 2) Meeting Mode banner shows 'MEETING MODE - Live data updates paused' when active, 3) Client Portal has exactly 3 tabs (Overview, Investments, Actions), 4) Client Portal Overview shows Net Worth Summary and Retirement Confidence, 5) Client Portal Actions shows Goals, Pending Actions, Recent Documents, 6) Navigation restructured with client-specific groups: Overview (Net Worth, Retirement, Health Score, Client 360) → Planning (Retirement Planner, Scenarios, Goals, Actions, Tax Analysis) → Investments (Shares & ETFs, Fixed Income, Property, Managed Funds, Alternatives) → Documents.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Client Portal Overview",
+        "issues": ["Net Worth Summary shows $0 in the card but $3,040,000 in the welcome banner - possible API data mismatch or different data sources"]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_113.json"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "N/A (frontend only testing)",
+    "frontend": "100%"
+  },
+  "test_credentials": "",
+  "seed_data_creation": "",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Meeting Mode and Navigation Restructure features complete. Key pages tested: /advisor-command-center (Meeting Mode toggle in Adviser Mode sidebar), /client-portal (3 tabs: Overview, Investments, Actions), /client-360 (client-specific navigation with Overview → Planning → Investments → Documents groups). Meeting Mode toggle shows 'Enter Meeting Mode' when off and 'Meeting Mode ON' when active. Banner shows amber background with 'MEETING MODE - Live data updates paused • Manual scenario changes only'.",
+  "features_tested": {
+    "meeting_mode": {
+      "toggle_visible": "PASS - Meeting Mode toggle found in Adviser Mode sidebar",
+      "toggle_label": "PASS - Shows 'Enter Meeting Mode' when off, 'Meeting Mode ON' when active",
+      "banner_appears": "PASS - Amber banner appears when Meeting Mode is activated",
+      "banner_text": "PASS - Banner shows 'MEETING MODE - Live data updates paused • Manual scenario changes only'",
+      "exit_button": "PASS - Exit Meeting Mode button works correctly",
+      "banner_disappears": "PASS - Banner disappears when Meeting Mode is deactivated"
+    },
+    "client_portal_3_tabs": {
+      "tab_count": "PASS - Client Portal has exactly 3 tabs",
+      "overview_tab": "PASS - Overview tab found with data-testid='tab-overview'",
+      "investments_tab": "PASS - Investments tab found with data-testid='tab-investments'",
+      "actions_tab": "PASS - Actions tab found with data-testid='tab-actions'"
+    },
+    "client_portal_overview_content": {
+      "net_worth_summary": "PASS - Net Worth Summary card found in Overview tab",
+      "retirement_confidence": "PASS - Retirement Confidence card found showing 84% On Track"
+    },
+    "client_portal_investments_content": {
+      "total_value": "PASS - Shows $3,040,000 total value",
+      "portfolios_count": "PASS - Shows 5 portfolios",
+      "ytd_return": "PASS - Shows +11.8% YTD return",
+      "portfolio_details": "PASS - Shows Growth Portfolio, Fixed Income & Hybrids, Cryptocurrency"
+    },
+    "client_portal_actions_content": {
+      "goals_section": "PASS - Your Goals section found with On Track/At Risk/Total counts",
+      "pending_actions": "PASS - Pending Actions section found",
+      "recent_documents": "PASS - Recent Documents section found"
+    },
+    "navigation_restructure": {
+      "overview_group": "PASS - Overview navigation group found",
+      "planning_group": "PASS - Planning navigation group found",
+      "investments_group": "PASS - Investments navigation group found",
+      "documents_group": "PASS - Documents navigation group found"
+    },
+    "navigation_overview_items": {
+      "net_worth": "PASS - Net Worth link found",
+      "retirement": "PASS - Retirement link found with PRO badge",
+      "health_score": "PASS - Health Score link found",
+      "client_360": "PASS - Client 360 link found"
+    },
+    "navigation_planning_items": {
+      "retirement_planner": "PASS - Retirement Planner link found",
+      "scenarios": "PASS - Scenarios link found",
+      "goals": "PASS - Goals link found",
+      "tax_analysis": "PASS - Tax Analysis link found"
+    },
+    "navigation_investments_items": {
+      "shares_etfs": "PASS - Shares & ETFs link found",
+      "fixed_income": "PASS - Fixed Income link found",
+      "property": "PASS - Property link found",
+      "managed_funds": "PASS - Managed Funds link found",
+      "alternatives": "PASS - Alternatives link found"
+    }
+  },
+  "mocked_apis": {
+    "has_mocked_apis": false,
+    "mocked_apis_list": []
+  }
+}

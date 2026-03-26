@@ -14,26 +14,25 @@ import {
   FileText,
   User,
   PieChart,
-  MessageSquare
+  MessageSquare,
+  Gauge,
+  CheckCircle,
+  AlertTriangle,
+  Clock,
+  ChevronRight
 } from "lucide-react";
 import {
   PieChart as RechartsPie,
   Pie,
   Cell,
   ResponsiveContainer,
-  Legend,
-  Tooltip,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid
+  Tooltip
 } from "recharts";
+import { Link } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL || process.env.REACT_APP_BACKEND_URL;
 
-// Color palette for charts
-const CHART_COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316', '#6366F1'];
+const CHART_COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316'];
 
 const ClientPortal = () => {
   const [loading, setLoading] = useState(true);
@@ -105,6 +104,9 @@ const ClientPortal = () => {
     );
   }
 
+  const pendingActions = notifications.filter(n => n.type === 'action_required').length;
+  const confidenceScore = retirementConfidence?.confidence_score || 0;
+
   return (
     <Layout>
       <div className="space-y-6" data-testid="client-portal">
@@ -112,27 +114,19 @@ const ClientPortal = () => {
         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white">
           <h2 className="text-2xl font-bold mb-2">Welcome back, {dashboard?.name?.split(' ')[0]}!</h2>
           <p className="text-blue-100 mb-4">Your advisor: {dashboard?.advisor?.name}</p>
-          <div className="grid md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-white/20 rounded-xl p-4">
               <p className="text-blue-100 text-sm">Net Worth</p>
               <p className="text-2xl font-bold">{formatCurrency(dashboard?.summary?.net_worth)}</p>
               <p className={`text-sm ${dashboard?.summary?.net_worth_change_pct >= 0 ? 'text-green-300' : 'text-red-300'}`}>
-                {dashboard?.summary?.net_worth_change_pct >= 0 ? '↑' : '↓'} {Math.abs(dashboard?.summary?.net_worth_change_pct || 0).toFixed(1)}% this month
+                {dashboard?.summary?.net_worth_change_pct >= 0 ? '↑' : '↓'} {Math.abs(dashboard?.summary?.net_worth_change_pct || 0).toFixed(1)}%
               </p>
             </div>
             <div className="bg-white/20 rounded-xl p-4">
               <p className="text-blue-100 text-sm">Retirement Confidence</p>
-              <p className="text-2xl font-bold">
-                {retirementConfidence?.confidence_score?.toFixed(0) || '--'}%
-              </p>
-              <p className={`text-sm ${
-                (retirementConfidence?.confidence_score || 0) >= 80 ? 'text-green-300' 
-                : (retirementConfidence?.confidence_score || 0) >= 60 ? 'text-yellow-300' 
-                : 'text-red-300'
-              }`}>
-                {(retirementConfidence?.confidence_score || 0) >= 80 ? 'On Track' 
-                 : (retirementConfidence?.confidence_score || 0) >= 60 ? 'Good' 
-                 : 'Needs Attention'}
+              <p className="text-2xl font-bold">{confidenceScore.toFixed(0)}%</p>
+              <p className={`text-sm ${confidenceScore >= 80 ? 'text-green-300' : confidenceScore >= 60 ? 'text-yellow-300' : 'text-red-300'}`}>
+                {confidenceScore >= 80 ? 'On Track' : confidenceScore >= 60 ? 'Good' : 'Needs Attention'}
               </p>
             </div>
             <div className="bg-white/20 rounded-xl p-4">
@@ -141,200 +135,199 @@ const ClientPortal = () => {
             </div>
             <div className="bg-white/20 rounded-xl p-4">
               <p className="text-blue-100 text-sm">Pending Actions</p>
-              <p className="text-2xl font-bold">{dashboard?.summary?.pending_documents}</p>
-            </div>
-            <div className="bg-white/20 rounded-xl p-4">
-              <p className="text-blue-100 text-sm">Next Meeting</p>
-              <p className="text-lg font-bold">{dashboard?.summary?.upcoming_meetings > 0 ? 'Scheduled' : 'None'}</p>
+              <p className="text-2xl font-bold">{pendingActions}</p>
             </div>
           </div>
         </div>
 
-        {dashboard?.latest_insight && (
-          <Card className="border-l-4 border-l-yellow-500">
-            <CardContent className="py-4 flex items-center gap-4">
-              <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
-                <TrendingUp className="h-5 w-5 text-yellow-600" />
-              </div>
-              <div className="flex-1">
-                <h4 className="font-semibold">{dashboard.latest_insight.title}</h4>
-                <p className="text-sm text-muted-foreground">{dashboard.latest_insight.message}</p>
-              </div>
-              <Button variant="outline" size="sm">View</Button>
-            </CardContent>
-          </Card>
-        )}
-
+        {/* Simplified 3-Tab Structure */}
         <Tabs defaultValue="overview" className="space-y-4">
-          <TabsList className="grid grid-cols-4 w-full max-w-md">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="portfolios">Portfolios</TabsTrigger>
-            <TabsTrigger value="goals">Goals</TabsTrigger>
-            <TabsTrigger value="documents">Documents</TabsTrigger>
+          <TabsList className="grid grid-cols-3 w-full max-w-md">
+            <TabsTrigger value="overview" data-testid="tab-overview">Overview</TabsTrigger>
+            <TabsTrigger value="investments" data-testid="tab-investments">Investments</TabsTrigger>
+            <TabsTrigger value="actions" data-testid="tab-actions">Actions</TabsTrigger>
           </TabsList>
 
+          {/* TAB 1: OVERVIEW - Net Worth, Retirement Confidence, Key Metrics */}
           <TabsContent value="overview" className="space-y-4">
             <div className="grid md:grid-cols-2 gap-4">
+              {/* Net Worth Summary */}
               <Card>
-                <CardHeader><CardTitle className="flex items-center gap-2"><PieChart className="h-5 w-5 text-blue-600" />Net Worth Breakdown</CardTitle></CardHeader>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Wallet className="h-5 w-5 text-blue-600" />
+                    Net Worth Summary
+                  </CardTitle>
+                </CardHeader>
                 <CardContent>
-                  {netWorth?.assets && Object.keys(netWorth.assets).length > 0 ? (
-                    <>
-                      <div className="h-[200px] mb-4">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <RechartsPie>
-                            <Pie
-                              data={Object.entries(netWorth.assets)
-                                .filter(([_, v]) => v > 0)
-                                .map(([key, value], idx) => ({
-                                  name: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-                                  value,
-                                  fill: CHART_COLORS[idx % CHART_COLORS.length]
-                                }))}
-                              cx="50%"
-                              cy="50%"
-                              innerRadius={40}
-                              outerRadius={80}
-                              paddingAngle={2}
-                              dataKey="value"
-                            >
-                              {Object.entries(netWorth.assets)
-                                .filter(([_, v]) => v > 0)
-                                .map((_, idx) => (
-                                  <Cell key={`cell-${idx}`} fill={CHART_COLORS[idx % CHART_COLORS.length]} />
-                                ))}
-                            </Pie>
-                            <Tooltip formatter={(value) => formatCurrency(value)} />
-                          </RechartsPie>
-                        </ResponsiveContainer>
-                      </div>
-                      <div className="space-y-2">
-                        {Object.entries(netWorth.assets).map(([key, value], idx) => (
-                          <div key={key} className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: CHART_COLORS[idx % CHART_COLORS.length] }} />
-                              <span className="capitalize text-sm">{key.replace(/_/g, ' ')}</span>
-                            </div>
-                            <span className="font-medium">{formatCurrency(value)}</span>
-                          </div>
-                        ))}
-                        <div className="border-t pt-2 flex items-center justify-between text-red-600">
-                          <span className="text-sm">Liabilities</span>
-                          <span className="font-medium">-{formatCurrency(netWorth?.liabilities?.total)}</span>
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    <div className="space-y-3">
-                      {netWorth?.assets && Object.entries(netWorth.assets).map(([key, value]) => (
-                        <div key={key} className="flex items-center justify-between">
-                          <span className="capitalize text-sm">{key.replace(/_/g, ' ')}</span>
-                          <span className="font-medium">{formatCurrency(value)}</span>
-                        </div>
-                      ))}
-                      <div className="border-t pt-2 flex items-center justify-between text-red-600">
-                        <span className="text-sm">Liabilities</span>
-                        <span className="font-medium">-{formatCurrency(netWorth?.liabilities?.total)}</span>
-                      </div>
+                  <div className="text-center mb-4">
+                    <p className="text-4xl font-bold text-blue-600">{formatCurrency(netWorth?.net_worth)}</p>
+                    <p className="text-sm text-muted-foreground">Total Net Worth</p>
+                  </div>
+                  {netWorth?.assets && (
+                    <div className="h-[180px] mb-4">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <RechartsPie>
+                          <Pie
+                            data={Object.entries(netWorth.assets)
+                              .filter(([_, v]) => v > 0)
+                              .slice(0, 6)
+                              .map(([key, value], idx) => ({
+                                name: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+                                value,
+                                fill: CHART_COLORS[idx % CHART_COLORS.length]
+                              }))}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={45}
+                            outerRadius={70}
+                            paddingAngle={2}
+                            dataKey="value"
+                          >
+                            {Object.entries(netWorth?.assets || {})
+                              .filter(([_, v]) => v > 0)
+                              .slice(0, 6)
+                              .map((_, idx) => (
+                                <Cell key={`cell-${idx}`} fill={CHART_COLORS[idx % CHART_COLORS.length]} />
+                              ))}
+                          </Pie>
+                          <Tooltip formatter={(value) => formatCurrency(value)} />
+                        </RechartsPie>
+                      </ResponsiveContainer>
                     </div>
                   )}
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="p-2 bg-green-50 rounded">
+                      <p className="text-muted-foreground">Assets</p>
+                      <p className="font-semibold text-green-700">{formatCurrency(netWorth?.assets?.total || Object.values(netWorth?.assets || {}).reduce((a, b) => a + b, 0))}</p>
+                    </div>
+                    <div className="p-2 bg-red-50 rounded">
+                      <p className="text-muted-foreground">Liabilities</p>
+                      <p className="font-semibold text-red-700">-{formatCurrency(netWorth?.liabilities?.total)}</p>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
-              <Card>
-                <CardHeader><CardTitle className="flex items-center gap-2"><Bell className="h-5 w-5 text-orange-600" />Notifications</CardTitle></CardHeader>
+
+              {/* Retirement Confidence */}
+              <Card className="border-2 border-primary/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Gauge className="h-5 w-5 text-primary" />
+                    Retirement Confidence
+                  </CardTitle>
+                </CardHeader>
                 <CardContent>
-                  {notifications.length === 0 ? (
-                    <p className="text-muted-foreground text-center py-4">No new notifications</p>
-                  ) : (
-                    <div className="space-y-3">
-                      {notifications.slice(0, 3).map((notif) => (
-                        <div key={notif.notification_id} className={`p-3 rounded-lg ${notif.read ? 'bg-muted/30' : 'bg-blue-50 border border-blue-200'}`}>
-                          <Badge variant={notif.type === 'action_required' ? 'destructive' : 'secondary'} className="text-xs mb-1">{notif.type.replace(/_/g, ' ')}</Badge>
-                          <h5 className="font-medium text-sm">{notif.title}</h5>
-                          <p className="text-xs text-muted-foreground">{notif.message}</p>
-                        </div>
-                      ))}
+                  <div className="text-center mb-4">
+                    <p 
+                      className="text-5xl font-bold"
+                      style={{ 
+                        color: confidenceScore >= 80 ? '#22c55e' 
+                             : confidenceScore >= 60 ? '#3b82f6' 
+                             : confidenceScore >= 40 ? '#f59e0b' 
+                             : '#ef4444' 
+                      }}
+                    >
+                      {confidenceScore.toFixed(0)}%
+                    </p>
+                    <Badge 
+                      className={
+                        confidenceScore >= 80 ? 'bg-green-500' 
+                        : confidenceScore >= 60 ? 'bg-blue-500' 
+                        : confidenceScore >= 40 ? 'bg-amber-500' 
+                        : 'bg-red-500'
+                      }
+                    >
+                      {confidenceScore >= 80 ? 'On Track' 
+                       : confidenceScore >= 60 ? 'Good' 
+                       : confidenceScore >= 40 ? 'Needs Attention' 
+                       : 'At Risk'}
+                    </Badge>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Monte Carlo Success</span>
+                      <span className="font-medium">{retirementConfidence?.monte_carlo?.success_rate_percent?.toFixed(0)}%</span>
                     </div>
-                  )}
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Years to Retirement</span>
+                      <span className="font-medium">{retirementConfidence?.inputs?.years_to_retirement || 20} years</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Projected Balance</span>
+                      <span className="font-medium">{formatCurrency(retirementConfidence?.monte_carlo?.percentiles?.p50_median)}</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 pt-4 border-t">
+                    <Progress value={confidenceScore} className="h-2" />
+                    <p className="text-xs text-muted-foreground mt-2 text-center">
+                      Based on {(retirementConfidence?.monte_carlo?.num_simulations || 3000).toLocaleString()} simulations
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
             </div>
           </TabsContent>
 
-          <TabsContent value="portfolios" className="space-y-4">
-            <div className="grid md:grid-cols-3 gap-4 mb-4">
+          {/* TAB 2: INVESTMENTS - Portfolio summary, Asset allocation */}
+          <TabsContent value="investments" className="space-y-4">
+            {/* Portfolio Summary */}
+            <div className="grid grid-cols-3 gap-4">
               <Card className="bg-gradient-to-br from-green-50 to-emerald-50">
                 <CardContent className="pt-6 text-center">
-                  <p className="text-sm text-muted-foreground">Total Portfolio Value</p>
-                  <p className="text-3xl font-bold text-green-700">{formatCurrency(portfolios?.summary?.total_value)}</p>
+                  <p className="text-sm text-muted-foreground">Total Value</p>
+                  <p className="text-2xl font-bold text-green-700">{formatCurrency(portfolios?.summary?.total_value)}</p>
                 </CardContent>
               </Card>
-              <Card><CardContent className="pt-6 text-center"><p className="text-sm text-muted-foreground">Portfolios</p><p className="text-3xl font-bold">{portfolios?.summary?.portfolio_count}</p></CardContent></Card>
-              <Card><CardContent className="pt-6 text-center"><p className="text-sm text-muted-foreground">YTD Return</p><p className={`text-3xl font-bold ${portfolios?.summary?.weighted_ytd_return >= 0 ? 'text-green-600' : 'text-red-600'}`}>{portfolios?.summary?.weighted_ytd_return >= 0 ? '+' : ''}{portfolios?.summary?.weighted_ytd_return}%</p></CardContent></Card>
-            </div>
-            
-            {/* Portfolio Performance Chart */}
-            {portfolios?.portfolios && portfolios.portfolios.length > 0 && (
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5 text-green-600" />
-                    Portfolio Performance (YTD)
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[200px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart 
-                        data={portfolios.portfolios.map(p => ({
-                          name: p.name.length > 15 ? p.name.substring(0, 15) + '...' : p.name,
-                          return: p.change_ytd,
-                          value: p.value
-                        }))}
-                        layout="vertical"
-                        margin={{ left: 20 }}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
-                        <XAxis type="number" tickFormatter={(v) => `${v}%`} />
-                        <YAxis type="category" dataKey="name" width={100} tick={{ fontSize: 12 }} />
-                        <Tooltip 
-                          formatter={(value, name) => [
-                            name === 'return' ? `${value}%` : formatCurrency(value),
-                            name === 'return' ? 'YTD Return' : 'Value'
-                          ]}
-                        />
-                        <Bar 
-                          dataKey="return" 
-                          fill="#10B981"
-                          radius={[0, 4, 4, 0]}
-                        >
-                          {portfolios.portfolios.map((entry, index) => (
-                            <Cell 
-                              key={`cell-${index}`} 
-                              fill={entry.change_ytd >= 0 ? '#10B981' : '#EF4444'} 
-                            />
-                          ))}
-                        </Bar>
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
+                <CardContent className="pt-6 text-center">
+                  <p className="text-sm text-muted-foreground">Portfolios</p>
+                  <p className="text-2xl font-bold">{portfolios?.summary?.portfolio_count}</p>
                 </CardContent>
               </Card>
-            )}
+              <Card>
+                <CardContent className="pt-6 text-center">
+                  <p className="text-sm text-muted-foreground">YTD Return</p>
+                  <p className={`text-2xl font-bold ${(portfolios?.summary?.weighted_ytd_return || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {(portfolios?.summary?.weighted_ytd_return || 0) >= 0 ? '+' : ''}{portfolios?.summary?.weighted_ytd_return || 0}%
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Portfolio Cards */}
             {portfolios?.portfolios?.map((portfolio) => (
               <Card key={portfolio.portfolio_id}>
-                <CardHeader>
+                <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <div><CardTitle>{portfolio.name}</CardTitle><CardDescription>{portfolio.risk_profile} • {formatCurrency(portfolio.value)}</CardDescription></div>
-                    <Badge className={portfolio.change_ytd >= 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}>{portfolio.change_ytd >= 0 ? '+' : ''}{portfolio.change_ytd}% YTD</Badge>
+                    <div>
+                      <CardTitle className="text-lg">{portfolio.name}</CardTitle>
+                      <CardDescription>{portfolio.risk_profile}</CardDescription>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xl font-bold">{formatCurrency(portfolio.value)}</p>
+                      <Badge className={portfolio.change_ytd >= 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}>
+                        {portfolio.change_ytd >= 0 ? '+' : ''}{portfolio.change_ytd}%
+                      </Badge>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    {portfolio.holdings?.slice(0, 5).map((holding, idx) => (
-                      <div key={idx} className="flex items-center justify-between py-2 border-b last:border-0">
-                        <div><p className="font-medium">{holding.symbol}</p><p className="text-xs text-muted-foreground">{holding.name}</p></div>
-                        <div className="text-right"><p className="font-medium">{formatCurrency(holding.value)}</p><p className={`text-xs ${holding.change_1d >= 0 ? 'text-green-600' : 'text-red-600'}`}>{holding.change_1d >= 0 ? '+' : ''}{holding.change_1d}%</p></div>
+                    {portfolio.holdings?.slice(0, 4).map((holding, idx) => (
+                      <div key={idx} className="flex items-center justify-between py-1 text-sm">
+                        <div>
+                          <span className="font-medium">{holding.symbol}</span>
+                          <span className="text-muted-foreground ml-2">{holding.name?.substring(0, 20)}</span>
+                        </div>
+                        <div className="text-right">
+                          <span className="font-medium">{formatCurrency(holding.value)}</span>
+                          <span className={`ml-2 ${holding.change_1d >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {holding.change_1d >= 0 ? '+' : ''}{holding.change_1d}%
+                          </span>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -343,41 +336,127 @@ const ClientPortal = () => {
             ))}
           </TabsContent>
 
-          <TabsContent value="goals" className="space-y-4">
-            <div className="grid md:grid-cols-3 gap-4 mb-4">
-              <Card className="bg-green-50"><CardContent className="pt-6 text-center"><Target className="h-8 w-8 text-green-600 mx-auto mb-2" /><p className="text-2xl font-bold text-green-700">{goals?.summary?.on_track}</p><p className="text-sm text-muted-foreground">On Track</p></CardContent></Card>
-              <Card className="bg-yellow-50"><CardContent className="pt-6 text-center"><Target className="h-8 w-8 text-yellow-600 mx-auto mb-2" /><p className="text-2xl font-bold text-yellow-700">{goals?.summary?.at_risk}</p><p className="text-sm text-muted-foreground">At Risk</p></CardContent></Card>
-              <Card><CardContent className="pt-6 text-center"><Target className="h-8 w-8 text-blue-600 mx-auto mb-2" /><p className="text-2xl font-bold">{goals?.summary?.total_goals}</p><p className="text-sm text-muted-foreground">Total Goals</p></CardContent></Card>
-            </div>
-            {goals?.goals?.map((goal) => (
-              <Card key={goal.goal_id} className={goal.status === 'at_risk' ? 'border-yellow-300' : ''}>
-                <CardContent className="pt-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div><h4 className="font-semibold">{goal.name}</h4><p className="text-sm text-muted-foreground">Target: {new Date(goal.target_date).toLocaleDateString()}</p></div>
-                    <Badge variant={goal.status === 'on_track' ? 'default' : goal.status === 'at_risk' ? 'secondary' : 'destructive'}>{goal.status.replace(/_/g, ' ')}</Badge>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm"><span>Progress</span><span>{goal.progress_pct}%</span></div>
-                    <Progress value={goal.progress_pct} className="h-3" />
-                    <div className="flex justify-between text-sm text-muted-foreground"><span>{formatCurrency(goal.current_amount)}</span><span>{formatCurrency(goal.target_amount)}</span></div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </TabsContent>
-
-          <TabsContent value="documents">
+          {/* TAB 3: ACTIONS - Goals progress, Pending documents, Notifications */}
+          <TabsContent value="actions" className="space-y-4">
+            {/* Goals Summary */}
             <Card>
-              <CardHeader><CardTitle className="flex items-center gap-2"><FileText className="h-5 w-5 text-blue-600" />Your Documents</CardTitle></CardHeader>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Target className="h-5 w-5 text-blue-600" />
+                  Your Goals
+                </CardTitle>
+              </CardHeader>
               <CardContent>
+                <div className="grid grid-cols-3 gap-4 mb-4">
+                  <div className="text-center p-3 bg-green-50 rounded-lg">
+                    <CheckCircle className="h-6 w-6 text-green-600 mx-auto mb-1" />
+                    <p className="text-xl font-bold text-green-700">{goals?.summary?.on_track || 0}</p>
+                    <p className="text-xs text-muted-foreground">On Track</p>
+                  </div>
+                  <div className="text-center p-3 bg-amber-50 rounded-lg">
+                    <AlertTriangle className="h-6 w-6 text-amber-600 mx-auto mb-1" />
+                    <p className="text-xl font-bold text-amber-700">{goals?.summary?.at_risk || 0}</p>
+                    <p className="text-xs text-muted-foreground">At Risk</p>
+                  </div>
+                  <div className="text-center p-3 bg-blue-50 rounded-lg">
+                    <Target className="h-6 w-6 text-blue-600 mx-auto mb-1" />
+                    <p className="text-xl font-bold text-blue-700">{goals?.summary?.total_goals || 0}</p>
+                    <p className="text-xs text-muted-foreground">Total</p>
+                  </div>
+                </div>
+                
                 <div className="space-y-3">
-                  {[{name:"Statement of Advice 2025",type:"SOA",date:"Jun 15, 2025",status:"signed"},{name:"Fee Disclosure Statement",type:"FDS",date:"Dec 1, 2025",status:"pending"},{name:"Q3 2025 Portfolio Report",type:"Report",date:"Oct 1, 2025",status:"available"}].map((doc, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center"><FileText className="h-5 w-5 text-blue-600" /></div>
-                        <div><p className="font-medium">{doc.name}</p><p className="text-xs text-muted-foreground">{doc.type} • {doc.date}</p></div>
+                  {goals?.goals?.slice(0, 3).map((goal) => (
+                    <div key={goal.goal_id} className="p-3 bg-muted/30 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium">{goal.name}</span>
+                        <Badge variant={goal.status === 'on_track' ? 'default' : 'secondary'}>
+                          {goal.progress_pct}%
+                        </Badge>
                       </div>
-                      <Button variant={doc.status === 'pending' ? 'default' : 'outline'} size="sm">{doc.status === 'pending' ? 'Sign Now' : 'View'}</Button>
+                      <Progress value={goal.progress_pct} className="h-2" />
+                      <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                        <span>{formatCurrency(goal.current_amount)}</span>
+                        <span>{formatCurrency(goal.target_amount)}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Pending Actions */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Bell className="h-5 w-5 text-orange-600" />
+                  Pending Actions
+                  {pendingActions > 0 && (
+                    <Badge variant="destructive">{pendingActions}</Badge>
+                  )}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {notifications.length === 0 ? (
+                  <p className="text-muted-foreground text-center py-4">No pending actions</p>
+                ) : (
+                  <div className="space-y-3">
+                    {notifications.slice(0, 4).map((notif) => (
+                      <div 
+                        key={notif.notification_id} 
+                        className={`p-3 rounded-lg flex items-start gap-3 ${
+                          notif.type === 'action_required' ? 'bg-red-50 border border-red-200' : 'bg-muted/30'
+                        }`}
+                      >
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                          notif.type === 'action_required' ? 'bg-red-100' : 'bg-blue-100'
+                        }`}>
+                          {notif.type === 'action_required' ? (
+                            <AlertTriangle className="h-4 w-4 text-red-600" />
+                          ) : (
+                            <Bell className="h-4 w-4 text-blue-600" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm">{notif.title}</p>
+                          <p className="text-xs text-muted-foreground truncate">{notif.message}</p>
+                        </div>
+                        {notif.type === 'action_required' && (
+                          <Button size="sm" variant="destructive">Action</Button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Documents Quick Access */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-blue-600" />
+                  Recent Documents
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {[
+                    { name: "Statement of Advice 2025", status: "signed", date: "Jun 15" },
+                    { name: "Fee Disclosure Statement", status: "pending", date: "Dec 1" },
+                    { name: "Q3 Portfolio Report", status: "available", date: "Oct 1" }
+                  ].map((doc, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-2 hover:bg-muted/30 rounded-lg transition-colors">
+                      <div className="flex items-center gap-3">
+                        <FileText className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <p className="text-sm font-medium">{doc.name}</p>
+                          <p className="text-xs text-muted-foreground">{doc.date}</p>
+                        </div>
+                      </div>
+                      <Badge variant={doc.status === 'pending' ? 'destructive' : doc.status === 'signed' ? 'default' : 'secondary'}>
+                        {doc.status}
+                      </Badge>
                     </div>
                   ))}
                 </div>
@@ -386,13 +465,22 @@ const ClientPortal = () => {
           </TabsContent>
         </Tabs>
 
+        {/* Advisor Contact */}
         <Card>
           <CardContent className="py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center"><User className="h-6 w-6" /></div>
-              <div><p className="font-semibold">{dashboard?.advisor?.name}</p><p className="text-sm text-muted-foreground">Your Financial Advisor</p></div>
+              <div className="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center">
+                <User className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="font-semibold">{dashboard?.advisor?.name}</p>
+                <p className="text-sm text-muted-foreground">Your Financial Advisor</p>
+              </div>
             </div>
-            <Button><MessageSquare className="h-4 w-4 mr-2" />Contact Advisor</Button>
+            <Button>
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Contact Advisor
+            </Button>
           </CardContent>
         </Card>
       </div>

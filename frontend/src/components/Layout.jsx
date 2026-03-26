@@ -72,7 +72,10 @@ import {
   Bitcoin,
   Coins,
   Cable,
-  Gauge
+  Gauge,
+  Lock,
+  Unlock,
+  Presentation
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -226,39 +229,38 @@ const adviserBaseNav = [
 ];
 
 // Client-specific navigation (shown when client is selected)
-// Bottom-Up Flow: Investments (Assets) → Net Worth (Portfolio) → Retirement (Planning)
+// Top-to-Bottom Flow: Overview (Big Picture) → Planning (Action/Analysis) → Investments (Asset Details)
 const clientContextNav = [
+  {
+    name: "Overview",
+    icon: Eye,
+    items: [
+      { path: "/family-wealth", label: "Net Worth", icon: Wallet, title: "Net Worth & Wealth Summary" },
+      { path: "/retirement-confidence", label: "Retirement", icon: Gauge, title: "Retirement Confidence Engine", badge: "PRO" },
+      { path: "/decision-engine", label: "Health Score", icon: Zap, title: "Financial Health Score" },
+      { path: "/client-360", label: "Client 360", icon: LayoutDashboard, title: "Client 360 Dashboard" },
+    ]
+  },
+  {
+    name: "Planning",
+    icon: Target,
+    items: [
+      { path: "/retirement", label: "Retirement Planner", icon: PiggyBank, title: "Retirement Planner" },
+      { path: "/scenario-modelling", label: "Scenarios", icon: Calculator, title: "What-If Scenario Modelling" },
+      { path: "/goal-tracker", label: "Goals", icon: Target, title: "Goal Tracker" },
+      { path: "/next-best-actions", label: "Actions", icon: Zap, title: "Next Best Actions" },
+      { path: "/tax-analysis-sync", label: "Tax Analysis", icon: FileText, title: "Tax Analysis & CGT" },
+    ]
+  },
   {
     name: "Investments",
     icon: TrendingUp,
     items: [
-      { path: "/stock-trading", label: "Shares & Trading", icon: TrendingUp, title: "Shares & Trading" },
-      { path: "/cash-deposits", label: "Cash & TDs", icon: PiggyBank, title: "Cash & Term Deposits" },
-      { path: "/managed-funds", label: "Funds", icon: PieChart, title: "Managed Funds" },
-      { path: "/bonds-trading", label: "Bonds", icon: Landmark, title: "Bonds & Fixed Income" },
-      { path: "/hybrids-trading", label: "Hybrids", icon: Coins, title: "Hybrid Securities" },
-      { path: "/crypto-portfolio", label: "Crypto", icon: Bitcoin, title: "Cryptocurrency" },
-      { path: "/property-portfolio", label: "Property", icon: Building2, title: "Property" },
-      { path: "/transaction-modeler", label: "What-If Modeler", icon: Calculator, title: "Transaction Modeler & What-If Analysis" },
-    ]
-  },
-  {
-    name: "Net Worth",
-    icon: Wallet,
-    items: [
-      { path: "/family-wealth", label: "Overview", icon: Eye, title: "Net Worth & Retirement Overview" },
-      { path: "/client-360", label: "Client 360", icon: LayoutDashboard, title: "Client 360 Dashboard" },
-      { path: "/decision-engine", label: "Health Score", icon: Zap, title: "Financial Health Score" },
-    ]
-  },
-  {
-    name: "Retirement",
-    icon: Target,
-    items: [
-      { path: "/retirement-confidence", label: "Confidence Engine", icon: Gauge, title: "Retirement Confidence Engine", badge: "PRO" },
-      { path: "/retirement", label: "Planner", icon: PiggyBank, title: "Retirement Planner (Accumulation & Decumulation)" },
-      { path: "/goal-tracker", label: "Goals", icon: Target, title: "Goal Tracker" },
-      { path: "/next-best-actions", label: "Actions", icon: Zap, title: "Next Best Actions" },
+      { path: "/stock-trading", label: "Shares & ETFs", icon: TrendingUp, title: "Shares & Trading" },
+      { path: "/bonds-trading", label: "Fixed Income", icon: Landmark, title: "Bonds, TDs & Cash" },
+      { path: "/property-portfolio", label: "Property", icon: Building2, title: "Property Portfolio" },
+      { path: "/managed-funds", label: "Managed Funds", icon: PieChart, title: "Managed Funds" },
+      { path: "/crypto-portfolio", label: "Alternatives", icon: Bitcoin, title: "Crypto & Hybrids" },
     ]
   },
   {
@@ -266,18 +268,11 @@ const clientContextNav = [
     icon: FileText,
     items: [
       { path: "/document-vault", label: "Vault", icon: FolderOpen, title: "Document Vault" },
-      { path: "/meeting-notes", label: "Meeting Notes", icon: Video, title: "Fathom Notes", badge: "NEW" },
+      { path: "/meeting-notes", label: "Meeting Notes", icon: Video, title: "Meeting Notes", badge: "NEW" },
       { path: "/reports", label: "Reports", icon: FileText, title: "Reports" },
-      { path: "/adviser-compliance", label: "SOA/ROA", icon: Shield, title: "SOA/ROA Compliance", badge: "NEW" },
+      { path: "/adviser-compliance", label: "SOA/ROA", icon: Shield, title: "SOA/ROA Compliance" },
     ]
   },
-  {
-    name: "AI Copilot",
-    icon: Bot,
-    items: [
-      { path: "/ai-copilot-advanced", label: "AI Assistant", icon: MessageSquare, title: "AI Copilot" },
-    ]
-  }
 ];
 
 // Combined for backwards compatibility
@@ -302,6 +297,16 @@ const Layout = ({ children }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [appMode, setAppMode] = useState(() => localStorage.getItem("app_mode") || "personal");
+  
+  // Meeting Mode - locks all live data updates during client presentations
+  const [meetingMode, setMeetingMode] = useState(() => localStorage.getItem("meeting_mode") === "true");
+  
+  // Persist meeting mode to localStorage
+  useEffect(() => {
+    localStorage.setItem("meeting_mode", meetingMode.toString());
+    // Dispatch custom event so other components can react
+    window.dispatchEvent(new CustomEvent('meetingModeChange', { detail: { meetingMode } }));
+  }, [meetingMode]);
   
   // Selected client for adviser mode
   const [selectedClient, setSelectedClient] = useState(() => {
@@ -593,6 +598,50 @@ const Layout = ({ children }) => {
             </SelectContent>
           </Select>
         </div>
+
+        {/* Meeting Mode Toggle - Locks live data updates */}
+        {appMode === "adviser" && !sidebarCollapsed && (
+          <div className="px-3 py-2 border-b border-white/10">
+            <button
+              onClick={() => setMeetingMode(!meetingMode)}
+              className={cn(
+                "w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-all",
+                meetingMode 
+                  ? "bg-amber-500/20 border border-amber-500/50 text-amber-400" 
+                  : "bg-white/5 hover:bg-white/10 text-white/60 hover:text-white"
+              )}
+              data-testid="meeting-mode-toggle"
+            >
+              {meetingMode ? (
+                <>
+                  <Lock className="h-4 w-4" />
+                  <span className="text-sm font-medium">Meeting Mode ON</span>
+                </>
+              ) : (
+                <>
+                  <Presentation className="h-4 w-4" />
+                  <span className="text-sm">Enter Meeting Mode</span>
+                </>
+              )}
+            </button>
+          </div>
+        )}
+        {appMode === "adviser" && sidebarCollapsed && (
+          <div className="px-2 py-2 border-b border-white/10">
+            <button
+              onClick={() => setMeetingMode(!meetingMode)}
+              className={cn(
+                "w-full flex items-center justify-center p-2 rounded-lg transition-all",
+                meetingMode 
+                  ? "bg-amber-500/20 border border-amber-500/50 text-amber-400" 
+                  : "bg-white/5 hover:bg-white/10 text-white/60"
+              )}
+              title={meetingMode ? "Exit Meeting Mode" : "Enter Meeting Mode"}
+            >
+              {meetingMode ? <Lock className="h-4 w-4" /> : <Presentation className="h-4 w-4" />}
+            </button>
+          </div>
+        )}
 
         {/* Selected Client Indicator (Adviser Mode) */}
         {appMode === "adviser" && !sidebarCollapsed && selectedClient && (
@@ -895,6 +944,28 @@ const Layout = ({ children }) => {
             </Button>
           </div>
         )}
+        
+        {/* Meeting Mode Banner */}
+        {meetingMode && (
+          <div className="bg-amber-500 text-black px-4 py-2 flex items-center justify-between" data-testid="meeting-mode-banner">
+            <div className="flex items-center gap-3">
+              <Lock className="h-5 w-5" />
+              <span className="font-semibold">MEETING MODE</span>
+              <span className="text-sm">Live data updates paused • Manual scenario changes only</span>
+            </div>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setMeetingMode(false)}
+              className="hover:bg-black/10 text-black"
+              data-testid="exit-meeting-mode-btn"
+            >
+              <Unlock className="h-4 w-4 mr-1" />
+              Exit Meeting Mode
+            </Button>
+          </div>
+        )}
+        
         <div className="p-4 md:p-6 lg:p-8">
           <div className="max-w-7xl mx-auto">
             {children}
