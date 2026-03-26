@@ -86,10 +86,10 @@ const PositionSummary = ({ result, baselineResult }) => {
             </p>
           )}
           {actions.length > 0 && (
-            <p className="text-sm mt-2">
+            <div className="text-sm mt-2">
               <span className="font-medium text-green-600">Biggest improvement:</span> {actions[0]?.action} 
               <Badge className="ml-2 bg-green-500">{actions[0]?.impact}</Badge>
-            </p>
+            </div>
           )}
         </div>
 
