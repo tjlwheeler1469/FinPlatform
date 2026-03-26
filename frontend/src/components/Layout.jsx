@@ -145,10 +145,8 @@ const personalNavGroups = [
       { path: "/loan-calculator", label: "Loan", icon: Landmark, title: "Loan Calculator" },
       { path: "/monte-carlo", label: "Monte Carlo", icon: BarChart3, title: "Monte Carlo" },
       { path: "/smsf-optimizer", label: "SMSF", icon: PiggyBank, title: "SMSF" },
-      { path: "/retirement-calculator", label: "Accumulation", icon: Target, title: "Retirement Calculator (Accumulation)", badge: "NEW" },
-      { path: "/decumulation-calculator", label: "Decumulation", icon: TrendingUp, title: "Decumulation Calculator (Pension)", badge: "NEW" },
-      { path: "/confidence-engine", label: "Confidence Engine", icon: Gauge, title: "Retirement Confidence Engine", badge: "NEW" },
-      { path: "/hybrid-engine", label: "Hybrid Engine", icon: Gauge, title: "World-Class Hybrid Confidence Engine", badge: "PRO" },
+      { path: "/retirement", label: "Retirement Planner", icon: Target, title: "Unified Retirement Planner", badge: "NEW" },
+      { path: "/retirement-confidence", label: "Retirement Confidence", icon: Gauge, title: "Retirement Confidence Engine", badge: "PRO" },
     ]
   },
   {
@@ -228,33 +226,12 @@ const adviserBaseNav = [
 ];
 
 // Client-specific navigation (shown when client is selected)
-// Order: Overview → Plan → Investments → Documents → AI
+// Bottom-Up Flow: Investments (Assets) → Net Worth (Portfolio) → Retirement (Planning)
 const clientContextNav = [
-  {
-    name: "Overview",
-    icon: LayoutDashboard,
-    items: [
-      { path: "/client-360", label: "Dashboard", icon: LayoutDashboard, title: "Client 360" },
-      { path: "/next-best-actions", label: "Actions", icon: Zap, title: "Next Best Actions" },
-      { path: "/decision-engine", label: "Health Score", icon: Zap, title: "Health Score" },
-    ]
-  },
-  {
-    name: "Plan",
-    icon: Target,
-    items: [
-      { path: "/goal-tracker", label: "Goals", icon: Target, title: "Goals" },
-      { path: "/retirement", label: "Retirement", icon: PiggyBank, title: "Retirement Planning (Accumulation & Decumulation)", badge: "NEW" },
-      { path: "/confidence-engine", label: "Confidence Engine", icon: Gauge, title: "Retirement Confidence Engine - Monte Carlo", badge: "NEW" },
-      { path: "/hybrid-engine", label: "Hybrid Engine", icon: Gauge, title: "World-Class Hybrid Confidence Engine", badge: "PRO" },
-    ]
-  },
   {
     name: "Investments",
     icon: TrendingUp,
     items: [
-      { path: "/family-wealth", label: "Net Worth", icon: Eye, title: "Net Worth" },
-      { path: "/transaction-modeler", label: "Transaction Modeler", icon: Calculator, title: "Transaction Modeler & What-If Analysis" },
       { path: "/stock-trading", label: "Shares & Trading", icon: TrendingUp, title: "Shares & Trading" },
       { path: "/cash-deposits", label: "Cash & TDs", icon: PiggyBank, title: "Cash & Term Deposits" },
       { path: "/managed-funds", label: "Funds", icon: PieChart, title: "Managed Funds" },
@@ -262,6 +239,26 @@ const clientContextNav = [
       { path: "/hybrids-trading", label: "Hybrids", icon: Coins, title: "Hybrid Securities" },
       { path: "/crypto-portfolio", label: "Crypto", icon: Bitcoin, title: "Cryptocurrency" },
       { path: "/property-portfolio", label: "Property", icon: Building2, title: "Property" },
+      { path: "/transaction-modeler", label: "What-If Modeler", icon: Calculator, title: "Transaction Modeler & What-If Analysis" },
+    ]
+  },
+  {
+    name: "Net Worth",
+    icon: Wallet,
+    items: [
+      { path: "/family-wealth", label: "Overview", icon: Eye, title: "Net Worth & Retirement Overview" },
+      { path: "/client-360", label: "Client 360", icon: LayoutDashboard, title: "Client 360 Dashboard" },
+      { path: "/decision-engine", label: "Health Score", icon: Zap, title: "Financial Health Score" },
+    ]
+  },
+  {
+    name: "Retirement",
+    icon: Target,
+    items: [
+      { path: "/retirement-confidence", label: "Confidence Engine", icon: Gauge, title: "Retirement Confidence Engine", badge: "PRO" },
+      { path: "/retirement", label: "Planner", icon: PiggyBank, title: "Retirement Planner (Accumulation & Decumulation)" },
+      { path: "/goal-tracker", label: "Goals", icon: Target, title: "Goal Tracker" },
+      { path: "/next-best-actions", label: "Actions", icon: Zap, title: "Next Best Actions" },
     ]
   },
   {

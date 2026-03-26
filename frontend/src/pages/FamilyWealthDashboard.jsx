@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
 import ChartContainer from "@/components/ChartContainer";
 import { 
   Users,
@@ -32,7 +33,10 @@ import {
   CheckCircle,
   Info,
   Eye,
-  ChevronRight
+  ChevronRight,
+  Gauge,
+  Clock,
+  Loader2
 } from "lucide-react";
 import { usePortfolio } from "@/App";
 import {
@@ -101,6 +105,47 @@ const FamilyWealthDashboard = () => {
   const [estateTransferAge, setEstateTransferAge] = useState(85);
   const [giftingAmount, setGiftingAmount] = useState(0);
   const [structureFilter, setStructureFilter] = useState("all");
+  
+  // Retirement overview state
+  const [retirementOverview, setRetirementOverview] = useState(null);
+  const [retirementLoading, setRetirementLoading] = useState(false);
+
+  // Fetch retirement overview on mount
+  const fetchRetirementOverview = async (netWorthValue) => {
+    setRetirementLoading(true);
+    try {
+      const API_URL = process.env.REACT_APP_BACKEND_URL || '';
+      const primaryMember = familyMembers.find(m => m.relationship === 'primary') || familyMembers[0];
+      
+      const response = await fetch(`${API_URL}/api/hybrid-engine/calculate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          client_id: 'demo_client',
+          current_age: primaryMember?.age || 45,
+          retirement_age: 65,
+          life_expectancy: 90,
+          current_portfolio: netWorthValue || 1000000,
+          annual_contributions: 30000,
+          retirement_spending: 80000,
+          expected_return: 0.07,
+          return_volatility: 0.15,
+          inflation_rate: 0.025,
+          num_simulations: 5000,
+          enable_dynamic_spending: true,
+          mode: 'background'
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setRetirementOverview(data);
+      }
+    } catch (error) {
+      console.error('Error fetching retirement overview:', error);
+    }
+    setRetirementLoading(false);
+  };
 
   // Define ownership structures with their assets
   const ownershipStructures = useMemo(() => ({
@@ -254,6 +299,13 @@ const FamilyWealthDashboard = () => {
       netWorth
     };
   }, [portfolio, sharePortfolio, familyMembers, trust, company, tradingAssets]);
+
+  // Fetch retirement overview when net worth changes
+  useEffect(() => {
+    if (familyWealth.netWorth > 0) {
+      fetchRetirementOverview(familyWealth.netWorth);
+    }
+  }, [familyWealth.netWorth]);
 
   // Calculate tax savings from current structure
   const taxSavings = useMemo(() => {
@@ -505,6 +557,121 @@ const FamilyWealthDashboard = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Retirement Overview Card */}
+        <Card className="border-2 border-primary/20 bg-gradient-to-r from-blue-50 to-purple-50">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <Gauge className="h-5 w-5 text-primary" />
+                Retirement Overview
+              </CardTitle>
+              <Link to="/retirement-confidence">
+                <Button variant="outline" size="sm">
+                  View Details
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </Link>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {retirementLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                <span className="ml-2 text-muted-foreground">Calculating retirement confidence...</span>
+              </div>
+            ) : retirementOverview ? (
+              <div className="grid md:grid-cols-4 gap-6">
+                {/* Confidence Score */}
+                <div className="text-center p-4 rounded-xl bg-white/80 border">
+                  <p className="text-sm text-muted-foreground mb-1">Retirement Confidence</p>
+                  <p 
+                    className="text-4xl font-bold"
+                    style={{ 
+                      color: retirementOverview.confidence_score >= 80 ? '#22c55e' 
+                           : retirementOverview.confidence_score >= 60 ? '#3b82f6' 
+                           : retirementOverview.confidence_score >= 40 ? '#f59e0b' 
+                           : '#ef4444' 
+                    }}
+                  >
+                    {retirementOverview.confidence_score?.toFixed(0)}%
+                  </p>
+                  <Badge 
+                    variant={retirementOverview.confidence_score >= 80 ? 'default' : 'secondary'}
+                    className={
+                      retirementOverview.confidence_score >= 80 ? 'bg-green-500' 
+                      : retirementOverview.confidence_score >= 60 ? 'bg-blue-500' 
+                      : retirementOverview.confidence_score >= 40 ? 'bg-amber-500' 
+                      : 'bg-red-500'
+                    }
+                  >
+                    {retirementOverview.confidence_score >= 80 ? 'On Track' 
+                     : retirementOverview.confidence_score >= 60 ? 'Good' 
+                     : retirementOverview.confidence_score >= 40 ? 'Needs Attention' 
+                     : 'At Risk'}
+                  </Badge>
+                </div>
+                
+                {/* Success Rate */}
+                <div className="text-center p-4 rounded-xl bg-white/80 border">
+                  <p className="text-sm text-muted-foreground mb-1">Monte Carlo Success</p>
+                  <p className="text-3xl font-bold text-blue-600">
+                    {retirementOverview.monte_carlo?.success_rate_percent?.toFixed(1)}%
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Probability of not running out
+                  </p>
+                </div>
+                
+                {/* Years to Retirement */}
+                <div className="text-center p-4 rounded-xl bg-white/80 border">
+                  <p className="text-sm text-muted-foreground mb-1">Years to Retirement</p>
+                  <div className="flex items-center justify-center gap-1">
+                    <Clock className="h-5 w-5 text-purple-500" />
+                    <p className="text-3xl font-bold text-purple-600">
+                      {retirementOverview.inputs?.years_to_retirement || 20}
+                    </p>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    At age {retirementOverview.inputs?.retirement_age || 65}
+                  </p>
+                </div>
+                
+                {/* Projected Balance */}
+                <div className="text-center p-4 rounded-xl bg-white/80 border">
+                  <p className="text-sm text-muted-foreground mb-1">Projected at Retirement</p>
+                  <p className="text-2xl font-bold text-green-600">
+                    {formatCurrency(retirementOverview.monte_carlo?.percentiles?.p50_median || 0)}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    50th percentile outcome
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <p>Unable to calculate retirement overview</p>
+                <Button variant="outline" size="sm" className="mt-2" onClick={() => fetchRetirementOverview(familyWealth.netWorth)}>
+                  Try Again
+                </Button>
+              </div>
+            )}
+            
+            {/* Progress Bar */}
+            {retirementOverview && (
+              <div className="mt-4 pt-4 border-t">
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-muted-foreground">Overall Retirement Readiness</span>
+                  <span className="font-medium">{retirementOverview.confidence_score?.toFixed(0)}%</span>
+                </div>
+                <Progress 
+                  value={retirementOverview.confidence_score || 0} 
+                  className="h-3"
+                />
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         <Tabs defaultValue="wealth">
           <TabsList className="grid w-full max-w-2xl grid-cols-4">

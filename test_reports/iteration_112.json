@@ -1,0 +1,74 @@
+{
+  "summary": "Completed frontend testing of UI/UX restructuring. All features verified: 1) Retirement Confidence page with Quick/Advanced toggle, 2) Today/After Changes/After Stress display, 3) Family Wealth Dashboard with Retirement Overview card showing confidence score, success rate, years to retirement, projected balance, 4) Client Portal welcome banner with Retirement Confidence, 5) Navigation shows 'Retirement Planner' and 'Retirement Confidence' under Calculators, 6) Backend /api/hybrid-engine/calculate endpoint working correctly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_112.json"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "100% (hybrid-engine/calculate endpoint working)",
+    "frontend": "100%"
+  },
+  "test_credentials": "",
+  "seed_data_creation": "",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "UI/UX restructuring complete. Key pages: /retirement-confidence (combined Confidence Engine + Hybrid Engine with Quick/Advanced toggle), /family-wealth (Net Worth with Retirement Overview card), /client-portal (Client view with Retirement Confidence in welcome banner). Navigation updated: Calculators section has 'Retirement Planner' (NEW badge) and 'Retirement Confidence' (PRO badge). Separate Accumulation/Decumulation links removed - unified under Retirement Planner.",
+  "features_tested": {
+    "retirement_confidence_page": {
+      "page_loads": "PASS - /retirement-confidence loads correctly",
+      "quick_advanced_toggle": "PASS - Quick/Advanced toggle buttons visible and functional",
+      "today_after_changes_after_stress": "PASS - Shows Today (84%), After Changes (84%), After Stress (100%)",
+      "tabs": "PASS - 5 tabs: Overview, Inputs, Factors, Scenarios, AI Assist",
+      "stress_test_results": "PASS - Base Case, Market Crash (-30%), High Inflation (6%), Live 5 Years Longer displayed",
+      "ai_analysis": "PASS - Summary text displayed",
+      "mode_toggle": "PASS - Advisor/Live mode toggle visible (Advanced mode only)",
+      "simulations_badge": "PASS - 10,000 simulations badge visible"
+    },
+    "family_wealth_dashboard": {
+      "page_loads": "PASS - /family-wealth loads correctly",
+      "retirement_overview_card": "PASS - Card visible with gradient background",
+      "confidence_score": "PASS - Shows 84% with On Track badge",
+      "monte_carlo_success": "PASS - Shows 100.0% with 'Probability of not running out'",
+      "years_to_retirement": "PASS - Shows 20 years (At age 65)",
+      "projected_balance": "PASS - Shows $41,765,836 (50th percentile outcome)",
+      "progress_bar": "PASS - Overall Retirement Readiness at 84%",
+      "view_details_button": "PASS - Links to /retirement-confidence"
+    },
+    "client_portal": {
+      "page_loads": "PASS - /client-portal loads correctly",
+      "welcome_banner": "PASS - Shows 'Welcome back, James!'",
+      "retirement_confidence_in_banner": "PASS - Shows 84% with 'On Track' status",
+      "net_worth_in_banner": "PASS - Shows $3,040,000",
+      "goals_on_track": "PASS - Shows 2/3",
+      "pending_actions": "PASS - Shows 1",
+      "next_meeting": "PASS - Shows 'Scheduled'"
+    },
+    "navigation_structure": {
+      "calculators_section": "PASS - CALCULATORS section visible in sidebar",
+      "retirement_planner_link": "PASS - 'Retirement Planner' with NEW badge",
+      "retirement_confidence_link": "PASS - 'Retirement Confidence' with PRO badge",
+      "no_separate_accumulation_decumulation": "PASS - Unified under Retirement Planner"
+    },
+    "backend_api": {
+      "hybrid_engine_calculate": "PASS - Returns confidence_score, display (today/after_stress), monte_carlo, stress_tests, explanation"
+    }
+  },
+  "mocked_apis": {
+    "has_mocked_apis": true,
+    "mocked_apis_list": [
+      "Market data indicators use default 2024-25 economic values"
+    ],
+    "note": "Economic indicators (expected_return=7%, inflation=2.5%, volatility=15%) are configurable defaults, not live market feeds."
+  }
+}

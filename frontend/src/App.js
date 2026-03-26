@@ -244,6 +244,9 @@ const RetirementConfidenceEngine = lazy(() => import("@/pages/RetirementConfiden
 // Hybrid Engine - World-class 19-section retirement calculation engine
 const HybridEngineView = lazy(() => import("@/pages/HybridEngineView"));
 
+// Combined Retirement Confidence (Quick + Advanced toggle)
+const RetirementConfidence = lazy(() => import("@/pages/RetirementConfidence"));
+
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -1140,6 +1143,9 @@ const AppRouter = () => {
       
       {/* Hybrid Engine - World-class 19-section retirement calculation */}
       <Route path="/hybrid-engine" element={<HybridEngineView />} />
+      
+      {/* Combined Retirement Confidence (Quick + Advanced) */}
+      <Route path="/retirement-confidence" element={<RetirementConfidence />} />
       
       {/* CRM Command Center */}
       <Route path="/crm-command-center" element={<CRMCommandCenter />} />

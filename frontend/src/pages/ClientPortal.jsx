@@ -43,6 +43,7 @@ const ClientPortal = () => {
   const [goals, setGoals] = useState(null);
   const [netWorth, setNetWorth] = useState(null);
   const [notifications, setNotifications] = useState([]);
+  const [retirementConfidence, setRetirementConfidence] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -51,18 +52,38 @@ const ClientPortal = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [dashRes, portRes, goalsRes, nwRes, notifRes] = await Promise.all([
+      const [dashRes, portRes, goalsRes, nwRes, notifRes, retireRes] = await Promise.all([
         fetch(`${API_URL}/api/client-portal/dashboard/${clientId}`),
         fetch(`${API_URL}/api/client-portal/portfolios/${clientId}`),
         fetch(`${API_URL}/api/client-portal/goals/${clientId}`),
         fetch(`${API_URL}/api/client-portal/net-worth/${clientId}`),
-        fetch(`${API_URL}/api/client-portal/notifications/${clientId}`)
+        fetch(`${API_URL}/api/client-portal/notifications/${clientId}`),
+        fetch(`${API_URL}/api/hybrid-engine/calculate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            client_id: clientId,
+            current_age: 45,
+            retirement_age: 65,
+            life_expectancy: 90,
+            current_portfolio: 800000,
+            annual_contributions: 30000,
+            retirement_spending: 80000,
+            expected_return: 0.07,
+            return_volatility: 0.15,
+            inflation_rate: 0.025,
+            num_simulations: 3000,
+            enable_dynamic_spending: true,
+            mode: 'background'
+          })
+        })
       ]);
       if (dashRes.ok) setDashboard(await dashRes.json());
       if (portRes.ok) setPortfolios(await portRes.json());
       if (goalsRes.ok) setGoals(await goalsRes.json());
       if (nwRes.ok) setNetWorth(await nwRes.json());
       if (notifRes.ok) setNotifications((await notifRes.json()).notifications || []);
+      if (retireRes.ok) setRetirementConfidence(await retireRes.json());
     } catch (error) {
       console.error("Failed to fetch client data:", error);
     }
@@ -91,12 +112,27 @@ const ClientPortal = () => {
         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white">
           <h2 className="text-2xl font-bold mb-2">Welcome back, {dashboard?.name?.split(' ')[0]}!</h2>
           <p className="text-blue-100 mb-4">Your advisor: {dashboard?.advisor?.name}</p>
-          <div className="grid md:grid-cols-4 gap-4">
+          <div className="grid md:grid-cols-5 gap-4">
             <div className="bg-white/20 rounded-xl p-4">
               <p className="text-blue-100 text-sm">Net Worth</p>
               <p className="text-2xl font-bold">{formatCurrency(dashboard?.summary?.net_worth)}</p>
               <p className={`text-sm ${dashboard?.summary?.net_worth_change_pct >= 0 ? 'text-green-300' : 'text-red-300'}`}>
                 {dashboard?.summary?.net_worth_change_pct >= 0 ? '↑' : '↓'} {Math.abs(dashboard?.summary?.net_worth_change_pct || 0).toFixed(1)}% this month
+              </p>
+            </div>
+            <div className="bg-white/20 rounded-xl p-4">
+              <p className="text-blue-100 text-sm">Retirement Confidence</p>
+              <p className="text-2xl font-bold">
+                {retirementConfidence?.confidence_score?.toFixed(0) || '--'}%
+              </p>
+              <p className={`text-sm ${
+                (retirementConfidence?.confidence_score || 0) >= 80 ? 'text-green-300' 
+                : (retirementConfidence?.confidence_score || 0) >= 60 ? 'text-yellow-300' 
+                : 'text-red-300'
+              }`}>
+                {(retirementConfidence?.confidence_score || 0) >= 80 ? 'On Track' 
+                 : (retirementConfidence?.confidence_score || 0) >= 60 ? 'Good' 
+                 : 'Needs Attention'}
               </p>
             </div>
             <div className="bg-white/20 rounded-xl p-4">
