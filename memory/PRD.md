@@ -1254,6 +1254,67 @@ Load testing infrastructure for enterprise-scale deployments:
 
 ---
 
+## Latest Implementation: March 26, 2026 (Session 2)
+
+### Feature 6: Unified Retirement Planner
+
+**Route**: `/retirement`
+**Frontend**: `/app/frontend/src/pages/RetirementPlanner.jsx`
+
+Comprehensive retirement planning combining accumulation and decumulation phases:
+
+#### Navigation Changes
+- **Removed from Execution tab**: Accumulation Calc, Decumulation Calc (now only Batch Execute)
+- **Added to Plan section**: Single "Retirement" entry replacing separate Accum/Decum
+- **Moved to Investments**: "Transaction Modeler" (renamed from What-If Modeller)
+
+#### Multi-Entity Support
+- Personal, Joint, Company, Family Trust, SMSF
+- Each asset assigned to specific entity with proper CGT treatment
+- Entity-specific CGT discounts (50% individual/trust, 0% company, 33% SMSF accum)
+
+#### Variable Assumptions (Sliding)
+- **Inflation Rate**: 0-10% slider
+- **Wage Growth Rate**: 0-8% slider
+- **Asset Yields by Class**: Editable for each type
+  - Cash, Term Deposit, Australian Shares, International Shares
+  - ETFs, Managed Funds, Property, Super, Bonds, Crypto
+- **Ages (Joint)**: Separate sliders for Primary and Partner
+  - Current Age, Retirement Age, Life Expectancy
+
+#### CGT Modeling
+- Track cost base for every asset
+- Schedule planned asset sales by year
+- Automatic CGT calculation with entity-appropriate discounts
+- Visualize CGT impact in year-by-year projection
+
+#### Income & Expense Features
+- Multiple income sources by entity
+- Employment income that ends at retirement
+- Ongoing investment/rental income
+- Category-based monthly expenses with escalation rates
+- **One-Off Expenditures**: Major future expenses (car, renovation, travel)
+
+#### Superannuation Integration
+- Employer SG rate slider
+- Salary sacrifice contributions
+- Non-concessional contributions
+- Drawdown strategies: Minimum Required, Fixed Percentage, Fixed Amount
+- Age Pension modeling with means test
+
+#### Projection Output
+- Year-by-year table with all financial components
+- Working/Retired phase indicator
+- Income breakdown (Employment, Super Pension, Age Pension, Investments)
+- Net Worth projection chart
+- Retirement transition reference line
+
+**7 Tabs**: Overview, People, Assets, Income, Expenses, Assumptions, Projection
+
+**Testing**: Iteration 104 - Frontend 100%
+
+---
+
 ## Backlog / Future Tasks
 
 ### P1 (High Priority)
