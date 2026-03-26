@@ -1,0 +1,1013 @@
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import Layout from '../components/Layout';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Button } from '../components/ui/button';
+import { Badge } from '../components/ui/badge';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { Slider } from '../components/ui/slider';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { Switch } from '../components/ui/switch';
+import { Alert, AlertDescription, AlertTitle } from '../components/ui/alert';
+import { ScrollArea } from '../components/ui/scroll-area';
+import { Separator } from '../components/ui/separator';
+import { Progress } from '../components/ui/progress';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
+import { toast } from 'sonner';
+import {
+  Target, TrendingUp, TrendingDown, DollarSign, PiggyBank, Shield, Users, Calendar,
+  AlertTriangle, Plus, Trash2, Play, RefreshCw, Info, BarChart3, Zap, ChevronRight,
+  Clock, Activity, Brain, Lightbulb, CheckCircle2, XCircle, ArrowRight, ArrowUp, ArrowDown,
+  Gauge, CircleDollarSign, Building2, Briefcase, Heart, Flame, Snowflake
+} from 'lucide-react';
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, Legend, RadialBarChart, RadialBar
+} from 'recharts';
+
+const API_URL = process.env.REACT_APP_BACKEND_URL;
+
+// ==================== CONFIDENCE GAUGE COMPONENT ====================
+
+const ConfidenceGauge = ({ score, size = 200 }) => {
+  const getColor = (s) => {
+    if (s >= 90) return '#22c55e';
+    if (s >= 75) return '#3b82f6';
+    if (s >= 50) return '#f59e0b';
+    if (s >= 25) return '#f97316';
+    return '#ef4444';
+  };
+
+  const getStatus = (s) => {
+    if (s >= 90) return 'Excellent';
+    if (s >= 75) return 'Good';
+    if (s >= 50) return 'Moderate';
+    if (s >= 25) return 'Concerning';
+    return 'Critical';
+  };
+
+  const data = [{ name: 'score', value: score, fill: getColor(score) }];
+
+  return (
+    <div className="flex flex-col items-center">
+      <div style={{ width: size, height: size / 2 + 40 }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <RadialBarChart
+            cx="50%"
+            cy="100%"
+            innerRadius="60%"
+            outerRadius="100%"
+            barSize={20}
+            data={data}
+            startAngle={180}
+            endAngle={0}
+          >
+            <RadialBar
+              background={{ fill: '#e5e7eb' }}
+              dataKey="value"
+              cornerRadius={10}
+            />
+          </RadialBarChart>
+        </ResponsiveContainer>
+      </div>
+      <div className="text-center -mt-8">
+        <span className="text-5xl font-bold" style={{ color: getColor(score) }}>
+          {score.toFixed(0)}%
+        </span>
+        <p className="text-lg font-medium text-muted-foreground mt-1">{getStatus(score)}</p>
+      </div>
+    </div>
+  );
+};
+
+// ==================== RISK BREAKDOWN COMPONENT ====================
+
+const RiskBreakdown = ({ risks }) => {
+  const riskItems = [
+    { key: 'longevity_risk', label: 'Longevity', icon: Clock, color: '#8b5cf6', description: 'Risk of outliving savings' },
+    { key: 'market_risk', label: 'Market', icon: TrendingDown, color: '#ef4444', description: 'Investment volatility risk' },
+    { key: 'spending_risk', label: 'Spending', icon: DollarSign, color: '#f59e0b', description: 'Expense level risk' },
+    { key: 'inflation_risk', label: 'Inflation', icon: Flame, color: '#f97316', description: 'Purchasing power erosion' },
+  ];
+
+  const totalRisk = Object.values(risks).reduce((a, b) => a + b, 0);
+
+  return (
+    <div className="space-y-4">
+      {riskItems.map((item) => {
+        const value = risks[item.key] || 0;
+        const Icon = item.icon;
+        return (
+          <div key={item.key} className="space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Icon className="h-4 w-4" style={{ color: item.color }} />
+                <span className="font-medium">{item.label}</span>
+              </div>
+              <span className="font-bold" style={{ color: item.color }}>{value.toFixed(1)}%</span>
+            </div>
+            <Progress value={totalRisk > 0 ? (value / totalRisk) * 100 : 0} className="h-2" />
+            <p className="text-xs text-muted-foreground">{item.description}</p>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+// ==================== SCENARIO CARD COMPONENT ====================
+
+const ScenarioCard = ({ scenario, isBase, onSelect, selected }) => {
+  const getScoreColor = (score) => {
+    if (score >= 90) return 'text-green-500';
+    if (score >= 75) return 'text-blue-500';
+    if (score >= 50) return 'text-yellow-500';
+    return 'text-red-500';
+  };
+
+  return (
+    <Card 
+      className={`cursor-pointer transition-all ${selected ? 'ring-2 ring-primary' : 'hover:shadow-md'}`}
+      onClick={() => onSelect(scenario.scenario_id)}
+    >
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg">{scenario.name}</CardTitle>
+          {isBase && <Badge variant="outline">Current</Badge>}
+        </div>
+        {scenario.description && (
+          <CardDescription>{scenario.description}</CardDescription>
+        )}
+      </CardHeader>
+      <CardContent>
+        <div className="text-center mb-4">
+          <span className={`text-4xl font-bold ${getScoreColor(scenario.confidence_score)}`}>
+            {scenario.confidence_score.toFixed(0)}%
+          </span>
+          {scenario.confidence_delta !== undefined && scenario.confidence_delta !== 0 && (
+            <div className={`flex items-center justify-center gap-1 mt-1 ${scenario.confidence_delta > 0 ? 'text-green-500' : 'text-red-500'}`}>
+              {scenario.confidence_delta > 0 ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
+              <span className="font-medium">{Math.abs(scenario.confidence_delta).toFixed(1)}%</span>
+            </div>
+          )}
+        </div>
+        
+        {scenario.adjustments && Object.keys(scenario.adjustments).some(k => scenario.adjustments[k] !== null) && (
+          <div className="text-xs text-muted-foreground space-y-1">
+            {scenario.adjustments.retirement_age && (
+              <p>Retire at {scenario.adjustments.retirement_age}</p>
+            )}
+            {scenario.adjustments.spending_adjustment && (
+              <p>Spending: {scenario.adjustments.spending_adjustment > 0 ? '+' : ''}{scenario.adjustments.spending_adjustment}%</p>
+            )}
+            {scenario.adjustments.contribution_adjustment && (
+              <p>Extra contribution: ${scenario.adjustments.contribution_adjustment.toLocaleString()}/yr</p>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+// ==================== MAIN COMPONENT ====================
+
+export default function RetirementConfidenceEngine() {
+  const [activeTab, setActiveTab] = useState('confidence');
+  const [loading, setLoading] = useState(false);
+  const [calculating, setCalculating] = useState(false);
+
+  // ==================== STATE ====================
+  
+  // Confidence result
+  const [confidenceResult, setConfidenceResult] = useState(null);
+  const [explanation, setExplanation] = useState(null);
+  
+  // Multi-scenario
+  const [scenarios, setScenarios] = useState([]);
+  const [selectedScenario, setSelectedScenario] = useState(null);
+  
+  // Inputs - People
+  const [currentAge, setCurrentAge] = useState(45);
+  const [retirementAge, setRetirementAge] = useState(65);
+  const [lifeExpectancy, setLifeExpectancy] = useState(90);
+  const [isCouple, setIsCouple] = useState(true);
+  const [partnerAge, setPartnerAge] = useState(43);
+  
+  // Inputs - Financial
+  const [netWorth, setNetWorth] = useState(2000000);
+  const [annualIncome, setAnnualIncome] = useState(200000);
+  const [annualExpenses, setAnnualExpenses] = useState(100000);
+  const [superBalance, setSuperBalance] = useState(600000);
+  const [investmentBalance, setInvestmentBalance] = useState(400000);
+  
+  // Inputs - Assumptions
+  const [inflationRate, setInflationRate] = useState(2.5);
+  const [expectedReturn, setExpectedReturn] = useState(7.0);
+  const [numSimulations, setNumSimulations] = useState(1000);
+  
+  // Scenario builder
+  const [newScenarioName, setNewScenarioName] = useState('');
+  const [scenarioRetirementAge, setScenarioRetirementAge] = useState(65);
+  const [scenarioSpendingAdjust, setScenarioSpendingAdjust] = useState(0);
+  const [scenarioContribAdjust, setScenarioContribAdjust] = useState(0);
+
+  // ==================== CALCULATIONS ====================
+
+  const calculateConfidence = useCallback(async () => {
+    setCalculating(true);
+    try {
+      const response = await fetch(
+        `${API_URL}/api/confidence-engine/quick-calculate?` +
+        `net_worth=${netWorth}&annual_income=${annualIncome}&annual_expenses=${annualExpenses}` +
+        `&current_age=${currentAge}&retirement_age=${retirementAge}&life_expectancy=${lifeExpectancy}` +
+        `&is_couple=${isCouple}&num_simulations=${numSimulations}`
+      , { method: 'POST' });
+      
+      const result = await response.json();
+      setConfidenceResult(result);
+      
+      // Get AI explanation
+      getExplanation(result);
+      
+    } catch (error) {
+      console.error('Failed to calculate confidence:', error);
+      toast.error('Failed to calculate confidence score');
+    }
+    setCalculating(false);
+  }, [netWorth, annualIncome, annualExpenses, currentAge, retirementAge, lifeExpectancy, isCouple, numSimulations]);
+
+  const getExplanation = async (result) => {
+    try {
+      const response = await fetch(`${API_URL}/api/ai-explain/explain`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          confidence_score: result.confidence_score,
+          risk_breakdown: result.risk_breakdown,
+          statistics: result.statistics,
+          inputs: {
+            net_worth: netWorth,
+            years_to_retirement: retirementAge - currentAge,
+            annual_expenses: annualExpenses,
+            portfolio_return: expectedReturn,
+            portfolio_volatility: 12
+          },
+          client_name: isCouple ? 'You and your partner' : 'You'
+        })
+      });
+      
+      const explanation = await response.json();
+      setExplanation(explanation);
+    } catch (error) {
+      console.error('Failed to get explanation:', error);
+    }
+  };
+
+  const addScenario = async () => {
+    if (!newScenarioName.trim()) {
+      toast.error('Please enter a scenario name');
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      // Calculate this scenario
+      const adjustedRetAge = scenarioRetirementAge;
+      const adjustedExpenses = annualExpenses * (1 + scenarioSpendingAdjust / 100);
+      
+      const response = await fetch(
+        `${API_URL}/api/confidence-engine/quick-calculate?` +
+        `net_worth=${netWorth}&annual_income=${annualIncome}&annual_expenses=${adjustedExpenses}` +
+        `&current_age=${currentAge}&retirement_age=${adjustedRetAge}&life_expectancy=${lifeExpectancy}` +
+        `&is_couple=${isCouple}&num_simulations=${numSimulations}`
+      , { method: 'POST' });
+      
+      const result = await response.json();
+      
+      const baseScore = confidenceResult?.confidence_score || 0;
+      
+      const newScenario = {
+        scenario_id: `SCEN-${Date.now()}`,
+        name: newScenarioName,
+        description: `Retire at ${adjustedRetAge}, spending ${scenarioSpendingAdjust >= 0 ? '+' : ''}${scenarioSpendingAdjust}%`,
+        confidence_score: result.confidence_score,
+        confidence_delta: result.confidence_score - baseScore,
+        risk_breakdown: result.risk_breakdown,
+        statistics: result.statistics,
+        adjustments: {
+          retirement_age: adjustedRetAge,
+          spending_adjustment: scenarioSpendingAdjust,
+          contribution_adjustment: scenarioContribAdjust
+        }
+      };
+      
+      setScenarios([...scenarios, newScenario]);
+      setNewScenarioName('');
+      toast.success(`Scenario "${newScenarioName}" added`);
+    } catch (error) {
+      toast.error('Failed to calculate scenario');
+    }
+    setLoading(false);
+  };
+
+  const removeScenario = (scenarioId) => {
+    setScenarios(scenarios.filter(s => s.scenario_id !== scenarioId));
+    if (selectedScenario === scenarioId) setSelectedScenario(null);
+  };
+
+  // Auto-calculate on mount and when key inputs change
+  useEffect(() => {
+    calculateConfidence();
+  }, []);
+
+  // Real-time updates with debounce
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      calculateConfidence();
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [currentAge, retirementAge, lifeExpectancy, netWorth, annualIncome, annualExpenses, isCouple]);
+
+  // ==================== RENDER ====================
+
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat('en-AU', {
+      style: 'currency',
+      currency: 'AUD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(value || 0);
+  };
+
+  const yearsToRetirement = retirementAge - currentAge;
+  const retirementYears = lifeExpectancy - retirementAge;
+
+  return (
+    <Layout>
+      <div className="space-y-6 p-6" data-testid="confidence-engine-page">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold flex items-center gap-3">
+              <Gauge className="h-8 w-8 text-primary" />
+              Retirement Confidence Engine
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Monte Carlo simulation-based retirement planning with real-time confidence scoring
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Badge variant="outline" className="text-sm">
+              {numSimulations.toLocaleString()} simulations
+            </Badge>
+            <Button onClick={calculateConfidence} disabled={calculating}>
+              <RefreshCw className={`h-4 w-4 mr-2 ${calculating ? 'animate-spin' : ''}`} />
+              Recalculate
+            </Button>
+          </div>
+        </div>
+
+        {/* Main Confidence Display */}
+        {confidenceResult && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Confidence Score */}
+            <Card className="lg:col-span-1">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Target className="h-5 w-5" />
+                  Retirement Confidence
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ConfidenceGauge score={confidenceResult.confidence_score} />
+                <div className="mt-6 grid grid-cols-2 gap-4 text-center">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Years to Retire</p>
+                    <p className="text-2xl font-bold">{yearsToRetirement}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Retirement Years</p>
+                    <p className="text-2xl font-bold">{retirementYears}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Risk Breakdown */}
+            <Card className="lg:col-span-1">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  Risk Drivers
+                </CardTitle>
+                <CardDescription>What's affecting your score</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <RiskBreakdown risks={confidenceResult.risk_breakdown} />
+              </CardContent>
+            </Card>
+
+            {/* Statistics */}
+            <Card className="lg:col-span-1">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5" />
+                  Projected Outcomes
+                </CardTitle>
+                <CardDescription>Based on {numSimulations.toLocaleString()} simulations</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="p-3 rounded-lg bg-green-50 border border-green-200">
+                  <p className="text-xs text-green-600 font-medium">Best Case (90th percentile)</p>
+                  <p className="text-xl font-bold text-green-700">
+                    {formatCurrency(confidenceResult.statistics?.p90_final_wealth)}
+                  </p>
+                </div>
+                <div className="p-3 rounded-lg bg-blue-50 border border-blue-200">
+                  <p className="text-xs text-blue-600 font-medium">Median Outcome</p>
+                  <p className="text-xl font-bold text-blue-700">
+                    {formatCurrency(confidenceResult.statistics?.median_final_wealth)}
+                  </p>
+                </div>
+                <div className="p-3 rounded-lg bg-red-50 border border-red-200">
+                  <p className="text-xs text-red-600 font-medium">Worst Case (10th percentile)</p>
+                  <p className="text-xl font-bold text-red-700">
+                    {formatCurrency(confidenceResult.statistics?.p10_final_wealth)}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Tabs for different features */}
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="confidence" data-testid="confidence-tab">
+              <Gauge className="h-4 w-4 mr-2" /> Real-Time Modeling
+            </TabsTrigger>
+            <TabsTrigger value="scenarios" data-testid="scenarios-tab">
+              <Activity className="h-4 w-4 mr-2" /> Multi-Scenario
+            </TabsTrigger>
+            <TabsTrigger value="explanation" data-testid="explanation-tab">
+              <Brain className="h-4 w-4 mr-2" /> AI Insights
+            </TabsTrigger>
+            <TabsTrigger value="settings" data-testid="settings-tab">
+              <Zap className="h-4 w-4 mr-2" /> Settings
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Real-Time Modeling Tab */}
+          <TabsContent value="confidence" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Interactive Sliders */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Adjust Your Plan</CardTitle>
+                  <CardDescription>Move sliders to see instant impact on confidence</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Ages */}
+                  <div className="space-y-4">
+                    <h4 className="font-medium flex items-center gap-2">
+                      <Users className="h-4 w-4" /> Timeline
+                    </h4>
+                    
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <Label>Current Age</Label>
+                        <span className="font-bold">{currentAge}</span>
+                      </div>
+                      <Slider
+                        value={[currentAge]}
+                        onValueChange={([v]) => setCurrentAge(v)}
+                        min={25}
+                        max={70}
+                        step={1}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <Label>Retirement Age</Label>
+                        <span className="font-bold">{retirementAge}</span>
+                      </div>
+                      <Slider
+                        value={[retirementAge]}
+                        onValueChange={([v]) => setRetirementAge(v)}
+                        min={55}
+                        max={75}
+                        step={1}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <Label>Life Expectancy</Label>
+                        <span className="font-bold">{lifeExpectancy}</span>
+                      </div>
+                      <Slider
+                        value={[lifeExpectancy]}
+                        onValueChange={([v]) => setLifeExpectancy(v)}
+                        min={75}
+                        max={105}
+                        step={1}
+                      />
+                    </div>
+                  </div>
+                  
+                  <Separator />
+                  
+                  {/* Financials */}
+                  <div className="space-y-4">
+                    <h4 className="font-medium flex items-center gap-2">
+                      <DollarSign className="h-4 w-4" /> Financials
+                    </h4>
+                    
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <Label>Net Worth</Label>
+                        <span className="font-bold">{formatCurrency(netWorth)}</span>
+                      </div>
+                      <Slider
+                        value={[netWorth]}
+                        onValueChange={([v]) => setNetWorth(v)}
+                        min={100000}
+                        max={10000000}
+                        step={50000}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <Label>Annual Income</Label>
+                        <span className="font-bold">{formatCurrency(annualIncome)}</span>
+                      </div>
+                      <Slider
+                        value={[annualIncome]}
+                        onValueChange={([v]) => setAnnualIncome(v)}
+                        min={30000}
+                        max={500000}
+                        step={5000}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <Label>Annual Expenses</Label>
+                        <span className="font-bold">{formatCurrency(annualExpenses)}</span>
+                      </div>
+                      <Slider
+                        value={[annualExpenses]}
+                        onValueChange={([v]) => setAnnualExpenses(v)}
+                        min={20000}
+                        max={300000}
+                        step={5000}
+                      />
+                    </div>
+                  </div>
+                  
+                  <Separator />
+                  
+                  {/* Couple Toggle */}
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label>Planning as Couple</Label>
+                      <p className="text-sm text-muted-foreground">Joint retirement planning</p>
+                    </div>
+                    <Switch checked={isCouple} onCheckedChange={setIsCouple} />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Quick Actions */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Quick Actions</CardTitle>
+                  <CardDescription>One-click improvements to explore</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <Button
+                    variant="outline"
+                    className="w-full justify-between"
+                    onClick={() => setRetirementAge(Math.min(75, retirementAge + 2))}
+                  >
+                    <span>Work 2 more years</span>
+                    <Badge className="bg-green-500">+5-10% confidence</Badge>
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    className="w-full justify-between"
+                    onClick={() => setAnnualExpenses(annualExpenses * 0.9)}
+                  >
+                    <span>Reduce expenses by 10%</span>
+                    <Badge className="bg-green-500">+5-8% confidence</Badge>
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    className="w-full justify-between"
+                    onClick={() => setNetWorth(netWorth + 100000)}
+                  >
+                    <span>Save additional $100k</span>
+                    <Badge className="bg-green-500">+3-5% confidence</Badge>
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    className="w-full justify-between"
+                    onClick={() => setLifeExpectancy(Math.min(105, lifeExpectancy + 5))}
+                  >
+                    <span>Plan to age {lifeExpectancy + 5}</span>
+                    <Badge className="bg-yellow-500">Stress test</Badge>
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Multi-Scenario Tab */}
+          <TabsContent value="scenarios" className="space-y-6">
+            {/* Scenario Builder */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Create New Scenario</CardTitle>
+                <CardDescription>Model different retirement strategies</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                  <div>
+                    <Label>Scenario Name</Label>
+                    <Input
+                      value={newScenarioName}
+                      onChange={(e) => setNewScenarioName(e.target.value)}
+                      placeholder="e.g., Early Retirement"
+                    />
+                  </div>
+                  <div>
+                    <Label>Retirement Age</Label>
+                    <Input
+                      type="number"
+                      value={scenarioRetirementAge}
+                      onChange={(e) => setScenarioRetirementAge(parseInt(e.target.value) || 65)}
+                    />
+                  </div>
+                  <div>
+                    <Label>Spending Change %</Label>
+                    <Input
+                      type="number"
+                      value={scenarioSpendingAdjust}
+                      onChange={(e) => setScenarioSpendingAdjust(parseFloat(e.target.value) || 0)}
+                      placeholder="-10 or +20"
+                    />
+                  </div>
+                  <div>
+                    <Label>Extra Contribution/yr</Label>
+                    <Input
+                      type="number"
+                      value={scenarioContribAdjust}
+                      onChange={(e) => setScenarioContribAdjust(parseFloat(e.target.value) || 0)}
+                    />
+                  </div>
+                  <div className="flex items-end">
+                    <Button onClick={addScenario} disabled={loading} className="w-full">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Scenario
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Scenario Comparison */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Base Case */}
+              {confidenceResult && (
+                <ScenarioCard
+                  scenario={{
+                    scenario_id: 'BASE',
+                    name: 'Current Plan',
+                    confidence_score: confidenceResult.confidence_score,
+                    risk_breakdown: confidenceResult.risk_breakdown,
+                    statistics: confidenceResult.statistics
+                  }}
+                  isBase={true}
+                  onSelect={setSelectedScenario}
+                  selected={selectedScenario === 'BASE'}
+                />
+              )}
+              
+              {/* Custom Scenarios */}
+              {scenarios.map((scenario) => (
+                <div key={scenario.scenario_id} className="relative">
+                  <ScenarioCard
+                    scenario={scenario}
+                    isBase={false}
+                    onSelect={setSelectedScenario}
+                    selected={selectedScenario === scenario.scenario_id}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute top-2 right-2"
+                    onClick={(e) => { e.stopPropagation(); removeScenario(scenario.scenario_id); }}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
+              ))}
+              
+              {/* Add Scenario Placeholder */}
+              {scenarios.length < 4 && (
+                <Card className="border-dashed flex items-center justify-center min-h-[200px] cursor-pointer hover:bg-muted/50"
+                  onClick={() => document.querySelector('input[placeholder="e.g., Early Retirement"]')?.focus()}>
+                  <div className="text-center text-muted-foreground">
+                    <Plus className="h-8 w-8 mx-auto mb-2" />
+                    <p>Add Scenario</p>
+                  </div>
+                </Card>
+              )}
+            </div>
+
+            {/* Preset Scenarios */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Quick Scenario Templates</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <Button variant="outline" onClick={() => {
+                    setNewScenarioName('Retire at 60');
+                    setScenarioRetirementAge(60);
+                    setScenarioSpendingAdjust(0);
+                  }}>
+                    Early Retirement (60)
+                  </Button>
+                  <Button variant="outline" onClick={() => {
+                    setNewScenarioName('Work until 70');
+                    setScenarioRetirementAge(70);
+                    setScenarioSpendingAdjust(0);
+                  }}>
+                    Work Longer (70)
+                  </Button>
+                  <Button variant="outline" onClick={() => {
+                    setNewScenarioName('Frugal Retirement');
+                    setScenarioRetirementAge(retirementAge);
+                    setScenarioSpendingAdjust(-20);
+                  }}>
+                    Reduce Spending 20%
+                  </Button>
+                  <Button variant="outline" onClick={() => {
+                    setNewScenarioName('Boost Savings');
+                    setScenarioRetirementAge(retirementAge);
+                    setScenarioContribAdjust(20000);
+                  }}>
+                    +$20k/yr Savings
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* AI Insights Tab */}
+          <TabsContent value="explanation" className="space-y-6">
+            {explanation && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Main Explanation */}
+                <Card className="lg:col-span-2">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Brain className="h-5 w-5" />
+                      AI Analysis
+                    </CardTitle>
+                    <CardDescription>
+                      Powered by {explanation.generated_by === 'llm' ? 'GPT-4' : 'Rule Engine'}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {explanation.ai_explanation ? (
+                      <div className="prose prose-sm max-w-none">
+                        <p className="whitespace-pre-wrap">{explanation.ai_explanation}</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        <Alert>
+                          <Info className="h-4 w-4" />
+                          <AlertTitle>{explanation.overall_status?.toUpperCase()}</AlertTitle>
+                          <AlertDescription>{explanation.score_explanation}</AlertDescription>
+                        </Alert>
+                        
+                        <div className="p-4 rounded-lg bg-muted">
+                          <h4 className="font-medium mb-2">Primary Risk: {explanation.primary_risk}</h4>
+                          <p className="text-sm text-muted-foreground">{explanation.primary_risk_explanation}</p>
+                          <p className="text-sm mt-2"><strong>Mitigation:</strong> {explanation.primary_risk_mitigation}</p>
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Recommended Actions */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Lightbulb className="h-5 w-5" />
+                      Recommended Actions
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {(explanation.recommended_actions || explanation.rule_based_backup?.recommended_actions || []).map((action, idx) => (
+                        <div key={idx} className={`p-4 rounded-lg border ${
+                          action.priority === 'high' ? 'border-red-200 bg-red-50' :
+                          action.priority === 'medium' ? 'border-yellow-200 bg-yellow-50' :
+                          'border-green-200 bg-green-50'
+                        }`}>
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <h4 className="font-medium">{action.action}</h4>
+                              <p className="text-sm text-muted-foreground mt-1">{action.description}</p>
+                            </div>
+                            <Badge className={
+                              action.priority === 'high' ? 'bg-red-500' :
+                              action.priority === 'medium' ? 'bg-yellow-500' :
+                              'bg-green-500'
+                            }>
+                              {action.priority}
+                            </Badge>
+                          </div>
+                          <p className="text-sm font-medium mt-2">{action.impact}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Summary */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <CheckCircle2 className="h-5 w-5" />
+                      Key Takeaways
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div className="flex items-start gap-3">
+                        <div className={`p-2 rounded-full ${confidenceResult?.confidence_score >= 75 ? 'bg-green-100' : 'bg-yellow-100'}`}>
+                          {confidenceResult?.confidence_score >= 75 ? 
+                            <CheckCircle2 className="h-4 w-4 text-green-600" /> :
+                            <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                          }
+                        </div>
+                        <div>
+                          <p className="font-medium">Confidence Score: {confidenceResult?.confidence_score.toFixed(0)}%</p>
+                          <p className="text-sm text-muted-foreground">
+                            {confidenceResult?.confidence_score >= 90 ? "You're in excellent shape!" :
+                             confidenceResult?.confidence_score >= 75 ? "On track with room to optimize" :
+                             confidenceResult?.confidence_score >= 50 ? "Some improvements recommended" :
+                             "Action needed to secure retirement"}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-3">
+                        <div className="p-2 rounded-full bg-blue-100">
+                          <Clock className="h-4 w-4 text-blue-600" />
+                        </div>
+                        <div>
+                          <p className="font-medium">{yearsToRetirement} years to retirement</p>
+                          <p className="text-sm text-muted-foreground">
+                            {yearsToRetirement > 10 ? "Plenty of time to optimize" :
+                             yearsToRetirement > 5 ? "Focus on maximizing contributions" :
+                             "Final preparation phase"}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-3">
+                        <div className="p-2 rounded-full bg-purple-100">
+                          <Target className="h-4 w-4 text-purple-600" />
+                        </div>
+                        <div>
+                          <p className="font-medium">Median outcome: {formatCurrency(confidenceResult?.statistics?.median_final_wealth)}</p>
+                          <p className="text-sm text-muted-foreground">Expected wealth at end of retirement</p>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Settings Tab */}
+          <TabsContent value="settings" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Simulation Settings</CardTitle>
+                  <CardDescription>Configure Monte Carlo parameters</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <Label>Number of Simulations</Label>
+                    <Select value={numSimulations.toString()} onValueChange={(v) => setNumSimulations(parseInt(v))}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="100">100 (Fast)</SelectItem>
+                        <SelectItem value="1000">1,000 (Standard)</SelectItem>
+                        <SelectItem value="5000">5,000 (Detailed)</SelectItem>
+                        <SelectItem value="10000">10,000 (High Precision)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      More simulations = more accurate but slower
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <Label>Inflation Rate</Label>
+                      <span className="font-bold">{inflationRate}%</span>
+                    </div>
+                    <Slider
+                      value={[inflationRate]}
+                      onValueChange={([v]) => setInflationRate(v)}
+                      min={0}
+                      max={10}
+                      step={0.5}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <Label>Expected Investment Return</Label>
+                      <span className="font-bold">{expectedReturn}%</span>
+                    </div>
+                    <Slider
+                      value={[expectedReturn]}
+                      onValueChange={([v]) => setExpectedReturn(v)}
+                      min={2}
+                      max={15}
+                      step={0.5}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Risk Factors Explained</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="p-3 rounded-lg border">
+                    <h4 className="font-medium flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-purple-500" /> Longevity Risk
+                    </h4>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      The risk of outliving your savings. We model this by simulating various lifespans.
+                    </p>
+                  </div>
+                  
+                  <div className="p-3 rounded-lg border">
+                    <h4 className="font-medium flex items-center gap-2">
+                      <TrendingDown className="h-4 w-4 text-red-500" /> Market Risk
+                    </h4>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Investment volatility, especially sequence of returns risk early in retirement.
+                    </p>
+                  </div>
+                  
+                  <div className="p-3 rounded-lg border">
+                    <h4 className="font-medium flex items-center gap-2">
+                      <DollarSign className="h-4 w-4 text-yellow-500" /> Spending Risk
+                    </h4>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      The risk that your spending level depletes savings faster than expected.
+                    </p>
+                  </div>
+                  
+                  <div className="p-3 rounded-lg border">
+                    <h4 className="font-medium flex items-center gap-2">
+                      <Flame className="h-4 w-4 text-orange-500" /> Inflation Risk
+                    </h4>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      The erosion of purchasing power over time. Even 3% inflation halves value in 24 years.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </Layout>
+  );
+}

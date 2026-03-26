@@ -623,6 +623,30 @@ def include_all_routes():
     except ImportError as e:
         logger.error(f"Failed to load multi-tenant routes: {e}")
 
+    # RETIREMENT CONFIDENCE ENGINE - Monte Carlo simulation-based confidence scoring
+    try:
+        from routes.confidence_engine import router as confidence_router
+        app.include_router(confidence_router, prefix="/api")
+        logger.info("CONFIDENCE ENGINE loaded: Monte Carlo simulations, multi-scenario comparison, risk analysis")
+    except ImportError as e:
+        logger.error(f"Failed to load confidence engine routes: {e}")
+
+    # AI EXPLANATION ENGINE - Natural language explanations for confidence scores
+    try:
+        from routes.ai_explanation_engine import router as ai_explain_router
+        app.include_router(ai_explain_router, prefix="/api")
+        logger.info("AI EXPLANATION ENGINE loaded: Score explanations, risk analysis, recommendations")
+    except ImportError as e:
+        logger.error(f"Failed to load AI explanation engine routes: {e}")
+
+    # ADVISER INTELLIGENCE - Daily insights and client alerts
+    try:
+        from routes.adviser_intelligence import router as adviser_intel_router
+        app.include_router(adviser_intel_router, prefix="/api")
+        logger.info("ADVISER INTELLIGENCE loaded: Client alerts, opportunities, bulk actions")
+    except ImportError as e:
+        logger.error(f"Failed to load adviser intelligence routes: {e}")
+
 # Include all routes
 include_all_routes()
 

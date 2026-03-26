@@ -1,126 +1,24 @@
-<analysis>**original_problem_statement**: 
-The user is evolving Wealth Command into AdviceOS, an enterprise-grade, compliance-first adviser workflow and GRC (Governance, Risk, and Compliance) platform built on top of Xplan. The system must act as a system of record to pass strict AFSL/licensee procurement (ASIC/APRA CPS 230/ISO standards), demonstrating Xplan integration boundaries, immutable audit logs, advice replay, explicit cost reductions, risk/control governance, comprehensive retirement planning (accumulation/decumulation), and budget/expense/milestone tracking.
-
-**User's preferred language**: English (INSTRUCT next agent to respond in English only)
-
-**what currently exists?** 
-A highly modular React + FastAPI + MongoDB platform. The backend includes robust modules for CRM, market data, Xplan Phase 2 Integration, AdviceOS compliance engine, immutable audit services, and bi-directional mock integrations for major platforms (AMP North, Netwealth, Hub24, Class). The frontend features an extensive suite of dashboards including a Live Sync Dashboard (WebSockets), holistic Client Financial Dashboards (Budget/Expenses/Milestones), Adviser Compliance Dashboard (SOA/ROA), and advanced Accumulation/Decumulation Calculators with multi-entity support.
-
-**Last working item**: 
-    - Last item agent was working: Building the holistic Client Financial Dashboard (Budget, Expenses, Milestones) and the Adviser Compliance Dashboard (SOA/ROA generation and tracking) to map the end-to-end client journey and adviser compliance duties.
-    - Status: USER VERIFICATION PENDING
-    - Agent Testing Done: Y (via testing subagent iteration 102)
-    - Which testing method agent to use?: NA (testing already done, wait for user feedback or new requests)
-    - User Testing Done: N
-
-**All Pending/In progress Issue list**:  
-None.
-
-**In progress Task List**:
-None. All tasks requested in the previous session were completed and tested.
-
-**Upcoming and Future Tasks**
-    Upcoming Tasks:
-    - P1: Implement Push Notification Alerts on the Live Sync Dashboard (desktop notifications when a breach is reported, portfolio drops below a threshold, or a platform sync completes/fails).
-    - P1: Wire up real Email/SMS notifications (Twilio/SendGrid are currently mocked and logging to the DB).
-    - P2: Add PDF Document Generation for SOA/ROA records (currently, the system tracks the metadata and compliance state of the document, but doesn't compile a downloadable PDF).
-    
-    Future Tasks:
-    - P2: Multi-tenant licensee data isolation for AFSL management.
-    - P3: Age Pension modeling deep-dive/direct integration with Services Australia dynamic rules.
-
-**Completed work in this session**
-- Registered and verified the Decumulation Phase Calculator (DONE)
-- Built  with bi-directional mock API feeds for AMP North, Netwealth, Hub24, Class, and IRESS (DONE)
-- Enhanced Retirement/Decumulation calculators with multi-structure entity support and a Save to Client Profile workflow (DONE)
-- Built  backed by  for real-time platform data sync streams (DONE)
-- Implemented Xplan Phase 2 with scenario document upload and deep portfolio sync (DONE)
-- Built  integrating budget, expenses, goals, and retirement milestones (DONE)
-- Built  for tracking Statements of Advice (SOA) and Records of Advice (ROA) (DONE)
-
-**Earlier issues found/mentioned but not fixed**
-None. (Note: The agent caused a severe file corruption/syntax error in  while trying to inject a function using  regex, but successfully debugged and resolved it).
-
-**Known issue recurrence from previous fork**
-  - Issue recurrence in previous fork: MongoDB  serialization error (ObjectId not JSON serializable).
-  - Recurrence count: 1 (Caught by testing agent in  during iteration 102).
-  - Status: RESOLVED
-  Note: Always remember to exclude  in MongoDB projections or manually remove it before returning dictionaries to the FastAPI frontend response.
-
-**Code Architecture**
-
-
-**Key Technical Concepts**
-- **Xplan Integration Boundaries**: Xplan is the source of truth; AdviceOS is the workflow layer. (Now upgraded to Phase 2 with scenario uploads).
-- **WebSockets**: Used for real-time live sync streams showing API pulls/pushes across platforms.
-- **Bi-directional Sync**: Platform integrations simulate both READ (pulling portfolios) and WRITE (pushing file notes/scenarios) capabilities.
-- **GRC & Compliance**: SOA/ROA generation tracking and breach logging.
-
-**key DB schema**
-  - : Tracks bidirectional sync events.
-  -  / : Tracks client-level financial goals.
-  - : Tracks SOA/ROA metadata, review dates, and status.
-  - : Logs simulated SendGrid/Twilio messages.
-
-**changes in tech stack**
-  - Introduced  for real-time dashboard updates.
-
-**All files of reference** 
-1.  (Updated extensively with new routers)
-2.  &  (Navigation)
-3.  (Warning: File is very large, >1100 lines)
-4. 
-5. 
-6. 
-
-**Areas that need refactoring**: 
--  has become massive due to the sheer number of routers being imported and included. It needs to be refactored into a modular  registry pattern.
--  and  are extremely large (>1100 lines) and complex. The previous agent corrupted the file using search/replace. Future edits to these files should either be done very carefully with exact string matches, or the files should be refactored into smaller sub-components.
-
-**key api endpoints**
--  (WebSocket for live platform sync)
-- 
-- 
-- 
-
-**Critical Info for New Agent** 
-- **MongoDB Serialization**: Be highly vigilant about stripping  from MongoDB responses. 
-- **Python Syntax**: Do not use . This throws a Python . Use standard  instead.
-- **Mocked Integrations**: The user specifically requested API feeds for AMP North, Netwealth, Hub24, Class, and IRESS. These are currently built as robust *mocks* that simulate bi-directional data flow. Ensure any future enhancements respect this mock architecture unless actual API keys are provided.
-
-**documents and test reports created in this job** 
-  - /app/test_reports/iteration_99.json
-  - /app/test_reports/iteration_100.json
-  - /app/test_reports/iteration_101.json
-  - /app/test_reports/iteration_102.json
-  - /app/memory/PRD.md
-
-**Last 10 User Messages and any pending HUMAN messages** 
-1. User approved the initial plan.
-2. User requested multi-structure support for SMSF, ability to push data to client profiles, and bi-directional API feeds for major platforms (AMP North, Netwealth, etc.).
-3. User approved plan for step 2.
-4. User requested to complete all next actions (Xplan Phase 2, Live Sync Dashboard) and make the sync dashboard update automatically (real-time).
-5. User approved plan for step 4.
-6. User requested a clean, complete client perspective flow (budget, expenses, portfolio, super drawdown/accumulation milestones) and an adviser perspective for compliance (SOA, ROA, breaches, who/when).
-7. User approved the plan to build the Client Financial Dashboard and Adviser Compliance Dashboard. *(No pending requests).*
-
-**Project Health Check:**
-- Broken: None
-- Mocked: Platform API Integrations (AMP North, Hub24, etc.), Xplan Sync (Phase 2), Twilio SMS, SendGrid Email.
-
-**3rd Party Integrations** 
-- OpenAI Whisper (Voice) — uses Emergent LLM Key.
-- External Platform APIs (AMP North, Netwealth, Hub24, Class, IRESS) — Mocked.
-- SendGrid / Twilio — Mocked (logging to DB).
-
-**Testing status**
-  - Testing agent used after significant changes: YES (Iterations 99, 100, 101, 102).
-  - Troubleshoot agent used after agent stuck in loop: NO
-  - Test files created: JSON reports generated by testing agent.
-  - Known regressions: None.
-
-**Credentials to test flow:**
-Use standard  MongoDB URLs. Auth is bypassed for backend testing.
-
-**What agent forgot to execute**
-The agent completed all tasks perfectly as requested.</analysis>
+<analysis>RetirementPlanner.jsxconfidence_engine.pynumpyai_explanation_engine.pyadviser_intelligence.py/app/frontend/src/pages/RetirementConfidenceEngine.jsxRetirementConfidenceEngine.jsx/app/frontend/src/pages/RetirementConfidenceEngine.jsx/app/frontend/src/App.js/app/frontend/src/components/Layout.jsx/app/frontend/src/pages/RetirementConfidenceEngine.jsxconfidence_engineai_explanation_engineadviser_intelligencedocument_generation.pyRetirementPlanner.jsxage_pension.pymulti_tenant.pyconfidence_engine.pyai_explanation_engine.pyadviser_intelligence.pynumpyTypeError: can't subtract offset-naive and offset-aware datetimes_idrm -rf node_modules/.cacheyarn cache cleanyarn install --forceUnexpected token '<'
+/app/
+├── backend/
+│   ├── server.py                        
+│   ├── routes/
+│   │   ├── confidence_engine.py         # NEW (Monte Carlo simulations)
+│   │   ├── ai_explanation_engine.py     # NEW
+│   │   ├── adviser_intelligence.py      # NEW
+│   │   ├── age_pension.py               # NEW
+│   │   ├── client_wealth_data.py        # NEW
+│   │   ├── multi_tenant.py              # NEW
+│   │   └── notification_service.py      # UPDATED
+│   └── tests/
+└── frontend/
+    └── src/
+        ├── App.js                       
+        ├── components/
+        │   └── Layout.jsx               
+        └── pages/
+            ├── RetirementConfidenceEngine.jsx # NEW (Empty, needs implementation)
+            ├── RetirementPlanner.jsx          # UPDATED (Unified planner)
+            ├── NotificationCenterPage.jsx     # NEW
+            └── StressTestDashboard.jsx        # NEW
+numpynumpy/app/frontend/src/pages/RetirementConfidenceEngine.jsx/app/backend/routes/confidence_engine.py/app/backend/routes/ai_explanation_engine.py/app/backend/routes/adviser_intelligence.py/app/frontend/src/App.js/app/frontend/src/components/Layout.jsx/app/frontend/src/pages/RetirementPlanner.jsxserver.pyRetirementPlanner.jsxPOST /api/confidence-engine/calculatePOST /api/ai-explanation/generateGET /api/adviser-intelligence/dashboardGET /api/wealth-data/snapshot/{client_id}RetirementConfidenceEngine.jsxnotification_service.py.envdatetime.now(timezone.utc)ask_human.env/app/test_reports/.env/app/frontend/src/pages/RetirementConfidenceEngine.jsx/app/frontend/src/pages/RetirementConfidenceEngine.jsx/app/frontend/src/App.js<Route />/app/frontend/src/components/Layout.jsx/app/backend/routes/confidence_engine.py</analysis>
