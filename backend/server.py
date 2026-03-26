@@ -599,6 +599,30 @@ def include_all_routes():
     except ImportError as e:
         logger.error(f"Failed to load stress testing routes: {e}")
 
+    # CLIENT WEALTH DATA - Unified wealth data for Retirement Planner
+    try:
+        from routes.client_wealth_data import router as client_wealth_router
+        app.include_router(client_wealth_router, prefix="/api")
+        logger.info("CLIENT WEALTH DATA loaded: Unified wealth snapshot, entity management, asset types")
+    except ImportError as e:
+        logger.error(f"Failed to load client wealth data routes: {e}")
+
+    # AGE PENSION MODELING - Australian Age Pension calculations
+    try:
+        from routes.age_pension import router as age_pension_router
+        app.include_router(age_pension_router, prefix="/api")
+        logger.info("AGE PENSION loaded: Eligibility calculations, payment projections, deeming rates")
+    except ImportError as e:
+        logger.error(f"Failed to load age pension routes: {e}")
+
+    # MULTI-TENANT MANAGEMENT - AFSL/Licensee data isolation
+    try:
+        from routes.multi_tenant import router as multi_tenant_router
+        app.include_router(multi_tenant_router, prefix="/api")
+        logger.info("MULTI-TENANT loaded: Licensee management, adviser management, data isolation, audit logs")
+    except ImportError as e:
+        logger.error(f"Failed to load multi-tenant routes: {e}")
+
 # Include all routes
 include_all_routes()
 

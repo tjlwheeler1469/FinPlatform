@@ -210,6 +210,131 @@ export default function RetirementPlanner() {
 
   // ==================== CALCULATIONS ====================
 
+  // Import from Family Wealth Dashboard (Net Worth)
+  const importFromNetWorth = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/api/wealth-data/snapshot/demo_client`);
+      const data = await response.json();
+      
+      if (data.assets) {
+        // Map API assets to our format
+        const mappedAssets = data.assets.map((a, idx) => ({
+          id: idx + 1,
+          name: a.name,
+          type: a.type,
+          entity: a.entity,
+          value: a.value,
+          costBase: a.cost_base || a.value * 0.7,
+          yield: a.annual_yield || 7,
+          isAssessable: a.is_assessable !== false
+        }));
+        setAssets(mappedAssets);
+      }
+      
+      if (data.liabilities) {
+        const mappedLiabilities = data.liabilities.map((l, idx) => ({
+          id: idx + 1,
+          name: l.name,
+          entity: l.entity,
+          balance: l.balance,
+          interestRate: l.interest_rate || 6.5,
+          monthlyPayment: l.monthly_payment || 0,
+          yearsRemaining: l.years_remaining || 10
+        }));
+        setLiabilities(mappedLiabilities);
+      }
+      
+      if (data.incomes) {
+        const mappedIncomes = data.incomes.map((i, idx) => ({
+          id: idx + 1,
+          name: i.name,
+          entity: i.entity,
+          amount: i.amount,
+          type: i.type || 'other',
+          endsAtRetirement: i.ends_at_retirement !== false
+        }));
+        setIncomes(mappedIncomes);
+      }
+      
+      if (data.people && data.people.length > 0) {
+        const mappedPeople = data.people.map(p => ({
+          id: p.id,
+          name: p.name,
+          currentAge: p.current_age,
+          retirementAge: p.retirement_age || 65,
+          lifeExpectancy: p.life_expectancy || 90,
+          gender: p.gender || 'male'
+        }));
+        setPeople(mappedPeople);
+        setIsCouple(data.is_couple || mappedPeople.length > 1);
+      }
+      
+      toast.success('Data imported from Net Worth dashboard');
+      calculateProjection();
+    } catch (error) {
+      console.error('Failed to import wealth data:', error);
+      toast.error('Failed to import data. Using sample data.');
+    }
+    setLoading(false);
+  };
+
+  // Calculate Age Pension eligibility
+  const calculateAgePension = async () => {
+    try {
+      const dob = new Date();
+      dob.setFullYear(dob.getFullYear() - primaryPerson.currentAge);
+      
+      const response = await fetch(`${API_URL}/api/age-pension/calculate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          person: {
+            name: primaryPerson.name,
+            date_of_birth: dob.toISOString().split('T')[0],
+            is_homeowner: true,
+            residency_years: 30
+          },
+          partner: isCouple ? {
+            name: people[1]?.name || 'Partner',
+            date_of_birth: (() => {
+              const d = new Date();
+              d.setFullYear(d.getFullYear() - (people[1]?.currentAge || 43));
+              return d.toISOString().split('T')[0];
+            })(),
+            is_homeowner: true,
+            residency_years: 30
+          } : null,
+          assets: {
+            financial_assets: assets.filter(a => a.isAssessable && a.type !== 'property').reduce((s, a) => s + a.value, 0),
+            real_assets: assets.filter(a => a.isAssessable && a.type === 'property').reduce((s, a) => s + a.value, 0),
+            personal_assets: 20000,
+            home_value: assets.filter(a => !a.isAssessable && a.type === 'property').reduce((s, a) => s + a.value, 0)
+          },
+          income: {
+            employment_income: incomes.filter(i => i.type === 'employment').reduce((s, i) => s + i.amount, 0),
+            investment_income: incomes.filter(i => i.type !== 'employment').reduce((s, i) => s + i.amount, 0),
+            super_income_stream: 0,
+            other_income: 0
+          }
+        })
+      });
+      
+      const result = await response.json();
+      
+      if (result.eligible) {
+        toast.success(`Age Pension: ${formatCurrency(result.annual_pension)}/year eligible`);
+      } else {
+        toast.info(`Age Pension: ${result.reason}`);
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('Age pension calculation failed:', error);
+      return null;
+    }
+  };
+
   const totalAssets = useMemo(() => {
     return assets.reduce((sum, a) => sum + a.value, 0);
   }, [assets]);
@@ -553,6 +678,14 @@ export default function RetirementPlanner() {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            <Button variant="outline" onClick={importFromNetWorth} disabled={loading}>
+              <Upload className={`h-4 w-4 mr-2`} />
+              Import from Net Worth
+            </Button>
+            <Button variant="outline" onClick={calculateAgePension} disabled={loading}>
+              <Shield className="h-4 w-4 mr-2" />
+              Check Age Pension
+            </Button>
             <Button variant="outline" onClick={calculateProjection} disabled={loading}>
               <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
               Recalculate
