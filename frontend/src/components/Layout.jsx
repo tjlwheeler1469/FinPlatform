@@ -83,18 +83,19 @@ import { cn } from "@/lib/utils";
 import { usePortfolio } from "@/App";
 
 // ==================== CONSOLIDATED NAVIGATION ====================
-// Streamlined navigation: Simplified Personal Mode with unified dashboard
-// Personal: Dashboard → Planning → Investments → Tools → Settings
+// MARCH 2026 UPDATE: Major consolidation per user request
+// Personal: Dashboard (Combined Overview + Briefing) → Planning (Retirement+Goals+Scenarios) → Investments (+Unlisted) → Tools → Settings
 // Adviser: Dashboard → CRM → AI Copilot → Execution → Compliance
+// Client: Simplified single-page view (Daily Briefing + Overview combined)
 
-// Personal Mode Navigation (Simplified)
+// Personal Mode Navigation (CONSOLIDATED)
 const personalNavGroups = [
   {
     name: "Dashboard",
     icon: LayoutDashboard,
     items: [
-      { path: "/personal-dashboard", label: "Overview", icon: Eye, title: "Personal Dashboard", badge: "NEW" },
-      { path: "/daily-briefing", label: "Daily Briefing", icon: Sun, title: "Daily Briefing" },
+      // Combined Daily Briefing + Overview into single Personal Dashboard
+      { path: "/personal-dashboard", label: "My Dashboard", icon: Eye, title: "Personal Dashboard", badge: "HOME" },
       { path: "/macro-dashboard", label: "Markets", icon: BarChart3, title: "Live Markets", badge: "LIVE" },
     ]
   },
@@ -102,9 +103,10 @@ const personalNavGroups = [
     name: "Planning",
     icon: Target,
     items: [
-      { path: "/retirement-confidence", label: "Retirement", icon: Gauge, title: "Retirement Confidence", badge: "PRO" },
-      { path: "/scenario-modelling", label: "Scenarios", icon: Calculator, title: "Scenario Modelling" },
-      { path: "/goal-tracker", label: "Goals", icon: Target, title: "Goal Tracker" },
+      // Combined: Retirement Planner + Retirement Confidence
+      { path: "/retirement-confidence", label: "Retirement", icon: Gauge, title: "Retirement Planning & Confidence", badge: "PRO" },
+      // Combined: Goals + Scenarios
+      { path: "/scenario-modelling", label: "Goals & Scenarios", icon: Target, title: "Goals & Scenario Modelling" },
       { path: "/portfolio-rebalancing", label: "Rebalancing", icon: ArrowLeftRight, title: "Portfolio Rebalancing" },
     ]
   },
@@ -112,11 +114,13 @@ const personalNavGroups = [
     name: "Investments",
     icon: TrendingUp,
     items: [
-      { path: "/family-wealth", label: "Net Worth", icon: Wallet, title: "Net Worth Overview" },
+      // Combined: 360 + Family Wealth Dashboard
+      { path: "/family-wealth", label: "Net Worth", icon: Wallet, title: "Net Worth & Wealth Overview" },
       { path: "/stock-trading", label: "Shares & ETFs", icon: TrendingUp, title: "Shares & ETFs" },
       { path: "/bonds-trading", label: "Bonds", icon: Landmark, title: "Bonds & Fixed Income" },
       { path: "/hybrids-trading", label: "Hybrids", icon: Coins, title: "Hybrid Securities" },
       { path: "/property-portfolio", label: "Property", icon: Building2, title: "Property" },
+      // Added: Unlisted Investments
       { path: "/unlisted-investments", label: "Unlisted", icon: FileText, title: "Unlisted Investments", badge: "NEW" },
       { path: "/cash-deposits", label: "Cash & TDs", icon: PiggyBank, title: "Cash & Term Deposits" },
       { path: "/managed-funds", label: "Managed Funds", icon: PieChart, title: "Managed Funds" },
@@ -213,26 +217,28 @@ const adviserBaseNav = [
   }
 ];
 
-// Client-specific navigation (shown when client is selected)
-// Top-to-Bottom Flow: Overview (Big Picture) → Planning (Action/Analysis) → Investments (Asset Details)
+// Client-specific navigation (shown when client is selected in Adviser mode)
+// CONSOLIDATED: Combined pages per user request
+// Overview = Client 360 + Family Wealth Dashboard combined
+// Planning = Retirement Planner + Confidence + Goals + Scenarios combined
 const clientContextNav = [
   {
     name: "Overview",
     icon: Eye,
     items: [
-      { path: "/family-wealth", label: "Net Worth", icon: Wallet, title: "Net Worth & Wealth Summary" },
-      { path: "/retirement-confidence", label: "Retirement", icon: Gauge, title: "Retirement Confidence Engine", badge: "PRO" },
+      // Combined: Client 360 + Family Wealth Dashboard
+      { path: "/family-wealth", label: "Client Overview", icon: Wallet, title: "Client 360 & Net Worth", badge: "360" },
+      // Combined: Retirement Planner + Retirement Confidence
+      { path: "/retirement-confidence", label: "Retirement", icon: Gauge, title: "Retirement Planning & Confidence", badge: "PRO" },
       { path: "/decision-engine", label: "Health Score", icon: Zap, title: "Financial Health Score" },
-      { path: "/client-360", label: "Client 360", icon: LayoutDashboard, title: "Client 360 Dashboard" },
     ]
   },
   {
     name: "Planning",
     icon: Target,
     items: [
-      { path: "/retirement", label: "Retirement Planner", icon: PiggyBank, title: "Retirement Planner" },
-      { path: "/scenario-modelling", label: "Scenarios", icon: Calculator, title: "What-If Scenario Modelling" },
-      { path: "/goal-tracker", label: "Goals", icon: Target, title: "Goal Tracker" },
+      // Combined: Goals + Scenarios
+      { path: "/scenario-modelling", label: "Goals & Scenarios", icon: Target, title: "Goals & Scenario Modelling" },
       { path: "/next-best-actions", label: "Actions", icon: Zap, title: "Next Best Actions" },
       { path: "/tax-analysis-sync", label: "Tax Analysis", icon: FileText, title: "Tax Analysis & CGT" },
     ]
@@ -245,6 +251,8 @@ const clientContextNav = [
       { path: "/bonds-trading", label: "Bonds", icon: Landmark, title: "Bonds & Fixed Income" },
       { path: "/hybrids-trading", label: "Hybrids", icon: Coins, title: "Hybrid Securities" },
       { path: "/property-portfolio", label: "Property", icon: Building2, title: "Property Portfolio" },
+      // Added: Unlisted Investments
+      { path: "/unlisted-investments", label: "Unlisted", icon: FileText, title: "Unlisted Investments", badge: "NEW" },
       { path: "/cash-deposits", label: "Cash & TDs", icon: PiggyBank, title: "Cash & Term Deposits" },
       { path: "/managed-funds", label: "Managed Funds", icon: PieChart, title: "Managed Funds" },
       { path: "/crypto-portfolio", label: "Crypto", icon: Bitcoin, title: "Cryptocurrency" },
@@ -374,11 +382,11 @@ const Layout = ({ children }) => {
     setAppMode(newMode);
     localStorage.setItem("app_mode", newMode);
     if (newMode === "adviser") {
-      navigate("/adviser-dashboard");
+      navigate("/advisor-command-center");
     } else if (newMode === "client") {
       navigate("/client-portal");
     } else {
-      navigate("/dashboard");
+      navigate("/personal-dashboard");
     }
   };
 

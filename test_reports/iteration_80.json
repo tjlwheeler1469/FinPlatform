@@ -45,7 +45,7 @@
     "frontend": "100% (all features verified)"
   },
   "test_credentials": {
-    "preview_url": "https://monte-carlo-hub.preview.emergentagent.com/knowledge-graph",
+    "preview_url": "https://debug-consolidate.preview.emergentagent.com/knowledge-graph",
     "compliance_bypass": "localStorage.setItem('wealth_command_compliance_v5', 'permanent')"
   },
   "seed_data_creation": "None - graph database uses MOCKED EmbeddedGraph class with demo financial data (6 clients, 3 portfolios, 9 assets, 4 insights, 4 actions)",

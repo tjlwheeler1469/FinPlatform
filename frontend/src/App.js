@@ -935,7 +935,7 @@ const AppRouter = () => {
       <Route path="/login" element={<Suspense fallback={<PageLoader />}><Login /></Suspense>} />
       
       {/* Protected routes */}
-      <Route path="/" element={<Navigate to="/daily-briefing" replace />} />
+      <Route path="/" element={<Navigate to="/personal-dashboard" replace />} />
       <Route path="/mode-selector" element={<ModeSelector />} />
       <Route path="/dashboard" element={<Suspense fallback={<PageLoader />}><Dashboard /></Suspense>} />
       <Route path="/overview" element={<FamilyOverview />} />

@@ -13,7 +13,7 @@ import requests
 import os
 from datetime import datetime
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://monte-carlo-hub.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://debug-consolidate.preview.emergentagent.com').rstrip('/')
 
 
 class TestScalingInfrastructure:

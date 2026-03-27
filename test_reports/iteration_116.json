@@ -1,0 +1,77 @@
+{
+  "summary": "Completed comprehensive testing of consolidated dashboard features. All 14 features tested and verified: Personal Dashboard with 5 tabs (Overview, Retirement, Portfolio, Assets, Insights), Smart Insights with AI-generated insights, Client Portal with simplified single-page view, navigation consolidation, and hybrid-engine API for retirement confidence.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "PersonalDashboard.jsx / ClientPortal.jsx",
+        "issues": ["Recharts warning: 'The width(-1) and height(-1) of chart should be greater than 0' - charts may briefly show warning on tab switch but render correctly"]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_consolidation_features.py",
+    "/app/test_reports/pytest/pytest_iteration116.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [
+    "/app/backend/tests/test_consolidation_features.py"
+  ],
+  "success_rate": {
+    "backend": "100% (11/11 tests passed)",
+    "frontend": "100% (all 14 features verified)"
+  },
+  "test_credentials": "",
+  "seed_data_creation": "",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Consolidation complete. Personal Dashboard at /personal-dashboard has 5 tabs (Overview, Retirement, Portfolio, Assets, Insights). Client Portal at /client-portal is simplified single-page view. Smart Insights uses localStorage for manual insights (MOCKED). Mock portfolio data in PersonalDashboard for demo. Compliance modal appears on page load - dismiss with Escape key.",
+  "features_tested": {
+    "personal_dashboard": {
+      "page_loads": "PASS - /personal-dashboard loads with data-testid='personal-dashboard'",
+      "combined_overview_briefing": "PASS - Shows date (Friday 27 March 2026) and sun icon like Daily Briefing",
+      "five_tabs": "PASS - Overview, Retirement, Portfolio, Assets, Insights tabs all found",
+      "smart_insights": "PASS - Smart Insights component with AI + Manual badge visible",
+      "retirement_readiness_gauge": "PASS - Shows 84% confidence with radial gauge",
+      "net_worth_by_entity": "PASS - Shows breakdown by Personal, Trust, Super, Company"
+    },
+    "client_portal": {
+      "page_loads": "PASS - /client-portal loads with data-testid='client-portal'",
+      "welcome_banner": "PASS - Shows 'Welcome, James!' with date",
+      "hero_stats": "PASS - Net Worth ($3,040,000), Retirement Confidence (84%), Goals (2/3), Years to Retirement (20)",
+      "smart_insights": "PASS - Smart Insights component visible",
+      "simplified_view": "PASS - Single-page view with no tabs"
+    },
+    "smart_insights_component": {
+      "ai_insights": "PASS - Shows AI badge on insights",
+      "portfolio_concentration_alert": "PASS - 'Property represents 46% of your portfolio'",
+      "tax_season_reminder": "PASS - 'Review your concessional super contributions before June 30'"
+    },
+    "navigation_structure": {
+      "default_redirect": "PASS - / redirects to /personal-dashboard",
+      "five_groups": "PASS - Dashboard, Planning, Investments, Tools, Settings",
+      "unlisted_in_investments": "PASS - Unlisted nav item with NEW badge found"
+    },
+    "backend_apis": {
+      "health_endpoint": "PASS - Returns healthy status",
+      "hybrid_engine_calculate": "PASS - Returns confidence_score, monte_carlo, confidence_breakdown",
+      "client_portal_dashboard": "PASS - Returns client data with net_worth, goals",
+      "client_portal_goals": "PASS - Returns goals with summary",
+      "client_portal_net_worth": "PASS - Returns assets breakdown"
+    }
+  },
+  "mocked_apis": {
+    "has_mocked_apis": true,
+    "mocked_apis_list": [
+      "Smart Insights manual insights stored in localStorage",
+      "Mock portfolio data (mockAssets, mockDocuments, mockRebalancing) in PersonalDashboard.jsx",
+      "Mock market indicators in PersonalDashboard.jsx"
+    ]
+  }
+}

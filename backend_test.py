@@ -5,7 +5,7 @@ from datetime import datetime, timezone, timedelta
 import time
 
 class AustralianInvestmentAPITester:
-    def __init__(self, base_url="https://monte-carlo-hub.preview.emergentagent.com"):
+    def __init__(self, base_url="https://debug-consolidate.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.session_token = None

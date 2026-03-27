@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import Layout from '@/components/Layout';
+import SmartInsights from '@/components/SmartInsights';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -14,12 +15,12 @@ import {
   RefreshCw, Target, Clock, DollarSign, Users, Eye, ChevronRight,
   CheckCircle2, XCircle, ArrowUp, ArrowDown, PieChart, Wallet,
   Lightbulb, Calendar, Bell, Activity, FileText, Building2, Landmark,
-  BarChart3, ArrowLeftRight, AlertCircle
+  BarChart3, ArrowLeftRight, AlertCircle, Sun
 } from 'lucide-react';
 import {
   PieChart as RechartsPie, Pie, Cell, BarChart, Bar, XAxis, YAxis,
   CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadialBarChart,
-  RadialBar, LineChart, Line
+  RadialBar, LineChart, Line, AreaChart, Area
 } from 'recharts';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || '';
@@ -42,6 +43,13 @@ const getConfidenceColor = (score) => {
   if (score >= 60) return '#3b82f6';
   if (score >= 40) return '#f59e0b';
   return '#ef4444';
+};
+
+const getConfidenceLabel = (score) => {
+  if (score >= 80) return 'On Track';
+  if (score >= 60) return 'Good';
+  if (score >= 40) return 'Needs Attention';
+  return 'At Risk';
 };
 
 // ==================== MOCK DATA ====================
@@ -73,10 +81,17 @@ const mockRebalancing = [
   { asset: 'Cash', current: 10, target: 10, diff: 0, action: 'Hold' },
 ];
 
+const mockMarketIndicators = [
+  { name: 'ASX 200', value: 7842, change: 0.8 },
+  { name: 'S&P 500', value: 5123, change: 1.2 },
+  { name: 'AUD/USD', value: 0.672, change: -0.3 },
+  { name: '10Y Bond', value: 4.25, change: 0.05 },
+];
+
 // ==================== MAIN COMPONENT ====================
 
 const PersonalDashboard = () => {
-  const [activeTab, setActiveTab] = useState('retirement');
+  const [activeTab, setActiveTab] = useState('overview');
   const [entityFilter, setEntityFilter] = useState('all');
   const [retirementData, setRetirementData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -135,6 +150,14 @@ const PersonalDashboard = () => {
     return { totalValue, byType, byEntity, assets: filteredAssets };
   }, [entityFilter]);
 
+  // Portfolio data for Smart Insights
+  const portfolioDataForInsights = {
+    totalValue: totals.totalValue,
+    byType: totals.byType,
+    byEntity: totals.byEntity,
+    net_worth: totals.totalValue
+  };
+
   // Asset allocation data for pie chart
   const allocationData = Object.entries(totals.byType).map(([name, value], index) => ({
     name,
@@ -155,12 +178,15 @@ const PersonalDashboard = () => {
   return (
     <Layout>
       <div className="space-y-6" data-testid="personal-dashboard">
-        {/* Header */}
+        {/* Header with Date (Daily Briefing style) */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold">Personal Dashboard</h1>
+            <h1 className="text-3xl font-bold flex items-center gap-2">
+              <Sun className="h-8 w-8 text-amber-500" />
+              Personal Dashboard
+            </h1>
             <p className="text-muted-foreground">
-              Your complete financial overview
+              {new Date().toLocaleDateString('en-AU', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -174,8 +200,8 @@ const PersonalDashboard = () => {
           </div>
         </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {/* Quick Stats Row */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
@@ -186,7 +212,7 @@ const PersonalDashboard = () => {
                 {confidence.toFixed(0)}%
               </p>
               <Badge className={confidence >= 80 ? 'bg-green-500' : confidence >= 60 ? 'bg-blue-500' : 'bg-amber-500'}>
-                {confidence >= 80 ? 'On Track' : confidence >= 60 ? 'Good' : 'Needs Attention'}
+                {getConfidenceLabel(confidence)}
               </Badge>
             </CardContent>
           </Card>
@@ -229,11 +255,45 @@ const PersonalDashboard = () => {
               <p className="text-sm text-amber-600">Documents pending</p>
             </CardContent>
           </Card>
+
+          <Card className="bg-gradient-to-br from-slate-50 to-gray-50 border-slate-200">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <BarChart3 className="h-5 w-5 text-slate-600" />
+                <span className="text-sm text-muted-foreground">ASX 200</span>
+              </div>
+              <p className="text-3xl font-bold text-slate-700">{mockMarketIndicators[0].value}</p>
+              <p className={`text-sm ${mockMarketIndicators[0].change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {mockMarketIndicators[0].change >= 0 ? '+' : ''}{mockMarketIndicators[0].change}%
+              </p>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Main Tabs */}
+        {/* Market Indicators Bar */}
+        <Card className="bg-slate-50">
+          <CardContent className="py-3">
+            <div className="flex items-center justify-between overflow-x-auto gap-6">
+              {mockMarketIndicators.map((indicator, idx) => (
+                <div key={idx} className="flex items-center gap-3 min-w-fit">
+                  <span className="text-sm font-medium text-muted-foreground">{indicator.name}</span>
+                  <span className="font-semibold">{indicator.value.toLocaleString()}</span>
+                  <span className={`text-sm ${indicator.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {indicator.change >= 0 ? '+' : ''}{indicator.change}%
+                  </span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Main Tabs - Combined Overview + Retirement + Portfolio + Assets + Management */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid grid-cols-4 w-full max-w-2xl">
+          <TabsList className="grid grid-cols-5 w-full max-w-3xl">
+            <TabsTrigger value="overview" className="flex items-center gap-1" data-testid="tab-overview">
+              <Eye className="h-4 w-4" />
+              Overview
+            </TabsTrigger>
             <TabsTrigger value="retirement" className="flex items-center gap-1" data-testid="tab-retirement">
               <Gauge className="h-4 w-4" />
               Retirement
@@ -246,13 +306,191 @@ const PersonalDashboard = () => {
               <Wallet className="h-4 w-4" />
               Assets
             </TabsTrigger>
-            <TabsTrigger value="management" className="flex items-center gap-1" data-testid="tab-management">
-              <Target className="h-4 w-4" />
-              Management
+            <TabsTrigger value="insights" className="flex items-center gap-1" data-testid="tab-insights">
+              <Brain className="h-4 w-4" />
+              Insights
             </TabsTrigger>
           </TabsList>
 
-          {/* ==================== TAB 1: RETIREMENT ==================== */}
+          {/* ==================== TAB 1: OVERVIEW (Combined Daily Briefing + Overview) ==================== */}
+          <TabsContent value="overview" className="space-y-6">
+            <div className="grid lg:grid-cols-3 gap-6">
+              {/* Retirement Readiness Summary */}
+              <Card className="border-2 border-primary/20">
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2">
+                    <Gauge className="h-5 w-5 text-primary" />
+                    Retirement Readiness
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-center mb-4">
+                    <div className="relative w-32 h-32">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <RadialBarChart 
+                          cx="50%" 
+                          cy="50%" 
+                          innerRadius="60%" 
+                          outerRadius="100%" 
+                          data={[{ value: confidence, fill: getConfidenceColor(confidence) }]}
+                          startAngle={180}
+                          endAngle={0}
+                        >
+                          <RadialBar dataKey="value" cornerRadius={10} background />
+                        </RadialBarChart>
+                      </ResponsiveContainer>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <p className="text-3xl font-bold" style={{ color: getConfidenceColor(confidence) }}>
+                          {confidence.toFixed(0)}%
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <Badge className={confidence >= 80 ? 'bg-green-500' : confidence >= 60 ? 'bg-blue-500' : 'bg-amber-500'}>
+                      {getConfidenceLabel(confidence)}
+                    </Badge>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      {yearsToRetirement} years to retirement
+                    </p>
+                  </div>
+                  <Link to="/retirement-confidence">
+                    <Button variant="outline" className="w-full mt-4">
+                      View Full Analysis <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+
+              {/* Net Worth Overview */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2">
+                    <Wallet className="h-5 w-5 text-green-500" />
+                    Net Worth
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center mb-4">
+                    <p className="text-3xl font-bold text-green-600">{formatCurrency(totals.totalValue)}</p>
+                    <p className="text-sm text-green-600"><ArrowUp className="h-3 w-3 inline" /> +8.2% YTD</p>
+                  </div>
+                  <div className="h-[120px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RechartsPie>
+                        <Pie
+                          data={entityData.slice(0, 4)}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={35}
+                          outerRadius={55}
+                          paddingAngle={2}
+                          dataKey="value"
+                        >
+                          {entityData.slice(0, 4).map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip formatter={(value) => formatCurrency(value)} />
+                      </RechartsPie>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 mt-2 text-xs">
+                    {entityData.slice(0, 4).map((item, idx) => (
+                      <div key={idx} className="flex items-center gap-1">
+                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
+                        <span className="truncate">{item.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Quick Actions */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2">
+                    <Zap className="h-5 w-5 text-purple-500" />
+                    Quick Actions
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <Link to="/retirement-confidence">
+                    <Button variant="outline" className="w-full justify-start h-auto py-3">
+                      <Gauge className="h-5 w-5 mr-3" />
+                      <div className="text-left">
+                        <p className="font-medium">Check Retirement</p>
+                        <p className="text-xs text-muted-foreground">Run confidence analysis</p>
+                      </div>
+                    </Button>
+                  </Link>
+                  <Link to="/scenario-modelling">
+                    <Button variant="outline" className="w-full justify-start h-auto py-3">
+                      <Target className="h-5 w-5 mr-3" />
+                      <div className="text-left">
+                        <p className="font-medium">Goals & Scenarios</p>
+                        <p className="text-xs text-muted-foreground">Plan your future</p>
+                      </div>
+                    </Button>
+                  </Link>
+                  <Link to="/portfolio-rebalancing">
+                    <Button variant="outline" className="w-full justify-start h-auto py-3">
+                      <ArrowLeftRight className="h-5 w-5 mr-3" />
+                      <div className="text-left">
+                        <p className="font-medium">Rebalance Portfolio</p>
+                        <p className="text-xs text-muted-foreground">Optimize allocations</p>
+                      </div>
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Smart Insights (AI + Manual) */}
+            <SmartInsights 
+              clientId="personal_dashboard"
+              portfolioData={portfolioDataForInsights}
+              retirementData={retirementData}
+              isAdvisor={false}
+              compact={true}
+              maxInsights={4}
+            />
+
+            {/* Documents Needing Attention */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-amber-500" />
+                  Documents & Actions
+                  <Badge variant="destructive">{mockDocuments.length}</Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-3 gap-3">
+                  {mockDocuments.map((doc) => (
+                    <div key={doc.id} className={`p-3 rounded-lg border ${
+                      doc.status === 'urgent' ? 'bg-red-50 border-red-200' : 'bg-amber-50 border-amber-200'
+                    }`}>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium text-sm">{doc.name}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge variant="outline" className="text-xs">{doc.type}</Badge>
+                            <span className="text-xs text-muted-foreground">Due: {doc.dueDate}</span>
+                          </div>
+                        </div>
+                        <Badge className={doc.status === 'urgent' ? 'bg-red-500' : 'bg-amber-500'}>
+                          {doc.status}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* ==================== TAB 2: RETIREMENT ==================== */}
           <TabsContent value="retirement" className="space-y-6">
             <div className="grid lg:grid-cols-2 gap-6">
               {/* Retirement Readiness Gauge */}
@@ -306,6 +544,12 @@ const PersonalDashboard = () => {
                       <p className="text-xl font-bold text-purple-600">{yearsToRetirement}</p>
                     </div>
                   </div>
+                  
+                  <Link to="/retirement-confidence">
+                    <Button className="w-full mt-4">
+                      Open Full Retirement Planner <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
 
@@ -368,7 +612,7 @@ const PersonalDashboard = () => {
             </Card>
           </TabsContent>
 
-          {/* ==================== TAB 2: PORTFOLIO ==================== */}
+          {/* ==================== TAB 3: PORTFOLIO ==================== */}
           <TabsContent value="portfolio" className="space-y-6">
             <div className="grid lg:grid-cols-2 gap-6">
               {/* Asset Allocation */}
@@ -466,7 +710,7 @@ const PersonalDashboard = () => {
             </Card>
           </TabsContent>
 
-          {/* ==================== TAB 3: ASSETS ==================== */}
+          {/* ==================== TAB 4: ASSETS ==================== */}
           <TabsContent value="assets" className="space-y-6">
             {/* Entity Filter */}
             <div className="flex items-center gap-4">
@@ -507,12 +751,14 @@ const PersonalDashboard = () => {
                           asset.type === 'Super' ? 'bg-green-100 text-green-600' :
                           asset.type === 'Bonds' ? 'bg-amber-100 text-amber-600' :
                           asset.type === 'Crypto' ? 'bg-orange-100 text-orange-600' :
+                          asset.type === 'Unlisted' ? 'bg-indigo-100 text-indigo-600' :
                           'bg-gray-100 text-gray-600'
                         }`}>
                           {asset.type === 'Shares' ? <TrendingUp className="h-5 w-5" /> :
                            asset.type === 'Property' ? <Building2 className="h-5 w-5" /> :
                            asset.type === 'Super' ? <Shield className="h-5 w-5" /> :
                            asset.type === 'Bonds' ? <Landmark className="h-5 w-5" /> :
+                           asset.type === 'Unlisted' ? <FileText className="h-5 w-5" /> :
                            <Wallet className="h-5 w-5" />}
                         </div>
                         <div>
@@ -536,125 +782,15 @@ const PersonalDashboard = () => {
             </Card>
           </TabsContent>
 
-          {/* ==================== TAB 4: MANAGEMENT ==================== */}
-          <TabsContent value="management" className="space-y-6">
-            <div className="grid lg:grid-cols-2 gap-6">
-              {/* Tax Allocation */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <DollarSign className="h-5 w-5 text-green-500" />
-                    Tax Allocation Overview
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">Tax-Advantaged (Super)</span>
-                        <span className="font-bold text-green-600">{formatCurrency(totals.byEntity['Super'] || 0)}</span>
-                      </div>
-                      <Progress value={((totals.byEntity['Super'] || 0) / totals.totalValue) * 100} className="mt-2" />
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {(((totals.byEntity['Super'] || 0) / totals.totalValue) * 100).toFixed(0)}% in concessional tax structure
-                      </p>
-                    </div>
-                    <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">Trust Structure</span>
-                        <span className="font-bold text-blue-600">{formatCurrency(totals.byEntity['Trust'] || 0)}</span>
-                      </div>
-                      <Progress value={((totals.byEntity['Trust'] || 0) / totals.totalValue) * 100} className="mt-2" />
-                    </div>
-                    <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">Company Structure</span>
-                        <span className="font-bold text-purple-600">{formatCurrency(totals.byEntity['Company'] || 0)}</span>
-                      </div>
-                      <Progress value={((totals.byEntity['Company'] || 0) / totals.totalValue) * 100} className="mt-2" />
-                    </div>
-                    <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">Personal (Taxable)</span>
-                        <span className="font-bold text-gray-600">{formatCurrency(totals.byEntity['Personal'] || 0)}</span>
-                      </div>
-                      <Progress value={((totals.byEntity['Personal'] || 0) / totals.totalValue) * 100} className="mt-2" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Documents Needing Attention */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="h-5 w-5 text-amber-500" />
-                    Documents Needing Attention
-                    <Badge variant="destructive">{mockDocuments.length}</Badge>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {mockDocuments.map((doc) => (
-                      <div key={doc.id} className={`p-3 rounded-lg border ${
-                        doc.status === 'urgent' ? 'bg-red-50 border-red-200' : 'bg-amber-50 border-amber-200'
-                      }`}>
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="font-medium">{doc.name}</p>
-                            <div className="flex items-center gap-2 mt-1">
-                              <Badge variant="outline" className="text-xs">{doc.type}</Badge>
-                              <span className="text-xs text-muted-foreground">Due: {doc.dueDate}</span>
-                            </div>
-                          </div>
-                          <Badge className={doc.status === 'urgent' ? 'bg-red-500' : 'bg-amber-500'}>
-                            {doc.status}
-                          </Badge>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Quick Actions */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Zap className="h-5 w-5 text-purple-500" />
-                  Quick Actions
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid md:grid-cols-4 gap-4">
-                  <Link to="/retirement-confidence">
-                    <Button variant="outline" className="w-full h-20 flex flex-col gap-2">
-                      <Gauge className="h-6 w-6" />
-                      <span>Check Retirement</span>
-                    </Button>
-                  </Link>
-                  <Link to="/portfolio-rebalancing">
-                    <Button variant="outline" className="w-full h-20 flex flex-col gap-2">
-                      <ArrowLeftRight className="h-6 w-6" />
-                      <span>Rebalance Portfolio</span>
-                    </Button>
-                  </Link>
-                  <Link to="/tax-analysis-sync">
-                    <Button variant="outline" className="w-full h-20 flex flex-col gap-2">
-                      <DollarSign className="h-6 w-6" />
-                      <span>Tax Analysis</span>
-                    </Button>
-                  </Link>
-                  <Link to="/documents">
-                    <Button variant="outline" className="w-full h-20 flex flex-col gap-2">
-                      <FileText className="h-6 w-6" />
-                      <span>View Documents</span>
-                    </Button>
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
+          {/* ==================== TAB 5: INSIGHTS (Full Smart Insights) ==================== */}
+          <TabsContent value="insights" className="space-y-6">
+            <SmartInsights 
+              clientId="personal_dashboard"
+              portfolioData={portfolioDataForInsights}
+              retirementData={retirementData}
+              isAdvisor={false}
+              compact={false}
+            />
           </TabsContent>
         </Tabs>
       </div>
