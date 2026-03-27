@@ -2067,3 +2067,63 @@ New page for tracking private equity, venture capital, and unlisted assets:
 - Native mobile app (React Native)
 - Live client data integration for Daily Briefing
 - Connect Personal Dashboard to real portfolio data
+
+---
+
+## Version 10.6 - Page Consolidation & Smart Insights (March 27, 2026) ✅ COMPLETE
+
+### Major Consolidation Per User Request
+
+**Personal Mode Dashboard** (`/personal-dashboard`):
+- Combined Daily Briefing + Overview into single unified dashboard
+- 5 tabs: Overview, Retirement, Portfolio, Assets, Insights
+- Smart Insights component with AI-generated + Manual observations
+- Retirement Readiness gauge with confidence score
+- Net Worth breakdown by entity (Personal, Super, Trust, Company)
+- Market indicators bar (ASX 200, S&P 500, AUD/USD, 10Y Bond)
+- Quick Actions panel
+
+**Client Portal** (`/client-portal`):
+- Simplified to single-page view (no tabs) per user request
+- Combined Daily Briefing + Overview
+- Hero stats: Net Worth, Retirement Confidence, Goals, Years to Retirement
+- Smart Insights component with AI observations
+- Advisor contact card
+
+**Navigation Consolidation**:
+- Personal Mode: Dashboard (My Dashboard, Markets) → Planning (Retirement, Goals & Scenarios, Rebalancing) → Investments (+Unlisted) → Tools → Settings
+- Adviser Client Context: Overview (Client Overview/360+Wealth, Retirement, Health Score) → Planning (Goals & Scenarios, Actions, Tax) → Investments (+Unlisted) → Documents
+- Default route `/` redirects to `/personal-dashboard`
+
+**Smart Insights Component** (`/app/frontend/src/components/SmartInsights.jsx`):
+- AI-generated insights based on portfolio and retirement data
+- Manual insight entry for advisers
+- Priority levels: critical, high, medium, low
+- Categories: portfolio, retirement, tax, risk, opportunity, action, general
+- Insights include title, description, impact, and recommended action
+- Persist manual insights to localStorage
+
+**AI Insight Examples**:
+- Portfolio Concentration Alert: "Property represents 46% of your portfolio"
+- Tax Season Reminder: "Review concessional super contributions before June 30"
+- On Track for Retirement: "84% confidence score shows you're well-prepared"
+- High Cash Allocation warning
+- Low Confidence warning
+
+**Files Created/Updated**:
+- `/app/frontend/src/components/SmartInsights.jsx` (NEW)
+- `/app/frontend/src/pages/PersonalDashboard.jsx` (REWRITTEN - consolidated view)
+- `/app/frontend/src/pages/ClientPortal.jsx` (REWRITTEN - simplified single-page)
+- `/app/frontend/src/components/Layout.jsx` (Updated navigation structure)
+- `/app/frontend/src/App.js` (Default route to /personal-dashboard)
+
+**Testing**: Iteration 116 - Backend 100% (11/11), Frontend 100% (14/14 features)
+
+**Mocked Data**:
+- Smart Insights manual insights stored in localStorage
+- Mock portfolio data (mockAssets, mockDocuments, mockRebalancing) in PersonalDashboard
+- Mock market indicators
+
+---
+
+*Last Updated: March 27, 2026 - Version 10.6 - Page Consolidation & Smart Insights Complete*
