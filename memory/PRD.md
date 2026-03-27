@@ -1970,6 +1970,95 @@ Each factor shows:
 
 ---
 
+## Version 10.11 - Personal Mode Simplification (March 27, 2026) ✅ COMPLETE
+
+### Navigation Restructure
+
+**Old Structure**: Dashboard, Trading, Finances, Planning, Tax & Reports, Calculators, Settings (7 groups)
+
+**New Simplified Structure**:
+```
+DASHBOARD
+├── Overview (NEW) → Unified Personal Dashboard
+├── Daily Briefing
+├── Markets (LIVE)
+
+PLANNING
+├── Retirement (PRO) → Confidence Engine
+├── Scenarios
+├── Goals
+├── Rebalancing
+
+INVESTMENTS (Combined Trading + Finances)
+├── Net Worth
+├── Shares & ETFs
+├── Bonds
+├── Hybrids
+├── Property
+├── Unlisted (NEW)
+├── Cash & TDs
+├── Managed Funds
+├── Crypto
+├── Super & Pension
+
+TOOLS
+├── Loan Calculator
+├── Monte Carlo
+├── SMSF
+├── Tax Analysis
+├── Capital Gains
+
+SETTINGS
+├── Security
+├── Bank Feeds
+├── Import/Export
+├── Documents
+```
+
+### Unified Personal Dashboard (`/personal-dashboard`)
+
+**4 Tabs:**
+
+**Tab 1: Retirement**
+- Retirement Readiness gauge (84% confidence)
+- Monte Carlo success rate, median outcome, years left
+- Confidence Drivers: Savings Strength, Market Protection, Longevity, Spending Flexibility, Diversification
+- Retirement Timeline: Current Age → Target Retirement
+
+**Tab 2: Portfolio**
+- Asset Allocation pie chart (all asset types)
+- Holdings by Entity horizontal bar chart
+- Portfolio Rebalancing Suggestions (Buy/Sell/Hold actions)
+
+**Tab 3: Assets**
+- Entity filter dropdown (All, Personal, Super, Trust, Company)
+- All assets list with type badges and entity badges
+- Filterable by entity
+
+**Tab 4: Management**
+- Tax Allocation Overview (Super, Trust, Company, Personal breakdown)
+- Documents Needing Attention (urgent/pending status)
+- Quick Actions (Check Retirement, Rebalance, Tax Analysis, Documents)
+
+### Unlisted Investments Page (`/unlisted-investments`)
+
+New page for tracking private equity, venture capital, and unlisted assets:
+- Summary cards: Total Investments, Cost Basis, Current Value, Total Return
+- Investment list with type, entity, purchase/valuation dates
+- Add Investment dialog
+
+**Files Created/Updated**:
+- `/app/frontend/src/pages/PersonalDashboard.jsx` (NEW - unified dashboard)
+- `/app/frontend/src/pages/UnlistedInvestments.jsx` (NEW)
+- `/app/frontend/src/components/Layout.jsx` (Simplified navigation)
+- `/app/frontend/src/App.js` (Routes)
+
+**Testing**: Iteration 115 - Frontend 100%
+
+**Note**: Dashboard uses MOCK data for demonstration. Live MongoDB integration is future work.
+
+---
+
 ### Future Potential Enhancements
 - Integration with real Services Australia API (requires government partnership)
 - AI-powered personalized recommendations using GPT
@@ -1977,4 +2066,4 @@ Each factor shows:
 - Multi-language support (Mandarin, Vietnamese, Greek for AU demographics)
 - Native mobile app (React Native)
 - Live client data integration for Daily Briefing
-
+- Connect Personal Dashboard to real portfolio data
