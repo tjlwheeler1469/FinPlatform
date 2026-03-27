@@ -83,74 +83,56 @@ import { cn } from "@/lib/utils";
 import { usePortfolio } from "@/App";
 
 // ==================== CONSOLIDATED NAVIGATION ====================
-// Streamlined navigation: 5-6 primary sections per mode
-// Personal: Dashboard → Trading → Finances → Planning → Reports → Calculators
+// Streamlined navigation: Simplified Personal Mode with unified dashboard
+// Personal: Dashboard → Planning → Investments → Tools → Settings
 // Adviser: Dashboard → CRM → AI Copilot → Execution → Compliance
 
-// Personal Mode Navigation (Consolidated)
+// Personal Mode Navigation (Simplified)
 const personalNavGroups = [
   {
     name: "Dashboard",
     icon: LayoutDashboard,
     items: [
-      { path: "/family-wealth", label: "Net Worth", icon: Eye, title: "Net Worth (All Assets)" },
+      { path: "/personal-dashboard", label: "Overview", icon: Eye, title: "Personal Dashboard", badge: "NEW" },
       { path: "/daily-briefing", label: "Daily Briefing", icon: Sun, title: "Daily Briefing" },
       { path: "/macro-dashboard", label: "Markets", icon: BarChart3, title: "Live Markets", badge: "LIVE" },
-      { path: "/dashboard", label: "Retirement", icon: Target, title: "Retirement Tracker" },
-      { path: "/decision-engine", label: "Health Score", icon: Zap, title: "Financial Health" },
-    ]
-  },
-  {
-    name: "Trading",
-    icon: TrendingUp,
-    items: [
-      { path: "/stock-trading", label: "Stocks & ETFs", icon: TrendingUp, title: "Stock Trading" },
-      { path: "/bonds-trading", label: "Bonds", icon: Landmark, title: "Bonds" },
-      { path: "/hybrids-trading", label: "Hybrids", icon: ArrowLeftRight, title: "Hybrid Securities", badge: "NEW" },
-      { path: "/stock-research", label: "Research", icon: LineChart, title: "Stock Screener" },
-    ]
-  },
-  {
-    name: "Finances",
-    icon: Wallet,
-    items: [
-      { path: "/financial-dashboard", label: "Overview", icon: BarChart3, title: "Financial Dashboard", badge: "NEW" },
-      { path: "/managed-funds", label: "Managed Funds", icon: PieChart, title: "Managed Funds" },
-      { path: "/property-portfolio", label: "Property", icon: Building2, title: "Property" },
-      { path: "/cash-deposits", label: "Cash & TDs", icon: PiggyBank, title: "Cash & Term Deposits" },
-      { path: "/crypto-portfolio", label: "Crypto", icon: Bitcoin, title: "Cryptocurrency", badge: "NEW" },
-      { path: "/portfolio-aggregator", label: "All Accounts", icon: Link2, title: "All Accounts" },
-      { path: "/budget", label: "Budget", icon: Wallet, title: "Budget & Cashflow" },
     ]
   },
   {
     name: "Planning",
     icon: Target,
     items: [
-      { path: "/scenario-modelling", label: "Scenario Modelling", icon: Calculator, title: "Goals & Scenario Modelling", badge: "NEW" },
-      { path: "/ai-advisor", label: "AI Advisor", icon: Sparkles, title: "AI Advisor" },
+      { path: "/retirement-confidence", label: "Retirement", icon: Gauge, title: "Retirement Confidence", badge: "PRO" },
+      { path: "/scenario-modelling", label: "Scenarios", icon: Calculator, title: "Scenario Modelling" },
+      { path: "/goal-tracker", label: "Goals", icon: Target, title: "Goal Tracker" },
       { path: "/portfolio-rebalancing", label: "Rebalancing", icon: ArrowLeftRight, title: "Portfolio Rebalancing" },
     ]
   },
   {
-    name: "Tax & Reports",
-    icon: FileText,
+    name: "Investments",
+    icon: TrendingUp,
     items: [
-      { path: "/tax-analysis-sync", label: "Tax Analysis", icon: Calculator, title: "Tax Analysis" },
-      { path: "/cgt", label: "Capital Gains", icon: TrendingUp, title: "CGT (All Assets)" },
-      { path: "/reports", label: "Reports", icon: FileText, title: "Reports" },
-      { path: "/documents", label: "Documents", icon: FileText, title: "Documents" },
+      { path: "/family-wealth", label: "Net Worth", icon: Wallet, title: "Net Worth Overview" },
+      { path: "/stock-trading", label: "Shares & ETFs", icon: TrendingUp, title: "Shares & ETFs" },
+      { path: "/bonds-trading", label: "Bonds", icon: Landmark, title: "Bonds & Fixed Income" },
+      { path: "/hybrids-trading", label: "Hybrids", icon: Coins, title: "Hybrid Securities" },
+      { path: "/property-portfolio", label: "Property", icon: Building2, title: "Property" },
+      { path: "/unlisted-investments", label: "Unlisted", icon: FileText, title: "Unlisted Investments", badge: "NEW" },
+      { path: "/cash-deposits", label: "Cash & TDs", icon: PiggyBank, title: "Cash & Term Deposits" },
+      { path: "/managed-funds", label: "Managed Funds", icon: PieChart, title: "Managed Funds" },
+      { path: "/crypto-portfolio", label: "Crypto", icon: Bitcoin, title: "Cryptocurrency" },
+      { path: "/super-pension", label: "Super & Pension", icon: Shield, title: "Superannuation & Pension" },
     ]
   },
   {
-    name: "Calculators",
+    name: "Tools",
     icon: Calculator,
     items: [
-      { path: "/loan-calculator", label: "Loan", icon: Landmark, title: "Loan Calculator" },
-      { path: "/monte-carlo", label: "Monte Carlo", icon: BarChart3, title: "Monte Carlo" },
-      { path: "/smsf-optimizer", label: "SMSF", icon: PiggyBank, title: "SMSF" },
-      { path: "/retirement", label: "Retirement Planner", icon: Target, title: "Unified Retirement Planner", badge: "NEW" },
-      { path: "/retirement-confidence", label: "Retirement Confidence", icon: Gauge, title: "Retirement Confidence Engine", badge: "PRO" },
+      { path: "/loan-calculator", label: "Loan Calculator", icon: Landmark, title: "Loan Calculator" },
+      { path: "/monte-carlo", label: "Monte Carlo", icon: BarChart3, title: "Monte Carlo Simulator" },
+      { path: "/smsf-optimizer", label: "SMSF", icon: PiggyBank, title: "SMSF Optimizer" },
+      { path: "/tax-analysis-sync", label: "Tax Analysis", icon: Calculator, title: "Tax Analysis" },
+      { path: "/cgt", label: "Capital Gains", icon: TrendingUp, title: "CGT Calculator" },
     ]
   },
   {
@@ -159,7 +141,8 @@ const personalNavGroups = [
     items: [
       { path: "/security", label: "Security", icon: Shield, title: "Security" },
       { path: "/bank-feeds", label: "Bank Feeds", icon: Landmark, title: "Bank Feeds" },
-      { path: "/data-import-export", label: "Import/Export", icon: Database, title: "Data" },
+      { path: "/data-import-export", label: "Import/Export", icon: Database, title: "Data Import/Export" },
+      { path: "/documents", label: "Documents", icon: FileText, title: "Documents" },
     ]
   }
 ];

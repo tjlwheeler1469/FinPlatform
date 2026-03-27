@@ -61,6 +61,8 @@ const StatementOfAdvice = lazy(() => import("@/pages/StatementOfAdvice"));
 const ClientOnboarding = lazy(() => import("@/pages/ClientOnboarding"));
 const Copilot = lazy(() => import("@/pages/Copilot"));
 const DailyBriefing = lazy(() => import("@/pages/DailyBriefing"));
+const PersonalDashboard = lazy(() => import("@/pages/PersonalDashboard"));
+const UnlistedInvestments = lazy(() => import("@/pages/UnlistedInvestments"));
 const AdviserDashboard = lazy(() => import("@/pages/AdviserDashboard"));
 const ClientPortalMerged = lazy(() => import("@/pages/ClientPortalMerged"));
 const PracticeManagement = lazy(() => import("@/pages/PracticeManagement"));
@@ -986,6 +988,8 @@ const AppRouter = () => {
       <Route path="/onboarding" element={<ClientOnboarding />} />
       <Route path="/copilot" element={<Copilot />} />
       <Route path="/daily-briefing" element={<DailyBriefing />} />
+      <Route path="/personal-dashboard" element={<PersonalDashboard />} />
+      <Route path="/unlisted-investments" element={<UnlistedInvestments />} />
       <Route path="/adviser-dashboard" element={<AdviserDashboard />} />
       <Route path="/client-portal-old" element={<ClientPortalMerged />} />
       <Route path="/practice-management" element={<PracticeManagement />} />

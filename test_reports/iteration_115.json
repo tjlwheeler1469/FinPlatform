@@ -1,0 +1,89 @@
+{
+  "summary": "Completed frontend testing of Personal Mode simplification. All 10 features tested and verified: Personal Dashboard with 4 tabs (Retirement, Portfolio, Assets, Management), Unlisted Investments page, and simplified navigation structure (Dashboard → Planning → Investments → Tools → Settings).",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {
+        "endpoint": "/api/hybrid-engine/calculate",
+        "issue": "API call fails with 'Failed to fetch' error in PersonalDashboard.jsx - retirement data not loading from API",
+        "priority": "LOW"
+      }
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "PersonalDashboard.jsx",
+        "issues": ["Recharts warning: 'The width(-1) and height(-1) of chart should be greater than 0' - charts may not render properly on initial load"]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_115.json"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "N/A (frontend only testing)",
+    "frontend": "100%"
+  },
+  "test_credentials": "",
+  "seed_data_creation": "",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Personal Mode restructured with unified dashboard. Compliance modal appears on page load - needs checkbox checked and 'I Understand & Accept' button clicked to dismiss. All data is MOCKED (mockAssets, mockDocuments, mockRebalancing in PersonalDashboard.jsx, mockUnlistedInvestments in UnlistedInvestments.jsx).",
+  "features_tested": {
+    "personal_dashboard_page": {
+      "page_loads": "PASS - /personal-dashboard loads with data-testid='personal-dashboard'",
+      "four_tabs": "PASS - Retirement, Portfolio, Assets, Management tabs all found",
+      "quick_stats_cards": "PASS - Retirement Confidence (84%), Total Net Worth ($1,850,000), Years to Retirement (20), Actions Required (3)"
+    },
+    "retirement_tab": {
+      "retirement_readiness_gauge": "PASS - Shows 84% confidence with radial gauge",
+      "confidence_drivers": "PASS - Shows Savings Strength (100%), Market Protection (100%), Longevity Coverage (100%), Spending Flexibility (40%), Diversification (70%)",
+      "retirement_timeline": "PASS - Shows Current Age 45 → Target Retirement 65 with progress bar"
+    },
+    "portfolio_tab": {
+      "asset_allocation_pie_chart": "PASS - Pie chart showing Bonds, Cash, Crypto, Hybrids, Managed Fund, Property, Shares, Super, Unlisted",
+      "holdings_by_entity": "PASS - Bar chart showing Personal, Trust, Super, Company holdings",
+      "rebalancing_suggestions": "PASS - Shows Australian Shares (Sell 5%), International Shares (Buy 5%), Property (Sell 5%), Bonds (Buy 5%), Cash (Hold 0%)"
+    },
+    "assets_tab": {
+      "entity_filter": "PASS - Dropdown with All Entities, Personal, Super, Trust, Company options",
+      "all_assets_list": "PASS - Shows 10 assets with type badges and entity badges, filterable by entity"
+    },
+    "management_tab": {
+      "tax_allocation_overview": "PASS - Shows Tax-Advantaged (Super) $450,000, Trust Structure $950,000, Company Structure $50,000, Personal (Taxable) $400,000",
+      "documents_needing_attention": "PASS - Shows 3 documents: Annual Tax Return 2025 (pending), Insurance Renewal (urgent), Super Statement Review (pending)",
+      "quick_actions": "PASS - Shows Check Retirement, Rebalance Portfolio, Tax Analysis, View Documents buttons"
+    },
+    "navigation_structure": {
+      "simplified_groups": "PASS - 5 groups: DASHBOARD, PLANNING, INVESTMENTS, TOOLS, SETTINGS",
+      "dashboard_items": "PASS - Overview (NEW badge), Daily Briefing, Markets (LIVE badge)",
+      "planning_items": "PASS - Retirement, Scenarios, Goals, Rebalancing",
+      "investments_items": "PASS - Net Worth, Shares & ETFs, Bonds, Hybrids, Property, Unlisted (NEW badge), Cash & TDs, Managed Funds, Crypto, Super & Pension",
+      "tools_items": "PASS - Loan Calculator, Monte Carlo, SMSF, Tax Analysis, Capital Gains",
+      "settings_items": "PASS - Security, Bank Feeds, Import/Export, Documents"
+    },
+    "unlisted_investments_page": {
+      "page_loads": "PASS - /unlisted-investments loads with data-testid='unlisted-investments'",
+      "page_title": "PASS - 'Unlisted Investments' title visible",
+      "add_investment_button": "PASS - Add Investment button found",
+      "investment_list": "PASS - Shows 4 mock investments (Private Equity Fund A, Venture Capital Fund, Commercial Property Syndicate, Infrastructure Fund)",
+      "summary_cards": "PASS - Total Investments (4), Cost Basis, Current Value, Total Return (+18.6%)",
+      "new_badge_in_nav": "PASS - Unlisted nav item has NEW badge"
+    }
+  },
+  "mocked_apis": {
+    "has_mocked_apis": true,
+    "mocked_apis_list": [
+      "mockAssets in PersonalDashboard.jsx - 10 sample assets",
+      "mockDocuments in PersonalDashboard.jsx - 3 sample documents",
+      "mockRebalancing in PersonalDashboard.jsx - 5 rebalancing suggestions",
+      "mockUnlistedInvestments in UnlistedInvestments.jsx - 4 sample unlisted investments"
+    ]
+  }
+}
