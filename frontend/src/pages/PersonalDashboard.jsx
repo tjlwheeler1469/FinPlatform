@@ -8,6 +8,17 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
 import {
@@ -15,7 +26,7 @@ import {
   RefreshCw, Target, Clock, DollarSign, Users, Eye, ChevronRight,
   CheckCircle2, XCircle, ArrowUp, ArrowDown, PieChart, Wallet,
   Lightbulb, Calendar, Bell, Activity, FileText, Building2, Landmark,
-  BarChart3, ArrowLeftRight, AlertCircle, Sun
+  BarChart3, ArrowLeftRight, AlertCircle, Sun, Settings, Edit2, User
 } from 'lucide-react';
 import {
   PieChart as RechartsPie, Pie, Cell, BarChart, Bar, XAxis, YAxis,
@@ -116,14 +127,18 @@ const mockMarketIndicators = [
   { name: '10Y Bond', value: 4.25, change: 0.05 },
 ];
 
-// User profile for the dashboard
-const userProfile = {
+// Default user profile for the dashboard
+const defaultUserProfile = {
+  user_id: 'thompson_family',
   name: 'David & Sarah Thompson',
+  first_name: 'David',
+  last_name: 'Thompson',
+  partner_first_name: 'Sarah',
   age: 50,
   retirementAge: 67,
   yearsToRetirement: 17,
   riskProfile: 'Balanced',
-  incomeHousehold: 185000, // Combined gross income
+  incomeHousehold: 185000,
   expensesAnnual: 95000,
   children: 2,
   status: 'Married'
@@ -136,6 +151,66 @@ const PersonalDashboard = () => {
   const [entityFilter, setEntityFilter] = useState('all');
   const [retirementData, setRetirementData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [marketIndicators, setMarketIndicators] = useState(mockMarketIndicators);
+  const [marketDataSource, setMarketDataSource] = useState('fallback');
+  const [userProfile, setUserProfile] = useState(defaultUserProfile);
+  const [showProfileEdit, setShowProfileEdit] = useState(false);
+
+  // Fetch live market data
+  useEffect(() => {
+    const fetchMarketData = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/market-data/indicators`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.indicators && data.indicators.length > 0) {
+            // Transform API data to match our format
+            const transformedData = data.indicators.slice(0, 4).map(ind => ({
+              name: ind.name,
+              value: ind.value,
+              change: ind.change_percent
+            }));
+            setMarketIndicators(transformedData);
+            setMarketDataSource(data.source);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching market data:', error);
+        // Keep using mock data on error
+      }
+    };
+    fetchMarketData();
+    // Refresh market data every 5 minutes
+    const interval = setInterval(fetchMarketData, 300000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Fetch user profile
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/user-profile/thompson_family/summary`);
+        if (response.ok) {
+          const data = await response.json();
+          setUserProfile(prev => ({
+            ...prev,
+            name: data.display_name,
+            age: data.age,
+            yearsToRetirement: data.years_to_retirement,
+            retirementAge: data.retirement_age,
+            riskProfile: data.risk_profile,
+            incomeHousehold: data.combined_income,
+            expensesAnnual: data.annual_expenses,
+            children: data.children,
+            status: data.marital_status === 'married' ? 'Married' : data.marital_status
+          }));
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+      }
+    };
+    fetchUserProfile();
+  }, []);
 
   // Fetch retirement confidence data
   useEffect(() => {
@@ -231,6 +306,54 @@ const PersonalDashboard = () => {
   const grossAssets = totals.totalValue;
   const netWorthValue = grossAssets - totalLiabilities;
 
+  // Profile edit form state
+  const [editForm, setEditForm] = useState({
+    first_name: 'David',
+    last_name: 'Thompson',
+    partner_first_name: 'Sarah',
+    date_of_birth: '1976-03-15',
+    partner_date_of_birth: '1976-08-22',
+    retirement_age: 67,
+    risk_profile: 'balanced',
+    annual_income: 125000,
+    partner_annual_income: 60000,
+    annual_expenses: 95000
+  });
+
+  // Handle profile update
+  const handleProfileUpdate = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/user-profile/thompson_family`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editForm)
+      });
+      if (response.ok) {
+        const data = await response.json();
+        // Update local state
+        const displayName = editForm.partner_first_name 
+          ? `${editForm.first_name} & ${editForm.partner_first_name} ${editForm.last_name}`
+          : `${editForm.first_name} ${editForm.last_name}`;
+        
+        setUserProfile(prev => ({
+          ...prev,
+          name: displayName,
+          retirementAge: editForm.retirement_age,
+          riskProfile: editForm.risk_profile,
+          incomeHousehold: (editForm.annual_income || 0) + (editForm.partner_annual_income || 0),
+          expensesAnnual: editForm.annual_expenses
+        }));
+        setShowProfileEdit(false);
+        toast.success('Profile updated successfully');
+      } else {
+        toast.error('Failed to update profile');
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast.error('Error updating profile');
+    }
+  };
+
   return (
     <Layout>
       <div className="space-y-6" data-testid="personal-dashboard">
@@ -240,6 +363,15 @@ const PersonalDashboard = () => {
             <h1 className="text-3xl font-bold flex items-center gap-2">
               <Sun className="h-8 w-8 text-amber-500" />
               {userProfile.name}
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-8 w-8"
+                onClick={() => setShowProfileEdit(true)}
+                data-testid="edit-profile-btn"
+              >
+                <Edit2 className="h-4 w-4" />
+              </Button>
             </h1>
             <p className="text-muted-foreground">
               {new Date().toLocaleDateString('en-AU', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
@@ -250,12 +382,139 @@ const PersonalDashboard = () => {
             <Badge variant="outline" className="text-lg px-3 py-1 bg-green-50 border-green-200">
               Net Worth: {formatCurrency(netWorthValue)}
             </Badge>
+            {marketDataSource === 'live' && (
+              <Badge variant="outline" className="bg-green-50 border-green-200 text-green-700">
+                <Activity className="h-3 w-3 mr-1" /> Live
+              </Badge>
+            )}
             <Button variant="outline" onClick={() => window.location.reload()}>
               <RefreshCw className="h-4 w-4 mr-2" />
               Refresh
             </Button>
           </div>
         </div>
+
+        {/* Edit Profile Dialog */}
+        <Dialog open={showProfileEdit} onOpenChange={setShowProfileEdit}>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <User className="h-5 w-5" />
+                Edit Profile
+              </DialogTitle>
+              <DialogDescription>
+                Update your personal details and financial information.
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="first_name">Your First Name</Label>
+                  <Input 
+                    id="first_name"
+                    value={editForm.first_name}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, first_name: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="last_name">Last Name</Label>
+                  <Input 
+                    id="last_name"
+                    value={editForm.last_name}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, last_name: e.target.value }))}
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="partner_first_name">Partner's First Name</Label>
+                  <Input 
+                    id="partner_first_name"
+                    value={editForm.partner_first_name}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, partner_first_name: e.target.value }))}
+                    placeholder="Leave empty if single"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="date_of_birth">Your Date of Birth</Label>
+                  <Input 
+                    id="date_of_birth"
+                    type="date"
+                    value={editForm.date_of_birth}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, date_of_birth: e.target.value }))}
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="retirement_age">Target Retirement Age</Label>
+                  <Input 
+                    id="retirement_age"
+                    type="number"
+                    value={editForm.retirement_age}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, retirement_age: parseInt(e.target.value) || 67 }))}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="risk_profile">Risk Profile</Label>
+                  <Select 
+                    value={editForm.risk_profile} 
+                    onValueChange={(value) => setEditForm(prev => ({ ...prev, risk_profile: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="conservative">Conservative</SelectItem>
+                      <SelectItem value="moderately_conservative">Moderately Conservative</SelectItem>
+                      <SelectItem value="balanced">Balanced</SelectItem>
+                      <SelectItem value="growth">Growth</SelectItem>
+                      <SelectItem value="high_growth">High Growth</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="annual_income">Your Annual Income</Label>
+                  <Input 
+                    id="annual_income"
+                    type="number"
+                    value={editForm.annual_income}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, annual_income: parseInt(e.target.value) || 0 }))}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="partner_annual_income">Partner's Income</Label>
+                  <Input 
+                    id="partner_annual_income"
+                    type="number"
+                    value={editForm.partner_annual_income}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, partner_annual_income: parseInt(e.target.value) || 0 }))}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="annual_expenses">Annual Expenses</Label>
+                  <Input 
+                    id="annual_expenses"
+                    type="number"
+                    value={editForm.annual_expenses}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, annual_expenses: parseInt(e.target.value) || 0 }))}
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowProfileEdit(false)}>Cancel</Button>
+              <Button onClick={handleProfileUpdate}>Save Changes</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         {/* Quick Stats Row */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -319,9 +578,9 @@ const PersonalDashboard = () => {
                 <BarChart3 className="h-5 w-5 text-slate-600" />
                 <span className="text-sm text-muted-foreground">ASX 200</span>
               </div>
-              <p className="text-3xl font-bold text-slate-700">{mockMarketIndicators[0].value}</p>
-              <p className={`text-sm ${mockMarketIndicators[0].change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {mockMarketIndicators[0].change >= 0 ? '+' : ''}{mockMarketIndicators[0].change}%
+              <p className="text-3xl font-bold text-slate-700">{marketIndicators[0]?.value?.toLocaleString() || '--'}</p>
+              <p className={`text-sm ${(marketIndicators[0]?.change || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {(marketIndicators[0]?.change || 0) >= 0 ? '+' : ''}{marketIndicators[0]?.change || 0}%
               </p>
             </CardContent>
           </Card>
@@ -331,15 +590,20 @@ const PersonalDashboard = () => {
         <Card className="bg-slate-50">
           <CardContent className="py-3">
             <div className="flex items-center justify-between overflow-x-auto gap-6">
-              {mockMarketIndicators.map((indicator, idx) => (
+              {marketIndicators.map((indicator, idx) => (
                 <div key={idx} className="flex items-center gap-3 min-w-fit">
                   <span className="text-sm font-medium text-muted-foreground">{indicator.name}</span>
-                  <span className="font-semibold">{indicator.value.toLocaleString()}</span>
-                  <span className={`text-sm ${indicator.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {indicator.change >= 0 ? '+' : ''}{indicator.change}%
+                  <span className="font-semibold">{indicator.value?.toLocaleString() || '--'}</span>
+                  <span className={`text-sm ${(indicator.change || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {(indicator.change || 0) >= 0 ? '+' : ''}{indicator.change || 0}%
                   </span>
                 </div>
               ))}
+              {marketDataSource === 'live' && (
+                <Badge variant="outline" className="bg-green-50 border-green-200 text-green-700 text-xs">
+                  <Activity className="h-3 w-3 mr-1" /> Live Data
+                </Badge>
+              )}
             </div>
           </CardContent>
         </Card>

@@ -1,214 +1,155 @@
 """
-Live Market Data Routes
-Real-time stock prices and market data.
+Market Data API - Live ASX and global market indicators
+Uses Yahoo Finance API for real-time market data
 """
 from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 from typing import List, Optional
-import logging
+import httpx
+import asyncio
+from datetime import datetime, timedelta
+import os
 
-from services.stock_prices import (
-    get_stock_price,
-    get_multiple_prices,
-    get_market_indices,
-    get_historical_prices,
-    search_stocks,
-    async_get_stock_price,
-    async_get_multiple_prices
-)
+router = APIRouter(prefix="/market-data", tags=["Market Data"])
 
-logger = logging.getLogger(__name__)
-router = APIRouter(prefix="/market", tags=["Market Data"])
+# Cache for market data (refresh every 5 minutes)
+market_cache = {
+    "data": None,
+    "last_updated": None
+}
+CACHE_DURATION_SECONDS = 300  # 5 minutes
 
+class MarketIndicator(BaseModel):
+    symbol: str
+    name: str
+    value: float
+    change: float
+    change_percent: float
+    last_updated: str
 
-@router.get("/quote/{symbol}")
-async def get_quote(symbol: str):
-    """Get real-time quote for a stock."""
+class MarketDataResponse(BaseModel):
+    indicators: List[MarketIndicator]
+    last_updated: str
+    source: str
+
+# Yahoo Finance symbols for Australian and global markets
+MARKET_SYMBOLS = {
+    "^AXJO": "ASX 200",
+    "^GSPC": "S&P 500",
+    "AUDUSD=X": "AUD/USD",
+    "^TNX": "10Y Bond",
+    "^AORD": "All Ords",
+    "BTC-AUD": "Bitcoin AUD"
+}
+
+async def fetch_yahoo_finance_quote(symbol: str, client: httpx.AsyncClient) -> Optional[dict]:
+    """Fetch quote from Yahoo Finance API"""
     try:
-        data = await async_get_stock_price(symbol)
-        if "error" in data:
-            raise HTTPException(status_code=404, detail=data["error"])
-        return data
-    except Exception as e:
-        logger.error(f"Error fetching quote for {symbol}: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.post("/quotes")
-async def get_quotes(symbols: List[str]):
-    """Get real-time quotes for multiple stocks."""
-    try:
-        data = await async_get_multiple_prices(symbols)
-        return {
-            "quotes": data,
-            "count": len(data),
-            "symbols_requested": symbols
+        url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}"
+        params = {
+            "interval": "1d",
+            "range": "2d"
         }
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        }
+        
+        response = await client.get(url, params=params, headers=headers, timeout=10.0)
+        
+        if response.status_code == 200:
+            data = response.json()
+            result = data.get("chart", {}).get("result", [])
+            if result:
+                meta = result[0].get("meta", {})
+                # Note: quote indicators available but using meta for price data
+                _ = result[0].get("indicators", {}).get("quote", [{}])[0]
+                
+                current_price = meta.get("regularMarketPrice", 0)
+                previous_close = meta.get("previousClose", current_price)
+                
+                change = current_price - previous_close
+                change_percent = (change / previous_close * 100) if previous_close else 0
+                
+                return {
+                    "symbol": symbol,
+                    "name": MARKET_SYMBOLS.get(symbol, symbol),
+                    "value": round(current_price, 4) if "=" in symbol else round(current_price, 2),
+                    "change": round(change, 4) if "=" in symbol else round(change, 2),
+                    "change_percent": round(change_percent, 2),
+                    "last_updated": datetime.utcnow().isoformat()
+                }
     except Exception as e:
-        logger.error(f"Error fetching multiple quotes: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Error fetching {symbol}: {e}")
+    return None
 
+async def fetch_all_market_data() -> List[MarketIndicator]:
+    """Fetch all market indicators concurrently"""
+    async with httpx.AsyncClient() as client:
+        tasks = [fetch_yahoo_finance_quote(symbol, client) for symbol in MARKET_SYMBOLS.keys()]
+        results = await asyncio.gather(*tasks)
+        
+        indicators = []
+        for result in results:
+            if result:
+                indicators.append(MarketIndicator(**result))
+        
+        return indicators
 
-@router.get("/indices")
-async def get_indices():
-    """Get major market indices."""
-    try:
-        return get_market_indices()
-    except Exception as e:
-        logger.error(f"Error fetching indices: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.get("/history/{symbol}")
-async def get_history(symbol: str, period: str = "1mo"):
-    """
-    Get historical price data.
-    Periods: 1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max
-    """
-    valid_periods = ["1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y", "10y", "ytd", "max"]
-    if period not in valid_periods:
-        raise HTTPException(status_code=400, detail=f"Invalid period. Use: {valid_periods}")
-    
-    try:
-        return get_historical_prices(symbol, period)
-    except Exception as e:
-        logger.error(f"Error fetching history for {symbol}: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.get("/search")
-async def search(query: str, market: str = "AU"):
-    """Search for stocks by name or symbol."""
-    if len(query) < 2:
-        raise HTTPException(status_code=400, detail="Query must be at least 2 characters")
-    
-    results = search_stocks(query, market)
-    return {
-        "query": query,
-        "market": market,
-        "results": results,
-        "count": len(results)
-    }
-
-
-@router.get("/asx/top")
-async def get_asx_top():
-    """Get top ASX stocks."""
-    symbols = [
-        "CBA.AX", "BHP.AX", "CSL.AX", "NAB.AX", "WBC.AX",
-        "ANZ.AX", "WES.AX", "WOW.AX", "MQG.AX", "RIO.AX"
+def get_fallback_data() -> List[MarketIndicator]:
+    """Return fallback/mock data if API fails"""
+    now = datetime.utcnow().isoformat()
+    return [
+        MarketIndicator(symbol="^AXJO", name="ASX 200", value=7842.50, change=62.30, change_percent=0.80, last_updated=now),
+        MarketIndicator(symbol="^GSPC", name="S&P 500", value=5123.40, change=61.48, change_percent=1.21, last_updated=now),
+        MarketIndicator(symbol="AUDUSD=X", name="AUD/USD", value=0.6720, change=-0.0020, change_percent=-0.30, last_updated=now),
+        MarketIndicator(symbol="^TNX", name="10Y Bond", value=4.25, change=0.02, change_percent=0.47, last_updated=now),
     ]
+
+@router.get("/indicators", response_model=MarketDataResponse)
+async def get_market_indicators():
+    """Get live market indicators for dashboard display"""
+    global market_cache
     
+    now = datetime.utcnow()
+    
+    # Check cache
+    if market_cache["data"] and market_cache["last_updated"]:
+        cache_age = (now - market_cache["last_updated"]).total_seconds()
+        if cache_age < CACHE_DURATION_SECONDS:
+            return MarketDataResponse(
+                indicators=market_cache["data"],
+                last_updated=market_cache["last_updated"].isoformat(),
+                source="cache"
+            )
+    
+    # Fetch fresh data
     try:
-        quotes = await async_get_multiple_prices(symbols)
-        return {
-            "stocks": list(quotes.values()),
-            "count": len(quotes),
-            "market": "ASX"
-        }
+        indicators = await fetch_all_market_data()
+        
+        if indicators:
+            market_cache["data"] = indicators
+            market_cache["last_updated"] = now
+            return MarketDataResponse(
+                indicators=indicators,
+                last_updated=now.isoformat(),
+                source="live"
+            )
     except Exception as e:
-        logger.error(f"Error fetching ASX top: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-
-# ==================== ECONOMIC INDICATORS ====================
-
-ECONOMIC_INDICATORS = {
-    "cash_rate": {
-        "name": "RBA Cash Rate",
-        "value": 4.35,
-        "unit": "%",
-        "source": "Reserve Bank of Australia",
-        "last_updated": "2024-03-19",
-        "trend": "holding"
-    },
-    "inflation_cpi": {
-        "name": "CPI Inflation (Annual)",
-        "value": 3.4,
-        "unit": "%",
-        "source": "ABS",
-        "target_range": "2-3%"
-    },
-    "unemployment": {
-        "name": "Unemployment Rate",
-        "value": 3.7,
-        "unit": "%",
-        "source": "ABS"
-    },
-    "gdp_growth": {
-        "name": "GDP Growth (Annual)",
-        "value": 1.5,
-        "unit": "%",
-        "source": "ABS"
-    },
-    "10yr_bond": {
-        "name": "10-Year Government Bond Yield",
-        "value": 4.15,
-        "unit": "%",
-        "source": "RBA"
-    }
-}
-
-SUPER_FUND_PERFORMANCE = {
-    "growth": {"name": "Growth (70/30)", "1yr": 11.2, "5yr": 8.1, "10yr": 8.5},
-    "balanced": {"name": "Balanced (50/50)", "1yr": 8.5, "5yr": 6.4, "10yr": 6.8},
-    "conservative": {"name": "Conservative (30/70)", "1yr": 5.8, "5yr": 4.5, "10yr": 4.9},
-    "high_growth": {"name": "High Growth (90/10)", "1yr": 14.5, "5yr": 9.2, "10yr": 9.8}
-}
-
-PENSION_RATE_HISTORY = [
-    {"date": "2024-03-20", "single": 1116.30, "couple": 1682.80},
-    {"date": "2023-09-20", "single": 1096.70, "couple": 1653.40},
-    {"date": "2023-03-20", "single": 1064.00, "couple": 1604.00},
-]
-
-
-@router.get("/economic-indicators")
-async def get_economic_indicators():
-    """Get Australian economic indicators."""
-    from datetime import datetime, timezone
-    return {
-        "indicators": ECONOMIC_INDICATORS,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "source": "RBA, ABS"
-    }
-
-
-@router.get("/super-performance")
-async def get_super_performance():
-    """Get superannuation fund performance benchmarks."""
-    return {
-        "options": SUPER_FUND_PERFORMANCE,
-        "note": "Returns shown are after fees. Past performance is not indicative of future performance."
-    }
-
-
-@router.get("/pension-rates/history")
-async def get_pension_rate_history():
-    """Get historical Age Pension rate changes."""
-    return {
-        "history": PENSION_RATE_HISTORY,
-        "next_indexation": "2024-09-20",
-        "source": "Services Australia"
-    }
-
-
-@router.get("/pension-rates/forecast")
-async def forecast_pension_rates(years: int = 5):
-    """Forecast future pension rates based on inflation."""
-    current = PENSION_RATE_HISTORY[0]
-    inflation = 0.025
-    from datetime import datetime
+        print(f"Error fetching market data: {e}")
     
-    forecasts = []
-    for i in range(years + 1):
-        factor = (1 + inflation) ** i
-        forecasts.append({
-            "year": datetime.now().year + i,
-            "single_fortnightly": round(current["single"] * factor, 2),
-            "single_annual": round(current["single"] * factor * 26, 2),
-            "couple_fortnightly": round(current["couple"] * factor, 2),
-            "couple_annual": round(current["couple"] * factor * 26, 2)
-        })
-    
-    return {"forecasts": forecasts, "inflation_assumption": inflation}
+    # Return fallback data if API fails
+    fallback = get_fallback_data()
+    return MarketDataResponse(
+        indicators=fallback,
+        last_updated=now.isoformat(),
+        source="fallback"
+    )
+
+@router.get("/indicator/{symbol}")
+async def get_single_indicator(symbol: str):
+    """Get a single market indicator by symbol"""
+    async with httpx.AsyncClient() as client:
+        result = await fetch_yahoo_finance_quote(symbol, client)
+        if result:
+            return MarketIndicator(**result)
+    raise HTTPException(status_code=404, detail=f"Symbol {symbol} not found")

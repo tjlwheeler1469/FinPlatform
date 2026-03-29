@@ -615,6 +615,14 @@ def include_all_routes():
     except ImportError as e:
         logger.error(f"Failed to load age pension routes: {e}")
 
+    # USER PROFILE - Manage user profile data and preferences
+    try:
+        from routes.user_profile import router as user_profile_router
+        app.include_router(user_profile_router)
+        logger.info("USER PROFILE loaded: Profile management, preferences, language settings")
+    except ImportError as e:
+        logger.error(f"Failed to load user profile routes: {e}")
+
     # MULTI-TENANT MANAGEMENT - AFSL/Licensee data isolation
     try:
         from routes.multi_tenant import router as multi_tenant_router
