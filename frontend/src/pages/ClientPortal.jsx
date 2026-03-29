@@ -89,16 +89,20 @@ const ClientPortal = () => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            // Realistic 50-year-old married couple (Client view)
             client_id: clientId,
-            current_age: 45,
-            retirement_age: 65,
-            life_expectancy: 90,
-            current_portfolio: 800000,
-            annual_contributions: 30000,
-            retirement_spending: 80000,
-            expected_return: 0.07,
-            return_volatility: 0.15,
-            inflation_rate: 0.025,
+            current_age: 50,
+            retirement_age: 67,
+            life_expectancy: 92,
+            // Combined net worth around $1.6M for average married 50-year-olds
+            current_portfolio: 1609800,
+            // Combined super contributions (employer + salary sacrifice)
+            annual_contributions: 42000,
+            // ASFA comfortable retirement standard for couples
+            retirement_spending: 72000,
+            expected_return: 0.065,
+            return_volatility: 0.12,
+            inflation_rate: 0.03,
             num_simulations: 3000,
             enable_dynamic_spending: true,
             mode: 'background'

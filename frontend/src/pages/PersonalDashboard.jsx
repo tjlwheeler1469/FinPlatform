@@ -52,32 +52,60 @@ const getConfidenceLabel = (score) => {
   return 'At Risk';
 };
 
-// ==================== MOCK DATA ====================
+// ==================== REALISTIC DATA FOR AVERAGE MARRIED 50-YEAR-OLD AUSTRALIAN COUPLE ====================
+// Based on ABS statistics and ASFA retirement standards for median Australian households
+// Profile: David (50) & Sarah (50) Thompson - Married, 2 adult children, living in Melbourne
 
 const mockAssets = [
-  { id: 1, name: 'Vanguard Australian Shares ETF', type: 'Shares', entity: 'Personal', value: 125000, change: 8.5 },
-  { id: 2, name: 'CBA Shares', type: 'Shares', entity: 'Personal', value: 45000, change: 12.3 },
-  { id: 3, name: 'Investment Property - Sydney', type: 'Property', entity: 'Trust', value: 850000, change: 5.2 },
-  { id: 4, name: 'Term Deposit - NAB', type: 'Cash', entity: 'Personal', value: 100000, change: 4.5 },
-  { id: 5, name: 'Super Accumulation', type: 'Super', entity: 'Super', value: 450000, change: 9.1 },
-  { id: 6, name: 'Managed Fund - Magellan', type: 'Managed Fund', entity: 'Personal', value: 75000, change: -2.3 },
-  { id: 7, name: 'Corporate Bonds', type: 'Bonds', entity: 'Company', value: 50000, change: 3.8 },
-  { id: 8, name: 'Bitcoin', type: 'Crypto', entity: 'Personal', value: 25000, change: 45.2 },
-  { id: 9, name: 'Private Equity Fund', type: 'Unlisted', entity: 'Trust', value: 100000, change: 15.0 },
-  { id: 10, name: 'Hybrid Securities - ANZ', type: 'Hybrids', entity: 'Personal', value: 30000, change: 5.5 },
+  // Superannuation - Combined super for couple (avg $240K each at age 50)
+  { id: 1, name: 'David - AustralianSuper', type: 'Super', entity: 'Super', value: 245000, change: 8.2 },
+  { id: 2, name: 'Sarah - REST Super', type: 'Super', entity: 'Super', value: 198000, change: 7.8 },
+  
+  // Family Home (Melbourne median ~$950K, with mortgage offset)
+  { id: 3, name: 'Family Home - Glen Waverley', type: 'Property', entity: 'Personal', value: 985000, change: 4.1 },
+  
+  // Investment Property (common for 50-year-olds building wealth)
+  { id: 4, name: 'Investment Unit - Brunswick', type: 'Property', entity: 'Joint', value: 620000, change: 3.8 },
+  
+  // Shares & ETFs (typical for middle-income earners)
+  { id: 5, name: 'Vanguard High Growth ETF', type: 'Shares', entity: 'Personal', value: 42000, change: 9.5 },
+  { id: 6, name: 'BHP Group Shares', type: 'Shares', entity: 'Personal', value: 18500, change: 6.2 },
+  { id: 7, name: 'CBA Shares (DRP)', type: 'Shares', entity: 'Joint', value: 24000, change: 11.3 },
+  
+  // Cash & Term Deposits (emergency fund + savings)
+  { id: 8, name: 'Emergency Fund - ING Savings', type: 'Cash', entity: 'Personal', value: 28000, change: 4.35 },
+  { id: 9, name: 'Term Deposit - Westpac 12m', type: 'Cash', entity: 'Joint', value: 35000, change: 4.65 },
+  
+  // Managed Funds (common for hands-off investing)
+  { id: 10, name: 'Colonial First State Balanced', type: 'Managed Fund', entity: 'Personal', value: 32000, change: 5.8 },
+  
+  // Small crypto exposure (increasingly common for Gen X)
+  { id: 11, name: 'Bitcoin (Coinbase)', type: 'Crypto', entity: 'Personal', value: 8500, change: 28.4 },
+  
+  // Vehicle (depreciating asset but part of net worth)
+  { id: 12, name: 'Toyota RAV4 Hybrid 2023', type: 'Other', entity: 'Personal', value: 42000, change: -12.0 },
+];
+
+// Liabilities for net worth calculation
+const mockLiabilities = [
+  { id: 1, name: 'Home Loan - CBA', type: 'Mortgage', value: 285000, rate: 6.19 },
+  { id: 2, name: 'Investment Loan - ANZ', type: 'Mortgage', value: 380000, rate: 6.49 },
+  { id: 3, name: 'Credit Card - Visa', type: 'Credit', value: 4200, rate: 19.99 },
 ];
 
 const mockDocuments = [
-  { id: 1, name: 'Annual Tax Return 2025', status: 'pending', dueDate: '2026-04-15', type: 'Tax' },
-  { id: 2, name: 'Insurance Renewal', status: 'urgent', dueDate: '2026-01-31', type: 'Insurance' },
-  { id: 3, name: 'Super Statement Review', status: 'pending', dueDate: '2026-02-28', type: 'Super' },
+  { id: 1, name: 'Joint Tax Return 2025', status: 'pending', dueDate: '2026-04-15', type: 'Tax' },
+  { id: 2, name: 'Home & Contents Insurance', status: 'urgent', dueDate: '2026-01-31', type: 'Insurance' },
+  { id: 3, name: 'Super Consolidation Review', status: 'pending', dueDate: '2026-02-28', type: 'Super' },
+  { id: 4, name: 'Investment Property Review', status: 'pending', dueDate: '2026-03-15', type: 'Property' },
 ];
 
+// Rebalancing based on age-appropriate allocation (50-year-old = 50% growth, 50% defensive)
 const mockRebalancing = [
-  { asset: 'Australian Shares', current: 35, target: 30, diff: 5, action: 'Sell' },
-  { asset: 'International Shares', current: 20, target: 25, diff: -5, action: 'Buy' },
-  { asset: 'Property', current: 25, target: 20, diff: 5, action: 'Sell' },
-  { asset: 'Bonds', current: 10, target: 15, diff: -5, action: 'Buy' },
+  { asset: 'Australian Shares', current: 28, target: 25, diff: 3, action: 'Sell' },
+  { asset: 'International Shares', current: 12, target: 20, diff: -8, action: 'Buy' },
+  { asset: 'Property', current: 42, target: 25, diff: 17, action: 'Review' },
+  { asset: 'Bonds/Fixed Income', current: 8, target: 20, diff: -12, action: 'Buy' },
   { asset: 'Cash', current: 10, target: 10, diff: 0, action: 'Hold' },
 ];
 
@@ -87,6 +115,19 @@ const mockMarketIndicators = [
   { name: 'AUD/USD', value: 0.672, change: -0.3 },
   { name: '10Y Bond', value: 4.25, change: 0.05 },
 ];
+
+// User profile for the dashboard
+const userProfile = {
+  name: 'David & Sarah Thompson',
+  age: 50,
+  retirementAge: 67,
+  yearsToRetirement: 17,
+  riskProfile: 'Balanced',
+  incomeHousehold: 185000, // Combined gross income
+  expensesAnnual: 95000,
+  children: 2,
+  status: 'Married'
+};
 
 // ==================== MAIN COMPONENT ====================
 
@@ -100,20 +141,30 @@ const PersonalDashboard = () => {
   useEffect(() => {
     const fetchRetirementData = async () => {
       try {
+        // Calculate total portfolio from assets (excluding liabilities)
+        const totalAssets = mockAssets.reduce((sum, a) => sum + a.value, 0);
+        const totalLiabilities = mockLiabilities.reduce((sum, l) => sum + l.value, 0);
+        const netPortfolio = totalAssets - totalLiabilities;
+        
         const response = await fetch(`${API_URL}/api/hybrid-engine/calculate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            client_id: 'personal_dashboard',
-            current_age: 45,
-            retirement_age: 65,
-            life_expectancy: 90,
-            current_portfolio: 1850000,
-            annual_contributions: 50000,
-            retirement_spending: 80000,
-            expected_return: 0.07,
-            return_volatility: 0.15,
-            inflation_rate: 0.025,
+            client_id: 'thompson_family',
+            // 50-year-old couple planning for retirement at 67 (Australian standard)
+            current_age: 50,
+            retirement_age: 67,
+            life_expectancy: 92,
+            // Net worth after liabilities (~$1.6M)
+            current_portfolio: netPortfolio,
+            // Combined super contributions (employer + salary sacrifice)
+            annual_contributions: 42000,
+            // ASFA comfortable retirement standard for couples (~$72K/year)
+            retirement_spending: 72000,
+            // Conservative return assumption for balanced portfolio
+            expected_return: 0.065,
+            return_volatility: 0.12,
+            inflation_rate: 0.03,
             num_simulations: 5000,
             enable_dynamic_spending: true,
             mode: 'background'
@@ -173,7 +224,12 @@ const PersonalDashboard = () => {
   }));
 
   const confidence = retirementData?.confidence_score || 0;
-  const yearsToRetirement = retirementData?.inputs?.years_to_retirement || 20;
+  const yearsToRetirement = userProfile.yearsToRetirement;
+  
+  // Calculate net worth (assets - liabilities)
+  const totalLiabilities = mockLiabilities.reduce((sum, l) => sum + l.value, 0);
+  const grossAssets = totals.totalValue;
+  const netWorthValue = grossAssets - totalLiabilities;
 
   return (
     <Layout>
@@ -183,15 +239,16 @@ const PersonalDashboard = () => {
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-2">
               <Sun className="h-8 w-8 text-amber-500" />
-              Personal Dashboard
+              {userProfile.name}
             </h1>
             <p className="text-muted-foreground">
               {new Date().toLocaleDateString('en-AU', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+              {' • '}<span className="text-primary">{userProfile.status}, Age {userProfile.age}</span>
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <Badge variant="outline" className="text-lg px-3 py-1">
-              Net Worth: {formatCurrency(totals.totalValue)}
+            <Badge variant="outline" className="text-lg px-3 py-1 bg-green-50 border-green-200">
+              Net Worth: {formatCurrency(netWorthValue)}
             </Badge>
             <Button variant="outline" onClick={() => window.location.reload()}>
               <RefreshCw className="h-4 w-4 mr-2" />
@@ -221,13 +278,13 @@ const PersonalDashboard = () => {
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Wallet className="h-5 w-5 text-green-600" />
-                <span className="text-sm text-muted-foreground">Total Net Worth</span>
+                <span className="text-sm text-muted-foreground">Net Worth</span>
               </div>
               <p className="text-3xl font-bold text-green-600">
-                {formatCurrency(totals.totalValue)}
+                {formatCurrency(netWorthValue)}
               </p>
               <p className="text-sm text-green-600">
-                <ArrowUp className="h-3 w-3 inline" /> +8.2% YTD
+                <ArrowUp className="h-3 w-3 inline" /> +5.8% YTD
               </p>
             </CardContent>
           </Card>
@@ -239,20 +296,20 @@ const PersonalDashboard = () => {
                 <span className="text-sm text-muted-foreground">Years to Retirement</span>
               </div>
               <p className="text-3xl font-bold text-purple-600">{yearsToRetirement}</p>
-              <p className="text-sm text-muted-foreground">At age 65</p>
+              <p className="text-sm text-muted-foreground">At age {userProfile.retirementAge}</p>
             </CardContent>
           </Card>
 
           <Card className="bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
-                <AlertTriangle className="h-5 w-5 text-amber-600" />
-                <span className="text-sm text-muted-foreground">Actions Required</span>
+                <Shield className="h-5 w-5 text-amber-600" />
+                <span className="text-sm text-muted-foreground">Combined Super</span>
               </div>
               <p className="text-3xl font-bold text-amber-600">
-                {mockDocuments.filter(d => d.status === 'urgent' || d.status === 'pending').length}
+                {formatCurrency(mockAssets.filter(a => a.type === 'Super').reduce((sum, a) => sum + a.value, 0))}
               </p>
-              <p className="text-sm text-amber-600">Documents pending</p>
+              <p className="text-sm text-amber-600">2 accounts</p>
             </CardContent>
           </Card>
 
@@ -448,7 +505,7 @@ const PersonalDashboard = () => {
 
             {/* Smart Insights (AI + Manual) */}
             <SmartInsights 
-              clientId="personal_dashboard"
+              clientId="thompson_family"
               portfolioData={portfolioDataForInsights}
               retirementData={retirementData}
               isAdvisor={false}
@@ -597,15 +654,15 @@ const PersonalDashboard = () => {
                 <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
                   <div className="text-center">
                     <p className="text-sm text-muted-foreground">Current Age</p>
-                    <p className="text-2xl font-bold">45</p>
+                    <p className="text-2xl font-bold">{userProfile.age}</p>
                   </div>
                   <div className="flex-1 mx-8">
-                    <Progress value={(20 - yearsToRetirement) / 20 * 100 + 50} className="h-4" />
+                    <Progress value={((userProfile.retirementAge - userProfile.age - yearsToRetirement) / (userProfile.retirementAge - 30)) * 100 + 50} className="h-4" />
                     <p className="text-center text-sm text-muted-foreground mt-2">{yearsToRetirement} years to go</p>
                   </div>
                   <div className="text-center">
                     <p className="text-sm text-muted-foreground">Target Retirement</p>
-                    <p className="text-2xl font-bold">65</p>
+                    <p className="text-2xl font-bold">{userProfile.retirementAge}</p>
                   </div>
                 </div>
               </CardContent>
@@ -785,7 +842,7 @@ const PersonalDashboard = () => {
           {/* ==================== TAB 5: INSIGHTS (Full Smart Insights) ==================== */}
           <TabsContent value="insights" className="space-y-6">
             <SmartInsights 
-              clientId="personal_dashboard"
+              clientId="thompson_family"
               portfolioData={portfolioDataForInsights}
               retirementData={retirementData}
               isAdvisor={false}

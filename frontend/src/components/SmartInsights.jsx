@@ -281,6 +281,7 @@ const SmartInsights = ({
   const [editingInsight, setEditingInsight] = useState(null);
   
   // Generate AI insights based on portfolio and retirement data
+  // Tailored for average 50-year-old Australian married couple
   const generateAIInsights = () => {
     const aiInsights = [];
     
@@ -288,7 +289,7 @@ const SmartInsights = ({
     if (portfolioData) {
       const totalValue = portfolioData.totalValue || portfolioData.net_worth || 0;
       
-      // Check asset concentration
+      // Check asset concentration (common for 50-year-olds with property)
       if (portfolioData.byType) {
         const entries = Object.entries(portfolioData.byType);
         const maxAllocation = Math.max(...entries.map(([_, v]) => v / totalValue * 100));
@@ -296,29 +297,45 @@ const SmartInsights = ({
           const topAsset = entries.find(([_, v]) => v / totalValue * 100 === maxAllocation);
           aiInsights.push({
             id: 'ai_concentration',
-            title: 'Portfolio Concentration Alert',
-            description: `${topAsset?.[0] || 'One asset class'} represents ${maxAllocation.toFixed(0)}% of your portfolio. Consider diversifying to reduce risk.`,
+            title: 'Property Heavy Portfolio',
+            description: `${topAsset?.[0] || 'Property'} represents ${maxAllocation.toFixed(0)}% of your portfolio. While common for your age group, consider increasing diversification as you approach retirement.`,
             category: 'risk',
             priority: maxAllocation > 60 ? 'high' : 'medium',
-            impact: 'Reduced volatility',
-            action: 'Review asset allocation',
+            impact: 'Better risk-adjusted returns',
+            action: 'Review asset allocation with adviser',
             source: 'ai',
             created_at: new Date().toISOString()
           });
         }
       }
       
-      // Check cash allocation
-      const cashPercent = (portfolioData.byType?.Cash || 0) / totalValue * 100;
-      if (cashPercent > 20) {
+      // Super consolidation opportunity (common at age 50)
+      const superValue = portfolioData.byType?.Super || 0;
+      if (superValue > 0) {
         aiInsights.push({
-          id: 'ai_cash_drag',
-          title: 'High Cash Allocation',
-          description: `You have ${cashPercent.toFixed(0)}% in cash. Consider investing some in growth assets to beat inflation.`,
+          id: 'ai_super_consolidate',
+          title: 'Superannuation Review',
+          description: `With ${formatCurrency(superValue)} in super, now is a great time to review fees, insurance, and consider consolidating if you have multiple accounts.`,
           category: 'opportunity',
           priority: 'medium',
-          impact: `+${formatCurrency(totalValue * 0.03 * (cashPercent - 10) / 100)}/year potential`,
-          action: 'Review investment strategy',
+          impact: 'Potential $2,000-5,000/year in fee savings',
+          action: 'Compare super funds on ATO website',
+          source: 'ai',
+          created_at: new Date().toISOString()
+        });
+      }
+      
+      // International diversification (common gap for Australian investors)
+      const intlShares = (portfolioData.byType?.['International Shares'] || 0) / totalValue * 100;
+      if (intlShares < 15) {
+        aiInsights.push({
+          id: 'ai_intl_diversification',
+          title: 'Consider International Exposure',
+          description: `Your international shares allocation is low. Australian shares represent only 2% of global markets. Consider adding global ETFs for better diversification.`,
+          category: 'opportunity',
+          priority: 'medium',
+          impact: 'Access to global growth',
+          action: 'Research low-cost international ETFs',
           source: 'ai',
           created_at: new Date().toISOString()
         });
@@ -328,64 +345,74 @@ const SmartInsights = ({
     // Retirement-based insights
     if (retirementData) {
       const confidence = retirementData.confidence_score || 0;
-      const successRate = retirementData.monte_carlo?.success_rate_percent || 0;
+      const yearsToRetirement = retirementData?.inputs?.years_to_retirement || 17;
       
       // Low confidence insight
       if (confidence < 60) {
         aiInsights.push({
           id: 'ai_low_confidence',
           title: 'Retirement Confidence Below Target',
-          description: `Your retirement confidence is ${confidence.toFixed(0)}%. Small changes now can make a big difference.`,
+          description: `Your retirement confidence is ${confidence.toFixed(0)}%. With ${yearsToRetirement} years until retirement, small changes now can make a big difference.`,
           category: 'retirement',
           priority: confidence < 40 ? 'critical' : 'high',
           impact: 'Improved retirement security',
-          action: 'Consider delaying retirement or increasing savings',
+          action: 'Increase super contributions or review retirement age',
           source: 'ai',
           created_at: new Date().toISOString()
         });
       }
       
       // Good confidence insight
-      if (confidence >= 80) {
+      if (confidence >= 70) {
         aiInsights.push({
           id: 'ai_on_track',
-          title: 'On Track for Retirement',
-          description: `Great news! Your ${confidence.toFixed(0)}% confidence score shows you're well-prepared. Consider estate planning.`,
+          title: 'On Track for Comfortable Retirement',
+          description: `Your ${confidence.toFixed(0)}% confidence score shows you're tracking well for ASFA's comfortable retirement standard. Time to consider estate planning and Age Pension optimization.`,
           category: 'retirement',
           priority: 'low',
           impact: 'Peace of mind',
-          action: 'Review estate planning',
+          action: 'Review estate planning & Age Pension eligibility',
           source: 'ai',
           created_at: new Date().toISOString()
         });
       }
       
-      // Spending flexibility insight
-      const factors = retirementData.confidence_breakdown?.raw_factors || {};
-      if ((factors.spending_flexibility || 0) < 0.4) {
-        aiInsights.push({
-          id: 'ai_spending',
-          title: 'Limited Spending Flexibility',
-          description: 'Your essential spending is high relative to income. Building a buffer would provide more security.',
-          category: 'risk',
-          priority: 'high',
-          impact: '+10% confidence potential',
-          action: 'Review monthly expenses',
-          source: 'ai',
-          created_at: new Date().toISOString()
-        });
-      }
+      // Catch-up contributions insight (relevant for 50+ year olds)
+      aiInsights.push({
+        id: 'ai_catchup',
+        title: 'Catch-Up Super Contributions Available',
+        description: `From age 50, you can potentially contribute more to super using unused concessional cap carry-forward from previous years. This can significantly boost your retirement savings.`,
+        category: 'tax',
+        priority: 'high',
+        impact: 'Up to $27,500/year tax-advantaged savings',
+        action: 'Check unused cap on myGov',
+        source: 'ai',
+        created_at: new Date().toISOString()
+      });
     }
     
-    // Tax optimization insight (general)
+    // Insurance review (critical at age 50)
     aiInsights.push({
-      id: 'ai_tax',
-      title: 'Tax Season Reminder',
-      description: 'Review your concessional super contributions before June 30 to maximize tax benefits.',
-      category: 'tax',
+      id: 'ai_insurance',
+      title: 'Insurance Coverage Review',
+      description: `At age 50, insurance premiums increase significantly. Review your life, TPD, and income protection coverage to ensure adequate protection without overpaying.`,
+      category: 'risk',
       priority: 'medium',
-      impact: 'Up to $5,625 tax savings',
-      action: 'Check super contribution caps',
+      impact: 'Potential premium savings',
+      action: 'Compare insurance inside vs outside super',
+      source: 'ai',
+      created_at: new Date().toISOString()
+    });
+    
+    // Debt reduction strategy
+    aiInsights.push({
+      id: 'ai_debt',
+      title: 'Mortgage Strategy Before Retirement',
+      description: `With 17 years to retirement, aim to be mortgage-free by age 67. Consider making extra repayments or using offset accounts to reduce interest.`,
+      category: 'action',
+      priority: 'medium',
+      impact: 'Interest savings & retirement security',
+      action: 'Review mortgage offset strategy',
       source: 'ai',
       created_at: new Date().toISOString()
     });
