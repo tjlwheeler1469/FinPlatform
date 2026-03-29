@@ -2127,3 +2127,60 @@ New page for tracking private equity, venture capital, and unlisted assets:
 ---
 
 *Last Updated: March 27, 2026 - Version 10.6 - Page Consolidation & Smart Insights Complete*
+
+---
+
+## Version 10.7 - Live Market Data, Profile Editing & Age Pension (March 29, 2026) ✅ COMPLETE
+
+### P2 Features Implemented
+
+**Live Market Data API** (`/api/market-data/indicators`):
+- Integration with Yahoo Finance API for real-time market data
+- 5-minute caching to reduce API calls
+- Returns: ASX 200, S&P 500, AUD/USD, 10Y Bond, All Ords, Bitcoin AUD
+- Fallback to static data if API unavailable
+- Dashboard shows "Live Data" badge when connected
+
+**Edit User Profile** (`/api/user-profile/{user_id}`):
+- Full CRUD operations for user profiles
+- Profile summary endpoint for dashboard
+- Editable fields: names, DOB, retirement age, risk profile, incomes, expenses
+- Persists to MongoDB
+- Edit Profile dialog accessible via pencil icon button
+
+### P3 Features Implemented
+
+**Services Australia Age Pension Calculator** (`/api/age-pension/calculate`):
+- Full implementation of Australian Age Pension means testing
+- Assets test (homeowner/non-homeowner, single/couple)
+- Income test with deeming rates
+- Pension age calculation based on birth date
+- 2025-2026 Services Australia rates and thresholds
+- Recommendations for pension optimization
+- Endpoint to get current rates: `/api/age-pension/rates`
+
+### Files Created/Updated
+- `/app/backend/routes/market_data.py` (Yahoo Finance integration)
+- `/app/backend/routes/user_profile.py` (Profile CRUD)
+- `/app/backend/routes/age_pension.py` (Age Pension calculator)
+- `/app/frontend/src/pages/PersonalDashboard.jsx` (Live data, edit profile dialog)
+
+### Testing: Iteration 117 - Backend 100% (14/14), Frontend 100%
+
+---
+
+### Remaining Future/Backlog
+
+**P4 - Voice-activated planning assistant**:
+- Speech-to-text integration (Whisper API)
+- Natural language query processing
+- Voice commands for common actions
+
+**P4 - Multi-language support**:
+- i18n framework setup
+- Translation files for: Mandarin, Vietnamese, Greek
+- Language selector in settings
+
+---
+
+*Last Updated: March 29, 2026 - Version 10.7 - Live Data & Age Pension Complete*
