@@ -1,614 +1,676 @@
-import React, { useState, useEffect } from 'react';
-import Layout from '../components/Layout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import { Button } from '../components/ui/button';
-import { Badge } from '../components/ui/badge';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Alert, AlertDescription, AlertTitle } from '../components/ui/alert';
-import { ScrollArea } from '../components/ui/scroll-area';
-import { Separator } from '../components/ui/separator';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
-import { Textarea } from '../components/ui/textarea';
-import { toast } from 'sonner';
+import { useState, useMemo } from 'react';
+import Layout from '@/components/Layout';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Progress } from '@/components/ui/progress';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import {
-  FileText, CheckCircle2, XCircle, Clock, AlertTriangle, RefreshCw, Plus,
-  Eye, Edit, Calendar, User, Shield, Search, Filter, Download, Upload,
-  ClipboardCheck, AlertOctagon, FileCheck, History
+  Shield, FileText, AlertTriangle, CheckCircle, XCircle, Clock,
+  Search, Filter, Download, Upload, Eye, ChevronRight, AlertCircle,
+  TrendingUp, Users, Calendar, Bell, Flag, ArrowUp, ArrowDown,
+  Target, Zap, Brain, MessageSquare, Folder, BarChart3, PieChart,
+  Scale, Gavel, BookOpen, FileCheck, FilePlus, FileWarning, Activity
 } from 'lucide-react';
+import {
+  ResponsiveContainer, PieChart as RechartsPie, Pie, Cell,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend
+} from 'recharts';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+// ===================== MOCK DATA =====================
 
-const DOCUMENT_TYPES = {
-  soa: { label: 'Statement of Advice', color: 'bg-blue-500' },
-  roa: { label: 'Record of Advice', color: 'bg-green-500' },
-  soa_supplementary: { label: 'SOA Supplementary', color: 'bg-purple-500' },
-  fsg: { label: 'Financial Services Guide', color: 'bg-orange-500' },
-  ips: { label: 'Investment Policy Statement', color: 'bg-teal-500' }
+const complianceStatuses = {
+  compliant: { color: 'bg-green-500', text: 'Compliant', icon: CheckCircle },
+  minor_issues: { color: 'bg-amber-500', text: 'Minor Issues', icon: AlertTriangle },
+  major_issues: { color: 'bg-red-500', text: 'Major Issues', icon: XCircle },
+  pending_review: { color: 'bg-blue-500', text: 'Pending Review', icon: Clock },
 };
 
-const STATUS_COLORS = {
-  draft: 'bg-gray-100 text-gray-800',
-  pending_review: 'bg-yellow-100 text-yellow-800',
-  reviewed: 'bg-blue-100 text-blue-800',
-  pending_signature: 'bg-purple-100 text-purple-800',
-  signed: 'bg-green-100 text-green-800',
-  implemented: 'bg-green-200 text-green-900',
-  superseded: 'bg-gray-200 text-gray-600',
-  withdrawn: 'bg-red-100 text-red-800'
+// Advice files for review
+const adviceFiles = [
+  {
+    id: 'SOA-2026-001',
+    client: 'David & Sarah Thompson',
+    type: 'Statement of Advice',
+    date: '2026-03-15',
+    adviser: 'James Mitchell',
+    status: 'compliant',
+    riskProfile: 'Balanced',
+    investmentAmount: 450000,
+    score: 95,
+    findings: [],
+    nextReview: '2027-03-15'
+  },
+  {
+    id: 'SOA-2026-002',
+    client: 'Michael Chen',
+    type: 'Statement of Advice',
+    date: '2026-03-10',
+    adviser: 'Sarah Williams',
+    status: 'minor_issues',
+    riskProfile: 'Growth',
+    investmentAmount: 280000,
+    score: 78,
+    findings: ['Risk profile documentation incomplete', 'Fee disclosure needs clarification'],
+    nextReview: '2027-03-10'
+  },
+  {
+    id: 'ROA-2026-015',
+    client: 'Jennifer & Robert Smith',
+    type: 'Record of Advice',
+    date: '2026-03-08',
+    adviser: 'James Mitchell',
+    status: 'major_issues',
+    riskProfile: 'Conservative',
+    investmentAmount: 125000,
+    score: 52,
+    findings: ['Asset allocation exceeds risk profile tolerance', 'Missing SOA update required', 'Client signature missing'],
+    nextReview: '2026-04-08'
+  },
+  {
+    id: 'SOA-2026-003',
+    client: 'Amanda Williams',
+    type: 'Statement of Advice',
+    date: '2026-03-05',
+    adviser: 'David Brown',
+    status: 'pending_review',
+    riskProfile: 'High Growth',
+    investmentAmount: 520000,
+    score: null,
+    findings: [],
+    nextReview: '2027-03-05'
+  },
+  {
+    id: 'ROA-2026-016',
+    client: 'Peter & Lisa Johnson',
+    type: 'Record of Advice',
+    date: '2026-03-01',
+    adviser: 'Sarah Williams',
+    status: 'compliant',
+    riskProfile: 'Balanced',
+    investmentAmount: 185000,
+    score: 92,
+    findings: [],
+    nextReview: '2027-03-01'
+  },
+];
+
+// ASIC compliance requirements
+const asicRequirements = [
+  {
+    category: 'Best Interests Duty',
+    requirements: [
+      { id: 'BID-1', name: 'Identify client objectives', status: 'compliant', notes: '' },
+      { id: 'BID-2', name: 'Identify alternative strategies', status: 'compliant', notes: '' },
+      { id: 'BID-3', name: 'Base advice on client circumstances', status: 'minor', notes: '2 files need updated circumstances' },
+      { id: 'BID-4', name: 'Recommend appropriate products', status: 'compliant', notes: '' },
+    ]
+  },
+  {
+    category: 'Fee Disclosure',
+    requirements: [
+      { id: 'FD-1', name: 'Initial fee disclosure', status: 'compliant', notes: '' },
+      { id: 'FD-2', name: 'Ongoing fee disclosure', status: 'compliant', notes: '' },
+      { id: 'FD-3', name: 'Fee Disclosure Statement', status: 'minor', notes: '1 FDS overdue for update' },
+      { id: 'FD-4', name: 'Opt-in notices', status: 'compliant', notes: '' },
+    ]
+  },
+  {
+    category: 'Conflicts Management',
+    requirements: [
+      { id: 'CM-1', name: 'Conflicts register maintained', status: 'compliant', notes: '' },
+      { id: 'CM-2', name: 'Conflicts disclosed to clients', status: 'compliant', notes: '' },
+      { id: 'CM-3', name: 'Related party transactions', status: 'compliant', notes: '' },
+    ]
+  },
+  {
+    category: 'Record Keeping',
+    requirements: [
+      { id: 'RK-1', name: 'Advice files retained 7 years', status: 'compliant', notes: '' },
+      { id: 'RK-2', name: 'File notes documented', status: 'minor', notes: '3 files missing file notes' },
+      { id: 'RK-3', name: 'Authority to proceed obtained', status: 'compliant', notes: '' },
+    ]
+  },
+];
+
+// Escalation pathways
+const escalationLevels = [
+  { level: 1, name: 'Adviser Self-Correction', timeframe: '7 days', description: 'Minor documentation issues' },
+  { level: 2, name: 'Practice Manager Review', timeframe: '14 days', description: 'Repeated minor issues or moderate concerns' },
+  { level: 3, name: 'Compliance Officer', timeframe: '30 days', description: 'Major compliance breaches' },
+  { level: 4, name: 'Licensee/AFSL Holder', timeframe: 'Immediate', description: 'Serious breaches, potential ASIC reporting' },
+];
+
+// Dashboard metrics
+const dashboardMetrics = {
+  totalFiles: 48,
+  reviewed: 42,
+  compliant: 35,
+  minorIssues: 5,
+  majorIssues: 2,
+  pendingReview: 6,
+  avgScore: 87,
+  overdue: 3,
 };
 
-export default function AdviserComplianceDashboard() {
-  const [activeTab, setActiveTab] = useState('overview');
-  const [loading, setLoading] = useState(true);
-  const [adviserId, setAdviserId] = useState('ADV001');
-  
-  // Data
-  const [documents, setDocuments] = useState([]);
-  const [pendingReviews, setPendingReviews] = useState([]);
-  const [reviewsDue, setReviewsDue] = useState({ reviews_due: [], overdue_reviews: [] });
-  const [complianceSummary, setComplianceSummary] = useState(null);
-  
-  // Dialogs
-  const [showNewDocDialog, setShowNewDocDialog] = useState(false);
-  const [showReviewDialog, setShowReviewDialog] = useState(false);
-  const [selectedDoc, setSelectedDoc] = useState(null);
+// Compliance score history
+const scoreHistory = [
+  { month: 'Oct', score: 82 },
+  { month: 'Nov', score: 85 },
+  { month: 'Dec', score: 84 },
+  { month: 'Jan', score: 88 },
+  { month: 'Feb', score: 86 },
+  { month: 'Mar', score: 87 },
+];
 
-  // New document form
-  const [newDoc, setNewDoc] = useState({
-    client_id: '',
-    client_name: '',
-    document_type: 'soa',
-    advice_type: 'personal',
-    title: '',
-    description: '',
-    advice_areas: [],
-    advice_fee: 0
-  });
+const COLORS = ['#22c55e', '#f59e0b', '#ef4444', '#3b82f6'];
 
-  useEffect(() => {
-    loadData();
-  }, [adviserId]);
+// ===================== MAIN COMPONENT =====================
 
-  const loadData = async () => {
-    setLoading(true);
-    try {
-      const [docsRes, pendingRes, dueRes, summaryRes] = await Promise.all([
-        fetch(`${API_URL}/api/compliance-docs/adviser/${adviserId}`).then(r => r.json()),
-        fetch(`${API_URL}/api/compliance-docs/reviews/pending`).then(r => r.json()),
-        fetch(`${API_URL}/api/compliance-docs/reviews/due?days=30`).then(r => r.json()),
-        fetch(`${API_URL}/api/compliance-docs/compliance-summary`).then(r => r.json())
-      ]);
-      
-      setDocuments(docsRes.documents || []);
-      setPendingReviews(pendingRes.pending_reviews || []);
-      setReviewsDue(dueRes);
-      setComplianceSummary(summaryRes);
-    } catch (error) {
-      console.error('Error loading data:', error);
+const AdviserComplianceDashboard = () => {
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Filter advice files
+  const filteredFiles = useMemo(() => {
+    let files = adviceFiles;
+    if (filterStatus !== 'all') {
+      files = files.filter(f => f.status === filterStatus);
     }
-    setLoading(false);
-  };
-
-  const createDocument = async () => {
-    try {
-      const payload = {
-        ...newDoc,
-        adviser_id: adviserId,
-        adviser_name: 'Demo Adviser',
-        advice_date: new Date().toISOString(),
-        status: 'draft'
-      };
-      
-      const response = await fetch(`${API_URL}/api/compliance-docs/document`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      
-      const data = await response.json();
-      
-      if (data.document_id) {
-        toast.success(`${DOCUMENT_TYPES[newDoc.document_type].label} created: ${data.document_id}`);
-        setShowNewDocDialog(false);
-        setNewDoc({
-          client_id: '',
-          client_name: '',
-          document_type: 'soa',
-          advice_type: 'personal',
-          title: '',
-          description: '',
-          advice_areas: [],
-          advice_fee: 0
-        });
-        loadData();
-      }
-    } catch (error) {
-      toast.error('Failed to create document');
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      files = files.filter(f => 
+        f.client.toLowerCase().includes(query) ||
+        f.id.toLowerCase().includes(query) ||
+        f.adviser.toLowerCase().includes(query)
+      );
     }
-  };
+    return files;
+  }, [filterStatus, searchQuery]);
 
-  const updateStatus = async (documentId, newStatus, notes = '') => {
-    try {
-      await fetch(`${API_URL}/api/compliance-docs/document/${documentId}/status`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus, notes, date: new Date().toISOString() })
-      });
-      toast.success(`Status updated to ${newStatus.replace('_', ' ')}`);
-      loadData();
-    } catch (error) {
-      toast.error('Failed to update status');
-    }
-  };
-
-  const submitReview = async (documentId, outcome, notes) => {
-    try {
-      await fetch(`${API_URL}/api/compliance-docs/document/${documentId}/review`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          reviewer_id: 'REV001',
-          reviewer_name: 'Compliance Officer',
-          outcome,
-          notes
-        })
-      });
-      toast.success(`Review submitted: ${outcome}`);
-      setShowReviewDialog(false);
-      loadData();
-    } catch (error) {
-      toast.error('Failed to submit review');
-    }
-  };
-
-  const getStatusBadge = (status) => (
-    <Badge className={STATUS_COLORS[status] || 'bg-gray-100'}>{status?.replace('_', ' ')}</Badge>
-  );
-
-  const formatDate = (dateStr) => dateStr ? new Date(dateStr).toLocaleDateString() : '-';
+  // Status distribution for chart
+  const statusDistribution = [
+    { name: 'Compliant', value: dashboardMetrics.compliant, color: '#22c55e' },
+    { name: 'Minor Issues', value: dashboardMetrics.minorIssues, color: '#f59e0b' },
+    { name: 'Major Issues', value: dashboardMetrics.majorIssues, color: '#ef4444' },
+    { name: 'Pending', value: dashboardMetrics.pendingReview, color: '#3b82f6' },
+  ];
 
   return (
     <Layout>
-      <div className="space-y-6 p-6" data-testid="adviser-compliance-dashboard">
+      <div className="space-y-6" data-testid="compliance-dashboard">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold flex items-center gap-3">
-              <Shield className="h-8 w-8 text-primary" />
-              Compliance Dashboard
+            <h1 className="text-3xl font-bold flex items-center gap-2">
+              <Shield className="h-8 w-8 text-blue-600" />
+              Adviser Compliance Dashboard
             </h1>
-            <p className="text-muted-foreground mt-1">
-              SOA/ROA tracking, reviews, breaches, and audit trails
+            <p className="text-muted-foreground">
+              Monitor advice quality, ASIC compliance, and regulatory alignment
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <Select value={adviserId} onValueChange={setAdviserId}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select adviser" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ADV001">Demo Adviser</SelectItem>
-                <SelectItem value="ADV002">John Smith</SelectItem>
-                <SelectItem value="ADV003">Sarah Wilson</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <Dialog open={showNewDocDialog} onOpenChange={setShowNewDocDialog}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" /> New SOA/ROA
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle>Create Compliance Document</DialogTitle>
-                  <DialogDescription>Create a new Statement of Advice or Record of Advice</DialogDescription>
-                </DialogHeader>
-                <div className="grid grid-cols-2 gap-4 py-4">
-                  <div>
-                    <Label>Document Type</Label>
-                    <Select value={newDoc.document_type} onValueChange={(v) => setNewDoc({...newDoc, document_type: v})}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(DOCUMENT_TYPES).map(([key, val]) => (
-                          <SelectItem key={key} value={key}>{val.label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label>Advice Type</Label>
-                    <Select value={newDoc.advice_type} onValueChange={(v) => setNewDoc({...newDoc, advice_type: v})}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="personal">Personal</SelectItem>
-                        <SelectItem value="general">General</SelectItem>
-                        <SelectItem value="scaled">Scaled</SelectItem>
-                        <SelectItem value="comprehensive">Comprehensive</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label>Client ID</Label>
-                    <Input value={newDoc.client_id} onChange={(e) => setNewDoc({...newDoc, client_id: e.target.value})} placeholder="e.g., CLIENT-001" />
-                  </div>
-                  <div>
-                    <Label>Client Name</Label>
-                    <Input value={newDoc.client_name} onChange={(e) => setNewDoc({...newDoc, client_name: e.target.value})} placeholder="e.g., John Smith" />
-                  </div>
-                  <div className="col-span-2">
-                    <Label>Title</Label>
-                    <Input value={newDoc.title} onChange={(e) => setNewDoc({...newDoc, title: e.target.value})} placeholder="e.g., Superannuation Rollover Advice" />
-                  </div>
-                  <div className="col-span-2">
-                    <Label>Description</Label>
-                    <Textarea value={newDoc.description} onChange={(e) => setNewDoc({...newDoc, description: e.target.value})} placeholder="Brief description of the advice..." />
-                  </div>
-                  <div>
-                    <Label>Advice Fee (AUD)</Label>
-                    <Input type="number" value={newDoc.advice_fee} onChange={(e) => setNewDoc({...newDoc, advice_fee: parseFloat(e.target.value) || 0})} />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setShowNewDocDialog(false)}>Cancel</Button>
-                  <Button onClick={createDocument}>Create Document</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-            
-            <Button variant="outline" onClick={loadData} disabled={loading}>
-              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-              Refresh
+            <Badge variant="outline" className="text-sm px-3 py-1">
+              AFSL: 123456
+            </Badge>
+            <Button variant="outline">
+              <Download className="h-4 w-4 mr-2" />
+              Export Report
             </Button>
           </div>
         </div>
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <FileText className="h-4 w-4" /> Total Documents
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{documents.length}</div>
-              <p className="text-xs text-muted-foreground">SOA: {documents.filter(d => d.document_type === 'soa').length} | ROA: {documents.filter(d => d.document_type === 'roa').length}</p>
-            </CardContent>
-          </Card>
-
-          <Card className={pendingReviews.length > 0 ? 'border-yellow-500 border-2' : ''}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <Clock className="h-4 w-4 text-yellow-500" /> Pending Review
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-yellow-600">{pendingReviews.length}</div>
-              <p className="text-xs text-muted-foreground">Awaiting compliance review</p>
-            </CardContent>
-          </Card>
-
-          <Card className={reviewsDue.overdue_reviews?.length > 0 ? 'border-red-500 border-2' : ''}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4 text-red-500" /> Overdue Reviews
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-red-600">{reviewsDue.overdue_reviews?.length || 0}</div>
-              <p className="text-xs text-muted-foreground">{reviewsDue.reviews_due?.length || 0} due in 30 days</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-green-500" /> Implemented
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">
-                {documents.filter(d => d.status === 'implemented').length}
-              </div>
-              <p className="text-xs text-muted-foreground">Advice implemented</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Alerts */}
-        {reviewsDue.overdue_reviews?.length > 0 && (
+        {/* Alert Banner */}
+        {dashboardMetrics.majorIssues > 0 && (
           <Alert variant="destructive">
-            <AlertOctagon className="h-4 w-4" />
-            <AlertTitle>Overdue Annual Reviews</AlertTitle>
+            <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              {reviewsDue.overdue_reviews.length} client(s) have overdue annual reviews. Immediate action required.
+              <strong>{dashboardMetrics.majorIssues} advice files</strong> have major compliance issues requiring immediate attention.
+              <Button variant="link" className="p-0 h-auto ml-2">View escalation pathways</Button>
             </AlertDescription>
           </Alert>
         )}
 
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="overview" data-testid="overview-tab">
-              <FileText className="h-4 w-4 mr-2" /> All Documents
+          <TabsList className="grid grid-cols-5 w-full max-w-4xl">
+            <TabsTrigger value="dashboard" className="flex items-center gap-1">
+              <BarChart3 className="h-4 w-4" />
+              Dashboard
             </TabsTrigger>
-            <TabsTrigger value="pending" data-testid="pending-tab">
-              <Clock className="h-4 w-4 mr-2" /> Pending Review
-              {pendingReviews.length > 0 && <Badge className="ml-2 bg-yellow-500">{pendingReviews.length}</Badge>}
+            <TabsTrigger value="files" className="flex items-center gap-1">
+              <FileText className="h-4 w-4" />
+              Advice Files
             </TabsTrigger>
-            <TabsTrigger value="reviews" data-testid="reviews-tab">
-              <Calendar className="h-4 w-4 mr-2" /> Reviews Due
-              {(reviewsDue.overdue_reviews?.length || 0) > 0 && <Badge className="ml-2 bg-red-500">{reviewsDue.overdue_reviews.length}</Badge>}
+            <TabsTrigger value="asic" className="flex items-center gap-1">
+              <Gavel className="h-4 w-4" />
+              ASIC Framework
             </TabsTrigger>
-            <TabsTrigger value="workflow" data-testid="workflow-tab">
-              <ClipboardCheck className="h-4 w-4 mr-2" /> Workflow
+            <TabsTrigger value="reports" className="flex items-center gap-1">
+              <BookOpen className="h-4 w-4" />
+              Reports
+            </TabsTrigger>
+            <TabsTrigger value="escalation" className="flex items-center gap-1">
+              <Flag className="h-4 w-4" />
+              Escalation
             </TabsTrigger>
           </TabsList>
 
-          {/* All Documents Tab */}
-          <TabsContent value="overview" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Compliance Documents</CardTitle>
-                <CardDescription>All SOA, ROA, and related documents</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ScrollArea className="h-[500px]">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Document ID</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead>Client</TableHead>
-                        <TableHead>Title</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Advice Date</TableHead>
-                        <TableHead>Review Due</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {documents.map((doc) => (
-                        <TableRow key={doc.document_id}>
-                          <TableCell className="font-mono text-sm">{doc.document_id}</TableCell>
-                          <TableCell>
-                            <Badge className={DOCUMENT_TYPES[doc.document_type]?.color || 'bg-gray-500'}>
-                              {doc.document_type?.toUpperCase()}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <div>{doc.client_name}</div>
-                            <div className="text-xs text-muted-foreground">{doc.client_id}</div>
-                          </TableCell>
-                          <TableCell className="max-w-[200px] truncate">{doc.title}</TableCell>
-                          <TableCell>{getStatusBadge(doc.status)}</TableCell>
-                          <TableCell>{formatDate(doc.advice_date)}</TableCell>
-                          <TableCell>
-                            {doc.review_due_date && (
-                              <span className={new Date(doc.review_due_date) < new Date() ? 'text-red-600 font-bold' : ''}>
-                                {formatDate(doc.review_due_date)}
-                              </span>
-                            )}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex justify-end gap-1">
-                              <Button size="sm" variant="ghost" onClick={() => { setSelectedDoc(doc); }}>
-                                <Eye className="h-3 w-3" />
-                              </Button>
-                              {doc.status === 'draft' && (
-                                <Button size="sm" variant="ghost" onClick={() => updateStatus(doc.document_id, 'pending_review')}>
-                                  Submit
-                                </Button>
-                              )}
-                              {doc.status === 'reviewed' && (
-                                <Button size="sm" variant="ghost" onClick={() => updateStatus(doc.document_id, 'pending_signature')}>
-                                  Present
-                                </Button>
-                              )}
-                              {doc.status === 'pending_signature' && (
-                                <Button size="sm" variant="ghost" onClick={() => updateStatus(doc.document_id, 'signed')}>
-                                  Sign
-                                </Button>
-                              )}
-                              {doc.status === 'signed' && (
-                                <Button size="sm" variant="ghost" onClick={() => updateStatus(doc.document_id, 'implemented')}>
-                                  Implement
-                                </Button>
-                              )}
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                      {documents.length === 0 && (
-                        <TableRow>
-                          <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                            No documents found. Create a new SOA or ROA to get started.
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </ScrollArea>
-              </CardContent>
-            </Card>
-          </TabsContent>
+          {/* ========== DASHBOARD TAB ========== */}
+          <TabsContent value="dashboard" className="space-y-6">
+            {/* Key Metrics */}
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              <Card className="bg-slate-50">
+                <CardContent className="p-4 text-center">
+                  <p className="text-sm text-muted-foreground">Total Files</p>
+                  <p className="text-3xl font-bold">{dashboardMetrics.totalFiles}</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-green-50 border-green-200">
+                <CardContent className="p-4 text-center">
+                  <p className="text-sm text-muted-foreground">Compliant</p>
+                  <p className="text-3xl font-bold text-green-600">{dashboardMetrics.compliant}</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-amber-50 border-amber-200">
+                <CardContent className="p-4 text-center">
+                  <p className="text-sm text-muted-foreground">Minor Issues</p>
+                  <p className="text-3xl font-bold text-amber-600">{dashboardMetrics.minorIssues}</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-red-50 border-red-200">
+                <CardContent className="p-4 text-center">
+                  <p className="text-sm text-muted-foreground">Major Issues</p>
+                  <p className="text-3xl font-bold text-red-600">{dashboardMetrics.majorIssues}</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-blue-50 border-blue-200">
+                <CardContent className="p-4 text-center">
+                  <p className="text-sm text-muted-foreground">Pending Review</p>
+                  <p className="text-3xl font-bold text-blue-600">{dashboardMetrics.pendingReview}</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-purple-50 border-purple-200">
+                <CardContent className="p-4 text-center">
+                  <p className="text-sm text-muted-foreground">Avg Score</p>
+                  <p className="text-3xl font-bold text-purple-600">{dashboardMetrics.avgScore}%</p>
+                </CardContent>
+              </Card>
+            </div>
 
-          {/* Pending Review Tab */}
-          <TabsContent value="pending" className="space-y-4">
+            <div className="grid lg:grid-cols-2 gap-6">
+              {/* Status Distribution */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Compliance Status Distribution</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[250px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RechartsPie>
+                        <Pie
+                          data={statusDistribution}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={100}
+                          paddingAngle={2}
+                          dataKey="value"
+                        >
+                          {statusDistribution.map((entry, idx) => (
+                            <Cell key={`cell-${idx}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                        <Legend />
+                      </RechartsPie>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Score Trend */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Compliance Score Trend</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[250px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={scoreHistory}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="month" />
+                        <YAxis domain={[70, 100]} />
+                        <Tooltip />
+                        <Bar dataKey="score" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Recent Files Requiring Attention */}
             <Card>
               <CardHeader>
-                <CardTitle>Documents Awaiting Compliance Review</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-amber-500" />
+                  Files Requiring Attention
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                {pendingReviews.length > 0 ? (
-                  <div className="space-y-4">
-                    {pendingReviews.map((doc) => (
-                      <div key={doc.document_id} className="p-4 border rounded-lg">
-                        <div className="flex items-center justify-between">
+                <div className="space-y-3">
+                  {adviceFiles.filter(f => f.status !== 'compliant' && f.status !== 'pending_review').map((file) => {
+                    const StatusIcon = complianceStatuses[file.status].icon;
+                    return (
+                      <div 
+                        key={file.id}
+                        className={`p-4 rounded-lg border-2 ${
+                          file.status === 'major_issues' ? 'border-red-200 bg-red-50' : 'border-amber-200 bg-amber-50'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between">
                           <div>
-                            <div className="flex items-center gap-2">
-                              <Badge className={DOCUMENT_TYPES[doc.document_type]?.color}>{doc.document_type?.toUpperCase()}</Badge>
-                              <span className="font-medium">{doc.title}</span>
+                            <div className="flex items-center gap-2 mb-1">
+                              <StatusIcon className={`h-4 w-4 ${file.status === 'major_issues' ? 'text-red-600' : 'text-amber-600'}`} />
+                              <span className="font-semibold">{file.id}</span>
+                              <Badge className={complianceStatuses[file.status].color}>
+                                {complianceStatuses[file.status].text}
+                              </Badge>
                             </div>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              Client: {doc.client_name} | Adviser: {doc.adviser_name} | Submitted: {formatDate(doc.created_at)}
-                            </p>
+                            <p className="text-sm">{file.client} • {file.type}</p>
+                            <p className="text-xs text-muted-foreground">Adviser: {file.adviser} • Date: {file.date}</p>
+                            {file.findings.length > 0 && (
+                              <div className="mt-2 space-y-1">
+                                {file.findings.map((finding, idx) => (
+                                  <p key={idx} className="text-sm text-red-700">• {finding}</p>
+                                ))}
+                              </div>
+                            )}
                           </div>
-                          <div className="flex gap-2">
-                            <Button size="sm" variant="outline" onClick={() => { setSelectedDoc(doc); setShowReviewDialog(true); }}>
-                              <ClipboardCheck className="h-4 w-4 mr-1" /> Review
+                          <div className="text-right">
+                            <p className="text-2xl font-bold">{file.score || '--'}%</p>
+                            <Button size="sm" variant="outline" className="mt-2">
+                              Review <ChevronRight className="h-4 w-4 ml-1" />
                             </Button>
                           </div>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <CheckCircle2 className="h-12 w-12 mx-auto mb-4 text-green-500" />
-                    <p>No documents pending review</p>
-                  </div>
-                )}
+                    );
+                  })}
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
 
-          {/* Reviews Due Tab */}
-          <TabsContent value="reviews" className="space-y-4">
-            {reviewsDue.overdue_reviews?.length > 0 && (
-              <Card className="border-red-200 bg-red-50">
+          {/* ========== ADVICE FILES TAB ========== */}
+          <TabsContent value="files" className="space-y-6">
+            <div className="flex items-center gap-4">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input 
+                  placeholder="Search by client, file ID, or adviser..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="compliant">Compliant</SelectItem>
+                  <SelectItem value="minor_issues">Minor Issues</SelectItem>
+                  <SelectItem value="major_issues">Major Issues</SelectItem>
+                  <SelectItem value="pending_review">Pending Review</SelectItem>
+                </SelectContent>
+              </Select>
+              <Badge variant="outline">{filteredFiles.length} files</Badge>
+            </div>
+
+            <Card>
+              <CardContent className="p-0">
+                <div className="divide-y">
+                  {filteredFiles.map((file) => {
+                    const StatusIcon = complianceStatuses[file.status].icon;
+                    return (
+                      <div 
+                        key={file.id}
+                        className="p-4 hover:bg-muted/30 cursor-pointer transition-colors"
+                        onClick={() => setSelectedFile(file)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                              file.status === 'compliant' ? 'bg-green-100' :
+                              file.status === 'minor_issues' ? 'bg-amber-100' :
+                              file.status === 'major_issues' ? 'bg-red-100' :
+                              'bg-blue-100'
+                            }`}>
+                              <StatusIcon className={`h-5 w-5 ${
+                                file.status === 'compliant' ? 'text-green-600' :
+                                file.status === 'minor_issues' ? 'text-amber-600' :
+                                file.status === 'major_issues' ? 'text-red-600' :
+                                'text-blue-600'
+                              }`} />
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-semibold">{file.id}</span>
+                                <Badge variant="outline" className="text-xs">{file.type}</Badge>
+                                <Badge className={complianceStatuses[file.status].color}>
+                                  {complianceStatuses[file.status].text}
+                                </Badge>
+                              </div>
+                              <p className="text-sm text-muted-foreground">{file.client}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {file.adviser} • {file.date} • {file.riskProfile}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-2xl font-bold">{file.score || '--'}%</p>
+                            <p className="text-xs text-muted-foreground">
+                              ${(file.investmentAmount / 1000).toFixed(0)}k investment
+                            </p>
+                          </div>
+                        </div>
+                        {file.findings.length > 0 && (
+                          <div className="mt-2 ml-14 flex flex-wrap gap-2">
+                            {file.findings.slice(0, 2).map((finding, idx) => (
+                              <Badge key={idx} variant="destructive" className="text-xs">
+                                {finding}
+                              </Badge>
+                            ))}
+                            {file.findings.length > 2 && (
+                              <Badge variant="secondary" className="text-xs">
+                                +{file.findings.length - 2} more
+                              </Badge>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* ========== ASIC FRAMEWORK TAB ========== */}
+          <TabsContent value="asic" className="space-y-6">
+            <Alert>
+              <Scale className="h-4 w-4" />
+              <AlertDescription>
+                This framework aligns with ASIC Regulatory Guide 175 (Licensing: Financial product advisers) 
+                and RG 244 (Giving information, general advice and scaled advice).
+              </AlertDescription>
+            </Alert>
+
+            {asicRequirements.map((category) => (
+              <Card key={category.category}>
                 <CardHeader>
-                  <CardTitle className="text-red-700 flex items-center gap-2">
-                    <AlertOctagon className="h-5 w-5" /> Overdue Reviews ({reviewsDue.overdue_reviews.length})
+                  <CardTitle className="flex items-center justify-between">
+                    <span>{category.category}</span>
+                    <Badge className={
+                      category.requirements.every(r => r.status === 'compliant') ? 'bg-green-500' :
+                      category.requirements.some(r => r.status === 'major') ? 'bg-red-500' :
+                      'bg-amber-500'
+                    }>
+                      {category.requirements.filter(r => r.status === 'compliant').length}/{category.requirements.length} Compliant
+                    </Badge>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-2">
-                    {reviewsDue.overdue_reviews.map((doc) => (
-                      <div key={doc.document_id} className="p-3 bg-white rounded border border-red-200">
-                        <div className="flex justify-between items-center">
+                  <div className="space-y-3">
+                    {category.requirements.map((req) => (
+                      <div key={req.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          {req.status === 'compliant' ? (
+                            <CheckCircle className="h-5 w-5 text-green-500" />
+                          ) : req.status === 'minor' ? (
+                            <AlertTriangle className="h-5 w-5 text-amber-500" />
+                          ) : (
+                            <XCircle className="h-5 w-5 text-red-500" />
+                          )}
                           <div>
-                            <span className="font-medium">{doc.client_name}</span>
-                            <span className="text-sm text-muted-foreground ml-2">{doc.title}</span>
+                            <p className="font-medium text-sm">{req.name}</p>
+                            {req.notes && (
+                              <p className="text-xs text-muted-foreground">{req.notes}</p>
+                            )}
                           </div>
-                          <Badge variant="destructive">Due: {formatDate(doc.review_due_date)}</Badge>
                         </div>
+                        <Badge variant={req.status === 'compliant' ? 'secondary' : 'destructive'}>
+                          {req.id}
+                        </Badge>
                       </div>
                     ))}
                   </div>
                 </CardContent>
               </Card>
-            )}
-            
+            ))}
+          </TabsContent>
+
+          {/* ========== REPORTS TAB ========== */}
+          <TabsContent value="reports" className="space-y-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[
+                { title: 'Monthly Compliance Summary', description: 'Overview of all advice files reviewed', icon: BarChart3 },
+                { title: 'Adviser Performance Report', description: 'Individual adviser compliance scores', icon: Users },
+                { title: 'Issue Resolution Tracker', description: 'Status of identified issues', icon: Target },
+                { title: 'ASIC Alignment Report', description: 'Regulatory compliance checklist', icon: Scale },
+                { title: 'Risk Assessment Report', description: 'Client risk profile alignment', icon: AlertTriangle },
+                { title: 'Audit Trail Report', description: 'Document changes and reviews', icon: FileCheck },
+              ].map((report, idx) => (
+                <Card key={idx} className="hover:shadow-md transition-shadow cursor-pointer">
+                  <CardContent className="p-6">
+                    <report.icon className="h-10 w-10 text-blue-600 mb-4" />
+                    <h3 className="font-semibold mb-2">{report.title}</h3>
+                    <p className="text-sm text-muted-foreground mb-4">{report.description}</p>
+                    <Button variant="outline" className="w-full">
+                      <Download className="h-4 w-4 mr-2" />
+                      Generate Report
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* ========== ESCALATION TAB ========== */}
+          <TabsContent value="escalation" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Reviews Due Within 30 Days ({reviewsDue.reviews_due?.length || 0})</CardTitle>
+                <CardTitle>Escalation Pathways</CardTitle>
+                <CardDescription>
+                  Structured process for addressing compliance concerns based on severity
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                {reviewsDue.reviews_due?.length > 0 ? (
-                  <div className="space-y-2">
-                    {reviewsDue.reviews_due.map((doc) => (
-                      <div key={doc.document_id} className="p-3 border rounded">
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <span className="font-medium">{doc.client_name}</span>
-                            <span className="text-sm text-muted-foreground ml-2">{doc.title}</span>
+                <div className="space-y-4">
+                  {escalationLevels.map((level) => (
+                    <div 
+                      key={level.level}
+                      className={`p-4 rounded-lg border-2 ${
+                        level.level === 1 ? 'border-green-200 bg-green-50' :
+                        level.level === 2 ? 'border-amber-200 bg-amber-50' :
+                        level.level === 3 ? 'border-orange-200 bg-orange-50' :
+                        'border-red-200 bg-red-50'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold ${
+                            level.level === 1 ? 'bg-green-500' :
+                            level.level === 2 ? 'bg-amber-500' :
+                            level.level === 3 ? 'bg-orange-500' :
+                            'bg-red-500'
+                          }`}>
+                            L{level.level}
                           </div>
-                          <Badge variant="outline">{formatDate(doc.review_due_date)}</Badge>
+                          <div>
+                            <h3 className="font-semibold">{level.name}</h3>
+                            <p className="text-sm text-muted-foreground">{level.description}</p>
+                          </div>
+                        </div>
+                        <Badge variant="outline">
+                          <Clock className="h-3 w-3 mr-1" />
+                          {level.timeframe}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Active Escalations</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {adviceFiles.filter(f => f.status === 'major_issues').length === 0 ? (
+                  <div className="text-center py-8">
+                    <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
+                    <p className="text-muted-foreground">No active escalations at this time</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {adviceFiles.filter(f => f.status === 'major_issues').map((file) => (
+                      <div key={file.id} className="p-4 bg-red-50 border-2 border-red-200 rounded-lg">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <Badge className="bg-red-500">Level 3</Badge>
+                              <span className="font-semibold">{file.id}</span>
+                            </div>
+                            <p className="text-sm">{file.client}</p>
+                            <p className="text-xs text-muted-foreground">Escalated for: {file.findings.join(', ')}</p>
+                          </div>
+                          <Button variant="destructive" size="sm">
+                            Take Action
+                          </Button>
                         </div>
                       </div>
                     ))}
                   </div>
-                ) : (
-                  <p className="text-center py-4 text-muted-foreground">No reviews due in the next 30 days</p>
                 )}
               </CardContent>
             </Card>
           </TabsContent>
-
-          {/* Workflow Tab */}
-          <TabsContent value="workflow" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>SOA/ROA Workflow</CardTitle>
-                <CardDescription>Standard compliance workflow for advice documents</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between p-4">
-                  {['Draft', 'Pending Review', 'Reviewed', 'Pending Signature', 'Signed', 'Implemented'].map((step, i) => (
-                    <React.Fragment key={step}>
-                      <div className="flex flex-col items-center">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${i < 3 ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>
-                          {i + 1}
-                        </div>
-                        <span className="text-xs mt-2 text-center max-w-[80px]">{step}</span>
-                      </div>
-                      {i < 5 && <div className="flex-1 h-1 bg-gray-200 mx-2" />}
-                    </React.Fragment>
-                  ))}
-                </div>
-                <Separator className="my-4" />
-                <div className="grid grid-cols-3 gap-4 text-sm">
-                  <div>
-                    <h4 className="font-medium mb-2">Draft</h4>
-                    <p className="text-muted-foreground">Adviser prepares the advice document</p>
-                  </div>
-                  <div>
-                    <h4 className="font-medium mb-2">Compliance Review</h4>
-                    <p className="text-muted-foreground">Document reviewed for compliance requirements</p>
-                  </div>
-                  <div>
-                    <h4 className="font-medium mb-2">Implementation</h4>
-                    <p className="text-muted-foreground">Advice presented, signed, and implemented</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
         </Tabs>
-
-        {/* Review Dialog */}
-        <Dialog open={showReviewDialog} onOpenChange={setShowReviewDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Compliance Review</DialogTitle>
-              <DialogDescription>Review document: {selectedDoc?.title}</DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="p-4 bg-muted rounded">
-                <p><strong>Client:</strong> {selectedDoc?.client_name}</p>
-                <p><strong>Type:</strong> {selectedDoc?.document_type?.toUpperCase()}</p>
-                <p><strong>Adviser:</strong> {selectedDoc?.adviser_name}</p>
-              </div>
-              <div>
-                <Label>Review Outcome</Label>
-                <Select>
-                  <SelectTrigger><SelectValue placeholder="Select outcome" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="approved">Approved</SelectItem>
-                    <SelectItem value="approved_with_conditions">Approved with Conditions</SelectItem>
-                    <SelectItem value="requires_changes">Requires Changes</SelectItem>
-                    <SelectItem value="rejected">Rejected</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>Review Notes</Label>
-                <Textarea placeholder="Enter review notes..." />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowReviewDialog(false)}>Cancel</Button>
-              <Button onClick={() => submitReview(selectedDoc?.document_id, 'approved', 'Review completed')}>Submit Review</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
       </div>
     </Layout>
   );
-}
+};
+
+export default AdviserComplianceDashboard;

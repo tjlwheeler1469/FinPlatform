@@ -839,7 +839,7 @@ const FamilyWealthDashboard = () => {
                       <BarChart data={memberWealth} layout="vertical">
                         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                         <XAxis type="number" tickFormatter={(v) => `$${(v/1000).toFixed(0)}k`} />
-                        <YAxis dataKey="name" type="category" width={80} />
+                        <YAxis dataKey="name" type="category" width={120} tick={{ fontSize: 12 }} />
                         <Tooltip formatter={(v) => formatCurrency(v)} />
                         <Legend />
                         <Bar dataKey="super" name="Super" stackId="a" fill="#D4A84C" />

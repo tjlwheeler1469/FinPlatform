@@ -101,6 +101,9 @@ const DecisionCenter = lazy(() => import("@/pages/DecisionCenter"));
 const ClientIntelligenceFeed = lazy(() => import("@/pages/ClientIntelligenceFeed"));
 const ClientPortal = lazy(() => import("@/pages/ClientPortal"));
 
+// Buffett-Style Trading Engine
+const BuffettTradingEngine = lazy(() => import("@/pages/BuffettTradingEngine"));
+
 // Super App Features - Meeting Prep, Research, Compliance, Wealth
 const MeetingPrep = lazy(() => import("@/pages/MeetingPrep"));
 const StockResearch = lazy(() => import("@/pages/StockResearch"));
@@ -969,6 +972,7 @@ const AppRouter = () => {
       <Route path="/holdings-performance" element={<HoldingsPerformance />} />
       <Route path="/calculation-methodology" element={<CalculationMethodology />} />
       <Route path="/sg-calculator" element={<SuperannuationGuarantee />} />
+      <Route path="/super-pension" element={<SuperannuationGuarantee />} />
       <Route path="/rental-yield-optimizer" element={<RentalYieldOptimizer />} />
       <Route path="/export" element={<ExportData />} />
       <Route path="/tax-analysis-sync" element={<TaxAnalysisSync />} />
@@ -1062,6 +1066,9 @@ const AppRouter = () => {
       
       {/* Stock Trading with CGT */}
       <Route path="/stock-trading" element={<StockTrading />} />
+      
+      {/* Buffett-Style Value Trading Engine */}
+      <Route path="/buffett-trading" element={<BuffettTradingEngine />} />
       
       {/* Macro Dashboard - Global Markets */}
       <Route path="/macro-dashboard" element={<MacroDashboard />} />

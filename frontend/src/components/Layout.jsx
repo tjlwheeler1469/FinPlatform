@@ -248,6 +248,7 @@ const clientContextNav = [
     icon: TrendingUp,
     items: [
       { path: "/stock-trading", label: "Shares & ETFs", icon: TrendingUp, title: "Shares & Trading" },
+      { path: "/buffett-trading", label: "Buffett Engine", icon: BookOpen, title: "Buffett-Style Trading", badge: "NEW" },
       { path: "/bonds-trading", label: "Bonds", icon: Landmark, title: "Bonds & Fixed Income" },
       { path: "/hybrids-trading", label: "Hybrids", icon: Coins, title: "Hybrid Securities" },
       { path: "/property-portfolio", label: "Property", icon: Building2, title: "Property Portfolio" },
@@ -265,7 +266,7 @@ const clientContextNav = [
       { path: "/document-vault", label: "Vault", icon: FolderOpen, title: "Document Vault" },
       { path: "/meeting-notes", label: "Meeting Notes", icon: Video, title: "Meeting Notes", badge: "NEW" },
       { path: "/reports", label: "Reports", icon: FileText, title: "Reports" },
-      { path: "/adviser-compliance", label: "SOA/ROA", icon: Shield, title: "SOA/ROA Compliance" },
+      { path: "/adviser-compliance", label: "Compliance", icon: Shield, title: "Adviser Compliance Dashboard" },
     ]
   },
 ];

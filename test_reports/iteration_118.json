@@ -1,0 +1,96 @@
+{
+  "summary": "Completed frontend testing for iteration 118 features: /super-pension route, Family Wealth Dashboard chart names, Buffett Trading Engine, and Adviser Compliance Dashboard. All features working correctly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Family Wealth Dashboard - Member Chart",
+        "issues": ["Michael Wheeler name slightly wrapped on Y-axis due to space constraints, but still readable"]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_118.json"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Buffett Engine navigation: The Buffett Engine link is in clientContextNav (shown when adviser selects a client) but NOT in personalNavGroups. This is by design - advisers see it when viewing client data. Consider adding to personalNavGroups if users should access it in Personal Mode."
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "N/A (frontend only testing)",
+    "frontend": "100% (all features verified)"
+  },
+  "test_credentials": "",
+  "seed_data_creation": "",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All new features working: /super-pension loads SG Calculator, Family Wealth chart shows full names (James Wheeler, Sarah Wheeler, Emily Wheeler, Michael Wheeler), Buffett Trading Engine has all 5 tabs and macro overlay, Adviser Compliance Dashboard has all 5 tabs and metrics.",
+  "features_tested": {
+    "super_pension_route": {
+      "status": "PASS",
+      "route": "/super-pension",
+      "details": "Loads Superannuation Guarantee Calculator without runtime error. Shows SG Rate 2024-25: 11.5%, Total Annual SG calculation, employee management, and compliance disclaimers."
+    },
+    "family_wealth_chart_names": {
+      "status": "PASS",
+      "route": "/family-wealth",
+      "details": "Y-axis width increased to 120px. Full member names displayed: James Wheeler, Sarah Wheeler, Emily Wheeler, Michael Wheeler. No truncation."
+    },
+    "buffett_trading_engine": {
+      "status": "PASS",
+      "route": "/buffett-trading",
+      "details": "Buffett-Style Investment Engine loads with all features",
+      "tabs": ["Daily Ideas", "Valuations", "Sectors", "Backtest", "Optimizer"],
+      "macro_overlay": {
+        "rba_rate": "4.35%",
+        "aud_usd": "0.672",
+        "iron_ore": "$118.5",
+        "cycle": "late expansion"
+      },
+      "daily_ideas": [
+        {"symbol": "FMG.AX", "action": "BUY", "pe": "7.2 vs avg 8.5", "upside": "+18%", "confidence": "85%"},
+        {"symbol": "NAB.AX", "action": "BUY", "pe": "14.1 vs avg 13.2", "upside": "+12%", "confidence": "78%"},
+        {"symbol": "CSL.AX", "action": "HOLD", "pe": "42.1 vs avg 38.5", "upside": "+5%", "confidence": "55%"},
+        {"symbol": "WES.AX", "action": "REDUCE", "pe": "26.5 vs avg 22.8", "upside": "-8%", "confidence": "72%"}
+      ],
+      "sector_rankings": ["Banks (78)", "Financials (75)", "Mining (72)", "Retail (60)", "Healthcare (58)", "Telco (58)"]
+    },
+    "adviser_compliance_dashboard": {
+      "status": "PASS",
+      "route": "/adviser-compliance",
+      "details": "Adviser Compliance Dashboard loads with all features",
+      "tabs": ["Dashboard", "Advice Files", "ASIC Framework", "Reports", "Escalation"],
+      "metrics": {
+        "total_files": 48,
+        "compliant": 35,
+        "minor_issues": 5,
+        "major_issues": 2,
+        "pending_review": 6,
+        "avg_score": "87%"
+      },
+      "files_requiring_attention": [
+        {"id": "SOA-2026-002", "status": "Minor Issues", "score": "78%", "findings": ["Risk profile documentation incomplete", "Fee disclosure needs clarification"]},
+        {"id": "ROA-2026-015", "status": "Major Issues", "score": "52%", "findings": ["Asset allocation exceeds risk profile tolerance", "Missing SOA update required"]}
+      ],
+      "compliance_score_trend": "Chart showing Oct-Mar trend (82→85→84→88→86→87)"
+    },
+    "navigation_buffett_engine": {
+      "status": "PASS",
+      "details": "Buffett Engine is in clientContextNav under Investments section. Appears when adviser selects a client. Route /buffett-trading is accessible directly."
+    }
+  },
+  "mocked_apis": {
+    "has_mocked_apis": true,
+    "mocked_apis_list": [
+      "BuffettTradingEngine - uses local mock data for stock opportunities, PE bands, sector scores, backtest results",
+      "AdviserComplianceDashboard - uses local mock data for advice files, ASIC requirements, escalation levels"
+    ],
+    "notes": "Both new components use local mock data for demonstration purposes as specified in the review request."
+  }
+}
