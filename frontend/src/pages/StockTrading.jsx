@@ -264,6 +264,15 @@ const StockTrading = () => {
       
       if (holdingsRes.ok) {
         const data = await holdingsRes.json();
+        // Normalize field names from API to what the UI expects
+        if (data.holdings) {
+          data.holdings = data.holdings.map(h => ({
+            ...h,
+            average_cost_per_unit: h.avg_cost ?? h.average_cost_per_unit,
+            market_value: h.current_value ?? h.market_value,
+            cgt_discount_eligible: h.eligible_for_cgt_discount ?? h.cgt_discount_eligible,
+          }));
+        }
         setHoldings(data);
       }
       if (cgtRes.ok) {

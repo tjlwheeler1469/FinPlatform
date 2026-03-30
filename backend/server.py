@@ -719,6 +719,14 @@ def include_all_routes():
     except ImportError as e:
         logger.error(f"Failed to load hybrid engine routes: {e}")
 
+    # VOICE ASSISTANT - GPT-powered financial planning assistant
+    try:
+        from routes.voice_assistant import router as voice_assistant_router
+        app.include_router(voice_assistant_router, prefix="/api")
+        logger.info("VOICE ASSISTANT loaded: Whisper STT + GPT financial planning")
+    except ImportError as e:
+        logger.error(f"Failed to load voice assistant routes: {e}")
+
 # Include all routes
 include_all_routes()
 

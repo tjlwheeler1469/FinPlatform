@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { XplanSyncProvider, XplanSyncIndicator } from "@/components/XplanSyncNotification";
+import { LanguageProvider } from "@/components/LanguageContext";
 
 // Loading component for lazy loaded pages
 const PageLoader = () => (
@@ -1177,20 +1178,22 @@ function App() {
   return (
     <div className="App min-h-screen bg-background">
       <BrowserRouter>
-        <AuthProvider>
-          <PortfolioProvider>
-            <NotificationsProvider>
-              <XplanSyncProvider>
-                <ComplianceModal />
-                <Suspense fallback={<PageLoader />}>
-                  <AppRouter />
-                </Suspense>
-                <Toaster position="top-right" richColors />
-                <XplanSyncIndicator />
-              </XplanSyncProvider>
-            </NotificationsProvider>
-          </PortfolioProvider>
-        </AuthProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <PortfolioProvider>
+              <NotificationsProvider>
+                <XplanSyncProvider>
+                  <ComplianceModal />
+                  <Suspense fallback={<PageLoader />}>
+                    <AppRouter />
+                  </Suspense>
+                  <Toaster position="top-right" richColors />
+                  <XplanSyncIndicator />
+                </XplanSyncProvider>
+              </NotificationsProvider>
+            </PortfolioProvider>
+          </AuthProvider>
+        </LanguageProvider>
       </BrowserRouter>
     </div>
   );

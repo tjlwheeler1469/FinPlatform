@@ -76,8 +76,12 @@ import {
   Lock,
   Unlock,
   Presentation,
-  Calendar
+  Calendar,
+  Mic,
+  Globe
 } from "lucide-react";
+import VoiceAssistant from "@/components/VoiceAssistant";
+import { useLanguage, LANGUAGE_LABELS } from "@/components/LanguageContext";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { usePortfolio } from "@/App";
@@ -285,6 +289,27 @@ const mobileBottomNav = [
   { path: "/loan-calculator", label: "Calc", icon: Calculator },
 ];
 
+const LanguageSelector = () => {
+  const { language, changeLanguage } = useLanguage();
+  return (
+    <div className="flex items-center gap-2">
+      <Globe className="h-4 w-4 text-white/60 flex-shrink-0" />
+      <select
+        value={language}
+        onChange={(e) => changeLanguage(e.target.value)}
+        className="flex-1 bg-white/10 border-0 text-white/80 text-xs rounded px-2 py-1.5 cursor-pointer focus:outline-none focus:ring-1 focus:ring-white/30"
+        data-testid="language-selector"
+      >
+        {Object.entries(LANGUAGE_LABELS).map(([code, label]) => (
+          <option key={code} value={code} className="bg-[#1a2744] text-white">
+            {label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+};
+
 const Layout = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -348,6 +373,7 @@ const Layout = ({ children }) => {
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const [voiceOpen, setVoiceOpen] = useState(false);
   
   // Ref for sidebar scroll position preservation
   const sidebarNavRef = useRef(null);
@@ -754,6 +780,13 @@ const Layout = ({ children }) => {
           )})}
         </nav>
 
+        {/* Language Selector */}
+        {!sidebarCollapsed && (
+          <div className="px-3 py-2 border-t border-white/10">
+            <LanguageSelector />
+          </div>
+        )}
+
         {/* Collapse Toggle */}
         <button
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
@@ -973,6 +1006,16 @@ const Layout = ({ children }) => {
         open={commandPaletteOpen} 
         onOpenChange={setCommandPaletteOpen} 
       />
+
+      {/* Voice Assistant FAB */}
+      <button
+        onClick={() => setVoiceOpen(true)}
+        className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg hover:shadow-xl transition-all flex items-center justify-center group"
+        data-testid="voice-assistant-fab"
+      >
+        <Mic className="h-6 w-6 group-hover:scale-110 transition-transform" />
+      </button>
+      <VoiceAssistant isOpen={voiceOpen} onClose={() => setVoiceOpen(false)} />
     </div>
   );
 };
