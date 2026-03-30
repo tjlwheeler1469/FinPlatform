@@ -44,7 +44,7 @@
     "frontend": "95% (all features working, minor data source inconsistency in CRM Command Center)"
   },
   "test_credentials": {
-    "api_base_url": "https://debug-consolidate.preview.emergentagent.com"
+    "api_base_url": "https://smart-insights-dash.preview.emergentagent.com"
   },
   "seed_data_creation": "None needed - backend has 8 hardcoded demo clients",
   "retest_needed": false,

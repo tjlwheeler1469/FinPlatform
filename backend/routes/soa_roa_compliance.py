@@ -130,6 +130,271 @@ def calculate_review_due_date(advice_date: str, advice_type: str) -> str:
 
 # ============== ENDPOINTS ==============
 
+@router.get("/dashboard")
+async def get_compliance_dashboard():
+    """Get compliance dashboard with metrics and all documents"""
+    db = await get_db()
+    
+    # Get all documents
+    docs = await db.compliance_documents.find(
+        {},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(length=500)
+    
+    total = len(docs)
+    
+    # Map statuses to dashboard categories
+    status_map = {
+        "reviewed": "compliant",
+        "signed": "compliant",
+        "implemented": "compliant",
+        "draft": "minor_issues",
+        "pending_review": "pending_review",
+        "pending_signature": "pending_review",
+        "superseded": "compliant",
+        "withdrawn": "compliant",
+    }
+    
+    compliant = 0
+    minor_issues = 0
+    major_issues = 0
+    pending_review = 0
+    scores = []
+    
+    for doc in docs:
+        status = doc.get("status", "draft")
+        review_outcome = doc.get("review_outcome")
+        score = doc.get("compliance_score")
+        
+        if score is not None:
+            scores.append(score)
+        
+        if review_outcome == "rejected" or review_outcome == "requires_changes":
+            major_issues += 1
+        elif review_outcome == "approved_with_conditions":
+            minor_issues += 1
+        elif status in ["reviewed", "signed", "implemented"] and review_outcome == "approved":
+            compliant += 1
+        elif status == "pending_review" or status == "pending_signature":
+            pending_review += 1
+        elif status == "draft":
+            minor_issues += 1
+        else:
+            compliant += 1
+    
+    avg_score = round(sum(scores) / len(scores)) if scores else 0
+    
+    now = datetime.now(timezone.utc).isoformat()
+    overdue = await db.compliance_documents.count_documents({
+        "review_due_date": {"$lt": now},
+        "status": {"$nin": ["superseded", "withdrawn"]}
+    })
+    
+    # Build advice files list for frontend
+    advice_files = []
+    for doc in docs:
+        status = doc.get("status", "draft")
+        review_outcome = doc.get("review_outcome")
+        
+        if review_outcome == "rejected" or review_outcome == "requires_changes":
+            display_status = "major_issues"
+        elif review_outcome == "approved_with_conditions":
+            display_status = "minor_issues"
+        elif status in ["reviewed", "signed", "implemented"]:
+            display_status = "compliant"
+        elif status in ["pending_review", "pending_signature"]:
+            display_status = "pending_review"
+        else:
+            display_status = "minor_issues"
+        
+        doc_type_map = {
+            "soa": "Statement of Advice",
+            "roa": "Record of Advice",
+            "soa_supplementary": "SOA Supplementary",
+            "fsg": "Financial Services Guide",
+            "ips": "Investment Policy Statement",
+        }
+        
+        advice_files.append({
+            "id": doc.get("document_id", ""),
+            "client": doc.get("client_name", ""),
+            "type": doc_type_map.get(doc.get("document_type", ""), doc.get("document_type", "")),
+            "date": (doc.get("advice_date") or doc.get("created_at", ""))[:10],
+            "adviser": doc.get("adviser_name", ""),
+            "status": display_status,
+            "riskProfile": doc.get("advice_areas", ["General"])[0] if doc.get("advice_areas") else "General",
+            "investmentAmount": doc.get("advice_fee", 0) * 100 or 250000,
+            "score": doc.get("compliance_score"),
+            "findings": doc.get("review_conditions", []),
+            "nextReview": (doc.get("review_due_date") or "")[:10],
+        })
+    
+    return {
+        "metrics": {
+            "totalFiles": total,
+            "reviewed": compliant + minor_issues + major_issues,
+            "compliant": compliant,
+            "minorIssues": minor_issues,
+            "majorIssues": major_issues,
+            "pendingReview": pending_review,
+            "avgScore": avg_score,
+            "overdue": overdue,
+        },
+        "adviceFiles": advice_files,
+        "timestamp": now
+    }
+
+
+@router.post("/seed-demo")
+async def seed_demo_compliance_data():
+    """Seed demo compliance documents for testing"""
+    db = await get_db()
+    
+    existing = await db.compliance_documents.count_documents({})
+    if existing > 0:
+        return {"status": "already_seeded", "count": existing}
+    
+    now = datetime.now(timezone.utc)
+    
+    demo_docs = [
+        {
+            "document_id": "SOA-2026-001",
+            "client_id": "client_thompson",
+            "client_name": "David & Sarah Thompson",
+            "document_type": "soa",
+            "advice_type": "comprehensive",
+            "status": "implemented",
+            "title": "Comprehensive Retirement Strategy",
+            "advice_areas": ["Balanced"],
+            "adviser_id": "adv_mitchell",
+            "adviser_name": "James Mitchell",
+            "advice_date": "2026-03-15",
+            "review_due_date": "2027-03-15",
+            "review_outcome": "approved",
+            "reviewer_name": "Compliance Team",
+            "compliance_score": 95,
+            "review_conditions": [],
+            "advice_fee": 4500,
+            "risk_profile_confirmed": True,
+            "conflicts_disclosed": True,
+            "fees_disclosed": True,
+            "cooling_off_explained": True,
+            "created_at": (now - timedelta(days=15)).isoformat(),
+            "updated_at": now.isoformat(),
+            "status_history": [{"status": "implemented", "timestamp": now.isoformat(), "notes": "Fully implemented"}]
+        },
+        {
+            "document_id": "SOA-2026-002",
+            "client_id": "client_chen",
+            "client_name": "Michael Chen",
+            "document_type": "soa",
+            "advice_type": "personal",
+            "status": "reviewed",
+            "title": "Growth Investment Strategy",
+            "advice_areas": ["Growth"],
+            "adviser_id": "adv_williams",
+            "adviser_name": "Sarah Williams",
+            "advice_date": "2026-03-10",
+            "review_due_date": "2027-03-10",
+            "review_outcome": "approved_with_conditions",
+            "reviewer_name": "Compliance Team",
+            "compliance_score": 78,
+            "review_conditions": ["Risk profile documentation incomplete", "Fee disclosure needs clarification"],
+            "advice_fee": 2800,
+            "risk_profile_confirmed": True,
+            "conflicts_disclosed": True,
+            "fees_disclosed": False,
+            "cooling_off_explained": True,
+            "created_at": (now - timedelta(days=20)).isoformat(),
+            "updated_at": now.isoformat(),
+            "status_history": [{"status": "reviewed", "timestamp": now.isoformat(), "notes": "Approved with conditions"}]
+        },
+        {
+            "document_id": "ROA-2026-015",
+            "client_id": "client_smith",
+            "client_name": "Jennifer & Robert Smith",
+            "document_type": "roa",
+            "advice_type": "personal",
+            "status": "draft",
+            "title": "Conservative Portfolio Adjustment",
+            "advice_areas": ["Conservative"],
+            "adviser_id": "adv_mitchell",
+            "adviser_name": "James Mitchell",
+            "advice_date": "2026-03-08",
+            "review_due_date": "2026-04-08",
+            "review_outcome": "requires_changes",
+            "reviewer_name": "Compliance Team",
+            "compliance_score": 52,
+            "review_conditions": ["Asset allocation exceeds risk profile tolerance", "Missing SOA update required", "Client signature missing"],
+            "advice_fee": 1250,
+            "risk_profile_confirmed": False,
+            "conflicts_disclosed": True,
+            "fees_disclosed": True,
+            "cooling_off_explained": False,
+            "created_at": (now - timedelta(days=22)).isoformat(),
+            "updated_at": now.isoformat(),
+            "status_history": [{"status": "draft", "timestamp": now.isoformat(), "notes": "Requires changes"}]
+        },
+        {
+            "document_id": "SOA-2026-003",
+            "client_id": "client_williams",
+            "client_name": "Amanda Williams",
+            "document_type": "soa",
+            "advice_type": "comprehensive",
+            "status": "pending_review",
+            "title": "High Growth Investment Strategy",
+            "advice_areas": ["High Growth"],
+            "adviser_id": "adv_brown",
+            "adviser_name": "David Brown",
+            "advice_date": "2026-03-05",
+            "review_due_date": "2027-03-05",
+            "review_outcome": None,
+            "reviewer_name": None,
+            "compliance_score": None,
+            "review_conditions": [],
+            "advice_fee": 5200,
+            "risk_profile_confirmed": True,
+            "conflicts_disclosed": True,
+            "fees_disclosed": True,
+            "cooling_off_explained": True,
+            "created_at": (now - timedelta(days=25)).isoformat(),
+            "updated_at": now.isoformat(),
+            "status_history": [{"status": "pending_review", "timestamp": now.isoformat(), "notes": "Awaiting compliance review"}]
+        },
+        {
+            "document_id": "ROA-2026-016",
+            "client_id": "client_johnson",
+            "client_name": "Peter & Lisa Johnson",
+            "document_type": "roa",
+            "advice_type": "personal",
+            "status": "signed",
+            "title": "Balanced Portfolio Rebalance",
+            "advice_areas": ["Balanced"],
+            "adviser_id": "adv_williams",
+            "adviser_name": "Sarah Williams",
+            "advice_date": "2026-03-01",
+            "review_due_date": "2027-03-01",
+            "review_outcome": "approved",
+            "reviewer_name": "Compliance Team",
+            "compliance_score": 92,
+            "review_conditions": [],
+            "advice_fee": 1850,
+            "risk_profile_confirmed": True,
+            "conflicts_disclosed": True,
+            "fees_disclosed": True,
+            "cooling_off_explained": True,
+            "created_at": (now - timedelta(days=29)).isoformat(),
+            "updated_at": now.isoformat(),
+            "status_history": [{"status": "signed", "timestamp": now.isoformat(), "notes": "Client signed"}]
+        },
+    ]
+    
+    await db.compliance_documents.insert_many(demo_docs)
+    
+    return {"status": "seeded", "count": len(demo_docs)}
+
+
+
 @router.post("/document")
 async def create_compliance_document(doc: ComplianceDocument):
     """Create a new SOA/ROA compliance document"""

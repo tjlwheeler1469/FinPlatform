@@ -248,7 +248,6 @@ const clientContextNav = [
     icon: TrendingUp,
     items: [
       { path: "/stock-trading", label: "Shares & ETFs", icon: TrendingUp, title: "Shares & Trading" },
-      { path: "/buffett-trading", label: "Buffett Engine", icon: BookOpen, title: "Buffett-Style Trading", badge: "NEW" },
       { path: "/bonds-trading", label: "Bonds", icon: Landmark, title: "Bonds & Fixed Income" },
       { path: "/hybrids-trading", label: "Hybrids", icon: Coins, title: "Hybrid Securities" },
       { path: "/property-portfolio", label: "Property", icon: Building2, title: "Property Portfolio" },

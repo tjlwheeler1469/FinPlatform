@@ -33,7 +33,7 @@
     "frontend": "100% (all requested features working)"
   },
   "test_credentials": {
-    "api_base_url": "https://debug-consolidate.preview.emergentagent.com"
+    "api_base_url": "https://smart-insights-dash.preview.emergentagent.com"
   },
   "seed_data_creation": "None - using existing data",
   "retest_needed": false,

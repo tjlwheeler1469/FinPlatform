@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
+import { Progress } from "@/components/ui/progress";
 import { 
   TrendingUp, 
   TrendingDown,
@@ -34,9 +35,24 @@ import {
   ChevronRight,
   Eye,
   FileText,
-  Zap
+  Zap,
+  BookOpen,
+  Globe,
+  Lightbulb,
+  BarChart3,
+  PieChart,
+  History,
+  Target,
+  Activity,
+  Newspaper,
+  ArrowUp,
+  ArrowDown
 } from "lucide-react";
 import { toast } from "sonner";
+import {
+  ResponsiveContainer, ComposedChart, BarChart, Bar, XAxis, YAxis,
+  CartesianGrid, Tooltip, Legend
+} from 'recharts';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || "";
 
@@ -54,11 +70,115 @@ const formatPercent = (value) => {
   return `${prefix}${value.toFixed(2)}%`;
 };
 
+const formatTimeAgo = (dateStr) => {
+  try {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 60) return `${diffMins}m ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    const diffDays = Math.floor(diffHours / 24);
+    return `${diffDays}d ago`;
+  } catch {
+    return dateStr;
+  }
+};
+
+// ===================== BUFFETT ENGINE DATA =====================
+
+// Historical PE bands for major stocks (10-year data)
+const mockHistoricalPE = {
+  'CBA.AX': { current: 18.2, avg10Y: 15.5, low10Y: 11.2, high10Y: 22.5, sector: 'Banks', name: 'Commonwealth Bank' },
+  'BHP.AX': { current: 11.5, avg10Y: 14.2, low10Y: 8.1, high10Y: 21.3, sector: 'Mining', name: 'BHP Group' },
+  'CSL.AX': { current: 42.1, avg10Y: 38.5, low10Y: 28.4, high10Y: 55.2, sector: 'Healthcare', name: 'CSL Limited' },
+  'WBC.AX': { current: 12.8, avg10Y: 13.9, low10Y: 9.5, high10Y: 18.2, sector: 'Banks', name: 'Westpac' },
+  'NAB.AX': { current: 14.1, avg10Y: 13.2, low10Y: 9.8, high10Y: 17.6, sector: 'Banks', name: 'NAB' },
+  'ANZ.AX': { current: 11.9, avg10Y: 12.5, low10Y: 8.9, high10Y: 16.4, sector: 'Banks', name: 'ANZ' },
+  'RIO.AX': { current: 9.8, avg10Y: 12.8, low10Y: 6.5, high10Y: 19.8, sector: 'Mining', name: 'Rio Tinto' },
+  'FMG.AX': { current: 7.2, avg10Y: 8.5, low10Y: 4.2, high10Y: 14.5, sector: 'Mining', name: 'Fortescue' },
+  'WES.AX': { current: 26.5, avg10Y: 22.8, low10Y: 16.5, high10Y: 32.1, sector: 'Retail', name: 'Wesfarmers' },
+  'WOW.AX': { current: 24.8, avg10Y: 21.5, low10Y: 15.2, high10Y: 28.9, sector: 'Retail', name: 'Woolworths' },
+  'TLS.AX': { current: 22.5, avg10Y: 18.2, low10Y: 12.8, high10Y: 25.5, sector: 'Telco', name: 'Telstra' },
+  'MQG.AX': { current: 16.8, avg10Y: 14.5, low10Y: 10.2, high10Y: 21.5, sector: 'Financials', name: 'Macquarie' },
+};
+
+// Daily idea generator
+const dailyIdeas = [
+  {
+    symbol: 'FMG.AX',
+    name: 'Fortescue Metals',
+    action: 'BUY',
+    reason: 'Trading 15% below 10Y avg PE with iron ore prices rising. Strong dividend yield of 8.2%.',
+    pe_current: 7.2,
+    pe_avg: 8.5,
+    upside: '+18%',
+    confidence: 85,
+    sector: 'Mining',
+    catalyst: 'Iron ore supply disruption in Brazil'
+  },
+  {
+    symbol: 'NAB.AX',
+    name: 'National Australia Bank',
+    action: 'BUY',
+    reason: 'Best positioned major bank for NIM expansion. PE near 10Y average with 6.1% yield.',
+    pe_current: 14.1,
+    pe_avg: 13.2,
+    upside: '+12%',
+    confidence: 78,
+    sector: 'Banks',
+    catalyst: 'RBA rate stability supporting margins'
+  },
+  {
+    symbol: 'CSL.AX',
+    name: 'CSL Limited',
+    action: 'HOLD',
+    reason: 'Quality compounder but trading above historical average. Wait for better entry.',
+    pe_current: 42.1,
+    pe_avg: 38.5,
+    upside: '+5%',
+    confidence: 55,
+    sector: 'Healthcare',
+    catalyst: 'Plasma collection recovery'
+  },
+  {
+    symbol: 'WES.AX',
+    name: 'Wesfarmers',
+    action: 'REDUCE',
+    reason: 'Elevated PE vs history. Bunnings growth slowing. Consider trimming for valuation reset.',
+    pe_current: 26.5,
+    pe_avg: 22.8,
+    upside: '-8%',
+    confidence: 72,
+    sector: 'Retail',
+    catalyst: 'Consumer spending slowdown'
+  },
+];
+
+// Backtest results
+const backtestResults = {
+  strategy: 'Buffett Value + Momentum',
+  yearly_returns: [
+    { year: '2020', strategy: 8.5, benchmark: 1.4 },
+    { year: '2021', strategy: 25.8, benchmark: 17.2 },
+    { year: '2022', strategy: -5.2, benchmark: -10.1 },
+    { year: '2023', strategy: 15.2, benchmark: 12.1 },
+    { year: '2024', strategy: 18.5, benchmark: 11.8 },
+    { year: '2025', strategy: 14.8, benchmark: 8.5 },
+  ],
+  returns: { strategy: 14.2, benchmark: 9.8, alpha: 4.4 },
+  metrics: { sharpe_ratio: 1.25, max_drawdown: -18.5, win_rate: 68 }
+};
+
+// ===================== MAIN COMPONENT =====================
+
 const StockTrading = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const clientIdFromUrl = searchParams.get('client');
   
+  const [activeTab, setActiveTab] = useState('portfolio');
   const [loading, setLoading] = useState(true);
   const [selectedClient, setSelectedClient] = useState(clientIdFromUrl || "client_1");
   const [holdings, setHoldings] = useState(null);
@@ -71,6 +191,11 @@ const StockTrading = () => {
     units: 0,
     price: 0
   });
+  
+  // Live market data state
+  const [marketData, setMarketData] = useState([]);
+  const [marketSource, setMarketSource] = useState('loading');
+  const [newsFeeds, setNewsFeeds] = useState([]);
 
   const clients = [
     { id: "client_1", name: "Wheeler Family" },
@@ -78,6 +203,56 @@ const StockTrading = () => {
     { id: "client_3", name: "Thompson SMSF" },
     { id: "client_4", name: "Patel Holdings" }
   ];
+
+  // Fetch live market data
+  useEffect(() => {
+    const fetchMarketData = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/market-data/indicators`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.indicators && data.indicators.length > 0) {
+            setMarketData(data.indicators);
+            setMarketSource(data.source);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching market data:', error);
+      }
+    };
+    fetchMarketData();
+    const interval = setInterval(fetchMarketData, 300000); // 5 min refresh
+    return () => clearInterval(interval);
+  }, []);
+
+  // Fetch live news from backend
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/news/headlines`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.headlines && data.headlines.length > 0) {
+            setNewsFeeds(data.headlines.slice(0, 20).map((item, idx) => ({
+              id: idx + 1,
+              headline: item.title,
+              summary: item.summary || '',
+              source: item.source,
+              time: item.published ? formatTimeAgo(item.published) : '',
+              link: item.link,
+              category: item.category || 'markets',
+              sentiment: 'neutral'
+            })));
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching news:', error);
+      }
+    };
+    fetchNews();
+    const interval = setInterval(fetchNews, 600000); // 10 min refresh
+    return () => clearInterval(interval);
+  }, []);
 
   const fetchHoldings = useCallback(async () => {
     setLoading(true);
@@ -128,7 +303,6 @@ const StockTrading = () => {
     });
     setShowOrderDialog(true);
     
-    // Calculate CGT preview for sell orders
     if (side === "sell") {
       const preview = await calculateCGTPreview(holding.symbol, Math.floor(holding.units * 0.5));
       setOrderPreview(preview);
@@ -162,7 +336,6 @@ const StockTrading = () => {
       });
       
       if (res.ok) {
-        const data = await res.json();
         toast.success(`Order executed: ${orderForm.side === "sell" ? "Sold" : "Bought"} ${orderForm.units} units of ${selectedHolding.symbol}`);
         setShowOrderDialog(false);
         fetchHoldings();
@@ -175,7 +348,34 @@ const StockTrading = () => {
     }
   };
 
-  if (loading) {
+  // PE Band Chart
+  const PEBandChart = ({ symbol, data }) => (
+    <div className="space-y-2">
+      <div className="flex justify-between items-center">
+        <span className="font-semibold">{symbol}</span>
+        <Badge className={data.current <= data.avg10Y ? 'bg-green-500' : 'bg-amber-500'}>
+          PE: {data.current}
+        </Badge>
+      </div>
+      <div className="h-4 bg-slate-100 rounded-full relative overflow-hidden">
+        <div 
+          className="absolute h-full bg-gradient-to-r from-green-500 via-blue-500 to-red-500 opacity-30"
+          style={{ width: '100%' }}
+        />
+        <div 
+          className="absolute h-full w-1 bg-slate-800"
+          style={{ left: `${((data.current - data.low10Y) / (data.high10Y - data.low10Y)) * 100}%` }}
+        />
+      </div>
+      <div className="flex justify-between text-xs text-muted-foreground">
+        <span>{data.low10Y}</span>
+        <span className="text-blue-600">{data.avg10Y} avg</span>
+        <span>{data.high10Y}</span>
+      </div>
+    </div>
+  );
+
+  if (loading && activeTab === 'portfolio') {
     return (
       <Layout>
         <div className="flex items-center justify-center h-[60vh]">
@@ -193,12 +393,17 @@ const StockTrading = () => {
           <div>
             <h1 className="text-2xl font-bold text-[#1a2744] flex items-center gap-2">
               <TrendingUp className="h-7 w-7 text-[#D4A84C]" />
-              Stock Trading
+              Shares & ETFs
             </h1>
-            <p className="text-muted-foreground">Buy and sell holdings with CGT calculations</p>
+            <p className="text-muted-foreground">Trade, analyze, and optimize your equity portfolio</p>
           </div>
           
           <div className="flex items-center gap-3">
+            {marketSource === 'live' && (
+              <Badge variant="outline" className="bg-green-50 border-green-200 text-green-700">
+                <Activity className="h-3 w-3 mr-1" /> Live Data
+              </Badge>
+            )}
             <Select value={selectedClient} onValueChange={setSelectedClient}>
               <SelectTrigger className="w-[200px]">
                 <SelectValue placeholder="Select client" />
@@ -217,250 +422,398 @@ const StockTrading = () => {
           </div>
         </div>
 
-        {/* Demo Mode Alert */}
-        <Alert className="border-yellow-200 bg-yellow-50">
-          <Info className="h-4 w-4 text-yellow-600" />
-          <AlertDescription className="text-yellow-800">
-            <strong>Demo Mode:</strong> All trades are simulated. No real money is used. Connect broker API for live trading.
-          </AlertDescription>
-        </Alert>
+        {/* Live Market Ticker */}
+        <Card className="bg-gradient-to-r from-slate-800 to-slate-900 text-white">
+          <CardContent className="py-3">
+            <div className="flex items-center justify-between overflow-x-auto gap-6">
+              <div className="flex items-center gap-2">
+                <Globe className="h-4 w-4 text-amber-400" />
+                <span className="text-sm font-medium">Live Markets</span>
+              </div>
+              {marketData.slice(0, 5).map((indicator, idx) => (
+                <div key={idx} className="flex items-center gap-2 min-w-fit">
+                  <span className="text-sm text-slate-300">{indicator.name}</span>
+                  <span className="font-semibold">{indicator.value?.toLocaleString()}</span>
+                  <span className={`text-sm ${indicator.change_percent >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    {indicator.change_percent >= 0 ? '+' : ''}{indicator.change_percent}%
+                  </span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-          <Card>
-            <CardContent className="pt-4">
-              <p className="text-xs text-muted-foreground">Portfolio Value</p>
-              <p className="text-2xl font-bold text-[#1a2744]">
-                {formatCurrency(holdings?.summary?.total_value || 0)}
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-4">
-              <p className="text-xs text-muted-foreground">Cost Base</p>
-              <p className="text-2xl font-bold text-[#1a2744]">
-                {formatCurrency(holdings?.summary?.total_cost_base || 0)}
-              </p>
-            </CardContent>
-          </Card>
-          <Card className={holdings?.summary?.total_unrealized_gain >= 0 ? "bg-green-50" : "bg-red-50"}>
-            <CardContent className="pt-4">
-              <p className="text-xs text-muted-foreground">Unrealized Gain/Loss</p>
-              <p className={`text-2xl font-bold ${holdings?.summary?.total_unrealized_gain >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {formatCurrency(holdings?.summary?.total_unrealized_gain || 0)}
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-4">
-              <p className="text-xs text-muted-foreground">Gains (Holdings)</p>
-              <p className="text-2xl font-bold text-green-600">
-                {holdings?.summary?.gains_count || 0}
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-4">
-              <p className="text-xs text-muted-foreground">Losses (Holdings)</p>
-              <p className="text-2xl font-bold text-red-600">
-                {holdings?.summary?.losses_count || 0}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Main Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid grid-cols-5 w-full max-w-3xl">
+            <TabsTrigger value="portfolio" className="flex items-center gap-1">
+              <Building className="h-4 w-4" />
+              Portfolio
+            </TabsTrigger>
+            <TabsTrigger value="buffett" className="flex items-center gap-1">
+              <BookOpen className="h-4 w-4" />
+              Buffett Ideas
+            </TabsTrigger>
+            <TabsTrigger value="valuations" className="flex items-center gap-1">
+              <BarChart3 className="h-4 w-4" />
+              Valuations
+            </TabsTrigger>
+            <TabsTrigger value="backtest" className="flex items-center gap-1">
+              <History className="h-4 w-4" />
+              Backtest
+            </TabsTrigger>
+            <TabsTrigger value="news" className="flex items-center gap-1">
+              <Newspaper className="h-4 w-4" />
+              News
+            </TabsTrigger>
+          </TabsList>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Holdings List */}
-          <div className="lg:col-span-2">
+          {/* ========== PORTFOLIO TAB ========== */}
+          <TabsContent value="portfolio" className="space-y-6">
+            {/* Demo Mode Alert */}
+            <Alert className="border-yellow-200 bg-yellow-50">
+              <Info className="h-4 w-4 text-yellow-600" />
+              <AlertDescription className="text-yellow-800">
+                <strong>Demo Mode:</strong> All trades are simulated. No real money is used.
+              </AlertDescription>
+            </Alert>
+
+            {/* Summary Cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+              <Card>
+                <CardContent className="pt-4">
+                  <p className="text-xs text-muted-foreground">Portfolio Value</p>
+                  <p className="text-2xl font-bold text-[#1a2744]">
+                    {formatCurrency(holdings?.summary?.total_value || 0)}
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-4">
+                  <p className="text-xs text-muted-foreground">Cost Base</p>
+                  <p className="text-2xl font-bold text-[#1a2744]">
+                    {formatCurrency(holdings?.summary?.total_cost_base || 0)}
+                  </p>
+                </CardContent>
+              </Card>
+              <Card className={holdings?.summary?.total_unrealized_gain >= 0 ? "bg-green-50" : "bg-red-50"}>
+                <CardContent className="pt-4">
+                  <p className="text-xs text-muted-foreground">Unrealized Gain/Loss</p>
+                  <p className={`text-2xl font-bold ${holdings?.summary?.total_unrealized_gain >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {formatCurrency(holdings?.summary?.total_unrealized_gain || 0)}
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-4">
+                  <p className="text-xs text-muted-foreground">Gains</p>
+                  <p className="text-2xl font-bold text-green-600">{holdings?.summary?.gains_count || 0}</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-4">
+                  <p className="text-xs text-muted-foreground">Losses</p>
+                  <p className="text-2xl font-bold text-red-600">{holdings?.summary?.losses_count || 0}</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Holdings List */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Building className="h-5 w-5" />
                   Holdings - {holdings?.client_name}
                 </CardTitle>
-                <CardDescription>Click on a holding to trade</CardDescription>
               </CardHeader>
               <CardContent>
-                <ScrollArea className="h-[500px]">
-                  <div className="space-y-3">
-                    {holdings?.holdings?.map((holding) => (
-                      <div 
-                        key={holding.symbol}
-                        className="p-4 border rounded-lg hover:shadow-md transition-shadow"
-                      >
-                        <div className="flex items-start justify-between mb-3">
+                <div className="space-y-4">
+                  {holdings?.holdings?.map((holding, idx) => (
+                    <div key={idx} className="p-4 border rounded-lg hover:bg-muted/30 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                            holding.unrealized_gain >= 0 ? 'bg-green-100' : 'bg-red-100'
+                          }`}>
+                            {holding.unrealized_gain >= 0 ? (
+                              <ArrowUpRight className="h-6 w-6 text-green-600" />
+                            ) : (
+                              <ArrowDownRight className="h-6 w-6 text-red-600" />
+                            )}
+                          </div>
                           <div>
                             <div className="flex items-center gap-2">
-                              <h4 className="font-bold text-[#1a2744]">{holding.symbol}</h4>
-                              <Badge variant="outline" className="text-xs">{holding.sector}</Badge>
-                              {holding.eligible_for_cgt_discount && (
-                                <Badge className="bg-green-500 text-xs">CGT Discount</Badge>
+                              <span className="font-bold text-lg">{holding.symbol}</span>
+                              <Badge variant="outline">{holding.units} units</Badge>
+                              {holding.cgt_discount_eligible && (
+                                <Badge className="bg-purple-100 text-purple-700">12m+ Held</Badge>
                               )}
                             </div>
-                            <p className="text-sm text-muted-foreground">{holding.name}</p>
-                          </div>
-                          <div className={`flex items-center gap-1 ${holding.unrealized_gain >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                            {holding.unrealized_gain >= 0 ? (
-                              <ArrowUpRight className="h-4 w-4" />
-                            ) : (
-                              <ArrowDownRight className="h-4 w-4" />
-                            )}
-                            <span className="font-bold">{formatPercent(holding.unrealized_gain_pct)}</span>
+                            <p className="text-sm text-muted-foreground">
+                              Avg Cost: {formatCurrency(holding.average_cost_per_unit)}
+                            </p>
                           </div>
                         </div>
-                        
-                        <div className="grid grid-cols-4 gap-4 text-sm mb-3">
-                          <div>
-                            <p className="text-muted-foreground text-xs">Units</p>
-                            <p className="font-medium">{holding.units.toLocaleString()}</p>
-                          </div>
-                          <div>
-                            <p className="text-muted-foreground text-xs">Avg Cost</p>
-                            <p className="font-medium">${holding.avg_cost.toFixed(2)}</p>
-                          </div>
-                          <div>
-                            <p className="text-muted-foreground text-xs">Current Price</p>
-                            <p className="font-medium">${holding.current_price.toFixed(2)}</p>
-                          </div>
-                          <div>
-                            <p className="text-muted-foreground text-xs">Value</p>
-                            <p className="font-medium">{formatCurrency(holding.current_value)}</p>
-                          </div>
+                        <div className="text-right">
+                          <p className="text-xl font-bold">{formatCurrency(holding.market_value)}</p>
+                          <p className={`text-sm ${holding.unrealized_gain >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {formatCurrency(holding.unrealized_gain)} ({formatPercent(holding.unrealized_gain_pct)})
+                          </p>
                         </div>
-                        
-                        <div className="flex items-center justify-between pt-3 border-t">
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                            <Calendar className="h-3 w-3" />
-                            Held {holding.days_held} days
-                            {!holding.eligible_for_cgt_discount && holding.unrealized_gain > 0 && (
-                              <Badge variant="outline" className="text-xs text-yellow-600">
-                                {365 - holding.days_held} days to CGT discount
-                              </Badge>
-                            )}
-                          </div>
-                          <div className="flex gap-2">
-                            <Button 
-                              size="sm" 
-                              variant="outline"
-                              onClick={() => openOrderDialog(holding, "buy")}
-                            >
-                              <Plus className="h-3 w-3 mr-1" />
-                              Buy More
-                            </Button>
-                            <Button 
-                              size="sm" 
-                              variant={holding.is_loss ? "default" : "outline"}
-                              className={holding.is_loss ? "bg-green-600 hover:bg-green-700" : ""}
-                              onClick={() => openOrderDialog(holding, "sell")}
-                            >
-                              <Minus className="h-3 w-3 mr-1" />
-                              {holding.is_loss ? "Harvest Loss" : "Sell"}
-                            </Button>
-                          </div>
-                        </div>
-                        
-                        {/* Unrealized Gain/Loss Bar */}
-                        <div className="mt-3 pt-3 border-t">
-                          <div className="flex items-center justify-between text-xs">
-                            <span className="text-muted-foreground">Unrealized {holding.unrealized_gain >= 0 ? 'Gain' : 'Loss'}</span>
-                            <span className={holding.unrealized_gain >= 0 ? 'text-green-600 font-medium' : 'text-red-600 font-medium'}>
-                              {formatCurrency(Math.abs(holding.unrealized_gain))}
-                            </span>
-                          </div>
+                        <div className="flex gap-2">
+                          <Button size="sm" variant="outline" onClick={() => openOrderDialog(holding, "buy")}>
+                            <Plus className="h-4 w-4 mr-1" /> Buy
+                          </Button>
+                          <Button size="sm" variant="outline" className="text-red-600" onClick={() => openOrderDialog(holding, "sell")}>
+                            <Minus className="h-4 w-4 mr-1" /> Sell
+                          </Button>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* CGT Summary Panel */}
-          <div className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <Calculator className="h-5 w-5" />
-                  CGT Summary FY24-25
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-xs text-muted-foreground mb-1">Entity Type</p>
-                  <Badge variant="outline">{cgtSummary?.entity_type?.replace(/_/g, ' ').toUpperCase()}</Badge>
-                </div>
-                
-                <Separator />
-                
-                <div>
-                  <h4 className="text-sm font-semibold mb-2">Unrealized Position</h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Total Gains</span>
-                      <span className="text-green-600 font-medium">
-                        {formatCurrency(cgtSummary?.unrealized?.total_gains || 0)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Total Losses</span>
-                      <span className="text-red-600 font-medium">
-                        {formatCurrency(cgtSummary?.unrealized?.total_losses || 0)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between pt-2 border-t">
-                      <span className="font-medium">Net Position</span>
-                      <span className={`font-bold ${cgtSummary?.unrealized?.net_position >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {formatCurrency(cgtSummary?.unrealized?.net_position || 0)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                
-                <Separator />
-                
-                <div>
-                  <h4 className="text-sm font-semibold mb-2">Tax Planning Opportunities</h4>
-                  {cgtSummary?.tax_planning_opportunities?.map((opp, i) => (
-                    <div key={i} className="p-3 bg-blue-50 rounded-lg mb-2">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Zap className="h-4 w-4 text-blue-600" />
-                        <span className="text-sm font-medium capitalize">{opp.type.replace(/_/g, ' ')}</span>
-                      </div>
-                      <p className="text-xs text-muted-foreground">{opp.description}</p>
-                      <p className="text-sm font-bold text-blue-600 mt-1">
-                        {formatCurrency(opp.type === 'tax_loss_harvesting' ? opp.available_losses : opp.discount_value)}
-                      </p>
                     </div>
                   ))}
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* ========== BUFFETT IDEAS TAB ========== */}
+          <TabsContent value="buffett" className="space-y-6">
+            <div className="grid lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Lightbulb className="h-5 w-5 text-amber-500" />
+                      Today's Value Opportunities
+                    </CardTitle>
+                    <CardDescription>Buffett-style picks with momentum confirmation</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {dailyIdeas.map((idea, idx) => (
+                      <div 
+                        key={idx}
+                        className={`p-4 rounded-lg border-2 ${
+                          idea.action === 'BUY' ? 'border-green-200 bg-green-50' :
+                          idea.action === 'HOLD' ? 'border-blue-200 bg-blue-50' :
+                          'border-red-200 bg-red-50'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="font-bold text-lg">{idea.symbol}</span>
+                              <span className="text-muted-foreground">{idea.name}</span>
+                              <Badge className={
+                                idea.action === 'BUY' ? 'bg-green-500' :
+                                idea.action === 'HOLD' ? 'bg-blue-500' : 'bg-red-500'
+                              }>
+                                {idea.action}
+                              </Badge>
+                              <Badge variant="outline">{idea.sector}</Badge>
+                            </div>
+                            <p className="text-sm mb-2">{idea.reason}</p>
+                            <div className="flex items-center gap-4 text-sm">
+                              <span>PE: <strong>{idea.pe_current}</strong> vs avg <strong>{idea.pe_avg}</strong></span>
+                              <span className={idea.upside.startsWith('+') ? 'text-green-600' : 'text-red-600'}>
+                                Upside: <strong>{idea.upside}</strong>
+                              </span>
+                            </div>
+                          </div>
+                          <div className="text-center">
+                            <div className="w-14 h-14 relative">
+                              <svg className="w-14 h-14 transform -rotate-90">
+                                <circle cx="28" cy="28" r="24" fill="none" stroke="#e5e7eb" strokeWidth="4" />
+                                <circle 
+                                  cx="28" cy="28" r="24" fill="none" 
+                                  stroke={idea.confidence >= 75 ? '#22c55e' : idea.confidence >= 50 ? '#f59e0b' : '#ef4444'}
+                                  strokeWidth="4" 
+                                  strokeDasharray={`${idea.confidence * 1.5} 150`}
+                                />
+                              </svg>
+                              <span className="absolute inset-0 flex items-center justify-center text-sm font-bold">
+                                {idea.confidence}
+                              </span>
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">Confidence</p>
+                          </div>
+                        </div>
+                        <div className="mt-2 p-2 bg-white/50 rounded text-sm">
+                          <strong>Catalyst:</strong> {idea.catalyst}
+                        </div>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div className="space-y-4">
+                <Card className="bg-amber-50 border-amber-200">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg">Market Sentiment</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-center">
+                      <div className="w-20 h-20 mx-auto mb-2 rounded-full bg-amber-100 flex items-center justify-center">
+                        <span className="text-3xl font-bold text-amber-700">68</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">Moderately Bullish</p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg">Sector Rankings</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {[
+                      { sector: 'Banks', score: 78 },
+                      { sector: 'Financials', score: 75 },
+                      { sector: 'Mining', score: 72 },
+                      { sector: 'Retail', score: 60 },
+                      { sector: 'Healthcare', score: 58 },
+                    ].map((item, idx) => (
+                      <div key={idx} className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold">
+                            {idx + 1}
+                          </span>
+                          <span className="text-sm">{item.sector}</span>
+                        </div>
+                        <Badge variant={item.score >= 70 ? 'default' : 'secondary'}>{item.score}</Badge>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* ========== VALUATIONS TAB ========== */}
+          <TabsContent value="valuations" className="space-y-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {Object.entries(mockHistoricalPE).map(([symbol, data]) => (
+                <Card key={symbol} className={`${
+                  data.current <= data.avg10Y ? 'border-green-200' :
+                  data.current <= data.avg10Y * 1.1 ? 'border-blue-200' : 'border-red-200'
+                }`}>
+                  <CardContent className="p-4">
+                    <p className="text-xs text-muted-foreground mb-1">{data.name}</p>
+                    <PEBandChart symbol={symbol} data={data} />
+                    <div className="mt-3 pt-3 border-t flex justify-between items-center">
+                      <Badge className={
+                        data.current <= data.avg10Y ? 'bg-green-500' :
+                        data.current <= data.avg10Y * 1.1 ? 'bg-blue-500' : 'bg-red-500'
+                      }>
+                        {data.current <= data.avg10Y ? 'Undervalued' : data.current <= data.avg10Y * 1.1 ? 'Fair' : 'Overvalued'}
+                      </Badge>
+                      <Badge variant="outline">{data.sector}</Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* ========== BACKTEST TAB ========== */}
+          <TabsContent value="backtest" className="space-y-6">
+            <div className="grid lg:grid-cols-4 gap-4">
+              <Card className="bg-green-50 border-green-200">
+                <CardContent className="p-4 text-center">
+                  <p className="text-sm text-muted-foreground">Strategy CAGR</p>
+                  <p className="text-3xl font-bold text-green-600">{backtestResults.returns.strategy}%</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-blue-50 border-blue-200">
+                <CardContent className="p-4 text-center">
+                  <p className="text-sm text-muted-foreground">Benchmark (ASX)</p>
+                  <p className="text-3xl font-bold text-blue-600">{backtestResults.returns.benchmark}%</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-amber-50 border-amber-200">
+                <CardContent className="p-4 text-center">
+                  <p className="text-sm text-muted-foreground">Alpha</p>
+                  <p className="text-3xl font-bold text-amber-600">+{backtestResults.returns.alpha}%</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-purple-50 border-purple-200">
+                <CardContent className="p-4 text-center">
+                  <p className="text-sm text-muted-foreground">Sharpe Ratio</p>
+                  <p className="text-3xl font-bold text-purple-600">{backtestResults.metrics.sharpe_ratio}</p>
+                </CardContent>
+              </Card>
+            </div>
 
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <Receipt className="h-5 w-5" />
-                  Quick Info
-                </CardTitle>
+                <CardTitle>Performance vs Benchmark (6 Years)</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm">
-                <div className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
-                  <p><strong>CGT Discount:</strong> 50% discount for holdings &gt;12 months (individuals/trusts)</p>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Info className="h-4 w-4 text-blue-500 mt-0.5" />
-                  <p><strong>SMSF Rate:</strong> 15% in accumulation, 0% in pension phase</p>
-                </div>
-                <div className="flex items-start gap-2">
-                  <AlertTriangle className="h-4 w-4 text-yellow-500 mt-0.5" />
-                  <p><strong>EOFY:</strong> Consider harvesting losses before June 30</p>
+              <CardContent>
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={backtestResults.yearly_returns}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="year" />
+                      <YAxis tickFormatter={(v) => `${v}%`} />
+                      <Tooltip formatter={(v) => `${v}%`} />
+                      <Legend />
+                      <Bar dataKey="strategy" name="Buffett Strategy" fill="#22c55e" />
+                      <Bar dataKey="benchmark" name="ASX 200" fill="#3b82f6" />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </div>
               </CardContent>
             </Card>
-          </div>
-        </div>
+          </TabsContent>
+
+          {/* ========== NEWS TAB ========== */}
+          <TabsContent value="news" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Newspaper className="h-5 w-5" />
+                  Market News & Updates
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {newsFeeds.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <RefreshCw className="h-6 w-6 animate-spin mx-auto mb-2" />
+                    <p>Loading latest news...</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {newsFeeds.map((news) => (
+                      <a
+                        key={news.id}
+                        href={news.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block p-4 border rounded-lg hover:bg-muted/30 transition-colors cursor-pointer"
+                        data-testid={`news-item-${news.id}`}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1">
+                            <p className="font-medium leading-tight">{news.headline}</p>
+                            {news.summary && (
+                              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{news.summary}</p>
+                            )}
+                            <div className="flex items-center gap-3 mt-2 text-sm text-muted-foreground">
+                              <Badge variant="outline" className="text-xs">{news.source}</Badge>
+                              {news.category && <Badge variant="secondary" className="text-xs">{news.category}</Badge>}
+                              <span>{news.time}</span>
+                            </div>
+                          </div>
+                          <ChevronRight className="h-4 w-4 text-muted-foreground mt-1 flex-shrink-0" />
+                        </div>
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
 
         {/* Order Dialog */}
         <Dialog open={showOrderDialog} onOpenChange={setShowOrderDialog}>
@@ -468,155 +821,75 @@ const StockTrading = () => {
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 {orderForm.side === "sell" ? (
-                  <Minus className="h-5 w-5 text-red-500" />
+                  <TrendingDown className="h-5 w-5 text-red-500" />
                 ) : (
-                  <Plus className="h-5 w-5 text-green-500" />
+                  <TrendingUp className="h-5 w-5 text-green-500" />
                 )}
                 {orderForm.side === "sell" ? "Sell" : "Buy"} {selectedHolding?.symbol}
               </DialogTitle>
-              <DialogDescription>{selectedHolding?.name}</DialogDescription>
             </DialogHeader>
             
-            <div className="space-y-4 py-4">
-              {/* Order Type Toggle */}
-              <div className="flex gap-2">
-                <Button 
-                  variant={orderForm.side === "buy" ? "default" : "outline"}
-                  className={orderForm.side === "buy" ? "bg-green-600" : ""}
-                  onClick={() => setOrderForm(prev => ({ ...prev, side: "buy" }))}
-                >
-                  <Plus className="h-4 w-4 mr-1" />
-                  Buy
-                </Button>
-                <Button 
-                  variant={orderForm.side === "sell" ? "default" : "outline"}
-                  className={orderForm.side === "sell" ? "bg-red-600" : ""}
-                  onClick={() => setOrderForm(prev => ({ ...prev, side: "sell" }))}
-                >
-                  <Minus className="h-4 w-4 mr-1" />
-                  Sell
-                </Button>
-              </div>
-
-              {/* Units Input */}
-              <div>
-                <Label>Units to {orderForm.side}</Label>
-                <div className="flex items-center gap-2 mt-1">
-                  <Input 
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Units</Label>
+                  <Input
                     type="number"
                     value={orderForm.units}
                     onChange={(e) => updateOrderUnits(parseInt(e.target.value) || 0)}
                     min={1}
                     max={orderForm.side === "sell" ? selectedHolding?.units : undefined}
                   />
-                  {orderForm.side === "sell" && (
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => updateOrderUnits(selectedHolding?.units || 0)}
-                    >
-                      Max
-                    </Button>
+                </div>
+                <div>
+                  <Label>Price</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={orderForm.price}
+                    onChange={(e) => setOrderForm(prev => ({ ...prev, price: parseFloat(e.target.value) || 0 }))}
+                  />
+                </div>
+              </div>
+              
+              <div className="p-3 bg-muted rounded-lg">
+                <div className="flex justify-between">
+                  <span>Order Value:</span>
+                  <span className="font-bold">{formatCurrency(orderForm.units * orderForm.price)}</span>
+                </div>
+              </div>
+
+              {orderPreview && orderForm.side === "sell" && (
+                <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg space-y-2">
+                  <p className="font-semibold text-amber-800">CGT Estimate:</p>
+                  <div className="flex justify-between text-sm">
+                    <span>Capital Gain:</span>
+                    <span className={orderPreview.capital_gain >= 0 ? 'text-green-600' : 'text-red-600'}>
+                      {formatCurrency(orderPreview.capital_gain)}
+                    </span>
+                  </div>
+                  {orderPreview.cgt_discount_applied && (
+                    <div className="flex justify-between text-sm">
+                      <span>50% CGT Discount Applied</span>
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                    </div>
                   )}
-                </div>
-                {orderForm.side === "sell" && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Available: {selectedHolding?.units?.toLocaleString()} units
-                  </p>
-                )}
-              </div>
-
-              {/* Price */}
-              <div>
-                <Label>Price per unit</Label>
-                <Input 
-                  type="number"
-                  value={orderForm.price}
-                  onChange={(e) => setOrderForm(prev => ({ ...prev, price: parseFloat(e.target.value) || 0 }))}
-                  step={0.01}
-                />
-              </div>
-
-              {/* Order Summary */}
-              <div className="p-3 bg-gray-50 rounded-lg">
-                <h4 className="font-medium mb-2">Order Summary</h4>
-                <div className="space-y-1 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">
-                      {orderForm.units} × ${orderForm.price.toFixed(2)}
-                    </span>
-                    <span className="font-medium">
-                      {formatCurrency(orderForm.units * orderForm.price)}
-                    </span>
+                  <div className="flex justify-between text-sm font-medium">
+                    <span>Estimated Tax:</span>
+                    <span>{formatCurrency(orderPreview.estimated_tax)}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Brokerage (est.)</span>
-                    <span>$9.50</span>
-                  </div>
-                  <Separator className="my-2" />
-                  <div className="flex justify-between font-bold">
-                    <span>{orderForm.side === "sell" ? "Net Proceeds" : "Total Cost"}</span>
-                    <span>{formatCurrency(orderForm.units * orderForm.price + (orderForm.side === "buy" ? 9.50 : -9.50))}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* CGT Preview for Sells */}
-              {orderForm.side === "sell" && orderPreview?.cgt_calculation && (
-                <div className={`p-3 rounded-lg border ${orderPreview.cgt_calculation.is_capital_loss ? 'bg-green-50 border-green-200' : 'bg-orange-50 border-orange-200'}`}>
-                  <h4 className="font-medium mb-2 flex items-center gap-2">
-                    <Calculator className="h-4 w-4" />
-                    CGT Impact
-                  </h4>
-                  <div className="space-y-1 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Gross {orderPreview.cgt_calculation.is_capital_loss ? 'Loss' : 'Gain'}</span>
-                      <span className={orderPreview.cgt_calculation.is_capital_loss ? 'text-green-600 font-medium' : 'text-orange-600 font-medium'}>
-                        {formatCurrency(Math.abs(orderPreview.cgt_calculation.gross_capital_gain))}
-                      </span>
-                    </div>
-                    {orderPreview.cgt_calculation.eligible_for_discount && (
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">50% CGT Discount</span>
-                        <span className="text-green-600">-{formatCurrency(orderPreview.cgt_calculation.discount_applied)}</span>
-                      </div>
-                    )}
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Net Capital {orderPreview.cgt_calculation.is_capital_loss ? 'Loss' : 'Gain'}</span>
-                      <span className="font-medium">{formatCurrency(orderPreview.cgt_calculation.net_capital_gain)}</span>
-                    </div>
-                    <Separator className="my-2" />
-                    <div className="flex justify-between font-bold">
-                      <span>Estimated Tax</span>
-                      <span className={orderPreview.cgt_calculation.is_capital_loss ? 'text-green-600' : 'text-red-600'}>
-                        {orderPreview.cgt_calculation.is_capital_loss ? 'Tax Deduction' : formatCurrency(orderPreview.cgt_calculation.estimated_cgt_liability)}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  {/* Recommendation */}
-                  {orderPreview.recommendation?.recommendations?.map((rec, i) => (
-                    <Alert key={i} className="mt-3">
-                      <Info className="h-4 w-4" />
-                      <AlertDescription className="text-xs">
-                        <strong>{rec.type.replace(/_/g, ' ')}:</strong> {rec.message}
-                      </AlertDescription>
-                    </Alert>
-                  ))}
                 </div>
               )}
             </div>
             
             <DialogFooter>
-              <Button variant="outline" onClick={() => setShowOrderDialog(false)}>
-                Cancel
-              </Button>
+              <Button variant="outline" onClick={() => setShowOrderDialog(false)}>Cancel</Button>
               <Button 
                 onClick={executeOrder}
                 className={orderForm.side === "sell" ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700"}
               >
                 <ShoppingCart className="h-4 w-4 mr-2" />
-                Execute {orderForm.side === "sell" ? "Sell" : "Buy"} Order
+                Execute {orderForm.side === "sell" ? "Sell" : "Buy"}
               </Button>
             </DialogFooter>
           </DialogContent>

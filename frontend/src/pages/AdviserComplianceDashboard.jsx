@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import Layout from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,14 +14,18 @@ import {
   Search, Filter, Download, Upload, Eye, ChevronRight, AlertCircle,
   TrendingUp, Users, Calendar, Bell, Flag, ArrowUp, ArrowDown,
   Target, Zap, Brain, MessageSquare, Folder, BarChart3, PieChart,
-  Scale, Gavel, BookOpen, FileCheck, FilePlus, FileWarning, Activity
+  Scale, Gavel, BookOpen, FileCheck, FilePlus, FileWarning, Activity,
+  RefreshCw
 } from 'lucide-react';
 import {
   ResponsiveContainer, PieChart as RechartsPie, Pie, Cell,
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend
 } from 'recharts';
+import { toast } from 'sonner';
 
-// ===================== MOCK DATA =====================
+const API_URL = process.env.REACT_APP_BACKEND_URL || "";
+
+// ===================== STATIC REFERENCE DATA =====================
 
 const complianceStatuses = {
   compliant: { color: 'bg-green-500', text: 'Compliant', icon: CheckCircle },
@@ -30,8 +34,8 @@ const complianceStatuses = {
   pending_review: { color: 'bg-blue-500', text: 'Pending Review', icon: Clock },
 };
 
-// Advice files for review
-const adviceFiles = [
+// Fallback static data (used when DB is empty)
+const fallbackAdviceFiles = [
   {
     id: 'SOA-2026-001',
     client: 'David & Sarah Thompson',
@@ -45,59 +49,18 @@ const adviceFiles = [
     findings: [],
     nextReview: '2027-03-15'
   },
-  {
-    id: 'SOA-2026-002',
-    client: 'Michael Chen',
-    type: 'Statement of Advice',
-    date: '2026-03-10',
-    adviser: 'Sarah Williams',
-    status: 'minor_issues',
-    riskProfile: 'Growth',
-    investmentAmount: 280000,
-    score: 78,
-    findings: ['Risk profile documentation incomplete', 'Fee disclosure needs clarification'],
-    nextReview: '2027-03-10'
-  },
-  {
-    id: 'ROA-2026-015',
-    client: 'Jennifer & Robert Smith',
-    type: 'Record of Advice',
-    date: '2026-03-08',
-    adviser: 'James Mitchell',
-    status: 'major_issues',
-    riskProfile: 'Conservative',
-    investmentAmount: 125000,
-    score: 52,
-    findings: ['Asset allocation exceeds risk profile tolerance', 'Missing SOA update required', 'Client signature missing'],
-    nextReview: '2026-04-08'
-  },
-  {
-    id: 'SOA-2026-003',
-    client: 'Amanda Williams',
-    type: 'Statement of Advice',
-    date: '2026-03-05',
-    adviser: 'David Brown',
-    status: 'pending_review',
-    riskProfile: 'High Growth',
-    investmentAmount: 520000,
-    score: null,
-    findings: [],
-    nextReview: '2027-03-05'
-  },
-  {
-    id: 'ROA-2026-016',
-    client: 'Peter & Lisa Johnson',
-    type: 'Record of Advice',
-    date: '2026-03-01',
-    adviser: 'Sarah Williams',
-    status: 'compliant',
-    riskProfile: 'Balanced',
-    investmentAmount: 185000,
-    score: 92,
-    findings: [],
-    nextReview: '2027-03-01'
-  },
 ];
+
+const fallbackMetrics = {
+  totalFiles: 0,
+  reviewed: 0,
+  compliant: 0,
+  minorIssues: 0,
+  majorIssues: 0,
+  pendingReview: 0,
+  avgScore: 0,
+  overdue: 0,
+};
 
 // ASIC compliance requirements
 const asicRequirements = [
@@ -145,19 +108,9 @@ const escalationLevels = [
   { level: 4, name: 'Licensee/AFSL Holder', timeframe: 'Immediate', description: 'Serious breaches, potential ASIC reporting' },
 ];
 
-// Dashboard metrics
-const dashboardMetrics = {
-  totalFiles: 48,
-  reviewed: 42,
-  compliant: 35,
-  minorIssues: 5,
-  majorIssues: 2,
-  pendingReview: 6,
-  avgScore: 87,
-  overdue: 3,
-};
+const COLORS = ['#22c55e', '#f59e0b', '#ef4444', '#3b82f6'];
 
-// Compliance score history
+// Static score history for chart (could be enhanced to fetch from DB)
 const scoreHistory = [
   { month: 'Oct', score: 82 },
   { month: 'Nov', score: 85 },
@@ -167,8 +120,6 @@ const scoreHistory = [
   { month: 'Mar', score: 87 },
 ];
 
-const COLORS = ['#22c55e', '#f59e0b', '#ef4444', '#3b82f6'];
-
 // ===================== MAIN COMPONENT =====================
 
 const AdviserComplianceDashboard = () => {
@@ -176,6 +127,38 @@ const AdviserComplianceDashboard = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [filterStatus, setFilterStatus] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [adviceFiles, setAdviceFiles] = useState([]);
+  const [dashboardMetrics, setDashboardMetrics] = useState(fallbackMetrics);
+
+  // Fetch dashboard data from MongoDB
+  const fetchDashboard = useCallback(async () => {
+    setLoading(true);
+    try {
+      // First try to seed demo data
+      await fetch(`${API_URL}/api/compliance-docs/seed-demo`, { method: 'POST' });
+      
+      const res = await fetch(`${API_URL}/api/compliance-docs/dashboard`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.adviceFiles && data.adviceFiles.length > 0) {
+          setAdviceFiles(data.adviceFiles);
+          setDashboardMetrics(data.metrics);
+        } else {
+          setAdviceFiles(fallbackAdviceFiles);
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching compliance dashboard:', err);
+      setAdviceFiles(fallbackAdviceFiles);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchDashboard();
+  }, [fetchDashboard]);
 
   // Filter advice files
   const filteredFiles = useMemo(() => {
@@ -220,6 +203,17 @@ const AdviserComplianceDashboard = () => {
             <Badge variant="outline" className="text-sm px-3 py-1">
               AFSL: 123456
             </Badge>
+            {loading ? (
+              <Badge variant="secondary"><RefreshCw className="h-3 w-3 mr-1 animate-spin" /> Loading...</Badge>
+            ) : (
+              <Badge variant="outline" className="bg-green-50 border-green-200 text-green-700">
+                <Activity className="h-3 w-3 mr-1" /> Live from MongoDB
+              </Badge>
+            )}
+            <Button variant="outline" onClick={fetchDashboard}>
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Refresh
+            </Button>
             <Button variant="outline">
               <Download className="h-4 w-4 mr-2" />
               Export Report

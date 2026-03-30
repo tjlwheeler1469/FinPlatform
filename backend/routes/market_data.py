@@ -36,10 +36,21 @@ class MarketDataResponse(BaseModel):
 MARKET_SYMBOLS = {
     "^AXJO": "ASX 200",
     "^GSPC": "S&P 500",
+    "^DJI": "Dow Jones",
+    "^IXIC": "NASDAQ",
+    "^FTSE": "FTSE 100",
+    "^N225": "Nikkei 225",
     "AUDUSD=X": "AUD/USD",
-    "^TNX": "10Y Bond",
+    "AUDEUR=X": "AUD/EUR",
+    "AUDGBP=X": "AUD/GBP",
+    "AUDJPY=X": "AUD/JPY",
+    "AUDNZD=X": "AUD/NZD",
+    "AUDCNY=X": "AUD/CNY",
+    "^TNX": "US 10Y Bond",
     "^AORD": "All Ords",
-    "BTC-AUD": "Bitcoin AUD"
+    "BTC-AUD": "Bitcoin AUD",
+    "GC=F": "Gold",
+    "CL=F": "Crude Oil WTI"
 }
 
 async def fetch_yahoo_finance_quote(symbol: str, client: httpx.AsyncClient) -> Optional[dict]:
@@ -101,8 +112,14 @@ def get_fallback_data() -> List[MarketIndicator]:
     return [
         MarketIndicator(symbol="^AXJO", name="ASX 200", value=7842.50, change=62.30, change_percent=0.80, last_updated=now),
         MarketIndicator(symbol="^GSPC", name="S&P 500", value=5123.40, change=61.48, change_percent=1.21, last_updated=now),
+        MarketIndicator(symbol="^DJI", name="Dow Jones", value=39150.00, change=245.00, change_percent=0.63, last_updated=now),
+        MarketIndicator(symbol="^IXIC", name="NASDAQ", value=16380.00, change=185.50, change_percent=1.15, last_updated=now),
         MarketIndicator(symbol="AUDUSD=X", name="AUD/USD", value=0.6720, change=-0.0020, change_percent=-0.30, last_updated=now),
-        MarketIndicator(symbol="^TNX", name="10Y Bond", value=4.25, change=0.02, change_percent=0.47, last_updated=now),
+        MarketIndicator(symbol="AUDEUR=X", name="AUD/EUR", value=0.6150, change=0.0010, change_percent=0.16, last_updated=now),
+        MarketIndicator(symbol="AUDGBP=X", name="AUD/GBP", value=0.5280, change=-0.0015, change_percent=-0.28, last_updated=now),
+        MarketIndicator(symbol="^TNX", name="US 10Y Bond", value=4.25, change=0.02, change_percent=0.47, last_updated=now),
+        MarketIndicator(symbol="GC=F", name="Gold", value=2175.50, change=12.30, change_percent=0.57, last_updated=now),
+        MarketIndicator(symbol="CL=F", name="Crude Oil WTI", value=78.45, change=-0.85, change_percent=-1.07, last_updated=now),
     ]
 
 @router.get("/indicators", response_model=MarketDataResponse)

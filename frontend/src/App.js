@@ -101,9 +101,6 @@ const DecisionCenter = lazy(() => import("@/pages/DecisionCenter"));
 const ClientIntelligenceFeed = lazy(() => import("@/pages/ClientIntelligenceFeed"));
 const ClientPortal = lazy(() => import("@/pages/ClientPortal"));
 
-// Buffett-Style Trading Engine
-const BuffettTradingEngine = lazy(() => import("@/pages/BuffettTradingEngine"));
-
 // Super App Features - Meeting Prep, Research, Compliance, Wealth
 const MeetingPrep = lazy(() => import("@/pages/MeetingPrep"));
 const StockResearch = lazy(() => import("@/pages/StockResearch"));
@@ -1066,9 +1063,6 @@ const AppRouter = () => {
       
       {/* Stock Trading with CGT */}
       <Route path="/stock-trading" element={<StockTrading />} />
-      
-      {/* Buffett-Style Value Trading Engine */}
-      <Route path="/buffett-trading" element={<BuffettTradingEngine />} />
       
       {/* Macro Dashboard - Global Markets */}
       <Route path="/macro-dashboard" element={<MacroDashboard />} />
