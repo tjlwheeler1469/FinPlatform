@@ -2,9 +2,9 @@
 Portfolio Routes
 Portfolio management, account aggregation, and investment tracking.
 """
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
+from typing import Dict, Optional, Any
 from datetime import datetime, timezone
 import uuid
 import logging

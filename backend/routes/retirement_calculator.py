@@ -9,7 +9,6 @@ from typing import List, Optional, Dict, Any
 from datetime import datetime, timezone
 from enum import Enum
 import uuid
-import math
 
 router = APIRouter(prefix="/retirement", tags=["Retirement Calculator"])
 

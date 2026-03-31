@@ -9,7 +9,7 @@ from emergentintegrations.llm.chat import LlmChat, UserMessage
 import os
 import tempfile
 import uuid
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 from dotenv import load_dotenv
 
 load_dotenv()

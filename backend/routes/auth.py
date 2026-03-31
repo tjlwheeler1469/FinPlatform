@@ -2,9 +2,9 @@
 Authentication Routes
 Handles login, registration, JWT tokens, and session management.
 """
-from fastapi import APIRouter, HTTPException, Depends, Request
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, EmailStr
-from typing import Optional, Dict, Any
+from typing import Optional, Dict
 from datetime import datetime, timedelta, timezone
 import secrets
 import hashlib

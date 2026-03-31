@@ -4,9 +4,9 @@ Track key milestones and targets for ideal client retirement
 """
 
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
-from datetime import datetime, timezone, date
+from pydantic import BaseModel
+from typing import List, Optional
+from datetime import datetime, timezone
 from enum import Enum
 import uuid
 import os

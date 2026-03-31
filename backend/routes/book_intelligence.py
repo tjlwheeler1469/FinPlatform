@@ -3,10 +3,8 @@ Book Intelligence Module - Cross-Client Analytics
 Analyzes the entire client book for macro opportunities, risks, and trends.
 This is the "advisor intelligence" layer that sees patterns humans miss.
 """
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
-from datetime import datetime, timezone, timedelta
+from fastapi import APIRouter
+from datetime import datetime, timezone
 from enum import Enum
 import uuid
 import logging

@@ -4,9 +4,8 @@ Generate professional SOA (Statement of Advice), portfolio reports, and complian
 """
 from fastapi import APIRouter, HTTPException, Response
 from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
-from datetime import datetime, timezone
-import uuid
+from typing import Dict, List, Optional
+from datetime import datetime
 import logging
 import io
 

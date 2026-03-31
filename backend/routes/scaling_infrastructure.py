@@ -3,18 +3,15 @@ Horizontal Scaling Infrastructure
 Connection pooling, caching, rate limiting, and background job processing for 20,000+ users
 """
 
-import os
 import asyncio
 import logging
 import hashlib
-import json
 from datetime import datetime, timezone, timedelta
 from typing import Optional, Dict, Any, List, Callable
 from functools import wraps
 from collections import defaultdict
 import time
-from fastapi import APIRouter, HTTPException, Request, Depends
-from pydantic import BaseModel
+from fastapi import APIRouter, HTTPException, Request
 
 logger = logging.getLogger(__name__)
 

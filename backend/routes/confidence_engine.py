@@ -10,12 +10,11 @@ _rng = secrets.SystemRandom()
 import logging
 import numpy as np
 from datetime import datetime, timezone
-from typing import Optional, Dict, Any, List, Tuple
-from fastapi import APIRouter, HTTPException, BackgroundTasks
+from typing import Optional, Dict, Any, List
+from fastapi import APIRouter
 from pydantic import BaseModel, Field
 from motor.motor_asyncio import AsyncIOMotorClient
 import uuid
-import asyncio
 
 logger = logging.getLogger(__name__)
 

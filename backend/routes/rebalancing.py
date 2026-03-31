@@ -4,7 +4,7 @@ Tax-aware, one-click portfolio rebalancing with trade optimization.
 """
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
+from typing import Dict, List
 from datetime import datetime, timezone
 import uuid
 import logging

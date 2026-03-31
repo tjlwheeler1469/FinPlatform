@@ -3,12 +3,10 @@ Live Data Integration Routes
 Real-time market data, portfolio updates, and live feeds.
 Enhanced beyond mocked data with actual market integration via yfinance.
 """
-from fastapi import APIRouter, HTTPException, BackgroundTasks
-from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
-from datetime import datetime, timezone, timedelta
+from fastapi import APIRouter, HTTPException
+from typing import Dict, Optional, Any
+from datetime import datetime, timezone
 import logging
-import asyncio
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/live", tags=["Live Data"])

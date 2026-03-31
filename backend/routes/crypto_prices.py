@@ -3,11 +3,10 @@ Live Cryptocurrency Price Feed
 Fetches real-time crypto prices from CoinGecko API (free tier).
 """
 from fastapi import APIRouter, HTTPException
-from typing import Optional, List, Dict, Any
+from typing import List, Dict, Any
 from datetime import datetime, timezone
 import logging
 import httpx
-import asyncio
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/crypto", tags=["Crypto Prices"])

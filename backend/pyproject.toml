@@ -1,0 +1,16 @@
+[tool.ruff]
+target-version = "py311"
+line-length = 150
+
+[tool.ruff.lint]
+select = ["E7", "E9", "F"]
+ignore = [
+    "E402",   # Module-level imports not at top (deliberate pattern for conditional imports)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"routes/ai.py" = ["F401"]
+"routes/document_generation.py" = ["F401"]
+"routes/enterprise_docs.py" = ["F401"]
+"routes/pdf_reports.py" = ["F401"]
+"routes/portfolio.py" = ["F401"]

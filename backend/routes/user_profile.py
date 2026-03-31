@@ -2,10 +2,9 @@
 User Profile API - Manage user profile data and preferences
 """
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
-from typing import Optional, List, Dict, Any
+from pydantic import BaseModel
+from typing import Optional, Dict, Any
 from datetime import datetime
-from bson import ObjectId
 import os
 from pymongo import MongoClient
 

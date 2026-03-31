@@ -6,9 +6,9 @@ Generates natural language explanations using LLM integration
 import os
 import logging
 from datetime import datetime, timezone
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from motor.motor_asyncio import AsyncIOMotorClient
 import uuid
 

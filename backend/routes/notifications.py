@@ -4,12 +4,11 @@ WebSocket-based real-time alerts, email notifications, and push notifications.
 """
 from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect, BackgroundTasks
 from pydantic import BaseModel, EmailStr
-from typing import Dict, List, Optional, Any, Set
-from datetime import datetime, timezone, timedelta
+from typing import Dict, List, Optional
+from datetime import datetime, timezone
 import uuid
 import logging
 import asyncio
-import json
 import os
 
 logger = logging.getLogger(__name__)

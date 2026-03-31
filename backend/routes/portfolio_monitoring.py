@@ -2,11 +2,9 @@
 Portfolio Monitoring Engine
 AI-powered daily portfolio scanning with real-time alerts and actionable insights.
 """
-from fastapi import APIRouter, HTTPException, BackgroundTasks
-from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
-from datetime import datetime, timezone, timedelta
-import uuid
+from fastapi import APIRouter, HTTPException
+from typing import Dict, List, Optional
+from datetime import datetime, timezone
 import logging
 import secrets
 _rng = secrets.SystemRandom()

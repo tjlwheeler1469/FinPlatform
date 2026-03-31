@@ -4,8 +4,7 @@ Global market indices, currencies, bonds, commodities, crypto, and futures.
 Covers AUS, Euro, and US markets.
 Uses yfinance for live data with fallback to static data.
 """
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from fastapi import APIRouter
 from typing import Dict, List, Optional
 from datetime import datetime, timezone
 import secrets

@@ -5,11 +5,10 @@ Comprehensive retirement income modeling with drawdown, assets, liabilities, and
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict
 from datetime import datetime, timezone
 from enum import Enum
 import uuid
-import math
 
 router = APIRouter(prefix="/decumulation", tags=["Decumulation Calculator"])
 

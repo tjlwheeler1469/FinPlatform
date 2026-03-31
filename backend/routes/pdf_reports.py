@@ -6,8 +6,8 @@ Generates compliance reports, audit trails, and client files in PDF format.
 import os
 import io
 import uuid
-from datetime import datetime, timezone, timedelta
-from typing import Optional, Dict, Any, List
+from datetime import datetime, timezone
+from typing import Optional, Dict, Any
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 from motor.motor_asyncio import AsyncIOMotorClient

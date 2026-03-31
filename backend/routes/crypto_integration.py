@@ -4,9 +4,8 @@ Custody abstraction, unified reporting, and portfolio integration.
 Makes crypto feel like any other asset class for advisors.
 """
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
-from datetime import datetime, timezone, timedelta
+from typing import Dict, List
+from datetime import datetime, timezone
 from enum import Enum
 import uuid
 import logging

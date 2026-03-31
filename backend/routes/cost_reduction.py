@@ -13,8 +13,8 @@ This is what CFOs care about.
 import os
 import uuid
 from datetime import datetime, timezone, timedelta
-from typing import Optional, Dict, Any, List
-from fastapi import APIRouter, HTTPException
+from typing import Optional
+from fastapi import APIRouter
 from pydantic import BaseModel
 from motor.motor_asyncio import AsyncIOMotorClient
 import logging

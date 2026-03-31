@@ -2,9 +2,9 @@
 White-Label & Multi-Tenancy Configuration
 Allows customization of branding, features, and settings per tenant.
 """
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
+from typing import Dict, Optional, Any
 from datetime import datetime, timezone
 import logging
 

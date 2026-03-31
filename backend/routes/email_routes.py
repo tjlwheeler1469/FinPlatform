@@ -3,7 +3,7 @@ Email Notification Routes
 Trade confirmations, alerts, and notifications via SendGrid.
 """
 from fastapi import APIRouter, HTTPException, BackgroundTasks
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 from typing import Dict, List, Optional, Any
 import logging
 

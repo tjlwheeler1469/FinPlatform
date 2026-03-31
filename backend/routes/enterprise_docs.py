@@ -14,12 +14,10 @@ All documents available as JSON and PDF format.
 """
 
 import os
-import uuid
 import hashlib
-from datetime import datetime, timezone, timedelta
-from typing import Optional, Dict, Any, List
+from datetime import datetime, timezone
+from typing import Dict, Any
 from fastapi import APIRouter, HTTPException, Response
-from pydantic import BaseModel
 from motor.motor_asyncio import AsyncIOMotorClient
 import logging
 from io import BytesIO

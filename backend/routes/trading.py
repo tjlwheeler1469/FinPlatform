@@ -4,9 +4,8 @@ Buy/sell listed stocks with CGT calculations and broker integration.
 """
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
-from datetime import datetime, timezone, timedelta
-from decimal import Decimal, ROUND_HALF_UP
+from typing import Dict, List, Optional
+from datetime import datetime, timezone
 import uuid
 import logging
 import secrets

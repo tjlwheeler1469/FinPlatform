@@ -4,8 +4,8 @@ Handles platform messages and emails from clients to advisors.
 Persists data to MongoDB.
 """
 from fastapi import APIRouter, HTTPException, BackgroundTasks
-from pydantic import BaseModel, EmailStr
-from typing import Optional, List, Dict, Any
+from pydantic import BaseModel
+from typing import Optional, Dict, Any
 from datetime import datetime, timezone
 from pymongo import MongoClient
 import uuid

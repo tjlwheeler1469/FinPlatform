@@ -8,7 +8,7 @@ import os
 import uuid
 from datetime import datetime, timezone, timedelta
 from typing import Optional, Dict, Any, List
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from motor.motor_asyncio import AsyncIOMotorClient
 import logging

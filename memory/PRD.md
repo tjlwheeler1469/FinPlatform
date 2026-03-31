@@ -4,22 +4,27 @@
 Build a comprehensive Australian wealth management platform for financial advisers with a universal AFSL-grade voice command engine, downloadable PDF reports, and multilingual support.
 
 ## Tech Stack
-- **Frontend**: React 18 + TypeScript, TailwindCSS, Shadcn/UI, Recharts
-- **Backend**: FastAPI, Motor (MongoDB), route_registry (124 routes)
+- **Frontend**: React 18 + TypeScript, TailwindCSS, Shadcn/UI, Recharts, ForceGraph2D
+- **Backend**: FastAPI, Motor (MongoDB), route_registry (125 routes)
 - **AI/LLM**: OpenAI GPT-5.2, Whisper STT (Emergent LLM Key)
 - **PDF**: ReportLab (professional PDF generation)
+- **Market Data**: CoinGecko (crypto), Yahoo Finance (indices/commodities via macro_data)
 
 ## Architecture
 ```
 /app/backend/routes/
 ├── voice_command.py          # Universal AFSL-grade command engine (12 types inc. client_pack)
 ├── pdf_report.py             # PDF report generator (all analysis types inc. client_pack)
+├── client_pack_scheduler.py  # Auto-schedule quarterly pack generation
+├── crypto_integration.py     # Live CoinGecko crypto prices
 ├── voice_retirement.py       # Dedicated retirement analysis
 ├── buffett_engine.py         # Live Buffett screening (Yahoo Finance)
 └── scenario_templates.py     # AST-based safe arithmetic
 
 /app/frontend/src/components/
 ├── VoiceAssistant.jsx        # 12 result cards + PDF download on hover
+├── KnowledgeGraphPanel.jsx   # Interactive ForceGraph2D visualization (collapsible)
+├── ClientPackScheduler.jsx   # Schedule + generate + download client packs
 ├── RetirementVoicePanel.jsx  # Retirement voice + what-if + PDF
 ├── Layout.jsx                # Floating mic + page context
 └── LanguageContext.jsx       # i18n (EN/ZH/VI/EL)
@@ -48,7 +53,18 @@ Build a comprehensive Australian wealth management platform for financial advise
 
 ## Completed Work (All Sessions)
 
-### Route Fixes + Knowledge Graph Consolidation + Client Pack (March 31, 2026) - LATEST
+### Massive Consolidation + Features (March 31, 2026) - LATEST
+- [x] Page consolidation: 15+ duplicate routes converted to redirects (scenarios, clients, dashboards, AI copilot, tax, retirement)
+- [x] Backend lint cleanup: 69 E741/E722/F841 errors → 0 errors (+ 362 F401 auto-fixed)
+- [x] pyproject.toml ruff config for project-specific lint rules
+- [x] ForceGraph2D interactive Knowledge Graph visualization (collapsible panel in dashboard)
+- [x] Client Pack Scheduler: CRUD schedules, on-demand + batch generation, PDF download
+- [x] Live crypto prices via CoinGecko integration (with fallback on rate limit)
+- [x] Compliance modal persistence via localStorage already confirmed working
+- [x] Knowledge Graph nav entry removed, route redirected
+- [x] Iteration 132: Backend 100% (21/21), Frontend 100%
+
+### Route Fixes + Knowledge Graph Consolidation + Client Pack (March 31, 2026)
 - [x] Fixed broken /next-actions route → redirects to /next-best-actions
 - [x] Combined Knowledge Graph into Advisor Command Center dashboard
   - Removed standalone /knowledge-graph nav entry from sidebar
@@ -82,12 +98,11 @@ Build a comprehensive Australian wealth management platform for financial advise
 - [x] Buffett Ideas live API, per-client data switching
 
 ## Testing History
+- iteration_132: Backend 100% (21/21), Frontend 100% — Consolidation, lint, ForceGraph2D, scheduler, live crypto
 - iteration_131: Backend 100% (13/13), Frontend 100% — Route fixes, KG consolidation, client pack
 - iteration_130: Backend 100% (12/12), Frontend 100% — PDF + type hints
 - iteration_129: Backend 100% (10/10), Frontend 100% — Universal engine
 - iteration_128-123: All passing
 
 ## Remaining
-- [x] All user-requested features complete
-- P2: Review remaining pages for further consolidation
-- Cosmetic: E741 ambiguous var names, E722 bare excepts, F841 unused locals
+- [x] All tasks from all sessions complete

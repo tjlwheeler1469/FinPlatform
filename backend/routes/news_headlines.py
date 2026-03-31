@@ -2,9 +2,8 @@
 Financial News Headlines API
 Fetches news from multiple financial sources via RSS feeds.
 """
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
-from typing import Dict, List, Optional
+from fastapi import APIRouter
+from typing import List, Optional
 from datetime import datetime, timezone
 import logging
 import asyncio

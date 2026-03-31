@@ -15,11 +15,10 @@ integrate with Kafka/Kinesis via the integration hooks provided.
 import os
 import uuid
 import asyncio
-import json
 from datetime import datetime, timezone, timedelta
 from typing import Optional, Dict, Any, List, Callable
 from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from motor.motor_asyncio import AsyncIOMotorClient
 from collections import defaultdict
 import logging

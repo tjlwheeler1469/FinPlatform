@@ -4,8 +4,7 @@ AI-powered recommendation engine that tells advisors what to do every day.
 This is the brain that drives decisions - not just shows data.
 """
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional
 from datetime import datetime, timezone, timedelta
 from enum import Enum
 import uuid

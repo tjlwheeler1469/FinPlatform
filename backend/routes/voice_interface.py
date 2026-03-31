@@ -5,11 +5,10 @@ Enables voice commands and queries for the financial advisory platform.
 """
 
 import os
-import io
 import uuid
 import tempfile
 from datetime import datetime, timezone
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form
 from pydantic import BaseModel
 from motor.motor_asyncio import AsyncIOMotorClient

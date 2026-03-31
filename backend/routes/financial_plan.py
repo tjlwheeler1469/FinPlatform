@@ -11,7 +11,6 @@ from pymongo import MongoClient
 import uuid
 import logging
 import os
-import json
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/financial-plan", tags=["Financial Plan"])

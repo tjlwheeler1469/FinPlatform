@@ -2,9 +2,9 @@
 Market Data Routes
 Real-time market data, stock quotes, and indices using Yahoo Finance.
 """
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Any
 from datetime import datetime, timezone
 import logging
 

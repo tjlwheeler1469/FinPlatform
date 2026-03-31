@@ -4,7 +4,7 @@ Financial goal tracking and progress monitoring.
 """
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
+from typing import Dict, Optional
 from datetime import datetime, timezone
 import uuid
 import logging

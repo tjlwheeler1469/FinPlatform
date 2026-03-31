@@ -4,7 +4,7 @@ Track Statement of Advice and Record of Advice documents for compliance
 """
 
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timezone, timedelta
 from enum import Enum

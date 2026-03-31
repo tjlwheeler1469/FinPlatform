@@ -3,13 +3,11 @@ Transaction Modeling Routes
 "What-If" Scenario Builder for Financial Advisers
 Model transactions (property, funds, stocks) and see impact on client portfolios.
 """
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Dict, List, Optional, Any
-from datetime import datetime, timezone, timedelta
-import uuid
+from datetime import datetime, timezone
 import logging
-import math
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/transaction-modeling", tags=["Transaction Modeling"])

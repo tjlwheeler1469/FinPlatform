@@ -14,8 +14,8 @@ import uuid
 import hashlib
 from datetime import datetime, timezone, timedelta
 from typing import Optional, Dict, Any, List
-from fastapi import APIRouter, HTTPException, BackgroundTasks
-from pydantic import BaseModel, Field
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 from motor.motor_asyncio import AsyncIOMotorClient
 from enum import Enum
 import logging

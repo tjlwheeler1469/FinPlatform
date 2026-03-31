@@ -4,8 +4,7 @@ Research and mock integration for Consumer Data Right (CDR) compliant data provi
 """
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
-from datetime import datetime, timezone
+from typing import List
 import logging
 
 logger = logging.getLogger(__name__)

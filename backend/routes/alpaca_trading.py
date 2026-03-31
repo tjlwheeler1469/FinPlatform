@@ -5,9 +5,8 @@ This is the execution layer that transforms insights into market actions.
 """
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, Field
-from typing import Dict, List, Optional, Any
+from typing import List, Optional
 from datetime import datetime, timezone
-from decimal import Decimal
 from enum import Enum
 import os
 import logging

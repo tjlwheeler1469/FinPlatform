@@ -4,7 +4,7 @@ ASX stock screening, intrinsic value analysis, and broker research.
 """
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional
 from datetime import datetime, timezone
 import secrets
 _rng = secrets.SystemRandom()

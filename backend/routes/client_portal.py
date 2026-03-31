@@ -2,9 +2,7 @@
 Client Portal API - Client-Facing Experience Layer
 Provides secure endpoints for clients to view their financial data.
 """
-from fastapi import APIRouter, HTTPException, Depends
-from pydantic import BaseModel, Field
-from typing import Dict, List, Optional, Any
+from fastapi import APIRouter
 from datetime import datetime, timezone, timedelta
 from enum import Enum
 import uuid

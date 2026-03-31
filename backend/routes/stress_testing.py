@@ -5,11 +5,9 @@ Uses Locust-compatible patterns for realistic stress testing
 """
 
 import os
-import json
 import asyncio
 import secrets
 _rng = secrets.SystemRandom()
-import string
 import time
 import uuid
 import logging
@@ -18,7 +16,6 @@ from typing import Dict, Any, List, Optional
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from pydantic import BaseModel, Field
 from motor.motor_asyncio import AsyncIOMotorClient
-import concurrent.futures
 
 logger = logging.getLogger(__name__)
 

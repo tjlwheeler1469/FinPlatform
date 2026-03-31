@@ -5,8 +5,8 @@ Comprehensive budgeting with goals, alerts, and tracking
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
-from datetime import datetime, timezone, date
+from typing import List, Optional, Dict
+from datetime import datetime, timezone
 from enum import Enum
 import uuid
 import os

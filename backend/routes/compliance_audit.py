@@ -3,9 +3,8 @@ Compliance & Audit Layer
 Full audit logs, KYC/AML workflows, document management, approvals.
 Enterprise-grade compliance for wealth management.
 """
-from fastapi import APIRouter, HTTPException, Query, UploadFile, File
-from pydantic import BaseModel, Field
-from typing import Dict, List, Optional, Any
+from fastapi import APIRouter, HTTPException
+from typing import Dict, List, Optional
 from datetime import datetime, timezone, timedelta
 from enum import Enum
 import uuid

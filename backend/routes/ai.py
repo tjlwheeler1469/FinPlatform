@@ -2,13 +2,12 @@
 AI Routes
 AI-powered features including financial plan generation, meeting summaries, and copilot.
 """
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import Dict, List, Optional, Any
 from datetime import datetime, timezone
 import uuid
 import logging
-import os
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/ai", tags=["AI Features"])

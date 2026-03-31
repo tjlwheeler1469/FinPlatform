@@ -7,7 +7,6 @@ from typing import Optional
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from pydantic import BaseModel
 import uuid
-import asyncio
 import logging
 
 logger = logging.getLogger(__name__)
@@ -180,7 +179,7 @@ async def generate_pack_now(client_id: str, client_name: str = "Client") -> dict
         "pack_data": pack_data,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "status": "ready",
-        "download_url": f"/api/pdf-report/generate",
+        "download_url": "/api/pdf-report/generate",
     }
     GENERATED_PACKS[pack_id] = pack_record
 

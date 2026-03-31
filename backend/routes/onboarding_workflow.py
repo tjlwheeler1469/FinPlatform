@@ -4,8 +4,8 @@ Multi-step wizard with document collection, KYC verification, and account openin
 Saves 5+ hours per new client.
 """
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
-from typing import Dict, List, Optional, Any
+from pydantic import BaseModel
+from typing import Dict, Optional, Any
 from datetime import datetime, timezone, timedelta
 from enum import Enum
 import uuid

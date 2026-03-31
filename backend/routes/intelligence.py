@@ -3,10 +3,8 @@ Cross-Client Intelligence Engine
 AI-powered analysis across the entire client book to identify patterns, opportunities, and risks.
 """
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
-from datetime import datetime, timezone, timedelta
-import uuid
+from typing import Dict
+from datetime import datetime, timezone
 import logging
 import secrets
 _rng = secrets.SystemRandom()

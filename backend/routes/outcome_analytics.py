@@ -2,12 +2,8 @@
 Outcome Analytics Dashboard - Measure impact and track success
 Shows the results of all actions: portfolio impact, revenue, engagement, learning progress.
 """
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
-from datetime import datetime, timezone, timedelta
-from enum import Enum
-import uuid
+from fastapi import APIRouter
+from datetime import datetime, timezone
 import logging
 
 logger = logging.getLogger(__name__)

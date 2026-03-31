@@ -2,10 +2,9 @@
 Tax Analysis Routes
 Handles all tax calculation endpoints including CGT, income tax, and comparisons.
 """
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
-from datetime import datetime, timezone
+from typing import Dict, List, Any
 import logging
 
 logger = logging.getLogger(__name__)
@@ -15,7 +14,6 @@ router = APIRouter(prefix="/tax", tags=["Tax Analysis"])
 from services.tax_constants import (
     HISTORICAL_TAX_BRACKETS,
     PERSONAL_TAX_BRACKETS_2024_25,
-    PERSONAL_TAX_BRACKETS_2025_26,
     HISTORICAL_COMPANY_RATES,
     COMPANY_TAX_RATE_BASE,
     COMPANY_TAX_RATE_FULL,
@@ -28,7 +26,6 @@ from services.tax_constants import (
     SMSF_BRING_FORWARD_CAP,
     SMSF_TOTAL_SUPER_BALANCE_LIMIT,
     SMSF_TAX_RATE,
-    SMSF_PENSION_TAX_RATE,
     DIV_293_THRESHOLD,
 )
 

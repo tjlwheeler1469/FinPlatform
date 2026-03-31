@@ -5,7 +5,7 @@ Simulates Plaid-like functionality with Australian institutions.
 """
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional
 from datetime import datetime, timezone, timedelta
 import uuid
 import logging

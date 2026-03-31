@@ -2,10 +2,9 @@
 Analysis Routes
 Investment analysis, Monte Carlo simulations, property comparison, and scenario analysis.
 """
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Query
 from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
-from datetime import datetime, timezone
+from typing import Dict, List, Any
 import numpy as np
 import logging
 

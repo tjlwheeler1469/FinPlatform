@@ -3,15 +3,14 @@ Advanced AI Copilot - Natural Language Query Engine
 Allows advisors to query across all data layers using natural language.
 Examples: "Which clients need rebalancing?", "Who is at retirement risk?"
 """
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel, Field
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional
 from datetime import datetime, timezone
 from enum import Enum
 import uuid
 import logging
 import os
-import re
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/ai-copilot", tags=["AI Copilot"])

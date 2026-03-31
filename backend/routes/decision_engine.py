@@ -3,13 +3,11 @@ Decision Engine Routes
 Financial health scoring, recommendations, net worth projections, and Monte Carlo simulations.
 All features work with comprehensive dummy data for demonstration.
 """
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
 from datetime import datetime, timezone
 import secrets
 _rng = secrets.SystemRandom()
-import math
 import logging
 
 logger = logging.getLogger(__name__)

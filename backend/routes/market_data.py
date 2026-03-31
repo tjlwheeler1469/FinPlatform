@@ -7,8 +7,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 import httpx
 import asyncio
-from datetime import datetime, timedelta
-import os
+from datetime import datetime
 
 router = APIRouter(prefix="/market-data", tags=["Market Data"])
 

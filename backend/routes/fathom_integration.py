@@ -2,10 +2,10 @@
 Fathom AI Meeting Notes Integration
 Integrates with Fathom.video API for automatic meeting transcription and AI summaries.
 """
-from fastapi import APIRouter, HTTPException, BackgroundTasks, Header
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 import uuid
 import logging
 import os

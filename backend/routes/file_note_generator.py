@@ -11,7 +11,7 @@ import uuid
 from datetime import datetime, timezone
 from typing import Optional, Dict, Any, List
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from motor.motor_asyncio import AsyncIOMotorClient
 import logging
 

@@ -6,9 +6,8 @@ Pre-built retirement scenarios for common life situations
 import os
 import logging
 from datetime import datetime, timezone
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any
 from fastapi import APIRouter, HTTPException, Query
-from pydantic import BaseModel, Field
 from motor.motor_asyncio import AsyncIOMotorClient
 import uuid
 import re

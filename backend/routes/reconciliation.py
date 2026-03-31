@@ -4,11 +4,9 @@ Unifies positions, trades, balances, and pricing across all brokers and exchange
 Creates a single source of truth for every client's financial state.
 """
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
+from typing import Dict, Optional
 from datetime import datetime, timezone, timedelta
 from enum import Enum
-import uuid
 import logging
 
 logger = logging.getLogger(__name__)

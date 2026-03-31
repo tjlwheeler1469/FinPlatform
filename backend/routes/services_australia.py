@@ -5,10 +5,10 @@ Direct API-like integration for Age Pension calculations with real-time eligibil
 
 import os
 import logging
-from datetime import datetime, timezone, date, timedelta
+from datetime import datetime, timezone, date
 from typing import Optional, Dict, Any, List
 from fastapi import APIRouter, HTTPException, Query
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from motor.motor_asyncio import AsyncIOMotorClient
 import uuid
 

@@ -5,10 +5,8 @@ WebSocket-based real-time communication for collaborative financial planning
 
 import os
 import logging
-import json
-import asyncio
 from datetime import datetime, timezone
-from typing import Optional, Dict, Any, List, Set
+from typing import Optional, Dict, Any, List
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, HTTPException, Query
 from pydantic import BaseModel
 from motor.motor_asyncio import AsyncIOMotorClient

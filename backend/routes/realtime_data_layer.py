@@ -4,9 +4,8 @@ Provides continuous data synchronization, real-time insights, and single source 
 Ready for custodian API integration when keys are available.
 """
 from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
-from pydantic import BaseModel, Field
-from typing import Dict, List, Optional, Any
-from datetime import datetime, timezone, timedelta
+from typing import List
+from datetime import datetime, timezone
 from enum import Enum
 import uuid
 import logging

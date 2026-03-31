@@ -2,8 +2,8 @@
 Dashboard Routes
 Main dashboard endpoints including health score, net worth, and summary data.
 """
-from fastapi import APIRouter, HTTPException
-from typing import Dict, List, Optional, Any
+from fastapi import APIRouter
+from typing import Dict, Any
 from datetime import datetime, timezone
 import logging
 

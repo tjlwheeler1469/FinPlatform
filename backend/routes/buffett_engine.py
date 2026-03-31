@@ -3,7 +3,7 @@ Buffett-Style Stock Screening API
 Provides value-based stock screening data for ASX stocks using Yahoo Finance.
 """
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timezone, timedelta

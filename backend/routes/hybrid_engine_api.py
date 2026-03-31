@@ -5,10 +5,9 @@ Sections 12-19: Scenario Comparison, Real-Time Data, Advisor Control
 
 import os
 import logging
-import asyncio
 from datetime import datetime, timezone
 from typing import Optional, Dict, Any, List
-from fastapi import APIRouter, HTTPException, Query, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Query, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 from motor.motor_asyncio import AsyncIOMotorClient
 import uuid
@@ -24,11 +23,7 @@ from routes.hybrid_engine import (
     calculate_confidence_score,
     run_stress_tests,
     generate_ai_explanation,
-    calculate_change_impact,
     HybridEngineRequest,
-    IncomeSource,
-    AssetHolding,
-    ExpenseBreakdown,
     EngineMode,
     DEFAULT_PARAMS
 )

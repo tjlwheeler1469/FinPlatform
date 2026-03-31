@@ -3,7 +3,6 @@ Basiq CDR Integration Routes
 Bank account aggregation via Australian Consumer Data Right.
 """
 from fastapi import APIRouter, HTTPException
-from typing import Optional
 import logging
 
 from services.basiq_service import basiq_service, get_basiq_status

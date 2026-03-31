@@ -9,10 +9,9 @@ Principle: System generates scenarios, not advice. Adviser makes all decisions.
 import os
 import hashlib
 import json
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from typing import Optional, Dict, Any, List
-from fastapi import APIRouter, HTTPException, Request, BackgroundTasks, Body
-from pydantic import BaseModel, Field
+from fastapi import APIRouter, HTTPException, Request, Body
 from motor.motor_asyncio import AsyncIOMotorClient
 import logging
 import uuid

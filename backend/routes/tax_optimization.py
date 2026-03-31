@@ -3,9 +3,8 @@ Tax Optimization Engine
 Advanced tax planning and optimization across multiple strategies.
 """
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
-from datetime import datetime, timezone, timedelta
+from typing import Dict
+from datetime import datetime, timezone
 import logging
 
 logger = logging.getLogger(__name__)

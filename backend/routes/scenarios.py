@@ -4,7 +4,7 @@ Scenario simulation, comparison, and what-if analysis.
 """
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Any
 from datetime import datetime, timezone
 import uuid
 import numpy as np

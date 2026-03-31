@@ -2,9 +2,8 @@
 Adviser Command Center Routes
 The daily "mission control" for financial advisers - aggregating all actionable intelligence.
 """
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
+from fastapi import APIRouter
+from typing import Dict, List, Optional
 from datetime import datetime, timezone, timedelta
 import uuid
 import logging

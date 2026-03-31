@@ -3,9 +3,8 @@ Documents Routes
 Document vault, PDF exports, and document management.
 """
 from fastapi import APIRouter, HTTPException, UploadFile, File
-from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional
 from datetime import datetime, timezone
 import uuid
 import logging

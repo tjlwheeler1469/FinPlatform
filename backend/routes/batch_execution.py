@@ -3,9 +3,9 @@ Batch Execution Layer - One-Click Execution for Book Intelligence Insights
 Connects AI insights directly to trading execution (Alpaca).
 Enables batch operations across multiple clients.
 """
-from fastapi import APIRouter, HTTPException, Depends
-from pydantic import BaseModel, Field
-from typing import Dict, List, Optional, Any
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
+from typing import Dict, List, Optional
 from datetime import datetime, timezone
 from enum import Enum
 import uuid
@@ -17,7 +17,7 @@ router = APIRouter(prefix="/batch-execution", tags=["Batch Execution"])
 # Try to import Alpaca
 ALPACA_AVAILABLE = False
 try:
-    from routes.alpaca_trading import get_trading_client, require_alpaca_client, ALPACA_AVAILABLE as ALPACA_SDK
+    from routes.alpaca_trading import ALPACA_AVAILABLE as ALPACA_SDK
     ALPACA_AVAILABLE = ALPACA_SDK
 except Exception:
     pass

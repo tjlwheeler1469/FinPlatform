@@ -3,14 +3,13 @@ Feedback & Learning System - Close the Loop
 Tracks every action's outcome, learns from results, and improves recommendations.
 This is the "brain" that makes the system truly autonomous.
 """
-from fastapi import APIRouter, HTTPException, BackgroundTasks
-from pydantic import BaseModel, Field
-from typing import Dict, List, Optional, Any
+from fastapi import APIRouter
+from pydantic import BaseModel
+from typing import Dict, List, Optional
 from datetime import datetime, timezone, timedelta
 from enum import Enum
 import uuid
 import logging
-import statistics
 import secrets
 _rng = secrets.SystemRandom()
 

@@ -3,9 +3,9 @@ Workflow Engine - Multi-step workflow automation for financial advisors
 Automates client onboarding, annual reviews, compliance tasks, and more.
 This is the execution backbone that transforms processes into automated workflows.
 """
-from fastapi import APIRouter, HTTPException, BackgroundTasks
-from pydantic import BaseModel, Field
-from typing import Dict, List, Optional, Any
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
+from typing import Dict, List, Optional
 from datetime import datetime, timezone, timedelta
 from enum import Enum
 import uuid

@@ -8,7 +8,7 @@ Insurance Analysis, Trust Strategy, Compliance Checks, Investment Comparison.
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional
 import io
 from datetime import datetime, timezone
 
@@ -18,9 +18,9 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import mm
 from reportlab.platypus import (
     SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle,
-    HRFlowable, KeepTogether
+    HRFlowable
 )
-from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
+from reportlab.lib.enums import TA_LEFT
 
 router = APIRouter(prefix="/pdf-report", tags=["PDF Report Generator"])
 

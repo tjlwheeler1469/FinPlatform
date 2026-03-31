@@ -4,9 +4,8 @@ Stock research, analyst ratings, price targets, and investment recommendations.
 For both Personal and Adviser modes.
 """
 from fastapi import APIRouter, HTTPException, Query
-from pydantic import BaseModel
-from typing import Dict, List, Optional
-from datetime import datetime, timezone, timedelta
+from typing import Dict, Optional
+from datetime import datetime, timezone
 import secrets
 _rng = secrets.SystemRandom()
 import logging

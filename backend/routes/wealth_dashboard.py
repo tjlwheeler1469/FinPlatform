@@ -3,9 +3,8 @@ Wealth Dashboard Routes
 Comprehensive wealth tracking across all asset classes:
 Cash, Stocks, ETFs, Managed Accounts, Funds, Property, Crypto, Super
 """
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
 from datetime import datetime, timezone, timedelta
 import secrets
 _rng = secrets.SystemRandom()

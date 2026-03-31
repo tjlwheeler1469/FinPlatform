@@ -8,13 +8,11 @@ Supports:
 """
 
 import os
-import json
-import asyncio
 import logging
 import uuid
 from datetime import datetime, timezone
 from typing import Optional, Dict, Any, List
-from fastapi import APIRouter, HTTPException, BackgroundTasks
+from fastapi import APIRouter, BackgroundTasks
 from pydantic import BaseModel, Field
 from motor.motor_asyncio import AsyncIOMotorClient
 
@@ -487,7 +485,7 @@ async def send_fcm_push(subscription: Dict, notification: Dict) -> dict:
     # Using Firebase Admin SDK
     try:
         import firebase_admin
-        from firebase_admin import credentials, messaging
+        from firebase_admin import messaging
         
         # Initialize Firebase if not already done
         if not firebase_admin._apps:

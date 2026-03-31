@@ -3,7 +3,7 @@ CRM Routes
 Client Relationship Management for advisers.
 Comprehensive client data with accounts, transactions, modelling capabilities.
 """
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Dict, List, Optional, Any
 from datetime import datetime, timezone, timedelta

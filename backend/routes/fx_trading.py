@@ -5,12 +5,11 @@ Multi-currency execution for international portfolios.
 """
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
-from datetime import datetime, timezone, timedelta
+from typing import Dict, Optional
+from datetime import datetime, timezone
 from enum import Enum
 import uuid
 import logging
-import os
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/fx", tags=["FX Trading"])

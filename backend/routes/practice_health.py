@@ -3,10 +3,9 @@ Practice Health Dashboard
 Real-time monitoring of practice performance, health metrics, and KPIs.
 This is the pulse of the advisory practice.
 """
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
-from datetime import datetime, timezone, timedelta
+from fastapi import APIRouter
+from typing import Dict
+from datetime import datetime, timezone
 import logging
 
 logger = logging.getLogger(__name__)

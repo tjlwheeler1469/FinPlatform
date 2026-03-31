@@ -3,7 +3,7 @@ Services Australia Age Pension Calculator API
 Estimates Age Pension eligibility and payments based on current rates (2025-2026)
 Note: This is an estimation tool - actual pension depends on Centrelink assessment
 """
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime, date

@@ -13,7 +13,7 @@ import os
 import uuid
 import hashlib
 from datetime import datetime, timezone, timedelta
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from motor.motor_asyncio import AsyncIOMotorClient

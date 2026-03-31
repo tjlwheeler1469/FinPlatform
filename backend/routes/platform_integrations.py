@@ -3,7 +3,7 @@ Platform Integrations Module - AMP North, Netwealth, Hub24, Class, IRESS
 Bi-directional data sync with audit logging for enterprise wealth platforms
 """
 
-from fastapi import APIRouter, HTTPException, BackgroundTasks
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timezone

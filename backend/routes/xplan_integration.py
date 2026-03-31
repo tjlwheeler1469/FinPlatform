@@ -20,11 +20,10 @@ Features:
 import os
 import uuid
 import httpx
-import asyncio
 from datetime import datetime, timezone, timedelta
 from typing import Optional, Dict, Any, List
 from fastapi import APIRouter, HTTPException, BackgroundTasks
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from motor.motor_asyncio import AsyncIOMotorClient
 import logging
 

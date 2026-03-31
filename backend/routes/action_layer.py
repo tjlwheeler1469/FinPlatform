@@ -3,8 +3,8 @@ Action Layer - Execution Engine
 1-Click execution for insights: Portfolio rebalancing, tax loss harvesting, client communications.
 This is the core of the "System of Execution" - transforming insights into actions.
 """
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
+from fastapi import APIRouter
+from pydantic import BaseModel
 from typing import Dict, List, Optional, Any
 from datetime import datetime, timezone
 from enum import Enum

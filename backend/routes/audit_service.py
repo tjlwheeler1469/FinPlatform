@@ -14,9 +14,9 @@ import uuid
 import hashlib
 import json
 from datetime import datetime, timezone, timedelta
-from typing import Optional, Dict, Any, List
-from fastapi import APIRouter, HTTPException, Request
-from pydantic import BaseModel, Field
+from typing import Optional, Dict, Any
+from fastapi import APIRouter, Request
+from pydantic import BaseModel
 from motor.motor_asyncio import AsyncIOMotorClient
 import logging
 

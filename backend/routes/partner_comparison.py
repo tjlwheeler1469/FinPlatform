@@ -6,9 +6,9 @@ Side-by-side comparison of individual vs couple retirement confidence scores
 import os
 import logging
 from datetime import datetime, timezone
-from typing import Optional, Dict, Any, List
-from fastapi import APIRouter, HTTPException, Query
-from pydantic import BaseModel, Field
+from typing import Dict, Any
+from fastapi import APIRouter, Query
+from pydantic import BaseModel
 from motor.motor_asyncio import AsyncIOMotorClient
 import uuid
 import numpy as np

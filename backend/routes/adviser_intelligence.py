@@ -6,11 +6,10 @@ Daily insights, client alerts, and opportunity identification
 import os
 import logging
 from datetime import datetime, timezone, timedelta
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, List
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from motor.motor_asyncio import AsyncIOMotorClient
-import uuid
 
 logger = logging.getLogger(__name__)
 

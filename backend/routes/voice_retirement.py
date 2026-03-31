@@ -6,7 +6,7 @@ with CGT, franking credits, super rules, and Age Pension calculations.
 
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from pydantic import BaseModel
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional
 import os
 import json
 import tempfile

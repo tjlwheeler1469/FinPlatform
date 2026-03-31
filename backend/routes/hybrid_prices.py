@@ -4,7 +4,7 @@ Fetches real-time prices for Australian bank hybrids from ASX via yfinance.
 Includes live BBSW rates from RBA and enhanced data sources.
 """
 from fastapi import APIRouter, HTTPException
-from typing import Optional, List, Dict, Any
+from typing import List, Dict, Any
 from datetime import datetime, timezone
 from concurrent.futures import ThreadPoolExecutor
 import logging

@@ -6,9 +6,9 @@ Provides unified access to client wealth data for the Retirement Planner
 import os
 import logging
 from datetime import datetime, timezone
-from typing import Optional, Dict, Any, List
-from fastapi import APIRouter, HTTPException, Query
-from pydantic import BaseModel, Field
+from typing import List
+from fastapi import APIRouter
+from pydantic import BaseModel
 from motor.motor_asyncio import AsyncIOMotorClient
 
 logger = logging.getLogger(__name__)

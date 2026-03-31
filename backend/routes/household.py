@@ -3,10 +3,10 @@ Household Intelligence System
 Multi-generational family trees, business entities, trusts, and professional networks.
 The foundation of wealth management - wealth is relational, not individual.
 """
-from fastapi import APIRouter, HTTPException, Query
-from pydantic import BaseModel, Field
-from typing import Dict, List, Optional, Any
-from datetime import datetime, timezone, date
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
+from typing import Dict, List, Optional
+from datetime import datetime, timezone
 from enum import Enum
 import uuid
 import logging
