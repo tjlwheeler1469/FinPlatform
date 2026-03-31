@@ -67,7 +67,7 @@ async def fetch_bbsw_rate() -> float:
                     if resp.status == 200:
                         # Parse would happen here - simplified
                         pass
-            except:
+            except Exception:
                 pass
             
             # Return realistic BBSW based on current market conditions (March 2026)

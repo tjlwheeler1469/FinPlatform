@@ -215,7 +215,7 @@ async def create_or_update_budget(client_id: str, budget: ClientBudget):
     budget_dict = budget.dict()
     budget_dict["updated_at"] = now
     
-    result = await db.client_budgets.update_one(
+    await db.client_budgets.update_one(
         {"client_id": client_id},
         {"$set": budget_dict, "$setOnInsert": {"created_at": now}},
         upsert=True
@@ -455,7 +455,7 @@ async def delete_budget_goal(client_id: str, goal_id: str):
     """Delete a budget goal"""
     db = await get_db()
     
-    result = await db.client_budgets.update_one(
+    await db.client_budgets.update_one(
         {"client_id": client_id},
         {"$pull": {"goals": {"goal_id": goal_id}}}
     )

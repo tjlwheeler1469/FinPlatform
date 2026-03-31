@@ -338,7 +338,7 @@ async def list_households() -> dict:
         entities_count = len(hh.get("entities", []))
         
         # Calculate total household net worth
-        total_assets = sum(m.get("annual_income", 0) for m in hh.get("members", []))
+        _total_assets = sum(m.get("annual_income", 0) for m in hh.get("members", []))
         entity_assets = sum(e.get("assets", 0) - e.get("liabilities", 0) for e in hh.get("entities", []))
         
         households.append({
@@ -407,7 +407,7 @@ async def get_family_tree(household_id: str) -> dict:
             try:
                 dob = datetime.strptime(member["date_of_birth"], "%Y-%m-%d")
                 age = (datetime.now() - dob).days // 365
-            except:
+            except Exception:
                 pass
         
         nodes.append({

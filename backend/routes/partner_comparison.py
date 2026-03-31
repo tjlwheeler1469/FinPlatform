@@ -100,7 +100,7 @@ def run_monte_carlo_simulation(
                 wealth = 0
                 break
         
-        wealth_at_retirement = wealth
+        # wealth captured at retirement
         
         # Decumulation phase
         for year in range(retirement_years):

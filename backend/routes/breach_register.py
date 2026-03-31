@@ -238,7 +238,7 @@ async def register_breach(breach: Breach):
             licensee_id=breach.licensee_id,
             action_description=f"Breach registered: {breach.title} ({breach.severity.value})"
         ))
-    except:
+    except Exception:
         pass
     
     return {
@@ -386,7 +386,7 @@ async def report_to_asic(breach_id: str, report: ASICReport):
             user_id=report.reported_by,
             action_description=f"Breach reported to ASIC: {report.report_reference}"
         ))
-    except:
+    except Exception:
         pass
     
     return {

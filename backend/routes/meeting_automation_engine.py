@@ -25,7 +25,7 @@ try:
     from services.ai_service import AIService
     ai_service = AIService()
     AI_AVAILABLE = True
-except:
+except Exception:
     ai_service = None
     logger.warning("AI service not available for meeting automation")
 
@@ -34,7 +34,7 @@ try:
     from db import db
     meetings_collection = db.automated_meetings
     DB_AVAILABLE = True
-except:
+except Exception:
     DB_AVAILABLE = False
     logger.warning("Database not available - using in-memory storage")
 
@@ -99,7 +99,7 @@ def generate_ai_summary(transcript: str, meeting_type: str, client_name: str) ->
     # If AI available, use it
     if AI_AVAILABLE and ai_service:
         try:
-            prompt = f"""Analyze this financial advisory meeting transcript and provide:
+            _prompt = f"""Analyze this financial advisory meeting transcript and provide:
 1. Executive Summary (2-3 sentences)
 2. Key Discussion Points (bullet points)
 3. Client Concerns/Questions
@@ -299,7 +299,7 @@ def generate_follow_up_emails(summary: Dict, client_name: str, meeting_type: str
     
     # Main follow-up email
     topics = summary.get("topics_discussed", [])
-    topic_text = ", ".join(topics[:3]) if topics else "our discussion"
+    _topic_text = ", ".join(topics[:3]) if topics else "our discussion"
     
     emails.append({
         "email_id": f"email_{uuid.uuid4().hex[:8]}",

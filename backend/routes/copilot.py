@@ -174,7 +174,7 @@ async def generate_financial_plan(request: PlanGenerationRequest):
                 "retirement_age": request.retirement_age,
                 "annual_income": request.annual_income
             })
-        except:
+        except Exception:
             raise HTTPException(status_code=500, detail=str(e))
 
 

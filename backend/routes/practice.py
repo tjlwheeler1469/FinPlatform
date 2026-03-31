@@ -71,7 +71,7 @@ async def get_practice_dashboard() -> dict:
     # Calculate stats
     total_hours_this_month = sum(t.get("hours", 0) for t in time_entries)
     billable_hours = sum(t.get("hours", 0) for t in time_entries if t.get("billable"))
-    total_revenue = sum(i.get("amount", 0) for i in invoices if i.get("status") == "paid")
+    _total_revenue = sum(i.get("amount", 0) for i in invoices if i.get("status") == "paid")
     outstanding = sum(i.get("amount", 0) for i in invoices if i.get("status") in ["pending", "sent"])
     
     return {

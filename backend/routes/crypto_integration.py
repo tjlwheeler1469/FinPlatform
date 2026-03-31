@@ -119,8 +119,10 @@ CRYPTO_ASSETS = {
 }
 
 
-# Live crypto prices (would come from real API)
-CRYPTO_PRICES = {
+# Live crypto prices - fetched from CoinGecko with fallback
+_live_crypto_cache = {"data": None, "timestamp": None}
+
+CRYPTO_FALLBACK = {
     "BTC": {"price": 67500, "change_24h": 2.1, "change_7d": 5.8, "volume_24h": 28000000000},
     "ETH": {"price": 3450, "change_24h": -1.2, "change_7d": 3.2, "volume_24h": 15000000000},
     "SOL": {"price": 145, "change_24h": 4.5, "change_7d": 12.3, "volume_24h": 2500000000},
@@ -130,6 +132,50 @@ CRYPTO_PRICES = {
     "USDC": {"price": 1.00, "change_24h": 0.0, "change_7d": 0.0, "volume_24h": 5000000000},
     "USDT": {"price": 1.00, "change_24h": 0.0, "change_7d": 0.0, "volume_24h": 45000000000},
 }
+
+COINGECKO_SYMBOL_MAP = {
+    "BTC": "bitcoin", "ETH": "ethereum", "SOL": "solana", "XRP": "ripple",
+    "ADA": "cardano", "LINK": "chainlink", "USDC": "usd-coin", "USDT": "tether",
+}
+
+async def _fetch_live_crypto() -> Dict:
+    """Fetch live crypto prices from CoinGecko with 60s cache."""
+    import httpx
+    now = datetime.now(timezone.utc)
+    if _live_crypto_cache["data"] and _live_crypto_cache["timestamp"]:
+        if (now - _live_crypto_cache["timestamp"]).total_seconds() < 60:
+            return _live_crypto_cache["data"]
+    try:
+        coin_ids = ",".join(COINGECKO_SYMBOL_MAP.values())
+        url = f"https://api.coingecko.com/api/v3/simple/price?ids={coin_ids}&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true"
+        async with httpx.AsyncClient(timeout=8.0) as client:
+            resp = await client.get(url)
+            resp.raise_for_status()
+            raw = resp.json()
+        result = {}
+        for symbol, cg_id in COINGECKO_SYMBOL_MAP.items():
+            if cg_id in raw:
+                d = raw[cg_id]
+                result[symbol] = {
+                    "price": round(d.get("usd", 0), 2),
+                    "change_24h": round(d.get("usd_24h_change", 0), 2),
+                    "change_7d": CRYPTO_FALLBACK.get(symbol, {}).get("change_7d", 0),
+                    "volume_24h": d.get("usd_24h_vol", 0),
+                }
+            else:
+                result[symbol] = CRYPTO_FALLBACK.get(symbol, {})
+        _live_crypto_cache["data"] = result
+        _live_crypto_cache["timestamp"] = now
+        return result
+    except Exception as e:
+        logger.warning(f"CoinGecko fetch failed, using fallback: {e}")
+        return CRYPTO_FALLBACK
+
+def get_crypto_price(symbol: str) -> Dict:
+    """Get crypto price (sync access to cache, fallback if no cache)."""
+    if _live_crypto_cache["data"] and symbol in _live_crypto_cache["data"]:
+        return _live_crypto_cache["data"][symbol]
+    return CRYPTO_FALLBACK.get(symbol, {"price": 0, "change_24h": 0, "change_7d": 0, "volume_24h": 0})
 
 
 # Client crypto holdings
@@ -171,7 +217,7 @@ def calculate_crypto_value(holdings: List[Dict]) -> Dict:
         quantity = h["quantity"]
         cost_basis = h["cost_basis"]
         
-        current_price = CRYPTO_PRICES.get(symbol, {}).get("price", 0)
+        current_price = get_crypto_price(symbol).get("price", 0)
         current_value = quantity * current_price
         gain = current_value - cost_basis
         gain_pct = (gain / cost_basis * 100) if cost_basis > 0 else 0
@@ -188,7 +234,7 @@ def calculate_crypto_value(holdings: List[Dict]) -> Dict:
             "cost_basis": cost_basis,
             "unrealized_gain": gain,
             "unrealized_gain_pct": round(gain_pct, 2),
-            "change_24h": CRYPTO_PRICES.get(symbol, {}).get("change_24h", 0)
+            "change_24h": get_crypto_price(symbol).get("change_24h", 0)
         })
     
     total_gain = total_value - total_cost
@@ -213,8 +259,8 @@ async def get_crypto_assets():
             {
                 "symbol": symbol,
                 **data,
-                "current_price": CRYPTO_PRICES.get(symbol, {}).get("price", 0),
-                "change_24h": CRYPTO_PRICES.get(symbol, {}).get("change_24h", 0)
+                "current_price": get_crypto_price(symbol).get("price", 0),
+                "change_24h": get_crypto_price(symbol).get("change_24h", 0)
             }
             for symbol, data in CRYPTO_ASSETS.items()
         ],
@@ -233,15 +279,17 @@ async def get_crypto_asset(symbol: str):
     return {
         "symbol": symbol,
         **CRYPTO_ASSETS[symbol],
-        "price_data": CRYPTO_PRICES.get(symbol, {})
+        "price_data": get_crypto_price(symbol)
     }
 
 
 @router.get("/prices")
 async def get_crypto_prices():
-    """Get all crypto prices."""
+    """Get all crypto prices (live from CoinGecko)."""
+    prices = await _fetch_live_crypto()
     return {
-        "prices": CRYPTO_PRICES,
+        "prices": prices,
+        "source": "CoinGecko",
         "timestamp": datetime.now(timezone.utc).isoformat()
     }
 
@@ -425,10 +473,10 @@ async def preview_crypto_trade(
     """Preview a crypto trade with cost and tax implications."""
     symbol = symbol.upper()
     
-    if symbol not in CRYPTO_PRICES:
+    if not get_crypto_price(symbol).get("price"):
         raise HTTPException(status_code=404, detail=f"Crypto {symbol} not found")
     
-    price = CRYPTO_PRICES[symbol]["price"]
+    price = get_crypto_price(symbol).get("price", 0)
     value = quantity * price
     
     # Estimate fees

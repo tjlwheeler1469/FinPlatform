@@ -207,7 +207,7 @@ def get_market_indices() -> Dict[str, Any]:
                 "change": data.get("change", 0),
                 "change_percent": data.get("change_percent", 0)
             })
-        except:
+        except Exception:
             results.append({
                 "symbol": idx["symbol"],
                 "name": idx["name"],
@@ -250,7 +250,7 @@ def get_sector_performance() -> Dict[str, Any]:
                 "day_change": data.get("change_percent", 0),
                 "ytd_return": hist.get("total_return", 0)
             })
-        except:
+        except Exception:
             results.append({
                 "symbol": sector["symbol"],
                 "name": sector["name"],
@@ -326,7 +326,7 @@ def get_dividend_calendar(symbols: List[str]) -> Dict[str, Any]:
                     "ex_dividend_date": datetime.fromtimestamp(ex_date).isoformat() if ex_date else None,
                     "payment_frequency": "Quarterly" if div_rate > 0 else "None"
                 })
-        except:
+        except Exception:
             pass
     
     # Sort by ex-dividend date

@@ -358,7 +358,7 @@ async def get_asset_assumptions():
         "assumptions": ASSET_RETURN_ASSUMPTIONS,
         "entity_types": [e.value for e in EntityType],
         "asset_types": [a.value for a in AssetType],
-        "liability_types": [l.value for l in LiabilityType]
+        "liability_types": [item.value for item in LiabilityType]
     }
 
 @router.post("/calculate")
@@ -417,7 +417,7 @@ async def calculate_decumulation(request: DecumulationRequest):
         # Calculate totals
         total_assets = sum(a.current_value for a in request.assets)
         total_super_pension = sum(p.current_balance for p in request.super_pensions)
-        total_liabilities = sum(l.current_balance for l in request.liabilities)
+        total_liabilities = sum(item.current_balance for item in request.liabilities)
         net_position = total_assets + total_super_pension - total_liabilities
         
         # Assessable assets for Age Pension (exclude home)
@@ -430,7 +430,7 @@ async def calculate_decumulation(request: DecumulationRequest):
         asset_income = sum(calculate_asset_income(a) for a in request.assets)
         pension_income = sum(p.current_balance * 0.05 for p in request.super_pensions)  # Approx 5% drawdown
         other_income = sum(i.annual_amount for i in request.other_income if i.start_age <= person.current_age)
-        total_income = asset_income + pension_income + other_income
+        _total_income = asset_income + pension_income + other_income
         
         # Deemed income for pension test
         deemed_income = calculate_deemed_income(assessable_assets, is_single)

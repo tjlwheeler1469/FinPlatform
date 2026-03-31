@@ -71,10 +71,10 @@ async def get_audit_logs(
     end_date: Optional[str] = None
 ):
     """Get audit logs for a client."""
-    logs = [l for l in AUDIT_LOGS if l["client_id"] == client_id]
+    logs = [entry for entry in AUDIT_LOGS if entry["client_id"] == client_id]
     
     if action_type:
-        logs = [l for l in logs if l["action_type"] == action_type]
+        logs = [entry for entry in logs if entry["action_type"] == action_type]
     
     # Sort by timestamp descending
     logs.sort(key=lambda x: x["timestamp"], reverse=True)

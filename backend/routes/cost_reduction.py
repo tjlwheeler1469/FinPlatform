@@ -158,7 +158,7 @@ async def get_cost_reduction_dashboard(licensee_id: str = "lic_default"):
             "logged_at": {"$gte": year_ago}
         })
         breach_cost_avoided = breaches_prevented * COST_ASSUMPTIONS["breach_remediation_cost"]
-    except:
+    except Exception:
         breaches_prevented = 0
         breach_cost_avoided = 0
     
@@ -170,7 +170,7 @@ async def get_cost_reduction_dashboard(licensee_id: str = "lic_default"):
             "compliance_result": "PASS",
             "created_at": {"$gte": month_ago}
         })
-    except:
+    except Exception:
         auto_approved = 0
     
     return {

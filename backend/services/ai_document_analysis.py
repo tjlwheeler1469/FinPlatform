@@ -303,7 +303,7 @@ def get_document_insights(documents: List[Dict]) -> Dict[str, Any]:
                         "expiry_date": expiry,
                         "days_until": days_until
                     })
-            except:
+            except Exception:
                 pass
     
     # Identify gaps

@@ -501,7 +501,7 @@ async def get_audit_statistics(licensee_id: str = "lic_default"):
     now = datetime.now(timezone.utc)
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
     week_ago = (now - timedelta(days=7)).isoformat()
-    month_ago = (now - timedelta(days=30)).isoformat()
+    # month_ago reserved for future use
     
     total_events = await audit_events_col.count_documents({"licensee_id": licensee_id})
     today_events = await audit_events_col.count_documents({

@@ -619,7 +619,7 @@ async def list_file_notes(
         try:
             xplan_data = await make_xplan_request("GET", f"/clients/{client_id}/file_notes", user_id)
             xplan_notes = xplan_data.get("file_notes", [])
-        except:
+        except Exception:
             pass
     
     return {
@@ -644,8 +644,8 @@ async def sync_single_client(
     
     try:
         # Fetch all client data
-        client = await get_xplan_client(client_id, user_id, refresh=True)
-        portfolio = await get_xplan_portfolio(client_id, user_id)
+        _client = await get_xplan_client(client_id, user_id, refresh=True)
+        _portfolio = await get_xplan_portfolio(client_id, user_id)
         transactions = await get_xplan_transactions(client_id, 50, user_id)
         
         duration = (datetime.now(timezone.utc) - start_time).total_seconds()
@@ -707,7 +707,7 @@ async def sync_all_clients(
         try:
             await sync_single_client(cid, user_id)
             synced += 1
-        except:
+        except Exception:
             failed += 1
     
     duration = (datetime.now(timezone.utc) - start_time).total_seconds()

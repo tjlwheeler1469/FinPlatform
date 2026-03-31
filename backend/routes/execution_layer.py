@@ -405,7 +405,7 @@ class CryptoBroker(BrokerInterface):
         try:
             await self.exchange.cancel_order(order_id)
             return True
-        except:
+        except Exception:
             return False
     
     async def close(self) -> dict:

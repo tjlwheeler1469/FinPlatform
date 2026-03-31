@@ -162,7 +162,7 @@ def calculate_tax_loss_harvest(individual: Dict) -> Dict:
     losses = individual.get("unrealized_losses", {})
     gains = individual.get("unrealized_gains", {})
     
-    total_losses = sum(l.get("loss", 0) for l in losses.values())
+    total_losses = sum(loss_item.get("loss", 0) for loss_item in losses.values())
     total_gains = sum(
         (g.get("value", 0) - g.get("cost", 0)) * (1 - CGT_DISCOUNT if g.get("held_months", 0) > 12 else 1)
         for g in gains.values()
@@ -342,7 +342,7 @@ async def get_tax_strategies(client_id: str):
         # Strategy 2: Tax-Loss Harvesting
         losses = individual.get("unrealized_losses", {})
         if losses:
-            total_loss = sum(l.get("loss", 0) for l in losses.values())
+            total_loss = sum(loss_item.get("loss", 0) for loss_item in losses.values())
             if total_loss > 1000:
                 strategies.append({
                     "strategy": "Tax-Loss Harvesting",

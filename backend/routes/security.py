@@ -240,9 +240,9 @@ async def get_audit_logs(
     # Filter mock logs
     logs = AUDIT_LOGS.copy()
     if user_id:
-        logs = [l for l in logs if l.get("user_id") == user_id]
+        logs = [entry for entry in logs if entry.get("user_id") == user_id]
     if action:
-        logs = [l for l in logs if l.get("action") == action]
+        logs = [entry for entry in logs if entry.get("action") == action]
     
     return {"logs": logs[:limit], "total": len(logs)}
 

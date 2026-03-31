@@ -257,7 +257,7 @@ async def record_feedback(feedback: ActionFeedback):
     feedback_id = f"feedback_{uuid.uuid4().hex[:8]}"
     now = datetime.now(timezone.utc)
     
-    feedback_record = {
+    _feedback_record = {
         "feedback_id": feedback_id,
         "action_id": feedback.action_id,
         "action_type": feedback.action_type.value,
@@ -377,7 +377,7 @@ async def get_outcomes(
 @router.get("/analytics/{advisor_id}")
 async def get_advisor_analytics(advisor_id: str, days: int = 90):
     """Get comprehensive analytics for an advisor."""
-    cutoff = datetime.now(timezone.utc) - timedelta(days=days)
+    _cutoff = datetime.now(timezone.utc) - timedelta(days=days)
     
     # Get outcomes for this advisor
     advisor_outcomes = [o for o in ACTION_OUTCOMES.values() 

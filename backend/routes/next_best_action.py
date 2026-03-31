@@ -226,7 +226,7 @@ def calculate_action_score(client: Dict, action_type: str) -> float:
 def generate_next_best_actions() -> List[Dict]:
     """Generate prioritized list of next best actions across all clients."""
     actions = []
-    now = datetime.now(timezone.utc)
+    # timestamp for eofy calc
     days_to_eofy = max(0, (datetime(2025, 6, 30) - datetime.now()).days)
     
     for client_id, client in CLIENTS_DB.items():

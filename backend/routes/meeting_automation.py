@@ -82,7 +82,7 @@ Format the response as JSON with these keys: summary, key_points, client_concern
         import json
         try:
             notes = json.loads(response.content)
-        except:
+        except Exception:
             notes = {
                 "summary": response.content[:500],
                 "key_points": request.topics_discussed,
@@ -286,16 +286,16 @@ async def get_compliance_logs(
     logs = COMPLIANCE_LOGS.copy()
     
     if client_id:
-        logs = [l for l in logs if l.get("client_id") == client_id]
+        logs = [item for item in logs if item.get("client_id") == client_id]
     if status:
-        logs = [l for l in logs if l.get("review_status") == status]
+        logs = [item for item in logs if item.get("review_status") == status]
     
     logs.sort(key=lambda x: x.get("created_at", ""), reverse=True)
     
     return {
         "logs": logs[:limit],
         "total": len(logs),
-        "pending_review": len([l for l in logs if l.get("review_status") == "pending"])
+        "pending_review": len([item for item in logs if item.get("review_status") == "pending"])
     }
 
 

@@ -151,6 +151,7 @@ ROUTE_REGISTRY = [
     ("routes.voice_retirement", "router", "/api", "Voice Retirement Analysis"),
     ("routes.voice_command", "router", "/api", "Voice Command Router"),
     ("routes.pdf_report", "router", "/api", "PDF Report Generator"),
+    ("routes.client_pack_scheduler", "router", "", "Client Pack Scheduler"),
     ("routes.buffett_engine", "router", "/api", "Buffett Engine"),
 ]
 

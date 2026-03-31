@@ -885,7 +885,7 @@ async def get_workflow_stats() -> dict:
                 created = datetime.fromisoformat(w["created_at"].replace("Z", "+00:00"))
                 completed_dt = datetime.fromisoformat(w["completed_at"].replace("Z", "+00:00"))
                 completion_times.append((completed_dt - created).days)
-            except:
+            except Exception:
                 pass
     
     avg_completion_days = round(sum(completion_times) / len(completion_times), 1) if completion_times else 0

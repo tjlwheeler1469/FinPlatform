@@ -167,7 +167,7 @@ def run_deterministic_model(
     
     portfolio_path = [current_portfolio]
     contributions = annual_contributions
-    withdrawals = 0
+    # withdrawals tracked via retirement_withdrawals
     retirement_withdrawals = retirement_spending
     
     year_of_depletion = None
@@ -242,12 +242,12 @@ def run_monte_carlo_simulation(
             Return[t] ~ Normal(mean=μ, std=σ)
             Inflation[t] ~ Normal(mean=i, std=i_std)
     """
-    years_to_retirement = retirement_age - current_age
-    retirement_years = life_expectancy - retirement_age
+    _years_to_retirement = retirement_age - current_age
+    _retirement_years = life_expectancy - retirement_age
     total_years = life_expectancy - current_age
     
     # Pre-compute expected portfolio path for dynamic spending thresholds
-    deterministic = run_deterministic_model(
+    _deterministic = run_deterministic_model(
         current_portfolio, current_age, retirement_age, life_expectancy,
         annual_contributions, retirement_spending, expected_return,
         inflation_mean, income_growth, fee_rate
@@ -326,7 +326,7 @@ def run_monte_carlo_simulation(
     success_rate = successful_simulations / num_simulations
     
     # SECTION 3: Downside Risk (Tail Risk)
-    sorted_outcomes = np.sort(final_portfolios)
+    _sorted_outcomes = np.sort(final_portfolios)
     p10 = np.percentile(final_portfolios, 10)
     p25 = np.percentile(final_portfolios, 25)
     p50 = np.percentile(final_portfolios, 50)

@@ -326,15 +326,15 @@ async def get_audit_log(
     
     # Apply filters
     if user_id:
-        logs = [l for l in logs if l.get("user_id") == user_id]
+        logs = [item for item in logs if item.get("user_id") == user_id]
     if action:
-        logs = [l for l in logs if l.get("action") == action]
+        logs = [item for item in logs if item.get("action") == action]
     if resource_type:
-        logs = [l for l in logs if l.get("resource_type") == resource_type]
+        logs = [item for item in logs if item.get("resource_type") == resource_type]
     if start_date:
-        logs = [l for l in logs if l.get("timestamp", "") >= start_date]
+        logs = [item for item in logs if item.get("timestamp", "") >= start_date]
     if end_date:
-        logs = [l for l in logs if l.get("timestamp", "") <= end_date]
+        logs = [item for item in logs if item.get("timestamp", "") <= end_date]
     
     # Sort by timestamp descending
     logs.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
@@ -390,7 +390,7 @@ async def create_audit_entry(
 async def get_audit_summary(days: int = 7) -> dict:
     """Get summary of audit activity."""
     cutoff = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
-    recent_logs = [l for l in AUDIT_LOG if l.get("timestamp", "") >= cutoff]
+    recent_logs = [item for item in AUDIT_LOG if item.get("timestamp", "") >= cutoff]
     
     # Count by action
     by_action = {}
@@ -416,7 +416,7 @@ async def get_audit_summary(days: int = 7) -> dict:
         "by_action": by_action,
         "by_user": by_user,
         "by_resource_type": by_resource,
-        "failed_events": len([l for l in recent_logs if not l.get("success", True)]),
+        "failed_events": len([item for item in recent_logs if not item.get("success", True)]),
         "timestamp": datetime.now(timezone.utc).isoformat()
     }
 

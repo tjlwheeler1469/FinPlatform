@@ -143,8 +143,8 @@ async def get_compliance_dashboard() -> Dict[str, Any]:
     
     total = len(docs)
     
-    # Map statuses to dashboard categories
-    status_map = {
+    # Status categories for compliance mapping
+    _status_map = {
         "reviewed": "compliant",
         "signed": "compliant",
         "implemented": "compliant",

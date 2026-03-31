@@ -430,8 +430,8 @@ async def get_book_insights() -> dict:
             sector_totals[sector] = sector_totals.get(sector, 0) + holding.get("value", 0)
     
     # Calculate book-wide metrics
-    cash_total = sector_totals.get("Cash", 0)
-    tech_total = sector_totals.get("Technology", 0)
+    _cash_total = sector_totals.get("Cash", 0)
+    _tech_total = sector_totals.get("Technology", 0)
     
     # Find clients with specific issues
     clients_over_cash = []

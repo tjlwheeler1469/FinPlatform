@@ -61,6 +61,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { ComplianceFooter } from "@/components/ComplianceDisclaimer";
+import KnowledgeGraphPanel from "@/components/KnowledgeGraphPanel";
+import ClientPackScheduler from "@/components/ClientPackScheduler";
 
 const API_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || "";
 
@@ -1054,6 +1056,12 @@ const AdvisorCommandCenter = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* ===== ZONE 9.5: KNOWLEDGE GRAPH VISUALIZATION ===== */}
+        <KnowledgeGraphPanel />
+
+        {/* ===== ZONE 9.6: CLIENT PACK SCHEDULER ===== */}
+        <ClientPackScheduler />
 
         {/* ===== ZONE 10: INSTANT CLIENT MEETING PREP ===== */}
         <Card>

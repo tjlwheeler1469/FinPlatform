@@ -120,8 +120,8 @@ async def get_client_wealth_snapshot(client_id: str):
             "incomes": incomes,
             "expenses": client.get("expenses", get_default_expenses()),
             "total_assets": sum(a.get("value", 0) for a in assets),
-            "total_liabilities": sum(l.get("balance", 0) for l in liabilities),
-            "net_worth": sum(a.get("value", 0) for a in assets) - sum(l.get("balance", 0) for l in liabilities),
+            "total_liabilities": sum(item.get("balance", 0) for item in liabilities),
+            "net_worth": sum(a.get("value", 0) for a in assets) - sum(item.get("balance", 0) for item in liabilities),
             "total_income": sum(i.get("amount", 0) for i in incomes),
             "total_expenses": sum(e.get("monthly", 0) for e in client.get("expenses", get_default_expenses())) * 12
         }
@@ -161,8 +161,8 @@ async def save_client_wealth_data(client_id: str, data: ClientWealthSnapshot):
     await db.client_liabilities.delete_many({"client_id": client_id})
     if data.liabilities:
         liabilities_to_insert = [
-            {**l.model_dump(), "client_id": client_id}
-            for l in data.liabilities
+            {**item.model_dump(), "client_id": client_id}
+            for item in data.liabilities
         ]
         await db.client_liabilities.insert_many(liabilities_to_insert)
     

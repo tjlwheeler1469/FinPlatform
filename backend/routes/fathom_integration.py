@@ -248,7 +248,7 @@ async def get_meeting(meeting_id: str) -> dict:
     if not MOCK_MODE:
         try:
             return await fathom_api_request("GET", f"meetings/{meeting_id}")
-        except:
+        except Exception:
             pass
     
     raise HTTPException(status_code=404, detail="Meeting not found")

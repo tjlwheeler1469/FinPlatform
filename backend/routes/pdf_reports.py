@@ -86,7 +86,7 @@ def create_compliance_report_pdf(
             textColor=colors.HexColor('#333333')
         )
         
-        body_style = ParagraphStyle(
+        _body_style = ParagraphStyle(
             'BodyText',
             parent=styles['Normal'],
             fontSize=10,

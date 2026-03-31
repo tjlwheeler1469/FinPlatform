@@ -544,7 +544,7 @@ async def get_indices(region: Optional[str] = None) -> dict:
     loop = asyncio.get_event_loop()
     try:
         live_indices = await loop.run_in_executor(executor, fetch_live_indices)
-    except:
+    except Exception:
         live_indices = None
     
     if region and region in INDICES:
@@ -630,7 +630,7 @@ async def get_crypto() -> dict:
     loop = asyncio.get_event_loop()
     try:
         live_crypto = await loop.run_in_executor(executor, fetch_live_crypto)
-    except:
+    except Exception:
         live_crypto = None
     
     crypto_data = live_crypto if live_crypto else update_data_with_jitter(CRYPTO)

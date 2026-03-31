@@ -19,7 +19,7 @@ ALPACA_AVAILABLE = False
 try:
     from routes.alpaca_trading import get_trading_client, require_alpaca_client, ALPACA_AVAILABLE as ALPACA_SDK
     ALPACA_AVAILABLE = ALPACA_SDK
-except:
+except Exception:
     pass
 
 # In-memory storage for execution history

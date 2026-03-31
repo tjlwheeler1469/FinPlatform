@@ -196,7 +196,7 @@ def run_monte_carlo_simulation(
     
     # Calculate totals
     total_assets = sum(a.current_value for a in request.assets)
-    total_liabilities = sum(l.balance for l in request.liabilities)
+    total_liabilities = sum(item.balance for item in request.liabilities)
     net_worth = total_assets - total_liabilities
     
     # Calculate weighted portfolio return and volatility
@@ -245,7 +245,7 @@ def run_monte_carlo_simulation(
         
         sim_success = True
         sim_shortfall_year = None
-        failure_reason = None
+        # failure tracking via category counters
         
         for year in range(total_years + 1):
             age = current_age + year
@@ -313,16 +313,12 @@ def run_monte_carlo_simulation(
                 # Determine failure reason
                 if year > retirement_years * 0.8:
                     longevity_failures += 1
-                    failure_reason = "longevity"
                 elif market_return < -0.15:
                     market_failures += 1
-                    failure_reason = "market"
                 elif inflation > 0.05:
                     inflation_failures += 1
-                    failure_reason = "inflation"
                 else:
                     spending_failures += 1
-                    failure_reason = "spending"
                 break
         
         if sim_success:

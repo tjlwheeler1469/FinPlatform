@@ -281,7 +281,7 @@ async def get_client_graph(client_id: str):
         sum(e.get("total_balance", 0) for e in graph.get("entities", []) if e.get("type") == "smsf")
     )
     
-    total_liabilities = sum(l.get("balance", 0) for l in graph.get("liabilities", []))
+    total_liabilities = sum(item.get("balance", 0) for item in graph.get("liabilities", []))
     
     return {
         "client_id": client_id,
@@ -433,7 +433,7 @@ async def get_estate_summary(client_id: str):
     trust_assets = sum(e.get("assets", 0) for e in graph.get("entities", []) if e.get("type") == "family_trust")
     super_balance = sum(e.get("total_balance", 0) for e in graph.get("entities", []) if e.get("type") == "smsf")
     
-    liabilities = sum(l.get("balance", 0) for l in graph.get("liabilities", []))
+    liabilities = sum(item.get("balance", 0) for item in graph.get("liabilities", []))
     
     total_estate = property_value + vehicle_value + collectibles_value + trust_assets + super_balance - liabilities
     

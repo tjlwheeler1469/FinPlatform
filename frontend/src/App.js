@@ -962,11 +962,13 @@ const AppRouter = () => {
       <Route path="/dashboard" element={<Suspense fallback={<PageLoader />}><Dashboard /></Suspense>} />
       <Route path="/overview" element={<FamilyOverview />} />
       <Route path="/budget" element={<HouseholdBudget />} />
-      <Route path="/tax-analysis" element={<TaxAnalysisSync />} />
+      {/* Tax - consolidate */}
+      <Route path="/tax-analysis" element={<Navigate to="/tax-analysis-sync" replace />} />
       <Route path="/property-portfolio" element={<PropertyPortfolio />} />
       <Route path="/monte-carlo" element={<MonteCarloSimulation />} />
       <Route path="/loan-calculator" element={<LoanCalculator />} />
-      <Route path="/scenarios" element={<SavedScenarios />} />
+      {/* Scenario routes - consolidate to /scenario-modelling */}
+      <Route path="/scenarios" element={<Navigate to="/scenario-modelling" replace />} />
       <Route path="/scenario-builder" element={<ScenarioBuilder />} />
       <Route path="/scenario-builder/:scenarioId" element={<ScenarioBuilder />} />
       <Route path="/cgt" element={<CGT />} />
@@ -977,8 +979,8 @@ const AppRouter = () => {
       <Route path="/reports" element={<ReportGenerator />} />
       <Route path="/salary-packaging" element={<SalaryPackaging />} />
       <Route path="/property-comparison" element={<PropertyComparison />} />
-      <Route path="/scenario-comparison" element={<Suspense fallback={<PageLoader />}><ScenarioComparison /></Suspense>} />
-      <Route path="/scenario-simulator" element={<Suspense fallback={<PageLoader />}><ScenarioSimulator /></Suspense>} />
+      <Route path="/scenario-comparison" element={<Navigate to="/scenario-modelling" replace />} />
+      <Route path="/scenario-simulator" element={<Navigate to="/scenario-modelling" replace />} />
       <Route path="/market-data" element={<Suspense fallback={<PageLoader />}><MarketData /></Suspense>} />
       <Route path="/tax-loss-harvesting" element={<TaxLossHarvesting />} />
       <Route path="/dividend-reinvestment" element={<DividendReinvestment />} />
@@ -1009,11 +1011,12 @@ const AppRouter = () => {
       <Route path="/risk-profiler" element={<RiskProfiler />} />
       <Route path="/statement-of-advice" element={<StatementOfAdvice />} />
       <Route path="/onboarding" element={<ClientOnboarding />} />
-      <Route path="/copilot" element={<Copilot />} />
+      <Route path="/copilot" element={<Navigate to="/ai-copilot-advanced" replace />} />
       <Route path="/daily-briefing" element={<DailyBriefing />} />
       <Route path="/personal-dashboard" element={<PersonalDashboard />} />
       <Route path="/unlisted-investments" element={<UnlistedInvestments />} />
-      <Route path="/adviser-dashboard" element={<AdviserDashboard />} />
+      {/* Dashboard redirects */}
+      <Route path="/adviser-dashboard" element={<Navigate to="/advisor-command-center" replace />} />
       <Route path="/client-portal-old" element={<ClientPortalMerged />} />
       <Route path="/practice-management" element={<PracticeManagement />} />
       <Route path="/documents" element={<DocumentsCommunications />} />
@@ -1025,13 +1028,14 @@ const AppRouter = () => {
       <Route path="/decision-dashboard" element={<DecisionDashboard />} />
       <Route path="/life-timeline" element={<LifeTimelinePlanner />} />
       <Route path="/timeline" element={<LifeTimeline />} />
-      <Route path="/clients" element={<ClientCRM />} />
-      <Route path="/client-crm" element={<ClientCRM />} />
+      {/* Client views - consolidate duplicates */}
+      <Route path="/clients" element={<Navigate to="/adviser-hub" replace />} />
+      <Route path="/client-crm" element={<Navigate to="/adviser-hub" replace />} />
       <Route path="/goal-tracker" element={<GoalTracker />} />
       <Route path="/goals" element={<GoalTracker />} />
       <Route path="/scenario-modelling" element={<ScenarioModelling />} />
       <Route path="/knowledge-graph" element={<Navigate to="/advisor-command-center" replace />} />
-      <Route path="/ai-advisor" element={<AIAdvisor />} />
+      <Route path="/ai-advisor" element={<Navigate to="/ai-copilot-advanced" replace />} />
       <Route path="/portfolio-aggregator" element={<PortfolioAggregator />} />
       <Route path="/net-worth-trend" element={<NetWorthTrend />} />
       <Route path="/insurance-gap" element={<InsuranceGapAnalysis />} />
@@ -1046,27 +1050,25 @@ const AppRouter = () => {
       <Route path="/portfolio-analyzer" element={<PortfolioAnalyzer />} />
       <Route path="/connected-accounts" element={<ConnectedAccounts />} />
       
-      {/* New AI-Powered Features */}
-      <Route path="/ai-copilot" element={<AICopilot />} />
-      <Route path="/copilot" element={<AICopilot />} />
+      {/* AI routes - consolidate to primary */}
+      <Route path="/ai-copilot" element={<Navigate to="/ai-copilot-advanced" replace />} />
       <Route path="/decision-center" element={<DecisionCenter />} />
-      <Route path="/client-insights" element={<AIInsights />} />
-      <Route path="/intelligence-feed" element={<AIInsights />} />
-      <Route path="/ai-insights" element={<AIInsights />} />
+      <Route path="/client-insights" element={<Navigate to="/ai-copilot-advanced" replace />} />
+      <Route path="/intelligence-feed" element={<Navigate to="/ai-copilot-advanced" replace />} />
+      <Route path="/ai-insights" element={<Navigate to="/ai-copilot-advanced" replace />} />
       <Route path="/client-portal" element={<ClientPortal />} />
       
       {/* Super App Features */}
       <Route path="/meeting-prep" element={<MeetingPrep />} />
       <Route path="/stock-research" element={<StockResearch />} />
       <Route path="/compliance" element={<ClientCompliance />} />
-      <Route path="/wealth-dashboard" element={<WealthDashboard />} />
+      <Route path="/wealth-dashboard" element={<Navigate to="/family-wealth" replace />} />
       
       {/* Client-Level Pages (Adviser viewing client data) */}
       <Route path="/client-wealth" element={<ClientWealth />} />
       <Route path="/client-compliance" element={<ClientCompliance />} />
       
-      {/* Command Center - Daily Adviser Hub */}
-      <Route path="/command-center" element={<CommandCenter />} />
+      <Route path="/command-center" element={<Navigate to="/advisor-command-center" replace />} />
       
       {/* Cross-Client Intelligence Engine */}
       <Route path="/intelligence" element={<IntelligenceEngine />} />
@@ -1138,14 +1140,14 @@ const AppRouter = () => {
       <Route path="/risk-control" element={<RiskControlMapping />} />
       <Route path="/breach-register" element={<BreachRegister />} />
       
-      {/* Retirement Calculator - SMSF Planning */}
-      <Route path="/retirement-calculator" element={<RetirementCalculator />} />
+      {/* Retirement - consolidate duplicates */}
+      <Route path="/retirement-calculator" element={<Navigate to="/retirement-confidence" replace />} />
       
       {/* Decumulation Calculator - Pension Phase Planning */}
       <Route path="/decumulation-calculator" element={<DecumulationCalculator />} />
       
-      {/* Unified Retirement Planner - Comprehensive retirement planning */}
-      <Route path="/retirement" element={<RetirementPlanner />} />
+      {/* Unified Retirement Planner */}
+      <Route path="/retirement" element={<Navigate to="/retirement-confidence" replace />} />
       
       {/* Platform Integrations - AMP North, Netwealth, Hub24, Class, IRESS */}
       <Route path="/platform-integrations" element={<PlatformIntegrations />} />
@@ -1153,8 +1155,7 @@ const AppRouter = () => {
       {/* Live Sync Dashboard */}
       <Route path="/live-sync" element={<LiveSyncDashboard />} />
       
-      {/* Client Financial Dashboard */}
-      <Route path="/financial-dashboard" element={<ClientFinancialDashboard />} />
+      <Route path="/financial-dashboard" element={<Navigate to="/family-wealth" replace />} />
       
       {/* Adviser Compliance Dashboard */}
       <Route path="/adviser-compliance" element={<AdviserComplianceDashboard />} />
@@ -1174,8 +1175,7 @@ const AppRouter = () => {
       {/* Combined Retirement Confidence (Quick + Advanced) */}
       <Route path="/retirement-confidence" element={<RetirementConfidence />} />
       
-      {/* CRM Command Center */}
-      <Route path="/crm-command-center" element={<CRMCommandCenter />} />
+      <Route path="/crm-command-center" element={<Navigate to="/adviser-hub" replace />} />
       
       {/* Client 360 View */}
       <Route path="/client-360" element={<Client360View />} />

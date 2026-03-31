@@ -119,7 +119,7 @@ async def start_advice_session(session: AdviceSession) -> dict:
             licensee_id=session.licensee_id,
             action_description=f"Advice session started for client {session.client_name}"
         ))
-    except:
+    except Exception:
         pass
     
     return {

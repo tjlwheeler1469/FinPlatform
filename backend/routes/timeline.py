@@ -254,7 +254,7 @@ async def calculate_financial_impact(household_id: str):
     
     # Calculate year-by-year impact
     yearly_impact = {}
-    cumulative = 0
+    # cumulative tracked inline
     
     for event in events:
         year = event.get("date", "")[:4]

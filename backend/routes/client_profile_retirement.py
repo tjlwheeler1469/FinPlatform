@@ -174,7 +174,7 @@ async def save_retirement_data(request: SaveRetirementDataRequest):
         profile_update["structures"] = [s.dict() for s in request.structures]
     
     # Upsert to database
-    result = await db.client_retirement_profiles.update_one(
+    await db.client_retirement_profiles.update_one(
         {"client_id": request.client_id},
         {"$set": profile_update},
         upsert=True
