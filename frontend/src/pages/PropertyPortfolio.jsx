@@ -52,7 +52,7 @@ const defaultProperty = {
   depreciation_fixtures: 0
 };
 
-const PropertyPortfolio = () => {
+const PropertyPortfolio = ({ embedded = false }) => {
   const [properties, setProperties] = useState([{ ...defaultProperty, name: "Property 1" }]);
   const [marginalTaxRate, setMarginalTaxRate] = useState(30);
   const [analyses, setAnalyses] = useState([]);
@@ -119,8 +119,8 @@ const PropertyPortfolio = () => {
     cashFlow: a.cash_flow_after_tax
   }));
 
-  return (
-    <Layout>
+  const content = (
+    <>
       <div className="space-y-8" data-testid="property-portfolio-page">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -475,8 +475,10 @@ const PropertyPortfolio = () => {
           </>
         )}
       </div>
-    </Layout>
+    </>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default PropertyPortfolio;

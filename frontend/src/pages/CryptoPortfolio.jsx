@@ -42,7 +42,7 @@ const MARKET_DATA = {
   trending: ["BTC", "ETH", "SOL", "PEPE", "WIF"]
 };
 
-const CryptoPortfolio = () => {
+const CryptoPortfolio = ({ embedded = false }) => {
   const [holdings, setHoldings] = useState([]);
   const [globalData, setGlobalData] = useState(null);
   const [activeTab, setActiveTab] = useState("portfolio");
@@ -130,8 +130,8 @@ const CryptoPortfolio = () => {
     fetchLivePrices();
   };
 
-  return (
-    <Layout>
+  const content = (
+    <>
       <div className="space-y-6" data-testid="crypto-portfolio-page">
         {/* Header */}
         <div className="flex justify-between items-start">
@@ -386,8 +386,10 @@ const CryptoPortfolio = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </Layout>
+    </>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default CryptoPortfolio;

@@ -124,8 +124,15 @@ const AdviserHub = () => {
   });
 
   const selectClient = (client) => {
-    setSelectedClient(client);
-    localStorage.setItem("selected_client", JSON.stringify(client));
+    const clientObj = {
+      id: client.client_id,
+      client_id: client.client_id,
+      name: client.name,
+      email: client.email,
+      aum: client.total_wealth
+    };
+    setSelectedClient(clientObj);
+    localStorage.setItem("selected_client", JSON.stringify(clientObj));
     navigate("/client-360");
   };
 

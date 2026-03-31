@@ -13,7 +13,7 @@ export const personalNavGroups = [
     name: "Dashboard",
     icon: LayoutDashboard,
     items: [
-      { path: "/personal-dashboard", label: "My Dashboard", icon: Eye, title: "Personal Dashboard", badge: "HOME" },
+      { path: "/dashboard", label: "My Dashboard", icon: Eye, title: "Dashboard & Net Worth", badge: "HOME" },
       { path: "/macro-dashboard", label: "Markets", icon: BarChart3, title: "Live Markets", badge: "LIVE" },
     ]
   },
@@ -30,15 +30,8 @@ export const personalNavGroups = [
     name: "Investments",
     icon: TrendingUp,
     items: [
-      { path: "/family-wealth", label: "Net Worth", icon: Wallet, title: "Net Worth & Wealth Overview" },
-      { path: "/stock-trading", label: "Shares & ETFs", icon: TrendingUp, title: "Shares & ETFs" },
-      { path: "/bonds-trading", label: "Bonds", icon: Landmark, title: "Bonds & Fixed Income" },
-      { path: "/hybrids-trading", label: "Hybrids", icon: Coins, title: "Hybrid Securities" },
-      { path: "/property-portfolio", label: "Property", icon: Building2, title: "Property" },
-      { path: "/unlisted-investments", label: "Unlisted", icon: FileText, title: "Unlisted Investments", badge: "NEW" },
+      { path: "/investments", label: "All Investments", icon: TrendingUp, title: "Investment Portfolio", badge: "NEW" },
       { path: "/cash-deposits", label: "Cash & TDs", icon: PiggyBank, title: "Cash & Term Deposits" },
-      { path: "/managed-funds", label: "Managed Funds", icon: PieChart, title: "Managed Funds" },
-      { path: "/crypto-portfolio", label: "Crypto", icon: Bitcoin, title: "Cryptocurrency" },
       { path: "/super-pension", label: "Super & Pension", icon: Shield, title: "Superannuation & Pension" },
     ]
   },
@@ -73,7 +66,7 @@ export const adviserBaseNav = [
       { path: "/advisor-command-center", label: "Command Center", icon: LayoutDashboard, title: "Advisor Command Center" },
       { path: "/daily-briefing", label: "Daily Briefing", icon: Calendar, title: "Daily Briefing", badge: "NEW" },
       { path: "/macro-dashboard", label: "Markets", icon: BarChart3, title: "Live Markets", badge: "LIVE" },
-      
+      { path: "/xplan", label: "Xplan Sync", icon: Cable, title: "Xplan Integration" },
     ]
   },
   {
@@ -81,14 +74,13 @@ export const adviserBaseNav = [
     icon: Users,
     items: [
       { path: "/adviser-hub", label: "Client Hub", icon: Zap, title: "Clients & Portfolio", badge: "HUB" },
-      { path: "/workflows", label: "Tasks", icon: ListTodo, title: "Tasks & Workflows" },
     ]
   },
   {
-    name: "AI Copilot",
+    name: "AI & Tasks",
     icon: Bot,
     items: [
-      { path: "/ai-copilot-advanced", label: "AI Assistant", icon: MessageSquare, title: "AI Copilot" },
+      { path: "/ai-copilot-advanced", label: "AI Assistant", icon: MessageSquare, title: "AI Copilot & Tasks", badge: "AI" },
       { path: "/meeting-prep", label: "Meeting Prep", icon: Sparkles, title: "Meeting Preparation" },
       { path: "/decision-center", label: "Decision Center", icon: Zap, title: "Scenario Modeling" },
     ]
@@ -113,7 +105,6 @@ export const adviserBaseNav = [
     name: "Integrations",
     icon: Link2,
     items: [
-      { path: "/xplan", label: "Xplan Sync", icon: Link2, title: "Xplan Integration" },
       { path: "/platform-integrations", label: "Platforms", icon: Cable, title: "Platform Integrations", badge: "NEW" },
       { path: "/live-sync", label: "Live Sync", icon: Activity, title: "Live Sync Dashboard", badge: "LIVE" },
     ]
@@ -133,7 +124,7 @@ export const clientContextNav = [
     name: "Overview",
     icon: Eye,
     items: [
-      { path: "/family-wealth", label: "Client Overview", icon: Wallet, title: "Client 360 & Net Worth", badge: "360" },
+      { path: "/dashboard", label: "Client Overview", icon: Wallet, title: "Client 360 & Net Worth", badge: "360" },
       { path: "/retirement-confidence", label: "Retirement", icon: Gauge, title: "Retirement Planning & Confidence", badge: "PRO" },
       { path: "/decision-engine", label: "Health Score", icon: Zap, title: "Financial Health Score" },
     ]
@@ -151,14 +142,8 @@ export const clientContextNav = [
     name: "Investments",
     icon: TrendingUp,
     items: [
-      { path: "/stock-trading", label: "Shares & ETFs", icon: TrendingUp, title: "Shares & Trading" },
-      { path: "/bonds-trading", label: "Bonds", icon: Landmark, title: "Bonds & Fixed Income" },
-      { path: "/hybrids-trading", label: "Hybrids", icon: Coins, title: "Hybrid Securities" },
-      { path: "/property-portfolio", label: "Property", icon: Building2, title: "Property Portfolio" },
-      { path: "/unlisted-investments", label: "Unlisted", icon: FileText, title: "Unlisted Investments", badge: "NEW" },
+      { path: "/investments", label: "All Investments", icon: TrendingUp, title: "Investment Portfolio", badge: "NEW" },
       { path: "/cash-deposits", label: "Cash & TDs", icon: PiggyBank, title: "Cash & Term Deposits" },
-      { path: "/managed-funds", label: "Managed Funds", icon: PieChart, title: "Managed Funds" },
-      { path: "/crypto-portfolio", label: "Crypto", icon: Bitcoin, title: "Cryptocurrency" },
     ]
   },
   {
@@ -175,7 +160,7 @@ export const clientContextNav = [
 
 export const mobileBottomNav = [
   { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { path: "/family-wealth", label: "Finances", icon: Wallet },
+  { path: "/investments", label: "Investments", icon: TrendingUp },
   { path: "/goal-tracker", label: "Goals", icon: Target },
   { path: "/reports", label: "Reports", icon: FileText },
   { path: "/loan-calculator", label: "Calc", icon: Calculator },

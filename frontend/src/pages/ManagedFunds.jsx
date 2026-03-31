@@ -121,7 +121,7 @@ const FUND_CATEGORIES = [
   { name: "Cash", allocation: 5 }
 ];
 
-const ManagedFunds = () => {
+const ManagedFunds = ({ embedded = false }) => {
   const [funds, setFunds] = useState(DEMO_FUNDS);
   const [activeTab, setActiveTab] = useState("portfolio");
 
@@ -167,8 +167,8 @@ const ManagedFunds = () => {
     ));
   };
 
-  return (
-    <Layout>
+  const content = (
+    <>
       <div className="space-y-6" data-testid="managed-funds-page">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -425,8 +425,10 @@ const ManagedFunds = () => {
           </CardContent>
         </Card>
       </div>
-    </Layout>
+    </>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default ManagedFunds;

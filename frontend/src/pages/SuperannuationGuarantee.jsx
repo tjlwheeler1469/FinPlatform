@@ -64,7 +64,7 @@ const defaultEmployee = {
   isContractor: false
 };
 
-const SuperannuationGuarantee = () => {
+const SuperannuationGuarantee = ({ embedded = false }) => {
   const [employees, setEmployees] = useState([
     { ...defaultEmployee, id: 1, name: "Employee 1", annualOTE: 85000 }
   ]);
@@ -156,8 +156,8 @@ const SuperannuationGuarantee = () => {
     }, 0)
   }));
 
-  return (
-    <Layout>
+  const content = (
+    <>
       <div className="space-y-6" data-testid="sg-calculator-page">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -483,8 +483,10 @@ const SuperannuationGuarantee = () => {
           </CardContent>
         </Card>
       </div>
-    </Layout>
+    </>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default SuperannuationGuarantee;

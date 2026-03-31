@@ -859,7 +859,7 @@ const AdvisorCommandCenter = () => {
               <Button 
                 variant="outline" 
                 className="w-full mt-3 text-xs"
-                onClick={() => navigate('/practice-management')}
+                onClick={() => navigate('/ai-copilot-advanced')}
               >
                 View All Tasks
                 <ChevronRight className="h-4 w-4 ml-2" />

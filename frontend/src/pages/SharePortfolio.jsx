@@ -80,7 +80,7 @@ const OWNERSHIP_LABELS = {
   company: 'Company'
 };
 
-const SharePortfolio = () => {
+const SharePortfolio = ({ embedded = false }) => {
   const { t } = useLanguage();
   const { 
     sharePortfolio, 
@@ -399,8 +399,8 @@ const SharePortfolio = () => {
 
   const filteredShares = getFilteredShares();
 
-  return (
-    <Layout>
+  const content = (
+    <>
       <div className="space-y-6" data-testid="share-portfolio-page">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -1046,8 +1046,10 @@ const SharePortfolio = () => {
           </Card>
         </div>
       )}
-    </Layout>
+    </>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default SharePortfolio;

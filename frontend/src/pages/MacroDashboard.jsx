@@ -146,18 +146,21 @@ const MacroDashboard = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      // Fetch market data and news in parallel for speed
-      const [overviewRes, indicesRes, currenciesRes, bondsRes, commoditiesRes, cryptoRes, futuresRes] = await Promise.all([
-        axios.get(`${API}/api/macro/overview`),
-        axios.get(`${API}/api/macro/indices`),
-        axios.get(`${API}/api/macro/currencies`),
-        axios.get(`${API}/api/macro/bonds`),
-        axios.get(`${API}/api/macro/commodities`),
-        axios.get(`${API}/api/macro/crypto`),
-        axios.get(`${API}/api/macro/futures`)
+      // Phase 1: Load overview first (fastest, cached)
+      const overviewRes = await axios.get(`${API}/api/macro/overview`);
+      setOverview(overviewRes.data);
+      setLoading(false);
+
+      // Phase 2: Load details in parallel (background)
+      const [indicesRes, currenciesRes, bondsRes, commoditiesRes, cryptoRes, futuresRes] = await Promise.all([
+        axios.get(`${API}/api/macro/indices`).catch(() => ({ data: {} })),
+        axios.get(`${API}/api/macro/currencies`).catch(() => ({ data: {} })),
+        axios.get(`${API}/api/macro/bonds`).catch(() => ({ data: {} })),
+        axios.get(`${API}/api/macro/commodities`).catch(() => ({ data: {} })),
+        axios.get(`${API}/api/macro/crypto`).catch(() => ({ data: {} })),
+        axios.get(`${API}/api/macro/futures`).catch(() => ({ data: {} }))
       ]);
 
-      setOverview(overviewRes.data);
       setIndices(indicesRes.data);
       setCurrencies(currenciesRes.data);
       setBonds(bondsRes.data);
@@ -167,7 +170,6 @@ const MacroDashboard = () => {
     } catch (error) {
       console.error("Error fetching macro data:", error);
       toast.error("Failed to load market data");
-    } finally {
       setLoading(false);
     }
   };

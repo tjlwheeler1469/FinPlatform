@@ -91,7 +91,7 @@ const calculateTax = (income) => {
 
 const COLORS = ['#1a2744', '#D4A84C', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#F59E0B', '#6366F1'];
 
-const FamilyWealthDashboard = () => {
+const FamilyWealthDashboard = ({ embedded = false }) => {
   const { 
     familyMembers, 
     sharePortfolio, 
@@ -503,8 +503,7 @@ const FamilyWealthDashboard = () => {
     };
   }).sort((a, b) => b.total - a.total);
 
-  return (
-    <Layout>
+  const content = (
       <div className="space-y-6" data-testid="family-wealth-dashboard">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -1299,8 +1298,9 @@ const FamilyWealthDashboard = () => {
           </CardContent>
         </Card>
       </div>
-    </Layout>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default FamilyWealthDashboard;

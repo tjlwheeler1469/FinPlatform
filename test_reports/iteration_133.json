@@ -1,0 +1,139 @@
+{
+  "summary": "Iteration 133 - UI Consolidation Testing Complete. All 10 features tested successfully. Dashboard has 3 tabs (Overview, Net Worth, Wealth Trends). Investments has 7 tabs (Shares & ETFs, Bonds, Property, Crypto, Super, Managed Funds, Unlisted). Route redirects working. Sidebar consolidated for Personal/Adviser modes. AI Copilot has Tasks sidebar. Command Center has Zone 7 Tasks panel. Backend lint passes (0 errors). 22/22 backend tests pass.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Charts", "issues": ["Recharts console warnings about width/height -1 on initial render - cosmetic only, charts render correctly after layout settles"]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration133_features.py",
+    "/app/test_reports/pytest/pytest_iteration133.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [
+    "/app/backend/tests/test_iteration133_features.py"
+  ],
+  "success_rate": {
+    "backend": "100% (22/22 tests passed)",
+    "frontend": "100% (all UI features working)"
+  },
+  "test_credentials": "No auth required - public access",
+  "seed_data_creation": "Created test schedule via Client Pack Scheduler API",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All UI consolidation features working. Dashboard has 3 tabs, Investments has 7 tabs. Route redirects work. Sidebar consolidated. AI Copilot has Tasks sidebar. Command Center has Zone 7 Tasks panel. Backend lint passes.",
+  "features_tested": {
+    "unified_dashboard_3_tabs": {
+      "status": "PASS",
+      "details": [
+        "Tab 'Overview' found and clickable",
+        "Tab 'Net Worth' found and clickable",
+        "Tab 'Wealth Trends' found and clickable",
+        "UnifiedDashboard component renders correctly"
+      ]
+    },
+    "unified_investments_7_tabs": {
+      "status": "PASS",
+      "details": [
+        "Tab 'Shares & ETFs' found",
+        "Tab 'Bonds' found",
+        "Tab 'Property' found",
+        "Tab 'Crypto' found",
+        "Tab 'Super' found",
+        "Tab 'Managed Funds' found",
+        "Tab 'Unlisted' found",
+        "All tabs clickable and load content"
+      ]
+    },
+    "route_redirects": {
+      "status": "PASS",
+      "details": [
+        "/personal-dashboard -> /dashboard ✓",
+        "/family-wealth -> /dashboard ✓",
+        "/bonds-trading -> /investments ✓",
+        "/crypto-portfolio -> /investments ✓",
+        "/property-portfolio -> /investments ✓",
+        "/stock-trading stays at /stock-trading (separate CGT trading page - correct behavior)"
+      ]
+    },
+    "sidebar_personal_mode": {
+      "status": "PASS",
+      "details": [
+        "Personal Mode selector found",
+        "DASHBOARD section with My Dashboard, Markets",
+        "PLANNING section",
+        "INVESTMENTS section with All Investments, Cash & TDs, Super & Pension",
+        "TOOLS section",
+        "SETTINGS section"
+      ]
+    },
+    "sidebar_adviser_mode": {
+      "status": "PASS",
+      "details": [
+        "Adviser Mode selector found and switchable",
+        "Command Center found",
+        "Daily Briefing found",
+        "Markets found",
+        "Xplan Sync found",
+        "Client Hub found",
+        "AI Assistant found",
+        "Platforms found"
+      ]
+    },
+    "ai_copilot_tasks_sidebar": {
+      "status": "PASS",
+      "details": [
+        "AI Copilot Advanced component found",
+        "Tasks & Workflows sidebar on right side",
+        "Quick Actions section with 4 action buttons",
+        "Create SOA, Compliance Check, Revenue Report, Review Pack actions"
+      ]
+    },
+    "command_center_zone7_tasks": {
+      "status": "PASS",
+      "details": [
+        "Advisor Command Center component found",
+        "Zone 7 'Tasks & Workflow' panel found",
+        "Next Best Actions section with 4 action items",
+        "View All Actions button found"
+      ]
+    },
+    "client_pack_scheduler_api": {
+      "status": "PASS",
+      "details": [
+        "List schedules endpoint works",
+        "Create schedule endpoint works",
+        "List packs endpoint works"
+      ]
+    },
+    "backend_lint": {
+      "status": "PASS",
+      "details": "ruff check routes/ returns 'All checks passed!' (0 errors)"
+    },
+    "retirement_auto_import": {
+      "status": "PASS",
+      "details": [
+        "Retirement Confidence component found",
+        "Confidence score displayed (84%)",
+        "Monte Carlo simulations badge found (10,000 simulations)",
+        "Import button available for manual import",
+        "Quick/Advanced engine toggle found",
+        "Portfolio data auto-imported from context"
+      ]
+    }
+  },
+  "mocked_apis": {
+    "has_mocked_apis": true,
+    "mocked_apis_list": [
+      "Client data, portfolio, tasks are mocked",
+      "Voice command and PDF generation use GPT-5.2"
+    ]
+  }
+}

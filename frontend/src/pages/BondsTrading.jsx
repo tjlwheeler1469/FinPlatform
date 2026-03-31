@@ -85,7 +85,7 @@ const MARKET_RATES = {
   "rba_cash": 4.35
 };
 
-const BondsTrading = () => {
+const BondsTrading = ({ embedded = false }) => {
   const [bonds, setBonds] = useState(DEMO_BONDS);
   const [activeTab, setActiveTab] = useState("portfolio");
 
@@ -109,8 +109,8 @@ const BondsTrading = () => {
     }).format(value);
   };
 
-  return (
-    <Layout>
+  const content = (
+    <>
       <div className="space-y-6" data-testid="bonds-trading-page">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -292,8 +292,10 @@ const BondsTrading = () => {
           </CardContent>
         </Card>
       </div>
-    </Layout>
+    </>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default BondsTrading;

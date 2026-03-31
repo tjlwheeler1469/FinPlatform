@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Layout from '@/components/Layout';
 import { useLanguage } from '@/components/LanguageContext';
+import { usePortfolio } from '@/App';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -549,6 +550,7 @@ const FactorBreakdown = ({ factors }) => {
 
 const RetirementConfidence = () => {
   const { t } = useLanguage();
+  const portfolioCtx = usePortfolio();
   // Engine mode: 'quick' or 'advanced'
   const [engineMode, setEngineMode] = useState('advanced');
   
@@ -564,6 +566,20 @@ const RetirementConfidence = () => {
   const [inflationRate, setInflationRate] = useState(2.5);
   const [numSimulations, setNumSimulations] = useState(10000);
   const [enableDynamicSpending, setEnableDynamicSpending] = useState(true);
+  
+  // Auto-import from portfolio context on mount
+  useEffect(() => {
+    if (portfolioCtx?.portfolio?.summary) {
+      const s = portfolioCtx.portfolio.summary;
+      if (s.netWorth > 0) setCurrentPortfolio(s.netWorth);
+      if (s.annualIncome > 0) setAnnualContributions(Math.round(s.annualIncome * 0.15)); // 15% savings rate
+      if (s.netIncome > 0) setRetirementSpending(Math.round(s.netIncome * 0.7)); // 70% of current net income
+    }
+    if (portfolioCtx?.portfolio?.personal) {
+      const p = portfolioCtx.portfolio.personal;
+      if (p.age > 0) setCurrentAge(p.age);
+    }
+  }, [portfolioCtx?.portfolio?.summary, portfolioCtx?.portfolio?.personal]);
   
   // Mode state (Presentation vs Background)
   const [mode, setMode] = useState('presentation');

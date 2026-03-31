@@ -146,7 +146,7 @@ const defaultUserProfile = {
 
 // ==================== MAIN COMPONENT ====================
 
-const PersonalDashboard = () => {
+const PersonalDashboard = ({ embedded = false }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [entityFilter, setEntityFilter] = useState('all');
   const [retirementData, setRetirementData] = useState(null);
@@ -354,8 +354,7 @@ const PersonalDashboard = () => {
     }
   };
 
-  return (
-    <Layout>
+  const content = (
       <div className="space-y-6" data-testid="personal-dashboard">
         {/* Header with Date (Daily Briefing style) */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -1115,8 +1114,9 @@ const PersonalDashboard = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </Layout>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default PersonalDashboard;

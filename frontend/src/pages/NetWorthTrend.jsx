@@ -74,7 +74,7 @@ const generateHistoricalData = (currentNetWorth, months = 24) => {
   return data;
 };
 
-const NetWorthTrend = () => {
+const NetWorthTrend = ({ embedded = false }) => {
   const { portfolio } = usePortfolio();
   const [timeRange, setTimeRange] = useState("24");
   const [chartType, setChartType] = useState("area");
@@ -127,8 +127,8 @@ const NetWorthTrend = () => {
     return null;
   };
 
-  return (
-    <Layout>
+  const content = (
+    <>
       <div className="space-y-6" data-testid="net-worth-trend-page">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -325,8 +325,10 @@ const NetWorthTrend = () => {
           </CardContent>
         </Card>
       </div>
-    </Layout>
+    </>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default NetWorthTrend;

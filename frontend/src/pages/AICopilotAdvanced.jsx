@@ -32,6 +32,7 @@ const AICopilotAdvanced = () => {
   const [quickInsights, setQuickInsights] = useState([]);
   const [conversationStarters, setConversationStarters] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [tasks, setTasks] = useState([]);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
@@ -44,14 +45,19 @@ const AICopilotAdvanced = () => {
 
   const fetchInitialData = async () => {
     try {
-      const [suggestionsRes, insightsRes, startersRes] = await Promise.all([
+      const [suggestionsRes, insightsRes, startersRes, tasksRes] = await Promise.all([
         fetch(`${API_URL}/api/ai-copilot/suggestions`),
         fetch(`${API_URL}/api/ai-copilot/quick-insights`),
-        fetch(`${API_URL}/api/ai-copilot/conversation-starters`)
+        fetch(`${API_URL}/api/ai-copilot/conversation-starters`),
+        fetch(`${API_URL}/api/workflows/tasks`)
       ]);
 
       if (suggestionsRes.ok) setSuggestions((await suggestionsRes.json()).suggestions || []);
       if (insightsRes.ok) setQuickInsights((await insightsRes.json()).insights || []);
+      if (tasksRes.ok) {
+        const tasksData = await tasksRes.json();
+        setTasks((tasksData.tasks || tasksData.data || []).slice(0, 6));
+      }
       if (startersRes.ok) {
         const data = await startersRes.json();
         setConversationStarters(data.starters || []);
@@ -352,6 +358,58 @@ const AICopilotAdvanced = () => {
                 ))}
               </div>
             </div>
+          </Card>
+        </div>
+
+        {/* Right sidebar - Tasks & Workflows */}
+        <div className="w-80 space-y-4 hidden xl:block">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Target className="h-4 w-4 text-[#D4A84C]" />
+                Tasks & Workflows
+              </CardTitle>
+              <CardDescription className="text-xs">Active tasks from AI and manual workflow</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {tasks.map((task, idx) => (
+                <div key={`task-${idx}`} className="p-2 rounded-lg bg-muted/50 border text-sm" data-testid={`task-item-${idx}`}>
+                  <div className="flex items-center justify-between mb-1">
+                    <Badge variant={task.priority === 'high' ? 'destructive' : task.priority === 'medium' ? 'default' : 'secondary'} className="text-[10px]">
+                      {task.priority}
+                    </Badge>
+                    <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                      <Clock className="h-3 w-3" />{task.due}
+                    </span>
+                  </div>
+                  <p className="text-xs font-medium">{task.title}</p>
+                  <p className="text-[10px] text-muted-foreground">{task.client}</p>
+                </div>
+              ))}
+              {tasks.length === 0 && (
+                <p className="text-xs text-muted-foreground text-center py-4">No active tasks</p>
+              )}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <ChevronRight className="h-4 w-4 text-blue-500" />
+                Quick Actions
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-1">
+              {[
+                { label: "Create SOA", action: "Draft a Statement of Advice for my next client meeting" },
+                { label: "Compliance Check", action: "Run a compliance audit across all client portfolios" },
+                { label: "Revenue Report", action: "Generate a revenue summary for this quarter" },
+                { label: "Review Pack", action: "Prepare quarterly review pack for all clients" },
+              ].map((qa, idx) => (
+                <Button key={`qa-${idx}`} variant="ghost" size="sm" className="w-full justify-start text-xs" onClick={() => sendQuery(qa.action)} data-testid={`quick-action-${idx}`}>
+                  {qa.label}
+                </Button>
+              ))}
+            </CardContent>
           </Card>
         </div>
       </div>

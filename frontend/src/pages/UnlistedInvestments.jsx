@@ -70,7 +70,7 @@ const formatCurrency = (value) => {
   }).format(value || 0);
 };
 
-const UnlistedInvestments = () => {
+const UnlistedInvestments = ({ embedded = false }) => {
   const [investments, setInvestments] = useState(mockUnlistedInvestments);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [newInvestment, setNewInvestment] = useState({
@@ -107,8 +107,8 @@ const UnlistedInvestments = () => {
     toast.success('Investment added successfully');
   };
 
-  return (
-    <Layout>
+  const content = (
+    <>
       <div className="space-y-6" data-testid="unlisted-investments">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -314,8 +314,10 @@ const UnlistedInvestments = () => {
           </CardContent>
         </Card>
       </div>
-    </Layout>
+    </>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default UnlistedInvestments;

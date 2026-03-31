@@ -64,6 +64,8 @@ const Copilot = lazy(() => import("@/pages/Copilot"));
 const DailyBriefing = lazy(() => import("@/pages/DailyBriefing"));
 const PersonalDashboard = lazy(() => import("@/pages/PersonalDashboard"));
 const UnlistedInvestments = lazy(() => import("@/pages/UnlistedInvestments"));
+const UnifiedDashboard = lazy(() => import("@/pages/UnifiedDashboard"));
+const UnifiedInvestments = lazy(() => import("@/pages/UnifiedInvestments"));
 const AdviserDashboard = lazy(() => import("@/pages/AdviserDashboard"));
 const ClientPortalMerged = lazy(() => import("@/pages/ClientPortalMerged"));
 const PracticeManagement = lazy(() => import("@/pages/PracticeManagement"));
@@ -331,6 +333,75 @@ const DEFAULT_TRUST = CLIENT_FAMILY_DATA.client_1.trust;
 // Default Company Structure (uses client_1 as fallback)
 const DEFAULT_COMPANY = CLIENT_FAMILY_DATA.client_1.company;
 
+// Per-client portfolio data for data flow consistency
+const CLIENT_PORTFOLIO_DATA = {
+  client_1: {
+    personal: { name: "Wheeler Family", age: 45, taxableIncome: 185000, entityType: "personal" },
+    investments: { cash_savings: 75000, term_deposit_amount: 150000, term_deposit_rate: 4.8, shares_value: 320000, shares_dividend_yield: 4.2, franking_percentage: 85, bonds_value: 80000, bonds_yield: 5.2, etf_value: 145000, etf_yield: 3.5, smsf_balance: 580000, properties: [
+      { property_id: "prop_001", name: "Sydney Investment Unit", value: 850000, rental_income: 36000, mortgage_amount: 510000, mortgage_rate: 6.29, mortgage_term_years: 25, annual_expenses: 8500, depreciation_building: 6500, depreciation_fixtures: 3200 },
+      { property_id: "prop_002", name: "Melbourne Townhouse", value: 720000, rental_income: 32000, mortgage_amount: 432000, mortgage_rate: 6.15, mortgage_term_years: 28, annual_expenses: 7200, depreciation_building: 5800, depreciation_fixtures: 2800 }
+    ]},
+    summary: { totalAssets: 2920000, totalDebt: 942000, netWorth: 1978000, annualIncome: 253400, totalTax: 58200, netIncome: 195200 }
+  },
+  client_2: {
+    personal: { name: "Chen Family Trust", age: 52, taxableIncome: 280000, entityType: "trust" },
+    investments: { cash_savings: 180000, term_deposit_amount: 350000, term_deposit_rate: 4.9, shares_value: 680000, shares_dividend_yield: 3.8, franking_percentage: 90, bonds_value: 220000, bonds_yield: 5.4, etf_value: 420000, etf_yield: 3.2, smsf_balance: 1100000, properties: [
+      { property_id: "prop_c2_1", name: "North Sydney Office", value: 1850000, rental_income: 85000, mortgage_amount: 920000, mortgage_rate: 6.1, mortgage_term_years: 20, annual_expenses: 18000, depreciation_building: 12000, depreciation_fixtures: 5500 },
+      { property_id: "prop_c2_2", name: "Chatswood Apartment", value: 980000, rental_income: 42000, mortgage_amount: 490000, mortgage_rate: 5.95, mortgage_term_years: 25, annual_expenses: 9800, depreciation_building: 7200, depreciation_fixtures: 3100 }
+    ]},
+    summary: { totalAssets: 5780000, totalDebt: 1410000, netWorth: 4370000, annualIncome: 407000, totalTax: 98500, netIncome: 308500 }
+  },
+  client_3: {
+    personal: { name: "Robert Mitchell", age: 58, taxableIncome: 145000, entityType: "personal" },
+    investments: { cash_savings: 95000, term_deposit_amount: 200000, term_deposit_rate: 4.7, shares_value: 450000, shares_dividend_yield: 4.5, franking_percentage: 88, bonds_value: 150000, bonds_yield: 5.0, etf_value: 180000, etf_yield: 3.6, smsf_balance: 680000, properties: []},
+    summary: { totalAssets: 1755000, totalDebt: 0, netWorth: 1755000, annualIncome: 154500, totalTax: 38200, netIncome: 116300 }
+  },
+  client_4: {
+    personal: { name: "Williams Family", age: 38, taxableIncome: 195000, entityType: "personal" },
+    investments: { cash_savings: 45000, term_deposit_amount: 80000, term_deposit_rate: 4.5, shares_value: 180000, shares_dividend_yield: 3.5, franking_percentage: 80, bonds_value: 50000, bonds_yield: 4.8, etf_value: 95000, etf_yield: 3.3, smsf_balance: 400000, properties: [
+      { property_id: "prop_c4_1", name: "Brunswick Home", value: 1200000, rental_income: 0, mortgage_amount: 720000, mortgage_rate: 6.2, mortgage_term_years: 28, annual_expenses: 5000, depreciation_building: 0, depreciation_fixtures: 0 }
+    ]},
+    summary: { totalAssets: 2050000, totalDebt: 720000, netWorth: 1330000, annualIncome: 200000, totalTax: 52000, netIncome: 148000 }
+  },
+  client_5: {
+    personal: { name: "Patel SMSF", age: 48, taxableIncome: 288000, entityType: "smsf" },
+    investments: { cash_savings: 250000, term_deposit_amount: 500000, term_deposit_rate: 5.1, shares_value: 920000, shares_dividend_yield: 4.0, franking_percentage: 92, bonds_value: 350000, bonds_yield: 5.5, etf_value: 580000, etf_yield: 3.4, smsf_balance: 1880000, properties: [
+      { property_id: "prop_c5_1", name: "Commercial Warehouse Dandenong", value: 2200000, rental_income: 120000, mortgage_amount: 880000, mortgage_rate: 5.8, mortgage_term_years: 15, annual_expenses: 22000, depreciation_building: 18000, depreciation_fixtures: 8000 },
+      { property_id: "prop_c5_2", name: "Toorak Investment Unit", value: 1450000, rental_income: 58000, mortgage_amount: 580000, mortgage_rate: 6.0, mortgage_term_years: 22, annual_expenses: 12000, depreciation_building: 9500, depreciation_fixtures: 4200 }
+    ]},
+    summary: { totalAssets: 8130000, totalDebt: 1460000, netWorth: 6670000, annualIncome: 466000, totalTax: 125000, netIncome: 341000 }
+  }
+};
+
+// Per-client share portfolios
+const CLIENT_SHARE_DATA = {
+  client_1: null, // will use DEFAULT_SHARE_PORTFOLIO_DATA
+  client_2: [
+    { id: 1, symbol: "ANZ", name: "ANZ Group", ownership: "personal", ownerId: 1, quantity: 400, purchasePrice: 24.50, currentPrice: 28.90, purchaseDate: "2022-01-10", dividendYield: 5.1, frankingPercentage: 100, sector: "Financials" },
+    { id: 2, symbol: "WES", name: "Wesfarmers", ownership: "personal", ownerId: 1, quantity: 120, purchasePrice: 52.00, currentPrice: 65.40, purchaseDate: "2023-03-15", dividendYield: 3.2, frankingPercentage: 100, sector: "Consumer Discretionary" },
+    { id: 3, symbol: "VGS", name: "Vanguard MSCI International", ownership: "joint", ownerId: null, quantity: 800, purchasePrice: 92.00, currentPrice: 108.50, purchaseDate: "2022-06-20", dividendYield: 2.1, frankingPercentage: 0, sector: "ETF" },
+    { id: 4, symbol: "RIO", name: "Rio Tinto", ownership: "company", ownerId: null, quantity: 250, purchasePrice: 115.00, currentPrice: 122.30, purchaseDate: "2023-08-01", dividendYield: 6.5, frankingPercentage: 100, sector: "Materials" },
+    { id: 5, symbol: "MQG", name: "Macquarie Group", ownership: "personal", ownerId: 2, quantity: 60, purchasePrice: 185.00, currentPrice: 210.50, purchaseDate: "2024-02-10", dividendYield: 3.8, frankingPercentage: 100, sector: "Financials" }
+  ],
+  client_3: [
+    { id: 1, symbol: "CBA", name: "Commonwealth Bank", ownership: "personal", ownerId: 1, quantity: 350, purchasePrice: 95.00, currentPrice: 118.50, purchaseDate: "2021-05-20", dividendYield: 4.2, frankingPercentage: 100, sector: "Financials" },
+    { id: 2, symbol: "CSL", name: "CSL Limited", ownership: "personal", ownerId: 1, quantity: 80, purchasePrice: 270.00, currentPrice: 298.00, purchaseDate: "2022-09-15", dividendYield: 1.2, frankingPercentage: 100, sector: "Healthcare" },
+    { id: 3, symbol: "IVV", name: "iShares S&P 500 ETF", ownership: "personal", ownerId: 1, quantity: 200, purchasePrice: 480.00, currentPrice: 545.00, purchaseDate: "2023-01-10", dividendYield: 1.5, frankingPercentage: 0, sector: "ETF" }
+  ],
+  client_4: [
+    { id: 1, symbol: "VAS", name: "Vanguard Australian Shares", ownership: "joint", ownerId: null, quantity: 400, purchasePrice: 85.00, currentPrice: 96.50, purchaseDate: "2023-04-10", dividendYield: 3.8, frankingPercentage: 85, sector: "ETF" },
+    { id: 2, symbol: "BHP", name: "BHP Group", ownership: "personal", ownerId: 1, quantity: 200, purchasePrice: 42.00, currentPrice: 42.80, purchaseDate: "2023-11-01", dividendYield: 5.8, frankingPercentage: 100, sector: "Materials" }
+  ],
+  client_5: [
+    { id: 1, symbol: "CBA", name: "Commonwealth Bank", ownership: "personal", ownerId: 1, quantity: 500, purchasePrice: 90.00, currentPrice: 118.50, purchaseDate: "2020-03-15", dividendYield: 4.2, frankingPercentage: 100, sector: "Financials" },
+    { id: 2, symbol: "CSL", name: "CSL Limited", ownership: "personal", ownerId: 1, quantity: 150, purchasePrice: 250.00, currentPrice: 298.00, purchaseDate: "2021-06-20", dividendYield: 1.2, frankingPercentage: 100, sector: "Healthcare" },
+    { id: 3, symbol: "VGS", name: "Vanguard MSCI International", ownership: "company", ownerId: null, quantity: 1000, purchasePrice: 88.00, currentPrice: 108.50, purchaseDate: "2022-01-15", dividendYield: 2.1, frankingPercentage: 0, sector: "ETF" },
+    { id: 4, symbol: "AFI", name: "AFIC", ownership: "personal", ownerId: 2, quantity: 2000, purchasePrice: 7.50, currentPrice: 8.20, purchaseDate: "2022-08-01", dividendYield: 3.5, frankingPercentage: 100, sector: "LIC" },
+    { id: 5, symbol: "WBC", name: "Westpac Banking", ownership: "company", ownerId: null, quantity: 800, purchasePrice: 22.00, currentPrice: 26.80, purchaseDate: "2023-02-15", dividendYield: 5.2, frankingPercentage: 100, sector: "Financials" },
+    { id: 6, symbol: "TCL", name: "Transurban Group", ownership: "personal", ownerId: 1, quantity: 600, purchasePrice: 13.50, currentPrice: 14.80, purchaseDate: "2023-07-01", dividendYield: 4.1, frankingPercentage: 0, sector: "Infrastructure" }
+  ]
+};
+
 // Default Share Portfolio with ownership types
 const DEFAULT_SHARE_PORTFOLIO = [
   // Personal Holdings
@@ -436,6 +507,10 @@ const DEFAULT_SHARE_PORTFOLIO = [
     sector: "Consumer Staples"
   }
 ];
+
+// Now fill in client_1 share data
+CLIENT_SHARE_DATA.client_1 = DEFAULT_SHARE_PORTFOLIO;
+
 
 // Default Household Budget
 const DEFAULT_BUDGET = {
@@ -611,14 +686,25 @@ const PortfolioProvider = ({ children }) => {
       if (saved) {
         try {
           const client = JSON.parse(saved);
-          if (client?.id && client.id !== activeClientId) {
-            setActiveClientId(client.id);
-            const clientData = CLIENT_FAMILY_DATA[client.id];
+          const clientId = client?.id || client?.client_id;
+          if (clientId && clientId !== activeClientId) {
+            setActiveClientId(clientId);
+            const clientData = CLIENT_FAMILY_DATA[clientId];
             if (clientData) {
               setFamilyMembers(clientData.familyMembers);
               setTrust(clientData.trust);
               setCompany(clientData.company);
               setHasUnsavedChanges(false);
+            }
+            // Switch portfolio data
+            const portfolioData = CLIENT_PORTFOLIO_DATA[clientId];
+            if (portfolioData) {
+              setPortfolio(portfolioData);
+            }
+            // Switch share portfolio
+            const shareData = CLIENT_SHARE_DATA[clientId];
+            if (shareData) {
+              setSharePortfolio(shareData);
             }
           }
         } catch {
@@ -630,6 +716,8 @@ const PortfolioProvider = ({ children }) => {
         setFamilyMembers(DEFAULT_FAMILY_MEMBERS);
         setTrust(DEFAULT_TRUST);
         setCompany(DEFAULT_COMPANY);
+        setPortfolio(CLIENT_PORTFOLIO_DATA.client_1);
+        setSharePortfolio(DEFAULT_SHARE_PORTFOLIO);
       }
     };
     
@@ -938,6 +1026,9 @@ const PortfolioProvider = ({ children }) => {
       getMonthlyCashflow,
       getCashflowProjection,
       
+      // Active client
+      activeClientId,
+      
       // Save/Reset
       hasUnsavedChanges,
       lastSaved,
@@ -957,14 +1048,14 @@ const AppRouter = () => {
       <Route path="/login" element={<Suspense fallback={<PageLoader />}><Login /></Suspense>} />
       
       {/* Protected routes */}
-      <Route path="/" element={<Navigate to="/personal-dashboard" replace />} />
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="/mode-selector" element={<ModeSelector />} />
-      <Route path="/dashboard" element={<Suspense fallback={<PageLoader />}><Dashboard /></Suspense>} />
+      <Route path="/old-dashboard" element={<Suspense fallback={<PageLoader />}><Dashboard /></Suspense>} />
       <Route path="/overview" element={<FamilyOverview />} />
       <Route path="/budget" element={<HouseholdBudget />} />
       {/* Tax - consolidate */}
       <Route path="/tax-analysis" element={<Navigate to="/tax-analysis-sync" replace />} />
-      <Route path="/property-portfolio" element={<PropertyPortfolio />} />
+      <Route path="/property-portfolio" element={<Navigate to="/investments" replace />} />
       <Route path="/monte-carlo" element={<MonteCarloSimulation />} />
       <Route path="/loan-calculator" element={<LoanCalculator />} />
       {/* Scenario routes - consolidate to /scenario-modelling */}
@@ -999,7 +1090,6 @@ const AppRouter = () => {
       <Route path="/tax-analysis-sync" element={<TaxAnalysisSync />} />
       <Route path="/scenario-modeling" element={<Navigate to="/strategic-planning" replace />} />
       <Route path="/family-member/:memberId" element={<FamilyMemberProfile />} />
-      <Route path="/family-wealth" element={<FamilyWealthDashboard />} />
       <Route path="/lifecycle-planning" element={<Navigate to="/strategic-planning" replace />} />
       <Route path="/financial-advisor" element={<FinancialAdvisorChat />} />
       <Route path="/strategic-planning" element={<StrategicPlanning />} />
@@ -1013,8 +1103,14 @@ const AppRouter = () => {
       <Route path="/onboarding" element={<ClientOnboarding />} />
       <Route path="/copilot" element={<Navigate to="/ai-copilot-advanced" replace />} />
       <Route path="/daily-briefing" element={<DailyBriefing />} />
-      <Route path="/personal-dashboard" element={<PersonalDashboard />} />
-      <Route path="/unlisted-investments" element={<UnlistedInvestments />} />
+      {/* Unified Dashboard (Net Worth + Dashboard) */}
+      <Route path="/dashboard" element={<UnifiedDashboard />} />
+      <Route path="/personal-dashboard" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/family-wealth" element={<Navigate to="/dashboard" replace />} />
+
+      {/* Unified Investments */}
+      <Route path="/investments" element={<UnifiedInvestments />} />
+      <Route path="/unlisted-investments" element={<Navigate to="/investments" replace />} />
       {/* Dashboard redirects */}
       <Route path="/adviser-dashboard" element={<Navigate to="/advisor-command-center" replace />} />
       <Route path="/client-portal-old" element={<ClientPortalMerged />} />
@@ -1062,7 +1158,7 @@ const AppRouter = () => {
       <Route path="/meeting-prep" element={<MeetingPrep />} />
       <Route path="/stock-research" element={<StockResearch />} />
       <Route path="/compliance" element={<ClientCompliance />} />
-      <Route path="/wealth-dashboard" element={<Navigate to="/family-wealth" replace />} />
+      <Route path="/wealth-dashboard" element={<Navigate to="/dashboard" replace />} />
       
       {/* Client-Level Pages (Adviser viewing client data) */}
       <Route path="/client-wealth" element={<ClientWealth />} />
@@ -1116,11 +1212,11 @@ const AppRouter = () => {
       <Route path="/realtime-data" element={<RealtimeDataDashboard />} />
       
       {/* New Trading Pages */}
-      <Route path="/bonds-trading" element={<BondsTrading />} />
+      <Route path="/bonds-trading" element={<Navigate to="/investments" replace />} />
       <Route path="/cash-deposits" element={<CashDeposits />} />
-      <Route path="/managed-funds" element={<ManagedFunds />} />
-      <Route path="/hybrids-trading" element={<HybridsTrading />} />
-      <Route path="/crypto-portfolio" element={<CryptoPortfolio />} />
+      <Route path="/managed-funds" element={<Navigate to="/investments" replace />} />
+      <Route path="/hybrids-trading" element={<Navigate to="/investments" replace />} />
+      <Route path="/crypto-portfolio" element={<Navigate to="/investments" replace />} />
       
       {/* Xplan Integration */}
       <Route path="/xplan-integration" element={<XplanIntegration />} />
@@ -1155,7 +1251,7 @@ const AppRouter = () => {
       {/* Live Sync Dashboard */}
       <Route path="/live-sync" element={<LiveSyncDashboard />} />
       
-      <Route path="/financial-dashboard" element={<Navigate to="/family-wealth" replace />} />
+      <Route path="/financial-dashboard" element={<Navigate to="/dashboard" replace />} />
       
       {/* Adviser Compliance Dashboard */}
       <Route path="/adviser-compliance" element={<AdviserComplianceDashboard />} />
