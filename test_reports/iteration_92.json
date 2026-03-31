@@ -52,7 +52,7 @@
     "frontend": "100% (CRM, Macro Dashboard, Scenario Modelling all working)"
   },
   "test_credentials": {
-    "preview_url": "https://smart-insights-dash.preview.emergentagent.com"
+    "preview_url": "https://dashboard-split-1.preview.emergentagent.com"
   },
   "seed_data_creation": "None - using existing demo data",
   "retest_needed": false,

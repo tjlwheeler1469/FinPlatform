@@ -10,7 +10,7 @@
 - **Users**: 1,000 concurrent
 - **Ramp-up**: 50 users/second
 - **Duration**: 60 seconds
-- **Target**: https://smart-insights-dash.preview.emergentagent.com
+- **Target**: https://dashboard-split-1.preview.emergentagent.com
 
 ---
 

@@ -7,7 +7,7 @@ import requests
 import os
 import time
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://smart-insights-dash.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://dashboard-split-1.preview.emergentagent.com')
 
 class TestHealthAndBasics:
     """Basic health check tests"""

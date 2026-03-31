@@ -14,7 +14,7 @@ from datetime import datetime
 # Get BASE_URL from environment
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 if not BASE_URL:
-    BASE_URL = "https://smart-insights-dash.preview.emergentagent.com"
+    BASE_URL = "https://dashboard-split-1.preview.emergentagent.com"
 
 
 class TestHealthCheck:
@@ -387,7 +387,7 @@ class TestLiveStockPriceIntegration:
     """Tests to verify live stock prices are working"""
     
     def test_live_price_flag(self):
-        """Verify is_live flag is True for real-time data"""
+        """Verify is_live flag == True for real-time data"""
         response = requests.get(f"{BASE_URL}/api/market/asx/top")
         assert response.status_code == 200
         data = response.json()

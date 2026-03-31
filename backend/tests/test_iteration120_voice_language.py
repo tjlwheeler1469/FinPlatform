@@ -62,7 +62,7 @@ class TestVoiceAssistant:
         )
         assert response.status_code == 200
         data = response.json()
-        assert data.get('error') is False or data.get('error') is None, f"Chat returned error: {data}"
+        assert data.get('error') == False or data.get('error') is None, f"Chat returned error: {data}"
         # Check response mentions retirement-related terms
         response_lower = data['response'].lower()
         assert any(term in response_lower for term in ['retire', 'super', 'save', 'invest', 'pension', 'fund']), \

@@ -55,7 +55,7 @@ class TestHealthCheck:
         assert response.status_code == 200
         data = response.json()
         assert data["adviceos"]["incident_management"] == True
-        print("PASS: incident_management is True in health check")
+        print("PASS: incident_management == True in health check")
     
     def test_health_includes_event_streaming(self, api_client):
         """Health check should include event_streaming."""
@@ -63,7 +63,7 @@ class TestHealthCheck:
         assert response.status_code == 200
         data = response.json()
         assert data["adviceos"]["event_streaming"] == True
-        print("PASS: event_streaming is True in health check")
+        print("PASS: event_streaming == True in health check")
     
     def test_health_includes_enterprise_docs(self, api_client):
         """Health check should include enterprise_docs."""
@@ -71,7 +71,7 @@ class TestHealthCheck:
         assert response.status_code == 200
         data = response.json()
         assert data["adviceos"]["enterprise_docs"] == True
-        print("PASS: enterprise_docs is True in health check")
+        print("PASS: enterprise_docs == True in health check")
 
 # ==================== INCIDENT MANAGEMENT TESTS ====================
 

@@ -9,7 +9,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://smart-insights-dash.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://dashboard-split-1.preview.emergentagent.com').rstrip('/')
 
 
 class TestHealthCheck:
@@ -33,8 +33,8 @@ class TestNotificationDemo:
         data = response.json()
         
         # Verify structure
-        assert data["success"] is True
-        assert data["demo_mode"] is True
+        assert data["success"] == True
+        assert data["demo_mode"] == True
         assert "integration_status" in data
         assert "notification_types" in data
         assert "sample_notifications" in data
@@ -187,7 +187,7 @@ class TestDataAggregators:
             assert "name" in agg
             assert "description" in agg
             assert "cdr_accredited" in agg
-            assert agg["cdr_accredited"] is True  # All should be CDR accredited
+            assert agg["cdr_accredited"] == True  # All should be CDR accredited
             assert "supported_banks" in agg
             assert "integration_effort" in agg
             assert "sandbox_available" in agg

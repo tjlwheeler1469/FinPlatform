@@ -39,7 +39,7 @@
   },
   "test_credentials": {
     "test_client_id": "client_1",
-    "api_base_url": "https://smart-insights-dash.preview.emergentagent.com"
+    "api_base_url": "https://dashboard-split-1.preview.emergentagent.com"
   },
   "seed_data_creation": "None - used existing mock data in portfolio_monitoring.py, financial_graph.py, tax_optimization.py, rebalancing.py",
   "retest_needed": false,
