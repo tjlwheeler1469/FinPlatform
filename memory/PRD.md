@@ -12,20 +12,20 @@ Build a comprehensive Australian wealth management platform for financial advise
 ## Architecture
 ```
 /app/backend/routes/
-├── voice_command.py          # Universal AFSL-grade command engine (11 types)
-├── pdf_report.py             # PDF report generator (all analysis types)
+├── voice_command.py          # Universal AFSL-grade command engine (12 types inc. client_pack)
+├── pdf_report.py             # PDF report generator (all analysis types inc. client_pack)
 ├── voice_retirement.py       # Dedicated retirement analysis
 ├── buffett_engine.py         # Live Buffett screening (Yahoo Finance)
 └── scenario_templates.py     # AST-based safe arithmetic
 
 /app/frontend/src/components/
-├── VoiceAssistant.jsx        # 11 result cards + PDF download on hover
+├── VoiceAssistant.jsx        # 12 result cards + PDF download on hover
 ├── RetirementVoicePanel.jsx  # Retirement voice + what-if + PDF
 ├── Layout.jsx                # Floating mic + page context
 └── LanguageContext.jsx       # i18n (EN/ZH/VI/EL)
 ```
 
-## Voice Command Engine — 11 Response Types
+## Voice Command Engine — 12 Response Types
 1. retirement_analysis — Projections, super, CGT, franking, Age Pension
 2. buffett_analysis — 8-criterion value investing (any ASX stock)
 3. investment_comparison — Compare all asset classes
@@ -37,17 +37,28 @@ Build a comprehensive Australian wealth management platform for financial advise
 9. scenario_analysis — What-if modelling, comparison
 10. stock_insight — Market data, sector analysis
 11. general — Catch-all
+12. client_pack — Bundled quarterly review PDF (portfolio + performance + compliance)
 
 ## PDF Report Generation
 - POST /api/pdf-report/generate — accepts any analysis JSON, returns branded PDF
 - Professional Halcyon branding (navy/gold)
-- Dedicated builders for: retirement, Buffett, SOA, tax, compliance, insurance, trust, investment comparison
+- Dedicated builders for: retirement, Buffett, SOA, tax, compliance, insurance, trust, investment comparison, **client_pack**
 - Hover-visible download button on all voice result cards
 - Dedicated download button on RetirementVoicePanel
 
 ## Completed Work (All Sessions)
 
-### PDF Reports + Code Quality (March 31, 2026) - LATEST
+### Route Fixes + Knowledge Graph Consolidation + Client Pack (March 31, 2026) - LATEST
+- [x] Fixed broken /next-actions route → redirects to /next-best-actions
+- [x] Combined Knowledge Graph into Advisor Command Center dashboard
+  - Removed standalone /knowledge-graph nav entry from sidebar
+  - Added redirect /knowledge-graph → /advisor-command-center
+  - Integrated AI Knowledge Graph section: graph stats, query buttons, AI Q&A input, latest insights
+- [x] "Generate Client Pack" voice command (type: client_pack) — multi-section PDF with portfolio summary, performance report, compliance checklist
+- [x] ClientPackCard rendering in VoiceAssistant.jsx
+- [x] Iteration 131: Backend 100% (13/13), Frontend 100%
+
+### PDF Reports + Code Quality (March 31, 2026)
 - [x] PDF generation endpoint for all 11 analysis types
 - [x] Professional branding (navy/gold, Halcyon headers)
 - [x] Hover PDF download on voice result cards
@@ -71,10 +82,12 @@ Build a comprehensive Australian wealth management platform for financial advise
 - [x] Buffett Ideas live API, per-client data switching
 
 ## Testing History
+- iteration_131: Backend 100% (13/13), Frontend 100% — Route fixes, KG consolidation, client pack
 - iteration_130: Backend 100% (12/12), Frontend 100% — PDF + type hints
 - iteration_129: Backend 100% (10/10), Frontend 100% — Universal engine
 - iteration_128-123: All passing
 
 ## Remaining
 - [x] All user-requested features complete
+- P2: Review remaining pages for further consolidation
 - Cosmetic: E741 ambiguous var names, E722 bare excepts, F841 unused locals
