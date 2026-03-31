@@ -1,0 +1,95 @@
+{
+  "summary": "Iteration 124 testing completed. Bug fix validated: Trust Distribution and Client360View now correctly show per-client data when switching between clients. Williams (client_4) shows $0 trust income with no beneficiaries, Wheeler (client_1) shows $150K trust income with 4 beneficiaries, Chen (client_2) shows $280K, Patel (client_5) shows $320K. Client360View correctly displays client-specific family members. Income Splitting, AdviceOS Dashboard, and Stock Trading pages continue to work.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Trust Distribution & other chart pages", "issues": ["Recharts warning: chart width/height -1 - needs minWidth/minHeight set (known issue from iteration 123)"]}
+    ]
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_124.json"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "N/A (frontend-only testing)",
+    "frontend": "100% (all features working)"
+  },
+  "test_credentials": "No auth needed - all endpoints are open",
+  "seed_data_creation": "None - used existing demo data",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Bug fix for client-specific data switching is working correctly. Key findings: (1) Trust Distribution page at /trust-distributions correctly shows per-client trust income and beneficiaries - Williams $0, Wheeler $150K, Chen $280K, Patel $320K, (2) Client360View at /client-360 correctly shows per-client family members and data, (3) Income Splitting page shows correct family members per client, (4) AdviceOS Dashboard and Stock Trading continue to work. The PortfolioProvider in App.js now listens to localStorage 'selected_client' changes and swaps familyMembers/trust/company data accordingly. CLIENT_FAMILY_DATA contains per-client datasets for all 5 CRM clients.",
+  "features_tested": {
+    "trust_distribution_client_switching": {
+      "status": "PASS",
+      "route": "/trust-distributions",
+      "williams_client_4": {
+        "trust_income": "$0",
+        "beneficiaries": "0 (all isTrustBeneficiary=false)",
+        "status": "PASS"
+      },
+      "wheeler_client_1": {
+        "trust_income": "$150,000",
+        "beneficiaries": "4 (James, Sarah, Emily, Michael Wheeler)",
+        "status": "PASS"
+      },
+      "chen_client_2": {
+        "trust_income": "$280,000",
+        "beneficiaries": "4 (Michael, Lisa, Daniel, Sophie Chen)",
+        "status": "PASS"
+      },
+      "patel_client_5": {
+        "trust_income": "$320,000",
+        "beneficiaries": "3 (Raj, Priya, Aarav Patel)",
+        "status": "PASS"
+      }
+    },
+    "client_360_view": {
+      "status": "PASS",
+      "route": "/client-360",
+      "williams_client_4": {
+        "name": "Emma & David Williams",
+        "status": "prospect",
+        "family": ["David Williams (38)", "Emma Williams (36)", "Lily Williams (8)", "Jack Williams (5)"],
+        "status": "PASS"
+      },
+      "wheeler_client_1": {
+        "name": "James & Sarah Wheeler",
+        "status": "active",
+        "family": ["James Wheeler (56)", "Sarah Wheeler (54)", "Emily Wheeler (24)", "Tom Wheeler (21)"],
+        "status": "PASS"
+      }
+    },
+    "income_splitting": {
+      "status": "PASS",
+      "route": "/income-splitting",
+      "notes": "Shows correct family members per selected client"
+    },
+    "adviceos_dashboard": {
+      "status": "PASS",
+      "route": "/adviceos"
+    },
+    "stock_trading": {
+      "status": "PASS",
+      "route": "/stock-trading"
+    }
+  },
+  "bug_fix_validation": {
+    "original_issue": "Trust Distribution Analysis page was showing Wheeler family beneficiary data instead of Williams data when viewing Emma & David Williams client profile",
+    "root_cause": "PortfolioProvider was not listening to selectedClient changes from localStorage and was using default Wheeler data for all clients",
+    "fix_applied": [
+      "Created per-client family member datasets (CLIENT_FAMILY_DATA) in App.js for all 5 CRM clients",
+      "Made PortfolioProvider listen to selectedClient changes from localStorage and swap familyMembers/trust/company data",
+      "Added full Client360View data for all 5 clients in DEMO_CLIENT_DATA",
+      "Fixed crash when beneficiaries array is empty with guard in TrustDistributionAnalysis.jsx"
+    ],
+    "fix_status": "VERIFIED - Working correctly"
+  }
+}

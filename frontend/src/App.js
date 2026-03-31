@@ -272,89 +272,64 @@ export const usePortfolio = () => {
 };
 
 // Default Family Members (shared across Trust, Income Splitting, Tax Analysis, Budget)
-const DEFAULT_FAMILY_MEMBERS = [
-  { 
-    id: 1, 
-    name: "James Wheeler", 
-    relationship: "primary",
-    age: 45,
-    taxableIncome: 120000,
-    salaryIncome: 120000,
-    dividendIncome: 8500,
-    rentalIncome: 18000,
-    otherIncome: 0,
-    deductions: 5200,
-    superBalance: 320000,
-    isTrustBeneficiary: true,
-    trustDistribution: 30
+// Per-client family member datasets
+const CLIENT_FAMILY_DATA = {
+  client_1: {
+    familyMembers: [
+      { id: 1, name: "James Wheeler", relationship: "primary", age: 45, taxableIncome: 120000, salaryIncome: 120000, dividendIncome: 8500, rentalIncome: 18000, otherIncome: 0, deductions: 5200, superBalance: 320000, isTrustBeneficiary: true, trustDistribution: 30 },
+      { id: 2, name: "Sarah Wheeler", relationship: "spouse", age: 43, taxableIncome: 65000, salaryIncome: 65000, dividendIncome: 4200, rentalIncome: 18000, otherIncome: 0, deductions: 2800, superBalance: 260000, isTrustBeneficiary: true, trustDistribution: 30 },
+      { id: 3, name: "Emily Wheeler", relationship: "adult_child", age: 22, taxableIncome: 25000, salaryIncome: 25000, dividendIncome: 0, rentalIncome: 0, otherIncome: 0, deductions: 0, superBalance: 15000, isTrustBeneficiary: true, trustDistribution: 20 },
+      { id: 4, name: "Michael Wheeler", relationship: "adult_child", age: 19, taxableIncome: 0, salaryIncome: 0, dividendIncome: 0, rentalIncome: 0, otherIncome: 0, deductions: 0, superBalance: 5000, isTrustBeneficiary: true, trustDistribution: 20 }
+    ],
+    trust: { name: "Wheeler Family Trust", type: "discretionary", netIncome: 150000, financialYear: "2024-25", companyDividendsReceived: 0 },
+    company: { name: "Wheeler Investments Pty Ltd", abn: "12 345 678 901", acn: "123 456 789", isBaseRateEntity: true, taxRate: 0.25, frankingAccountBalance: 45000, retainedEarnings: 180000, financialYear: "2024-25" }
   },
-  { 
-    id: 2, 
-    name: "Sarah Wheeler", 
-    relationship: "spouse",
-    age: 43,
-    taxableIncome: 65000,
-    salaryIncome: 65000,
-    dividendIncome: 4200,
-    rentalIncome: 18000,
-    otherIncome: 0,
-    deductions: 2800,
-    superBalance: 260000,
-    isTrustBeneficiary: true,
-    trustDistribution: 30
+  client_2: {
+    familyMembers: [
+      { id: 1, name: "Michael Chen", relationship: "primary", age: 52, taxableIncome: 185000, salaryIncome: 185000, dividendIncome: 12000, rentalIncome: 35000, otherIncome: 0, deductions: 8500, superBalance: 620000, isTrustBeneficiary: true, trustDistribution: 35 },
+      { id: 2, name: "Lisa Chen", relationship: "spouse", age: 48, taxableIncome: 95000, salaryIncome: 95000, dividendIncome: 6000, rentalIncome: 35000, otherIncome: 0, deductions: 4200, superBalance: 480000, isTrustBeneficiary: true, trustDistribution: 35 },
+      { id: 3, name: "Daniel Chen", relationship: "adult_child", age: 24, taxableIncome: 52000, salaryIncome: 52000, dividendIncome: 0, rentalIncome: 0, otherIncome: 0, deductions: 0, superBalance: 28000, isTrustBeneficiary: true, trustDistribution: 15 },
+      { id: 4, name: "Sophie Chen", relationship: "adult_child", age: 20, taxableIncome: 12000, salaryIncome: 12000, dividendIncome: 0, rentalIncome: 0, otherIncome: 0, deductions: 0, superBalance: 8000, isTrustBeneficiary: true, trustDistribution: 15 }
+    ],
+    trust: { name: "Chen Family Trust", type: "discretionary", netIncome: 280000, financialYear: "2024-25", companyDividendsReceived: 15000 },
+    company: { name: "Chen Holdings Pty Ltd", abn: "23 456 789 012", acn: "234 567 890", isBaseRateEntity: true, taxRate: 0.25, frankingAccountBalance: 62000, retainedEarnings: 320000, financialYear: "2024-25" }
   },
-  { 
-    id: 3, 
-    name: "Emily Wheeler", 
-    relationship: "adult_child",
-    age: 22,
-    taxableIncome: 25000,
-    salaryIncome: 25000,
-    dividendIncome: 0,
-    rentalIncome: 0,
-    otherIncome: 0,
-    deductions: 0,
-    superBalance: 15000,
-    isTrustBeneficiary: true,
-    trustDistribution: 20
+  client_3: {
+    familyMembers: [
+      { id: 1, name: "Robert Mitchell", relationship: "primary", age: 58, taxableIncome: 145000, salaryIncome: 145000, dividendIncome: 9500, rentalIncome: 0, otherIncome: 0, deductions: 6800, superBalance: 680000, isTrustBeneficiary: false, trustDistribution: 0 }
+    ],
+    trust: { name: "Mitchell Family Trust", type: "discretionary", netIncome: 0, financialYear: "2024-25", companyDividendsReceived: 0 },
+    company: { name: "Mitchell Consulting Pty Ltd", abn: "34 567 890 123", acn: "345 678 901", isBaseRateEntity: true, taxRate: 0.25, frankingAccountBalance: 18000, retainedEarnings: 95000, financialYear: "2024-25" }
   },
-  { 
-    id: 4, 
-    name: "Michael Wheeler", 
-    relationship: "adult_child",
-    age: 19,
-    taxableIncome: 0,
-    salaryIncome: 0,
-    dividendIncome: 0,
-    rentalIncome: 0,
-    otherIncome: 0,
-    deductions: 0,
-    superBalance: 5000,
-    isTrustBeneficiary: true,
-    trustDistribution: 20
+  client_4: {
+    familyMembers: [
+      { id: 1, name: "David Williams", relationship: "primary", age: 38, taxableIncome: 110000, salaryIncome: 110000, dividendIncome: 3200, rentalIncome: 0, otherIncome: 0, deductions: 3500, superBalance: 220000, isTrustBeneficiary: false, trustDistribution: 0 },
+      { id: 2, name: "Emma Williams", relationship: "spouse", age: 36, taxableIncome: 85000, salaryIncome: 85000, dividendIncome: 1800, rentalIncome: 0, otherIncome: 0, deductions: 2200, superBalance: 180000, isTrustBeneficiary: false, trustDistribution: 0 },
+      { id: 3, name: "Lily Williams", relationship: "child", age: 8, taxableIncome: 0, salaryIncome: 0, dividendIncome: 0, rentalIncome: 0, otherIncome: 0, deductions: 0, superBalance: 0, isTrustBeneficiary: false, trustDistribution: 0 },
+      { id: 4, name: "Jack Williams", relationship: "child", age: 5, taxableIncome: 0, salaryIncome: 0, dividendIncome: 0, rentalIncome: 0, otherIncome: 0, deductions: 0, superBalance: 0, isTrustBeneficiary: false, trustDistribution: 0 }
+    ],
+    trust: { name: "Williams Family Trust", type: "discretionary", netIncome: 0, financialYear: "2024-25", companyDividendsReceived: 0 },
+    company: { name: "Williams Property Pty Ltd", abn: "45 678 901 234", acn: "456 789 012", isBaseRateEntity: true, taxRate: 0.25, frankingAccountBalance: 0, retainedEarnings: 0, financialYear: "2024-25" }
+  },
+  client_5: {
+    familyMembers: [
+      { id: 1, name: "Raj Patel", relationship: "primary", age: 48, taxableIncome: 210000, salaryIncome: 210000, dividendIncome: 18000, rentalIncome: 42000, otherIncome: 5000, deductions: 12000, superBalance: 1200000, isTrustBeneficiary: true, trustDistribution: 40 },
+      { id: 2, name: "Priya Patel", relationship: "spouse", age: 45, taxableIncome: 78000, salaryIncome: 78000, dividendIncome: 8000, rentalIncome: 42000, otherIncome: 0, deductions: 5500, superBalance: 680000, isTrustBeneficiary: true, trustDistribution: 35 },
+      { id: 3, name: "Aarav Patel", relationship: "adult_child", age: 22, taxableIncome: 45000, salaryIncome: 45000, dividendIncome: 0, rentalIncome: 0, otherIncome: 0, deductions: 0, superBalance: 22000, isTrustBeneficiary: true, trustDistribution: 25 }
+    ],
+    trust: { name: "Patel SMSF Trust", type: "smsf", netIncome: 320000, financialYear: "2024-25", companyDividendsReceived: 25000 },
+    company: { name: "Patel Holdings Pty Ltd", abn: "56 789 012 345", acn: "567 890 123", isBaseRateEntity: false, taxRate: 0.30, frankingAccountBalance: 95000, retainedEarnings: 580000, financialYear: "2024-25" }
   }
-];
-
-// Default Trust Configuration
-const DEFAULT_TRUST = {
-  name: "Wheeler Family Trust",
-  type: "discretionary",
-  netIncome: 150000,
-  financialYear: "2024-25",
-  companyDividendsReceived: 0 // Dividends from company distributed to trust
 };
 
-// Default Company Structure
-const DEFAULT_COMPANY = {
-  name: "Wheeler Investments Pty Ltd",
-  abn: "12 345 678 901",
-  acn: "123 456 789",
-  isBaseRateEntity: true, // Under $50M aggregated turnover, 25% tax rate
-  taxRate: 0.25,
-  frankingAccountBalance: 45000,
-  retainedEarnings: 180000,
-  financialYear: "2024-25"
-};
+// Default uses client_1 (Wheeler) as fallback
+const DEFAULT_FAMILY_MEMBERS = CLIENT_FAMILY_DATA.client_1.familyMembers;
+
+// Default Trust Configuration (uses client_1 as fallback)
+const DEFAULT_TRUST = CLIENT_FAMILY_DATA.client_1.trust;
+
+// Default Company Structure (uses client_1 as fallback)
+const DEFAULT_COMPANY = CLIENT_FAMILY_DATA.client_1.company;
 
 // Default Share Portfolio with ownership types
 const DEFAULT_SHARE_PORTFOLIO = [
@@ -624,13 +599,55 @@ const PortfolioProvider = ({ children }) => {
   const [sharePortfolio, setSharePortfolio] = useState(DEFAULT_SHARE_PORTFOLIO);
   const [company, setCompany] = useState(DEFAULT_COMPANY);
   
-  // Track unsaved changes
+  // Track current client and unsaved changes
+  const [activeClientId, setActiveClientId] = useState(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [lastSaved, setLastSaved] = useState(null);
 
+  // Listen for selectedClient changes from Layout (stored in localStorage)
+  useEffect(() => {
+    const checkClient = () => {
+      const saved = localStorage.getItem("selected_client");
+      if (saved) {
+        try {
+          const client = JSON.parse(saved);
+          if (client?.id && client.id !== activeClientId) {
+            setActiveClientId(client.id);
+            const clientData = CLIENT_FAMILY_DATA[client.id];
+            if (clientData) {
+              setFamilyMembers(clientData.familyMembers);
+              setTrust(clientData.trust);
+              setCompany(clientData.company);
+              setHasUnsavedChanges(false);
+            }
+          }
+        } catch {
+          // ignore parse errors
+        }
+      } else if (activeClientId !== null) {
+        // Client deselected, reset to default
+        setActiveClientId(null);
+        setFamilyMembers(DEFAULT_FAMILY_MEMBERS);
+        setTrust(DEFAULT_TRUST);
+        setCompany(DEFAULT_COMPANY);
+      }
+    };
+    
+    checkClient();
+    
+    // Poll for changes (Layout updates localStorage on client selection)
+    const interval = setInterval(checkClient, 500);
+    window.addEventListener('storage', checkClient);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('storage', checkClient);
+    };
+  }, [activeClientId]);
+
   // Load saved data from localStorage on mount
   useEffect(() => {
-    const savedData = localStorage.getItem("wheelerFamilyData");
+    const storageKey = activeClientId ? `clientData_${activeClientId}` : "wheelerFamilyData";
+    const savedData = localStorage.getItem(storageKey);
     if (savedData) {
       try {
         const parsed = JSON.parse(savedData);
@@ -645,7 +662,7 @@ const PortfolioProvider = ({ children }) => {
         console.error("Error loading saved data:", e);
       }
     }
-  }, []);
+  }, [activeClientId]);
 
   // Update family member
   const updateFamilyMember = useCallback((id, updates) => {
@@ -719,23 +736,27 @@ const PortfolioProvider = ({ children }) => {
       company,
       lastSaved: new Date().toISOString()
     };
-    localStorage.setItem("wheelerFamilyData", JSON.stringify(dataToSave));
+    const storageKey = activeClientId ? `clientData_${activeClientId}` : "wheelerFamilyData";
+    localStorage.setItem(storageKey, JSON.stringify(dataToSave));
     setHasUnsavedChanges(false);
     setLastSaved(dataToSave.lastSaved);
     toast.success("All changes saved successfully");
-  }, [familyMembers, trust, budget, portfolio, sharePortfolio, company]);
+  }, [familyMembers, trust, budget, portfolio, sharePortfolio, company, activeClientId]);
 
-  // Reset to defaults
+  // Reset to defaults (for current client)
   const resetToDefaults = useCallback(() => {
-    setFamilyMembers(DEFAULT_FAMILY_MEMBERS);
-    setTrust(DEFAULT_TRUST);
+    const clientData = activeClientId ? CLIENT_FAMILY_DATA[activeClientId] : CLIENT_FAMILY_DATA.client_1;
+    if (clientData) {
+      setFamilyMembers(clientData.familyMembers);
+      setTrust(clientData.trust);
+      setCompany(clientData.company);
+    }
     setBudget(DEFAULT_BUDGET);
     setPortfolio(DEFAULT_PORTFOLIO);
     setSharePortfolio(DEFAULT_SHARE_PORTFOLIO);
-    setCompany(DEFAULT_COMPANY);
     setHasUnsavedChanges(true);
     toast.info("Reset to default values");
-  }, []);
+  }, [activeClientId]);
 
   // Share Portfolio functions
   const addShare = useCallback((share) => {

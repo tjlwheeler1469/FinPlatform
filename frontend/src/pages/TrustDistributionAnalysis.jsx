@@ -241,10 +241,12 @@ const TrustDistributionAnalysis = () => {
   const combinedTax = totalDistributionTax + undistributedTax;
   
   // Compare to if all income went to highest earner
-  const highestEarner = beneficiaries.reduce((max, b) => 
-    b.existingIncome > max.existingIncome ? b : max, beneficiaries[0]);
-  const noSplitTax = calculateTax(highestEarner.existingIncome + trustIncome) - 
-                     calculateTax(highestEarner.existingIncome);
+  const highestEarner = beneficiaries.length > 0
+    ? beneficiaries.reduce((max, b) => b.existingIncome > max.existingIncome ? b : max, beneficiaries[0])
+    : { existingIncome: 0 };
+  const noSplitTax = highestEarner.existingIncome > 0 || trustIncome > 0
+    ? calculateTax(highestEarner.existingIncome + trustIncome) - calculateTax(highestEarner.existingIncome)
+    : 0;
   
   const taxSavings = noSplitTax - combinedTax;
   
