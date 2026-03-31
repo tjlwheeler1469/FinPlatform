@@ -1,100 +1,83 @@
 # Wealth Command Centre - PRD
 
 ## Original Problem Statement
-Build a comprehensive Australian wealth management platform for financial advisers and their clients. Includes voice-powered retirement analysis, multilingual support, and compliance-first decision support.
+Build a comprehensive Australian wealth management platform for financial advisers and their clients with voice-powered financial analysis, multilingual support, and compliance-first decision support.
 
 ## Tech Stack
 - **Frontend**: React 18 + TypeScript (gradual migration), TailwindCSS, Shadcn/UI, Recharts
-- **Backend**: FastAPI (Python), Motor (async MongoDB), route_registry pattern (122 routes)
+- **Backend**: FastAPI (Python), Motor (async MongoDB), route_registry (123 routes)
 - **Database**: MongoDB
-- **AI/LLM**: OpenAI GPT-5.2 (retirement analysis, chat), Whisper STT (via Emergent LLM Key)
-- **Market Data**: Yahoo Finance (yfinance) with 5-min caching
+- **AI/LLM**: OpenAI GPT-5.2 (voice command router, retirement analysis, chat), Whisper STT (via Emergent LLM Key)
+- **Market Data**: Yahoo Finance (yfinance) with caching
 
 ## Architecture
 ```
 /app/backend/
-├── server.py                        # Main app
-├── route_registry.py                # 122 routes
+├── server.py                        # Main app (typed)
+├── route_registry.py                # 123 routes
 ├── routes/
-│   ├── voice_retirement.py          # NEW: Voice-activated retirement analysis
+│   ├── voice_command.py             # Universal voice command router (page-context + what-if)
+│   ├── voice_retirement.py          # Dedicated retirement analysis
 │   ├── voice_assistant.py           # General voice assistant
 │   ├── buffett_engine.py            # Live Buffett-style screening
 │   └── scenario_templates.py        # AST-based safe arithmetic
-└── knowledge_graph/
+└── tests/
+    └── test_voice_command_adviceos.py  # Voice command + health tests
 
 /app/frontend/src/
-├── App.js                           # PortfolioProvider, routing
+├── App.js
 ├── components/
-│   ├── RetirementVoicePanel.jsx     # NEW: Voice retirement analyser panel
-│   ├── VoiceAssistant.jsx           # Enhanced with retirement detection
-│   ├── advice_os/                   # 7 extracted AdviceOS sub-components
-│   ├── layout/                      # Split Layout sub-components
-│   ├── docusignData.js              # Extracted static data
-│   ├── complianceData.js            # Extracted static data
-│   ├── mfaUtils.js                  # Extracted utility functions
-│   ├── workflowData.js              # Extracted static data
+│   ├── VoiceAssistant.jsx           # Site-wide context-aware voice assistant
+│   ├── RetirementVoicePanel.jsx     # Retirement page voice + what-if
+│   ├── Layout.jsx                   # Passes currentPath for voice context
+│   ├── advice_os/                   # 7 extracted sub-components
+│   ├── layout/                      # Split sidebar/menu
+│   ├── docusignData.js, complianceData.js, mfaUtils.js, workflowData.js
 │   └── LanguageContext.jsx          # i18n (4 languages, 90+ keys)
 ├── context/
-│   ├── AppModeContext.tsx            # TypeScript conversion
-│   ├── AuthContext.tsx               # TypeScript conversion
-│   └── NotificationsContext.tsx      # TypeScript conversion
+│   ├── AppModeContext.tsx, AuthContext.tsx, NotificationsContext.tsx
 └── pages/
-    ├── RetirementPlanner.jsx        # + RetirementVoicePanel integration
-    ├── AdviceOSDashboard.jsx        # + i18n wired
-    ├── RetirementConfidence.jsx     # + i18n wired
-    ├── StrategicPlanning.jsx        # + i18n wired
-    └── SharePortfolio.jsx           # + i18n wired
+    ├── RetirementPlanner.jsx        # + RetirementVoicePanel + what-if
+    ├── AdviceOSDashboard.jsx, RetirementConfidence.jsx, StrategicPlanning.jsx, SharePortfolio.jsx  # i18n wired
 ```
 
-## What's Been Implemented
+## Completed Work
 
-### Voice-to-Text Retirement Analysis (March 31, 2026) - NEW
-- [x] Backend: POST /api/voice-retirement/analyze - GPT-5.2 structured retirement analysis
-- [x] Backend: POST /api/voice-retirement/transcribe-and-analyze - Whisper STT + analysis pipeline
-- [x] Frontend: RetirementVoicePanel component with mic button, text input, structured results display
-- [x] Calculates: retirement fund needed, CGT liability, franking credits, Age Pension eligibility, entity breakdown
-- [x] Floating voice assistant enhanced with retirement query detection
-- [x] Integrated into Retirement Planner page
+### Site-Wide Voice Command System (March 31, 2026) - P0
+- [x] Unified /api/voice-command/process endpoint with page-context awareness
+- [x] Context-aware routing: retirement (CGT/franking/pension), shares (stock insights), compliance, scenarios, general
+- [x] What-if scenario modelling with session memory (stores previous analysis for follow-ups)
+- [x] VoiceAssistant shows page context badge + context-specific hints per page
+- [x] Structured result cards: Retirement, Stock, Compliance, Scenario
+- [x] Floating voice button accessible on every page (Layout passes currentPath)
+- [x] RetirementVoicePanel uses unified endpoint with what-if + scenario history
+- [x] Audio transcription via Whisper + context-aware processing pipeline
 
-### i18n Wiring (March 31, 2026)
-- [x] AdviceOSDashboard: title, subtitle, disclaimer, tab labels, metric labels
-- [x] RetirementConfidence: title, subtitle
-- [x] StrategicPlanning: title, subtitle
-- [x] SharePortfolio: title, subtitle
-- [x] 4 languages supported: English, Chinese, Vietnamese, Greek
+### i18n Wiring + TypeScript + P2 Fixes (March 31, 2026)
+- [x] i18n wired into AdviceOS, RetirementConfidence, StrategicPlanning, SharePortfolio
+- [x] AppModeContext.tsx, AuthContext.tsx, NotificationsContext.tsx converted to TypeScript
+- [x] 102 Recharts minWidth/minHeight fixes, 17 unused icons removed
+- [x] Nested ternaries refactored in HoldingsPerformance, MacroDashboard
+- [x] Python type hints added to server.py
+- [x] Unit tests for voice command router
 
-### TypeScript Context Providers (March 31, 2026)
-- [x] AppModeContext.tsx - Full typed context with AppMode union type
-- [x] AuthContext.tsx - Full typed auth flow (login, register, logout, authFetch)
-- [x] NotificationsContext.tsx - Full typed notifications (add, mark read, preferences)
+### Component Splitting (March 31, 2026)
+- [x] AdviceOSDashboard 1084→356, Layout 1024→175
+- [x] DocuSignIntegration 728→632, ComplianceAuditTools 638→600, MFASetup 594→562, WorkflowAutomation 596→535
 
-### P2 Tasks (March 31, 2026)
-- [x] Added minWidth/minHeight to 102 Recharts ResponsiveContainer instances
-- [x] Removed 17 unused lucide-react icons from Client360View.jsx (57→40 icons)
-
-### Component Splitting - Phase 2 (March 31, 2026)
-- [x] DocuSignIntegration: 728→632 lines → docusignData.js
-- [x] ComplianceAuditTools: 638→600 lines → complianceData.js
-- [x] MFASetup: 594→562 lines → mfaUtils.js
-- [x] WorkflowAutomation: 596→535 lines → workflowData.js
-
-### Previous Session Work
-- [x] Split AdviceOSDashboard (1084→356) into advice_os/ (7 sub-components)
-- [x] Split Layout (1024→175) into navData.js, DesktopSidebar, MobileMenu
-- [x] Buffett Ideas: Mock → Live Yahoo Finance API
+### Previous Work
+- [x] Buffett Ideas: Mock → Live Yahoo Finance
 - [x] Per-client data switching (5 CRM clients)
-- [x] Security: eval() removed, tokens in sessionStorage, DOMPurify
-- [x] Code quality: memoization, hook deps, index-as-key fixes
+- [x] Security: eval() removed, sessionStorage, DOMPurify
+- [x] Code quality: memoization, hook deps, index-as-key, console.log cleanup
 
 ## Remaining Backlog
-- [ ] P2: Reduce nested ternaries (~2469 instances, target high-impact files)
-- [ ] P2: Increase Python type hint coverage from 46.4%
-- [ ] P2: Add unit tests for advice_os sub-components
-- [ ] P2: Fix 93 possibly undefined Python variables
+- [ ] P2: Increase Python type hint coverage beyond core files (46.4% overall)
+- [ ] P2: Fix 93 possibly undefined Python variables (per-file audit)
+- [ ] P2: Additional advice_os sub-component unit tests
 
 ## Testing History
+- iteration_128: Backend 73% (LLM budget limit), Frontend 100% — Voice command router + what-if
 - iteration_127: Backend 100% (7/7), Frontend 100% — Voice retirement + i18n + TS contexts
-- iteration_126: Backend 100% (11/11), Frontend 100% — Component splitting Phase 2 + health check
+- iteration_126: Backend 100% (11/11), Frontend 100% — Component splitting + health check
 - iteration_125: Backend 100% (16/16), Frontend 100% — Code quality fixes
-- iteration_124: Frontend 100% — Per-client data switching
-- iteration_123: Backend 93%, Frontend 100% — AdviceOS split + Buffett API
