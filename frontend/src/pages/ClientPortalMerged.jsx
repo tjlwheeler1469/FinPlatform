@@ -168,7 +168,7 @@ const ClientLogin = ({ onLogin }) => {
       }
 
       const data = await response.json();
-      localStorage.setItem("client_token", data.token);
+      sessionStorage.setItem("client_token", data.token);
       // Only store non-sensitive client data (name, id - not token)
       sessionStorage.setItem("client_session", JSON.stringify({ client_id: data.client_id, name: data.name, email: data.email }));
       toast.success(isLogin ? "Welcome back!" : "Account created successfully!");
@@ -189,7 +189,7 @@ const ClientLogin = ({ onLogin }) => {
       token: "demo_token",
       adviser_name: "David Chen"
     };
-    localStorage.setItem("client_token", demoData.token);
+    sessionStorage.setItem("client_token", demoData.token);
     sessionStorage.setItem("client_session", JSON.stringify({ client_id: demoData.client_id, name: demoData.name, email: demoData.email }));
     toast.success("Demo login successful!");
     onLogin(demoData);
@@ -332,7 +332,7 @@ const ClientDashboard = ({ clientAuth, onLogout }) => {
     } catch (error) {
       console.error("Logout error:", error);
     }
-    localStorage.removeItem("client_token");
+    sessionStorage.removeItem("client_token");
     sessionStorage.removeItem("client_session");
     onLogout();
   };
@@ -819,7 +819,7 @@ const ClientPortalMerged = () => {
   useEffect(() => {
     // Check for existing session
     const checkAuth = async () => {
-      const token = localStorage.getItem("client_token");
+      const token = sessionStorage.getItem("client_token");
       const storedSession = sessionStorage.getItem("client_session");
       
       if (token && storedSession) {
@@ -842,7 +842,7 @@ const ClientPortalMerged = () => {
               setClientAuth({ ...sessionData, token: "demo_token" });
             } else {
               // Clear invalid session
-              localStorage.removeItem("client_token");
+              sessionStorage.removeItem("client_token");
               sessionStorage.removeItem("client_session");
             }
           }

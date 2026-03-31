@@ -274,7 +274,7 @@ function InsightsList({ insights, onAction }) {
         const actionItems = insight.action_items || (insight.action ? [insight.action] : []);
         
         return (
-          <Card key={`item-${idx}`} className={`${getPriorityBorder(insight.priority)} hover:shadow-md transition-shadow`}>
+          <Card key={insight.id || `insight-${insight.title}`} className={`${getPriorityBorder(insight.priority)} hover:shadow-md transition-shadow`}>
             <CardContent className="p-4">
               <div className="flex items-start gap-4">
                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
@@ -299,7 +299,7 @@ function InsightsList({ insights, onAction }) {
                   {affectedClients.length > 0 && (
                     <div className="flex flex-wrap gap-2 mb-3">
                       {affectedClients.map((client, cidx) => (
-                        <Badge key={cidx} variant="outline" className="gap-1">
+                        <Badge key={`client-${client}`} variant="outline" className="gap-1">
                           <Users className="h-3 w-3" />
                           {client}
                         </Badge>
@@ -313,7 +313,7 @@ function InsightsList({ insights, onAction }) {
                       <p className="text-sm font-medium mb-2">Recommended Actions:</p>
                       <ul className="space-y-1">
                         {actionItems.map((action, aidx) => (
-                          <li key={aidx} className="text-sm text-muted-foreground flex items-center gap-2">
+                          <li key={`action-${action}`} className="text-sm text-muted-foreground flex items-center gap-2">
                             <ChevronRight className="h-3 w-3" />
                             {action}
                           </li>

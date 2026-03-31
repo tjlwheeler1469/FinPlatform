@@ -28,88 +28,72 @@ class GraphQueryEngine:
     
     # ==================== SECTOR ANALYSIS ====================
     
-    async def get_clients_overweight_sector(self, sector_code: str = None, threshold: float = 0.10) -> List[Dict[str, Any]]:
-        """
-        Find clients who are overweight in a specific sector (or any sector).
-        
-        Query pattern:
-        (Client)-[:OWNS]->(Portfolio)-[:HOLDS]->(Asset)-[:IN_SECTOR]->(Sector)
-        
-        Args:
-            sector_code: Specific sector to check (e.g., "XFJ" for Financials)
-            threshold: Overweight threshold above benchmark (default 10%)
-        
-        Returns:
-            List of clients with their sector exposure details
-        """
-        results = []
-        
-        # Get all sectors with their benchmarks
-        sectors = {s["id"]: s for s in self.graph.get_nodes_by_label("Sector")}
-        
-        # Get all clients
-        clients = self.graph.get_nodes_by_label("Client")
-        
-        for client in clients:
-            # Get client's portfolios
-            portfolios = self.graph.get_connected_nodes(client["id"], "OWNS", "outgoing")
-            
-            # Calculate sector exposure across all portfolios
-            sector_exposure = {}
-            total_portfolio_value = 0
-            
-            for portfolio in portfolios:
-                portfolio_data = self.graph.get_node(portfolio["id"])
-                if not portfolio_data:
-                    continue
-                
-                total_portfolio_value += portfolio_data.get("total_value", 0)
-                
-                # Get holdings
-                holdings = self.graph.get_connected_nodes(portfolio["id"], "HOLDS", "outgoing")
-                
-                for holding in holdings:
-                    rel = holding.get("_relationship", {})
-                    holding_value = rel.get("properties", {}).get("value", 0)
-                    
-                    # Get asset's sector
-                    asset_data = self.graph.get_node(holding["id"])
-                    if asset_data and asset_data.get("sector_id"):
-                        sector_id = asset_data["sector_id"]
-                        if sector_id not in sector_exposure:
-                            sector_exposure[sector_id] = 0
-                        sector_exposure[sector_id] += holding_value
-            
-            # Check for overweight sectors
-            if total_portfolio_value > 0:
-                overweight_sectors = []
-                
-                for sector_id, exposure_value in sector_exposure.items():
-                    sector = sectors.get(sector_id, {})
-                    sector_weight = exposure_value / total_portfolio_value
-                    benchmark_weight = sector.get("weight_benchmark", 0)
-                    
-                    # Check if overweight
-                    if sector_weight > benchmark_weight + threshold:
-                        if sector_code is None or sector.get("code") == sector_code:
-                            overweight_sectors.append({
-                                "sector_id": sector_id,
-                                "sector_name": sector.get("name", "Unknown"),
-                                "sector_code": sector.get("code", ""),
-                                "client_weight": round(sector_weight * 100, 1),
-                                "benchmark_weight": round(benchmark_weight * 100, 1),
-                                "overweight_by": round((sector_weight - benchmark_weight) * 100, 1),
-                                "exposure_value": exposure_value
-                            })
-                
-                if overweight_sectors:
-                    results.append({
-                        "client_id": client["id"],
-                        "client_name": client.get("name", "Unknown"),
-                        "total_portfolio_value": total_portfolio_value,
-                        "overweight_sectors": overweight_sectors
+    def _calculate_sector_exposure(self, client_id: str) -> tuple:
+        """Calculate sector exposure across all portfolios for a client.
+        Returns (sector_exposure_dict, total_portfolio_value)."""
+        portfolios = self.graph.get_connected_nodes(client_id, "OWNS", "outgoing")
+        sector_exposure = {}
+        total_portfolio_value = 0
+
+        for portfolio in portfolios:
+            portfolio_data = self.graph.get_node(portfolio["id"])
+            if not portfolio_data:
+                continue
+            total_portfolio_value += portfolio_data.get("total_value", 0)
+            holdings = self.graph.get_connected_nodes(portfolio["id"], "HOLDS", "outgoing")
+            for holding in holdings:
+                rel = holding.get("_relationship", {})
+                holding_value = rel.get("properties", {}).get("value", 0)
+                asset_data = self.graph.get_node(holding["id"])
+                if asset_data and asset_data.get("sector_id"):
+                    sector_id = asset_data["sector_id"]
+                    sector_exposure[sector_id] = sector_exposure.get(sector_id, 0) + holding_value
+
+        return sector_exposure, total_portfolio_value
+
+    def _find_overweight_sectors(self, sector_exposure: dict, total_value: float,
+                                  sectors: dict, threshold: float, sector_code: str = None) -> list:
+        """Find sectors where client weight exceeds benchmark + threshold."""
+        overweight = []
+        for sector_id, exposure_value in sector_exposure.items():
+            sector = sectors.get(sector_id, {})
+            sector_weight = exposure_value / total_value
+            benchmark_weight = sector.get("weight_benchmark", 0)
+            if sector_weight > benchmark_weight + threshold:
+                if sector_code is None or sector.get("code") == sector_code:
+                    overweight.append({
+                        "sector_id": sector_id,
+                        "sector_name": sector.get("name", "Unknown"),
+                        "sector_code": sector.get("code", ""),
+                        "client_weight": round(sector_weight * 100, 1),
+                        "benchmark_weight": round(benchmark_weight * 100, 1),
+                        "overweight_by": round((sector_weight - benchmark_weight) * 100, 1),
+                        "exposure_value": exposure_value
                     })
-        
+        return overweight
+
+    async def get_clients_overweight_sector(self, sector_code: str = None, threshold: float = 0.10) -> List[Dict[str, Any]]:
+        """Find clients who are overweight in a specific sector (or any sector)."""
+        results = []
+        sectors = {s["id"]: s for s in self.graph.get_nodes_by_label("Sector")}
+        clients = self.graph.get_nodes_by_label("Client")
+
+        for client in clients:
+            sector_exposure, total_value = self._calculate_sector_exposure(client["id"])
+            if total_value <= 0:
+                continue
+
+            overweight_sectors = self._find_overweight_sectors(
+                sector_exposure, total_value, sectors, threshold, sector_code
+            )
+            if overweight_sectors:
+                results.append({
+                    "client_id": client["id"],
+                    "client_name": client.get("name", "Unknown"),
+                    "total_portfolio_value": total_value,
+                    "overweight_sectors": overweight_sectors
+                })
+
         return sorted(results, key=lambda x: max([s["overweight_by"] for s in x["overweight_sectors"]]), reverse=True)
     
     # ==================== RETIREMENT RISK ====================
@@ -129,67 +113,20 @@ class GraphQueryEngine:
         (Client)-[:HAS_PLAN]->(FinancialPlan)-[:HAS_GOAL]->(Goal {type: "retirement"})
         """
         results = []
-        
         clients = self.graph.get_nodes_by_label("Client")
         plans = {p["id"]: p for p in self.graph.get_nodes_by_label("FinancialPlan")}
-        
+
         for client in clients:
             client_age = client.get("age", 40)
             retirement_age = client.get("retirement_age", 65)
             years_to_retirement = retirement_age - client_age
-            
-            # Get client's financial plan
             plan_rels = self.graph.get_connected_nodes(client["id"], "HAS_PLAN", "outgoing")
-            
-            retirement_risk = None
-            
-            for plan_rel in plan_rels:
-                plan = plans.get(plan_rel["id"], {})
-                goals = plan.get("goals", [])
-                
-                for goal in goals:
-                    # Check if it's a retirement-related goal
-                    goal_name = goal.get("name", "").lower()
-                    if "retirement" in goal_name or "retire" in goal_name:
-                        target = goal.get("target", 0)
-                        current = goal.get("current", 0)
-                        funding_ratio = current / target if target > 0 else 0
-                        
-                        # Calculate required annual growth
-                        if years_to_retirement > 0 and current > 0:
-                            required_growth = ((target / current) ** (1 / years_to_retirement)) - 1
-                        else:
-                            required_growth = 0
-                        
-                        # Assess risk
-                        risk_score = 0
-                        risk_factors = []
-                        
-                        if years_to_retirement < years_to_retirement_threshold:
-                            risk_score += 30
-                            risk_factors.append(f"Only {years_to_retirement} years to retirement")
-                        
-                        if funding_ratio < funding_ratio_threshold:
-                            risk_score += 40
-                            risk_factors.append(f"Only {funding_ratio*100:.0f}% funded")
-                        
-                        if required_growth > 0.12:  # >12% annual growth needed
-                            risk_score += 30
-                            risk_factors.append(f"Requires {required_growth*100:.1f}% annual growth")
-                        
-                        if risk_score > 0:
-                            retirement_risk = {
-                                "goal_name": goal.get("name"),
-                                "target_amount": target,
-                                "current_amount": current,
-                                "funding_ratio": round(funding_ratio * 100, 1),
-                                "years_to_retirement": years_to_retirement,
-                                "required_annual_growth": round(required_growth * 100, 1),
-                                "risk_score": risk_score,
-                                "risk_factors": risk_factors,
-                                "status": goal.get("status", "unknown")
-                            }
-            
+
+            retirement_risk = self._assess_retirement_risk(
+                plan_rels, plans, years_to_retirement,
+                years_to_retirement_threshold, funding_ratio_threshold
+            )
+
             if retirement_risk:
                 results.append({
                     "client_id": client["id"],
@@ -198,8 +135,64 @@ class GraphQueryEngine:
                     "retirement_age": retirement_age,
                     "retirement_risk": retirement_risk
                 })
-        
+
         return sorted(results, key=lambda x: x["retirement_risk"]["risk_score"], reverse=True)
+
+    def _assess_retirement_risk(self, plan_rels, plans, years_to_retirement,
+                                 years_threshold, funding_threshold):
+        """Assess retirement risk for a client's financial plans."""
+        for plan_rel in plan_rels:
+            plan = plans.get(plan_rel["id"], {})
+            for goal in plan.get("goals", []):
+                goal_name = goal.get("name", "").lower()
+                if "retirement" not in goal_name and "retire" not in goal_name:
+                    continue
+
+                target = goal.get("target", 0)
+                current = goal.get("current", 0)
+                funding_ratio = current / target if target > 0 else 0
+
+                required_growth = 0
+                if years_to_retirement > 0 and current > 0:
+                    required_growth = ((target / current) ** (1 / years_to_retirement)) - 1
+
+                risk_score, risk_factors = self._calculate_risk_factors(
+                    years_to_retirement, years_threshold,
+                    funding_ratio, funding_threshold,
+                    required_growth
+                )
+
+                if risk_score > 0:
+                    return {
+                        "goal_name": goal.get("name"),
+                        "target_amount": target,
+                        "current_amount": current,
+                        "funding_ratio": round(funding_ratio * 100, 1),
+                        "years_to_retirement": years_to_retirement,
+                        "required_annual_growth": round(required_growth * 100, 1),
+                        "risk_score": risk_score,
+                        "risk_factors": risk_factors,
+                        "status": goal.get("status", "unknown")
+                    }
+        return None
+
+    @staticmethod
+    def _calculate_risk_factors(years_to_ret, years_threshold,
+                                 funding_ratio, funding_threshold,
+                                 required_growth):
+        """Calculate risk score and factors for retirement assessment."""
+        risk_score = 0
+        risk_factors = []
+        if years_to_ret < years_threshold:
+            risk_score += 30
+            risk_factors.append(f"Only {years_to_ret} years to retirement")
+        if funding_ratio < funding_threshold:
+            risk_score += 40
+            risk_factors.append(f"Only {funding_ratio*100:.0f}% funded")
+        if required_growth > 0.12:
+            risk_score += 30
+            risk_factors.append(f"Requires {required_growth*100:.1f}% annual growth")
+        return risk_score, risk_factors
     
     # ==================== REBALANCING ====================
     

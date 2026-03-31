@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Button } from '../components/ui/button';
@@ -38,12 +38,7 @@ export default function XplanSyncPage() {
     adviser_id: 'ADV001'
   });
 
-  useEffect(() => {
-    loadData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true);
     try {
       const [statusRes, syncRes, logsRes] = await Promise.all([
@@ -59,7 +54,11 @@ export default function XplanSyncPage() {
       console.error('Failed to load Xplan data:', error);
     }
     setLoading(false);
-  };
+  }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const connectToXplan = async () => {
     try {

@@ -18,12 +18,36 @@ logger = logging.getLogger(__name__)
 
 def _safe_eval_arithmetic(expr: str) -> float:
     """Safely evaluate simple arithmetic expressions (numbers and +, -, *, /)."""
+    import ast
+    import operator
+
+    allowed_ops = {
+        ast.Add: operator.add,
+        ast.Sub: operator.sub,
+        ast.Mult: operator.mul,
+        ast.Div: operator.truediv,
+        ast.USub: operator.neg,
+    }
+
+    def _eval_node(node):
+        if isinstance(node, ast.Expression):
+            return _eval_node(node.body)
+        if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
+            return float(node.value)
+        if isinstance(node, ast.BinOp) and type(node.op) in allowed_ops:
+            left = _eval_node(node.left)
+            right = _eval_node(node.right)
+            return allowed_ops[type(node.op)](left, right)
+        if isinstance(node, ast.UnaryOp) and type(node.op) in allowed_ops:
+            return allowed_ops[type(node.op)](_eval_node(node.operand))
+        raise ValueError(f"Unsupported expression node: {ast.dump(node)}")
+
     sanitized = re.sub(r'[^0-9+\-*/.()\s]', '', str(expr))
     if not sanitized.strip():
         raise ValueError(f"Invalid arithmetic expression: {expr}")
     try:
-        # Only allow numbers and basic operators
-        return float(eval(sanitized, {"__builtins__": {}}, {}))
+        tree = ast.parse(sanitized.strip(), mode='eval')
+        return float(_eval_node(tree))
     except Exception:
         raise ValueError(f"Cannot safely evaluate expression: {expr}")
 

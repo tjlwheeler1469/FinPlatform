@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -232,9 +232,9 @@ const WorkflowAutomation = ({ onTaskCreated, onReminderSet }) => {
     }));
   };
 
-  const activeCount = activeWorkflows.filter(w => w.status === "active").length;
-  const pausedCount = activeWorkflows.filter(w => w.status === "paused").length;
-  const completedCount = activeWorkflows.filter(w => w.status === "completed").length;
+  const activeCount = useMemo(() => activeWorkflows.filter(w => w.status === "active").length, [activeWorkflows]);
+  const pausedCount = useMemo(() => activeWorkflows.filter(w => w.status === "paused").length, [activeWorkflows]);
+  const completedCount = useMemo(() => activeWorkflows.filter(w => w.status === "completed").length, [activeWorkflows]);
 
   return (
     <div className="space-y-6">

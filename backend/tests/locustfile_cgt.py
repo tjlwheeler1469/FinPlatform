@@ -3,6 +3,7 @@ Locust Load Test for CGT (Capital Gains Tax) Endpoint
 Run: locust -f locustfile_cgt.py --headless -u 50 -r 10 -t 60s --host=http://localhost:8001
 """
 from locust import HttpUser, task, between
+import secrets
 import random
 import json
 
@@ -83,7 +84,7 @@ class CGTLoadTest(HttpUser):
     @task(5)
     def calculate_cgt_simple(self):
         """Test CGT calculation with a small portfolio."""
-        holdings = random.sample(self.sample_holdings, k=random.randint(2, 4))
+        holdings = secrets.SystemRandom().sample(self.sample_holdings, k=random.randint(2, 4))
         
         payload = {
             "holdings": holdings,
@@ -109,7 +110,7 @@ class CGTLoadTest(HttpUser):
     @task(3)
     def calculate_cgt_medium(self):
         """Test CGT calculation with a medium portfolio."""
-        holdings = random.sample(self.sample_holdings, k=random.randint(4, 6))
+        holdings = secrets.SystemRandom().sample(self.sample_holdings, k=random.randint(4, 6))
         
         payload = {
             "holdings": holdings,

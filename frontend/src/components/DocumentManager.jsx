@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -131,12 +131,12 @@ const DocumentManager = ({ clientId = null, compact = false }) => {
     localStorage.setItem('wheeler_documents', JSON.stringify(documents));
   }, [documents]);
 
-  // Filter documents
-  const filteredDocuments = documents.filter(doc => {
+  // Filter documents - memoized to avoid recomputation
+  const filteredDocuments = useMemo(() => documents.filter(doc => {
     const matchesSearch = doc.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesType = filterType === 'all' || doc.type === filterType;
     return matchesSearch && matchesType;
-  });
+  }), [documents, searchQuery, filterType]);
 
   // Generate report
   const handleGenerateReport = async (type, customName = null) => {

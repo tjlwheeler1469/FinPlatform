@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -78,10 +78,9 @@ const XplanIntegration = () => {
   useEffect(() => {
     fetchConnectionStatus();
     fetchSyncHistory();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchConnectionStatus, fetchSyncHistory]);
   
-  const fetchConnectionStatus = async () => {
+  const fetchConnectionStatus = useCallback(async () => {
     try {
       const response = await axios.get(`${API_URL}/api/xplan/status`);
       setConnectionStatus(response.data);
@@ -95,7 +94,7 @@ const XplanIntegration = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
   
   const fetchClients = async () => {
     try {
@@ -106,14 +105,14 @@ const XplanIntegration = () => {
     }
   };
   
-  const fetchSyncHistory = async () => {
+  const fetchSyncHistory = useCallback(async () => {
     try {
       const response = await axios.get(`${API_URL}/api/xplan/sync-history`);
       setSyncHistory(response.data.history || []);
     } catch (error) {
       console.error("Error fetching sync history:", error);
     }
-  };
+  }, []);
   
   const testConnection = async () => {
     setTestingConnection(true);

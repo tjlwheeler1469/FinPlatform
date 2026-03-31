@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -34,12 +34,7 @@ const WorkflowDashboard = () => {
   const [stats, setStats] = useState(null);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
 
-  useEffect(() => {
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const [dashRes, templatesRes, instancesRes, statsRes] = await Promise.all([
@@ -58,7 +53,11 @@ const WorkflowDashboard = () => {
       toast.error("Failed to load workflow data");
     }
     setLoading(false);
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const startWorkflow = async (templateKey, clientId = "demo_client", clientName = "Demo Client") => {
     try {

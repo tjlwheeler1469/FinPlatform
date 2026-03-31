@@ -3,7 +3,8 @@ Wealth Command Load Testing Suite
 Tests 10,000 simultaneous users across personal, adviser, and client profiles.
 """
 from locust import HttpUser, task, between, events
-import random
+import secrets
+import random  # kept for randint/uniform only
 import json
 import logging
 
@@ -31,7 +32,7 @@ class AdviserUser(HttpUser):
     
     def login(self):
         """Authenticate adviser"""
-        user = random.choice(ADVISER_USERS)
+        user = secrets.choice(ADVISER_USERS)
         with self.client.post(
             "/api/auth/login",
             json=user,
@@ -83,13 +84,13 @@ class AdviserUser(HttpUser):
     @task(5)
     def client_holdings(self):
         """Get client holdings"""
-        client_id = random.choice(CLIENT_IDS)
+        client_id = secrets.choice(CLIENT_IDS)
         self.client.get(f"/api/trading/holdings/{client_id}", headers=self.headers, name="Client Holdings")
     
     @task(5)
     def cgt_summary(self):
         """Get CGT summary"""
-        client_id = random.choice(CLIENT_IDS)
+        client_id = secrets.choice(CLIENT_IDS)
         self.client.get(f"/api/trading/cgt-summary/{client_id}", headers=self.headers, name="CGT Summary")
     
     @task(4)
@@ -105,7 +106,7 @@ class AdviserUser(HttpUser):
     @task(3)
     def meeting_prep(self):
         """Generate meeting prep"""
-        client_id = random.choice(CLIENT_IDS)
+        client_id = secrets.choice(CLIENT_IDS)
         self.client.post(
             "/api/meeting-prep/generate",
             json={
@@ -115,7 +116,7 @@ class AdviserUser(HttpUser):
                 "portfolio_value": random.randint(500000, 5000000),
                 "ytd_return": random.uniform(0.05, 0.15),
                 "retirement_probability": random.randint(50, 90),
-                "risk_profile": random.choice(["Conservative", "Balanced", "Growth"]),
+                "risk_profile": secrets.choice(["Conservative", "Balanced", "Growth"]),
                 "age": random.randint(35, 65)
             },
             headers=self.headers,
@@ -125,13 +126,13 @@ class AdviserUser(HttpUser):
     @task(3)
     def financial_graph(self):
         """Get client financial graph"""
-        client_id = random.choice(CLIENT_IDS)
+        client_id = secrets.choice(CLIENT_IDS)
         self.client.get(f"/api/financial-graph/{client_id}", headers=self.headers, name="Financial Graph")
     
     @task(2)
     def calculate_cgt(self):
         """Calculate CGT for a trade"""
-        client_id = random.choice(CLIENT_IDS)
+        client_id = secrets.choice(CLIENT_IDS)
         self.client.get(
             f"/api/trading/calculate-cgt?client_id={client_id}&symbol=CBA.AX&units_to_sell=50",
             headers=self.headers,
@@ -141,13 +142,13 @@ class AdviserUser(HttpUser):
     @task(2)
     def rebalancing_preview(self):
         """Preview rebalancing"""
-        client_id = random.choice(CLIENT_IDS)
+        client_id = secrets.choice(CLIENT_IDS)
         self.client.get(f"/api/rebalancing/{client_id}/preview", headers=self.headers, name="Rebalancing Preview")
     
     @task(2)
     def tax_optimization(self):
         """Get tax optimization analysis"""
-        client_id = random.choice(CLIENT_IDS)
+        client_id = secrets.choice(CLIENT_IDS)
         self.client.get(f"/api/tax-optimization/{client_id}/analysis", headers=self.headers, name="Tax Optimization")
     
     @task(1)
@@ -161,7 +162,7 @@ class AdviserUser(HttpUser):
         ]
         self.client.post(
             "/api/copilot/query",
-            json={"query": random.choice(queries), "context": "adviser_dashboard"},
+            json={"query": secrets.choice(queries), "context": "adviser_dashboard"},
             headers=self.headers,
             name="AI Copilot Query"
         )
