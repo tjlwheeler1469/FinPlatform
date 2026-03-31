@@ -235,7 +235,7 @@ const FamilyOverview = () => {
             </CardHeader>
             <CardContent>
               <ChartContainer height={300}>
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                   <ComposedChart data={cashflowProjection}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis dataKey="month" />
@@ -356,7 +356,7 @@ const FamilyOverview = () => {
             </CardHeader>
             <CardContent>
               <ChartContainer height={250}>
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                   <BarChart data={familyIncomeData} layout="vertical">
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis type="number" tickFormatter={(v) => `$${(v/1000).toFixed(0)}k`} />

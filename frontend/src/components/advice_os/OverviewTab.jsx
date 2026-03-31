@@ -62,7 +62,7 @@ const OverviewTab = ({
           <CardContent>
             {complianceChartData.length > 0 ? (
               <div className="h-48">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                   <PieChart>
                     <Pie
                       data={complianceChartData}

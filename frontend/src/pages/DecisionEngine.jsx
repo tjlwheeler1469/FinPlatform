@@ -166,7 +166,7 @@ const DecisionEngine = () => {
             <CardContent className="pt-4">
               <div className="flex items-center justify-center">
                 <div className="relative w-48 h-48">
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                     <RadialBarChart
                       cx="50%"
                       cy="50%"

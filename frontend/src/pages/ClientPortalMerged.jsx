@@ -491,7 +491,7 @@ const ClientDashboard = ({ clientAuth, onLogout }) => {
                 <CardContent>
                   <div className="flex items-center gap-4">
                     <ChartContainer height={150} className="flex-1">
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                         <RechartPie>
                           <Pie
                             data={allocationData}
@@ -532,7 +532,7 @@ const ClientDashboard = ({ clientAuth, onLogout }) => {
                 </CardHeader>
                 <CardContent>
                   <ChartContainer height={150}>
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <AreaChart data={client.performanceData}>
                         <defs>
                           <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">

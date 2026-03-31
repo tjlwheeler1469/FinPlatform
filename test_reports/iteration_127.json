@@ -1,0 +1,104 @@
+{
+  "summary": "Iteration 127 - Voice Retirement Analysis & i18n Testing. Backend: 7/7 tests passed (100%). Frontend: All tested features working correctly. New voice-retirement API returns structured JSON with CGT/franking credits analysis. RetirementVoicePanel component renders correctly with all data-testids. i18n translations working on AdviceOS, Retirement Confidence, Strategic Planning, and Share Portfolio pages.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration127_voice_retirement.py",
+    "/app/test_reports/pytest/pytest_iteration127.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Voice Retirement API working correctly - POST /api/voice-retirement/analyze returns structured JSON with client_summary, retirement_analysis, tax_considerations, age_pension, recommendations",
+    "RetirementVoicePanel component has all required data-testids: retirement-voice-panel, retirement-voice-mic, retirement-voice-input, retirement-voice-send, retirement-analysis-results",
+    "i18n translations rendering correctly - no raw translation keys visible on tested pages",
+    "Language selector visible at bottom-left of sidebar showing 'English'",
+    "Floating voice assistant button visible at bottom-right corner",
+    "Navigation between major pages (Dashboard, Retirement, AdviceOS, Share Portfolio) working correctly"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration127_voice_retirement.py"
+  ],
+  "success_rate": {
+    "backend": "100% (7/7 tests passed)",
+    "frontend": "100% (all tested features working)"
+  },
+  "test_credentials": "No auth needed - all endpoints are open",
+  "seed_data_creation": "None - used existing demo data",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Iteration 127 verified: (1) New voice-retirement backend route at /api/voice-retirement/analyze working with GPT-5.2 for retirement analysis with CGT/franking credits, (2) RetirementVoicePanel component on /retirement page with all data-testids, (3) i18n translations working on AdviceOS, RetirementConfidence, StrategicPlanning, SharePortfolio pages, (4) Language selector at bottom-left of sidebar, (5) Floating voice assistant button at bottom-right. Route for Retirement Planner is /retirement (not /retirement-planner).",
+  "features_tested": {
+    "voice_retirement_api": {
+      "status": "PASS",
+      "endpoint": "POST /api/voice-retirement/analyze",
+      "notes": "Returns structured JSON with client_summary, retirement_analysis, tax_considerations (CGT, franking credits), age_pension, recommendations. Tested with basic, complex, and CGT/franking scenarios."
+    },
+    "voice_retirement_transcribe": {
+      "status": "PASS",
+      "endpoint": "POST /api/voice-retirement/transcribe-and-analyze",
+      "notes": "Endpoint exists and accepts audio uploads (returns 422 without audio file as expected)"
+    },
+    "health_endpoint": {
+      "status": "PASS",
+      "endpoint": "GET /api/health",
+      "notes": "Returns healthy status, version 8.0.0"
+    },
+    "buffett_engine": {
+      "status": "PASS",
+      "endpoint": "GET /api/buffett-engine/screen",
+      "notes": "Returns stock ideas with BUY/AVOID recommendations"
+    },
+    "retirement_voice_panel": {
+      "status": "PASS",
+      "route": "/retirement",
+      "data_testids": ["retirement-voice-panel", "retirement-voice-mic", "retirement-voice-input", "retirement-voice-send", "retirement-analysis-results"],
+      "notes": "Component renders correctly, input field works, send button triggers analysis, results display with structured data"
+    },
+    "adviceos_i18n": {
+      "status": "PASS",
+      "route": "/adviceos",
+      "notes": "Page loads with translated labels, 5 tabs visible (Overview, Scenarios, Compliance, Audit Trail, Reports)"
+    },
+    "retirement_confidence_i18n": {
+      "status": "PASS",
+      "route": "/retirement-confidence",
+      "notes": "Page title 'Retirement Confidence' displayed correctly"
+    },
+    "strategic_planning_i18n": {
+      "status": "PASS",
+      "route": "/strategic-planning",
+      "notes": "Page title 'Strategic Financial Planning' displayed correctly"
+    },
+    "share_portfolio_i18n": {
+      "status": "PASS",
+      "route": "/share-portfolio",
+      "notes": "Page title 'Shares & ETFs' displayed correctly"
+    },
+    "language_selector": {
+      "status": "PASS",
+      "location": "Bottom-left of sidebar",
+      "notes": "Shows 'English' with dropdown indicator"
+    },
+    "floating_voice_assistant": {
+      "status": "PASS",
+      "location": "Bottom-right corner",
+      "notes": "Microphone icon button visible"
+    },
+    "navigation": {
+      "status": "PASS",
+      "notes": "Navigation between Dashboard, Retirement Planner, AdviceOS, Share Portfolio working correctly"
+    }
+  },
+  "mocked_apis": {
+    "DocuSign e-signature": "MOCK - simulated signing flow",
+    "MFA TOTP verification": "MOCK - accepts any 6-digit code",
+    "Client family data": "MOCK - CLIENT_FAMILY_DATA in App.js"
+  }
+}

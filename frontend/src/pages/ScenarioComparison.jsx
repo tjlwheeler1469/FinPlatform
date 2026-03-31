@@ -451,7 +451,7 @@ const ScenarioComparison = () => {
               </CardHeader>
               <CardContent>
                 <ChartContainer height={300}>
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                     <LineChart data={timelineData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                       <XAxis 

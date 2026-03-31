@@ -1,11 +1,43 @@
-import { createContext, useContext, useState, useCallback, useEffect } from "react";
+import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from "react";
 import { toast } from "sonner";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-const AuthContext = createContext(null);
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  [key: string]: unknown;
+}
 
-export const useAuth = () => {
+interface LoginResult {
+  success?: boolean;
+  requiresMFA?: boolean;
+  user?: User;
+  error?: string;
+}
+
+interface RegisterResult {
+  success: boolean;
+  error?: string;
+}
+
+interface AuthContextType {
+  user: User | null;
+  token: string | null;
+  isLoading: boolean;
+  isAuthenticated: boolean;
+  login: (email: string, password: string) => Promise<LoginResult>;
+  register: (email: string, password: string, name: string, role?: string) => Promise<RegisterResult>;
+  logout: () => Promise<void>;
+  refreshToken: () => Promise<boolean>;
+  authFetch: (url: string, options?: RequestInit) => Promise<Response>;
+}
+
+const AuthContext = createContext<AuthContextType | null>(null);
+
+export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
@@ -13,13 +45,16 @@ export const useAuth = () => {
   return context;
 };
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(() => sessionStorage.getItem("auth_token"));
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export const AuthProvider = ({ children }: AuthProviderProps) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(() => sessionStorage.getItem("auth_token"));
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Check authentication status on mount
   useEffect(() => {
     const checkAuth = async () => {
       const savedToken = sessionStorage.getItem("auth_token");
@@ -27,26 +62,23 @@ export const AuthProvider = ({ children }) => {
         try {
           const response = await fetch(`${API_URL}/api/auth/verify-token?token=${savedToken}`);
           const data = await response.json();
-          
+
           if (data.valid) {
             setToken(savedToken);
             setIsAuthenticated(true);
-            // Get user info
             const userResponse = await fetch(`${API_URL}/api/auth/me?token=${savedToken}`);
             if (userResponse.ok) {
               const userData = await userResponse.json();
               setUser(userData);
             }
           } else {
-            // Token invalid, clear it
             sessionStorage.removeItem("auth_token");
             setToken(null);
             setIsAuthenticated(false);
           }
-        } catch (error) {
-          console.error("Auth check failed:", error);
+        } catch {
           sessionStorage.removeItem("auth_token");
-            setToken(null);
+          setToken(null);
           setIsAuthenticated(false);
         }
       }
@@ -56,14 +88,12 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, []);
 
-  const login = useCallback(async (email, password) => {
+  const login = useCallback(async (email: string, password: string): Promise<LoginResult> => {
     setIsLoading(true);
     try {
       const response = await fetch(`${API_URL}/api/auth/login`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
@@ -77,31 +107,28 @@ export const AuthProvider = ({ children }) => {
         return { requiresMFA: true };
       }
 
-      // Store token in sessionStorage (more secure than localStorage)
       sessionStorage.setItem("auth_token", data.access_token);
       setToken(data.access_token);
       setUser(data.user);
       setIsAuthenticated(true);
-      
+
       toast.success(`Welcome back, ${data.user.name}!`);
-      
       return { success: true, user: data.user };
-    } catch (error) {
-      toast.error(error.message || "Login failed");
-      return { success: false, error: error.message };
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Login failed";
+      toast.error(message);
+      return { success: false, error: message };
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  const register = useCallback(async (email, password, name, role = "client") => {
+  const register = useCallback(async (email: string, password: string, name: string, role = "client"): Promise<RegisterResult> => {
     setIsLoading(true);
     try {
       const response = await fetch(`${API_URL}/api/auth/register`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, name, role }),
       });
 
@@ -113,9 +140,10 @@ export const AuthProvider = ({ children }) => {
 
       toast.success("Registration successful! Please login.");
       return { success: true };
-    } catch (error) {
-      toast.error(error.message || "Registration failed");
-      return { success: false, error: error.message };
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Registration failed";
+      toast.error(message);
+      return { success: false, error: message };
     } finally {
       setIsLoading(false);
     }
@@ -126,13 +154,11 @@ export const AuthProvider = ({ children }) => {
       const sessionId = sessionStorage.getItem("session_id");
       await fetch(`${API_URL}/api/auth/logout`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ session_id: sessionId }),
       });
-    } catch (error) {
-      console.error("Logout error:", error);
+    } catch {
+      // silently ignore logout errors
     }
 
     sessionStorage.removeItem("auth_token");
@@ -140,19 +166,17 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     setUser(null);
     setIsAuthenticated(false);
-    
+
     toast.success("Logged out successfully");
   }, []);
 
-  const refreshToken = useCallback(async () => {
+  const refreshToken = useCallback(async (): Promise<boolean> => {
     if (!token) return false;
 
     try {
       const response = await fetch(`${API_URL}/api/auth/refresh-token`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token }),
       });
 
@@ -164,17 +188,15 @@ export const AuthProvider = ({ children }) => {
       sessionStorage.setItem("auth_token", data.access_token);
       setToken(data.access_token);
       return true;
-    } catch (error) {
-      console.error("Token refresh failed:", error);
+    } catch {
       logout();
       return false;
     }
   }, [token, logout]);
 
-  // API helper with auth header
-  const authFetch = useCallback(async (url, options = {}) => {
-    const headers = {
-      ...options.headers,
+  const authFetch = useCallback(async (url: string, options: RequestInit = {}): Promise<Response> => {
+    const headers: Record<string, string> = {
+      ...(options.headers as Record<string, string>),
       "Content-Type": "application/json",
     };
 
@@ -182,16 +204,11 @@ export const AuthProvider = ({ children }) => {
       headers["Authorization"] = `Bearer ${token}`;
     }
 
-    const response = await fetch(url, {
-      ...options,
-      headers,
-    });
+    const response = await fetch(url, { ...options, headers });
 
-    // Handle token expiration
     if (response.status === 401) {
       const refreshed = await refreshToken();
       if (refreshed) {
-        // Retry request with new token
         headers["Authorization"] = `Bearer ${sessionStorage.getItem("auth_token")}`;
         return fetch(url, { ...options, headers });
       }
@@ -200,7 +217,7 @@ export const AuthProvider = ({ children }) => {
     return response;
   }, [token, refreshToken]);
 
-  const value = {
+  const value: AuthContextType = {
     user,
     token,
     isLoading,

@@ -634,7 +634,7 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                 <AreaChart data={netWorthProjection.length > 0 ? netWorthProjection : [
                   { year: 2025, net_worth: 1978000 },
                   { year: 2030, net_worth: 2800000 },

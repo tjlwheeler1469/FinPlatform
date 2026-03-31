@@ -386,7 +386,7 @@ const PortfolioRebalancing = () => {
                 </CardHeader>
                 <CardContent>
                   <ChartContainer height={300}>
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <BarChart data={comparisonData} layout="vertical">
                         <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
                         <XAxis type="number" domain={[0, 50]} unit="%" />
@@ -408,7 +408,7 @@ const PortfolioRebalancing = () => {
                 </CardHeader>
                 <CardContent>
                   <ChartContainer height={300}>
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <RadarChart data={radarData}>
                         <PolarGrid />
                         <PolarAngleAxis dataKey="subject" />
@@ -592,7 +592,7 @@ const PortfolioRebalancing = () => {
                 </CardHeader>
                 <CardContent>
                   <ChartContainer height={250}>
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <RechartsPie>
                         <Pie
                           data={targetPieData}

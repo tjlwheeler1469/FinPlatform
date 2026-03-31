@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import Layout from '@/components/Layout';
+import { useLanguage } from '@/components/LanguageContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -547,6 +548,7 @@ const FactorBreakdown = ({ factors }) => {
 // ==================== MAIN COMPONENT ====================
 
 const RetirementConfidence = () => {
+  const { t } = useLanguage();
   // Engine mode: 'quick' or 'advanced'
   const [engineMode, setEngineMode] = useState('advanced');
   
@@ -846,9 +848,9 @@ const RetirementConfidence = () => {
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold">Retirement Confidence</h1>
+            <h1 className="text-3xl font-bold">{t('retirement.title')}</h1>
             <p className="text-muted-foreground">
-              Monte Carlo simulation-based retirement planning
+              {t('retirement.subtitle')}
             </p>
           </div>
           <div className="flex items-center gap-3 flex-wrap">
@@ -1309,7 +1311,7 @@ const RetirementConfidence = () => {
                   <CardContent>
                     {result?.confidence_breakdown?.factor_contributions && (
                       <div className="h-64">
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                           <BarChart
                             data={Object.entries(result.confidence_breakdown.factor_contributions).map(([k, v]) => ({
                               name: k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),

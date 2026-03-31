@@ -456,7 +456,7 @@ const InvestmentComparison = () => {
                 </CardHeader>
                 <CardContent>
                   <ChartContainer height={400}>
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <BarChart data={prepareBarChartData()} layout="vertical">
                         <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
                         <XAxis type="number" tickFormatter={(v) => formatCurrency(v)} />
@@ -484,7 +484,7 @@ const InvestmentComparison = () => {
                 </CardHeader>
                 <CardContent>
                   <ChartContainer height={300}>
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <BarChart data={prepareStructureComparisonData()}>
                         <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
                         <XAxis dataKey="structure" />

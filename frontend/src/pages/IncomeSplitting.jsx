@@ -313,7 +313,7 @@ const IncomeSplitting = () => {
                 </CardHeader>
                 <CardContent>
                   <ChartContainer height={250}>
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <BarChart data={comparisonData} layout="vertical">
                         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                         <XAxis type="number" tickFormatter={(v) => `$${(v/1000).toFixed(0)}k`} />
@@ -341,7 +341,7 @@ const IncomeSplitting = () => {
                 </CardHeader>
                 <CardContent>
                   <ChartContainer height={250}>
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <BarChart data={memberComparisonData}>
                         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                         <XAxis dataKey="name" />
@@ -582,7 +582,7 @@ const IncomeSplitting = () => {
                 <CardContent className="space-y-4">
                   {distributionPieData.length > 0 && (
                     <ChartContainer height={200}>
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                         <RechartsPie>
                           <Pie
                             data={distributionPieData}

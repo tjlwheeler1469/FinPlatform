@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Mic, MicOff, Send, X, MessageSquare, Volume2, Loader2, Bot, User, AlertCircle } from 'lucide-react';
+import { Mic, MicOff, Send, X, MessageSquare, Volume2, Loader2, Bot, User, AlertCircle, Calculator } from 'lucide-react';
 import { useLanguage } from './LanguageContext';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || "";
@@ -20,6 +20,7 @@ const VoiceAssistant = ({ isOpen, onClose }) => {
   const [inputText, setInputText] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [retirementAnalysis, setRetirementAnalysis] = useState(null);
   const [sessionId] = useState(() => `session_${Date.now()}`);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
@@ -112,6 +113,12 @@ const VoiceAssistant = ({ isOpen, onClose }) => {
     }
   };
 
+  const isRetirementQuery = (text) => {
+    const keywords = ['retire', 'retirement', 'age pension', 'super', 'superannuation', 'cgt', 'franking', 'pension', 'wealth', 'assets', 'years to retirement'];
+    const lower = text.toLowerCase();
+    return keywords.filter(k => lower.includes(k)).length >= 2;
+  };
+
   const sendTextMessage = async () => {
     const text = inputText.trim();
     if (!text || isProcessing) return;
@@ -119,6 +126,31 @@ const VoiceAssistant = ({ isOpen, onClose }) => {
     setMessages(prev => [...prev, { role: 'user', content: text }]);
     setInputText('');
     setIsProcessing(true);
+    setRetirementAnalysis(null);
+
+    // Check if retirement-related
+    if (isRetirementQuery(text)) {
+      try {
+        const res = await fetch(`${API_URL}/api/voice-retirement/analyze`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, session_id: sessionId }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.structured && data.analysis) {
+            setRetirementAnalysis(data.analysis);
+            const ra = data.analysis.retirement_analysis || {};
+            const summary = ra.is_on_track
+              ? `Based on my analysis, this client is on track for retirement with a projected surplus of $${(ra.surplus_or_shortfall || 0).toLocaleString()}. See the detailed breakdown below.`
+              : `This client has a projected shortfall of $${Math.abs(ra.surplus_or_shortfall || 0).toLocaleString()}. See the detailed analysis and recommendations below.`;
+            setMessages(prev => [...prev, { role: 'assistant', content: summary }]);
+            setIsProcessing(false);
+            return;
+          }
+        }
+      } catch { /* fall through to regular chat */ }
+    }
 
     try {
       const formData = new FormData();
@@ -207,6 +239,28 @@ const VoiceAssistant = ({ isOpen, onClose }) => {
                 <div className="bg-muted rounded-2xl rounded-bl-md px-4 py-3">
                   <Loader2 className="h-4 w-4 animate-spin text-emerald-600" />
                 </div>
+              </div>
+            )}
+            {retirementAnalysis && (
+              <div className="p-3 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl border border-emerald-200" data-testid="voice-retirement-result">
+                <p className="text-xs font-semibold text-emerald-700 mb-2 flex items-center gap-1">
+                  <Calculator className="h-3 w-3" /> Retirement Analysis
+                </p>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  {retirementAnalysis.retirement_analysis?.annual_income_needed > 0 && (
+                    <div><span className="text-muted-foreground">Income needed:</span> <span className="font-bold">${(retirementAnalysis.retirement_analysis.annual_income_needed || 0).toLocaleString()}/yr</span></div>
+                  )}
+                  {retirementAnalysis.retirement_analysis?.total_retirement_fund_needed > 0 && (
+                    <div><span className="text-muted-foreground">Fund needed:</span> <span className="font-bold">${(retirementAnalysis.retirement_analysis.total_retirement_fund_needed || 0).toLocaleString()}</span></div>
+                  )}
+                  {retirementAnalysis.tax_considerations?.estimated_cgt_liability > 0 && (
+                    <div><span className="text-muted-foreground">CGT:</span> <span className="font-bold text-red-600">${(retirementAnalysis.tax_considerations.estimated_cgt_liability || 0).toLocaleString()}</span></div>
+                  )}
+                  {retirementAnalysis.tax_considerations?.franking_credits_value > 0 && (
+                    <div><span className="text-muted-foreground">Franking:</span> <span className="font-bold text-green-600">+${(retirementAnalysis.tax_considerations.franking_credits_value || 0).toLocaleString()}</span></div>
+                  )}
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-2">Open Retirement Planner for full analysis</p>
               </div>
             )}
           </div>

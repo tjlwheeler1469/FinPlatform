@@ -291,7 +291,7 @@ const DecisionDashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <ChartContainer height={300}>
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="80%">
                         <PolarGrid stroke="#e5e7eb" />
                         <PolarAngleAxis dataKey="dimension" tick={{ fontSize: 11 }} />

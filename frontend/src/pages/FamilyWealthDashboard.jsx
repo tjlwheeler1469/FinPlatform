@@ -768,7 +768,7 @@ const FamilyWealthDashboard = () => {
               </CardHeader>
               <CardContent>
                 <ChartContainer height={300}>
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                     <BarChart data={structureTotals.filter(s => s.total > 0)} layout="vertical">
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis type="number" tickFormatter={(v) => `$${(v/1000000).toFixed(1)}M`} />
@@ -793,7 +793,7 @@ const FamilyWealthDashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <ChartContainer height={280}>
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <PieChart>
                         <Pie
                           data={wealthComposition}
@@ -835,7 +835,7 @@ const FamilyWealthDashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <ChartContainer height={280}>
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <BarChart data={memberWealth} layout="vertical">
                         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                         <XAxis type="number" tickFormatter={(v) => `$${(v/1000).toFixed(0)}k`} />
@@ -894,7 +894,7 @@ const FamilyWealthDashboard = () => {
               </CardHeader>
               <CardContent>
                 <ChartContainer height={350}>
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                     <AreaChart data={wealthProjection}>
                       <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                       <XAxis dataKey="year" stroke="hsl(var(--muted-foreground))" />
@@ -957,7 +957,7 @@ const FamilyWealthDashboard = () => {
                   {taxSavingsData.length > 0 ? (
                     <>
                       <ChartContainer height={250}>
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                           <BarChart data={taxSavingsData} layout="vertical">
                             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                             <XAxis type="number" tickFormatter={(v) => `$${(v/1000).toFixed(0)}k`} />

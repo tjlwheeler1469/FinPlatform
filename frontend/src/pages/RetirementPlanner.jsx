@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Layout from '../components/Layout';
+import RetirementVoicePanel from '../components/RetirementVoicePanel';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Button } from '../components/ui/button';
@@ -697,6 +698,9 @@ export default function RetirementPlanner() {
           </div>
         </div>
 
+        {/* Voice Retirement Analyser */}
+        <RetirementVoicePanel />
+
         {/* Summary Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           <Card>
@@ -786,7 +790,7 @@ export default function RetirementPlanner() {
                 </CardHeader>
                 <CardContent>
                   <div className="h-64">
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <PieChart>
                         <Pie
                           data={ENTITY_TYPES.map(e => ({
@@ -896,7 +900,7 @@ export default function RetirementPlanner() {
                 </CardHeader>
                 <CardContent>
                   <div className="h-80">
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <AreaChart data={projectionData}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="year" />
@@ -1735,7 +1739,7 @@ export default function RetirementPlanner() {
                   </CardHeader>
                   <CardContent>
                     <div className="h-80">
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                         <ComposedChart data={projectionData}>
                           <CartesianGrid strokeDasharray="3 3" />
                           <XAxis dataKey="year" />

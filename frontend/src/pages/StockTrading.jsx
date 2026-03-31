@@ -761,7 +761,7 @@ const StockTrading = () => {
               </CardHeader>
               <CardContent>
                 <div className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                     <BarChart data={backtestResults.yearly_returns}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="year" />

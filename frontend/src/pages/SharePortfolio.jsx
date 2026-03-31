@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import Layout from "@/components/Layout";
+import { useLanguage } from "@/components/LanguageContext";
 import ChartContainer from "@/components/ChartContainer";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -80,6 +81,7 @@ const OWNERSHIP_LABELS = {
 };
 
 const SharePortfolio = () => {
+  const { t } = useLanguage();
   const { 
     sharePortfolio, 
     addShare, 
@@ -404,10 +406,10 @@ const SharePortfolio = () => {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold  text-foreground">
-              Share Portfolio
+              {t('stocks.title')}
             </h1>
             <p className="text-muted-foreground mt-1">
-              Manage personal, joint, and company share holdings
+              {t('stocks.subtitle')}
             </p>
           </div>
           <div className="flex gap-2 flex-wrap">
@@ -648,7 +650,7 @@ const SharePortfolio = () => {
                   </CardHeader>
                   <CardContent>
                     <ChartContainer height={200}>
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                         <RechartsPie>
                           <Pie
                             data={ownershipPieData}

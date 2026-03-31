@@ -365,7 +365,7 @@ const DividendReinvestment = () => {
                       </CardHeader>
                       <CardContent>
                         <div className="h-[350px]">
-                          <ResponsiveContainer width="100%" height="100%">
+                          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                             <AreaChart data={comparisonChartData}>
                               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                               <XAxis 
@@ -410,7 +410,7 @@ const DividendReinvestment = () => {
                       </CardHeader>
                       <CardContent>
                         <div className="h-[350px]">
-                          <ResponsiveContainer width="100%" height="100%">
+                          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                             <LineChart data={comparisonChartData}>
                               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                               <XAxis 
@@ -456,7 +456,7 @@ const DividendReinvestment = () => {
                       </CardHeader>
                       <CardContent>
                         <div className="h-[350px]">
-                          <ResponsiveContainer width="100%" height="100%">
+                          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                             <BarChart data={dividendChartData}>
                               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                               <XAxis dataKey="year" stroke="hsl(var(--muted-foreground))" />

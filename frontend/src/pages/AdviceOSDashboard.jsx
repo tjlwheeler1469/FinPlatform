@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
+import { useLanguage } from "@/components/LanguageContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -21,6 +22,7 @@ import {
 const API_URL = process.env.REACT_APP_BACKEND_URL || "";
 
 const AdviceOSDashboard = () => {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState("overview");
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState(null);
@@ -211,7 +213,7 @@ const AdviceOSDashboard = () => {
   };
 
   return (
-    <Layout title="AdviceOS" subtitle="Compliance-First Decision Support Platform">
+    <Layout title={t('adviceos.title')} subtitle={t('adviceos.subtitle')}>
       <div className="space-y-6" data-testid="adviceos-dashboard">
         {/* Compliance Disclaimer Banner */}
         <Card className="bg-blue-50 border-blue-200">
@@ -219,10 +221,9 @@ const AdviceOSDashboard = () => {
             <div className="flex items-start gap-3">
               <Shield className="h-5 w-5 text-blue-600 mt-0.5" />
               <div>
-                <p className="text-sm font-medium text-blue-900">This tool provides decision support only</p>
+                <p className="text-sm font-medium text-blue-900">{t('adviceos.disclaimer')}</p>
                 <p className="text-xs text-blue-700 mt-1">
-                  This is not financial advice. All scenarios are for comparison purposes only.
-                  The adviser must confirm all outputs before presenting to clients.
+                  {t('adviceos.disclaimerDetail')}
                 </p>
               </div>
             </div>
@@ -235,7 +236,7 @@ const AdviceOSDashboard = () => {
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
                 <Shield className="h-5 w-5 text-emerald-600" />
-                <span className="text-sm text-emerald-700">Compliance Score</span>
+                <span className="text-sm text-emerald-700">{t('adviceos.complianceScore')}</span>
               </div>
               <p className="text-3xl font-bold text-emerald-700 mt-2" data-testid="compliance-score">{summary.compliance_score}%</p>
             </CardContent>
@@ -244,7 +245,7 @@ const AdviceOSDashboard = () => {
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
                 <Calculator className="h-5 w-5 text-[#D4A84C]" />
-                <span className="text-sm text-muted-foreground">Scenarios</span>
+                <span className="text-sm text-muted-foreground">{t('adviceos.scenarios')}</span>
               </div>
               <p className="text-3xl font-bold mt-2">{summary.scenarios.total}</p>
               <p className="text-xs text-muted-foreground">{summary.scenarios.last_30_days} last 30 days</p>
@@ -254,7 +255,7 @@ const AdviceOSDashboard = () => {
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
                 <ClipboardCheck className="h-5 w-5 text-blue-600" />
-                <span className="text-sm text-muted-foreground">Decisions</span>
+                <span className="text-sm text-muted-foreground">{t('adviceos.decisions')}</span>
               </div>
               <p className="text-3xl font-bold mt-2">{summary.decisions.total}</p>
               <p className="text-xs text-muted-foreground">{summary.decisions.overrides} overrides</p>
@@ -264,7 +265,7 @@ const AdviceOSDashboard = () => {
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
                 <AlertTriangle className={`h-5 w-5 ${summary.breaches.open > 0 ? "text-amber-600" : "text-muted-foreground"}`} />
-                <span className="text-sm text-muted-foreground">Open Breaches</span>
+                <span className="text-sm text-muted-foreground">{t('adviceos.openBreaches')}</span>
               </div>
               <p className={`text-3xl font-bold mt-2 ${summary.breaches.open > 0 ? "text-amber-600" : ""}`}>
                 {summary.breaches.open}
@@ -276,7 +277,7 @@ const AdviceOSDashboard = () => {
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
                 <History className="h-5 w-5 text-purple-600" />
-                <span className="text-sm text-muted-foreground">Audit Entries</span>
+                <span className="text-sm text-muted-foreground">{t('adviceos.auditEntries')}</span>
               </div>
               <p className="text-3xl font-bold mt-2">{summary.audit_logs || auditLogs.length}</p>
             </CardContent>
@@ -286,11 +287,11 @@ const AdviceOSDashboard = () => {
         {/* Main Content Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <TabsList className="grid w-full max-w-3xl grid-cols-5">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="scenarios">Scenarios</TabsTrigger>
-            <TabsTrigger value="compliance">Compliance</TabsTrigger>
-            <TabsTrigger value="audit">Audit Trail</TabsTrigger>
-            <TabsTrigger value="reports">Reports</TabsTrigger>
+            <TabsTrigger value="overview">{t('adviceos.overview')}</TabsTrigger>
+            <TabsTrigger value="scenarios">{t('adviceos.scenarios')}</TabsTrigger>
+            <TabsTrigger value="compliance">{t('adviceos.compliance')}</TabsTrigger>
+            <TabsTrigger value="audit">{t('adviceos.auditTrail')}</TabsTrigger>
+            <TabsTrigger value="reports">{t('adviceos.reports')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview">

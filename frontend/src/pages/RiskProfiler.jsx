@@ -388,7 +388,7 @@ Individual circumstances vary. Consult a licensed financial adviser before makin
                 <div>
                   <p className="text-sm font-medium mb-2 text-center">Recommended Asset Allocation</p>
                   <ChartContainer height={200}>
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <PieChart>
                         <Pie
                           data={assetData}
@@ -426,7 +426,7 @@ Individual circumstances vary. Consult a licensed financial adviser before makin
             </CardHeader>
             <CardContent>
               <ChartContainer height={300}>
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                   <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
                     <PolarGrid />
                     <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11 }} />

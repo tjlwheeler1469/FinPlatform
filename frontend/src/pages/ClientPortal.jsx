@@ -218,7 +218,7 @@ const ClientPortal = () => {
             <CardContent>
               <div className="flex items-center justify-center mb-4">
                 <div className="relative w-40 h-40">
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                     <RadialBarChart 
                       cx="50%" 
                       cy="50%" 
@@ -283,7 +283,7 @@ const ClientPortal = () => {
               
               {netWorthData.length > 0 && (
                 <div className="h-[160px] mb-4">
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                     <RechartsPie>
                       <Pie
                         data={netWorthData}

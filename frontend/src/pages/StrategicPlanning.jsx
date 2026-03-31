@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import Layout from "@/components/Layout";
+import { useLanguage } from "@/components/LanguageContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -150,6 +151,7 @@ const defaultScenario = {
 };
 
 const StrategicPlanning = () => {
+  const { t } = useLanguage();
   const { familyMembers, portfolio, sharePortfolio, trust, company, budget } = usePortfolio();
   const primaryMember = familyMembers.find(m => m.relationship === 'primary') || familyMembers[0];
 
@@ -461,10 +463,10 @@ const StrategicPlanning = () => {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold  text-foreground">
-              Strategic Planning
+              {t('planning.title')}
             </h1>
             <p className="text-muted-foreground mt-1">
-              Lifecycle planning, scenario modeling, and what-if analysis
+              {t('planning.subtitle')}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -628,7 +630,7 @@ const StrategicPlanning = () => {
                         <Card>
                           <CardContent className="p-4">
                             <ChartContainer height={250}>
-                              <ResponsiveContainer width="100%" height="100%">
+                              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                                 <AreaChart data={retirementResult.projections}>
                                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                                   <XAxis dataKey="age" stroke="hsl(var(--muted-foreground))" fontSize={10} />
@@ -958,7 +960,7 @@ const StrategicPlanning = () => {
                   <Card>
                     <CardContent className="p-4">
                       <ChartContainer height={250}>
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                           <AreaChart data={projections[activeScenarioId]}>
                             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                             <XAxis dataKey="year" stroke="hsl(var(--muted-foreground))" fontSize={10} />
@@ -1003,7 +1005,7 @@ const StrategicPlanning = () => {
               </CardHeader>
               <CardContent>
                 <ChartContainer height={350}>
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                     <LineChart data={comparisonData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                       <XAxis dataKey="year" stroke="hsl(var(--muted-foreground))" />

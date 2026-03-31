@@ -776,7 +776,7 @@ const HybridEngineView = () => {
                 <CardContent>
                   {result?.confidence_breakdown?.factor_contributions && (
                     <div className="h-64">
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                         <BarChart
                           data={Object.entries(result.confidence_breakdown.factor_contributions).map(([k, v]) => ({
                             name: k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),

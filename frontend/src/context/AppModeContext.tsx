@@ -1,16 +1,29 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
-// App Modes
 export const APP_MODES = {
   PERSONAL: "personal",
-  ADVISER: "adviser", 
+  ADVISER: "adviser",
   CLIENT: "client"
-};
+} as const;
 
-// Mode Context
-const AppModeContext = createContext();
+type AppMode = typeof APP_MODES[keyof typeof APP_MODES];
 
-export const useAppMode = () => {
+interface AppModeContextType {
+  mode: AppMode;
+  activeClientId: number | null;
+  switchToPersonal: () => void;
+  switchToAdviser: () => void;
+  switchToClient: () => void;
+  selectClient: (clientId: number) => void;
+  clearClient: () => void;
+  isPersonalMode: boolean;
+  isAdviserMode: boolean;
+  isClientMode: boolean;
+}
+
+const AppModeContext = createContext<AppModeContextType | null>(null);
+
+export const useAppMode = (): AppModeContextType => {
   const context = useContext(AppModeContext);
   if (!context) {
     throw new Error("useAppMode must be used within AppModeProvider");
@@ -18,13 +31,17 @@ export const useAppMode = () => {
   return context;
 };
 
-export const AppModeProvider = ({ children }) => {
-  const [mode, setMode] = useState(() => {
+interface AppModeProviderProps {
+  children: ReactNode;
+}
+
+export const AppModeProvider = ({ children }: AppModeProviderProps) => {
+  const [mode, setMode] = useState<AppMode>(() => {
     const saved = localStorage.getItem("app_mode");
-    return saved || APP_MODES.PERSONAL;
+    return (saved as AppMode) || APP_MODES.PERSONAL;
   });
 
-  const [activeClientId, setActiveClientId] = useState(() => {
+  const [activeClientId, setActiveClientId] = useState<number | null>(() => {
     const saved = localStorage.getItem("active_client_id");
     return saved ? parseInt(saved) : null;
   });
@@ -55,7 +72,7 @@ export const AppModeProvider = ({ children }) => {
     setMode(APP_MODES.CLIENT);
   };
 
-  const selectClient = (clientId) => {
+  const selectClient = (clientId: number) => {
     setActiveClientId(clientId);
   };
 

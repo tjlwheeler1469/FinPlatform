@@ -617,7 +617,7 @@ const TaxAnalysisSync = () => {
                 </CardHeader>
                 <CardContent>
                   <ChartContainer height={300}>
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <BarChart data={familyComparisonData}>
                         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                         <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" />
@@ -643,7 +643,7 @@ const TaxAnalysisSync = () => {
                   {taxDistributionData.length > 0 ? (
                     <>
                       <ChartContainer height={200}>
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                           <PieChart>
                             <Pie
                               data={taxDistributionData}

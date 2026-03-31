@@ -492,7 +492,7 @@ This is a summary only. For a full Statement of Advice, visit the SOA Generator.
                     <div>
                       <p className="text-sm font-medium mb-2 text-center">Recommended Allocation</p>
                       <ChartContainer height={150}>
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                           <PieChart>
                             <Pie
                               data={allocationData}

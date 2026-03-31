@@ -647,7 +647,7 @@ const PersonalDashboard = () => {
                 <CardContent>
                   <div className="flex items-center justify-center mb-4">
                     <div className="relative w-32 h-32">
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                         <RadialBarChart 
                           cx="50%" 
                           cy="50%" 
@@ -697,7 +697,7 @@ const PersonalDashboard = () => {
                     <p className="text-sm text-green-600"><ArrowUp className="h-3 w-3 inline" /> +8.2% YTD</p>
                   </div>
                   <div className="h-[120px]">
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <RechartsPie>
                         <Pie
                           data={entityData.slice(0, 4)}
@@ -825,7 +825,7 @@ const PersonalDashboard = () => {
                 <CardContent>
                   <div className="flex items-center justify-center">
                     <div className="relative w-48 h-48">
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                         <RadialBarChart 
                           cx="50%" 
                           cy="50%" 
@@ -946,7 +946,7 @@ const PersonalDashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="h-[250px]">
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <RechartsPie>
                         <Pie
                           data={allocationData}
@@ -979,7 +979,7 @@ const PersonalDashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="h-[250px]">
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <BarChart data={entityData} layout="vertical">
                         <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
                         <XAxis type="number" tickFormatter={(v) => `$${(v/1000000).toFixed(1)}M`} />

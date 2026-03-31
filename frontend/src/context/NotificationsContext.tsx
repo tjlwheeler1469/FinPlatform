@@ -1,68 +1,85 @@
-import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
 
-const NotificationsContext = createContext(null);
+interface Notification {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  timestamp: string;
+  read: boolean;
+  priority: string;
+  link?: string;
+}
 
-// Mock notifications data
-const INITIAL_NOTIFICATIONS = [
+interface NotificationPreferences {
+  taskReminders: boolean;
+  meetingReminders: boolean;
+  marketUpdates: boolean;
+  complianceAlerts: boolean;
+  invoiceAlerts: boolean;
+  emailNotifications: boolean;
+  pushNotifications: boolean;
+}
+
+interface NotificationsContextType {
+  notifications: Notification[];
+  unreadCount: number;
+  preferences: NotificationPreferences;
+  addNotification: (notification: Partial<Notification>) => void;
+  markAsRead: (id: string) => void;
+  markAllAsRead: () => void;
+  deleteNotification: (id: string) => void;
+  clearAll: () => void;
+  updatePreferences: (newPrefs: Partial<NotificationPreferences>) => void;
+  simulateNotification: () => void;
+}
+
+const INITIAL_NOTIFICATIONS: Notification[] = [
   {
-    id: 'notif_1',
-    type: 'task',
-    title: 'Task Due Tomorrow',
+    id: 'notif_1', type: 'task', title: 'Task Due Tomorrow',
     message: 'Annual Review - Wheeler is due tomorrow',
-    timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 mins ago
-    read: false,
-    priority: 'high',
-    link: '/practice-management'
+    timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+    read: false, priority: 'high', link: '/practice-management'
   },
   {
-    id: 'notif_2',
-    type: 'meeting',
-    title: 'Meeting in 2 Hours',
+    id: 'notif_2', type: 'meeting', title: 'Meeting in 2 Hours',
     message: 'Portfolio Discussion with Williams Family at 2:00 PM',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60).toISOString(), // 1 hour ago
-    read: false,
-    priority: 'medium',
-    link: '/practice-management'
+    timestamp: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
+    read: false, priority: 'medium', link: '/practice-management'
   },
   {
-    id: 'notif_3',
-    type: 'market',
-    title: 'Market Update',
+    id: 'notif_3', type: 'market', title: 'Market Update',
     message: 'ASX 200 is up 1.2% today',
-    timestamp: new Date(Date.now() - 1000 * 60 * 120).toISOString(), // 2 hours ago
-    read: true,
-    priority: 'low',
-    link: '/share-portfolio'
+    timestamp: new Date(Date.now() - 1000 * 60 * 120).toISOString(),
+    read: true, priority: 'low', link: '/share-portfolio'
   },
   {
-    id: 'notif_4',
-    type: 'compliance',
-    title: 'Compliance Reminder',
+    id: 'notif_4', type: 'compliance', title: 'Compliance Reminder',
     message: 'KYC update due for Johnson Trust in 7 days',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
-    read: true,
-    priority: 'medium',
-    link: '/practice-management'
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
+    read: true, priority: 'medium', link: '/practice-management'
   },
   {
-    id: 'notif_5',
-    type: 'invoice',
-    title: 'Invoice Overdue',
+    id: 'notif_5', type: 'invoice', title: 'Invoice Overdue',
     message: 'INV-2025-003 for Johnson Trust is 5 days overdue',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(), // 2 days ago
-    read: false,
-    priority: 'high',
-    link: '/practice-management'
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
+    read: false, priority: 'high', link: '/practice-management'
   }
 ];
 
-export const NotificationsProvider = ({ children }) => {
-  const [notifications, setNotifications] = useState(() => {
+const NotificationsContext = createContext<NotificationsContextType | null>(null);
+
+interface NotificationsProviderProps {
+  children: ReactNode;
+}
+
+export const NotificationsProvider = ({ children }: NotificationsProviderProps) => {
+  const [notifications, setNotifications] = useState<Notification[]>(() => {
     const stored = localStorage.getItem('wheeler_notifications');
     return stored ? JSON.parse(stored) : INITIAL_NOTIFICATIONS;
   });
-  
-  const [preferences, setPreferences] = useState(() => {
+
+  const [preferences, setPreferences] = useState<NotificationPreferences>(() => {
     const stored = localStorage.getItem('wheeler_notification_preferences');
     return stored ? JSON.parse(stored) : {
       taskReminders: true,
@@ -70,12 +87,11 @@ export const NotificationsProvider = ({ children }) => {
       marketUpdates: true,
       complianceAlerts: true,
       invoiceAlerts: true,
-      emailNotifications: false, // Mock - not actually sending emails
+      emailNotifications: false,
       pushNotifications: false
     };
   });
 
-  // Persist to localStorage
   useEffect(() => {
     localStorage.setItem('wheeler_notifications', JSON.stringify(notifications));
   }, [notifications]);
@@ -84,53 +100,49 @@ export const NotificationsProvider = ({ children }) => {
     localStorage.setItem('wheeler_notification_preferences', JSON.stringify(preferences));
   }, [preferences]);
 
-  // Get unread count
   const unreadCount = notifications.filter(n => !n.read).length;
 
-  // Add notification
-  const addNotification = useCallback((notification) => {
-    const newNotif = {
+  const addNotification = useCallback((notification: Partial<Notification>) => {
+    const newNotif: Notification = {
       id: `notif_${Date.now()}`,
+      type: 'info',
+      title: '',
+      message: '',
       timestamp: new Date().toISOString(),
       read: false,
+      priority: 'medium',
       ...notification
-    };
+    } as Notification;
     setNotifications(prev => [newNotif, ...prev]);
   }, []);
 
-  // Mark as read
-  const markAsRead = useCallback((id) => {
-    setNotifications(prev => 
+  const markAsRead = useCallback((id: string) => {
+    setNotifications(prev =>
       prev.map(n => n.id === id ? { ...n, read: true } : n)
     );
   }, []);
 
-  // Mark all as read
   const markAllAsRead = useCallback(() => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
   }, []);
 
-  // Delete notification
-  const deleteNotification = useCallback((id) => {
+  const deleteNotification = useCallback((id: string) => {
     setNotifications(prev => prev.filter(n => n.id !== id));
   }, []);
 
-  // Clear all notifications
   const clearAll = useCallback(() => {
     setNotifications([]);
   }, []);
 
-  // Update preferences
-  const updatePreferences = useCallback((newPrefs) => {
+  const updatePreferences = useCallback((newPrefs: Partial<NotificationPreferences>) => {
     setPreferences(prev => ({ ...prev, ...newPrefs }));
   }, []);
 
-  // Simulate new notification (for demo)
   const simulateNotification = useCallback(() => {
     const types = ['task', 'meeting', 'market', 'compliance', 'invoice'];
     const type = types[Math.floor(Math.random() * types.length)];
-    
-    const messages = {
+
+    const messages: Record<string, { title: string; message: string }> = {
       task: { title: 'New Task Assigned', message: 'Review portfolio strategy for Brown Investments' },
       meeting: { title: 'Meeting Reminder', message: 'Client call with Smith & Associates in 30 minutes' },
       market: { title: 'Stock Alert', message: 'BHP has moved 3% today' },
@@ -164,7 +176,7 @@ export const NotificationsProvider = ({ children }) => {
   );
 };
 
-export const useNotifications = () => {
+export const useNotifications = (): NotificationsContextType => {
   const context = useContext(NotificationsContext);
   if (!context) {
     throw new Error('useNotifications must be used within NotificationsProvider');

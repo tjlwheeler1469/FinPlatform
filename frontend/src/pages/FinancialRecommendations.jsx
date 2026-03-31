@@ -553,7 +553,7 @@ const FinancialRecommendations = () => {
                 </CardHeader>
                 <CardContent>
                   <ChartContainer height={300}>
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <RadarChart data={radarData}>
                         <PolarGrid stroke="hsl(var(--border))" />
                         <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11 }} />
@@ -580,7 +580,7 @@ const FinancialRecommendations = () => {
                 </CardHeader>
                 <CardContent>
                   <ChartContainer height={200}>
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <PieChart>
                         <Pie
                           data={priorityData}

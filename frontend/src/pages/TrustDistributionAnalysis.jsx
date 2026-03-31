@@ -396,7 +396,7 @@ const TrustDistributionAnalysis = () => {
                   Distribution Allocation
                 </h4>
                 <ChartContainer height={180}>
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                     <PieChart>
                       <Pie
                         data={distributionPieData}
@@ -612,7 +612,7 @@ const TrustDistributionAnalysis = () => {
             </CardHeader>
             <CardContent>
               <ChartContainer height={250}>
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                   <BarChart data={taxComparisonData} layout="vertical">
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis type="number" tickFormatter={(v) => `$${(v/1000).toFixed(0)}k`} />
@@ -643,7 +643,7 @@ const TrustDistributionAnalysis = () => {
             </CardHeader>
             <CardContent>
               <ChartContainer height={250}>
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                   <BarChart data={effectiveRateData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis dataKey="name" />

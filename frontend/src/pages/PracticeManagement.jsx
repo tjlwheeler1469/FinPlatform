@@ -411,7 +411,7 @@ const PracticeManagement = () => {
                 </CardHeader>
                 <CardContent>
                   <ChartContainer height={200}>
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <BarChart data={weeklyHours}>
                         <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
                         <XAxis dataKey="day" />
@@ -435,7 +435,7 @@ const PracticeManagement = () => {
                 <CardContent>
                   <div className="flex items-center gap-4">
                     <ChartContainer height={160} className="flex-1">
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                         <PieChart>
                           <Pie
                             data={hoursBreakdown}

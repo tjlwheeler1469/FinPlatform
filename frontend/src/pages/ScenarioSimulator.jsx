@@ -399,7 +399,7 @@ const ScenarioSimulator = () => {
               <CardContent>
                 <div className="h-64">
                   {result?.projections && (
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <AreaChart data={result.projections.filter((_, i) => i % 2 === 0)}>
                         <defs>
                           <linearGradient id="netWorthGradient" x1="0" y1="0" x2="0" y2="1">

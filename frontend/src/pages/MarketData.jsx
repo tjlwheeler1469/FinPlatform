@@ -295,7 +295,7 @@ const MarketData = () => {
               </CardHeader>
               <CardContent>
                 <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                     <RechartsPieChart>
                       <Pie
                         data={portfolio?.positions || []}
@@ -456,7 +456,7 @@ const MarketData = () => {
                   {/* Price Chart */}
                   {stockHistory?.history && (
                     <div className="h-48">
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                         <AreaChart data={stockHistory.history}>
                           <defs>
                             <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">

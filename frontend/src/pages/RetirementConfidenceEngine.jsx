@@ -1296,7 +1296,7 @@ export default function RetirementConfidenceEngine() {
                     </div>
                   ) : historyData?.chart_data?.length > 0 ? (
                     <div className="h-64">
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                         <AreaChart data={historyData.chart_data}>
                           <CartesianGrid strokeDasharray="3 3" />
                           <XAxis dataKey="period" />
@@ -1329,7 +1329,7 @@ export default function RetirementConfidenceEngine() {
                   </CardHeader>
                   <CardContent>
                     <div className="h-64">
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                         <LineChart data={historyData.chart_data}>
                           <CartesianGrid strokeDasharray="3 3" />
                           <XAxis dataKey="period" />

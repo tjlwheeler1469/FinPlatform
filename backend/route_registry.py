@@ -148,6 +148,7 @@ ROUTE_REGISTRY = [
     ("routes.scenario_templates", "router", "/api", "Scenario Templates"),
     ("routes.hybrid_engine_api", "router", "/api", "Hybrid Engine"),
     ("routes.voice_assistant", "router", "/api", "Voice Assistant"),
+    ("routes.voice_retirement", "router", "/api", "Voice Retirement Analysis"),
     ("routes.buffett_engine", "router", "/api", "Buffett Engine"),
 ]
 
