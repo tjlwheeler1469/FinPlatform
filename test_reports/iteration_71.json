@@ -36,7 +36,7 @@
     "frontend": "100% (All features verified via code review and visual inspection)"
   },
   "test_credentials": {
-    "api_base_url": "https://voice-wealth-engine.preview.emergentagent.com"
+    "api_base_url": "https://wealth-consolidation.preview.emergentagent.com"
   },
   "seed_data_creation": "No seed data needed - all Client 360 data is DEMO/MOCKED in frontend",
   "retest_needed": false,

@@ -7,7 +7,7 @@ import requests
 import os
 import json
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://voice-wealth-engine.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://wealth-consolidation.preview.emergentagent.com').rstrip('/')
 
 # Test credentials - loaded from environment
 CLIENT_PORTAL_EMAIL = os.environ.get('CLIENT_PORTAL_EMAIL', 'client_wheeler@email.com')

@@ -66,7 +66,6 @@ export const adviserBaseNav = [
       { path: "/advisor-command-center", label: "Command Center", icon: LayoutDashboard, title: "Advisor Command Center" },
       { path: "/daily-briefing", label: "Daily Briefing", icon: Calendar, title: "Daily Briefing", badge: "NEW" },
       { path: "/macro-dashboard", label: "Markets", icon: BarChart3, title: "Live Markets", badge: "LIVE" },
-      { path: "/xplan", label: "Xplan Sync", icon: Cable, title: "Xplan Integration" },
     ]
   },
   {
@@ -105,6 +104,7 @@ export const adviserBaseNav = [
     name: "Integrations",
     icon: Link2,
     items: [
+      { path: "/xplan", label: "Xplan Sync", icon: Cable, title: "Xplan Integration" },
       { path: "/platform-integrations", label: "Platforms", icon: Cable, title: "Platform Integrations", badge: "NEW" },
       { path: "/live-sync", label: "Live Sync", icon: Activity, title: "Live Sync Dashboard", badge: "LIVE" },
     ]
