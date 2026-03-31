@@ -53,7 +53,21 @@ Build a comprehensive Australian wealth management platform for financial advise
 
 ## Completed Work (All Sessions)
 
-### Massive Consolidation + Features (March 31, 2026) - LATEST
+### UI Consolidation + Data Flow (March 31, 2026) - LATEST
+- [x] **Profile data mismatch fix**: selectedClient now propagates correctly via PortfolioProvider (id/client_id unified)
+- [x] **Unified Dashboard**: /dashboard combines Overview + Net Worth + Wealth Trends via 3 tabs
+- [x] **Unified Investments**: /investments combines Shares, Bonds, Property, Crypto, Super, Managed Funds, Unlisted via 7 tabs
+- [x] **Sidebar consolidated**: Personal mode nav reduced from 64 to ~24 items; Adviser mode streamlined
+- [x] **AI Assistant + Tasks merged**: Tasks sidebar in AI Copilot page (/ai-copilot-advanced)
+- [x] **Xplan Integration inline**: Xplan Sync added to Adviser Dashboard nav section (not popup)
+- [x] **Tasks on Command Centre**: Zone 7 Tasks & Workflow panel routes to AI Copilot
+- [x] **Data flow**: Retirement page auto-imports portfolio data (net worth, age, income) from PortfolioContext
+- [x] **Markets performance**: Progressive loading (overview first, details in background)
+- [x] **Per-client portfolio data**: 5 client datasets (Wheeler, Chen, Mitchell, Williams, Patel) with unique investments, shares, net worth
+- [x] **30+ route redirects**: Old individual pages → unified consolidated pages
+- [x] Iteration 133: Backend 100% (22/22), Frontend 100%
+
+### Massive Consolidation + Features (March 31, 2026)
 - [x] Page consolidation: 15+ duplicate routes converted to redirects (scenarios, clients, dashboards, AI copilot, tax, retirement)
 - [x] Backend lint cleanup: 69 E741/E722/F841 errors → 0 errors (+ 362 F401 auto-fixed)
 - [x] pyproject.toml ruff config for project-specific lint rules
@@ -98,6 +112,7 @@ Build a comprehensive Australian wealth management platform for financial advise
 - [x] Buffett Ideas live API, per-client data switching
 
 ## Testing History
+- iteration_133: Backend 100% (22/22), Frontend 100% — UI consolidation, data flow, profile fix
 - iteration_132: Backend 100% (21/21), Frontend 100% — Consolidation, lint, ForceGraph2D, scheduler, live crypto
 - iteration_131: Backend 100% (13/13), Frontend 100% — Route fixes, KG consolidation, client pack
 - iteration_130: Backend 100% (12/12), Frontend 100% — PDF + type hints
