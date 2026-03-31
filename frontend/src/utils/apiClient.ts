@@ -86,6 +86,40 @@ export interface HealthResponse {
   version: string;
 }
 
+// ===================== Buffett Engine Types =====================
+
+export interface BuffettIdea {
+  symbol: string;
+  name: string;
+  sector: string;
+  price: number;
+  pe_current: number | null;
+  pe_avg: number;
+  pe_low: number;
+  pe_high: number;
+  dividend_yield: number | null;
+  market_cap: number | null;
+  action: 'BUY' | 'HOLD' | 'AVOID';
+  confidence: number;
+  upside: string;
+  reason: string;
+  catalyst: string;
+}
+
+export interface SectorRanking {
+  sector: string;
+  score: number;
+}
+
+export interface BuffettScreenResponse {
+  ideas: BuffettIdea[];
+  sentiment_score: number;
+  sentiment_label: string;
+  sector_rankings: SectorRanking[];
+  source: 'live' | 'fallback';
+  timestamp: string;
+}
+
 // ===================== API Client =====================
 
 class ApiClient {
@@ -149,6 +183,11 @@ class ApiClient {
     formData.append('audio', audio, 'recording.webm');
     if (sessionId) formData.append('session_id', sessionId);
     return this.post('/api/voice-assistant/transcribe', formData);
+  }
+
+  // Buffett Engine
+  async getBuffettScreen(): Promise<BuffettScreenResponse> {
+    return this.get('/api/buffett-engine/screen');
   }
 }
 

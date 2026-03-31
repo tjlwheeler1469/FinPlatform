@@ -68,7 +68,7 @@ class TestUserNotifications:
         assert "notifications" in data
         # All returned notifications should be unread
         for notif in data["notifications"]:
-            assert notif.get("read") == False
+            assert notif.get("read") is False
         print(f"Unread notifications: {len(data['notifications'])}")
 
 
@@ -82,7 +82,7 @@ class TestDemoNotifications:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert data["notifications_created"] == 5  # 5 demo notifications
         assert "notification_ids" in data
         assert len(data["notification_ids"]) == 5
@@ -114,8 +114,8 @@ class TestNotificationPreferences:
         data = response.json()
         # Should return defaults
         assert data["user_id"] == user_id
-        assert data["in_app_enabled"] == True
-        assert data["desktop_push_enabled"] == True
+        assert data["in_app_enabled"] is True
+        assert data["desktop_push_enabled"] is True
         assert "categories" in data
         print(f"Default preferences for {user_id}: in_app={data['in_app_enabled']}")
     
@@ -149,7 +149,7 @@ class TestNotificationPreferences:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         print(f"Saved preferences for {user_id}")
         
         # Verify saved preferences
@@ -157,9 +157,9 @@ class TestNotificationPreferences:
         assert get_response.status_code == 200
         
         saved = get_response.json()
-        assert saved["desktop_push_enabled"] == False
-        assert saved["quiet_hours_enabled"] == True
-        assert saved["categories"]["meeting"] == False
+        assert saved["desktop_push_enabled"] is False
+        assert saved["quiet_hours_enabled"] is True
+        assert saved["categories"]["meeting"] is False
         print(f"Verified preferences: desktop_push={saved['desktop_push_enabled']}, quiet_hours={saved['quiet_hours_enabled']}")
 
 
@@ -185,7 +185,7 @@ class TestNotificationActions:
             assert read_response.status_code == 200
             
             read_data = read_response.json()
-            assert read_data["success"] == True
+            assert read_data["success"] is True
             print(f"Marked notification {notif_id} as read")
         else:
             print("No unread notifications to test")
@@ -198,7 +198,7 @@ class TestNotificationActions:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         print(f"Marked {data.get('marked_read', 0)} notifications as read")
 
 
@@ -212,7 +212,7 @@ class TestSendNotification:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert "notification_id" in data
         assert "channels" in data
         print(f"Test notification sent: {data['notification_id']}, channels: {data['channels']}")
@@ -338,7 +338,7 @@ class TestPushSubscriptions:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert data["subscription_type"] == "web_push"
         print(f"Web push subscription created for user: {subscription['user_id']}")
     
@@ -362,7 +362,7 @@ class TestPushSubscriptions:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         print(f"Unsubscribed user {user_id}, deleted {data['deleted']} subscriptions")
 
 

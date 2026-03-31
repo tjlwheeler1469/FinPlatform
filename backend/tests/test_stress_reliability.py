@@ -53,7 +53,7 @@ class TestSecureDataFeeds:
         assert "data" in data
         assert "accounts" in data["data"]
         assert "_security" in data
-        assert data["_security"]["encrypted"] == True
+        assert data["_security"]["encrypted"] is True
         assert data["_security"]["encryption_standard"] == "AES-256-GCM"
         
         # Verify accounts have required fields
@@ -77,7 +77,7 @@ class TestSecureDataFeeds:
         assert "data" in data
         assert "transactions" in data["data"]
         assert "_security" in data
-        assert data["_security"]["encrypted"] == True
+        assert data["_security"]["encrypted"] is True
         
         transactions = data["data"]["transactions"]
         print(f"✓ CDR transactions feed passed: {len(transactions)} transactions returned")
@@ -95,7 +95,7 @@ class TestSecureDataFeeds:
         assert "balance" in data
         assert "investments" in data
         assert "_security" in data
-        assert data["_security"]["apra_compliant"] == True
+        assert data["_security"]["apra_compliant"] is True
         
         # Verify balance structure
         balance = data["balance"]
@@ -137,7 +137,7 @@ class TestSecureDataFeeds:
         assert "valuation" in data
         assert "property_type" in data
         assert "_security" in data
-        assert data["_security"]["encrypted"] == True
+        assert data["_security"]["encrypted"] is True
         
         valuation = data["valuation"]
         assert "estimate" in valuation
@@ -166,7 +166,7 @@ class TestSecurityCompliance:
         encryption = data["encryption_status"]
         assert encryption["algorithm"] == "AES-256-GCM"
         assert "256" in encryption["key_strength"]
-        assert encryption["compliant"] == True
+        assert encryption["compliant"] is True
         
         # Verify regulatory compliance
         compliance = data["regulatory_compliance"]
@@ -190,8 +190,8 @@ class TestSecurityCompliance:
         # Verify compliance certifications
         assert "compliance_certifications" in data
         certs = data["compliance_certifications"]
-        assert certs["apra_cps_234"] == True
-        assert certs["privacy_act_1988"] == True
+        assert certs["apra_cps_234"] is True
+        assert certs["privacy_act_1988"] is True
         
         print(f"✓ Encryption info passed: {data['encryption_standard']}, {data['kdf_iterations']} KDF iterations")
 

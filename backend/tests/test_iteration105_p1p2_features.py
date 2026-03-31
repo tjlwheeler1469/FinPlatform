@@ -38,7 +38,7 @@ class TestClientWealthDataAPI:
         # Verify demo data values
         assert data["client_id"] == "demo_client"
         assert data["client_name"] == "James & Sarah Mitchell"
-        assert data["is_couple"] == True
+        assert data["is_couple"] is True
         assert len(data["people"]) == 2
         assert len(data["assets"]) >= 5
         print(f"✓ Demo client snapshot returned with {len(data['assets'])} assets, net worth: ${data['net_worth']:,}")
@@ -157,7 +157,7 @@ class TestAgePensionAPI:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["eligible"] == False
+        assert data["eligible"] is False
         assert "qualifying_age" in data
         assert "years_until_eligible" in data
         
@@ -204,7 +204,7 @@ class TestMultiTenantAPI:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert data["licensee_id"] == "LIC-DEMO0001"
         assert "advisers" in data
         assert len(data["advisers"]) >= 2
@@ -339,7 +339,7 @@ class TestDocumentGenerationAPI:
                 print(f"✓ SOA PDF generated: {len(response.content)} bytes")
             else:
                 data = response.json()
-                if data.get("success") == False:
+                if data.get("success") is False:
                     print(f"⚠ SOA PDF generation not available: {data.get('error')}")
                 else:
                     print(f"✓ SOA generation response received")

@@ -205,12 +205,12 @@ class TestActionLayerAPIs:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert "execution_id" in data
         assert data["status"] == "completed"
         assert "summary" in data
         assert "portfolios" in data
-        assert data["demo_mode"] == True
+        assert data["demo_mode"] is True
         
         summary = data["summary"]
         assert "portfolios_rebalanced" in summary
@@ -230,13 +230,13 @@ class TestActionLayerAPIs:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert "execution_id" in data
         assert data["status"] == "completed"
         assert "harvested_positions" in data
         assert "replacement_positions" in data
         assert "summary" in data
-        assert data["demo_mode"] == True
+        assert data["demo_mode"] is True
         
         summary = data["summary"]
         assert "total_losses_harvested" in summary
@@ -250,7 +250,7 @@ class TestActionLayerAPIs:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["preview"] == True
+        assert data["preview"] is True
         assert "drift_threshold" in data
         assert "portfolios_affected" in data
         assert "total_trades" in data
@@ -265,7 +265,7 @@ class TestActionLayerAPIs:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["preview"] == True
+        assert data["preview"] is True
         assert "opportunities" in data
         assert "summary" in data
         

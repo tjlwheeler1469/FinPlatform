@@ -34,7 +34,7 @@ class TestAICopilot:
         data = response.json()
         
         # Verify response structure
-        assert data.get("success") == True
+        assert data.get("success") is True
         assert "answer" in data
         assert "session_id" in data
         assert len(data["answer"]) > 100  # Should have substantial response
@@ -58,7 +58,7 @@ class TestAICopilot:
         assert response.status_code == 200
         data = response.json()
         
-        assert data.get("success") == True
+        assert data.get("success") is True
         assert "answer" in data
         assert "parsed" in data
         print(f"✓ AI Copilot with context answered")
@@ -310,7 +310,7 @@ class TestFinancialPlanGeneration:
         data = response.json()
         
         # Verify response structure
-        assert data.get("success") == True
+        assert data.get("success") is True
         assert "plan" in data
         assert "client_name" in data
         assert len(data["plan"]) > 500  # Should be substantial plan

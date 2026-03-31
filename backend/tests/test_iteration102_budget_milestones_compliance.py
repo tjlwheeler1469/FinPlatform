@@ -513,9 +513,9 @@ class TestHealthCheck:
         
         # Check adviceos section includes new features
         adviceos = data.get("adviceos", {})
-        assert adviceos.get("retirement_milestones") == True, "retirement_milestones not in health check"
-        assert adviceos.get("soa_roa_compliance") == True, "soa_roa_compliance not in health check"
-        assert adviceos.get("budget_expenses") == True, "budget_expenses not in health check"
+        assert adviceos.get("retirement_milestones") is True, "retirement_milestones not in health check"
+        assert adviceos.get("soa_roa_compliance") is True, "soa_roa_compliance not in health check"
+        assert adviceos.get("budget_expenses") is True, "budget_expenses not in health check"
         
         print("✓ Health check includes all new features")
 

@@ -123,7 +123,7 @@ class TestMarketDataEndpoints:
         # Verify live data flag
         for stock in data["stocks"]:
             assert "is_live" in stock
-            assert stock["is_live"] == True
+            assert stock["is_live"] is True
         print(f"✓ ASX top stocks test passed: {data['count']} stocks with LIVE prices")
 
 
@@ -142,7 +142,7 @@ class TestEmailServiceEndpoints:
         assert "templates_available" in data
         
         # Should be in demo mode without API key
-        assert data["demo_mode"] == True
+        assert data["demo_mode"] is True
         assert "trade_confirmation" in data["templates_available"]
         print(f"✓ Email status test passed: demo_mode={data['demo_mode']}, templates={data['templates_available']}")
     
@@ -169,8 +169,8 @@ class TestEmailServiceEndpoints:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["success"] == True
-        assert data["demo_mode"] == True
+        assert data["success"] is True
+        assert data["demo_mode"] is True
         assert "Trade Confirmation" in data["subject"]
         assert "would_send" in data
         print(f"✓ Trade confirmation email test passed: {data['subject']}")
@@ -183,8 +183,8 @@ class TestEmailServiceEndpoints:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["success"] == True
-        assert data["demo_mode"] == True
+        assert data["success"] is True
+        assert data["demo_mode"] is True
         assert "Test Email" in data["subject"]
         print(f"✓ Test email test passed: {data['subject']}")
 
@@ -204,8 +204,8 @@ class TestBankFeedsEndpoints:
         assert "cdr_compliant" in data
         
         # Should be in demo mode without API key
-        assert data["demo_mode"] == True
-        assert data["cdr_compliant"] == True
+        assert data["demo_mode"] is True
+        assert data["cdr_compliant"] is True
         print(f"✓ Bank feeds status test passed: demo_mode={data['demo_mode']}, banks={data.get('supported_banks', 'N/A')}")
     
     def test_get_institutions(self):
@@ -237,7 +237,7 @@ class TestBankFeedsEndpoints:
         assert "id" in data
         assert data["id"].startswith("USR-")
         assert data["email"] == "test@example.com"
-        assert data["demo_mode"] == True
+        assert data["demo_mode"] is True
         print(f"✓ Create user test passed: user_id={data['id']}")
     
     def test_create_bank_connection(self):
@@ -252,7 +252,7 @@ class TestBankFeedsEndpoints:
         assert data["id"].startswith("CON-")
         assert data["status"] == "pending"
         assert "consent_url" in data
-        assert data["demo_mode"] == True
+        assert data["demo_mode"] is True
         print(f"✓ Create connection test passed: connection_id={data['id']}")
     
     def test_get_linked_accounts(self):
@@ -387,7 +387,7 @@ class TestLiveStockPriceIntegration:
     """Tests to verify live stock prices are working"""
     
     def test_live_price_flag(self):
-        """Verify is_live flag == True for real-time data"""
+        """Verify is_live flag is True for real-time data"""
         response = requests.get(f"{BASE_URL}/api/market/asx/top")
         assert response.status_code == 200
         data = response.json()

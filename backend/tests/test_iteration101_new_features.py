@@ -58,10 +58,10 @@ class TestNotificationServiceMockMode:
         data = response.json()
         assert "email_result" in data
         assert "sms_result" in data
-        assert data["email_result"]["success"] == True
-        assert data["email_result"]["mock"] == True
-        assert data["sms_result"]["success"] == True
-        assert data["sms_result"]["mock"] == True
+        assert data["email_result"]["success"] is True
+        assert data["email_result"]["mock"] is True
+        assert data["sms_result"]["success"] is True
+        assert data["sms_result"]["mock"] is True
         print(f"PASS: Mock notifications sent - Email log_id: {data['email_result'].get('log_id')}, SMS log_id: {data['sms_result'].get('log_id')}")
     
     def test_get_mock_notifications(self):
@@ -213,7 +213,7 @@ class TestClientProfileRetirement:
         assert response.status_code == 200
         data = response.json()
         assert data.get("status") == "success"
-        assert data.get("profile_updated") == True
+        assert data.get("profile_updated") is True
         print(f"PASS: Retirement calculation saved - Client ID: {data['client_id']}")
     
     def test_save_decumulation_calculation(self):
@@ -246,7 +246,7 @@ class TestClientProfileRetirement:
         assert response.status_code == 200
         data = response.json()
         assert data.get("status") == "success"
-        assert data.get("profile_updated") == True
+        assert data.get("profile_updated") is True
         print(f"PASS: Decumulation calculation saved - Client ID: {data['client_id']}")
 
 
@@ -290,11 +290,11 @@ class TestHealthCheck:
         
         # Check AdviceOS features
         adviceos = data.get("adviceos", {})
-        assert adviceos.get("websocket_service") == True
-        assert adviceos.get("notification_service") == True
-        assert adviceos.get("xplan_phase2") == True
-        assert adviceos.get("platform_integrations") == True
-        assert adviceos.get("client_profile_retirement") == True
+        assert adviceos.get("websocket_service") is True
+        assert adviceos.get("notification_service") is True
+        assert adviceos.get("xplan_phase2") is True
+        assert adviceos.get("platform_integrations") is True
+        assert adviceos.get("client_profile_retirement") is True
         
         print(f"PASS: Health check - All new features enabled")
 

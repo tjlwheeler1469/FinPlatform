@@ -63,6 +63,36 @@ import {
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+// Helper functions to replace nested ternaries
+const getChecklistBgClass = (item) => {
+  if (item.complete) return 'bg-[#10B981]/10';
+  if (item.priority === 'critical') return 'bg-destructive/10';
+  return 'bg-muted/50';
+};
+
+const getChecklistBadgeVariant = (item) => {
+  if (item.complete) return 'secondary';
+  if (item.priority === 'critical') return 'destructive';
+  return 'outline';
+};
+
+const getChecklistIconClass = (priority) => {
+  if (priority === 'critical') return 'text-destructive';
+  return 'text-amber-500';
+};
+
+const getRelationship = (member) => {
+  if (member.relationship === 'spouse') return 'spouse';
+  if (member.age < 18) return 'child_under_18';
+  return 'adult_child';
+};
+
+const getRankBadgeClass = (index) => {
+  if (index === 0) return 'bg-[#D4A84C]';
+  if (index === 1) return 'bg-gray-400';
+  return 'bg-amber-700';
+};
+
 const formatCurrency = (value) => {
   return new Intl.NumberFormat('en-AU', {
     style: 'currency',
@@ -151,7 +181,7 @@ const StrategicPlanning = () => {
     property_value: portfolio?.investments?.properties?.reduce((sum, p) => sum + p.value, 0) || 1570000,
     beneficiaries: familyMembers.filter(m => m.relationship !== 'primary').map(m => ({
       name: m.name,
-      relationship: m.relationship === 'spouse' ? 'spouse' : m.age < 18 ? 'child_under_18' : 'adult_child',
+      relationship: getRelationship(m),
       share_percent: 100 / (familyMembers.length - 1 || 1)
     })),
     has_will: false,
@@ -692,14 +722,12 @@ const StrategicPlanning = () => {
                           <CardContent>
                             <div className="space-y-2">
                               {estateResult.checklist.map((item, i) => (
-                                <div key={`item-${i}`} className={`flex items-center justify-between p-2 rounded ${
-                                  item.complete ? 'bg-[#10B981]/10' : item.priority === 'critical' ? 'bg-destructive/10' : 'bg-muted/50'
-                                }`}>
+                                <div key={`item-${i}`} className={`flex items-center justify-between p-2 rounded ${getChecklistBgClass(item)}`}>
                                   <div className="flex items-center gap-2">
-                                    {item.complete ? <CheckCircle className="h-4 w-4 text-[#10B981]" /> : <AlertTriangle className={`h-4 w-4 ${item.priority === 'critical' ? 'text-destructive' : 'text-amber-500'}`} />}
+                                    {item.complete ? <CheckCircle className="h-4 w-4 text-[#10B981]" /> : <AlertTriangle className={`h-4 w-4 ${getChecklistIconClass(item.priority)}`} />}
                                     <span className="text-sm">{item.item}</span>
                                   </div>
-                                  <Badge variant={item.complete ? 'secondary' : item.priority === 'critical' ? 'destructive' : 'outline'} className="text-xs">
+                                  <Badge variant={getChecklistBadgeVariant(item)} className="text-xs">
                                     {item.complete ? 'Done' : item.priority}
                                   </Badge>
                                 </div>
@@ -1024,7 +1052,7 @@ const StrategicPlanning = () => {
                   {scenarioOutcomes.sort((a, b) => b.finalNetWorth - a.finalNetWorth).map((outcome, i) => (
                     <div key={outcome.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                       <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${i === 0 ? 'bg-[#D4A84C]' : i === 1 ? 'bg-gray-400' : 'bg-amber-700'}`}>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${getRankBadgeClass(i)}`}>
                           {i + 1}
                         </div>
                         <div>

@@ -66,7 +66,7 @@ class TestAuthRoutes:
         })
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         print(f"✓ Registration successful: {unique_email}")
 
 

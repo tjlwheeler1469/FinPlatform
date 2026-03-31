@@ -43,10 +43,10 @@ class TestHealthEndpoint:
         data = response.json()
         assert "feedback_loop" in data
         fb = data["feedback_loop"]
-        assert fb.get("advisor_preferences") == True
-        assert fb.get("outcome_tracking") == True
-        assert fb.get("personalized_recommendations") == True
-        assert fb.get("learning_system") == True
+        assert fb.get("advisor_preferences") is True
+        assert fb.get("outcome_tracking") is True
+        assert fb.get("personalized_recommendations") is True
+        assert fb.get("learning_system") is True
         print("✓ Health endpoint includes complete feedback_loop section")
     
     def test_health_has_new_capabilities(self):
@@ -122,9 +122,9 @@ class TestFeedbackLearningSystem:
         )
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert "feedback_id" in data
-        assert data["preferences_updated"] == True
+        assert data["preferences_updated"] is True
         print(f"✓ POST /api/feedback-loop/feedback records feedback with ID: {data['feedback_id']}")
     
     def test_simulate_learning(self):
@@ -134,7 +134,7 @@ class TestFeedbackLearningSystem:
         )
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert data["simulated_feedback"] == 5
         assert "simulated_outcomes" in data
         print(f"✓ POST /api/feedback-loop/simulate-learning simulated {data['simulated_feedback']} actions")
@@ -191,9 +191,9 @@ class TestEnhancedExecutionEngine:
         assert "steps_completed" in data
         assert "validation" in data["steps_completed"]
         assert "execution" in data["steps_completed"]
-        assert data["portfolio_updated"] == True
-        assert data["crm_updated"] == True
-        assert data["outcome_captured"] == True
+        assert data["portfolio_updated"] is True
+        assert data["crm_updated"] is True
+        assert data["outcome_captured"] is True
         print(f"✓ POST /api/execution-engine/execute completed with loop_closed={data.get('loop_closed')}")
     
     def test_get_executions(self):
@@ -222,7 +222,7 @@ class TestEnhancedExecutionEngine:
         )
         assert response.status_code == 200
         data = response.json()
-        assert data["auto_executed"] == False
+        assert data["auto_executed"] is False
         assert "preview" in data
         assert "proposed_action" in data["preview"]
         print("✓ POST /api/execution-engine/execute-insight returns preview without auto-execute")
@@ -238,7 +238,7 @@ class TestRealtimeDataLayer:
         data = response.json()
         assert data["status"] == "operational"
         assert data["mode"] == "demo"
-        assert data["single_source_of_truth"] == True
+        assert data["single_source_of_truth"] is True
         assert "data_sources" in data
         print("✓ GET /api/realtime-data/status returns operational in demo mode")
     
@@ -294,10 +294,10 @@ class TestRealtimeDataLayer:
         )
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert "trade_id" in data
         assert "execution" in data
-        assert data["portfolio_updated"] == True
+        assert data["portfolio_updated"] is True
         print(f"✓ POST /api/realtime-data/execute-trade executed {data['execution']['action']} {data['execution']['shares']} {data['execution']['symbol']}")
     
     def test_refresh_data(self):
@@ -305,9 +305,9 @@ class TestRealtimeDataLayer:
         response = requests.post(f"{BASE_URL}/api/realtime-data/refresh")
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] == True
-        assert data["updated"]["market_data"] == True
-        assert data["updated"]["portfolios"] == True
+        assert data["success"] is True
+        assert data["updated"]["market_data"] is True
+        assert data["updated"]["portfolios"] is True
         print("✓ POST /api/realtime-data/refresh successfully refreshed data")
     
     def test_get_integration_status(self):
@@ -356,7 +356,7 @@ class TestRecordOutcome:
         )
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert "outcome_id" in data
         print(f"✓ POST /api/feedback-loop/outcome recorded with ID: {data['outcome_id']}")
     

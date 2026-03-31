@@ -25,9 +25,9 @@ class TestHealthAndBasicAPIs:
         assert response.status_code == 200
         data = response.json()
         assert "client_portal" in data
-        assert data["client_portal"].get("net_worth") == True
-        assert data["client_portal"].get("portfolios") == True
-        assert data["client_portal"].get("goals") == True
+        assert data["client_portal"].get("net_worth") is True
+        assert data["client_portal"].get("portfolios") is True
+        assert data["client_portal"].get("goals") is True
         print("Client portal features enabled in health check")
 
 

@@ -57,11 +57,11 @@ class TestWhiteLabelMultiTenancy:
         response = requests.get(f"{BASE_URL}/api/tenant/features")
         assert response.status_code == 200
         data = response.json()
-        assert data["next_best_action"] == True
-        assert data["practice_health"] == True
-        assert data["meeting_automation"] == True
-        assert data["ai_copilot"] == True
-        assert data["stock_trading"] == True
+        assert data["next_best_action"] is True
+        assert data["practice_health"] is True
+        assert data["meeting_automation"] is True
+        assert data["ai_copilot"] is True
+        assert data["stock_trading"] is True
         assert data["max_clients"] == 500
         assert data["max_aum"] == 100000000
     
@@ -79,7 +79,7 @@ class TestWhiteLabelMultiTenancy:
         assert starter["name"] == "Starter"
         assert starter["price_monthly"] == 99
         assert starter["max_clients"] == 50
-        assert starter["features"]["stock_trading"] == False
+        assert starter["features"]["stock_trading"] is False
         
         # Professional tier
         assert "professional" in data["tiers"]
@@ -87,7 +87,7 @@ class TestWhiteLabelMultiTenancy:
         assert professional["name"] == "Professional"
         assert professional["price_monthly"] == 299
         assert professional["max_clients"] == 200
-        assert professional["features"]["stock_trading"] == True
+        assert professional["features"]["stock_trading"] is True
         
         # Enterprise tier
         assert "enterprise" in data["tiers"]
@@ -95,8 +95,8 @@ class TestWhiteLabelMultiTenancy:
         assert enterprise["name"] == "Enterprise"
         assert enterprise["price_monthly"] == "custom"
         assert enterprise["max_clients"] == -1  # Unlimited
-        assert enterprise["features"]["api_access"] == True
-        assert enterprise["features"]["white_label"] == True
+        assert enterprise["features"]["api_access"] is True
+        assert enterprise["features"]["white_label"] is True
     
     def test_css_variables(self):
         """GET /api/tenant/css-variables returns CSS variables"""
@@ -128,7 +128,7 @@ class TestMeetingWorkflowMongoDB:
         response = requests.post(f"{BASE_URL}/api/meeting-automation/schedule", json=payload)
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert "meeting_id" in data
         assert data["storage"] == "mongodb"
         assert data["meeting"]["client_name"] == "Test Client Iteration 60"
@@ -156,7 +156,7 @@ class TestMeetingWorkflowMongoDB:
         response = requests.post(f"{BASE_URL}/api/meeting-automation/tasks", json=payload)
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert "task_id" in data
         assert data["storage"] == "mongodb"
         assert data["task"]["title"] == "TEST_Task Iteration 60"
@@ -275,7 +275,7 @@ class TestCRMNotes:
         )
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert "note" in data
         assert data["note"]["client_id"] == "TEST_client_iter60"
     

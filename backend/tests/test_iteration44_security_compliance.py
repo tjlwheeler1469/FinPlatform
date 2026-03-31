@@ -71,7 +71,7 @@ class TestMFASetup:
         data = response.json()
         
         if response.status_code == 200:
-            assert data.get("success") == False or "error" in data
+            assert data.get("success") is False or "error" in data
         print(f"✓ MFA Verify TOTP (invalid code) handled correctly")
     
     def test_mfa_send_sms_code(self):
@@ -84,7 +84,7 @@ class TestMFASetup:
         data = response.json()
         
         assert "success" in data, "Missing 'success' in response"
-        assert data["success"] == True, "SMS send should succeed"
+        assert data["success"] is True, "SMS send should succeed"
         
         # Demo code should be returned (MOCKED)
         if "demo_code" in data:
@@ -170,7 +170,7 @@ class TestAuditLogging:
         data = response.json()
         
         assert "success" in data, "Missing 'success' in response"
-        assert data["success"] == True, "Audit log should succeed"
+        assert data["success"] is True, "Audit log should succeed"
         assert "event_id" in data, "Missing 'event_id' in response"
         
         print(f"✓ Audit Log Event created: event_id={data['event_id']}")

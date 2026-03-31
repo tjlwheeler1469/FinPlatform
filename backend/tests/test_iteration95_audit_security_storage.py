@@ -31,9 +31,9 @@ class TestHealthCheck:
         
         # Check AdviceOS section includes new services
         adviceos = data.get("adviceos", {})
-        assert adviceos.get("audit_service") == True, "audit_service should be True in health check"
-        assert adviceos.get("security_controls") == True, "security_controls should be True in health check"
-        assert adviceos.get("object_storage") == True, "object_storage should be True in health check"
+        assert adviceos.get("audit_service") is True, "audit_service should be True in health check"
+        assert adviceos.get("security_controls") is True, "security_controls should be True in health check"
+        assert adviceos.get("object_storage") is True, "object_storage should be True in health check"
         
         print(f"✓ Health check includes all new services: audit_service, security_controls, object_storage")
 
@@ -60,11 +60,11 @@ class TestAuditService:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert "event_id" in data
         assert data["event_id"].startswith("evt_")
         assert "timestamp" in data
-        assert data["chain_verified"] == True
+        assert data["chain_verified"] is True
         
         print(f"✓ Created audit log: {data['event_id']}")
         return data["event_id"]
@@ -101,7 +101,7 @@ class TestAuditService:
         assert "verified_at" in data
         
         # Chain should be valid (no tampering)
-        assert data["valid"] == True, "Hash chain should be valid"
+        assert data["valid"] is True, "Hash chain should be valid"
         
         print(f"✓ Hash chain verified: {data['entries_checked']} entries, valid={data['valid']}")
     
@@ -213,7 +213,7 @@ class TestAuditService:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["valid"] == True, "Chain should remain valid after multiple events"
+        assert data["valid"] is True, "Chain should remain valid after multiple events"
         assert data["entries_checked"] >= 3
         
         print(f"✓ Hash chain integrity verified after {len(event_ids)} events")
@@ -228,7 +228,7 @@ class TestSecurityControls:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert "roles_initialized" in data
         assert "roles" in data
         
@@ -343,7 +343,7 @@ class TestSecurityControls:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert "key_id" in data
         assert "api_key" in data
         assert data["api_key"].startswith("wc_")
@@ -523,8 +523,8 @@ class TestSecurityEvents:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] == True
-        assert data["logged"] == True
+        assert data["success"] is True
+        assert data["logged"] is True
         
         print("✓ Logged security event")
     
@@ -573,7 +573,7 @@ class TestCreateCustomRole:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert "role_id" in data
         
         print(f"✓ Created custom role: {role_name}")

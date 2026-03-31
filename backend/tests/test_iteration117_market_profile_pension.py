@@ -211,7 +211,7 @@ class TestAgePensionAPI:
         assert "disclaimer" in data
         
         # Should be eligible (age 68, low assets)
-        assert data["eligible"] == True
+        assert data["eligible"] is True
         assert data["estimated_payment_fortnight"] > 0
         
         print(f"✓ Pension calculation (single): eligible={data['eligible']}, payment=${data['estimated_payment_fortnight']:.2f}/fortnight")
@@ -253,7 +253,7 @@ class TestAgePensionAPI:
         data = response.json()
         
         # Should not be eligible due to age
-        assert data["eligible"] == False
+        assert data["eligible"] is False
         assert data["years_until_eligible"] > 0
         
         print(f"✓ Pension calculation (under age): eligible={data['eligible']}, years_until_eligible={data['years_until_eligible']:.1f}")

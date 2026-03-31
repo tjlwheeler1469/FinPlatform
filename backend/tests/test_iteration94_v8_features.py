@@ -37,10 +37,10 @@ class TestHealthCheck:
         data = response.json()
         
         adviceos = data.get("adviceos", {})
-        assert adviceos.get("pdf_reports") == True, "PDF reports should be enabled"
-        assert adviceos.get("notification_service") == True, "Notification service should be enabled"
-        assert adviceos.get("voice_interface") == True, "Voice interface should be enabled"
-        assert adviceos.get("licensee_dashboard") == True, "Licensee dashboard should be enabled"
+        assert adviceos.get("pdf_reports") is True, "PDF reports should be enabled"
+        assert adviceos.get("notification_service") is True, "Notification service should be enabled"
+        assert adviceos.get("voice_interface") is True, "Voice interface should be enabled"
+        assert adviceos.get("licensee_dashboard") is True, "Licensee dashboard should be enabled"
         print(f"✓ AdviceOS features verified: {adviceos}")
 
 
@@ -124,7 +124,7 @@ class TestKnowledgeGraphMongoDB:
         )
         assert response.status_code == 200
         data = response.json()
-        assert data.get("success") == True
+        assert data.get("success") is True
         
         # Verify persistence by fetching
         get_response = requests.get(f"{BASE_URL}/api/financial-graph/client/{test_client_id}")
@@ -408,7 +408,7 @@ class TestNotificationService:
         )
         assert response.status_code == 200
         data = response.json()
-        assert data.get("success") == True
+        assert data.get("success") is True
         
         # Verify persistence
         get_response = requests.get(f"{BASE_URL}/api/notifications/settings/lic_test")
@@ -458,7 +458,7 @@ class TestLicenseeDashboard:
         assert response.status_code == 200
         data = response.json()
         
-        assert data.get("success") == True
+        assert data.get("success") is True
         assert "licensee_id" in data
         
         self.test_licensee_id = data["licensee_id"]
@@ -517,7 +517,7 @@ class TestLicenseeDashboard:
         assert response.status_code == 200
         data = response.json()
         
-        assert data.get("success") == True
+        assert data.get("success") is True
         assert "adviser_id" in data
         
         print(f"✓ Adviser added: {data['adviser_id']}")
@@ -546,7 +546,7 @@ class TestLicenseeDashboard:
         assert response.status_code == 200
         data = response.json()
         
-        assert data.get("success") == True
+        assert data.get("success") is True
         assert "product_id" in data
         
         print(f"✓ APL product added: {data['product_id']}")
@@ -596,7 +596,7 @@ class TestLicenseeDashboard:
         assert response.status_code == 200
         data = response.json()
         
-        assert data.get("success") == True
+        assert data.get("success") is True
         
         print(f"✓ Custom rule added: {rule_data['rule_name']}")
 

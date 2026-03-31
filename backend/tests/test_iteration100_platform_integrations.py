@@ -38,7 +38,7 @@ class TestPlatformIntegrationsAvailable:
         
         # Verify all platforms have bidirectional=True
         for platform in platforms:
-            assert platform.get("bidirectional") == True, f"Platform {platform['platform_id']} should have bidirectional=True"
+            assert platform.get("bidirectional") is True, f"Platform {platform['platform_id']} should have bidirectional=True"
             assert "read_capabilities" in platform, f"Platform {platform['platform_id']} missing read_capabilities"
             assert "write_capabilities" in platform, f"Platform {platform['platform_id']} missing write_capabilities"
         
@@ -61,7 +61,7 @@ class TestPlatformConnect:
         assert data.get("status") == "connected", "Status should be 'connected'"
         assert data.get("mode") == "demo", "Mode should be 'demo'"
         assert data.get("platform") == "amp_north", "Platform should be 'amp_north'"
-        assert data.get("bidirectional") == True, "Should have bidirectional=True"
+        assert data.get("bidirectional") is True, "Should have bidirectional=True"
         
         print("PASS: POST /api/platforms/connect/amp_north - Connected in demo mode")
     
@@ -428,7 +428,7 @@ class TestMultiStructureCalculation:
         
         data = response.json()
         assert "calculation_id" in data, "Response should contain 'calculation_id'"
-        assert data.get("is_multi_structure") == True, "Should be multi-structure calculation"
+        assert data.get("is_multi_structure") is True, "Should be multi-structure calculation"
         assert "current_position" in data, "Response should contain 'current_position'"
         assert "projected_position" in data, "Response should contain 'projected_position'"
         assert "structure_breakdown" in data, "Response should contain 'structure_breakdown'"
@@ -543,7 +543,7 @@ class TestRetirementDataSave:
         
         data = response.json()
         assert data.get("status") == "success", "Status should be 'success'"
-        assert data.get("profile_updated") == True, "Profile should be updated"
+        assert data.get("profile_updated") is True, "Profile should be updated"
         assert data.get("calculation_type") == "accumulation"
         
         print(f"PASS: POST /api/client-profile/retirement/save - Profile updated for {data.get('client_id')}")
@@ -562,8 +562,8 @@ class TestHealthCheck:
         
         # Verify platform_integrations and client_profile_retirement are enabled
         adviceos = data.get("adviceos", {})
-        assert adviceos.get("platform_integrations") == True, "platform_integrations should be enabled"
-        assert adviceos.get("client_profile_retirement") == True, "client_profile_retirement should be enabled"
+        assert adviceos.get("platform_integrations") is True, "platform_integrations should be enabled"
+        assert adviceos.get("client_profile_retirement") is True, "client_profile_retirement should be enabled"
         
         print("PASS: Health check - API healthy with platform integrations enabled")
 

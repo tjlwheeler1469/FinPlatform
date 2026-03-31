@@ -23,12 +23,12 @@ class TestHealthCheck:
         
         # Verify execution layer components
         exec_layer = data["execution_layer"]
-        assert exec_layer["trading"] == True
-        assert exec_layer["portfolio_engine"] == True
-        assert exec_layer["smart_router"] == True
-        assert exec_layer["realtime_data"] == True
-        assert exec_layer["crypto"] == True
-        assert exec_layer["reconciliation"] == True
+        assert exec_layer["trading"] is True
+        assert exec_layer["portfolio_engine"] is True
+        assert exec_layer["smart_router"] is True
+        assert exec_layer["realtime_data"] is True
+        assert exec_layer["crypto"] is True
+        assert exec_layer["reconciliation"] is True
         
         # Verify capabilities include new features
         capabilities = data["capabilities"]
@@ -54,8 +54,8 @@ class TestExecutionLayer:
         assert "alpaca" in data["brokers"]
         assert "crypto" in data["brokers"]
         assert "features" in data
-        assert data["features"]["block_trading"] == True
-        assert data["features"]["model_portfolios"] == True
+        assert data["features"]["block_trading"] is True
+        assert data["features"]["model_portfolios"] is True
         print(f"✓ Execution status: {data['status']}, features: {list(data['features'].keys())}")
     
     def test_submit_order_demo_mode(self):
@@ -74,11 +74,11 @@ class TestExecutionLayer:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert "order_id" in data
         assert data["order_id"].startswith("ORD_")
         assert data["status"] in ["filled", "submitted"]
-        assert data["demo_mode"] == True
+        assert data["demo_mode"] is True
         print(f"✓ Order submitted: {data['order_id']}, status: {data['status']}, demo: {data['demo_mode']}")
     
     def test_get_positions(self):
@@ -89,7 +89,7 @@ class TestExecutionLayer:
         data = response.json()
         assert "positions" in data
         assert "total_positions" in data
-        assert data["demo_mode"] == True
+        assert data["demo_mode"] is True
         assert len(data["positions"]) >= 0
         print(f"✓ Positions retrieved: {data['total_positions']} positions, demo: {data['demo_mode']}")
     
@@ -403,7 +403,7 @@ class TestReconciliation:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert "total_clients" in data
         assert "matched" in data
         assert "discrepancies" in data
@@ -449,7 +449,7 @@ class TestBlockTrading:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert "block_id" in data
         assert data["block_id"].startswith("BLK_")
         assert data["status"] == "filled"

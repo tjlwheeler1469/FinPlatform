@@ -140,7 +140,7 @@ class TestXplanMockAPI:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["success"] == True
+        assert data["success"] is True
         assert "note_id" in data
         assert data["client_id"] == client_id
         assert "created_date" in data
@@ -204,7 +204,7 @@ class TestXplanIntegrationService:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["success"] == True
+        assert data["success"] is True
         assert "message" in data
         assert "token_prefix" in data
         print(f"PASS: Connected to Xplan - {data['message']}")
@@ -308,10 +308,10 @@ class TestXplanIntegrationService:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["success"] == True
+        assert data["success"] is True
         assert "note_id" in data
         assert data["client_id"] == "XP-001"
-        assert data["synced_to_xplan"] == True
+        assert data["synced_to_xplan"] is True
         print(f"PASS: File note written to Xplan - {data['note_id']}")
     
     def test_integration_list_file_notes(self):
@@ -364,11 +364,11 @@ class TestXplanIntegrationService:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["success"] == True
+        assert data["success"] is True
         assert data["client_id"] == client_id
         assert "synced" in data
-        assert data["synced"]["client_data"] == True
-        assert data["synced"]["portfolio"] == True
+        assert data["synced"]["client_data"] is True
+        assert data["synced"]["portfolio"] is True
         assert "duration_seconds" in data
         print(f"PASS: Synced client {client_id} in {data['duration_seconds']}s")
 

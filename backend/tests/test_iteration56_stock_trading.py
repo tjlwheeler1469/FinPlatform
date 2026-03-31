@@ -104,7 +104,7 @@ class TestTradingHoldings:
         
         # BHP.AX should show a loss
         assert data["holding"]["unrealized_gain"] < 0
-        assert data["cgt_preview_if_sold_today"]["is_capital_loss"] == True
+        assert data["cgt_preview_if_sold_today"]["is_capital_loss"] is True
         
         print(f"✓ BHP.AX shows unrealized loss: ${abs(data['holding']['unrealized_gain']):,.2f}")
     
@@ -128,7 +128,7 @@ class TestCGTCalculations:
         data = response.json()
         
         cgt = data["cgt_calculation"]
-        assert cgt["eligible_for_discount"] == True
+        assert cgt["eligible_for_discount"] is True
         assert cgt["discount_percentage"] == 50
         assert cgt["gross_capital_gain"] > 0
         assert cgt["discount_applied"] > 0
@@ -146,7 +146,7 @@ class TestCGTCalculations:
         data = response.json()
         
         cgt = data["cgt_calculation"]
-        assert cgt["is_capital_loss"] == True
+        assert cgt["is_capital_loss"] is True
         assert cgt["gross_capital_gain"] < 0
         assert cgt["estimated_cgt_liability"] == 0  # No tax on losses
         
@@ -294,10 +294,10 @@ class TestOrderManagement:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["success"] == True
+        assert data["success"] is True
         assert data["demo_mode_notice"] is not None
         assert "order" in data
-        assert data["order"]["demo_mode"] == True
+        assert data["order"]["demo_mode"] is True
         assert "order_id" in data["order"]
         
         print(f"✓ Order executed (DEMO): {data['order']['order_id']}")
@@ -320,11 +320,11 @@ class TestHoldingModification:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["success"] == True
+        assert data["success"] is True
         assert data["action"] == "holding_increased"
         assert "new_avg_cost" in data
         assert "new_total_units" in data
-        assert data["demo_mode"] == True
+        assert data["demo_mode"] is True
         
         print(f"✓ Holding increased: {data['additional_units']} units added, new avg cost ${data['new_avg_cost']:.2f}")
     
@@ -342,11 +342,11 @@ class TestHoldingModification:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["success"] == True
+        assert data["success"] is True
         assert data["action"] == "holding_decreased"
         assert "cgt_event" in data
         assert "tax_summary" in data
-        assert data["demo_mode"] == True
+        assert data["demo_mode"] is True
         
         tax = data["tax_summary"]
         print(f"✓ Holding decreased: {data['units_sold']} units sold, CGT ${tax['estimated_tax']:,.2f}")

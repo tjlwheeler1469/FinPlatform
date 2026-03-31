@@ -308,7 +308,7 @@ class TestTransactionModelerStockAPI:
         cgt = analysis["cgt_analysis"]
         assert "gross_gain" in cgt, "Should have gross_gain"
         assert "cgt_discount_eligible" in cgt, "Should have CGT discount eligibility"
-        assert cgt["cgt_discount_eligible"] == True, "Should be eligible for 50% discount (held > 12 months)"
+        assert cgt["cgt_discount_eligible"] is True, "Should be eligible for 50% discount (held > 12 months)"
         
         print(f"Stock sell with CGT test PASSED:")
         print(f"  Gross Gain: ${cgt['gross_gain']:,.2f}")
@@ -361,7 +361,7 @@ class TestCRMClientCreation:
         assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
         data = response.json()
         
-        assert data.get("success") == True, "Response should indicate success"
+        assert data.get("success") is True, "Response should indicate success"
         assert "client" in data, "Response should include client data"
         
         client = data["client"]
@@ -439,7 +439,7 @@ class TestCRMClientUpdate:
             assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
             data = response.json()
             
-            assert data.get("success") == True
+            assert data.get("success") is True
             assert data["client"]["phone"] == "0400 UPDATED"
             
             print(f"Client update test PASSED - Updated client: {client_id}")

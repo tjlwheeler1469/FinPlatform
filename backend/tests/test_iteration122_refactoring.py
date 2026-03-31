@@ -117,7 +117,7 @@ class TestVoiceAssistantAPI:
         
         assert "session_id" in data
         assert "response" in data
-        assert data["error"] == False
+        assert data["error"] is False
         assert len(data["response"]) > 50, "Expected a meaningful response"
         
         print(f"✓ Voice assistant passed: session_id={data['session_id'][:8]}...")

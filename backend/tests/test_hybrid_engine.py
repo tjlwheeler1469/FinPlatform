@@ -396,7 +396,7 @@ class TestHybridEngineAISuggestions:
             assert "projected_confidence" in suggestion
             assert "delta" in suggestion
             assert "auto_applied" in suggestion
-            assert suggestion["auto_applied"] == False, "AI should NOT auto-apply changes"
+            assert suggestion["auto_applied"] is False, "AI should NOT auto-apply changes"
         
         print(f"✓ AI suggestions: {len(data['ai_suggestions'])} suggestions, {len(data['identified_risks'])} risks")
 

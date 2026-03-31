@@ -164,7 +164,7 @@ class TestFinancialPlanAPI:
         data = response.json()
         
         # Verify success and plan structure
-        assert data.get("success") == True, "Response should indicate success"
+        assert data.get("success") is True, "Response should indicate success"
         assert "plan" in data, "Response should have plan object"
         
         plan = data["plan"]

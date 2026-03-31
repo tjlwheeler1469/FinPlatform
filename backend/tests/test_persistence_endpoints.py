@@ -97,7 +97,7 @@ class TestNetWorthHistory:
         
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert data["date"] == "2024-01"
         print(f"✓ Net worth snapshot saved successfully for date {data['date']}")
     
@@ -165,7 +165,7 @@ class TestDebtManagement:
         
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert data["debt_id"] == "TEST_debt_001"
         print(f"✓ Debt item saved successfully: {data['debt_id']}")
     
@@ -222,7 +222,7 @@ class TestDebtManagement:
         delete_response = requests.delete(f"{BASE_URL}/api/planning/debts/TEST_debt_to_delete")
         assert delete_response.status_code == 200
         data = delete_response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert data["debt_id"] == "TEST_debt_to_delete"
         print(f"✓ Debt deleted successfully: {data['debt_id']}")
 
@@ -281,7 +281,7 @@ class TestInsuranceCoverage:
         
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert data["coverage_id"] == "TEST_ins_001"
         print(f"✓ Insurance coverage saved successfully: {data['coverage_id']}")
     

@@ -86,77 +86,7 @@ const formatTimeAgo = (dateStr) => {
   }
 };
 
-// ===================== BUFFETT ENGINE DATA =====================
-
-// Historical PE bands for major stocks (10-year data)
-const mockHistoricalPE = {
-  'CBA.AX': { current: 18.2, avg10Y: 15.5, low10Y: 11.2, high10Y: 22.5, sector: 'Banks', name: 'Commonwealth Bank' },
-  'BHP.AX': { current: 11.5, avg10Y: 14.2, low10Y: 8.1, high10Y: 21.3, sector: 'Mining', name: 'BHP Group' },
-  'CSL.AX': { current: 42.1, avg10Y: 38.5, low10Y: 28.4, high10Y: 55.2, sector: 'Healthcare', name: 'CSL Limited' },
-  'WBC.AX': { current: 12.8, avg10Y: 13.9, low10Y: 9.5, high10Y: 18.2, sector: 'Banks', name: 'Westpac' },
-  'NAB.AX': { current: 14.1, avg10Y: 13.2, low10Y: 9.8, high10Y: 17.6, sector: 'Banks', name: 'NAB' },
-  'ANZ.AX': { current: 11.9, avg10Y: 12.5, low10Y: 8.9, high10Y: 16.4, sector: 'Banks', name: 'ANZ' },
-  'RIO.AX': { current: 9.8, avg10Y: 12.8, low10Y: 6.5, high10Y: 19.8, sector: 'Mining', name: 'Rio Tinto' },
-  'FMG.AX': { current: 7.2, avg10Y: 8.5, low10Y: 4.2, high10Y: 14.5, sector: 'Mining', name: 'Fortescue' },
-  'WES.AX': { current: 26.5, avg10Y: 22.8, low10Y: 16.5, high10Y: 32.1, sector: 'Retail', name: 'Wesfarmers' },
-  'WOW.AX': { current: 24.8, avg10Y: 21.5, low10Y: 15.2, high10Y: 28.9, sector: 'Retail', name: 'Woolworths' },
-  'TLS.AX': { current: 22.5, avg10Y: 18.2, low10Y: 12.8, high10Y: 25.5, sector: 'Telco', name: 'Telstra' },
-  'MQG.AX': { current: 16.8, avg10Y: 14.5, low10Y: 10.2, high10Y: 21.5, sector: 'Financials', name: 'Macquarie' },
-};
-
-// Daily idea generator
-const dailyIdeas = [
-  {
-    symbol: 'FMG.AX',
-    name: 'Fortescue Metals',
-    action: 'BUY',
-    reason: 'Trading 15% below 10Y avg PE with iron ore prices rising. Strong dividend yield of 8.2%.',
-    pe_current: 7.2,
-    pe_avg: 8.5,
-    upside: '+18%',
-    confidence: 85,
-    sector: 'Mining',
-    catalyst: 'Iron ore supply disruption in Brazil'
-  },
-  {
-    symbol: 'NAB.AX',
-    name: 'National Australia Bank',
-    action: 'BUY',
-    reason: 'Best positioned major bank for NIM expansion. PE near 10Y average with 6.1% yield.',
-    pe_current: 14.1,
-    pe_avg: 13.2,
-    upside: '+12%',
-    confidence: 78,
-    sector: 'Banks',
-    catalyst: 'RBA rate stability supporting margins'
-  },
-  {
-    symbol: 'CSL.AX',
-    name: 'CSL Limited',
-    action: 'HOLD',
-    reason: 'Quality compounder but trading above historical average. Wait for better entry.',
-    pe_current: 42.1,
-    pe_avg: 38.5,
-    upside: '+5%',
-    confidence: 55,
-    sector: 'Healthcare',
-    catalyst: 'Plasma collection recovery'
-  },
-  {
-    symbol: 'WES.AX',
-    name: 'Wesfarmers',
-    action: 'REDUCE',
-    reason: 'Elevated PE vs history. Bunnings growth slowing. Consider trimming for valuation reset.',
-    pe_current: 26.5,
-    pe_avg: 22.8,
-    upside: '-8%',
-    confidence: 72,
-    sector: 'Retail',
-    catalyst: 'Consumer spending slowdown'
-  },
-];
-
-// Backtest results
+// Backtest results (static reference data)
 const backtestResults = {
   strategy: 'Buffett Value + Momentum',
   yearly_returns: [
@@ -196,6 +126,11 @@ const StockTrading = () => {
   const [marketData, setMarketData] = useState([]);
   const [marketSource, setMarketSource] = useState('loading');
   const [newsFeeds, setNewsFeeds] = useState([]);
+
+  // Buffett Engine state (live API)
+  const [buffettData, setBuffettData] = useState(null);
+  const [buffettLoading, setBuffettLoading] = useState(false);
+  const [buffettSource, setBuffettSource] = useState('idle');
 
   const clients = [
     { id: "client_1", name: "Wheeler Family" },
@@ -253,6 +188,29 @@ const StockTrading = () => {
     const interval = setInterval(fetchNews, 600000); // 10 min refresh
     return () => clearInterval(interval);
   }, []);
+
+  // Fetch Buffett Engine data from live API
+  const fetchBuffettData = useCallback(async () => {
+    setBuffettLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/api/buffett-engine/screen`);
+      if (response.ok) {
+        const data = await response.json();
+        setBuffettData(data);
+        setBuffettSource(data.source || 'live');
+      }
+    } catch {
+      toast.error("Failed to load Buffett screening data");
+    } finally {
+      setBuffettLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (activeTab === 'buffett' || activeTab === 'valuations') {
+      if (!buffettData) fetchBuffettData();
+    }
+  }, [activeTab, buffettData, fetchBuffettData]);
 
   const fetchHoldings = useCallback(async () => {
     setLoading(true);
@@ -362,24 +320,26 @@ const StockTrading = () => {
     <div className="space-y-2">
       <div className="flex justify-between items-center">
         <span className="font-semibold">{symbol}</span>
-        <Badge className={data.current <= data.avg10Y ? 'bg-green-500' : 'bg-amber-500'}>
-          PE: {data.current}
+        <Badge className={data.pe_current && data.pe_current <= data.pe_avg ? 'bg-green-500' : 'bg-amber-500'}>
+          PE: {data.pe_current || 'N/A'}
         </Badge>
       </div>
       <div className="h-4 bg-slate-100 rounded-full relative overflow-hidden">
-        <div 
+        <div
           className="absolute h-full bg-gradient-to-r from-green-500 via-blue-500 to-red-500 opacity-30"
           style={{ width: '100%' }}
         />
-        <div 
-          className="absolute h-full w-1 bg-slate-800"
-          style={{ left: `${((data.current - data.low10Y) / (data.high10Y - data.low10Y)) * 100}%` }}
-        />
+        {data.pe_current && (
+          <div
+            className="absolute h-full w-1 bg-slate-800"
+            style={{ left: `${((data.pe_current - data.pe_low) / (data.pe_high - data.pe_low)) * 100}%` }}
+          />
+        )}
       </div>
       <div className="flex justify-between text-xs text-muted-foreground">
-        <span>{data.low10Y}</span>
-        <span className="text-blue-600">{data.avg10Y} avg</span>
-        <span>{data.high10Y}</span>
+        <span>{data.pe_low}</span>
+        <span className="text-blue-600">{data.pe_avg} avg</span>
+        <span>{data.pe_high}</span>
       </div>
     </div>
   );
@@ -587,25 +547,46 @@ const StockTrading = () => {
 
           {/* ========== BUFFETT IDEAS TAB ========== */}
           <TabsContent value="buffett" className="space-y-6">
+            {buffettLoading ? (
+              <div className="flex items-center justify-center h-[300px]">
+                <RefreshCw className="h-8 w-8 animate-spin text-[#D4A84C]" />
+              </div>
+            ) : (
             <div className="grid lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-4">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Lightbulb className="h-5 w-5 text-amber-500" />
-                      Today's Value Opportunities
-                    </CardTitle>
-                    <CardDescription>Buffett-style picks with momentum confirmation</CardDescription>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="flex items-center gap-2">
+                          <Lightbulb className="h-5 w-5 text-amber-500" />
+                          Today's Value Opportunities
+                        </CardTitle>
+                        <CardDescription>Buffett-style screening via live Yahoo Finance data</CardDescription>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {buffettSource && (
+                          <Badge variant="outline" className={buffettSource === 'live' ? 'bg-green-50 border-green-200 text-green-700' : 'bg-amber-50 border-amber-200 text-amber-700'}>
+                            {buffettSource === 'live' ? 'Live' : 'Cached'}
+                          </Badge>
+                        )}
+                        <Button variant="outline" size="sm" onClick={fetchBuffettData}>
+                          <RefreshCw className="h-3 w-3 mr-1" />
+                          Refresh
+                        </Button>
+                      </div>
+                    </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {dailyIdeas.map((idea, idx) => (
-                      <div 
-                        key={`item-${idx}`}
+                    {(buffettData?.ideas || []).map((idea, idx) => (
+                      <div
+                        key={`idea-${idx}`}
                         className={`p-4 rounded-lg border-2 ${
                           idea.action === 'BUY' ? 'border-green-200 bg-green-50' :
                           idea.action === 'HOLD' ? 'border-blue-200 bg-blue-50' :
                           'border-red-200 bg-red-50'
                         }`}
+                        data-testid={`buffett-idea-${idea.symbol}`}
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
@@ -622,20 +603,23 @@ const StockTrading = () => {
                             </div>
                             <p className="text-sm mb-2">{idea.reason}</p>
                             <div className="flex items-center gap-4 text-sm">
-                              <span>PE: <strong>{idea.pe_current}</strong> vs avg <strong>{idea.pe_avg}</strong></span>
+                              <span>PE: <strong>{idea.pe_current || 'N/A'}</strong> vs avg <strong>{idea.pe_avg}</strong></span>
                               <span className={idea.upside.startsWith('+') ? 'text-green-600' : 'text-red-600'}>
                                 Upside: <strong>{idea.upside}</strong>
                               </span>
+                              {idea.dividend_yield && (
+                                <span>Yield: <strong>{idea.dividend_yield}%</strong></span>
+                              )}
                             </div>
                           </div>
                           <div className="text-center">
                             <div className="w-14 h-14 relative">
                               <svg className="w-14 h-14 transform -rotate-90">
                                 <circle cx="28" cy="28" r="24" fill="none" stroke="#e5e7eb" strokeWidth="4" />
-                                <circle 
-                                  cx="28" cy="28" r="24" fill="none" 
+                                <circle
+                                  cx="28" cy="28" r="24" fill="none"
                                   stroke={idea.confidence >= 75 ? '#22c55e' : idea.confidence >= 50 ? '#f59e0b' : '#ef4444'}
-                                  strokeWidth="4" 
+                                  strokeWidth="4"
                                   strokeDasharray={`${idea.confidence * 1.5} 150`}
                                 />
                               </svg>
@@ -651,6 +635,12 @@ const StockTrading = () => {
                         </div>
                       </div>
                     ))}
+                    {(!buffettData?.ideas || buffettData.ideas.length === 0) && (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <Lightbulb className="h-8 w-8 mx-auto mb-2" />
+                        <p>No screening data available. Click Refresh to load.</p>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </div>
@@ -663,9 +653,13 @@ const StockTrading = () => {
                   <CardContent>
                     <div className="text-center">
                       <div className="w-20 h-20 mx-auto mb-2 rounded-full bg-amber-100 flex items-center justify-center">
-                        <span className="text-3xl font-bold text-amber-700">68</span>
+                        <span className="text-3xl font-bold text-amber-700" data-testid="sentiment-score">
+                          {buffettData?.sentiment_score || '--'}
+                        </span>
                       </div>
-                      <p className="text-sm text-muted-foreground">Moderately Bullish</p>
+                      <p className="text-sm text-muted-foreground" data-testid="sentiment-label">
+                        {buffettData?.sentiment_label || 'Loading...'}
+                      </p>
                     </div>
                   </CardContent>
                 </Card>
@@ -675,14 +669,8 @@ const StockTrading = () => {
                     <CardTitle className="text-lg">Sector Rankings</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2">
-                    {[
-                      { sector: 'Banks', score: 78 },
-                      { sector: 'Financials', score: 75 },
-                      { sector: 'Mining', score: 72 },
-                      { sector: 'Retail', score: 60 },
-                      { sector: 'Healthcare', score: 58 },
-                    ].map((item, idx) => (
-                      <div key={`item-${idx}`} className="flex items-center justify-between">
+                    {(buffettData?.sector_rankings || []).map((item, idx) => (
+                      <div key={`sector-${idx}`} className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <span className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold">
                             {idx + 1}
@@ -696,32 +684,46 @@ const StockTrading = () => {
                 </Card>
               </div>
             </div>
+            )}
           </TabsContent>
 
           {/* ========== VALUATIONS TAB ========== */}
           <TabsContent value="valuations" className="space-y-6">
+            {buffettLoading ? (
+              <div className="flex items-center justify-center h-[300px]">
+                <RefreshCw className="h-8 w-8 animate-spin text-[#D4A84C]" />
+              </div>
+            ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {Object.entries(mockHistoricalPE).map(([symbol, data]) => (
-                <Card key={symbol} className={`${
-                  data.current <= data.avg10Y ? 'border-green-200' :
-                  data.current <= data.avg10Y * 1.1 ? 'border-blue-200' : 'border-red-200'
+              {(buffettData?.ideas || []).map((stock) => (
+                <Card key={stock.symbol} className={`${
+                  stock.pe_current && stock.pe_current <= stock.pe_avg ? 'border-green-200' :
+                  stock.pe_current && stock.pe_current <= stock.pe_avg * 1.1 ? 'border-blue-200' : 'border-red-200'
                 }`}>
                   <CardContent className="p-4">
-                    <p className="text-xs text-muted-foreground mb-1">{data.name}</p>
-                    <PEBandChart symbol={symbol} data={data} />
+                    <p className="text-xs text-muted-foreground mb-1">{stock.name}</p>
+                    <PEBandChart symbol={stock.symbol} data={stock} />
                     <div className="mt-3 pt-3 border-t flex justify-between items-center">
                       <Badge className={
-                        data.current <= data.avg10Y ? 'bg-green-500' :
-                        data.current <= data.avg10Y * 1.1 ? 'bg-blue-500' : 'bg-red-500'
+                        stock.pe_current && stock.pe_current <= stock.pe_avg ? 'bg-green-500' :
+                        stock.pe_current && stock.pe_current <= stock.pe_avg * 1.1 ? 'bg-blue-500' : 'bg-red-500'
                       }>
-                        {data.current <= data.avg10Y ? 'Undervalued' : data.current <= data.avg10Y * 1.1 ? 'Fair' : 'Overvalued'}
+                        {stock.pe_current && stock.pe_current <= stock.pe_avg ? 'Undervalued' :
+                         stock.pe_current && stock.pe_current <= stock.pe_avg * 1.1 ? 'Fair' : 'Overvalued'}
                       </Badge>
-                      <Badge variant="outline">{data.sector}</Badge>
+                      <Badge variant="outline">{stock.sector}</Badge>
                     </div>
                   </CardContent>
                 </Card>
               ))}
+              {(!buffettData?.ideas || buffettData.ideas.length === 0) && (
+                <div className="col-span-full text-center py-8 text-muted-foreground">
+                  <BarChart3 className="h-8 w-8 mx-auto mb-2" />
+                  <p>No valuation data available. Switch to Buffett Ideas tab to load data.</p>
+                </div>
+              )}
             </div>
+            )}
           </TabsContent>
 
           {/* ========== BACKTEST TAB ========== */}

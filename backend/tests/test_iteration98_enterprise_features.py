@@ -32,7 +32,7 @@ class TestReplayAdvice:
         response = requests.post(f"{BASE_URL}/api/replay/demo/create-sample-session")
         assert response.status_code == 200
         data = response.json()
-        assert data.get("success") == True
+        assert data.get("success") is True
         assert "session_id" in data
         assert data["session_id"].startswith("ADV-DEMO-")
         print(f"PASS: POST /api/replay/demo/create-sample-session - Created {data['session_id']}")
@@ -170,7 +170,7 @@ class TestCostReduction:
         response = requests.post(f"{BASE_URL}/api/cost-reduction/demo/seed-data")
         assert response.status_code == 200
         data = response.json()
-        assert data.get("success") == True
+        assert data.get("success") is True
         assert "events_created" in data
         print(f"PASS: POST /api/cost-reduction/demo/seed-data - Created {data['events_created']} events")
     
@@ -186,7 +186,7 @@ class TestCostReduction:
         response = requests.post(f"{BASE_URL}/api/cost-reduction/log", json=payload)
         assert response.status_code == 200
         data = response.json()
-        assert data.get("success") == True
+        assert data.get("success") is True
         assert "time_saved_hours" in data
         assert "cost_saved_aud" in data
         assert data["time_saved_hours"] == 2.0  # 2.5 - 0.5
@@ -243,7 +243,7 @@ class TestRiskControlMapping:
         response = requests.post(f"{BASE_URL}/api/risk-control/demo/seed-data")
         assert response.status_code == 200
         data = response.json()
-        assert data.get("success") == True
+        assert data.get("success") is True
         assert "risks_created" in data
         assert "controls_created" in data
         print(f"PASS: POST /api/risk-control/demo/seed-data - {data['risks_created']} risks, {data['controls_created']} controls")
@@ -263,7 +263,7 @@ class TestRiskControlMapping:
         response = requests.post(f"{BASE_URL}/api/risk-control/risks", json=payload)
         assert response.status_code == 200
         data = response.json()
-        assert data.get("success") == True
+        assert data.get("success") is True
         assert "risk_id" in data
         assert "risk_rating" in data
         print(f"PASS: POST /api/risk-control/risks - Created {data['risk_id']} with rating {data['risk_rating']['rating']}")
@@ -282,7 +282,7 @@ class TestRiskControlMapping:
         response = requests.post(f"{BASE_URL}/api/risk-control/controls", json=payload)
         assert response.status_code == 200
         data = response.json()
-        assert data.get("success") == True
+        assert data.get("success") is True
         assert "control_id" in data
         print(f"PASS: POST /api/risk-control/controls - Created {data['control_id']}")
 
@@ -319,7 +319,7 @@ class TestBreachRegister:
         response = requests.post(f"{BASE_URL}/api/breaches/demo/seed-data")
         assert response.status_code == 200
         data = response.json()
-        assert data.get("success") == True
+        assert data.get("success") is True
         assert "breaches_created" in data
         print(f"PASS: POST /api/breaches/demo/seed-data - Created {data['breaches_created']} breaches")
     
@@ -388,7 +388,7 @@ class TestBreachRegister:
         response = requests.post(f"{BASE_URL}/api/breaches/register/{breach_id}/update", json=update_payload)
         assert response.status_code == 200
         data = response.json()
-        assert data.get("success") == True
+        assert data.get("success") is True
         assert data["new_status"] == "investigating"
         print(f"PASS: POST /api/breaches/register/{breach_id}/update - Status: {data['new_status']}")
     

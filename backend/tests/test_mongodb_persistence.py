@@ -48,7 +48,7 @@ class TestFactFindMongoDB:
         
         assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert data["client_id"] == client_id
         print(f"✓ Created fact-find for client: {client_id}")
         
@@ -156,7 +156,7 @@ class TestESignatureMongoDB:
         
         assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert data["request_id"] == request_id
         print(f"✓ Created signature request: {request_id}")
         
@@ -192,7 +192,7 @@ class TestESignatureMongoDB:
         
         assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert data["signatures_count"] >= 1
         print(f"✓ Signed document, status: {data['status']}")
     
@@ -242,9 +242,9 @@ class TestMFAMongoDB:
         
         assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert data["user_id"] == user_id
-        assert data["mfa_enabled"] == True
+        assert data["mfa_enabled"] is True
         print(f"✓ Setup MFA for user: {user_id}")
         
         # Store for subsequent tests
@@ -261,7 +261,7 @@ class TestMFAMongoDB:
         assert response.status_code == 200
         data = response.json()
         assert data["user_id"] == user_id
-        assert data["enabled"] == True
+        assert data["enabled"] is True
         assert data["method"] == "totp"
         assert len(data["backup_codes"]) == 3
         print(f"✓ Retrieved MFA status from MongoDB: enabled={data['enabled']}")
@@ -281,7 +281,7 @@ class TestMFAMongoDB:
         
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         print("✓ MFA verification successful (mock)")
     
     def test_verify_mfa_invalid_code(self):
@@ -295,7 +295,7 @@ class TestMFAMongoDB:
         
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] == False
+        assert data["success"] is False
         print("✓ Invalid MFA code correctly rejected")
     
     def test_disable_mfa_updates_db(self):
@@ -313,13 +313,13 @@ class TestMFAMongoDB:
         
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         
         # Verify MFA is disabled in DB
         get_response = requests.get(f"{BASE_URL}/api/mfa/{user_id}")
         assert get_response.status_code == 200
         mfa_data = get_response.json()
-        assert mfa_data["enabled"] == False
+        assert mfa_data["enabled"] is False
         print("✓ MFA disabled and persisted in MongoDB")
     
     def test_get_mfa_nonexistent_user_returns_default(self):
@@ -328,7 +328,7 @@ class TestMFAMongoDB:
         
         assert response.status_code == 200
         data = response.json()
-        assert data["enabled"] == False
+        assert data["enabled"] is False
         assert data["method"] is None
         print("✓ Non-existent user returns default MFA disabled state")
 
@@ -404,7 +404,7 @@ class TestDataPersistence:
         assert get_response.status_code == 200
         data = get_response.json()
         
-        assert data["enabled"] == True
+        assert data["enabled"] is True
         assert data["method"] == "totp"
         print("✓ MFA data persists across requests (MongoDB)")
 

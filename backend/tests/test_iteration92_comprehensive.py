@@ -198,7 +198,7 @@ class TestDecisionEngine:
         
         data = response.json()
         assert "success" in data, "Response should have 'success' field"
-        assert data["success"] == True, "Health score calculation should succeed"
+        assert data["success"] is True, "Health score calculation should succeed"
         assert "overall_score" in data, "Response should have 'overall_score'"
         assert "grade" in data, "Response should have 'grade'"
         assert "component_scores" in data, "Response should have 'component_scores'"
@@ -227,7 +227,7 @@ class TestDecisionEngine:
         
         data = response.json()
         assert "success" in data, "Response should have 'success' field"
-        assert data["success"] == True, "Recommendations should succeed"
+        assert data["success"] is True, "Recommendations should succeed"
         assert "recommendations" in data, "Response should have 'recommendations'"
         assert isinstance(data["recommendations"], list), "Recommendations should be a list"
         

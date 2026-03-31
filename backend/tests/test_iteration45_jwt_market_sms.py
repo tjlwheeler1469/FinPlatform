@@ -66,7 +66,7 @@ class TestJWTAuthentication:
         assert response.status_code == 200, f"Token verification failed: {response.text}"
         
         data = response.json()
-        assert data.get("valid") == True, "Token should be valid"
+        assert data.get("valid") is True, "Token should be valid"
         assert "payload" in data, "Missing payload in response"
         assert data["payload"]["email"] == TEST_EMAIL, "Email mismatch in token payload"
         print(f"✓ Token verified successfully, payload: {data['payload']}")
@@ -77,7 +77,7 @@ class TestJWTAuthentication:
         assert response.status_code == 200  # Returns 200 with valid=false
         
         data = response.json()
-        assert data.get("valid") == False, "Invalid token should return valid=false"
+        assert data.get("valid") is False, "Invalid token should return valid=false"
         print("✓ Invalid token correctly identified")
     
     def test_get_current_user(self):
@@ -137,7 +137,7 @@ class TestJWTAuthentication:
         assert response.status_code == 200, f"Registration failed: {response.text}"
         
         data = response.json()
-        assert data.get("success") == True, "Registration should succeed"
+        assert data.get("success") is True, "Registration should succeed"
         assert "user_id" in data, "Missing user_id in response"
         print(f"✓ User registered: {test_email}")
     
@@ -279,8 +279,8 @@ class TestTwilioSMS:
         assert response.status_code == 200, f"Send verification failed: {response.text}"
         
         data = response.json()
-        assert data.get("success") == True, "Should succeed in demo mode"
-        assert data.get("demo_mode") == True, "Should be in demo mode"
+        assert data.get("success") is True, "Should succeed in demo mode"
+        assert data.get("demo_mode") is True, "Should be in demo mode"
         assert "demo_code" in data, "Should return demo_code in demo mode"
         assert len(data["demo_code"]) == 6, "Demo code should be 6 digits"
         print(f"✓ SMS verification sent (demo mode), code: {data['demo_code']}")
@@ -295,9 +295,9 @@ class TestTwilioSMS:
         assert response.status_code == 200, f"Verify code failed: {response.text}"
         
         data = response.json()
-        assert data.get("success") == True, "Should succeed in demo mode"
-        assert data.get("valid") == True, "Code should be valid in demo mode"
-        assert data.get("demo_mode") == True, "Should be in demo mode"
+        assert data.get("success") is True, "Should succeed in demo mode"
+        assert data.get("valid") is True, "Code should be valid in demo mode"
+        assert data.get("demo_mode") is True, "Should be in demo mode"
         print("✓ SMS code verified (demo mode)")
     
     def test_verify_invalid_code_format(self):
@@ -309,7 +309,7 @@ class TestTwilioSMS:
         assert response.status_code == 200  # Returns 200 with success=false
         
         data = response.json()
-        assert data.get("success") == False or data.get("valid") == False, "Invalid code format should fail"
+        assert data.get("success") is False or data.get("valid") is False, "Invalid code format should fail"
         print("✓ Invalid code format correctly rejected")
     
     def test_format_phone_number(self):
@@ -333,7 +333,7 @@ class TestTwilioSMS:
         assert response.status_code == 200, f"Validate number failed: {response.text}"
         
         data = response.json()
-        assert data.get("valid") == True, "Valid phone should pass validation"
+        assert data.get("valid") is True, "Valid phone should pass validation"
         print("✓ Phone number validated")
 
 

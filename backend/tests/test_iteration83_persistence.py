@@ -105,7 +105,7 @@ class TestClientContactPersistence:
         
         assert read_response.status_code == 200, f"Expected 200, got {read_response.status_code}"
         data = read_response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert data["status"] == "read"
         
         print(f"✅ Message marked as read: {message_id}")
@@ -165,7 +165,7 @@ class TestFinancialPlanPersistence:
         assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
         
         data = response.json()
-        assert data["success"] == True, "Response should indicate success"
+        assert data["success"] is True, "Response should indicate success"
         assert "plan" in data, "Response should include plan object"
         
         plan = data["plan"]

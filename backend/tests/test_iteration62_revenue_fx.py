@@ -33,7 +33,7 @@ class TestHealthEndpoint:
         data = response.json()
         
         assert "execution_layer" in data
-        assert data["execution_layer"]["fx_trading"] == True
+        assert data["execution_layer"]["fx_trading"] is True
         
     def test_health_has_revenue_layer(self):
         """Verify revenue_layer is present"""
@@ -42,9 +42,9 @@ class TestHealthEndpoint:
         data = response.json()
         
         assert "revenue_layer" in data
-        assert data["revenue_layer"]["aum_fees"] == True
-        assert data["revenue_layer"]["trading_fees"] == True
-        assert data["revenue_layer"]["subscriptions"] == True
+        assert data["revenue_layer"]["aum_fees"] is True
+        assert data["revenue_layer"]["trading_fees"] is True
+        assert data["revenue_layer"]["subscriptions"] is True
         
     def test_health_has_fx_capabilities(self):
         """Verify fx_trading and currency_hedging in capabilities"""
@@ -415,8 +415,8 @@ class TestFXTradingStatus:
         
         assert "mt5" in data["platforms"]
         assert "ctrader" in data["platforms"]
-        assert data["platforms"]["mt5"]["demo_available"] == True
-        assert data["platforms"]["ctrader"]["demo_available"] == True
+        assert data["platforms"]["mt5"]["demo_available"] is True
+        assert data["platforms"]["ctrader"]["demo_available"] is True
 
 
 class TestFXTradingPairs:
@@ -541,7 +541,7 @@ class TestFXTradingOrder:
         )
         data = response.json()
         
-        assert data["success"] == True
+        assert data["success"] is True
         assert "order" in data
         assert "message" in data
         
@@ -551,7 +551,7 @@ class TestFXTradingOrder:
         assert order["side"] == "buy"
         assert order["volume"] == 0.1
         assert order["status"] == "executed"
-        assert order["demo_mode"] == True
+        assert order["demo_mode"] is True
         
     def test_fx_order_sell(self):
         """Verify sell order works"""
@@ -567,7 +567,7 @@ class TestFXTradingOrder:
         )
         data = response.json()
         
-        assert data["success"] == True
+        assert data["success"] is True
         assert data["order"]["side"] == "sell"
 
 
@@ -610,7 +610,7 @@ class TestFXTradingExposure:
         data = response.json()
         
         assert data["client_id"] == "client_1"
-        assert data["has_fx_exposure"] == True
+        assert data["has_fx_exposure"] is True
         assert "exposures" in data
         assert "hedging_strategy" in data
         assert "recommendations" in data
@@ -620,7 +620,7 @@ class TestFXTradingExposure:
         response = requests.get(f"{BASE_URL}/api/fx/exposure/client_3")
         data = response.json()
         
-        assert data["has_fx_exposure"] == False
+        assert data["has_fx_exposure"] is False
 
 
 class TestFXTradingHedgePreview:

@@ -136,7 +136,7 @@ class TestCrossClientIntelligenceEngine:
         assert data["total_aum"] == 21260000
         assert data["current_fee_rate"] == 0.85
         assert data["optimal_fee_rate"] == 0.45
-        assert data["action_required"] == True
+        assert data["action_required"] is True
     
     def test_goals_analysis(self):
         """Test goals analysis endpoint"""
@@ -172,7 +172,7 @@ class TestClientPortalAuth:
         data = response.json()
         
         # Verify response structure
-        assert data["success"] == True
+        assert data["success"] is True
         assert "token" in data
         assert "user" in data
         assert "expires_in" in data
@@ -328,7 +328,7 @@ class TestClientPortalEndpoints:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["success"] == True
+        assert data["success"] is True
         assert "message_id" in data
         assert "sent_at" in data
     
@@ -358,7 +358,7 @@ class TestMeetingAutomation:
         data = response.json()
         
         # Verify structure
-        assert data["success"] == True
+        assert data["success"] is True
         assert "meeting_id" in data
         assert "meeting" in data
         assert "compliance_entry" in data
@@ -403,7 +403,7 @@ class TestMeetingAutomation:
         data = response.json()
         
         # Verify structure
-        assert data["success"] == True
+        assert data["success"] is True
         assert "email_content" in data
         assert "ai_generated" in data
         assert data["meeting_id"] == meeting_id

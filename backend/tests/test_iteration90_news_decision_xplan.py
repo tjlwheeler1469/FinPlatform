@@ -107,7 +107,7 @@ class TestDecisionEngine:
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         
         data = response.json()
-        assert data.get("success") == True, "Response should have success=True"
+        assert data.get("success") is True, "Response should have success=True"
         assert "recommendations" in data, "Response should contain 'recommendations'"
         assert len(data["recommendations"]) > 0, "Should have at least one recommendation"
         
@@ -141,7 +141,7 @@ class TestDecisionEngine:
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         
         data = response.json()
-        assert data.get("success") == True, "Response should have success=True"
+        assert data.get("success") is True, "Response should have success=True"
         assert "overall_score" in data, "Response should contain 'overall_score'"
         assert "grade" in data, "Response should contain 'grade'"
         assert "component_scores" in data, "Response should contain 'component_scores'"
@@ -162,7 +162,7 @@ class TestXplanSync:
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         
         data = response.json()
-        assert data.get("success") == True, "Response should have success=True"
+        assert data.get("success") is True, "Response should have success=True"
         assert data.get("mode") == "demo", "Mode should be 'demo'"
         print(f"✓ Xplan demo mode enabled")
     
@@ -176,7 +176,7 @@ class TestXplanSync:
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         
         data = response.json()
-        assert data.get("connected") == True, "Should be connected in demo mode"
+        assert data.get("connected") is True, "Should be connected in demo mode"
         assert data.get("mode") == "demo", "Mode should be 'demo'"
         print(f"✓ Xplan status: connected={data['connected']}, mode={data['mode']}")
     
@@ -204,7 +204,7 @@ class TestXplanSync:
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         
         data = response.json()
-        assert data.get("success") == True, "Push should succeed in demo mode"
+        assert data.get("success") is True, "Push should succeed in demo mode"
         print(f"✓ Xplan push strategy working (demo mode)")
 
 

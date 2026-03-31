@@ -68,7 +68,7 @@ class TestAuthenticationFlow:
         verify_response = requests.get(f"{BASE_URL}/api/auth/verify-token?token={token}")
         assert verify_response.status_code == 200
         data = verify_response.json()
-        assert data["valid"] == True, "Token should be valid"
+        assert data["valid"] is True, "Token should be valid"
         print("✓ Token verification working")
     
     def test_get_current_user(self):

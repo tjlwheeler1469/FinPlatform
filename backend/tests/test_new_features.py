@@ -52,7 +52,7 @@ class TestStockPrices:
                 print(f"SUCCESS: {price['symbol']} - ${price['price']} ({price['name']})")
         
         # Verify mock data flag
-        assert data["is_mock_data"] == True  # No Alpha Vantage key configured
+        assert data["is_mock_data"] is True  # No Alpha Vantage key configured
         print(f"SUCCESS: Stock prices returned (mock data: {data['is_mock_data']})")
     
     def test_get_stock_prices_unknown_symbol(self):
@@ -205,20 +205,20 @@ class TestEstatePlanning:
         assert len(data["beneficiaries"]) == 3
         spouse = next((b for b in data["beneficiaries"] if b["name"] == "Sarah Wheeler"), None)
         assert spouse is not None
-        assert spouse["is_tax_dependant"] == True  # Spouse is tax dependant
+        assert spouse["is_tax_dependant"] is True  # Spouse is tax dependant
         assert spouse["potential_super_tax"] == 0  # No tax for dependants
         
         # Adult children should have potential super tax
         emily = next((b for b in data["beneficiaries"] if b["name"] == "Emily Wheeler"), None)
         assert emily is not None
-        assert emily["is_tax_dependant"] == False
+        assert emily["is_tax_dependant"] is False
         assert emily["potential_super_tax"] > 0  # Tax for non-dependants
         
         # Verify checklist
         assert len(data["checklist"]) > 0
         will_item = next((c for c in data["checklist"] if c["item"] == "Valid Will"), None)
         assert will_item is not None
-        assert will_item["complete"] == True
+        assert will_item["complete"] is True
         
         print(f"SUCCESS: Estate plan analyzed")
         print(f"  - Total estate: ${summary['total_estate_value']:,.0f}")
@@ -352,7 +352,7 @@ class TestFinancialAdvisorChat:
         assert "suggestions" in data
         
         # Should be in demo mode (no LLM key)
-        assert data["ai_enabled"] == False
+        assert data["ai_enabled"] is False
         
         # Should have suggestions
         assert len(data["suggestions"]) > 0

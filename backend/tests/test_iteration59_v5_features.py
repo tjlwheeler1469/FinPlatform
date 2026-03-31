@@ -145,7 +145,7 @@ class TestNextBestActionEngine:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert data["action_id"] == action_id
         assert data["status"] == "executed"
         assert "executed_at" in data
@@ -161,7 +161,7 @@ class TestNextBestActionEngine:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert data["action_id"] == action_id
         assert data["status"] == "snoozed"
         assert "snoozed_until" in data
@@ -353,7 +353,7 @@ class TestMeetingWorkflowAutomation:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert "meeting_id" in data
         assert "meeting" in data
         assert "prep_task_id" in data
@@ -437,7 +437,7 @@ class TestMeetingWorkflowAutomation:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert "task_id" in data
         assert "task" in data
         
@@ -473,7 +473,7 @@ class TestMeetingWorkflowAutomation:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert data["task_id"] == task_id
         assert data["status"] == "completed"
         
@@ -500,7 +500,7 @@ class TestMeetingWorkflowAutomation:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert "note" in data
         assert data["note"]["type"] == "general"
         

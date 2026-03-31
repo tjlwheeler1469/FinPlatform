@@ -49,7 +49,7 @@ class TestAdviceOSInitialization:
         response = requests.post(f"{BASE_URL}/api/reports/generate-demo-data")
         assert response.status_code == 200
         data = response.json()
-        assert data.get("success") == True
+        assert data.get("success") is True
         print(f"✓ Demo data generated: {data.get('created', {})}")
 
 

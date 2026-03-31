@@ -320,7 +320,7 @@ class TestComplianceSOAAPI:
         
         data = response.json()
         assert "success" in data
-        assert data["success"] == True
+        assert data["success"] is True
         assert "soa_id" in data
 
 
@@ -339,7 +339,7 @@ class TestComplianceAuditLogAPI:
         
         data = response.json()
         assert "success" in data
-        assert data["success"] == True
+        assert data["success"] is True
         
     def test_audit_log_get_returns_200(self):
         """Test audit log retrieval endpoint returns 200"""

@@ -27,6 +27,43 @@ import {
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || '';
 
+// Helper functions to replace nested ternaries
+const getConfidenceRisk = (confidence) => {
+  if (confidence >= 60) return ' with moderate risk.';
+  if (confidence >= 40) return ' with elevated risk.';
+  return ' and need immediate attention.';
+};
+
+const getDeltaColor = (delta) => {
+  if (delta > 0) return 'text-green-600';
+  if (delta < 0) return 'text-red-600';
+  return 'text-gray-600';
+};
+
+const getDeltaBorderClass = (delta) => {
+  if (delta > 0) return 'border-green-200 bg-green-50/50';
+  if (delta < 0) return 'border-red-200 bg-red-50/50';
+  return '';
+};
+
+const getDeltaBadgeClass = (delta) => {
+  if (delta > 0) return 'bg-green-500';
+  if (delta < 0) return 'bg-red-500';
+  return 'bg-gray-500';
+};
+
+const getDeltaLabel = (delta) => {
+  if (delta > 0) return 'Extended runway';
+  if (delta < 0) return 'Increased risk';
+  return 'No change';
+};
+
+const getDriverBarColor = (value, fallbackColor) => {
+  if (value >= 80) return '#22c55e';
+  if (value >= 50) return fallbackColor;
+  return '#ef4444';
+};
+
 // ==================== PHASE 1: CLIENT POSITION SUMMARY ====================
 
 const PositionSummary = ({ result, baselineResult }) => {
@@ -78,7 +115,7 @@ const PositionSummary = ({ result, baselineResult }) => {
         <div className={`p-4 rounded-lg bg-white border ${position.border}`}>
           <p className="text-lg">
             <span className={`font-bold ${position.color}`}>You are {position.status.toLowerCase()}</span> for retirement 
-            {confidence >= 60 ? ' with moderate risk.' : confidence >= 40 ? ' with elevated risk.' : ' and need immediate attention.'}
+            {getConfidenceRisk(confidence)}
           </p>
           {risks.length > 0 && (
             <p className="text-sm text-muted-foreground mt-2">
@@ -243,7 +280,7 @@ const ConfidenceDrivers = ({ factors }) => {
                     className="h-full rounded-full transition-all duration-500"
                     style={{ 
                       width: `${driver.value}%`, 
-                      backgroundColor: driver.value >= 80 ? '#22c55e' : driver.value >= 50 ? driver.color : '#ef4444'
+                      backgroundColor: getDriverBarColor(driver.value, driver.color)
                     }}
                   />
                 </div>
@@ -276,7 +313,7 @@ const ScenarioDelta = ({ baselineResult, currentResult, scenarios }) => {
   };
 
   return (
-    <Card className={delta !== 0 ? (delta > 0 ? 'border-green-200 bg-green-50/50' : 'border-red-200 bg-red-50/50') : ''}>
+    <Card className={getDeltaBorderClass(delta)}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Target className="h-5 w-5 text-purple-500" />
@@ -288,7 +325,7 @@ const ScenarioDelta = ({ baselineResult, currentResult, scenarios }) => {
           {/* Confidence Change */}
           <div className="text-center p-4 bg-white rounded-lg border">
             <p className="text-xs text-muted-foreground mb-1">Confidence Change</p>
-            <p className={`text-3xl font-bold ${delta > 0 ? 'text-green-600' : delta < 0 ? 'text-red-600' : 'text-gray-600'}`}>
+            <p className={`text-3xl font-bold ${getDeltaColor(delta)}`}>
               {delta > 0 ? '+' : ''}{delta.toFixed(1)}%
             </p>
             <p className="text-xs text-muted-foreground mt-1">
@@ -299,7 +336,7 @@ const ScenarioDelta = ({ baselineResult, currentResult, scenarios }) => {
           {/* Surplus/Shortfall Change */}
           <div className="text-center p-4 bg-white rounded-lg border">
             <p className="text-xs text-muted-foreground mb-1">Surplus Change</p>
-            <p className={`text-3xl font-bold ${surplusDelta > 0 ? 'text-green-600' : surplusDelta < 0 ? 'text-red-600' : 'text-gray-600'}`}>
+            <p className={`text-3xl font-bold ${getDeltaColor(surplusDelta)}`}>
               {surplusDelta > 0 ? '+' : ''}{formatCurrency(surplusDelta)}
             </p>
             <p className="text-xs text-muted-foreground mt-1">
@@ -311,7 +348,7 @@ const ScenarioDelta = ({ baselineResult, currentResult, scenarios }) => {
           <div className="text-center p-4 bg-white rounded-lg border">
             <p className="text-xs text-muted-foreground mb-1">Primary Driver</p>
             <p className="text-lg font-bold text-purple-600">
-              {delta > 0 ? 'Extended runway' : delta < 0 ? 'Increased risk' : 'No change'}
+              {getDeltaLabel(delta)}
             </p>
             <p className="text-xs text-muted-foreground mt-1">
               Impact source
@@ -329,7 +366,7 @@ const ScenarioDelta = ({ baselineResult, currentResult, scenarios }) => {
                 <div className="flex items-center gap-2">
                   <span className="font-bold">{scenario.confidence?.toFixed(0)}%</span>
                   {scenario.delta_vs_base !== undefined && (
-                    <Badge className={scenario.delta_vs_base > 0 ? 'bg-green-500' : scenario.delta_vs_base < 0 ? 'bg-red-500' : 'bg-gray-500'}>
+                    <Badge className={getDeltaBadgeClass(scenario.delta_vs_base)}>
                       {scenario.delta_vs_base > 0 ? '+' : ''}{scenario.delta_vs_base?.toFixed(1)}%
                     </Badge>
                   )}
@@ -1314,7 +1351,7 @@ const RetirementConfidence = () => {
                     <CardContent>
                       <p className="text-3xl font-bold">{scenario.confidence?.toFixed(0)}%</p>
                       {scenario.delta_vs_base !== undefined && (
-                        <p className={`text-sm ${scenario.delta_vs_base > 0 ? 'text-green-600' : scenario.delta_vs_base < 0 ? 'text-red-600' : 'text-muted-foreground'}`}>
+                        <p className={`text-sm ${getDeltaColor(scenario.delta_vs_base)}`}>
                           {scenario.delta_vs_base > 0 ? '+' : ''}{scenario.delta_vs_base?.toFixed(1)}% vs current
                         </p>
                       )}

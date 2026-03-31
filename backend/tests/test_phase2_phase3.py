@@ -90,7 +90,7 @@ class TestCRMTasks:
         response = requests.post(f"{BASE_URL}/api/crm/tasks", json=task_data)
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert "task_id" in data
         print(f"✓ POST /api/crm/tasks - Created task {data['task_id']}")
 
@@ -147,7 +147,7 @@ class TestCRMNotes:
         response = requests.post(f"{BASE_URL}/api/crm/notes", json=note_data)
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert "note_id" in data
         print(f"✓ POST /api/crm/notes - Created note {data['note_id']}")
 
@@ -216,7 +216,7 @@ class TestGoalTracker:
         response = requests.post(f"{BASE_URL}/api/goals", json=goal_data)
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert "goal_id" in data
         print(f"✓ POST /api/goals - Created goal {data['goal_id']}")
 
@@ -446,7 +446,7 @@ class TestPortfolioAggregator:
         response = requests.post(f"{BASE_URL}/api/portfolio/sync/hh_wheeler001")
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] == True
+        assert data["success"] is True
         assert "synced_at" in data
         print(f"✓ POST /api/portfolio/sync - Synced at {data['synced_at']}")
 
