@@ -102,7 +102,29 @@ Build a comprehensive Australian wealth management platform for financial advise
 - [ ] Voice recording (microphone) end-to-end test
 - [ ] Extend i18n translations to all page content (currently nav + common labels)
 
+## Code Quality Fixes Applied (March 2026)
+
+### Critical Security Fixes
+- [x] Removed hardcoded secrets from 5 test files → env vars with fallbacks
+- [x] Replaced `eval()` with `ast.literal_eval` + safe arithmetic parser in `scenario_templates.py`
+- [x] Sanitized `dangerouslySetInnerHTML` with DOMPurify in `NotificationCenter.jsx`
+- [x] Sanitized `document.write` with DOMPurify in `EnterpriseComplianceDashboard.jsx`
+- [x] Migrated auth tokens from `localStorage` to `sessionStorage` in `AuthContext.jsx` and `ClientPortalMerged.jsx`
+- [x] Replaced MD5 with SHA-256 in `scaling_infrastructure.py`
+
+### Important Fixes
+- [x] Fixed high-priority React hook dependencies in 4 pages (XplanSyncPage, XplanIntegration, WorkflowDashboard, WealthDashboard)
+
+### Remaining Code Quality Items (Lower Priority)
+- [ ] Reduce component sizes (DigitalOnboarding: 1206 lines, AdviceOSDashboard: 1023 lines)
+- [ ] Replace index-as-key in 236 instances
+- [ ] Add type hints to Python public APIs
+- [ ] Replace `random` with `secrets` module in sensitive operations
+- [ ] Remove 253 console.log statements for production
+- [ ] Reduce nested ternaries (2,344 instances)
+- [ ] Split server.py imports into modules (129 imports)
+
 ## Testing Status
-- Backend: 100% (19/19 tests in iteration_120)
-- Frontend: 100% (18/18 tests in iteration_120)
-- Test reports: /app/test_reports/iteration_119.json, iteration_120.json
+- Backend: 100% (12/12 tests in iteration_121 — security regression)
+- Frontend: 100% (all verified in iteration_121)
+- Test reports: /app/test_reports/iteration_119.json, iteration_120.json, iteration_121.json
