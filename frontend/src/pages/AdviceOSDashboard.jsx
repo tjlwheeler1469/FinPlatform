@@ -904,7 +904,7 @@ const AdviceOSDashboard = () => {
                   </h3>
                   <div className="space-y-2">
                     {generatedScenarios.scenario_set.trade_offs.map((tradeoff, idx) => (
-                      <Card key={idx} className="bg-muted/50">
+                      <Card key={`item-${idx}`} className="bg-muted/50">
                         <CardContent className="p-3">
                           <p className="font-medium text-sm">{tradeoff.description}</p>
                           <p className="text-sm text-muted-foreground mt-1">{tradeoff.impact_description}</p>

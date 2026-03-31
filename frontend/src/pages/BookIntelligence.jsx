@@ -194,7 +194,7 @@ const BookIntelligence = () => {
               <div className="space-y-4">
                 {insights.map((insight, idx) => (
                   <div 
-                    key={idx} 
+                    key={`item-${idx}`} 
                     className="flex items-start gap-4 p-4 bg-muted/30 rounded-lg border"
                     data-testid={`insight-${idx}`}
                   >
@@ -290,7 +290,7 @@ const BookIntelligence = () => {
                       Concentration Risks
                     </h4>
                     {sectorAnalysis.concentration_risks.map((risk, idx) => (
-                      <p key={idx} className="text-sm text-red-700">
+                      <p key={`item-${idx}`} className="text-sm text-red-700">
                         {risk.clients_overweight} clients are overweight {risk.sector} ({risk.book_exposure}% vs 30% max)
                       </p>
                     ))}
@@ -338,7 +338,7 @@ const BookIntelligence = () => {
                 {/* Client List */}
                 <div className="space-y-3">
                   {taxOps?.opportunities?.slice(0, 5).map((opp, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                    <div key={`item-${idx}`} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
                       <div>
                         <p className="font-medium">{opp.client_name}</p>
                         <p className="text-sm text-muted-foreground">
@@ -398,7 +398,7 @@ const BookIntelligence = () => {
                 <h4 className="font-semibold mb-3">Clients Needing Attention</h4>
                 <div className="space-y-3">
                   {engagement?.at_risk_clients?.map((client, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                    <div key={`item-${idx}`} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
                       <div className="flex items-center gap-3">
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ${
                           client.engagement_score < 50 ? 'bg-red-500' : 'bg-yellow-500'

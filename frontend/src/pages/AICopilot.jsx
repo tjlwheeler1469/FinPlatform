@@ -187,7 +187,7 @@ What would you like to explore today?`,
               <div className="space-y-4">
                 {messages.map((message, index) => (
                   <div
-                    key={index}
+                    key={`item-${index}`}
                     className={`flex gap-3 ${message.role === "user" ? "justify-end" : ""}`}
                   >
                     {message.role === "assistant" && (
@@ -308,7 +308,7 @@ What would you like to explore today?`,
             <CardContent className="space-y-2">
               {SUGGESTED_QUESTIONS.map((q, index) => (
                 <Button
-                  key={index}
+                  key={`item-${index}`}
                   variant="ghost"
                   className="w-full justify-start text-left h-auto py-2 px-3"
                   onClick={() => handleSuggestedQuestion(q.text)}

@@ -604,7 +604,7 @@ const PortfolioRebalancing = () => {
                           label={({ name, value }) => `${value}%`}
                         >
                           {targetPieData.map((entry, index) => (
-                            <Cell key={index} fill={entry.color} />
+                            <Cell key={`item-${index}`} fill={entry.color} />
                           ))}
                         </Pie>
                         <Tooltip formatter={(v) => formatPercent(v)} />
@@ -650,7 +650,7 @@ const PortfolioRebalancing = () => {
                   <div className="space-y-4">
                     {suggestedTrades.map((trade, index) => (
                       <div 
-                        key={index}
+                        key={`item-${index}`}
                         className={`p-4 rounded-lg border ${
                           trade.action === "Reduce" ? 'border-red-200 bg-red-50/50' : 'border-blue-200 bg-blue-50/50'
                         }`}

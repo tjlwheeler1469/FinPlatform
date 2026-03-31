@@ -192,7 +192,7 @@ const BrokerResearch = () => {
                 <h3 className="font-semibold mb-3">Recent Analyst Reports</h3>
                 <div className="space-y-2">
                   {stockDetail.recent_reports?.map((report, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                    <div key={`item-${idx}`} className="flex items-center justify-between p-3 bg-muted rounded-lg">
                       <div>
                         <p className="font-medium">{report.broker}</p>
                         <p className="text-sm text-muted-foreground">{report.analyst} • {report.date}</p>
@@ -220,7 +220,7 @@ const BrokerResearch = () => {
                   </h3>
                   <ul className="list-disc list-inside text-muted-foreground">
                     {stockDetail.risks?.map((risk, idx) => (
-                      <li key={idx}>{risk}</li>
+                      <li key={`item-${idx}`}>{risk}</li>
                     ))}
                   </ul>
                 </div>
@@ -230,7 +230,7 @@ const BrokerResearch = () => {
                   </h3>
                   <ul className="list-disc list-inside text-muted-foreground">
                     {stockDetail.catalysts?.map((catalyst, idx) => (
-                      <li key={idx}>{catalyst}</li>
+                      <li key={`item-${idx}`}>{catalyst}</li>
                     ))}
                   </ul>
                 </div>
@@ -251,7 +251,7 @@ const BrokerResearch = () => {
             <div className="grid gap-4">
               {topRated.map((stock, idx) => (
                 <Card 
-                  key={idx} 
+                  key={`item-${idx}`} 
                   className="hover:border-primary cursor-pointer transition-colors"
                   onClick={() => fetchStockDetail(stock.symbol)}
                 >
@@ -300,7 +300,7 @@ const BrokerResearch = () => {
                 <div className="space-y-3">
                   {ratingChanges.map((change, idx) => (
                     <div 
-                      key={idx} 
+                      key={`item-${idx}`} 
                       className="flex items-center justify-between p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80"
                       onClick={() => fetchStockDetail(change.symbol)}
                     >
@@ -333,7 +333,7 @@ const BrokerResearch = () => {
           <TabsContent value="sectors" className="mt-4">
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {sectorRatings.map((sector, idx) => (
-                <Card key={idx}>
+                <Card key={`item-${idx}`}>
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-medium">{sector.sector}</span>
@@ -351,7 +351,7 @@ const BrokerResearch = () => {
                     <div className="mt-2 flex flex-wrap gap-1">
                       {sector.top_picks.map((pick, i) => (
                         <Badge 
-                          key={i} 
+                          key={`item-${i}`} 
                           variant="outline" 
                           className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
                           onClick={() => fetchStockDetail(pick)}

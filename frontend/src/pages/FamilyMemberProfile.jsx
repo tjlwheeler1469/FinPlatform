@@ -413,7 +413,7 @@ const FamilyMemberProfile = () => {
                               dataKey="value"
                             >
                               {incomeBreakdown.map((entry, index) => (
-                                <Cell key={index} fill={entry.color} />
+                                <Cell key={`item-${index}`} fill={entry.color} />
                               ))}
                             </Pie>
                             <Tooltip formatter={(v) => formatCurrency(v)} />
@@ -422,7 +422,7 @@ const FamilyMemberProfile = () => {
                       </ChartContainer>
                       <div className="flex flex-wrap justify-center gap-3 mt-4">
                         {incomeBreakdown.map((item, i) => (
-                          <div key={i} className="flex items-center gap-2">
+                          <div key={`item-${i}`} className="flex items-center gap-2">
                             <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
                             <span className="text-sm">{item.name}</span>
                           </div>
@@ -587,7 +587,7 @@ const FamilyMemberProfile = () => {
                         const gainPct = ((share.currentPrice - share.purchasePrice) / share.purchasePrice) * 100;
                         
                         return (
-                          <div key={i} className="p-3 rounded-lg border">
+                          <div key={`item-${i}`} className="p-3 rounded-lg border">
                             <div className="flex justify-between items-start">
                               <div>
                                 <p className="font-semibold">{share.symbol}</p>
@@ -658,7 +658,7 @@ const FamilyMemberProfile = () => {
                               dataKey="value"
                             >
                               {wealthComposition.map((entry, index) => (
-                                <Cell key={index} fill={entry.color} />
+                                <Cell key={`item-${index}`} fill={entry.color} />
                               ))}
                             </Pie>
                             <Tooltip formatter={(v) => formatCurrency(v)} />
@@ -667,7 +667,7 @@ const FamilyMemberProfile = () => {
                       </ChartContainer>
                       <div className="space-y-2 mt-4">
                         {wealthComposition.map((item, i) => (
-                          <div key={i} className="flex justify-between items-center">
+                          <div key={`item-${i}`} className="flex justify-between items-center">
                             <div className="flex items-center gap-2">
                               <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
                               <span>{item.name}</span>

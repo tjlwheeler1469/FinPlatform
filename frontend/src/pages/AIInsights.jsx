@@ -274,7 +274,7 @@ function InsightsList({ insights, onAction }) {
         const actionItems = insight.action_items || (insight.action ? [insight.action] : []);
         
         return (
-          <Card key={idx} className={`${getPriorityBorder(insight.priority)} hover:shadow-md transition-shadow`}>
+          <Card key={`item-${idx}`} className={`${getPriorityBorder(insight.priority)} hover:shadow-md transition-shadow`}>
             <CardContent className="p-4">
               <div className="flex items-start gap-4">
                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${

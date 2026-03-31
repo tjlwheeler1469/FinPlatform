@@ -10,7 +10,8 @@ from datetime import datetime, timezone, timedelta
 import asyncio
 import json
 import logging
-import random
+import secrets
+_rng = secrets.SystemRandom()
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/realtime", tags=["Real-Time Data Layer"])
@@ -144,7 +145,7 @@ def simulate_price_update(symbol: str) -> Dict:
     current = LIVE_PRICES[symbol].copy()
     
     # Random price movement (-0.5% to +0.5%)
-    change_pct = random.uniform(-0.5, 0.5)
+    change_pct = _rng.uniform(-0.5, 0.5)
     price_change = current["price"] * change_pct / 100
     
     current["price"] = round(current["price"] + price_change, 2)

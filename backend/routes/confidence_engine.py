@@ -5,7 +5,8 @@ Monte Carlo simulation-based retirement confidence scoring with multi-entity, mu
 
 import os
 import math
-import random
+import secrets
+_rng = secrets.SystemRandom()
 import logging
 import numpy as np
 from datetime import datetime, timezone

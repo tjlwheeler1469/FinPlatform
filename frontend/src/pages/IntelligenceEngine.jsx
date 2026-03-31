@@ -185,7 +185,7 @@ const IntelligenceEngine = () => {
             <div className="grid md:grid-cols-2 gap-4">
               {analysis?.priority_actions?.map((action, idx) => (
                 <div
-                  key={idx}
+                  key={`item-${idx}`}
                   className={`p-4 rounded-lg border ${idx === 0 ? 'bg-red-50 border-red-200' : idx === 1 ? 'bg-orange-50 border-orange-200' : 'bg-gray-50'}`}
                   data-testid={`priority-action-${idx}`}
                 >
@@ -263,7 +263,7 @@ const IntelligenceEngine = () => {
                         {client.overweight?.length > 0 && (
                           <div className="flex flex-wrap gap-1 mb-1">
                             {client.overweight.map((o, i) => (
-                              <Badge key={i} variant="outline" className="text-xs bg-red-50 text-red-600">
+                              <Badge key={`item-${i}`} variant="outline" className="text-xs bg-red-50 text-red-600">
                                 <ArrowUpRight className="h-3 w-3 mr-1" />
                                 {o.asset} +{o.diff?.toFixed(1)}%
                               </Badge>
@@ -273,7 +273,7 @@ const IntelligenceEngine = () => {
                         {client.underweight?.length > 0 && (
                           <div className="flex flex-wrap gap-1">
                             {client.underweight.map((u, i) => (
-                              <Badge key={i} variant="outline" className="text-xs bg-blue-50 text-blue-600">
+                              <Badge key={`item-${i}`} variant="outline" className="text-xs bg-blue-50 text-blue-600">
                                 <ArrowDownRight className="h-3 w-3 mr-1" />
                                 {u.asset} -{u.diff?.toFixed(1)}%
                               </Badge>
@@ -328,7 +328,7 @@ const IntelligenceEngine = () => {
                       <div key={client.client_id} className="p-3 rounded-lg border">
                         <p className="font-medium mb-2">{client.client_name}</p>
                         {client.opportunities?.map((opp, i) => (
-                          <div key={i} className="flex items-center justify-between py-1 border-t">
+                          <div key={`item-${i}`} className="flex items-center justify-between py-1 border-t">
                             <div className="flex items-center gap-2">
                               {opp.type === "tax_loss_harvest" ? (
                                 <TrendingDown className="h-4 w-4 text-red-500" />
@@ -451,7 +451,7 @@ const IntelligenceEngine = () => {
                         <p className="font-medium mb-2">Platforms to Contact:</p>
                         <div className="flex flex-wrap gap-2">
                           {analysis?.fee_optimization?.platforms_to_contact?.map((platform, i) => (
-                            <Badge key={i} variant="outline">{platform}</Badge>
+                            <Badge key={`item-${i}`} variant="outline">{platform}</Badge>
                           ))}
                         </div>
                       </div>
@@ -494,7 +494,7 @@ const IntelligenceEngine = () => {
                   <div className="space-y-2">
                     {analysis?.goals?.all_goals?.map((goal, idx) => (
                       <div
-                        key={idx}
+                        key={`item-${idx}`}
                         className={`p-3 rounded-lg border ${!goal.on_track ? 'border-red-200 bg-red-50' : ''}`}
                       >
                         <div className="flex items-center justify-between mb-2">
@@ -535,7 +535,7 @@ const IntelligenceEngine = () => {
                 ) : (
                   <ul className="space-y-2">
                     {aiInsights.fallback_insights?.map((insight, i) => (
-                      <li key={i}>{insight}</li>
+                      <li key={`item-${i}`}>{insight}</li>
                     ))}
                   </ul>
                 )}

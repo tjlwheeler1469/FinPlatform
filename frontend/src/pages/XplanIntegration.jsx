@@ -432,7 +432,7 @@ const XplanIntegration = () => {
                         { icon: Target, label: "Goals & Plans", desc: "Retirement, savings" },
                         { icon: Shield, label: "Risk Profile", desc: "Tolerance, capacity" },
                       ].map((item, idx) => (
-                        <div key={idx} className="flex items-start gap-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors">
+                        <div key={`item-${idx}`} className="flex items-start gap-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors">
                           <item.icon className="h-5 w-5 text-[#D4A84C] mt-0.5" />
                           <div>
                             <p className="font-medium text-sm">{item.label}</p>
@@ -659,7 +659,7 @@ const XplanIntegration = () => {
                   <ScrollArea className="h-[400px]">
                     <div className="space-y-3">
                       {syncHistory.map((log, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-4 rounded-lg border">
+                        <div key={`item-${idx}`} className="flex items-center justify-between p-4 rounded-lg border">
                           <div className="flex items-center gap-4">
                             {log.status === "completed" ? (
                               <CheckCircle2 className="h-5 w-5 text-emerald-600" />

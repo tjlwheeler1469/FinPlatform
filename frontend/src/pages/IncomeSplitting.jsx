@@ -321,7 +321,7 @@ const IncomeSplitting = () => {
                         <Tooltip formatter={(v) => formatCurrency(v)} />
                         <Bar dataKey="tax" radius={[0, 4, 4, 0]}>
                           {comparisonData.map((entry, index) => (
-                            <Cell key={index} fill={entry.fill} />
+                            <Cell key={`item-${index}`} fill={entry.fill} />
                           ))}
                         </Bar>
                       </BarChart>
@@ -593,7 +593,7 @@ const IncomeSplitting = () => {
                             dataKey="value"
                           >
                             {distributionPieData.map((entry, index) => (
-                              <Cell key={index} fill={entry.color} />
+                              <Cell key={`item-${index}`} fill={entry.color} />
                             ))}
                           </Pie>
                           <Tooltip formatter={(v) => formatCurrency(v)} />
@@ -604,7 +604,7 @@ const IncomeSplitting = () => {
                   
                   <div className="space-y-2">
                     {distributionPieData.map((item, i) => (
-                      <div key={i} className="flex items-center justify-between">
+                      <div key={`item-${i}`} className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
                           <span className="text-sm">{item.name}</span>

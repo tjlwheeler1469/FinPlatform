@@ -408,7 +408,7 @@ Individual circumstances vary. Consult a licensed financial adviser before makin
                   </ChartContainer>
                   <div className="flex flex-wrap gap-2 justify-center mt-2">
                     {assetData.map((item, i) => (
-                      <div key={i} className="flex items-center gap-1 text-xs">
+                      <div key={`item-${i}`} className="flex items-center gap-1 text-xs">
                         <span className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
                         {item.name}
                       </div>

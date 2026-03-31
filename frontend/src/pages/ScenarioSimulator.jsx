@@ -453,7 +453,7 @@ const ScenarioSimulator = () => {
                 <CardContent>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {result.milestones.map((milestone, i) => (
-                      <div key={i} className="p-3 border rounded-lg text-center">
+                      <div key={`item-${i}`} className="p-3 border rounded-lg text-center">
                         <CheckCircle className={`h-6 w-6 mx-auto mb-2 ${
                           milestone.achieved ? "text-green-500" : "text-gray-300"
                         }`} />

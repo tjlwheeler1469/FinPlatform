@@ -558,7 +558,7 @@ const MFASetup = ({ userId, userEmail, onMFAEnabled, onMFADisabled }) => {
             <div className="grid grid-cols-2 gap-2">
               {((mfaStatus.backup_codes || []).length > 0 ? mfaStatus.backup_codes : newBackupCodes).map((item, index) => (
                 <div 
-                  key={index}
+                  key={`item-${index}`}
                   className={`p-2 font-mono text-center rounded border ${
                     item.used ? 'bg-muted text-muted-foreground line-through' : 'bg-white'
                   }`}

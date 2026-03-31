@@ -8,7 +8,8 @@ from typing import Dict, List, Optional, Any
 from datetime import datetime, timezone, timedelta
 import uuid
 import logging
-import random
+import secrets
+_rng = secrets.SystemRandom()
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/monitoring", tags=["Portfolio Monitoring"])

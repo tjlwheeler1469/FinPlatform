@@ -325,7 +325,7 @@ const ScenarioComparison = () => {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {STRESS_TEST_PRESETS.map((preset, index) => (
                   <button
-                    key={index}
+                    key={`item-${index}`}
                     onClick={() => applyStressTest(preset)}
                     disabled={scenarios.length >= 6}
                     className="flex flex-col items-center p-4 rounded-lg border-2 border-dashed border-red-200 hover:border-red-400 hover:bg-red-50 transition-all text-center disabled:opacity-50"

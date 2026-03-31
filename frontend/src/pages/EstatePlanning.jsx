@@ -215,7 +215,7 @@ const EstatePlanning = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-2 mt-4">
                     {assetComposition.map((asset, i) => (
-                      <div key={i} className="flex items-center gap-2">
+                      <div key={`item-${i}`} className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[i] }} />
                         <span className="text-sm">{asset.name}: {formatCompact(asset.value)}</span>
                       </div>
@@ -290,7 +290,7 @@ const EstatePlanning = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               {projections?.projections?.map((proj, i) => (
-                <Card key={i}>
+                <Card key={`item-${i}`}>
                   <CardContent className="p-4 text-center">
                     <p className="text-sm text-muted-foreground">Age {proj.age}</p>
                     <p className="text-xl font-bold">{proj.formatted}</p>
@@ -358,7 +358,7 @@ const EstatePlanning = () => {
                   <CardContent>
                     <div className="space-y-4">
                       {estatePlan.distributions?.map((dist, i) => (
-                        <div key={i} className="flex items-center gap-4 p-4 border rounded-lg">
+                        <div key={`item-${i}`} className="flex items-center gap-4 p-4 border rounded-lg">
                           <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                             <Users className="h-5 w-5 text-primary" />
                           </div>
@@ -385,7 +385,7 @@ const EstatePlanning = () => {
                   <CardContent>
                     <div className="space-y-3">
                       {estatePlan.recommendations?.map((rec, i) => (
-                        <div key={i} className="flex items-start gap-4 p-3 border rounded-lg">
+                        <div key={`item-${i}`} className="flex items-start gap-4 p-3 border rounded-lg">
                           <div className={`p-2 rounded-lg ${
                             rec.priority === "High" ? "bg-red-100" : "bg-amber-100"
                           }`}>
@@ -426,7 +426,7 @@ const EstatePlanning = () => {
                     { document: "Super Binding Nomination", status: "Update required", last_updated: "2022-03-10" },
                     { document: "Family Trust Deed", status: "In place", last_updated: "2020-01-15" }
                   ]).map((doc, i) => (
-                    <div key={i} className="flex items-center gap-4 p-3 border rounded-lg">
+                    <div key={`item-${i}`} className="flex items-center gap-4 p-3 border rounded-lg">
                       <FileText className="h-5 w-5 text-muted-foreground" />
                       <div className="flex-1">
                         <p className="font-medium">{doc.document}</p>

@@ -339,7 +339,7 @@ const MeetingAutomation = () => {
                       <h5 className="font-medium text-sm">Topics Discussed:</h5>
                       <div className="flex flex-wrap gap-1">
                         {processedMeeting.summary?.topics_discussed?.map((topic, i) => (
-                          <Badge key={i} variant="outline">{topic}</Badge>
+                          <Badge key={`item-${i}`} variant="outline">{topic}</Badge>
                         ))}
                       </div>
                     </div>

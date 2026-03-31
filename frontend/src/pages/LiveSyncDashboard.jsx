@@ -60,7 +60,6 @@ export default function LiveSyncDashboard() {
       const ws = new WebSocket(`${WS_URL}/api/ws/platform-sync`);
       
       ws.onopen = () => {
-        console.log('WebSocket connected');
         setWsConnected(true);
         addLiveEvent('system', 'WebSocket connected', 'success');
       };
@@ -75,14 +74,12 @@ export default function LiveSyncDashboard() {
       };
       
       ws.onclose = () => {
-        console.log('WebSocket disconnected');
         setWsConnected(false);
         addLiveEvent('system', 'WebSocket disconnected', 'warning');
         
         // Attempt reconnect after 5 seconds
         if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
         reconnectTimeoutRef.current = setTimeout(() => {
-          console.log('Attempting WebSocket reconnect...');
           connectWebSocket();
         }, 5000);
       };
@@ -577,7 +574,7 @@ export default function LiveSyncDashboard() {
                 <CardContent>
                   <div className="space-y-3">
                     {(portfolioSummary?.portfolios || []).map((portfolio, idx) => (
-                      <div key={idx} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                      <div key={`item-${idx}`} className="flex items-center justify-between p-3 bg-muted rounded-lg">
                         <div className="flex items-center gap-2">
                           <span>{PLATFORM_ICONS[portfolio.platform]}</span>
                           <div>

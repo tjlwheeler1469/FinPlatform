@@ -21,7 +21,6 @@ const XplanSyncContext = createContext(null);
 export const useXplanSync = () => {
   const context = useContext(XplanSyncContext);
   if (!context) {
-    console.warn("useXplanSync must be used within XplanSyncProvider");
     return {
       triggerSync: () => {},
       pendingChanges: [],

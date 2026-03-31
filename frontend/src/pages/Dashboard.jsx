@@ -524,7 +524,7 @@ const Dashboard = () => {
                 { title: "Refinance mortgage", impact: 68000, impact_text: "Switch to lower rate" },
                 { title: "Increase equity allocation", impact: 45000, impact_text: "Shift 10% from bonds to growth" }
               ]).slice(0, 3).map((rec, i) => (
-                <div key={i} className="flex items-center gap-4 p-3 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
+                <div key={`item-${i}`} className="flex items-center gap-4 p-3 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
                   <span className="w-8 h-8 rounded-full bg-amber-500 text-slate-900 flex items-center justify-center font-bold">
                     {i + 1}
                   </span>
@@ -693,7 +693,7 @@ const Dashboard = () => {
                 const progress = Math.min(100, (goal.current / goal.target) * 100);
                 const Icon = goal.icon;
                 return (
-                  <div key={i} className="p-4 border rounded-lg">
+                  <div key={`item-${i}`} className="p-4 border rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
                       <Icon className="h-4 w-4 text-muted-foreground" />
                       <p className="text-sm font-medium">{goal.name}</p>

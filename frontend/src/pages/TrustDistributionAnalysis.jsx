@@ -405,7 +405,7 @@ const TrustDistributionAnalysis = () => {
                         dataKey="value"
                       >
                         {distributionPieData.map((entry, index) => (
-                          <Cell key={index} fill={entry.color} />
+                          <Cell key={`item-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
                       <Tooltip formatter={(v) => formatCurrency(v)} />
@@ -414,7 +414,7 @@ const TrustDistributionAnalysis = () => {
                 </ChartContainer>
                 <div className="space-y-1 mt-2">
                   {distributionPieData.map((item, i) => (
-                    <div key={i} className="flex items-center justify-between text-sm">
+                    <div key={`item-${i}`} className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
                         <span>{item.name}</span>
@@ -551,7 +551,7 @@ const TrustDistributionAnalysis = () => {
                         </thead>
                         <tbody>
                           {result.taxBreakdown.map((bracket, i) => (
-                            <tr key={i} className="border-b">
+                            <tr key={`item-${i}`} className="border-b">
                               <td className="p-2 text-muted-foreground">{bracket.bracket}</td>
                               <td className="text-right p-2">{bracket.rate}%</td>
                               <td className="text-right p-2">{formatCurrency(bracket.taxable)}</td>
@@ -618,7 +618,7 @@ const TrustDistributionAnalysis = () => {
                     <Tooltip formatter={(v) => formatCurrency(v)} />
                     <Bar dataKey="tax" radius={[0, 4, 4, 0]}>
                       {taxComparisonData.map((entry, index) => (
-                        <Cell key={index} fill={entry.fill} />
+                        <Cell key={`item-${index}`} fill={entry.fill} />
                       ))}
                     </Bar>
                   </BarChart>

@@ -1531,7 +1531,7 @@ export default function RetirementConfidenceEngine() {
                   <CardContent>
                     <div className="space-y-4">
                       {(explanation.recommended_actions || explanation.rule_based_backup?.recommended_actions || []).map((action, idx) => (
-                        <div key={idx} className={`p-4 rounded-lg border ${
+                        <div key={`item-${idx}`} className={`p-4 rounded-lg border ${
                           action.priority === 'high' ? 'border-red-200 bg-red-50' :
                           action.priority === 'medium' ? 'border-yellow-200 bg-yellow-50' :
                           'border-green-200 bg-green-50'

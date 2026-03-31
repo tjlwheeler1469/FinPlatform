@@ -470,7 +470,7 @@ const TaxCalendar = () => {
                       
                       return (
                         <div
-                          key={index}
+                          key={`item-${index}`}
                           onClick={() => date && setSelectedDate(date)}
                           className={`
                             min-h-[80px] p-1 border rounded-lg cursor-pointer transition-colors

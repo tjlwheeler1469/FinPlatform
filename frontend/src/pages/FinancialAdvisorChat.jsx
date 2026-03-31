@@ -170,7 +170,7 @@ const FinancialAdvisorChat = () => {
             <ScrollArea className="flex-1 px-4" ref={scrollRef}>
               <div className="space-y-4 py-4">
                 {messages.map((message, index) => (
-                  <div key={index} className={`flex gap-3 ${message.role === "user" ? "justify-end" : ""}`}>
+                  <div key={`item-${index}`} className={`flex gap-3 ${message.role === "user" ? "justify-end" : ""}`}>
                     {message.role === "assistant" && (
                       <div className="w-8 h-8 rounded-full bg-[#1a2744] flex items-center justify-center flex-shrink-0">
                         <Bot className="h-4 w-4 text-white" />
@@ -190,7 +190,7 @@ const FinancialAdvisorChat = () => {
                         <div className="mt-2 flex flex-wrap gap-2">
                           {message.suggestions.map((suggestion, i) => (
                             <Button
-                              key={i}
+                              key={`item-${i}`}
                               variant="outline"
                               size="sm"
                               className="text-xs"
@@ -262,7 +262,7 @@ const FinancialAdvisorChat = () => {
               <CardContent className="space-y-2">
                 {topics.map((topic, i) => (
                   <Button
-                    key={i}
+                    key={`item-${i}`}
                     variant="outline"
                     className="w-full justify-start"
                     onClick={() => handleSuggestionClick(topic.query)}

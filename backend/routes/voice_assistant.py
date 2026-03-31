@@ -9,6 +9,7 @@ from emergentintegrations.llm.chat import LlmChat, UserMessage
 import os
 import tempfile
 import uuid
+from typing import Dict, Any
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -38,7 +39,7 @@ Guidelines:
 async def transcribe_and_respond(
     audio: UploadFile = File(...),
     session_id: str = Form(default=None)
-):
+) -> Dict[str, Any]:
     """Transcribe audio and generate financial planning response"""
     api_key = os.environ.get("EMERGENT_LLM_KEY")
     if not api_key:
@@ -115,7 +116,7 @@ async def transcribe_and_respond(
 async def text_chat(
     message: str = Form(...),
     session_id: str = Form(default=None)
-):
+) -> Dict[str, Any]:
     """Text-based financial planning chat"""
     api_key = os.environ.get("EMERGENT_LLM_KEY")
     if not api_key:

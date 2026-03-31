@@ -435,7 +435,7 @@ const AdviceWorkflow = () => {
                     <Label className="text-sm text-muted-foreground">Attached Documents</Label>
                     <div className="mt-2 flex flex-wrap gap-2">
                       {selectedRecord.documents.map((doc, i) => (
-                        <Badge key={i} variant="outline" className="cursor-pointer hover:bg-muted">
+                        <Badge key={`item-${i}`} variant="outline" className="cursor-pointer hover:bg-muted">
                           <FileText className="h-3 w-3 mr-1" />
                           {doc}
                         </Badge>

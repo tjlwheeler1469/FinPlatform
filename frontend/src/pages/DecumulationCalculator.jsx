@@ -871,7 +871,7 @@ export default function DecumulationCalculator() {
                         <PieChart>
                           <Pie data={getAssetsByTypeData()} cx="50%" cy="50%" outerRadius={80} dataKey="value" label={({ name, value }) => `${name}: ${formatCurrency(value)}`}>
                             {getAssetsByTypeData().map((entry, idx) => (
-                              <Cell key={idx} fill={entry.color} />
+                              <Cell key={`item-${idx}`} fill={entry.color} />
                             ))}
                           </Pie>
                           <Tooltip formatter={(v) => formatCurrency(v)} />
@@ -889,7 +889,7 @@ export default function DecumulationCalculator() {
                         <PieChart>
                           <Pie data={getAssetsByEntityData()} cx="50%" cy="50%" outerRadius={80} dataKey="value" label={({ name, value }) => `${name}: ${formatCurrency(value)}`}>
                             {getAssetsByEntityData().map((entry, idx) => (
-                              <Cell key={idx} fill={entry.color} />
+                              <Cell key={`item-${idx}`} fill={entry.color} />
                             ))}
                           </Pie>
                           <Tooltip formatter={(v) => formatCurrency(v)} />

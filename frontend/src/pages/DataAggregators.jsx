@@ -280,7 +280,7 @@ const DataAggregators = () => {
                             <p className="font-medium mb-1">Key Features:</p>
                             <ul className="list-disc list-inside text-muted-foreground">
                               {recommendation.recommendation.primary.features?.slice(0, 4).map((f, i) => (
-                                <li key={i}>{f}</li>
+                                <li key={`item-${i}`}>{f}</li>
                               ))}
                             </ul>
                           </div>
@@ -305,7 +305,7 @@ const DataAggregators = () => {
                             <p className="font-medium mb-1">Key Features:</p>
                             <ul className="list-disc list-inside text-muted-foreground">
                               {recommendation.recommendation.secondary.features?.slice(0, 4).map((f, i) => (
-                                <li key={i}>{f}</li>
+                                <li key={`item-${i}`}>{f}</li>
                               ))}
                             </ul>
                           </div>
@@ -321,7 +321,7 @@ const DataAggregators = () => {
                       <CardContent>
                         <ol className="space-y-2">
                           {recommendation.integration_steps?.map((step, i) => (
-                            <li key={i} className="flex items-start gap-2 text-sm">
+                            <li key={`item-${i}`} className="flex items-start gap-2 text-sm">
                               <span className="flex-shrink-0 w-6 h-6 bg-[#1a2744] text-white rounded-full flex items-center justify-center text-xs">
                                 {i + 1}
                               </span>
@@ -384,7 +384,7 @@ const DataAggregators = () => {
                   <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       {cdrRequirements.participation_paths?.map((path, i) => (
-                        <div key={i} className="p-4 border rounded-lg">
+                        <div key={`item-${i}`} className="p-4 border rounded-lg">
                           <h4 className="font-semibold text-[#1a2744] mb-2">{path.path}</h4>
                           <p className="text-sm text-muted-foreground mb-3">{path.description}</p>
                           <div className="space-y-2">
@@ -418,7 +418,7 @@ const DataAggregators = () => {
                     <CardContent>
                       <ul className="space-y-1">
                         {cdrRequirements.data_available?.map((item, i) => (
-                          <li key={i} className="flex items-center gap-2 text-sm">
+                          <li key={`item-${i}`} className="flex items-center gap-2 text-sm">
                             <CheckCircle className="h-4 w-4 text-green-500" />
                             {item}
                           </li>
@@ -434,7 +434,7 @@ const DataAggregators = () => {
                     <CardContent>
                       <ul className="space-y-1">
                         {cdrRequirements.security_requirements?.map((item, i) => (
-                          <li key={i} className="flex items-center gap-2 text-sm">
+                          <li key={`item-${i}`} className="flex items-center gap-2 text-sm">
                             <Shield className="h-4 w-4 text-blue-500" />
                             {item}
                           </li>
@@ -483,7 +483,7 @@ const DataAggregators = () => {
                   <CardContent>
                     <div className="space-y-6">
                       {roadmap.phases?.map((phase, i) => (
-                        <div key={i} className="relative">
+                        <div key={`item-${i}`} className="relative">
                           <div className="flex items-start gap-4">
                             <div className="flex-shrink-0 w-10 h-10 bg-[#1a2744] text-white rounded-full flex items-center justify-center font-bold">
                               {phase.phase}
@@ -574,7 +574,7 @@ const DataAggregators = () => {
                     <CardContent>
                       <ol className="space-y-2">
                         {roadmap.next_steps?.map((step, i) => (
-                          <li key={i} className="flex items-start gap-2 text-sm">
+                          <li key={`item-${i}`} className="flex items-start gap-2 text-sm">
                             <span className="flex-shrink-0 w-5 h-5 bg-[#1a2744] text-white rounded-full flex items-center justify-center text-xs">
                               {i + 1}
                             </span>

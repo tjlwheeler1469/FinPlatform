@@ -1,0 +1,142 @@
+{
+  "summary": "Regression testing after major code refactoring (route_registry pattern, TypeScript migration, DigitalOnboarding split). All 14 test cases passed. Backend: 7/7 pytest tests passed. Frontend: All features working correctly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration122_refactoring.py",
+    "/app/test_reports/pytest/pytest_iteration122.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "route_registry.py: Clean centralized route registration - 120 routes loaded, 0 skipped",
+    "server.py: Refactored from 129 inline imports to use route_registry pattern - much cleaner",
+    "DigitalOnboarding.jsx: Split from 1369 to 601 lines with 7 extracted section components",
+    "apiClient.ts: Fixed TypeScript error - added process declaration for env access",
+    "formatters.ts: Well-typed utility functions for currency, percent, number formatting"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration122_refactoring.py",
+    "/app/frontend/src/utils/apiClient.ts"
+  ],
+  "success_rate": {
+    "backend": "100% (7/7 tests passed)",
+    "frontend": "100% (all 7 UI tests passed)"
+  },
+  "test_credentials": "",
+  "seed_data_creation": "",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iteration 122 verified all refactoring changes: (1) route_registry.py loads 120 routes successfully, (2) DigitalOnboarding split into 7 section components, (3) TypeScript migration started with apiClient.ts and formatters.ts, (4) All existing features continue to work. /buffett-trading route shows blank page (route removed from App.js, no 404 page configured - expected behavior).",
+  "features_tested": {
+    "test_1_health_endpoint": {
+      "status": "PASS",
+      "endpoint": "GET /api/health",
+      "details": "Returns 200 OK with status: healthy, architecture: modular"
+    },
+    "test_2_market_data_api": {
+      "status": "PASS",
+      "endpoint": "GET /api/market-data/indicators",
+      "details": "Returns 17 indicators (ASX 200, S&P 500, Dow Jones, NASDAQ, FTSE 100, etc.)"
+    },
+    "test_3_news_api": {
+      "status": "PASS",
+      "endpoint": "GET /api/news/headlines",
+      "details": "Returns 20 live headlines from Bloomberg, CNBC, MarketWatch, Financial Times, Economist"
+    },
+    "test_4_compliance_dashboard_api": {
+      "status": "PASS",
+      "endpoint": "GET /api/compliance-docs/dashboard",
+      "details": "Returns MongoDB data: 5 files, avg score 79%"
+    },
+    "test_5_voice_assistant_api": {
+      "status": "PASS",
+      "endpoint": "POST /api/voice-assistant/chat",
+      "details": "GPT-5.2 responds to financial questions via FormData"
+    },
+    "test_6_personal_dashboard": {
+      "status": "PASS",
+      "route": "/personal-dashboard",
+      "details": "Shows David & Sarah Thompson, Net Worth $1,608,800"
+    },
+    "test_7_stock_trading_5_tabs": {
+      "status": "PASS",
+      "route": "/stock-trading",
+      "details": "5 tabs present: Portfolio, Buffett Ideas, Valuations, Backtest, News"
+    },
+    "test_8_portfolio_no_nan": {
+      "status": "PASS",
+      "route": "/stock-trading (Portfolio tab)",
+      "details": "No $NaN values, Portfolio Value $135,210.00"
+    },
+    "test_9_news_tab_live_headlines": {
+      "status": "PASS",
+      "route": "/stock-trading (News tab)",
+      "details": "Shows live headlines from Bloomberg, CNBC, MarketWatch, Financial Times"
+    },
+    "test_10_adviser_compliance_dashboard": {
+      "status": "PASS",
+      "route": "/adviser-compliance",
+      "details": "Shows 'Live from MongoDB', 5 files, clients: Michael Chen, Jennifer & Robert Smith"
+    },
+    "test_11_voice_fab_button": {
+      "status": "PASS",
+      "details": "Microphone FAB button visible at bottom-right corner"
+    },
+    "test_12_language_selector": {
+      "status": "PASS",
+      "details": "Language selector showing 'English' visible in sidebar bottom"
+    },
+    "test_13_buffett_trading_removed": {
+      "status": "PASS",
+      "route": "/buffett-trading",
+      "details": "Route removed from App.js - shows blank page (no 404 page configured)"
+    },
+    "test_14_no_console_errors": {
+      "status": "PASS",
+      "details": "No critical JavaScript console errors (only network timing 'Failed to fetch' during initial load)"
+    }
+  },
+  "refactoring_verified": {
+    "route_registry_pattern": {
+      "file": "/app/backend/route_registry.py",
+      "status": "VERIFIED",
+      "details": "120 routes loaded, 0 skipped"
+    },
+    "server_py_refactored": {
+      "file": "/app/backend/server.py",
+      "status": "VERIFIED",
+      "details": "Now uses register_all_routes() from route_registry"
+    },
+    "digital_onboarding_split": {
+      "file": "/app/frontend/src/components/DigitalOnboarding.jsx",
+      "status": "VERIFIED",
+      "details": "601 lines (down from 1369), 7 section components extracted"
+    },
+    "typescript_migration": {
+      "files": ["/app/frontend/src/utils/apiClient.ts", "/app/frontend/src/utils/formatters.ts", "/app/frontend/tsconfig.json"],
+      "status": "VERIFIED",
+      "details": "TypeScript configured with strict: false for gradual migration"
+    },
+    "onboarding_sections": {
+      "directory": "/app/frontend/src/components/onboarding/",
+      "status": "VERIFIED",
+      "details": "7 components: PersonalSection, EmploymentSection, AssetsSection, LiabilitiesSection, InsuranceSection, GoalsSection, RiskSection"
+    }
+  },
+  "mocked_apis": {
+    "has_mocked_apis": true,
+    "mocked_apis_list": [
+      "Buffett Ideas stock data (static in StockTrading.jsx)",
+      "Backtest data (static)",
+      "Valuations data (static)"
+    ],
+    "notes": "Voice Assistant uses real GPT-5.2 via Emergent LLM Key. News tab and Compliance Dashboard use live backend APIs."
+  }
+}

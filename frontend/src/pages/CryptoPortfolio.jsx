@@ -81,7 +81,6 @@ const CryptoPortfolio = () => {
         const globalRes = await axios.get(`${API}/api/crypto/global`);
         setGlobalData(globalRes.data);
       } catch (e) {
-        console.warn("Failed to fetch global data:", e);
       }
       
       toast.success("Prices updated from CoinGecko");

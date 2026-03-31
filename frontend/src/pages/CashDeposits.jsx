@@ -390,7 +390,7 @@ const CashDeposits = () => {
               <CardContent>
                 <div className="space-y-3">
                   {BEST_RATES.map((rate, index) => (
-                    <div key={index} className="p-4 rounded-lg border flex items-center justify-between">
+                    <div key={`item-${index}`} className="p-4 rounded-lg border flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
                           <Building2 className="h-5 w-5 text-blue-600" />

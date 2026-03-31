@@ -806,7 +806,7 @@ const FamilyWealthDashboard = () => {
                           labelLine={false}
                         >
                           {wealthComposition.map((entry, index) => (
-                            <Cell key={index} fill={entry.color} />
+                            <Cell key={`item-${index}`} fill={entry.color} />
                           ))}
                         </Pie>
                         <Tooltip formatter={(v) => formatCurrency(v)} />
@@ -815,7 +815,7 @@ const FamilyWealthDashboard = () => {
                   </ChartContainer>
                   <div className="grid grid-cols-2 gap-2 mt-4">
                     {wealthComposition.map((item, i) => (
-                      <div key={i} className="flex items-center justify-between text-sm p-2 rounded bg-muted/50">
+                      <div key={`item-${i}`} className="flex items-center justify-between text-sm p-2 rounded bg-muted/50">
                         <div className="flex items-center gap-2">
                           <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
                           <span className="truncate">{item.name}</span>
@@ -849,7 +849,7 @@ const FamilyWealthDashboard = () => {
                   </ChartContainer>
                   <div className="mt-4 space-y-2">
                     {memberWealth.map((m, i) => (
-                      <Link key={i} to={`/family-member/${familyMembers.find(fm => fm.name === m.name)?.id}`}>
+                      <Link key={`item-${i}`} to={`/family-member/${familyMembers.find(fm => fm.name === m.name)?.id}`}>
                         <div className="flex items-center justify-between p-2 rounded hover:bg-muted/50 cursor-pointer">
                           <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-full bg-[#1a2744] text-white flex items-center justify-center text-sm">
@@ -965,7 +965,7 @@ const FamilyWealthDashboard = () => {
                             <Tooltip formatter={(v) => formatCurrency(v)} />
                             <Bar dataKey="value" fill="#10B981" radius={[0, 4, 4, 0]}>
                               {taxSavingsData.map((entry, index) => (
-                                <Cell key={index} fill={entry.color} />
+                                <Cell key={`item-${index}`} fill={entry.color} />
                               ))}
                             </Bar>
                           </BarChart>
@@ -1157,7 +1157,7 @@ const FamilyWealthDashboard = () => {
                 <CardContent className="space-y-3">
                   {wealthTransfer.strategies.map((strategy, i) => (
                     <div 
-                      key={i}
+                      key={`item-${i}`}
                       className={`p-4 rounded-lg border ${
                         strategy.priority === 'High' ? 'bg-[#1a2744]/5 border-[#1a2744]/20' :
                         strategy.priority === 'Medium' ? 'bg-[#D4A84C]/5 border-[#D4A84C]/20' :
@@ -1199,7 +1199,7 @@ const FamilyWealthDashboard = () => {
                   {familyMembers
                     .filter(m => m.relationship === 'adult_child' || m.relationship === 'child')
                     .map((member, i) => (
-                      <Link key={i} to={`/family-member/${member.id}`}>
+                      <Link key={`item-${i}`} to={`/family-member/${member.id}`}>
                         <Card className="hover:border-[#1a2744] transition-colors cursor-pointer">
                           <CardContent className="p-4">
                             <div className="flex items-center gap-3">

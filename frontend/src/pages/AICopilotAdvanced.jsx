@@ -148,7 +148,7 @@ const AICopilotAdvanced = () => {
             <CardContent className="space-y-2">
               {quickInsights.map((insight, idx) => (
                 <div 
-                  key={idx} 
+                  key={`item-${idx}`} 
                   className="p-3 rounded-lg bg-muted/50 hover:bg-muted cursor-pointer transition-colors"
                   onClick={() => sendQuery(insight.action)}
                 >
@@ -176,7 +176,7 @@ const AICopilotAdvanced = () => {
             <CardContent className="space-y-2">
               {suggestions.slice(0, 5).map((suggestion, idx) => (
                 <Button 
-                  key={idx}
+                  key={`item-${idx}`}
                   variant="ghost" 
                   className="w-full justify-start text-left h-auto py-2 px-3"
                   onClick={() => sendQuery(suggestion.query)}
@@ -217,7 +217,7 @@ const AICopilotAdvanced = () => {
             {/* Messages */}
             <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.map((message, idx) => (
-                <div key={idx} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div key={`item-${idx}`} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[80%] ${message.type === 'user' ? 'order-1' : 'order-2'}`}>
                     {message.type === 'assistant' && (
                       <div className="flex items-center gap-2 mb-1">
@@ -240,7 +240,7 @@ const AICopilotAdvanced = () => {
                       <div className="mt-3 space-y-2">
                         {Array.isArray(message.data) ? (
                           message.data.slice(0, 5).map((item, i) => (
-                            <div key={i} className="p-3 bg-white border rounded-lg shadow-sm">
+                            <div key={`item-${i}`} className="p-3 bg-white border rounded-lg shadow-sm">
                               <div className="flex items-center justify-between">
                                 <span className="font-medium">{item.name || item.client_name}</span>
                                 {item.priority && (
@@ -262,13 +262,13 @@ const AICopilotAdvanced = () => {
                             <div className="p-3 bg-green-50 rounded-lg">
                               <p className="text-xs text-green-700 font-medium mb-1">Top Performers</p>
                               {message.data.top_performers.map((p, i) => (
-                                <p key={i} className="text-sm">{p.name}: +{p.alpha}% alpha</p>
+                                <p key={`item-${i}`} className="text-sm">{p.name}: +{p.alpha}% alpha</p>
                               ))}
                             </div>
                             <div className="p-3 bg-red-50 rounded-lg">
                               <p className="text-xs text-red-700 font-medium mb-1">Underperformers</p>
                               {message.data.underperformers.map((p, i) => (
-                                <p key={i} className="text-sm">{p.name}: {p.alpha}% alpha</p>
+                                <p key={`item-${i}`} className="text-sm">{p.name}: {p.alpha}% alpha</p>
                               ))}
                             </div>
                           </div>
@@ -299,7 +299,7 @@ const AICopilotAdvanced = () => {
                       <div className="mt-3 flex flex-wrap gap-2">
                         {message.suggestions.map((suggestion, i) => (
                           <Button 
-                            key={i}
+                            key={`item-${i}`}
                             variant="outline" 
                             size="sm"
                             className="text-xs"
@@ -341,7 +341,7 @@ const AICopilotAdvanced = () => {
               <div className="flex flex-wrap gap-2 mt-3">
                 {conversationStarters.slice(0, 3).map((starter, idx) => (
                   <Button 
-                    key={idx}
+                    key={`item-${idx}`}
                     variant="ghost" 
                     size="sm"
                     className="text-xs"

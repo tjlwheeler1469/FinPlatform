@@ -347,7 +347,7 @@ export default function StockResearch() {
                   </thead>
                   <tbody>
                     {dividends.slice(0, 15).map((div, idx) => (
-                      <tr key={idx} className="border-b border/50 hover:bg-card">
+                      <tr key={`item-${idx}`} className="border-b border/50 hover:bg-card">
                         <td className="p-3">
                           <p className="font-semibold text-foreground">{div.ticker}</p>
                           <p className="text-sm text-muted-foreground">{div.name}</p>
@@ -462,7 +462,7 @@ export default function StockResearch() {
                   <h4 className="text-foreground font-semibold mb-3">Moat Analysis</h4>
                   <div className="space-y-2">
                     {selectedStock.moat_analysis.factors.map((factor, idx) => (
-                      <div key={idx} className="flex items-center justify-between bg-card rounded-lg p-3">
+                      <div key={`item-${idx}`} className="flex items-center justify-between bg-card rounded-lg p-3">
                         <div>
                           <p className="text-foreground font-medium">{factor.factor}</p>
                           <p className="text-muted-foreground text-sm">{factor.description}</p>

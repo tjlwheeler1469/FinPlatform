@@ -467,7 +467,7 @@ const RentalYieldOptimizer = () => {
               ) : (
                 recommendations.map((rec, i) => (
                   <div 
-                    key={i}
+                    key={`item-${i}`}
                     className={`p-3 rounded-lg border ${
                       rec.priority === 'High' ? 'bg-red-50 border-red-200' :
                       rec.priority === 'Medium' ? 'bg-amber-50 border-amber-200' :

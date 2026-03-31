@@ -469,7 +469,7 @@ const TaxAnalysisSync = () => {
                         <p className="text-sm font-medium mb-2">Tax Bracket Breakdown</p>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                           {member.breakdown.map((b, i) => (
-                            <div key={i} className="p-2 rounded bg-muted/50 text-xs">
+                            <div key={`item-${i}`} className="p-2 rounded bg-muted/50 text-xs">
                               <p className="text-muted-foreground">{b.bracket}</p>
                               <p className="font-medium">{b.rate}% = {formatCurrency(b.tax)}</p>
                             </div>
@@ -654,7 +654,7 @@ const TaxAnalysisSync = () => {
                               dataKey="value"
                             >
                               {taxDistributionData.map((entry, index) => (
-                                <Cell key={index} fill={entry.color} />
+                                <Cell key={`item-${index}`} fill={entry.color} />
                               ))}
                             </Pie>
                             <Tooltip formatter={(v) => formatCurrency(v)} />
@@ -663,7 +663,7 @@ const TaxAnalysisSync = () => {
                       </ChartContainer>
                       <div className="flex flex-wrap justify-center gap-4 mt-4">
                         {taxDistributionData.map((item, i) => (
-                          <div key={i} className="flex items-center gap-2">
+                          <div key={`item-${i}`} className="flex items-center gap-2">
                             <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
                             <span className="text-sm">{item.name}: {formatCurrency(item.value)}</span>
                           </div>
@@ -748,7 +748,7 @@ const TaxAnalysisSync = () => {
                 <CardContent>
                   <div className="space-y-2 text-sm">
                     {TAX_BRACKETS.map((bracket, i) => (
-                      <div key={i} className="flex justify-between p-2 rounded bg-muted/50">
+                      <div key={`item-${i}`} className="flex justify-between p-2 rounded bg-muted/50">
                         <span>
                           ${bracket.min.toLocaleString()} - {bracket.max === Infinity ? '+' : `$${bracket.max.toLocaleString()}`}
                         </span>

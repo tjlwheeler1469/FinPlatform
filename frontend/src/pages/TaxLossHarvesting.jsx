@@ -218,7 +218,7 @@ const TaxLossHarvesting = () => {
                   )}
                   
                   {manualHoldings.map((h, idx) => (
-                    <div key={idx} className="p-3 rounded-lg border space-y-2">
+                    <div key={`item-${idx}`} className="p-3 rounded-lg border space-y-2">
                       <div className="flex justify-between items-center">
                         <Input
                           placeholder="Symbol"
@@ -339,7 +339,7 @@ const TaxLossHarvesting = () => {
                               dataKey="value"
                             >
                               {pieData.map((entry, index) => (
-                                <Cell key={index} fill={entry.color} />
+                                <Cell key={`item-${index}`} fill={entry.color} />
                               ))}
                             </Pie>
                             <Tooltip formatter={(v) => formatCurrency(v)} />
@@ -412,7 +412,7 @@ const TaxLossHarvesting = () => {
                           </thead>
                           <tbody>
                             {result.opportunities.map((opp, i) => (
-                              <tr key={i} className="border-b">
+                              <tr key={`item-${i}`} className="border-b">
                                 <td className="p-3">
                                   <div className="font-medium">{opp.symbol}</div>
                                   <div className="text-xs text-muted-foreground">{opp.name}</div>
@@ -470,7 +470,7 @@ const TaxLossHarvesting = () => {
                   <CardContent>
                     <div className="space-y-2">
                       {result.recommendations.map((rec, index) => (
-                        <div key={index} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                        <div key={`item-${index}`} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
                           <CheckCircle className="h-5 w-5 text-[#10B981] flex-shrink-0 mt-0.5" />
                           <p className="text-sm">{rec}</p>
                         </div>

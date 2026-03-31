@@ -264,7 +264,7 @@ const DecisionCenter = () => {
               <div className="grid grid-cols-2 gap-2">
                 {quickScenarios.map((scenario, index) => (
                   <Button
-                    key={index}
+                    key={`item-${index}`}
                     variant="outline"
                     size="sm"
                     className="h-auto py-2 text-xs"
@@ -390,7 +390,7 @@ const DecisionCenter = () => {
               <CardContent className="space-y-3">
                 {result.recommendations.map((rec, index) => (
                   <div 
-                    key={index}
+                    key={`item-${index}`}
                     className="flex items-start gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
                   >
                     {rec.type === "early_retirement" ? (

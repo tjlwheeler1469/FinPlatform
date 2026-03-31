@@ -356,7 +356,7 @@ const ConnectedAccounts = () => {
                 <CardContent>
                   <div className="space-y-2">
                     {account.holdings.map((holding, i) => (
-                      <div key={i} className="flex items-center gap-4 p-3 border rounded-lg">
+                      <div key={`item-${i}`} className="flex items-center gap-4 p-3 border rounded-lg">
                         <div className="flex-1">
                           <p className="font-medium">{holding.symbol}</p>
                           <p className="text-sm text-muted-foreground">{holding.name}</p>
@@ -441,7 +441,7 @@ const ConnectedAccounts = () => {
                     <CardContent>
                       <div className="space-y-2">
                         {cashflow.insights.map((insight, i) => (
-                          <div key={i} className={`p-3 rounded-lg ${
+                          <div key={`item-${i}`} className={`p-3 rounded-lg ${
                             insight.type === "positive" ? "bg-green-50" : 
                             insight.type === "warning" ? "bg-amber-50" : "bg-blue-50"
                           }`}>

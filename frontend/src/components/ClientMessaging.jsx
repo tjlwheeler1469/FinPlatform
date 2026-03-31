@@ -493,7 +493,7 @@ const ClientMessaging = ({ userRole = 'client', userName = 'James Wheeler' }) =>
                 </div>
                 <div className="prose prose-sm max-w-none">
                   {selectedMessage.body.split('\n').map((line, i) => (
-                    <p key={i} className={line.startsWith('•') ? 'ml-4' : ''}>
+                    <p key={`item-${i}`} className={line.startsWith('•') ? 'ml-4' : ''}>
                       {line || <br />}
                     </p>
                   ))}
@@ -503,7 +503,7 @@ const ClientMessaging = ({ userRole = 'client', userName = 'James Wheeler' }) =>
                     <p className="text-sm font-medium mb-3">Attachments</p>
                     <div className="space-y-2">
                       {selectedMessage.attachments.map((file, i) => (
-                        <div key={i} className="flex items-center gap-3 p-3 border rounded-lg hover:bg-muted/50">
+                        <div key={`item-${i}`} className="flex items-center gap-3 p-3 border rounded-lg hover:bg-muted/50">
                           <FileText className="h-5 w-5 text-red-500" />
                           <span className="flex-1 text-sm">{file}</span>
                           <Button variant="ghost" size="sm">

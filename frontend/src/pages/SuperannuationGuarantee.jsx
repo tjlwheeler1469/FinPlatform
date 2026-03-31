@@ -337,7 +337,7 @@ const SuperannuationGuarantee = () => {
                               </thead>
                               <tbody>
                                 {calc.quarterlyBreakdown.map((q, i) => (
-                                  <tr key={i} className="border-b">
+                                  <tr key={`item-${i}`} className="border-b">
                                     <td className="p-2">{q.quarter}</td>
                                     <td className="text-right p-2">{formatCurrency(q.ote)}</td>
                                     <td className="text-right p-2 font-medium">{formatCurrency(q.sg)}</td>

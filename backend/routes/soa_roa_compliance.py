@@ -131,7 +131,7 @@ def calculate_review_due_date(advice_date: str, advice_type: str) -> str:
 # ============== ENDPOINTS ==============
 
 @router.get("/dashboard")
-async def get_compliance_dashboard():
+async def get_compliance_dashboard() -> Dict[str, Any]:
     """Get compliance dashboard with metrics and all documents"""
     db = await get_db()
     
@@ -246,7 +246,7 @@ async def get_compliance_dashboard():
 
 
 @router.post("/seed-demo")
-async def seed_demo_compliance_data():
+async def seed_demo_compliance_data() -> Dict[str, Any]:
     """Seed demo compliance documents for testing"""
     db = await get_db()
     
@@ -640,7 +640,7 @@ async def get_reviews_due(days: int = 30):
     }
 
 @router.get("/compliance-summary")
-async def get_compliance_summary():
+async def get_compliance_summary() -> Dict[str, Any]:
     """Get overall compliance document summary"""
     db = await get_db()
     
@@ -680,7 +680,7 @@ async def get_compliance_summary():
     }
 
 @router.get("/audit-trail/{document_id}")
-async def get_document_audit_trail(document_id: str):
+async def get_document_audit_trail(document_id: str) -> Dict[str, Any]:
     """Get full audit trail for a document"""
     db = await get_db()
     

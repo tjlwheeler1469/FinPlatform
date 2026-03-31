@@ -375,7 +375,7 @@ const MeetingNotes = () => {
                     <Users className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm text-muted-foreground">Attendees:</span>
                     {selectedMeeting.attendees.map((attendee, idx) => (
-                      <Badge key={idx} variant="outline" className="text-xs">
+                      <Badge key={`item-${idx}`} variant="outline" className="text-xs">
                         {attendee}
                       </Badge>
                     ))}
@@ -410,7 +410,7 @@ const MeetingNotes = () => {
                             </h4>
                             <ul className="space-y-2">
                               {selectedMeeting.summary.key_points.map((point, idx) => (
-                                <li key={idx} className="flex items-start gap-2 text-sm">
+                                <li key={`item-${idx}`} className="flex items-start gap-2 text-sm">
                                   <ChevronRight className="h-4 w-4 text-[#D4A84C] mt-0.5 flex-shrink-0" />
                                   {point}
                                 </li>
@@ -452,7 +452,7 @@ const MeetingNotes = () => {
                         <div className="space-y-3">
                           {selectedMeeting.summary.action_items.map((item, idx) => (
                             <div 
-                              key={idx} 
+                              key={`item-${idx}`} 
                               className={`p-4 rounded-lg border ${
                                 item.status === "completed" ? "bg-emerald-50 border-emerald-200" : "bg-amber-50 border-amber-200"
                               }`}
@@ -502,7 +502,7 @@ const MeetingNotes = () => {
                           </div>
                           <div className="space-y-3 max-h-[400px] overflow-y-auto">
                             {selectedMeeting.transcript.map((entry, idx) => (
-                              <div key={idx} className="flex gap-3">
+                              <div key={`item-${idx}`} className="flex gap-3">
                                 <span className="text-xs text-muted-foreground w-16 flex-shrink-0">
                                   {entry.time}
                                 </span>

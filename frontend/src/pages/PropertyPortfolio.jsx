@@ -170,7 +170,7 @@ const PropertyPortfolio = () => {
         {/* Properties */}
         <div className="space-y-6">
           {properties.map((property, index) => (
-            <Card key={index} data-testid={`property-card-${index}`}>
+            <Card key={`item-${index}`} data-testid={`property-card-${index}`}>
               <CardHeader className="flex flex-row items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-[#1a2744] flex items-center justify-center">
@@ -404,7 +404,7 @@ const PropertyPortfolio = () => {
             {/* Individual Results */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {analyses.map((analysis, index) => (
-                <Card key={index} data-testid={`analysis-result-${index}`}>
+                <Card key={`item-${index}`} data-testid={`analysis-result-${index}`}>
                   <CardHeader>
                     <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${

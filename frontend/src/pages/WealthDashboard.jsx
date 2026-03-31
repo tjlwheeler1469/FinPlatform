@@ -260,7 +260,7 @@ export default function WealthDashboard() {
         <TabsContent value="property" className="mt-4">
           <div className="grid gap-4">
             {wealthData?.property.properties.map((property, idx) => (
-              <Card key={idx} className="bg-slate-800/50 border-slate-700">
+              <Card key={`item-${idx}`} className="bg-slate-800/50 border-slate-700">
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-4">
@@ -311,7 +311,7 @@ export default function WealthDashboard() {
         <TabsContent value="super" className="mt-4">
           <div className="grid gap-4">
             {wealthData?.super.funds.map((fund, idx) => (
-              <Card key={idx} className="bg-slate-800/50 border-slate-700">
+              <Card key={`item-${idx}`} className="bg-slate-800/50 border-slate-700">
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between mb-6">
                     <div className="flex items-start gap-4">
@@ -459,7 +459,7 @@ export default function WealthDashboard() {
             <CardContent>
               <div className="grid gap-4">
                 {wealthData?.cash.accounts.map((account, idx) => (
-                  <div key={idx} className="bg-slate-900/50 rounded-lg p-4 border border-slate-700 flex items-center justify-between">
+                  <div key={`item-${idx}`} className="bg-slate-900/50 rounded-lg p-4 border border-slate-700 flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
                         account.type === 'term_deposit' ? 'bg-purple-500/20' : 

@@ -290,7 +290,7 @@ const RealtimeDataDashboard = () => {
                     <div className="space-y-4">
                       {selectedPortfolio.holdings.map((holding, index) => (
                         <div 
-                          key={index} 
+                          key={`item-${index}`} 
                           className="flex items-center justify-between p-3 rounded-lg border"
                           data-testid={`holding-${holding.symbol}`}
                         >

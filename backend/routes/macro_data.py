@@ -8,7 +8,8 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Dict, List, Optional
 from datetime import datetime, timezone
-import random
+import secrets
+_rng = secrets.SystemRandom()
 import logging
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
@@ -418,7 +419,7 @@ TOP_STOCKS = {
 
 def add_jitter(value: float, pct: float = 0.001) -> float:
     """Add small random jitter to simulate live data."""
-    jitter = random.uniform(-pct, pct)
+    jitter = _rng.uniform(-pct, pct)
     return round(value * (1 + jitter), 4)
 
 
@@ -525,8 +526,8 @@ async def get_macro_overview():
                 "aus_10y": BONDS["australia"][2],
             }
         },
-        "fear_greed_index": random.randint(45, 72),
-        "market_sentiment": "neutral" if random.random() > 0.5 else "bullish"
+        "fear_greed_index": _rng.randint(45, 72),
+        "market_sentiment": "neutral" if _rng.random() > 0.5 else "bullish"
     }
     
     # Cache the result

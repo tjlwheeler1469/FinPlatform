@@ -592,7 +592,7 @@ const FinancialRecommendations = () => {
                           label={({ name, value }) => `${name}: ${value}`}
                         >
                           {priorityData.map((entry, index) => (
-                            <Cell key={index} fill={entry.color} />
+                            <Cell key={`item-${index}`} fill={entry.color} />
                           ))}
                         </Pie>
                         <Tooltip />

@@ -422,7 +422,7 @@ export default function EnterpriseComplianceDashboard() {
                   { name: 'Corporations Act (Record Keeping)', status: 'COMPLIANT' },
                   { name: 'Privacy Act (APP 11)', status: 'COMPLIANT' }
                 ].map((item, i) => (
-                  <div key={i} className="flex justify-between items-center p-2 bg-muted rounded">
+                  <div key={`item-${i}`} className="flex justify-between items-center p-2 bg-muted rounded">
                     <span className="text-sm">{item.name}</span>
                     <Badge className="bg-green-500">{item.status}</Badge>
                   </div>
@@ -512,7 +512,7 @@ export default function EnterpriseComplianceDashboard() {
                 <h4 className="font-semibold">Recent Audit Events</h4>
                 <div className="max-h-96 overflow-y-auto space-y-2">
                   {auditEvents.map((event, i) => (
-                    <div key={i} className="p-3 border rounded-lg text-sm">
+                    <div key={`item-${i}`} className="p-3 border rounded-lg text-sm">
                       <div className="flex justify-between items-start">
                         <div>
                           <Badge variant="outline">{event.event_type}</Badge>
@@ -546,7 +546,7 @@ export default function EnterpriseComplianceDashboard() {
                   { control: 'Audit Logging', status: 'Hash-chained', enabled: true },
                   { control: 'API Key Management', status: 'Revocable', enabled: true }
                 ].map((item, i) => (
-                  <div key={i} className="flex justify-between items-center p-2 bg-muted rounded">
+                  <div key={`item-${i}`} className="flex justify-between items-center p-2 bg-muted rounded">
                     <span>{item.control}</span>
                     <div className="flex items-center gap-2">
                       <Badge variant="outline">{item.status}</Badge>
@@ -683,7 +683,7 @@ export default function EnterpriseComplianceDashboard() {
                 ) : (
                   <div className="space-y-2">
                     {incidents.map((inc, i) => (
-                      <div key={i} className="p-3 border rounded-lg">
+                      <div key={`item-${i}`} className="p-3 border rounded-lg">
                         <div className="flex justify-between items-start">
                           <div className="flex items-center gap-2">
                             <div className={`w-2 h-2 rounded-full ${getSeverityColor(inc.severity)}`} />
@@ -754,7 +754,7 @@ export default function EnterpriseComplianceDashboard() {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {documents.map((doc, i) => (
-                  <div key={i} className="p-4 border rounded-lg">
+                  <div key={`item-${i}`} className="p-4 border rounded-lg">
                     <div className="flex items-start justify-between">
                       <div>
                         <h4 className="font-semibold flex items-center gap-2">

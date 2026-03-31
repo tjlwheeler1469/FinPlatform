@@ -324,7 +324,7 @@ const FeedbackAnalytics = () => {
                 <div className="space-y-4">
                   {insights.map((insight, index) => (
                     <div 
-                      key={index} 
+                      key={`item-${index}`} 
                       className="p-4 rounded-lg border bg-gradient-to-r from-purple-50 to-white"
                       data-testid={`insight-${index}`}
                     >
@@ -459,7 +459,7 @@ const FeedbackAnalytics = () => {
                     <div className="flex flex-wrap gap-2">
                       {analytics?.preferences?.preferred_actions?.length > 0 ? (
                         analytics.preferences.preferred_actions.map((action, i) => (
-                          <Badge key={i} variant="secondary" className="bg-emerald-100 text-emerald-800">
+                          <Badge key={`item-${i}`} variant="secondary" className="bg-emerald-100 text-emerald-800">
                             {action.replace(/_/g, " ")}
                           </Badge>
                         ))
@@ -476,7 +476,7 @@ const FeedbackAnalytics = () => {
                     <div className="flex flex-wrap gap-2">
                       {analytics?.preferences?.avoided_actions?.length > 0 ? (
                         analytics.preferences.avoided_actions.map((action, i) => (
-                          <Badge key={i} variant="secondary" className="bg-red-100 text-red-800">
+                          <Badge key={`item-${i}`} variant="secondary" className="bg-red-100 text-red-800">
                             {action.replace(/_/g, " ")}
                           </Badge>
                         ))

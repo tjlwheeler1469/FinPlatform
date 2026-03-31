@@ -212,7 +212,7 @@ const SalaryPackaging = () => {
                   const Icon = itemConfig?.icon || Briefcase;
                   
                   return (
-                    <div key={index} className="p-3 rounded-lg border border-border space-y-2">
+                    <div key={`item-${index}`} className="p-3 rounded-lg border border-border space-y-2">
                       <div className="flex items-center justify-between">
                         <Select 
                           value={item.type} 
@@ -349,7 +349,7 @@ const SalaryPackaging = () => {
                               dataKey="value"
                             >
                               {pieData.map((entry, index) => (
-                                <Cell key={index} fill={entry.color} />
+                                <Cell key={`item-${index}`} fill={entry.color} />
                               ))}
                             </Pie>
                             <Tooltip formatter={(v) => formatCurrency(v)} />
@@ -381,7 +381,7 @@ const SalaryPackaging = () => {
                         
                         return (
                           <div 
-                            key={index}
+                            key={`item-${index}`}
                             className="p-4 rounded-lg border border-border flex items-center justify-between"
                           >
                             <div className="flex items-center gap-3">
@@ -431,7 +431,7 @@ const SalaryPackaging = () => {
                   <CardContent>
                     <div className="space-y-2">
                       {result.recommendations.map((rec, index) => (
-                        <div key={index} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                        <div key={`item-${index}`} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
                           <CheckCircle className="h-5 w-5 text-[#10B981] flex-shrink-0 mt-0.5" />
                           <p className="text-sm">{rec}</p>
                         </div>

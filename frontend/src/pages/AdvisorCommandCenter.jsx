@@ -502,7 +502,7 @@ const AdvisorCommandCenter = () => {
                     </h4>
                     <ul className="space-y-1">
                       {selectedAction.action_steps?.map((step, i) => (
-                        <li key={i} className="text-xs flex items-start gap-2">
+                        <li key={`item-${i}`} className="text-xs flex items-start gap-2">
                           <CheckCircle className="h-3 w-3 text-emerald-500 mt-0.5 flex-shrink-0" />
                           <span>{step}</span>
                         </li>
@@ -672,7 +672,7 @@ const AdvisorCommandCenter = () => {
                 <div className="space-y-3">
                   {intelligence?.book_wide_insights?.slice(0, 6).map((insight, i) => (
                     <div 
-                      key={i} 
+                      key={`item-${i}`} 
                       className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors"
                       onClick={() => navigate('/intelligence')}
                     >
@@ -743,7 +743,7 @@ const AdvisorCommandCenter = () => {
                 <div className="space-y-3">
                   {monitoring?.alerts?.slice(0, 6).map((alert, i) => (
                     <div 
-                      key={i}
+                      key={`item-${i}`}
                       className="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
                       onClick={() => navigate(`/client-wealth?client=${alert.client_id}`)}
                     >
@@ -1107,7 +1107,7 @@ const AdvisorCommandCenter = () => {
                     </h4>
                     <ul className="space-y-2">
                       {selectedClient.meetingPrep?.portfolio_insights?.slice(0, 3).map((insight, i) => (
-                        <li key={i} className="text-xs flex items-start gap-2">
+                        <li key={`item-${i}`} className="text-xs flex items-start gap-2">
                           <Badge variant={insight.severity === 'warning' ? 'destructive' : insight.severity === 'positive' ? 'default' : 'secondary'} className="text-[10px] mt-0.5">
                             {insight.type}
                           </Badge>
@@ -1131,7 +1131,7 @@ const AdvisorCommandCenter = () => {
                     </h4>
                     <ul className="space-y-2">
                       {selectedClient.meetingPrep?.talking_points?.slice(0, 4).map((topic, i) => (
-                        <li key={i} className="text-xs flex items-start gap-2">
+                        <li key={`item-${i}`} className="text-xs flex items-start gap-2">
                           <CheckCircle className="h-3 w-3 text-green-500 mt-0.5 flex-shrink-0" />
                           <span>{topic}</span>
                         </li>
@@ -1187,7 +1187,7 @@ const AdvisorCommandCenter = () => {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                 {commandCenter.schedule.map((meeting, i) => (
                   <div 
-                    key={i}
+                    key={`item-${i}`}
                     className="p-3 border rounded-lg hover:shadow-md transition-shadow cursor-pointer"
                     onClick={() => generateMeetingPrep({ 
                       id: meeting.client_id, 

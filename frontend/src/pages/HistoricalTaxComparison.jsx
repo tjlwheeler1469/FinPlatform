@@ -332,7 +332,7 @@ const HistoricalTaxComparison = () => {
                     </div>
                     <div className="space-y-1 text-sm">
                       {data.brackets.map((b, i) => (
-                        <div key={i} className="flex justify-between">
+                        <div key={`item-${i}`} className="flex justify-between">
                           <span className="text-muted-foreground">
                             {b.to ? `$${b.from.toLocaleString()} - $${b.to.toLocaleString()}` : `$${b.from.toLocaleString()}+`}
                           </span>

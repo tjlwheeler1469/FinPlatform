@@ -105,7 +105,7 @@ const PositionSummary = ({ result, baselineResult }) => {
                 <p className="text-sm text-muted-foreground">No significant risks identified</p>
               ) : (
                 risks.slice(0, 3).map((risk, i) => (
-                  <div key={i} className="flex items-center gap-2 text-sm">
+                  <div key={`item-${i}`} className="flex items-center gap-2 text-sm">
                     <XCircle className="h-3 w-3 text-red-500" />
                     {risk}
                   </div>
@@ -123,7 +123,7 @@ const PositionSummary = ({ result, baselineResult }) => {
                 <p className="text-sm text-muted-foreground">Building towards stability</p>
               ) : (
                 strengths.slice(0, 3).map((strength, i) => (
-                  <div key={i} className="flex items-center gap-2 text-sm">
+                  <div key={`item-${i}`} className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-3 w-3 text-green-500" />
                     {strength}
                   </div>
@@ -142,7 +142,7 @@ const PositionSummary = ({ result, baselineResult }) => {
             </p>
             <div className="space-y-2">
               {actions.slice(0, 3).map((action, i) => (
-                <div key={i} className="flex items-center justify-between p-2 bg-white rounded border">
+                <div key={`item-${i}`} className="flex items-center justify-between p-2 bg-white rounded border">
                   <span className="text-sm">{action.action}</span>
                   <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
                     {action.impact}
@@ -324,7 +324,7 @@ const ScenarioDelta = ({ baselineResult, currentResult, scenarios }) => {
           <div className="space-y-2">
             <p className="text-sm font-medium">Scenario Comparison:</p>
             {scenarios.slice(0, 4).map((scenario, i) => (
-              <div key={i} className="flex items-center justify-between p-2 bg-white rounded border">
+              <div key={`item-${i}`} className="flex items-center justify-between p-2 bg-white rounded border">
                 <span className="text-sm">{scenario.name}</span>
                 <div className="flex items-center gap-2">
                   <span className="font-bold">{scenario.confidence?.toFixed(0)}%</span>
@@ -1070,7 +1070,7 @@ const RetirementConfidence = () => {
                           <h4 className="font-medium text-sm mb-2">Identified Risks:</h4>
                           <div className="space-y-2">
                             {result.explanation.identified_risks.map((risk, i) => (
-                              <div key={i} className="flex items-start gap-2 p-2 bg-red-50 rounded">
+                              <div key={`item-${i}`} className="flex items-start gap-2 p-2 bg-red-50 rounded">
                                 <AlertTriangle className="h-4 w-4 text-red-500 mt-0.5" />
                                 <div>
                                   <p className="text-sm font-medium">{risk.factor}</p>
@@ -1087,7 +1087,7 @@ const RetirementConfidence = () => {
                           <h4 className="font-medium text-sm mb-2">Recommendations:</h4>
                           <div className="space-y-2">
                             {result.explanation.recommendations.slice(0, 3).map((rec, i) => (
-                              <div key={i} className="flex items-start gap-2 p-2 bg-green-50 rounded">
+                              <div key={`item-${i}`} className="flex items-start gap-2 p-2 bg-green-50 rounded">
                                 <Lightbulb className="h-4 w-4 text-green-500 mt-0.5" />
                                 <div>
                                   <p className="text-sm font-medium">{rec.action}</p>
@@ -1307,7 +1307,7 @@ const RetirementConfidence = () => {
             {scenarios.length > 0 && (
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {scenarios.map((scenario, i) => (
-                  <Card key={i} className={i === 0 ? 'border-primary' : ''}>
+                  <Card key={`item-${i}`} className={i === 0 ? 'border-primary' : ''}>
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm">{scenario.name}</CardTitle>
                     </CardHeader>
@@ -1353,7 +1353,7 @@ const RetirementConfidence = () => {
                   <CardContent>
                     <div className="space-y-3">
                       {aiSuggestions.identified_risks?.map((risk, i) => (
-                        <div key={i} className="p-3 bg-red-50 rounded-lg">
+                        <div key={`item-${i}`} className="p-3 bg-red-50 rounded-lg">
                           <div className="flex items-center gap-2">
                             <AlertTriangle className="h-4 w-4 text-red-500" />
                             <span className="font-medium">{risk.factor}</span>
@@ -1375,7 +1375,7 @@ const RetirementConfidence = () => {
                   <CardContent>
                     <div className="space-y-3">
                       {aiSuggestions.ai_suggestions?.map((suggestion, i) => (
-                        <div key={i} className="p-3 bg-green-50 rounded-lg">
+                        <div key={`item-${i}`} className="p-3 bg-green-50 rounded-lg">
                           <p className="font-medium text-sm">{suggestion.suggestion}</p>
                           <div className="flex justify-between items-center mt-2">
                             <span className="text-sm text-green-600">

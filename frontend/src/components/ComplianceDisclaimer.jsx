@@ -67,12 +67,9 @@ const setAcknowledgement = (permanent = false) => {
   try {
     if (permanent) {
       localStorage.setItem(STORAGE_KEY, "permanent");
-      console.log("[Compliance] Modal permanently dismissed");
     }
     sessionStorage.setItem(SESSION_KEY, new Date().toISOString());
-    console.log("[Compliance] Session acknowledgement set");
   } catch (e) {
-    console.warn('Could not persist compliance acknowledgement:', e);
   }
 };
 
@@ -134,12 +131,10 @@ export const ComplianceModal = ({ onAccept }) => {
     
     // Double-check: if already acknowledged, never show
     if (hasAcknowledged()) {
-      console.log("[Compliance] Already acknowledged, not showing modal");
       setOpen(false);
       return;
     }
     
-    console.log("[Compliance] No previous acknowledgement, showing modal");
     setOpen(true);
   }, []);
 
@@ -182,7 +177,7 @@ export const ComplianceModal = ({ onAccept }) => {
 
         <div className="space-y-4 py-4">
           {COMPLIANCE_CONTENT.sections.map((section, index) => (
-            <div key={index} className="p-4 rounded-lg bg-muted/50 border">
+            <div key={`item-${index}`} className="p-4 rounded-lg bg-muted/50 border">
               <div className="flex items-start gap-3">
                 <section.icon className="h-5 w-5 text-[#1a2744] flex-shrink-0 mt-0.5" />
                 <div>
@@ -200,7 +195,7 @@ export const ComplianceModal = ({ onAccept }) => {
             <h4 className="font-semibold text-sm text-amber-800 mb-2">Before making financial decisions:</h4>
             <ul className="space-y-1">
               {COMPLIANCE_CONTENT.recommendations.map((rec, i) => (
-                <li key={i} className="text-sm text-amber-700 flex items-start gap-2">
+                <li key={`item-${i}`} className="text-sm text-amber-700 flex items-start gap-2">
                   <span className="text-amber-500">•</span>
                   {rec}
                 </li>
@@ -211,7 +206,7 @@ export const ComplianceModal = ({ onAccept }) => {
           <div className="flex flex-wrap gap-2">
             {COMPLIANCE_CONTENT.regulatoryLinks.map((link, i) => (
               <a
-                key={i}
+                key={`item-${i}`}
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"

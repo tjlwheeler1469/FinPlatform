@@ -327,7 +327,7 @@ const HoldingsPerformance = () => {
                       dataKey="value"
                     >
                       {sectorData.map((entry, index) => (
-                        <Cell key={index} fill={entry.color} />
+                        <Cell key={`item-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
                     <Tooltip formatter={(v) => formatCurrency(v)} />
@@ -336,7 +336,7 @@ const HoldingsPerformance = () => {
               </ChartContainer>
               <div className="space-y-2 mt-4">
                 {sectorData.slice(0, 5).map((sector, i) => (
-                  <div key={i} className="flex items-center justify-between text-sm">
+                  <div key={`item-${i}`} className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full" style={{ backgroundColor: sector.color }} />
                       <span className="truncate max-w-[120px]">{sector.name}</span>
@@ -396,7 +396,7 @@ const HoldingsPerformance = () => {
                   .sort((a, b) => b.dividendYield - a.dividendYield)
                   .slice(0, 3)
                   .map((stock, i) => (
-                    <div key={i} className="flex justify-between text-sm py-1">
+                    <div key={`item-${i}`} className="flex justify-between text-sm py-1">
                       <span>{stock.symbol}</span>
                       <span className="font-medium">{stock.dividendYield.toFixed(1)}% yield</span>
                     </div>
@@ -480,7 +480,7 @@ const HoldingsPerformance = () => {
                 </thead>
                 <tbody>
                   {stockPerformance.map((stock, i) => (
-                    <tr key={i} className="border-b hover:bg-muted/30">
+                    <tr key={`item-${i}`} className="border-b hover:bg-muted/30">
                       <td className="p-3 font-semibold">{stock.symbol}</td>
                       <td className="p-3 text-muted-foreground">{stock.name}</td>
                       <td className="text-right p-3">{formatCurrency(stock.value)}</td>

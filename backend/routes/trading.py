@@ -9,7 +9,8 @@ from datetime import datetime, timezone, timedelta
 from decimal import Decimal, ROUND_HALF_UP
 import uuid
 import logging
-import random
+import secrets
+_rng = secrets.SystemRandom()
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/trading", tags=["Stock Trading"])

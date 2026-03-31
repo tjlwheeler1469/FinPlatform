@@ -12,7 +12,7 @@ router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
 
 
 @router.get("/summary")
-async def get_dashboard_summary():
+async def get_dashboard_summary() -> Dict[str, Any]:
     """Get comprehensive dashboard summary data."""
     return {
         "net_worth": {
@@ -40,7 +40,7 @@ async def get_dashboard_summary():
 
 
 @router.get("/widgets")
-async def get_dashboard_widgets():
+async def get_dashboard_widgets() -> Dict[str, Any]:
     """Get data for dashboard widgets."""
     return {
         "net_worth_chart": {
@@ -61,7 +61,7 @@ async def get_dashboard_widgets():
 
 
 @router.get("/quick-stats")
-async def get_quick_stats():
+async def get_quick_stats() -> Dict[str, Any]:
     """Get quick statistics for header display."""
     return {
         "net_worth": 1978000,

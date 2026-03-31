@@ -331,7 +331,7 @@ const AdvisorIntelligenceDashboard = () => {
                 <div className="space-y-3">
                   {intelligence?.book_wide_insights?.map((insight, idx) => (
                     <div 
-                      key={idx}
+                      key={`item-${idx}`}
                       className="p-4 rounded-lg border bg-gradient-to-r from-white to-gray-50 hover:shadow-md transition-all cursor-pointer"
                       onClick={() => navigate("/intelligence")}
                       data-testid={`insight-${idx}`}
@@ -348,7 +348,7 @@ const AdvisorIntelligenceDashboard = () => {
                       {insight.clients?.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-2">
                           {insight.clients.slice(0, 3).map((client, i) => (
-                            <Badge key={i} variant="outline" className="text-xs">
+                            <Badge key={`item-${i}`} variant="outline" className="text-xs">
                               {client.name}
                             </Badge>
                           ))}

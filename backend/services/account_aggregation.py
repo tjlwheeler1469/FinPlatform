@@ -6,7 +6,8 @@ In production, this would integrate with Plaid, Yodlee, or Basiq (Australian).
 from typing import Dict, List, Any, Optional
 from datetime import datetime, timedelta
 import uuid
-import random
+import secrets
+_rng = secrets.SystemRandom()
 
 
 # Simulated connected accounts
@@ -152,11 +153,11 @@ def generate_mock_transactions(account_id: str, days: int = 30) -> List[Dict]:
     for i in range(days):
         date = datetime.now() - timedelta(days=i)
         # Add 2-4 random transactions per day
-        num_txns = random.randint(1, 3) if account_type == "checking" else random.randint(0, 1)
+        num_txns = _rng.randint(1, 3) if account_type == "checking" else _rng.randint(0, 1)
         
         for _ in range(num_txns):
-            template = random.choice(templates)
-            amount = template[2] * (0.8 + random.random() * 0.4)  # Vary amount ±20%
+            template = _rng.choice(templates)
+            amount = template[2] * (0.8 + _rng.random() * 0.4)  # Vary amount ±20%
             
             transactions.append({
                 "transaction_id": f"txn_{uuid.uuid4().hex[:12]}",
@@ -165,7 +166,7 @@ def generate_mock_transactions(account_id: str, days: int = 30) -> List[Dict]:
                 "type": template[1],
                 "amount": round(amount, 2),
                 "category": template[3],
-                "pending": i == 0 and random.random() < 0.2
+                "pending": i == 0 and _rng.random() < 0.2
             })
     
     return sorted(transactions, key=lambda x: x["date"], reverse=True)
@@ -278,9 +279,9 @@ def connect_account(
         "institution_logo": institution.lower().replace(" ", ""),
         "account_type": "checking",
         "account_name": "New Account",
-        "account_number": f"****{random.randint(1000, 9999)}",
-        "current_balance": random.uniform(1000, 50000),
-        "available_balance": random.uniform(1000, 50000),
+        "account_number": f"****{_rng.randint(1000, 9999)}",
+        "current_balance": _rng.uniform(1000, 50000),
+        "available_balance": _rng.uniform(1000, 50000),
         "currency": "AUD",
         "last_synced": datetime.now().isoformat(),
         "connection_status": "active"
@@ -322,7 +323,7 @@ def sync_accounts(client_id: str) -> Dict[str, Any]:
     # Simulate balance changes
     for account in accounts:
         if account.get("account_type") in ["checking", "savings"]:
-            change = random.uniform(-500, 500)
+            change = _rng.uniform(-500, 500)
             account["current_balance"] += change
             account["available_balance"] = account["current_balance"]
         
@@ -347,21 +348,21 @@ def get_cashflow_analysis(client_id: str, months: int = 3) -> Dict[str, Any]:
         month_date = datetime.now() - timedelta(days=30 * i)
         monthly_data.append({
             "month": month_date.strftime("%Y-%m"),
-            "income": random.uniform(12000, 15000),
-            "expenses": random.uniform(8000, 11000),
+            "income": _rng.uniform(12000, 15000),
+            "expenses": _rng.uniform(8000, 11000),
             "savings": 0  # Will calculate
         })
         monthly_data[-1]["savings"] = monthly_data[-1]["income"] - monthly_data[-1]["expenses"]
     
     # Category breakdown
     categories = {
-        "Housing": random.uniform(3000, 4500),
-        "Groceries": random.uniform(800, 1200),
-        "Transport": random.uniform(400, 700),
-        "Utilities": random.uniform(300, 500),
-        "Entertainment": random.uniform(200, 500),
-        "Insurance": random.uniform(400, 800),
-        "Other": random.uniform(500, 1000)
+        "Housing": _rng.uniform(3000, 4500),
+        "Groceries": _rng.uniform(800, 1200),
+        "Transport": _rng.uniform(400, 700),
+        "Utilities": _rng.uniform(300, 500),
+        "Entertainment": _rng.uniform(200, 500),
+        "Insurance": _rng.uniform(400, 800),
+        "Other": _rng.uniform(500, 1000)
     }
     
     total_expenses = sum(categories.values())

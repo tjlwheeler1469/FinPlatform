@@ -179,7 +179,7 @@ const ClientCard = ({ client, priority }) => {
                 <p className="text-xs text-muted-foreground mb-1">Key Risks:</p>
                 <div className="flex flex-wrap gap-1">
                   {client.risks.slice(0, 3).map((risk, i) => (
-                    <Badge key={i} variant="destructive" className="text-xs">{risk}</Badge>
+                    <Badge key={`item-${i}`} variant="destructive" className="text-xs">{risk}</Badge>
                   ))}
                 </div>
               </div>

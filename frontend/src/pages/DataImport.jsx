@@ -530,7 +530,7 @@ const DataImport = () => {
                     </div>
                     <ul className="text-sm text-destructive space-y-1">
                       {errors.map((error, i) => (
-                        <li key={i}>{error}</li>
+                        <li key={`item-${i}`}>{error}</li>
                       ))}
                     </ul>
                   </div>
@@ -626,7 +626,7 @@ const DataImport = () => {
                     </thead>
                     <tbody>
                       {parsedData?.rows.slice(0, 5).map((row, i) => (
-                        <tr key={i} className="border-t">
+                        <tr key={`item-${i}`} className="border-t">
                           {DATA_TEMPLATES[selectedDataType].fields.map(field => {
                             const sourceField = mappings[field];
                             const value = sourceField ? row[sourceField] : '-';
@@ -711,7 +711,7 @@ const DataImport = () => {
                       <div className="max-h-40 overflow-y-auto">
                         <ul className="text-sm text-amber-700 space-y-1">
                           {errors.slice(0, 10).map((error, i) => (
-                            <li key={i}>{error}</li>
+                            <li key={`item-${i}`}>{error}</li>
                           ))}
                           {errors.length > 10 && (
                             <li className="text-amber-600">...and {errors.length - 10} more</li>

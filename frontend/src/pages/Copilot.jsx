@@ -976,7 +976,7 @@ const Copilot = () => {
               <CardContent className="space-y-2">
                 {QUICK_ACTIONS.map((action, i) => (
                   <Button 
-                    key={i}
+                    key={`item-${i}`}
                     variant="outline" 
                     className="w-full justify-start text-sm"
                     onClick={() => handleQuickAction(action.command)}

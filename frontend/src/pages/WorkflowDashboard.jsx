@@ -263,7 +263,7 @@ const WorkflowDashboard = () => {
             ) : (
               <div className="grid gap-3">
                 {dashboard?.action_items?.map((item, idx) => (
-                  <Card key={idx}>
+                  <Card key={`item-${idx}`}>
                     <CardContent className="py-4">
                       <div className="flex items-center gap-4">
                         <div className="p-2 bg-amber-100 rounded-lg">
@@ -313,7 +313,7 @@ const WorkflowDashboard = () => {
                     </div>
                     <div className="flex flex-wrap gap-1 mb-4">
                       {template.step_types?.map((type, idx) => (
-                        <Badge key={idx} variant="secondary" className="text-xs">
+                        <Badge key={`item-${idx}`} variant="secondary" className="text-xs">
                           {type}
                         </Badge>
                       ))}

@@ -513,7 +513,7 @@ export default function PlatformIntegrations() {
                   </TableHeader>
                   <TableBody>
                     {(portfolioSummary?.portfolios || []).map((portfolio, idx) => (
-                      <TableRow key={idx}>
+                      <TableRow key={`item-${idx}`}>
                         <TableCell>
                           <Badge 
                             style={{ backgroundColor: PLATFORM_COLORS[portfolio.platform] + '20', color: PLATFORM_COLORS[portfolio.platform] }}

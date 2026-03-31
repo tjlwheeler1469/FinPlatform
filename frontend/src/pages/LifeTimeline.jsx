@@ -190,7 +190,7 @@ const LifeTimeline = () => {
             <div className="mt-2 pt-2 border-t">
               <p className="font-semibold text-sm">Events:</p>
               {data.events.map((e, i) => (
-                <p key={i} className="text-sm text-[#D4A84C]">• {e}</p>
+                <p key={`item-${i}`} className="text-sm text-[#D4A84C]">• {e}</p>
               ))}
             </div>
           )}
@@ -475,7 +475,7 @@ const LifeTimeline = () => {
                         {/* Mark milestones */}
                         {timelineData?.projections?.filter(p => p.is_milestone).map((milestone, idx) => (
                           <ReferenceDot
-                            key={idx}
+                            key={`item-${idx}`}
                             x={milestone.age}
                             y={milestone.net_worth}
                             r={8}
@@ -510,7 +510,7 @@ const LifeTimeline = () => {
                     {timelineData?.milestones?.map((milestone, index) => {
                       const Icon = getEventIcon(milestone.type);
                       return (
-                        <div key={index} className="relative flex items-start gap-4 pl-12">
+                        <div key={`item-${index}`} className="relative flex items-start gap-4 pl-12">
                           <div 
                             className="absolute left-3 w-6 h-6 rounded-full flex items-center justify-center"
                             style={{ backgroundColor: getEventColor(milestone.type) }}
@@ -559,7 +559,7 @@ const LifeTimeline = () => {
                     const Icon = getEventIcon(event.event_type);
                     return (
                       <div 
-                        key={index} 
+                        key={`item-${index}`} 
                         className="flex items-center gap-4 p-4 border rounded-lg hover:bg-muted/50 transition-colors"
                       >
                         <div 

@@ -374,7 +374,7 @@ const MeetingPrep = () => {
                 <TabsContent value="insights" className="mt-4">
                   <div className="space-y-3">
                     {meetingPrep.portfolio_insights?.map((insight, i) => (
-                      <div key={i} className={`p-4 rounded-lg border ${getSeverityColor(insight.severity)}`}>
+                      <div key={`item-${i}`} className={`p-4 rounded-lg border ${getSeverityColor(insight.severity)}`}>
                         <div className="flex items-start justify-between">
                           <div>
                             <h4 className="font-semibold">{insight.title}</h4>
@@ -402,7 +402,7 @@ const MeetingPrep = () => {
                 <TabsContent value="risks" className="mt-4">
                   <div className="space-y-3">
                     {meetingPrep.risk_alerts?.map((alert, i) => (
-                      <div key={i} className={`p-4 rounded-lg border ${getSeverityColor(alert.severity)}`}>
+                      <div key={`item-${i}`} className={`p-4 rounded-lg border ${getSeverityColor(alert.severity)}`}>
                         <div className="flex items-start gap-3">
                           <AlertTriangle className={`h-5 w-5 mt-0.5 ${
                             alert.severity === 'high' ? 'text-red-500' : 
@@ -433,7 +433,7 @@ const MeetingPrep = () => {
                   <div className="space-y-3">
                     <h4 className="font-semibold text-[#1a2744]">Suggested Discussion Topics</h4>
                     {meetingPrep.talking_points?.map((topic, i) => (
-                      <div key={i} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                      <div key={`item-${i}`} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
                         <div className="flex-shrink-0 w-6 h-6 bg-[#1a2744] text-white rounded-full flex items-center justify-center text-sm">
                           {i + 1}
                         </div>
@@ -463,7 +463,7 @@ const MeetingPrep = () => {
                   <div className="space-y-3">
                     <h4 className="font-semibold text-[#1a2744]">Post-Meeting Action Items</h4>
                     {meetingPrep.action_items?.map((action, i) => (
-                      <div key={i} className="flex items-start gap-3 p-3 border rounded-lg">
+                      <div key={`item-${i}`} className="flex items-start gap-3 p-3 border rounded-lg">
                         <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
                         <div className="flex-1">
                           <p className="text-sm font-medium">{action.action}</p>

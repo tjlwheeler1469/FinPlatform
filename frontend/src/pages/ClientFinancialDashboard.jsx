@@ -261,7 +261,7 @@ export default function ClientFinancialDashboard() {
             <AlertTitle>Budget Alerts</AlertTitle>
             <AlertDescription>
               {budget.active_alerts.map((alert, i) => (
-                <div key={i} className="text-sm">{alert.message}</div>
+                <div key={`item-${i}`} className="text-sm">{alert.message}</div>
               ))}
             </AlertDescription>
           </Alert>
@@ -300,7 +300,7 @@ export default function ClientFinancialDashboard() {
                 <CardContent>
                   <div className="space-y-3">
                     {(budget?.incomes || []).map((inc, i) => (
-                      <div key={i} className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                      <div key={`item-${i}`} className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                         <div>
                           <p className="font-medium">{inc.source}</p>
                           <p className="text-sm text-muted-foreground">{inc.category} • {inc.frequency}</p>
@@ -375,7 +375,7 @@ export default function ClientFinancialDashboard() {
                     </TableHeader>
                     <TableBody>
                       {(budget?.incomes || []).map((inc, i) => (
-                        <TableRow key={i}>
+                        <TableRow key={`item-${i}`}>
                           <TableCell className="font-medium">{inc.source}</TableCell>
                           <TableCell><Badge variant="outline">{inc.category}</Badge></TableCell>
                           <TableCell>{inc.frequency}</TableCell>
@@ -410,7 +410,7 @@ export default function ClientFinancialDashboard() {
                       </TableHeader>
                       <TableBody>
                         {(budget?.expenses || []).map((exp, i) => (
-                          <TableRow key={i}>
+                          <TableRow key={`item-${i}`}>
                             <TableCell className="font-medium">
                               <div className="flex items-center gap-2">
                                 {exp.is_essential && <Badge className="bg-blue-100 text-blue-800 text-xs">Essential</Badge>}
@@ -446,7 +446,7 @@ export default function ClientFinancialDashboard() {
                     const percentage = (spent / budgeted) * 100;
                     
                     return (
-                      <div key={i} className="p-4 border rounded-lg">
+                      <div key={`item-${i}`} className="p-4 border rounded-lg">
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
                             {getCategoryIcon(cat)}
@@ -484,7 +484,7 @@ export default function ClientFinancialDashboard() {
                 const progress = goal.target_amount > 0 ? (goal.current_amount / goal.target_amount) * 100 : 0;
                 
                 return (
-                  <Card key={i}>
+                  <Card key={`item-${i}`}>
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
                         <CardTitle className="text-lg">{goal.name}</CardTitle>
@@ -582,7 +582,7 @@ export default function ClientFinancialDashboard() {
                   <ScrollArea className="h-[400px]">
                     <div className="space-y-3">
                       {milestones.map((m, i) => (
-                        <div key={i} className="p-4 border rounded-lg">
+                        <div key={`item-${i}`} className="p-4 border rounded-lg">
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-2">
                               <div className={`w-3 h-3 rounded-full ${getStatusColor(m.status)}`} />

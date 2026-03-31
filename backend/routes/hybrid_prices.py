@@ -282,7 +282,7 @@ def fetch_hybrid_prices_sync(symbols: List[str]) -> Dict[str, Dict]:
                 # Generate realistic price around par (97-102)
                 import random
                 random.seed(hash(symbol) % 1000)  # Consistent price per symbol
-                simulated_price = round(98 + random.uniform(-1, 4), 2)
+                simulated_price = round(98 + _rng.uniform(-1, 4), 2)
                 
                 results[symbol] = {
                     "symbol": symbol,
@@ -290,9 +290,9 @@ def fetch_hybrid_prices_sync(symbols: List[str]) -> Dict[str, Dict]:
                     "issuer": hybrid_info["issuer"],
                     "type": hybrid_info["type"],
                     "price": simulated_price,
-                    "prev_close": simulated_price - round(random.uniform(-0.5, 0.5), 2),
-                    "change": round(random.uniform(-0.3, 0.3), 2),
-                    "change_pct": round(random.uniform(-0.3, 0.3), 2),
+                    "prev_close": simulated_price - round(_rng.uniform(-0.5, 0.5), 2),
+                    "change": round(_rng.uniform(-0.3, 0.3), 2),
+                    "change_pct": round(_rng.uniform(-0.3, 0.3), 2),
                     "face_value": 100.0,
                     "margin_bbsw": margin,
                     "bbsw_3m": CURRENT_BBSW_3M,

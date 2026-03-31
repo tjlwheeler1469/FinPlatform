@@ -173,7 +173,7 @@ const ClientIntelligenceFeed = () => {
                   const Icon = getInsightIcon(insight.type);
                   return (
                     <div
-                      key={index}
+                      key={`item-${index}`}
                       className={`p-4 rounded-lg border-l-4 cursor-pointer transition-all hover:shadow-md ${getInsightColor(insight.priority)} ${selectedInsight === index ? "ring-2 ring-purple-500" : ""}`}
                       onClick={() => setSelectedInsight(index)}
                     >
@@ -251,7 +251,7 @@ const ClientIntelligenceFeed = () => {
                         <h4 className="text-sm font-medium text-muted-foreground mb-2">Affected Clients ({insight.clients?.length || insight.count})</h4>
                         <div className="space-y-2">
                           {insight.clients?.slice(0, 5).map((client, idx) => (
-                            <div key={idx} className="flex items-center justify-between p-2 bg-muted rounded-lg">
+                            <div key={`item-${idx}`} className="flex items-center justify-between p-2 bg-muted rounded-lg">
                               <span className="font-medium">{client}</span>
                               <Button variant="ghost" size="sm">
                                 View <ArrowUpRight className="h-3 w-3 ml-1" />

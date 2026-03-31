@@ -7,7 +7,8 @@ Uses Locust-compatible patterns for realistic stress testing
 import os
 import json
 import asyncio
-import random
+import secrets
+_rng = secrets.SystemRandom()
 import string
 import time
 import uuid
@@ -102,7 +103,7 @@ async def simulate_user_session(
     
     async with httpx.AsyncClient(timeout=30.0) as client:
         while time.time() - start_time < duration_seconds:
-            endpoint = random.choice(endpoints)
+            endpoint = _rng.choice(endpoints)
             request_start = time.time()
             
             try:
@@ -137,7 +138,7 @@ async def simulate_user_session(
                 results_collector["errors"][error_type] = results_collector["errors"].get(error_type, 0) + 1
             
             # Random delay between requests (50-500ms)
-            await asyncio.sleep(random.uniform(0.05, 0.5))
+            await asyncio.sleep(_rng.uniform(0.05, 0.5))
 
 async def run_stress_test(config: StressTestConfig, test_state: Dict):
     """Run the actual stress test"""
@@ -425,9 +426,9 @@ async def notification_flood_test(
                     "user_id": user_id,
                     "title": f"Stress Test Notification #{j}",
                     "message": f"This is notification {j} for user {i} during stress test {test_id}",
-                    "notification_type": random.choice(["info", "warning", "alert", "success"]),
-                    "priority": random.choice(["low", "normal", "high"]),
-                    "category": random.choice(["compliance", "platform_sync", "portfolio", "general"]),
+                    "notification_type": _rng.choice(["info", "warning", "alert", "success"]),
+                    "priority": _rng.choice(["low", "normal", "high"]),
+                    "category": _rng.choice(["compliance", "platform_sync", "portfolio", "general"]),
                     "read": False,
                     "dismissed": False,
                     "created_at": datetime.now(timezone.utc).isoformat()

@@ -280,7 +280,7 @@ const BatchExecution = () => {
 
                   <div className="space-y-4 mb-6">
                     {selectedPreview.clients?.map((client, idx) => (
-                      <div key={idx} className="p-4 bg-muted/30 rounded-lg">
+                      <div key={`item-${idx}`} className="p-4 bg-muted/30 rounded-lg">
                         <div className="flex items-center justify-between mb-2">
                           <h4 className="font-semibold">{client.client_name}</h4>
                           <span className="text-sm text-muted-foreground">{client.trade_count} trades</span>

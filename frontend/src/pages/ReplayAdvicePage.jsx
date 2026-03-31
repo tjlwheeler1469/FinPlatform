@@ -267,7 +267,7 @@ export default function ReplayAdvicePage() {
                   <ScrollArea className="h-[500px]">
                     <div className="space-y-4">
                       {selectedSession.timeline?.map((event, idx) => (
-                        <div key={idx} className="flex gap-3">
+                        <div key={`item-${idx}`} className="flex gap-3">
                           <div className="flex flex-col items-center">
                             <div className={`w-3 h-3 rounded-full ${
                               event.event.includes('started') ? 'bg-blue-500' :
@@ -323,7 +323,7 @@ export default function ReplayAdvicePage() {
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {selectedSession.inputs?.map((input, idx) => (
-                          <div key={idx} className="border rounded-lg p-3 bg-gray-50">
+                          <div key={`item-${idx}`} className="border rounded-lg p-3 bg-gray-50">
                             <Badge variant="outline" className="mb-2">{input.input_type}</Badge>
                             <pre className="text-xs bg-white p-2 rounded overflow-auto max-h-24">
                               {JSON.stringify(input.data, null, 2)}
@@ -340,7 +340,7 @@ export default function ReplayAdvicePage() {
                         Generated Scenarios ({selectedSession.scenarios?.length || 0})
                       </h3>
                       {selectedSession.scenarios?.map((scenario, idx) => (
-                        <div key={idx} className="border rounded-lg p-4 mb-3">
+                        <div key={`item-${idx}`} className="border rounded-lg p-4 mb-3">
                           <div className="flex items-center justify-between mb-2">
                             <Badge>{scenario.scenario_id}</Badge>
                             <span className="text-xs text-gray-500">
@@ -369,7 +369,7 @@ export default function ReplayAdvicePage() {
                         Recorded Decisions ({selectedSession.decisions?.length || 0})
                       </h3>
                       {selectedSession.decisions?.map((decision, idx) => (
-                        <div key={idx} className="border rounded-lg p-4 bg-green-50 border-green-200">
+                        <div key={`item-${idx}`} className="border rounded-lg p-4 bg-green-50 border-green-200">
                           <div className="font-medium">{decision.selected_option}</div>
                           <div className="text-sm text-gray-600 mt-2">{decision.justification}</div>
                           <div className="flex gap-4 mt-3 text-xs">
@@ -391,7 +391,7 @@ export default function ReplayAdvicePage() {
                         Compliance Checks ({selectedSession.compliance_checks?.length || 0})
                       </h3>
                       {selectedSession.compliance_checks?.map((check, idx) => (
-                        <div key={idx} className={`border rounded-lg p-4 ${getSeverityColor(check.overall_result)}`}>
+                        <div key={`item-${idx}`} className={`border rounded-lg p-4 ${getSeverityColor(check.overall_result)}`}>
                           <div className="flex items-center justify-between mb-3">
                             <Badge className={getSeverityColor(check.overall_result)}>
                               {check.overall_result}

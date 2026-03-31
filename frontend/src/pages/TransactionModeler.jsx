@@ -125,7 +125,7 @@ const ProjectionChart = ({ projections, initialValue, timeframe, scenarios = nul
         {/* Grid lines */}
         <div className="absolute inset-0 flex flex-col justify-between">
           {[0, 1, 2, 3, 4].map(i => (
-            <div key={i} className="border-t border-dashed border-muted-foreground/20 w-full" />
+            <div key={`item-${i}`} className="border-t border-dashed border-muted-foreground/20 w-full" />
           ))}
         </div>
 

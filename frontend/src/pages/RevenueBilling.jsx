@@ -135,7 +135,7 @@ const RevenueBilling = () => {
         <div className="bg-white p-3 border rounded-lg shadow-lg">
           <p className="font-bold text-sm mb-2">{label}</p>
           {payload.map((entry, index) => (
-            <p key={index} className="text-sm" style={{ color: entry.color }}>
+            <p key={`item-${index}`} className="text-sm" style={{ color: entry.color }}>
               {entry.name}: {formatCurrency(entry.value)}
             </p>
           ))}
@@ -320,7 +320,7 @@ const RevenueBilling = () => {
               <div className="space-y-3">
                 {clientRevenue.map((client, index) => (
                   <div 
-                    key={index}
+                    key={`item-${index}`}
                     className="flex items-center justify-between p-3 border rounded-lg"
                   >
                     <div className="flex items-center gap-3">
@@ -376,7 +376,7 @@ const RevenueBilling = () => {
                     { id: "INV-2024-004", client: "Thompson Family", service: "Investment Review", amount: 1500, date: "2024-11-08", status: "paid" },
                     { id: "INV-2024-005", client: "Williams Family", service: "Insurance Review", amount: 800, date: "2024-11-05", status: "overdue" }
                   ].map((invoice, index) => (
-                    <tr key={index} className="border-b hover:bg-muted/50">
+                    <tr key={`item-${index}`} className="border-b hover:bg-muted/50">
                       <td className="py-3 px-4 font-mono text-sm">{invoice.id}</td>
                       <td className="py-3 px-4">{invoice.client}</td>
                       <td className="py-3 px-4">{invoice.service}</td>
@@ -410,7 +410,7 @@ const RevenueBilling = () => {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {practiceData.advisers.map((adviser, index) => (
-                  <div key={index} className="p-4 border rounded-lg">
+                  <div key={`item-${index}`} className="p-4 border rounded-lg">
                     <div className="flex items-center gap-3 mb-3">
                       <div 
                         className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"

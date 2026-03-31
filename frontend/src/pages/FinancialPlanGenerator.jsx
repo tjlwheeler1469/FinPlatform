@@ -445,7 +445,7 @@ const FinancialPlanGenerator = () => {
                     <h4 className="font-semibold mb-3">Recommendations</h4>
                     <div className="space-y-3">
                       {plan.retirement_plan.recommendations.map((rec, i) => (
-                        <div key={i} className="flex items-center gap-4 p-3 border rounded-lg">
+                        <div key={`item-${i}`} className="flex items-center gap-4 p-3 border rounded-lg">
                           <CheckCircle className="h-5 w-5 text-green-600 shrink-0" />
                           <div className="flex-1">
                             <p className="font-medium">{rec.action}</p>
@@ -502,7 +502,7 @@ const FinancialPlanGenerator = () => {
                     <h4 className="font-semibold mb-3">Recommendations</h4>
                     <div className="space-y-3">
                       {plan.investment_strategy.recommendations.map((rec, i) => (
-                        <div key={i} className="flex items-center gap-4 p-3 border rounded-lg">
+                        <div key={`item-${i}`} className="flex items-center gap-4 p-3 border rounded-lg">
                           <div className="flex-1">
                             <p className="font-medium">{rec.action}</p>
                             <p className="text-sm text-muted-foreground">{rec.detail}</p>
@@ -547,7 +547,7 @@ const FinancialPlanGenerator = () => {
                     <h4 className="font-semibold mb-3">Tax Recommendations</h4>
                     <div className="space-y-3">
                       {plan.tax_strategy.recommendations.map((rec, i) => (
-                        <div key={i} className="flex items-center gap-4 p-3 border rounded-lg">
+                        <div key={`item-${i}`} className="flex items-center gap-4 p-3 border rounded-lg">
                           <div className="flex-1">
                             <p className="font-medium">{rec.action}</p>
                             <p className="text-sm text-muted-foreground">{rec.detail}</p>
@@ -612,7 +612,7 @@ const FinancialPlanGenerator = () => {
                     <h4 className="font-semibold mb-3">Insurance Recommendations</h4>
                     <div className="space-y-3">
                       {plan.insurance_gaps.recommendations.map((rec, i) => (
-                        <div key={i} className="flex items-center gap-4 p-3 border rounded-lg">
+                        <div key={`item-${i}`} className="flex items-center gap-4 p-3 border rounded-lg">
                           <div className="flex-1">
                             <p className="font-medium">{rec.action}</p>
                             <p className="text-sm text-muted-foreground">{rec.detail}</p>
@@ -638,7 +638,7 @@ const FinancialPlanGenerator = () => {
                     <CardContent>
                       <div className="space-y-2">
                         {plan.action_plan.immediate_actions.map((action, i) => (
-                          <div key={i} className="flex items-start gap-2 p-2 bg-red-50 rounded">
+                          <div key={`item-${i}`} className="flex items-start gap-2 p-2 bg-red-50 rounded">
                             <CheckCircle className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
                             <p className="text-sm">{action}</p>
                           </div>
@@ -657,7 +657,7 @@ const FinancialPlanGenerator = () => {
                     <CardContent>
                       <div className="space-y-2">
                         {plan.action_plan.short_term_actions.map((action, i) => (
-                          <div key={i} className="flex items-start gap-2 p-2 bg-amber-50 rounded">
+                          <div key={`item-${i}`} className="flex items-start gap-2 p-2 bg-amber-50 rounded">
                             <CheckCircle className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
                             <p className="text-sm">{action}</p>
                           </div>
@@ -676,7 +676,7 @@ const FinancialPlanGenerator = () => {
                     <CardContent>
                       <div className="space-y-2">
                         {plan.action_plan.long_term_actions.map((action, i) => (
-                          <div key={i} className="flex items-start gap-2 p-2 bg-green-50 rounded">
+                          <div key={`item-${i}`} className="flex items-start gap-2 p-2 bg-green-50 rounded">
                             <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
                             <p className="text-sm">{action}</p>
                           </div>

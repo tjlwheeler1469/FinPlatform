@@ -14,7 +14,8 @@ Endpoints simulate:
 
 import os
 import uuid
-import random
+import secrets
+_rng = secrets.SystemRandom()
 from datetime import datetime, timezone, timedelta
 from typing import Optional, Dict, Any, List
 from fastapi import APIRouter, HTTPException, Header
@@ -199,8 +200,8 @@ def generate_portfolio(client_id: str) -> Dict[str, Any]:
     total_value = profile["assets"] * 0.7  # 70% in investments
     
     # Generate holdings
-    num_holdings = random.randint(4, 8)
-    selected_holdings = random.sample(SAMPLE_HOLDINGS, num_holdings)
+    num_holdings = _rng.randint(4, 8)
+    selected_holdings = _rng.sample(SAMPLE_HOLDINGS, num_holdings)
     
     holdings = []
     remaining_value = total_value
@@ -209,10 +210,10 @@ def generate_portfolio(client_id: str) -> Dict[str, Any]:
         if i == len(selected_holdings) - 1:
             value = remaining_value
         else:
-            value = remaining_value * random.uniform(0.1, 0.3)
+            value = remaining_value * _rng.uniform(0.1, 0.3)
             remaining_value -= value
         
-        price = random.uniform(20, 300)
+        price = _rng.uniform(20, 300)
         quantity = int(value / price)
         actual_value = quantity * price
         
@@ -251,27 +252,27 @@ def generate_transactions(client_id: str, limit: int = 20) -> List[Dict[str, Any
     transaction_types = ["BUY", "SELL", "DIVIDEND", "CONTRIBUTION", "WITHDRAWAL", "FEE"]
     
     for i in range(limit):
-        days_ago = random.randint(1, 365)
+        days_ago = _rng.randint(1, 365)
         tx_date = (datetime.now(timezone.utc) - timedelta(days=days_ago)).strftime("%Y-%m-%d")
-        tx_type = random.choice(transaction_types)
+        tx_type = _rng.choice(transaction_types)
         
         if tx_type in ["BUY", "SELL"]:
-            holding = random.choice(SAMPLE_HOLDINGS)
+            holding = _rng.choice(SAMPLE_HOLDINGS)
             product = holding["security_code"]
-            amount = random.uniform(1000, 50000)
+            amount = _rng.uniform(1000, 50000)
         elif tx_type == "DIVIDEND":
-            holding = random.choice(SAMPLE_HOLDINGS)
+            holding = _rng.choice(SAMPLE_HOLDINGS)
             product = holding["security_code"]
-            amount = random.uniform(100, 2000)
+            amount = _rng.uniform(100, 2000)
         elif tx_type == "CONTRIBUTION":
             product = "CASH"
-            amount = random.uniform(5000, 25000)
+            amount = _rng.uniform(5000, 25000)
         elif tx_type == "WITHDRAWAL":
             product = "CASH"
-            amount = random.uniform(2000, 15000)
+            amount = _rng.uniform(2000, 15000)
         else:  # FEE
             product = "ADMIN"
-            amount = random.uniform(50, 500)
+            amount = _rng.uniform(50, 500)
         
         transactions.append({
             "transaction_id": f"TX-{client_id}-{i:04d}",
@@ -573,12 +574,12 @@ async def get_mock_portfolio_performance(
     return {
         "client_id": client_id,
         "metrics": {
-            "total_return": round(random.uniform(5, 15), 2),
-            "annualized_return": round(random.uniform(6, 12), 2),
-            "volatility": round(random.uniform(8, 18), 2),
-            "sharpe_ratio": round(random.uniform(0.5, 1.5), 2),
-            "max_drawdown": round(random.uniform(-15, -5), 2),
-            "benchmark_return": round(random.uniform(7, 10), 2)
+            "total_return": round(_rng.uniform(5, 15), 2),
+            "annualized_return": round(_rng.uniform(6, 12), 2),
+            "volatility": round(_rng.uniform(8, 18), 2),
+            "sharpe_ratio": round(_rng.uniform(0.5, 1.5), 2),
+            "max_drawdown": round(_rng.uniform(-15, -5), 2),
+            "benchmark_return": round(_rng.uniform(7, 10), 2)
         },
         "period_days": days,
         "calculated_at": datetime.now(timezone.utc).isoformat()
@@ -600,9 +601,9 @@ async def get_mock_tax_lots(
             "lot_id": f"LOT-{uuid.uuid4().hex[:6].upper()}",
             "security_code": holding["security_code"],
             "quantity": holding["quantity"],
-            "cost_basis": round(holding["value"] * random.uniform(0.7, 1.1), 2),
-            "acquisition_date": (datetime.now(timezone.utc) - timedelta(days=random.randint(100, 1000))).strftime("%Y-%m-%d"),
-            "unrealized_gain": round(holding["value"] * random.uniform(-0.1, 0.3), 2)
+            "cost_basis": round(holding["value"] * _rng.uniform(0.7, 1.1), 2),
+            "acquisition_date": (datetime.now(timezone.utc) - timedelta(days=_rng.randint(100, 1000))).strftime("%Y-%m-%d"),
+            "unrealized_gain": round(holding["value"] * _rng.uniform(-0.1, 0.3), 2)
         })
     
     return {

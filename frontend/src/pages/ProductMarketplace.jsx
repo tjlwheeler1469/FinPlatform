@@ -185,7 +185,7 @@ const ProductMarketplace = () => {
           <TabsContent value="recommendations" className="space-y-6 mt-4">
             {/* Insurance Recommendations */}
             {recommendations?.insurance?.map((rec, i) => (
-              <Card key={i}>
+              <Card key={`item-${i}`}>
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -244,7 +244,7 @@ const ProductMarketplace = () => {
 
             {/* Investment Recommendations */}
             {recommendations?.investments?.map((rec, i) => (
-              <Card key={i}>
+              <Card key={`item-${i}`}>
                 <CardHeader className="pb-2">
                   <div className="flex items-center gap-2">
                     <TrendingUp className="h-5 w-5 text-blue-600" />
@@ -293,7 +293,7 @@ const ProductMarketplace = () => {
 
             {/* Loan Recommendations */}
             {recommendations?.loans?.map((rec, i) => (
-              <Card key={i}>
+              <Card key={`item-${i}`}>
                 <CardHeader className="pb-2">
                   <div className="flex items-center gap-2">
                     <Home className="h-5 w-5 text-purple-600" />
@@ -363,7 +363,7 @@ const ProductMarketplace = () => {
               <CardContent>
                 <div className="space-y-3">
                   {filteredProducts.filter(p => p.category?.includes('life') || p.category?.includes('income') || p.category?.includes('tpd')).map((product, i) => (
-                    <div key={i} className="flex items-center gap-4 p-4 border rounded-lg hover:shadow-md transition-shadow">
+                    <div key={`item-${i}`} className="flex items-center gap-4 p-4 border rounded-lg hover:shadow-md transition-shadow">
                       <Shield className="h-8 w-8 text-green-600" />
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
@@ -397,7 +397,7 @@ const ProductMarketplace = () => {
               <CardContent>
                 <div className="space-y-3">
                   {filteredProducts.filter(p => p.category?.includes('super') || p.category?.includes('etf') || p.category?.includes('managed')).map((product, i) => (
-                    <div key={i} className="flex items-center gap-4 p-4 border rounded-lg hover:shadow-md transition-shadow">
+                    <div key={`item-${i}`} className="flex items-center gap-4 p-4 border rounded-lg hover:shadow-md transition-shadow">
                       <TrendingUp className="h-8 w-8 text-blue-600" />
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
@@ -442,7 +442,7 @@ const ProductMarketplace = () => {
               <CardContent>
                 <div className="space-y-3">
                   {filteredProducts.filter(p => p.category?.includes('loan')).map((product, i) => (
-                    <div key={i} className="flex items-center gap-4 p-4 border rounded-lg hover:shadow-md transition-shadow">
+                    <div key={`item-${i}`} className="flex items-center gap-4 p-4 border rounded-lg hover:shadow-md transition-shadow">
                       <Home className="h-8 w-8 text-purple-600" />
                       <div className="flex-1">
                         <div className="flex items-center gap-2">

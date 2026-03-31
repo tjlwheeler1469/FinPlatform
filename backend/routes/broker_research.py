@@ -7,7 +7,8 @@ from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 from typing import Dict, List, Optional
 from datetime import datetime, timezone, timedelta
-import random
+import secrets
+_rng = secrets.SystemRandom()
 import logging
 
 logger = logging.getLogger(__name__)
@@ -260,7 +261,7 @@ BROKER_RESEARCH.update(ASX_RESEARCH)
 def add_price_movement(data: Dict) -> Dict:
     """Add simulated price movement to research data."""
     data = data.copy()
-    jitter = random.uniform(-0.02, 0.02)
+    jitter = _rng.uniform(-0.02, 0.02)
     data["current_price"] = round(data["current_price"] * (1 + jitter), 2)
     return data
 

@@ -1780,7 +1780,7 @@ export default function RetirementPlanner() {
                         </TableHeader>
                         <TableBody>
                           {projectionData.map((row, idx) => (
-                            <TableRow key={idx} className={row.isRetired ? 'bg-green-50/50' : ''}>
+                            <TableRow key={`item-${idx}`} className={row.isRetired ? 'bg-green-50/50' : ''}>
                               <TableCell>{row.year}</TableCell>
                               <TableCell>{row.age}</TableCell>
                               <TableCell>

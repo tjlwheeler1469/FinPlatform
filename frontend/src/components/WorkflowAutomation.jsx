@@ -286,7 +286,7 @@ const WorkflowAutomation = ({ onTaskCreated, onReminderSet }) => {
                     </p>
                     <div className="space-y-1">
                       {WORKFLOW_TEMPLATES.find(t => t.id === selectedTemplate)?.steps.map((step, i) => (
-                        <div key={i} className="text-xs flex items-center gap-2 text-muted-foreground">
+                        <div key={`item-${i}`} className="text-xs flex items-center gap-2 text-muted-foreground">
                           <div className="w-5 h-5 rounded-full bg-[#1a2744]/10 flex items-center justify-center text-[10px] font-bold">
                             {i + 1}
                           </div>

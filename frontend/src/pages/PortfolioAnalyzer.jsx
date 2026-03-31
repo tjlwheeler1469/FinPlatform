@@ -248,7 +248,7 @@ const PortfolioAnalyzer = () => {
               </div>
               <div className="grid grid-cols-2 gap-2 mt-4">
                 {allocationData.map((asset, i) => (
-                  <div key={i} className="flex items-center gap-2">
+                  <div key={`item-${i}`} className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
                     <span className="text-sm">{asset.name}: {asset.value.toFixed(1)}%</span>
                   </div>
@@ -295,7 +295,7 @@ const PortfolioAnalyzer = () => {
             <CardContent>
               <div className="space-y-3">
                 {analysis.rebalancing_trades?.map((trade, i) => (
-                  <div key={i} className="flex items-center gap-4 p-4 border rounded-lg">
+                  <div key={`item-${i}`} className="flex items-center gap-4 p-4 border rounded-lg">
                     <div className={`p-2 rounded-lg ${trade.action === 'buy' ? 'bg-green-100' : 'bg-red-100'}`}>
                       {trade.action === 'buy' ? (
                         <TrendingUp className="h-5 w-5 text-green-600" />
@@ -334,7 +334,7 @@ const PortfolioAnalyzer = () => {
             <CardContent>
               <div className="space-y-3">
                 {analysis.concentration_risks.map((risk, i) => (
-                  <div key={i} className="flex items-center gap-4 p-3 bg-red-50 rounded-lg">
+                  <div key={`item-${i}`} className="flex items-center gap-4 p-3 bg-red-50 rounded-lg">
                     <div className="flex-1">
                       <p className="font-medium capitalize">{risk.asset_class.split('_').join(' ')}</p>
                       <p className="text-sm text-muted-foreground">{risk.recommendation}</p>
@@ -361,7 +361,7 @@ const PortfolioAnalyzer = () => {
             <CardContent>
               <div className="space-y-3">
                 {analysis.insights.map((insight, i) => (
-                  <div key={i} className="flex items-start gap-3 p-3 border rounded-lg">
+                  <div key={`item-${i}`} className="flex items-start gap-3 p-3 border rounded-lg">
                     <AlertTriangle className={`h-5 w-5 ${
                       insight.impact === 'high' ? 'text-red-600' : 
                       insight.impact === 'moderate' ? 'text-amber-600' : 'text-blue-600'
@@ -391,7 +391,7 @@ const PortfolioAnalyzer = () => {
             <CardContent>
               <div className="space-y-3">
                 {sectorExposure.sector_breakdown?.map((sector, i) => (
-                  <div key={i} className="flex items-center gap-4">
+                  <div key={`item-${i}`} className="flex items-center gap-4">
                     <div className="w-32 text-sm font-medium">{sector.sector}</div>
                     <div className="flex-1">
                       <Progress 

@@ -354,7 +354,7 @@ const ReportGenerator = () => {
 
                   {/* Report Sections */}
                   {reportData.sections.map((section, index) => (
-                    <div key={index} className="p-4 rounded-lg border border-border">
+                    <div key={`item-${index}`} className="p-4 rounded-lg border border-border">
                       <h3 className="text-lg font-semibold  mb-4 flex items-center gap-2">
                         {section.title === 'Executive Summary' && <PieChart className="h-5 w-5 text-[#1a2744]" />}
                         {section.title === 'Income Breakdown' && <DollarSign className="h-5 w-5 text-[#10B981]" />}
@@ -403,7 +403,7 @@ const ReportGenerator = () => {
                                 </thead>
                                 <tbody>
                                   {section.data.breakdown.map((bracket, i) => (
-                                    <tr key={i} className="border-b">
+                                    <tr key={`item-${i}`} className="border-b">
                                       <td className="p-2 text-muted-foreground">{bracket.bracket}</td>
                                       <td className="text-right p-2">{bracket.rate}%</td>
                                       <td className="text-right p-2">{formatCurrency(bracket.taxable)}</td>
@@ -457,7 +457,7 @@ const ReportGenerator = () => {
                                   </thead>
                                   <tbody>
                                     {section.data.percentile_projections.years.map((year, i) => (
-                                      <tr key={i} className="border-b">
+                                      <tr key={`item-${i}`} className="border-b">
                                         <td className="p-2 font-medium">Year {year}</td>
                                         <td className="text-right p-2 text-destructive">
                                           {formatCurrency(section.data.percentile_projections.p10?.[i] || 0)}
@@ -486,7 +486,7 @@ const ReportGenerator = () => {
                         section.data.length > 0 ? (
                           <div className="space-y-3">
                             {section.data.map((item, i) => (
-                              <div key={i} className="p-3 rounded bg-muted/50">
+                              <div key={`item-${i}`} className="p-3 rounded bg-muted/50">
                                 <p className="font-medium">{item.property_name || `Item ${i + 1}`}</p>
                                 <div className="grid grid-cols-2 gap-2 mt-2 text-sm">
                                   {Object.entries(item)
@@ -665,7 +665,7 @@ const ReportGenerator = () => {
                           
                           return recommendations.map((rec, i) => (
                             <div 
-                              key={i} 
+                              key={`item-${i}`} 
                               className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
                                 rec.priority === 'High' ? 'bg-red-50 border-red-200 hover:border-red-400' :
                                 rec.priority === 'Medium' ? 'bg-amber-50 border-amber-200 hover:border-amber-400' :

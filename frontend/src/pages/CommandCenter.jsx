@@ -483,7 +483,7 @@ const CommandCenter = () => {
                 <div className="grid grid-cols-2 gap-2">
                   {digest?.quick_actions?.map((action, idx) => (
                     <Button
-                      key={idx}
+                      key={`item-${idx}`}
                       variant="outline"
                       className="h-auto py-3 flex flex-col items-center gap-1 hover:bg-[#1a2744] hover:text-white transition-colors"
                       onClick={() => navigate(action.route)}

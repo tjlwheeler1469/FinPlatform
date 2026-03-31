@@ -280,7 +280,7 @@ const Security = () => {
               <CardContent>
                 <div className="space-y-2">
                   {auditLogs.slice(0, 5).map((log, i) => (
-                    <div key={i} className="flex items-center gap-3 p-2 border rounded-lg">
+                    <div key={`item-${i}`} className="flex items-center gap-3 p-2 border rounded-lg">
                       {getEventIcon(log.event_type)}
                       <div className="flex-1">
                         <p className="text-sm font-medium">{log.event_type.replace(/\./g, " → ")}</p>
@@ -363,7 +363,7 @@ const Security = () => {
                             <p className="text-sm mb-2">Store these codes in a safe place. Each code can only be used once.</p>
                             <div className="grid grid-cols-2 gap-2">
                               {["XXXX-XXXX", "XXXX-XXXX", "XXXX-XXXX", "XXXX-XXXX"].map((code, i) => (
-                                <code key={i} className="bg-muted px-2 py-1 rounded text-sm">{code}</code>
+                                <code key={`item-${i}`} className="bg-muted px-2 py-1 rounded text-sm">{code}</code>
                               ))}
                             </div>
                           </AlertDescription>
@@ -409,7 +409,7 @@ const Security = () => {
               <CardContent>
                 <div className="space-y-2 max-h-96 overflow-y-auto">
                   {auditLogs.map((log, i) => (
-                    <div key={i} className="flex items-center gap-3 p-3 border rounded-lg hover:bg-muted/50">
+                    <div key={`item-${i}`} className="flex items-center gap-3 p-3 border rounded-lg hover:bg-muted/50">
                       <div className={`p-2 rounded-full ${
                         log.risk_level === "high" ? "bg-red-100" :
                         log.risk_level === "medium" ? "bg-amber-100" : "bg-blue-100"

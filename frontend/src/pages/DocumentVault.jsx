@@ -384,7 +384,7 @@ const DocumentVault = () => {
                             </div>
                             <div className="flex items-center gap-1">
                               {doc.tags?.slice(0, 2).map((tag, i) => (
-                                <Badge key={i} variant="secondary" className="text-xs">
+                                <Badge key={`item-${i}`} variant="secondary" className="text-xs">
                                   {tag}
                                 </Badge>
                               ))}
@@ -462,7 +462,7 @@ const DocumentVault = () => {
                     <CardContent>
                       <div className="space-y-3">
                         {portfolioInsights.gaps_identified.map((gap, i) => (
-                          <div key={i} className="flex items-start gap-3 p-3 bg-white rounded-lg border">
+                          <div key={`item-${i}`} className="flex items-start gap-3 p-3 bg-white rounded-lg border">
                             <AlertTriangle className={`h-5 w-5 ${gap.priority === "High" ? "text-red-500" : "text-amber-500"}`} />
                             <div className="flex-1">
                               <p className="font-medium">{gap.type}</p>
@@ -490,7 +490,7 @@ const DocumentVault = () => {
                     <CardContent>
                       <div className="space-y-2">
                         {portfolioInsights.upcoming_renewals.map((renewal, i) => (
-                          <div key={i} className="flex items-center gap-4 p-3 border rounded-lg">
+                          <div key={`item-${i}`} className="flex items-center gap-4 p-3 border rounded-lg">
                             <Clock className="h-5 w-5 text-blue-500" />
                             <div className="flex-1">
                               <p className="font-medium">{renewal.document}</p>
@@ -517,7 +517,7 @@ const DocumentVault = () => {
                     <CardContent>
                       <div className="space-y-2">
                         {portfolioInsights.action_items.map((action, i) => (
-                          <div key={i} className="flex items-center gap-4 p-3 border rounded-lg">
+                          <div key={`item-${i}`} className="flex items-center gap-4 p-3 border rounded-lg">
                             <Lightbulb className="h-5 w-5 text-amber-500" />
                             <div className="flex-1">
                               <p className="font-medium">{action.action}</p>
@@ -666,7 +666,7 @@ const DocumentVault = () => {
                     <h4 className="font-medium mb-2">Key Insights</h4>
                     <div className="space-y-2">
                       {aiAnalysis.key_insights.map((insight, i) => (
-                        <div key={i} className="flex items-start gap-2 p-2 bg-blue-50 rounded-lg">
+                        <div key={`item-${i}`} className="flex items-start gap-2 p-2 bg-blue-50 rounded-lg">
                           <Lightbulb className="h-4 w-4 text-blue-500 mt-0.5" />
                           <p className="text-sm">{insight}</p>
                         </div>
@@ -681,7 +681,7 @@ const DocumentVault = () => {
                     <h4 className="font-medium mb-2">Recommendations</h4>
                     <div className="space-y-2">
                       {aiAnalysis.recommendations.map((rec, i) => (
-                        <div key={i} className="flex items-start gap-2 p-2 bg-green-50 rounded-lg">
+                        <div key={`item-${i}`} className="flex items-start gap-2 p-2 bg-green-50 rounded-lg">
                           <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
                           <p className="text-sm">{rec}</p>
                         </div>

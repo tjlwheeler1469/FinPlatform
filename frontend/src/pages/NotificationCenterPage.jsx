@@ -253,7 +253,6 @@ export default function NotificationCenterPage() {
       
       ws.onopen = () => {
         setWsConnected(true);
-        console.log('Notification WebSocket connected');
       };
       
       ws.onmessage = (event) => {

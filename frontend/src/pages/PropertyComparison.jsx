@@ -332,7 +332,7 @@ const PropertyComparison = () => {
                       <tr className="border-b">
                         <th className="text-left p-3 font-semibold">Metric</th>
                         {result.comparisons.map((c, i) => (
-                          <th key={i} className="text-right p-3 font-semibold">
+                          <th key={`item-${i}`} className="text-right p-3 font-semibold">
                             <div className="flex items-center justify-end gap-2">
                               <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
                               {c.property_name}
@@ -345,31 +345,31 @@ const PropertyComparison = () => {
                       <tr className="border-b">
                         <td className="p-3 text-muted-foreground">Value</td>
                         {result.comparisons.map((c, i) => (
-                          <td key={i} className="text-right p-3 font-medium">{formatCurrency(c.metrics.current_value)}</td>
+                          <td key={`item-${i}`} className="text-right p-3 font-medium">{formatCurrency(c.metrics.current_value)}</td>
                         ))}
                       </tr>
                       <tr className="border-b">
                         <td className="p-3 text-muted-foreground">Gross Yield</td>
                         {result.comparisons.map((c, i) => (
-                          <td key={i} className="text-right p-3 font-medium">{c.metrics.gross_yield}%</td>
+                          <td key={`item-${i}`} className="text-right p-3 font-medium">{c.metrics.gross_yield}%</td>
                         ))}
                       </tr>
                       <tr className="border-b">
                         <td className="p-3 text-muted-foreground">Net Yield</td>
                         {result.comparisons.map((c, i) => (
-                          <td key={i} className="text-right p-3 font-medium">{c.metrics.net_yield}%</td>
+                          <td key={`item-${i}`} className="text-right p-3 font-medium">{c.metrics.net_yield}%</td>
                         ))}
                       </tr>
                       <tr className="border-b">
                         <td className="p-3 text-muted-foreground">LVR</td>
                         {result.comparisons.map((c, i) => (
-                          <td key={i} className="text-right p-3 font-medium">{c.metrics.lvr}%</td>
+                          <td key={`item-${i}`} className="text-right p-3 font-medium">{c.metrics.lvr}%</td>
                         ))}
                       </tr>
                       <tr className="border-b">
                         <td className="p-3 text-muted-foreground">Cash Flow (After Tax)</td>
                         {result.comparisons.map((c, i) => (
-                          <td key={i} className={`text-right p-3 font-medium ${c.cash_flow.cash_flow_after_tax >= 0 ? 'text-[#10B981]' : 'text-destructive'}`}>
+                          <td key={`item-${i}`} className={`text-right p-3 font-medium ${c.cash_flow.cash_flow_after_tax >= 0 ? 'text-[#10B981]' : 'text-destructive'}`}>
                             {formatCurrency(c.cash_flow.cash_flow_after_tax)}
                           </td>
                         ))}
@@ -377,25 +377,25 @@ const PropertyComparison = () => {
                       <tr className="border-b">
                         <td className="p-3 text-muted-foreground">Tax Benefit</td>
                         {result.comparisons.map((c, i) => (
-                          <td key={i} className="text-right p-3 font-medium text-[#D4A84C]">{formatCurrency(c.cash_flow.tax_benefit)}</td>
+                          <td key={`item-${i}`} className="text-right p-3 font-medium text-[#D4A84C]">{formatCurrency(c.cash_flow.tax_benefit)}</td>
                         ))}
                       </tr>
                       <tr className="border-b">
                         <td className="p-3 text-muted-foreground">Return on Equity</td>
                         {result.comparisons.map((c, i) => (
-                          <td key={i} className="text-right p-3 font-medium">{c.returns.return_on_equity}%</td>
+                          <td key={`item-${i}`} className="text-right p-3 font-medium">{c.returns.return_on_equity}%</td>
                         ))}
                       </tr>
                       <tr className="border-b bg-muted/30">
                         <td className="p-3 font-semibold">Projected Value ({horizon}yr)</td>
                         {result.comparisons.map((c, i) => (
-                          <td key={i} className="text-right p-3 font-bold text-[#10B981]">{formatCurrency(c.returns.projected_value)}</td>
+                          <td key={`item-${i}`} className="text-right p-3 font-bold text-[#10B981]">{formatCurrency(c.returns.projected_value)}</td>
                         ))}
                       </tr>
                       <tr className="bg-muted/30">
                         <td className="p-3 font-semibold">Total Return ({horizon}yr)</td>
                         {result.comparisons.map((c, i) => (
-                          <td key={i} className="text-right p-3 font-bold">{formatCurrency(c.returns.total_return)}</td>
+                          <td key={`item-${i}`} className="text-right p-3 font-bold">{formatCurrency(c.returns.total_return)}</td>
                         ))}
                       </tr>
                     </tbody>

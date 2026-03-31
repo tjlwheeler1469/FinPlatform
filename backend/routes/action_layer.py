@@ -9,7 +9,8 @@ from typing import Dict, List, Optional, Any
 from datetime import datetime, timezone
 from enum import Enum
 import uuid
-import random
+import secrets
+_rng = secrets.SystemRandom()
 import logging
 
 logger = logging.getLogger(__name__)
@@ -383,7 +384,7 @@ async def execute_trade(request: TradeRequest):
     execution_id = f"trade_{uuid.uuid4().hex[:8]}"
     
     # Simulate trade execution
-    simulated_price = random.uniform(100, 500)
+    simulated_price = _rng.uniform(100, 500)
     quantity = request.quantity or (request.amount / simulated_price if request.amount else 10)
     
     return {

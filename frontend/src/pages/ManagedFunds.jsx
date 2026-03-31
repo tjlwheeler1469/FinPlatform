@@ -161,7 +161,7 @@ const ManagedFunds = () => {
   const renderStars = (rating) => {
     return Array(5).fill(0).map((_, i) => (
       <Star 
-        key={i} 
+        key={`item-${i}`} 
         className={`h-3 w-3 ${i < rating ? "text-amber-400 fill-amber-400" : "text-gray-300"}`} 
       />
     ));
@@ -346,7 +346,7 @@ const ManagedFunds = () => {
               <CardContent>
                 <div className="space-y-4">
                   {FUND_CATEGORIES.map((cat, index) => (
-                    <div key={index} className="space-y-2">
+                    <div key={`item-${index}`} className="space-y-2">
                       <div className="flex justify-between text-sm">
                         <span className="flex items-center gap-2">
                           {getCategoryIcon(cat.name)}

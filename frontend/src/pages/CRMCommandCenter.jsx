@@ -547,7 +547,7 @@ const CRMCommandCenter = () => {
                           {client.accounts.slice(0, 4).map((account, idx) => {
                             const AccountIcon = getAccountIcon(account.type);
                             return (
-                              <div key={idx} className="flex items-center gap-2 px-3 py-1.5 bg-muted rounded-lg">
+                              <div key={`item-${idx}`} className="flex items-center gap-2 px-3 py-1.5 bg-muted rounded-lg">
                                 <AccountIcon className="h-4 w-4 text-muted-foreground" />
                                 <span className="text-sm font-medium">{account.type || account.name}</span>
                                 <span className="text-sm text-muted-foreground">{formatCurrency(account.balance)}</span>

@@ -6,7 +6,8 @@ from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 from typing import Dict, List, Optional, Any
 from datetime import datetime, timezone
-import random
+import secrets
+_rng = secrets.SystemRandom()
 import logging
 
 logger = logging.getLogger(__name__)
@@ -115,7 +116,7 @@ async def screen_stocks(request: ScreenerRequest):
             continue
         
         # Add random daily change
-        change = random.uniform(-3, 3)
+        change = _rng.uniform(-3, 3)
         
         filtered.append({
             "ticker": ticker,
@@ -178,9 +179,9 @@ async def get_stock_details(ticker: str):
             "factors": _get_moat_factors(stock["moat"], stock["sector"])
         },
         "analyst_consensus": {
-            "rating": random.choice(["buy", "hold", "sell"]),
-            "target_price": round(stock["price"] * random.uniform(0.9, 1.3), 2),
-            "analysts_count": random.randint(5, 25)
+            "rating": _rng.choice(["buy", "hold", "sell"]),
+            "target_price": round(stock["price"] * _rng.uniform(0.9, 1.3), 2),
+            "analysts_count": _rng.randint(5, 25)
         },
         "key_metrics": {
             "pe_ratio": stock["pe"],
@@ -273,21 +274,21 @@ async def get_dividend_calendar(month: Optional[int] = None, year: Optional[int]
     for ticker, stock in ASX_STOCKS.items():
         if stock["dividend_yield"] > 0:
             # Random ex-div date in the month
-            ex_div_day = random.randint(1, 28)
+            ex_div_day = _rng.randint(1, 28)
             payment_day = min(ex_div_day + 14, 28)
             
             # Calculate dividend amount
             annual_dividend = stock["price"] * (stock["dividend_yield"] / 100)
             dividend_per_share = annual_dividend / 2  # Semi-annual
             
-            if random.random() > 0.5:  # 50% chance to be in this month
+            if _rng.random() > 0.5:  # 50% chance to be in this month
                 dividends.append({
                     "ticker": ticker,
                     "name": stock["name"],
                     "ex_dividend_date": f"{year}-{month:02d}-{ex_div_day:02d}",
                     "payment_date": f"{year}-{month:02d}-{payment_day:02d}",
                     "dividend_per_share": round(dividend_per_share, 4),
-                    "franking": random.choice([100, 100, 100, 50, 0]),  # Most are 100%
+                    "franking": _rng.choice([100, 100, 100, 50, 0]),  # Most are 100%
                     "yield": stock["dividend_yield"],
                     "frequency": "semi-annual"
                 })
@@ -393,7 +394,7 @@ async def get_sector_breakdown():
             "market_cap_formatted": f"${data['total_market_cap'] / 1e9:.1f}B",
             "avg_pe": round(avg_pe, 1),
             "avg_dividend_yield": round(avg_yield, 1),
-            "change_percent": round(random.uniform(-2, 3), 2),
+            "change_percent": round(_rng.uniform(-2, 3), 2),
             "top_stocks": data["stocks"][:5]
         })
     

@@ -11,7 +11,8 @@ from enum import Enum
 import uuid
 import logging
 import asyncio
-import random
+import secrets
+_rng = secrets.SystemRandom()
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/realtime-data", tags=["Real-Time Data"])
@@ -136,7 +137,7 @@ async def simulate_price_update():
     """Simulate real-time price updates."""
     for symbol, data in LIVE_DATA_STORE["market_data"].items():
         # Random price movement (-1% to +1%)
-        change_pct = random.uniform(-0.01, 0.01)
+        change_pct = _rng.uniform(-0.01, 0.01)
         new_price = data["price"] * (1 + change_pct)
         data["price"] = round(new_price, 2)
         data["change"] = round(change_pct * 100, 2)

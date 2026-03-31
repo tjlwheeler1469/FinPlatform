@@ -160,7 +160,7 @@ export default function ComplianceCenter() {
             <CardContent>
               <div className="space-y-3">
                 {dashboard?.risk_alerts.map((alert, idx) => (
-                  <div key={idx} className={`p-4 rounded-lg border ${
+                  <div key={`item-${idx}`} className={`p-4 rounded-lg border ${
                     alert.severity === 'high' ? 'bg-red-500/10 border-red-500/30' :
                     alert.severity === 'medium' ? 'bg-amber-500/10 border-amber-500/30' :
                     'bg-blue-500/10 border-blue-500/30'
@@ -228,7 +228,7 @@ export default function ComplianceCenter() {
             <CardContent>
               <div className="space-y-3">
                 {dashboard?.upcoming_reviews.map((review, idx) => (
-                  <div key={idx} className="bg-slate-900/50 rounded-lg p-4 border border-slate-700 flex items-center justify-between">
+                  <div key={`item-${idx}`} className="bg-slate-900/50 rounded-lg p-4 border border-slate-700 flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
                         {review.client_name.split(' ').map(n => n[0]).join('')}
@@ -347,7 +347,7 @@ export default function ComplianceCenter() {
             <CardContent>
               <div className="space-y-3">
                 {dashboard?.recent_activity.map((activity, idx) => (
-                  <div key={idx} className="flex items-center gap-4 p-3 bg-slate-900/50 rounded-lg border border-slate-700">
+                  <div key={`item-${idx}`} className="flex items-center gap-4 p-3 bg-slate-900/50 rounded-lg border border-slate-700">
                     <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
                       <FileText className="w-5 h-5 text-purple-400" />
                     </div>

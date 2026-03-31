@@ -8,7 +8,8 @@ from typing import Dict, List, Optional, Any
 from datetime import datetime, timezone, timedelta
 import uuid
 import logging
-import random
+import secrets
+_rng = secrets.SystemRandom()
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/command-center", tags=["Command Center"])
@@ -53,9 +54,9 @@ def generate_daily_alerts() -> List[Dict]:
     now = datetime.now(timezone.utc)
     
     # Portfolio Drift Alerts
-    drift_clients = random.sample(CLIENTS, 3)
+    drift_clients = _rng.sample(CLIENTS, 3)
     for i, client in enumerate(drift_clients):
-        drift_pct = random.uniform(5, 15)
+        drift_pct = _rng.uniform(5, 15)
         alerts.append({
             "id": f"alert_{uuid.uuid4().hex[:8]}",
             "type": AlertType.PORTFOLIO_DRIFT,
@@ -67,7 +68,7 @@ def generate_daily_alerts() -> List[Dict]:
             "impact": f"Risk exposure increased - potential ${int(client['aum'] * drift_pct / 100):,} variance",
             "action_text": "Review & Rebalance",
             "action_route": "/client-wealth",
-            "created_at": (now - timedelta(hours=random.randint(1, 12))).isoformat(),
+            "created_at": (now - timedelta(hours=_rng.randint(1, 12))).isoformat(),
             "metadata": {
                 "drift_percentage": drift_pct,
                 "overweight_asset": "Australian Equities",
@@ -76,9 +77,9 @@ def generate_daily_alerts() -> List[Dict]:
         })
     
     # Tax-Loss Harvesting Opportunities
-    tax_clients = random.sample(CLIENTS, 2)
+    tax_clients = _rng.sample(CLIENTS, 2)
     for client in tax_clients:
-        loss_amount = random.randint(5000, 25000)
+        loss_amount = _rng.randint(5000, 25000)
         tax_saved = int(loss_amount * 0.39)  # Top marginal rate
         alerts.append({
             "id": f"alert_{uuid.uuid4().hex[:8]}",
@@ -91,7 +92,7 @@ def generate_daily_alerts() -> List[Dict]:
             "impact": f"Save ${tax_saved:,} in tax this financial year",
             "action_text": "Execute Harvest",
             "action_route": "/tax-analysis",
-            "created_at": (now - timedelta(hours=random.randint(1, 24))).isoformat(),
+            "created_at": (now - timedelta(hours=_rng.randint(1, 24))).isoformat(),
             "metadata": {
                 "unrealised_loss": loss_amount,
                 "tax_savings": tax_saved,
@@ -100,9 +101,9 @@ def generate_daily_alerts() -> List[Dict]:
         })
     
     # Idle Cash Alerts
-    cash_clients = random.sample(CLIENTS, 2)
+    cash_clients = _rng.sample(CLIENTS, 2)
     for client in cash_clients:
-        idle_cash = random.randint(50000, 200000)
+        idle_cash = _rng.randint(50000, 200000)
         opportunity_cost = int(idle_cash * 0.05)  # 5% opportunity cost
         alerts.append({
             "id": f"alert_{uuid.uuid4().hex[:8]}",
@@ -115,18 +116,18 @@ def generate_daily_alerts() -> List[Dict]:
             "impact": f"Annual opportunity cost: ${opportunity_cost:,}",
             "action_text": "Invest Cash",
             "action_route": "/client-wealth",
-            "created_at": (now - timedelta(hours=random.randint(6, 48))).isoformat(),
+            "created_at": (now - timedelta(hours=_rng.randint(6, 48))).isoformat(),
             "metadata": {
                 "idle_amount": idle_cash,
-                "days_idle": random.randint(30, 90),
+                "days_idle": _rng.randint(30, 90),
                 "suggested_allocation": ["Term Deposit", "Money Market ETF", "Bond Fund"]
             }
         })
     
     # Compliance Due Alerts
-    compliance_clients = random.sample(CLIENTS, 2)
+    compliance_clients = _rng.sample(CLIENTS, 2)
     for client in compliance_clients:
-        days_until_due = random.randint(-5, 14)
+        days_until_due = _rng.randint(-5, 14)
         alerts.append({
             "id": f"alert_{uuid.uuid4().hex[:8]}",
             "type": AlertType.COMPLIANCE_DUE,
@@ -138,7 +139,7 @@ def generate_daily_alerts() -> List[Dict]:
             "impact": "Compliance requirement - ASIC Reg Guide 175",
             "action_text": "Schedule Review",
             "action_route": "/compliance",
-            "created_at": (now - timedelta(hours=random.randint(1, 6))).isoformat(),
+            "created_at": (now - timedelta(hours=_rng.randint(1, 6))).isoformat(),
             "metadata": {
                 "days_until_due": days_until_due,
                 "last_review": (now - timedelta(days=365 + abs(days_until_due))).strftime("%Y-%m-%d"),
@@ -147,7 +148,7 @@ def generate_daily_alerts() -> List[Dict]:
         })
     
     # Goal At Risk Alerts
-    goal_clients = random.sample(CLIENTS, 1)
+    goal_clients = _rng.sample(CLIENTS, 1)
     for client in goal_clients:
         alerts.append({
             "id": f"alert_{uuid.uuid4().hex[:8]}",
@@ -160,7 +161,7 @@ def generate_daily_alerts() -> List[Dict]:
             "impact": "Projected shortfall of $245,000 at retirement",
             "action_text": "Run Scenario",
             "action_route": "/decision-center",
-            "created_at": (now - timedelta(hours=random.randint(1, 24))).isoformat(),
+            "created_at": (now - timedelta(hours=_rng.randint(1, 24))).isoformat(),
             "metadata": {
                 "goal_name": "Retirement at 65",
                 "target_amount": 2500000,
@@ -190,7 +191,7 @@ def generate_daily_alerts() -> List[Dict]:
     })
     
     # Fee Optimization Alert
-    fee_client = random.choice(CLIENTS)
+    fee_client = _rng.choice(CLIENTS)
     alerts.append({
         "id": f"alert_{uuid.uuid4().hex[:8]}",
         "type": AlertType.FEE_OPTIMIZATION,
@@ -202,7 +203,7 @@ def generate_daily_alerts() -> List[Dict]:
         "impact": "Annual savings of $3,200 (0.15% of AUM)",
         "action_text": "View Options",
         "action_route": "/product-marketplace",
-        "created_at": (now - timedelta(hours=random.randint(12, 72))).isoformat(),
+        "created_at": (now - timedelta(hours=_rng.randint(12, 72))).isoformat(),
         "metadata": {
             "current_fee": 0.85,
             "optimized_fee": 0.70,
@@ -222,8 +223,8 @@ def generate_daily_metrics() -> Dict:
     total_aum = sum(c["aum"] for c in CLIENTS)
     return {
         "total_aum": total_aum,
-        "aum_change_24h": random.uniform(-0.5, 1.2),
-        "aum_change_mtd": random.uniform(-2, 4),
+        "aum_change_24h": _rng.uniform(-0.5, 1.2),
+        "aum_change_mtd": _rng.uniform(-2, 4),
         "total_clients": len(CLIENTS),
         "active_clients": len(CLIENTS) - 1,
         "reviews_due_30d": 4,

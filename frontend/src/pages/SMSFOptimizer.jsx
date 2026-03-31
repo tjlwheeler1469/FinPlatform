@@ -430,7 +430,7 @@ const SMSFOptimizer = () => {
                     <div className="space-y-3">
                       {result.recommendations.map((rec, index) => (
                         <div 
-                          key={index} 
+                          key={`item-${index}`} 
                           className="flex items-start gap-3 p-3 rounded-lg bg-muted/50"
                         >
                           <CheckCircle className="h-5 w-5 text-[#10B981] flex-shrink-0 mt-0.5" />

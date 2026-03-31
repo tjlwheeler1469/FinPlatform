@@ -486,12 +486,12 @@ def _generate_sample_history(client_id: str, days: int) -> List[Dict[str, Any]]:
     import random
     
     history = []
-    base_score = 75 + random.uniform(-10, 15)
+    base_score = 75 + _rng.uniform(-10, 15)
     current_date = datetime.now(timezone.utc) - timedelta(days=days)
     
     while current_date <= datetime.now(timezone.utc):
         # Add some random variation with slight upward trend
-        variation = random.uniform(-3, 4)
+        variation = _rng.uniform(-3, 4)
         base_score = max(20, min(100, base_score + variation * 0.3))
         
         history.append({
@@ -500,16 +500,16 @@ def _generate_sample_history(client_id: str, days: int) -> List[Dict[str, Any]]:
             "timestamp": current_date,
             "confidence_score": round(base_score, 1),
             "risk_breakdown": {
-                "longevity_risk": round(random.uniform(0, 15), 1),
-                "market_risk": round(random.uniform(0, 20), 1),
-                "spending_risk": round(random.uniform(0, 10), 1),
-                "inflation_risk": round(random.uniform(0, 8), 1)
+                "longevity_risk": round(_rng.uniform(0, 15), 1),
+                "market_risk": round(_rng.uniform(0, 20), 1),
+                "spending_risk": round(_rng.uniform(0, 10), 1),
+                "inflation_risk": round(_rng.uniform(0, 8), 1)
             },
             "calculated_by": "system",
             "notes": None
         })
         
         # Move forward by 7-14 days
-        current_date += timedelta(days=random.randint(7, 14))
+        current_date += timedelta(days=_rng.randint(7, 14))
     
     return history

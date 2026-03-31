@@ -614,7 +614,7 @@ export default function BreachRegister() {
                       <div className="text-xs font-medium text-gray-500 mb-2">EXAMPLES</div>
                       <ul className="text-sm text-gray-600 space-y-1">
                         {value.examples?.map((ex, idx) => (
-                          <li key={idx} className="flex items-start gap-2">
+                          <li key={`item-${idx}`} className="flex items-start gap-2">
                             <span className="text-gray-400">•</span>
                             {ex}
                           </li>

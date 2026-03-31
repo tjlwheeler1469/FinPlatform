@@ -7,7 +7,8 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Dict, List, Optional, Any
 from datetime import datetime, timezone, timedelta
-import random
+import secrets
+_rng = secrets.SystemRandom()
 import logging
 
 logger = logging.getLogger(__name__)
@@ -252,7 +253,7 @@ async def get_performance_analysis(client_id: str, period: str = "1y"):
     base_value = 1800000
     for i in range(days, 0, -7):  # Weekly data points
         date = (now - timedelta(days=i)).strftime("%Y-%m-%d")
-        value = base_value * (1 + random.uniform(-0.02, 0.03))
+        value = base_value * (1 + _rng.uniform(-0.02, 0.03))
         base_value = value
         data_points.append({"date": date, "value": round(value, 2)})
     

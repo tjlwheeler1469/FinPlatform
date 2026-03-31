@@ -3,7 +3,7 @@ User Profile API - Manage user profile data and preferences
 """
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 from datetime import datetime
 from bson import ObjectId
 import os
@@ -161,7 +161,7 @@ async def create_profile(profile: UserProfile):
     return profile
 
 @router.get("/{user_id}/summary")
-async def get_profile_summary(user_id: str):
+async def get_profile_summary(user_id: str) -> Dict[str, Any]:
     """Get profile summary with calculated fields"""
     profile = await get_profile(user_id)
     

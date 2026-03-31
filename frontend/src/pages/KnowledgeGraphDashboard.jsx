@@ -639,7 +639,7 @@ const KnowledgeGraphDashboard = () => {
                       </div>
                       <div className="mt-2 flex flex-wrap gap-1">
                         {risk.retirement_risk?.risk_factors?.map((factor, i) => (
-                          <Badge key={i} variant="destructive" className="text-xs">{factor}</Badge>
+                          <Badge key={`item-${i}`} variant="destructive" className="text-xs">{factor}</Badge>
                         ))}
                       </div>
                     </div>
@@ -655,7 +655,7 @@ const KnowledgeGraphDashboard = () => {
 
             <h3 className="font-semibold">Cross-Client Risks</h3>
             {crossClientRisks.map((risk, i) => (
-              <Card key={i} className="border-l-4 border-orange-400">
+              <Card key={`item-${i}`} className="border-l-4 border-orange-400">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Badge className={getSeverityColor(risk.severity)}>
@@ -684,7 +684,7 @@ const KnowledgeGraphDashboard = () => {
                       </p>
                       <div className="mt-3 space-y-2">
                         {opp.opportunities?.map((opportunity, i) => (
-                          <div key={i} className="p-2 bg-emerald-50 rounded">
+                          <div key={`item-${i}`} className="p-2 bg-emerald-50 rounded">
                             <div className="flex items-center justify-between">
                               <span className="text-sm font-medium">{opportunity.description}</span>
                               <Badge variant="secondary">{formatCurrency(opportunity.potential_revenue)}</Badge>

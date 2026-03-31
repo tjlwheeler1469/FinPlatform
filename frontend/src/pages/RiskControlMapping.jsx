@@ -300,7 +300,7 @@ export default function RiskControlMapping() {
             <CardContent>
               <div className="grid grid-cols-1 gap-4">
                 {matrix.map((item, idx) => (
-                  <div key={idx} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                  <div key={`item-${idx}`} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-3">
@@ -505,7 +505,7 @@ export default function RiskControlMapping() {
                         </TableRow>
                       ))
                     ) : (
-                      <TableRow key={idx}>
+                      <TableRow key={`item-${idx}`}>
                         <TableCell className="font-medium">{item.risk.name}</TableCell>
                         <TableCell>
                           <Badge className={getRatingColor(item.risk.rating)}>

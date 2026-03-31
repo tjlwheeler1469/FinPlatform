@@ -8,7 +8,8 @@ from typing import Dict, List, Optional, Any
 from datetime import datetime, timezone, timedelta
 import uuid
 import logging
-import random
+import secrets
+_rng = secrets.SystemRandom()
 import os
 
 logger = logging.getLogger(__name__)

@@ -442,7 +442,7 @@ const MacroDashboard = () => {
                     <CardTitle className="text-lg capitalize">{region}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {Array.isArray(data) && data.map((item, idx) => <IndexRow key={idx} item={item} />)}
+                    {Array.isArray(data) && data.map((item, idx) => <IndexRow key={`item-${idx}`} item={item} />)}
                   </CardContent>
                 </Card>
               ))}
@@ -460,7 +460,7 @@ const MacroDashboard = () => {
                   </CardHeader>
                   <CardContent>
                     {Array.isArray(pairs) && pairs.map((pair, idx) => (
-                      <div key={idx} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                      <div key={`item-${idx}`} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                         <span className="font-medium">{pair.pair}</span>
                         <div className="text-right">
                           <span className="font-medium">{formatPrice(pair.rate, 4)}</span>
@@ -485,7 +485,7 @@ const MacroDashboard = () => {
                   </CardHeader>
                   <CardContent>
                     {Array.isArray(bondList) && bondList.map((bond, idx) => (
-                      <div key={idx} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                      <div key={`item-${idx}`} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                         <span className="text-sm">{bond.name}</span>
                         <div className="text-right">
                           <span className="font-medium">{bond.yield}%</span>
@@ -515,7 +515,7 @@ const MacroDashboard = () => {
                   </CardHeader>
                   <CardContent>
                     {Array.isArray(items) && items.map((item, idx) => (
-                      <div key={idx} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                      <div key={`item-${idx}`} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                         <div>
                           <span className="font-medium">{item.name}</span>
                           <span className="text-xs text-muted-foreground ml-2">/{item.unit}</span>
@@ -537,7 +537,7 @@ const MacroDashboard = () => {
           <TabsContent value="crypto" className="mt-4">
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
               {crypto?.cryptocurrencies?.map((coin, idx) => (
-                <Card key={idx}>
+                <Card key={`item-${idx}`}>
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
@@ -569,7 +569,7 @@ const MacroDashboard = () => {
                   </CardHeader>
                   <CardContent>
                     {Array.isArray(items) && items.map((item, idx) => (
-                      <div key={idx} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                      <div key={`item-${idx}`} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                         <div>
                           <span className="font-medium">{item.name}</span>
                           <span className="text-xs text-muted-foreground ml-2">{item.expiry}</span>
@@ -610,7 +610,7 @@ const MacroDashboard = () => {
             {newsLoading ? (
               <div className="space-y-3">
                 {[1,2,3,4,5].map(i => (
-                  <div key={i} className="flex gap-4 p-3 rounded-lg border">
+                  <div key={`item-${i}`} className="flex gap-4 p-3 rounded-lg border">
                     <Skeleton className="h-12 w-12 rounded" />
                     <div className="flex-1 space-y-2">
                       <Skeleton className="h-4 w-3/4" />
@@ -624,7 +624,7 @@ const MacroDashboard = () => {
                 <div className="space-y-3">
                   {news.map((item, idx) => (
                     <a
-                      key={idx}
+                      key={`item-${idx}`}
                       href={item.link || "#"}
                       target="_blank"
                       rel="noopener noreferrer"

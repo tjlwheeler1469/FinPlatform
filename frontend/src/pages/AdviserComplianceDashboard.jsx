@@ -384,7 +384,7 @@ const AdviserComplianceDashboard = () => {
                             {file.findings.length > 0 && (
                               <div className="mt-2 space-y-1">
                                 {file.findings.map((finding, idx) => (
-                                  <p key={idx} className="text-sm text-red-700">• {finding}</p>
+                                  <p key={`item-${idx}`} className="text-sm text-red-700">• {finding}</p>
                                 ))}
                               </div>
                             )}
@@ -481,7 +481,7 @@ const AdviserComplianceDashboard = () => {
                         {file.findings.length > 0 && (
                           <div className="mt-2 ml-14 flex flex-wrap gap-2">
                             {file.findings.slice(0, 2).map((finding, idx) => (
-                              <Badge key={idx} variant="destructive" className="text-xs">
+                              <Badge key={`item-${idx}`} variant="destructive" className="text-xs">
                                 {finding}
                               </Badge>
                             ))}
@@ -565,7 +565,7 @@ const AdviserComplianceDashboard = () => {
                 { title: 'Risk Assessment Report', description: 'Client risk profile alignment', icon: AlertTriangle },
                 { title: 'Audit Trail Report', description: 'Document changes and reviews', icon: FileCheck },
               ].map((report, idx) => (
-                <Card key={idx} className="hover:shadow-md transition-shadow cursor-pointer">
+                <Card key={`item-${idx}`} className="hover:shadow-md transition-shadow cursor-pointer">
                   <CardContent className="p-6">
                     <report.icon className="h-10 w-10 text-blue-600 mb-4" />
                     <h3 className="font-semibold mb-2">{report.title}</h3>

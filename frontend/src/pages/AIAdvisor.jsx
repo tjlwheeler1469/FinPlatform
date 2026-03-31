@@ -206,7 +206,7 @@ const AIAdvisor = () => {
                   <div className="flex flex-wrap gap-2">
                     {quickQuestions.map((q, idx) => (
                       <Button
-                        key={idx}
+                        key={`item-${idx}`}
                         variant="outline"
                         size="sm"
                         onClick={() => handleAskQuestion(q)}
@@ -246,7 +246,7 @@ const AIAdvisor = () => {
                         <p className="text-sm font-medium text-green-800 mb-2">Key Strengths</p>
                         <ul className="text-sm text-green-700 space-y-1">
                           {advice.analysis?.key_strengths?.map((s, i) => (
-                            <li key={i}>• {s}</li>
+                            <li key={`item-${i}`}>• {s}</li>
                           ))}
                         </ul>
                       </div>
@@ -254,7 +254,7 @@ const AIAdvisor = () => {
                         <p className="text-sm font-medium text-yellow-800 mb-2">Areas to Improve</p>
                         <ul className="text-sm text-yellow-700 space-y-1">
                           {advice.analysis?.areas_for_improvement?.map((s, i) => (
-                            <li key={i}>• {s}</li>
+                            <li key={`item-${i}`}>• {s}</li>
                           ))}
                         </ul>
                       </div>
@@ -280,7 +280,7 @@ const AIAdvisor = () => {
                   <CardContent className="space-y-4">
                     {advice.recommendations?.map((rec, idx) => (
                       <div 
-                        key={idx}
+                        key={`item-${idx}`}
                         className="flex items-start gap-4 p-4 border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
                         onClick={() => navigate("/decision-engine")}
                       >
@@ -324,7 +324,7 @@ const AIAdvisor = () => {
                   <AlertDescription>
                     <ul className="text-sm space-y-1 mt-2">
                       {advice.disclaimers?.map((d, i) => (
-                        <li key={i}>• {d}</li>
+                        <li key={`item-${i}`}>• {d}</li>
                       ))}
                     </ul>
                   </AlertDescription>
@@ -347,7 +347,7 @@ const AIAdvisor = () => {
                   <div className="space-y-4">
                     {adviceHistory.map((item, idx) => (
                       <div 
-                        key={idx}
+                        key={`item-${idx}`}
                         className="p-4 border rounded-lg hover:bg-muted/50 cursor-pointer"
                         onClick={() => setAdvice(item)}
                       >

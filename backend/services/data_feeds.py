@@ -10,7 +10,8 @@ Provides secure mock data feeds simulating:
 All data is encrypted at rest using AES-256-GCM per APRA CPS 234.
 """
 
-import random
+import secrets
+_rng = secrets.SystemRandom()
 import hashlib
 from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Any, Optional
@@ -91,28 +92,28 @@ class SecureDataFeedService:
         """
         random.seed(hash(customer_id) % 2**32)
         
-        _ = random.choice(CDR_BANKS)  # Bank selection for seed consistency
-        num_accounts = random.randint(2, 5)
+        _ = _rng.choice(CDR_BANKS)  # Bank selection for seed consistency
+        num_accounts = _rng.randint(2, 5)
         
         accounts = []
         for i in range(num_accounts):
-            account_type = random.choice(["TRANS_AND_SAVINGS_ACCOUNTS", "TERM_DEPOSITS", "CREDIT_CARD"])
+            account_type = _rng.choice(["TRANS_AND_SAVINGS_ACCOUNTS", "TERM_DEPOSITS", "CREDIT_CARD"])
             
             if account_type == "TRANS_AND_SAVINGS_ACCOUNTS":
-                balance = round(random.uniform(5000, 150000), 2)
-                product = random.choice(["Everyday Account", "NetBank Saver", "GoalSaver", "Smart Access"])
+                balance = round(_rng.uniform(5000, 150000), 2)
+                product = _rng.choice(["Everyday Account", "NetBank Saver", "GoalSaver", "Smart Access"])
             elif account_type == "TERM_DEPOSITS":
-                balance = round(random.uniform(50000, 500000), 2)
+                balance = round(_rng.uniform(50000, 500000), 2)
                 product = "Term Deposit"
             else:
-                balance = -round(random.uniform(500, 15000), 2)
-                product = random.choice(["Platinum Card", "Low Rate Card", "Awards Card"])
+                balance = -round(_rng.uniform(500, 15000), 2)
+                product = _rng.choice(["Platinum Card", "Low Rate Card", "Awards Card"])
             
             account = {
                 "accountId": f"ACC{hash(f'{customer_id}_{i}') % 10**12:012d}",
                 "displayName": f"{product}",
-                "bsb": f"{random.randint(100, 999)}-{random.randint(100, 999)}",
-                "accountNumber": f"{random.randint(10000000, 99999999)}",
+                "bsb": f"{_rng.randint(100, 999)}-{_rng.randint(100, 999)}",
+                "accountNumber": f"{_rng.randint(10000000, 99999999)}",
                 "productCategory": account_type,
                 "productName": product,
                 "balance": {
@@ -122,7 +123,7 @@ class SecureDataFeedService:
                 },
                 "isOwned": True,
                 "openStatus": "OPEN",
-                "creationDate": (datetime.now() - timedelta(days=random.randint(365, 3650))).strftime("%Y-%m-%d"),
+                "creationDate": (datetime.now() - timedelta(days=_rng.randint(365, 3650))).strftime("%Y-%m-%d"),
             }
             accounts.append(account)
         
@@ -166,21 +167,21 @@ class SecureDataFeedService:
         
         for day in range(days):
             date = current_date - timedelta(days=day)
-            num_txns = random.randint(0, 5)
+            num_txns = _rng.randint(0, 5)
             
             for _ in range(num_txns):
-                category, merchants = random.choice(categories)
-                merchant = random.choice(merchants)
-                amount = -round(random.uniform(5, 200), 2)
+                category, merchants = _rng.choice(categories)
+                merchant = _rng.choice(merchants)
+                amount = -round(_rng.uniform(5, 200), 2)
                 
                 # Occasional income
-                if random.random() < 0.05:
-                    amount = round(random.uniform(500, 5000), 2)
-                    merchant = random.choice(["Employer Salary", "Interest", "Refund"])
+                if _rng.random() < 0.05:
+                    amount = round(_rng.uniform(500, 5000), 2)
+                    merchant = _rng.choice(["Employer Salary", "Interest", "Refund"])
                     category = "Income"
                 
                 txn = {
-                    "transactionId": f"TXN{random.randint(10**15, 10**16)}",
+                    "transactionId": f"TXN{_rng.randint(10**15, 10**16)}",
                     "isDetailAvailable": True,
                     "type": "DIRECT_DEBIT" if amount < 0 else "DIRECT_CREDIT",
                     "status": "POSTED",
@@ -189,7 +190,7 @@ class SecureDataFeedService:
                     "executionDateTime": date.isoformat(),
                     "amount": str(amount),
                     "currency": "AUD",
-                    "reference": f"REF{random.randint(100000, 999999)}",
+                    "reference": f"REF{_rng.randint(100000, 999999)}",
                     "merchantName": merchant,
                     "merchantCategoryCode": category,
                 }
@@ -208,8 +209,8 @@ class SecureDataFeedService:
         """Get superannuation balance and allocation."""
         random.seed(hash(member_number) % 2**32)
         
-        fund = random.choice(SUPER_FUNDS)
-        balance = round(random.uniform(100000, 2000000), 2)
+        fund = _rng.choice(SUPER_FUNDS)
+        balance = round(_rng.uniform(100000, 2000000), 2)
         
         # Investment options
         options = [
@@ -225,7 +226,7 @@ class SecureDataFeedService:
             "balance": {
                 "total": balance,
                 "accumulation": balance * 0.85,
-                "pension": balance * 0.15 if random.random() > 0.5 else 0,
+                "pension": balance * 0.15 if _rng.random() > 0.5 else 0,
                 "currency": "AUD"
             },
             "investments": [
@@ -241,9 +242,9 @@ class SecureDataFeedService:
                 "income_protection": round(balance * 0.006, 0)
             },
             "contributions": {
-                "employer_ytd": round(random.uniform(10000, 30000), 2),
-                "personal_ytd": round(random.uniform(0, 15000), 2),
-                "last_contribution_date": (datetime.now() - timedelta(days=random.randint(1, 30))).strftime("%Y-%m-%d")
+                "employer_ytd": round(_rng.uniform(10000, 30000), 2),
+                "personal_ytd": round(_rng.uniform(0, 15000), 2),
+                "last_contribution_date": (datetime.now() - timedelta(days=_rng.randint(1, 30))).strftime("%Y-%m-%d")
             },
             "_security": {
                 "encrypted": True,
@@ -261,17 +262,17 @@ class SecureDataFeedService:
             company = next((c for c in ASX_COMPANIES if c["symbol"] == symbol), None)
             if company:
                 base_price = hash(symbol) % 200 + 10
-                current_price = base_price * (1 + random.uniform(-0.05, 0.05))
+                current_price = base_price * (1 + _rng.uniform(-0.05, 0.05))
                 
                 prices.append({
                     "symbol": symbol,
                     "name": company["name"],
                     "sector": company["sector"],
                     "price": round(current_price, 2),
-                    "change": round(random.uniform(-3, 3), 2),
-                    "changePercent": round(random.uniform(-2, 2), 2),
-                    "volume": random.randint(100000, 5000000),
-                    "marketCap": round(current_price * random.randint(1000000, 100000000), 0),
+                    "change": round(_rng.uniform(-3, 3), 2),
+                    "changePercent": round(_rng.uniform(-2, 2), 2),
+                    "volume": _rng.randint(100000, 5000000),
+                    "marketCap": round(current_price * _rng.randint(1000000, 100000000), 0),
                     "timestamp": datetime.now(timezone.utc).isoformat()
                 })
         
@@ -290,7 +291,7 @@ class SecureDataFeedService:
         
         # Base value depends on suburb
         suburb_factor = 1 + (hash(address.split()[-1] if address else "Sydney") % 10) / 10
-        base_value = random.randint(600000, 2500000) * suburb_factor
+        base_value = _rng.randint(600000, 2500000) * suburb_factor
         
         return {
             "address": address,
@@ -298,19 +299,19 @@ class SecureDataFeedService:
                 "estimate": round(base_value, -3),
                 "low": round(base_value * 0.9, -3),
                 "high": round(base_value * 1.1, -3),
-                "confidence": random.choice(["HIGH", "MEDIUM", "LOW"]),
+                "confidence": _rng.choice(["HIGH", "MEDIUM", "LOW"]),
                 "as_at": datetime.now().strftime("%Y-%m-%d")
             },
-            "property_type": random.choice(["House", "Unit", "Townhouse"]),
-            "bedrooms": random.randint(2, 5),
-            "bathrooms": random.randint(1, 3),
-            "car_spaces": random.randint(1, 3),
-            "land_size": random.randint(200, 800) if random.random() > 0.3 else None,
+            "property_type": _rng.choice(["House", "Unit", "Townhouse"]),
+            "bedrooms": _rng.randint(2, 5),
+            "bathrooms": _rng.randint(1, 3),
+            "car_spaces": _rng.randint(1, 3),
+            "land_size": _rng.randint(200, 800) if _rng.random() > 0.3 else None,
             "comparable_sales": [
                 {
-                    "address": f"{random.randint(1, 100)} Nearby Street",
-                    "sold_price": round(base_value * random.uniform(0.9, 1.1), -3),
-                    "sold_date": (datetime.now() - timedelta(days=random.randint(30, 180))).strftime("%Y-%m-%d")
+                    "address": f"{_rng.randint(1, 100)} Nearby Street",
+                    "sold_price": round(base_value * _rng.uniform(0.9, 1.1), -3),
+                    "sold_date": (datetime.now() - timedelta(days=_rng.randint(30, 180))).strftime("%Y-%m-%d")
                 }
                 for _ in range(3)
             ],

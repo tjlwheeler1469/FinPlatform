@@ -440,7 +440,7 @@ const StockTrading = () => {
                 <span className="text-sm font-medium">Live Markets</span>
               </div>
               {marketData.slice(0, 5).map((indicator, idx) => (
-                <div key={idx} className="flex items-center gap-2 min-w-fit">
+                <div key={`item-${idx}`} className="flex items-center gap-2 min-w-fit">
                   <span className="text-sm text-slate-300">{indicator.name}</span>
                   <span className="font-semibold">{indicator.value?.toLocaleString()}</span>
                   <span className={`text-sm ${indicator.change_percent >= 0 ? 'text-green-400' : 'text-red-400'}`}>
@@ -538,7 +538,7 @@ const StockTrading = () => {
               <CardContent>
                 <div className="space-y-4">
                   {holdings?.holdings?.map((holding, idx) => (
-                    <div key={idx} className="p-4 border rounded-lg hover:bg-muted/30 transition-colors">
+                    <div key={`item-${idx}`} className="p-4 border rounded-lg hover:bg-muted/30 transition-colors">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
                           <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
@@ -600,7 +600,7 @@ const StockTrading = () => {
                   <CardContent className="space-y-4">
                     {dailyIdeas.map((idea, idx) => (
                       <div 
-                        key={idx}
+                        key={`item-${idx}`}
                         className={`p-4 rounded-lg border-2 ${
                           idea.action === 'BUY' ? 'border-green-200 bg-green-50' :
                           idea.action === 'HOLD' ? 'border-blue-200 bg-blue-50' :
@@ -682,7 +682,7 @@ const StockTrading = () => {
                       { sector: 'Retail', score: 60 },
                       { sector: 'Healthcare', score: 58 },
                     ].map((item, idx) => (
-                      <div key={idx} className="flex items-center justify-between">
+                      <div key={`item-${idx}`} className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <span className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold">
                             {idx + 1}

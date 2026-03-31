@@ -351,7 +351,7 @@ export default function ClientWealth() {
             <CardContent>
               <div className="flex gap-4 overflow-x-auto pb-2">
                 {connectedAccounts.slice(0, 5).map((account, idx) => (
-                  <div key={idx} className="flex-shrink-0 bg-muted rounded-lg p-3 min-w-[200px]">
+                  <div key={`item-${idx}`} className="flex-shrink-0 bg-muted rounded-lg p-3 min-w-[200px]">
                     <div className="flex items-center gap-2 mb-2">
                       <CheckCircle className="w-4 h-4 text-green-500" />
                       <span className="font-medium text-sm">{account.institution}</span>
@@ -502,7 +502,7 @@ export default function ClientWealth() {
           <TabsContent value="property" className="mt-4">
             <div className="grid gap-4">
               {wealthData?.property?.properties?.map((property, idx) => (
-                <Card key={idx}>
+                <Card key={`item-${idx}`}>
                   <CardContent className="p-6">
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-4">
@@ -559,7 +559,7 @@ export default function ClientWealth() {
           <TabsContent value="super" className="mt-4">
             <div className="grid gap-4">
               {wealthData?.super?.funds?.map((fund, idx) => (
-                <Card key={idx}>
+                <Card key={`item-${idx}`}>
                   <CardContent className="p-6">
                     <div className="flex items-start justify-between mb-6">
                       <div className="flex items-start gap-4">
@@ -723,7 +723,7 @@ export default function ClientWealth() {
               <CardContent>
                 <div className="grid gap-4">
                   {wealthData?.cash?.accounts?.map((account, idx) => (
-                    <div key={idx} className="bg-muted rounded-lg p-4 flex items-center justify-between">
+                    <div key={`item-${idx}`} className="bg-muted rounded-lg p-4 flex items-center justify-between">
                       <div className="flex items-center gap-4">
                         <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
                           account.type === 'term_deposit' ? 'bg-purple-100' : 

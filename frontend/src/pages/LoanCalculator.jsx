@@ -250,7 +250,7 @@ const LoanCalculator = () => {
                 <div className="space-y-3">
                   {result.variable_rate_scenarios.map((scenario, index) => (
                     <div 
-                      key={index}
+                      key={`item-${index}`}
                       className={`p-4 rounded-lg border ${
                         scenario.rate_change === 0 
                           ? 'border-[#1a2744] bg-[#1a2744]/5' 

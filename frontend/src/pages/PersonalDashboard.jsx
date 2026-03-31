@@ -591,7 +591,7 @@ const PersonalDashboard = () => {
           <CardContent className="py-3">
             <div className="flex items-center justify-between overflow-x-auto gap-6">
               {marketIndicators.map((indicator, idx) => (
-                <div key={idx} className="flex items-center gap-3 min-w-fit">
+                <div key={`item-${idx}`} className="flex items-center gap-3 min-w-fit">
                   <span className="text-sm font-medium text-muted-foreground">{indicator.name}</span>
                   <span className="font-semibold">{indicator.value?.toLocaleString() || '--'}</span>
                   <span className={`text-sm ${(indicator.change || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
@@ -718,7 +718,7 @@ const PersonalDashboard = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-2 mt-2 text-xs">
                     {entityData.slice(0, 4).map((item, idx) => (
-                      <div key={idx} className="flex items-center gap-1">
+                      <div key={`item-${idx}`} className="flex items-center gap-1">
                         <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
                         <span className="truncate">{item.name}</span>
                       </div>
@@ -1008,7 +1008,7 @@ const PersonalDashboard = () => {
               <CardContent>
                 <div className="space-y-3">
                   {mockRebalancing.map((item, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                    <div key={`item-${index}`} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
                       <div className="flex items-center gap-4">
                         <span className="font-medium w-40">{item.asset}</span>
                         <div className="flex items-center gap-2">

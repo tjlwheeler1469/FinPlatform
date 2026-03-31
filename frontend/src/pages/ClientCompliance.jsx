@@ -280,7 +280,7 @@ export default function ClientCompliance() {
               <CardContent>
                 <div className="space-y-4">
                   {dashboard?.upcoming_reviews?.map((review, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-4 bg-muted rounded-lg">
+                    <div key={`item-${idx}`} className="flex items-center justify-between p-4 bg-muted rounded-lg">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#1a2744] to-[#2d3a5c] flex items-center justify-center text-white font-semibold">
                           {review.client_name.split(' ').map(n => n[0]).join('')}
@@ -334,7 +334,7 @@ export default function ClientCompliance() {
               <CardContent>
                 <div className="space-y-4">
                   {dashboard?.recent_activity?.map((activity, idx) => (
-                    <div key={idx} className="flex items-center gap-4 p-4 bg-muted rounded-lg">
+                    <div key={`item-${idx}`} className="flex items-center gap-4 p-4 bg-muted rounded-lg">
                       <div className="w-10 h-10 rounded-full bg-[#D4A84C]/20 flex items-center justify-center">
                         <FileText className="w-5 h-5 text-[#D4A84C]" />
                       </div>
@@ -367,7 +367,7 @@ export default function ClientCompliance() {
               <div className="space-y-3">
                 {dashboard.risk_alerts.map((alert, idx) => (
                   <div 
-                    key={idx} 
+                    key={`item-${idx}`} 
                     className={`p-4 rounded-lg border cursor-pointer hover:shadow-md transition-shadow ${
                       alert.severity === 'high' ? 'bg-red-50 border-red-200' :
                       alert.severity === 'medium' ? 'bg-amber-50 border-amber-200' :

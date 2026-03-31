@@ -581,7 +581,7 @@ const HybridEngineView = () => {
                           <h4 className="font-medium text-sm mb-2">Identified Risks:</h4>
                           <div className="space-y-2">
                             {result.explanation.identified_risks.map((risk, i) => (
-                              <div key={i} className="flex items-start gap-2 p-2 bg-red-50 rounded">
+                              <div key={`item-${i}`} className="flex items-start gap-2 p-2 bg-red-50 rounded">
                                 <AlertTriangle className="h-4 w-4 text-red-500 mt-0.5" />
                                 <div>
                                   <p className="text-sm font-medium">{risk.factor}</p>
@@ -598,7 +598,7 @@ const HybridEngineView = () => {
                           <h4 className="font-medium text-sm mb-2">Top Recommendations:</h4>
                           <div className="space-y-2">
                             {result.explanation.recommendations.slice(0, 3).map((rec, i) => (
-                              <div key={i} className="flex items-start gap-2 p-2 bg-green-50 rounded">
+                              <div key={`item-${i}`} className="flex items-start gap-2 p-2 bg-green-50 rounded">
                                 <Lightbulb className="h-4 w-4 text-green-500 mt-0.5" />
                                 <div>
                                   <p className="text-sm font-medium">{rec.action}</p>
@@ -810,7 +810,7 @@ const HybridEngineView = () => {
             {scenarios.length > 0 && (
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {scenarios.map((scenario, i) => (
-                  <Card key={i} className={i === 0 ? 'border-primary' : ''}>
+                  <Card key={`item-${i}`} className={i === 0 ? 'border-primary' : ''}>
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm">{scenario.name}</CardTitle>
                     </CardHeader>
@@ -856,7 +856,7 @@ const HybridEngineView = () => {
                   <CardContent>
                     <div className="space-y-3">
                       {aiSuggestions.identified_risks?.map((risk, i) => (
-                        <div key={i} className="p-3 bg-red-50 rounded-lg">
+                        <div key={`item-${i}`} className="p-3 bg-red-50 rounded-lg">
                           <div className="flex items-center gap-2">
                             <AlertTriangle className="h-4 w-4 text-red-500" />
                             <span className="font-medium">{risk.factor}</span>
@@ -878,7 +878,7 @@ const HybridEngineView = () => {
                   <CardContent>
                     <div className="space-y-3">
                       {aiSuggestions.ai_suggestions?.map((suggestion, i) => (
-                        <div key={i} className="p-3 bg-green-50 rounded-lg">
+                        <div key={`item-${i}`} className="p-3 bg-green-50 rounded-lg">
                           <p className="font-medium text-sm">{suggestion.suggestion}</p>
                           <div className="flex justify-between items-center mt-2">
                             <span className="text-sm text-green-600">

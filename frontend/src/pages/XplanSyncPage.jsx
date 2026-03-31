@@ -270,7 +270,7 @@ export default function XplanSyncPage() {
                   <h4 className="font-semibold text-green-800 mb-2">READ Operations</h4>
                   <div className="space-y-1">
                     {status?.capabilities?.read?.map((cap, i) => (
-                      <div key={i} className="flex items-center gap-2 text-sm text-green-700">
+                      <div key={`item-${i}`} className="flex items-center gap-2 text-sm text-green-700">
                         <CheckCircle2 className="w-4 h-4" />
                         {cap}
                       </div>
@@ -281,7 +281,7 @@ export default function XplanSyncPage() {
                   <h4 className="font-semibold text-blue-800 mb-2">WRITE Operations</h4>
                   <div className="space-y-1">
                     {status?.capabilities?.write?.map((cap, i) => (
-                      <div key={i} className="flex items-center gap-2 text-sm text-blue-700">
+                      <div key={`item-${i}`} className="flex items-center gap-2 text-sm text-blue-700">
                         <CheckCircle2 className="w-4 h-4" />
                         {cap}
                       </div>
@@ -344,7 +344,7 @@ export default function XplanSyncPage() {
                   <div className="space-y-2 max-h-96 overflow-y-auto">
                     {clients.map((client, i) => (
                       <div 
-                        key={i}
+                        key={`item-${i}`}
                         className={`p-3 border rounded-lg cursor-pointer transition-colors ${
                           selectedClient === client.external_id ? 'border-primary bg-primary/5' : 'hover:bg-muted'
                         }`}
@@ -384,7 +384,7 @@ export default function XplanSyncPage() {
                         <h4 className="font-semibold mb-2">Recent Transactions</h4>
                         <div className="space-y-1 max-h-48 overflow-y-auto">
                           {clientTransactions.slice(0, 5).map((tx, i) => (
-                            <div key={i} className="flex justify-between text-sm p-2 bg-muted rounded">
+                            <div key={`item-${i}`} className="flex justify-between text-sm p-2 bg-muted rounded">
                               <span>{tx.transaction_type}</span>
                               <span>${tx.amount?.toLocaleString()}</span>
                             </div>
@@ -449,7 +449,7 @@ export default function XplanSyncPage() {
                 <h4 className="font-semibold mb-2">Recent Client Syncs</h4>
                 <div className="space-y-2">
                   {syncStatus?.recent_client_syncs?.map((sync, i) => (
-                    <div key={i} className="flex justify-between items-center p-2 bg-muted rounded">
+                    <div key={`item-${i}`} className="flex justify-between items-center p-2 bg-muted rounded">
                       <div>
                         <span className="font-medium">{sync.client_id}</span>
                         <span className="text-sm text-muted-foreground ml-2">{sync.sync_type}</span>
@@ -504,7 +504,7 @@ export default function XplanSyncPage() {
                       </SelectTrigger>
                       <SelectContent>
                         {clients.map((c, i) => (
-                          <SelectItem key={i} value={c.external_id}>
+                          <SelectItem key={`item-${i}`} value={c.external_id}>
                             {c.first_name} {c.last_name} ({c.external_id})
                           </SelectItem>
                         ))}
@@ -561,7 +561,7 @@ export default function XplanSyncPage() {
             <CardContent>
               <div className="space-y-2 max-h-96 overflow-y-auto">
                 {apiLogs.map((log, i) => (
-                  <div key={i} className="p-3 border rounded-lg text-sm">
+                  <div key={`item-${i}`} className="p-3 border rounded-lg text-sm">
                     <div className="flex justify-between items-start">
                       <div className="flex items-center gap-2">
                         <Badge variant={log.status_code === 200 ? 'default' : 'destructive'}>

@@ -320,7 +320,7 @@ const AdviserHub = () => {
                       {client.accounts?.slice(0, 3).map((account, idx) => {
                         const Icon = getAccountIcon(account.type);
                         return (
-                          <div key={idx} className="flex items-center gap-1 text-xs bg-muted rounded px-2 py-1">
+                          <div key={`item-${idx}`} className="flex items-center gap-1 text-xs bg-muted rounded px-2 py-1">
                             <Icon className="h-3 w-3" />
                             <span>{formatCurrency(account.balance)}</span>
                           </div>

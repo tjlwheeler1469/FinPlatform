@@ -7,7 +7,8 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Dict, List, Optional, Any
 from datetime import datetime, timezone
-import random
+import secrets
+_rng = secrets.SystemRandom()
 import math
 import logging
 
@@ -69,8 +70,8 @@ async def calculate_health_score_v2(request: HealthScoreRequest):
         "emergency_fund": min(100, emergency_months * 16.67),  # 6 months = 100
         "debt_management": max(0, 100 - debt_to_asset_ratio * 200),  # 50% ratio = 0
         "retirement_progress": min(100, (request.super_balance / (request.current_income * years_to_retirement * 0.5)) * 100),
-        "diversification": 75 + random.randint(-10, 15),  # Simulated
-        "insurance_coverage": 70 + random.randint(-5, 20),  # Simulated
+        "diversification": 75 + _rng.randint(-10, 15),  # Simulated
+        "insurance_coverage": 70 + _rng.randint(-5, 20),  # Simulated
     }
     
     # Overall score (weighted average)
@@ -303,7 +304,7 @@ async def run_monte_carlo_advanced(request: MonteCarloRequest):
         
         for year in range(request.years):
             # Random return with drift
-            annual_return = random.gauss(request.expected_return, request.volatility)
+            annual_return = _rng.gauss(request.expected_return, request.volatility)
             value = value * (1 + annual_return) + request.annual_contribution
             value = max(0, value)  # Can't go negative
             path.append(value)

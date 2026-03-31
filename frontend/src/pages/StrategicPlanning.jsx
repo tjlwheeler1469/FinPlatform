@@ -692,7 +692,7 @@ const StrategicPlanning = () => {
                           <CardContent>
                             <div className="space-y-2">
                               {estateResult.checklist.map((item, i) => (
-                                <div key={i} className={`flex items-center justify-between p-2 rounded ${
+                                <div key={`item-${i}`} className={`flex items-center justify-between p-2 rounded ${
                                   item.complete ? 'bg-[#10B981]/10' : item.priority === 'critical' ? 'bg-destructive/10' : 'bg-muted/50'
                                 }`}>
                                   <div className="flex items-center gap-2">
@@ -732,7 +732,7 @@ const StrategicPlanning = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                   <div className="lg:col-span-2 space-y-3">
                     {goals.map((goal, index) => (
-                      <Card key={index}>
+                      <Card key={`item-${index}`}>
                         <CardContent className="p-3">
                           <div className="flex items-center justify-between mb-2">
                             <Input value={goal.name} onChange={e => updateGoal(index, 'name', e.target.value)} className="font-medium border-0 p-0 h-auto max-w-[150px]" />

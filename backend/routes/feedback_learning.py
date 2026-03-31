@@ -11,7 +11,8 @@ from enum import Enum
 import uuid
 import logging
 import statistics
-import random
+import secrets
+_rng = secrets.SystemRandom()
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/feedback-loop", tags=["Feedback & Learning"])
@@ -470,15 +471,15 @@ async def simulate_learning_data(advisor_id: str = "default", num_actions: int =
     simulated_outcomes = 0
     
     for i in range(num_actions):
-        action_type = random.choice(action_types)
-        feedback_type = random.choice(feedback_types)
+        action_type = _rng.choice(action_types)
+        feedback_type = _rng.choice(feedback_types)
         
         # Simulate feedback
         RECOMMENDATION_HISTORY.append({
             "action_type": action_type.value,
             "advisor_id": advisor_id,
             "feedback": feedback_type.value,
-            "timestamp": (now - timedelta(days=random.randint(1, 60))).isoformat()
+            "timestamp": (now - timedelta(days=_rng.randint(1, 60))).isoformat()
         })
         simulated_feedback += 1
         
@@ -492,16 +493,16 @@ async def simulate_learning_data(advisor_id: str = "default", num_actions: int =
                 "outcome_id": outcome_id,
                 "action_id": f"action_{uuid.uuid4().hex[:8]}",
                 "action_type": action_type.value,
-                "status": random.choice([OutcomeStatus.SUCCESS, OutcomeStatus.SUCCESS, OutcomeStatus.PARTIAL]).value,
-                "client_ids": [f"client_{random.randint(1, 12):03d}"],
+                "status": _rng.choice([OutcomeStatus.SUCCESS, OutcomeStatus.SUCCESS, OutcomeStatus.PARTIAL]).value,
+                "client_ids": [f"client_{_rng.randint(1, 12):03d}"],
                 "advisor_id": advisor_id,
                 "metrics": {
-                    "portfolio_impact": random.randint(5000, 50000),
-                    "revenue_impact": random.randint(500, 5000),
-                    "tax_savings": random.randint(0, 15000) if action_type == ActionType.TAX_HARVEST else 0,
-                    "engagement_change": random.uniform(-5, 15)
+                    "portfolio_impact": _rng.randint(5000, 50000),
+                    "revenue_impact": _rng.randint(500, 5000),
+                    "tax_savings": _rng.randint(0, 15000) if action_type == ActionType.TAX_HARVEST else 0,
+                    "engagement_change": _rng.uniform(-5, 15)
                 },
-                "recorded_at": (now - timedelta(days=random.randint(1, 60))).isoformat()
+                "recorded_at": (now - timedelta(days=_rng.randint(1, 60))).isoformat()
             }
             simulated_outcomes += 1
     

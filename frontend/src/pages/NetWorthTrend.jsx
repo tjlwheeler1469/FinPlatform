@@ -117,7 +117,7 @@ const NetWorthTrend = () => {
         <div className="bg-white p-3 border rounded-lg shadow-lg">
           <p className="font-bold text-sm mb-2">{label}</p>
           {payload.map((entry, index) => (
-            <p key={index} className="text-sm" style={{ color: entry.color }}>
+            <p key={`item-${index}`} className="text-sm" style={{ color: entry.color }}>
               {entry.name}: {formatCurrency(entry.value)}
             </p>
           ))}

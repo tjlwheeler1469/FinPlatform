@@ -261,7 +261,7 @@ const MeetingSummaryGenerator = () => {
                 <CardContent>
                   <ul className="space-y-2">
                     {summary.discussion_summary.topics_covered.map((topic, i) => (
-                      <li key={i} className="flex items-center gap-2 text-sm">
+                      <li key={`item-${i}`} className="flex items-center gap-2 text-sm">
                         <CheckCircle className="h-4 w-4 text-green-500" />
                         {topic}
                       </li>
@@ -277,7 +277,7 @@ const MeetingSummaryGenerator = () => {
                 <CardContent>
                   <ul className="space-y-2">
                     {summary.discussion_summary.decisions_made.map((decision, i) => (
-                      <li key={i} className="flex items-center gap-2 text-sm">
+                      <li key={`item-${i}`} className="flex items-center gap-2 text-sm">
                         <ArrowRight className="h-4 w-4 text-blue-500" />
                         {decision}
                       </li>
@@ -298,7 +298,7 @@ const MeetingSummaryGenerator = () => {
               <CardContent>
                 <div className="space-y-3">
                   {summary.action_items.map((item, i) => (
-                    <div key={i} className="flex items-center gap-4 p-3 border rounded-lg">
+                    <div key={`item-${i}`} className="flex items-center gap-4 p-3 border rounded-lg">
                       <div className="flex-1">
                         <p className="font-medium">{item.task}</p>
                         <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
@@ -332,7 +332,7 @@ const MeetingSummaryGenerator = () => {
                   {summary.plan_updates.changes_required ? (
                     <ul className="space-y-2">
                       {summary.plan_updates.updates.map((update, i) => (
-                        <li key={i} className="flex items-center gap-2 text-sm">
+                        <li key={`item-${i}`} className="flex items-center gap-2 text-sm">
                           <AlertCircle className="h-4 w-4 text-amber-500" />
                           {update}
                         </li>
@@ -356,7 +356,7 @@ const MeetingSummaryGenerator = () => {
                   <p className="text-sm text-muted-foreground mb-2">Focus Areas:</p>
                   <ul className="space-y-1">
                     {summary.next_meeting.focus_areas.map((area, i) => (
-                      <li key={i} className="text-sm flex items-center gap-2">
+                      <li key={`item-${i}`} className="text-sm flex items-center gap-2">
                         <CheckCircle className="h-3 w-3 text-green-500" />
                         {area}
                       </li>

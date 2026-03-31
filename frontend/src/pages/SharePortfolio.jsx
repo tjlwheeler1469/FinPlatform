@@ -659,7 +659,7 @@ const SharePortfolio = () => {
                             dataKey="value"
                           >
                             {ownershipPieData.map((entry, index) => (
-                              <Cell key={index} fill={entry.color} />
+                              <Cell key={`item-${index}`} fill={entry.color} />
                             ))}
                           </Pie>
                           <Tooltip formatter={(v) => formatCurrency(v)} />

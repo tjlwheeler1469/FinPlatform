@@ -320,7 +320,7 @@ const HouseholdBudget = () => {
                           labelLine={false}
                         >
                           {expenseByCategory.map((entry, index) => (
-                            <Cell key={index} fill={entry.color} />
+                            <Cell key={`item-${index}`} fill={entry.color} />
                           ))}
                         </Pie>
                         <Tooltip formatter={(v) => formatCurrency(v)} />
@@ -590,7 +590,7 @@ const HouseholdBudget = () => {
                             </SelectTrigger>
                             <SelectContent>
                               {MONTHS.map((month, idx) => (
-                                <SelectItem key={idx} value={idx.toString()}>{month}</SelectItem>
+                                <SelectItem key={`item-${idx}`} value={idx.toString()}>{month}</SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
@@ -614,7 +614,7 @@ const HouseholdBudget = () => {
                       
                       return (
                         <div 
-                          key={idx}
+                          key={`item-${idx}`}
                           className={`p-2 rounded-lg text-center ${
                             monthTotal > 0 ? 'bg-[#D4A84C]/10' : 'bg-muted/50'
                           }`}

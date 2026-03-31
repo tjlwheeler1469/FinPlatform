@@ -409,7 +409,7 @@ const LifeTimelinePlanner = () => {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                 {milestones.map((milestone, index) => (
                   <div 
-                    key={index}
+                    key={`item-${index}`}
                     className="bg-gradient-to-br from-[#1a2744]/5 to-[#D4A84C]/10 rounded-lg p-4 text-center border"
                   >
                     <div className="text-3xl mb-2">{MILESTONE_EMOJIS[milestone.label] || '🎯'}</div>

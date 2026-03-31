@@ -607,7 +607,7 @@ const Client360View = () => {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {client.family.map((member, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50">
+                    <div key={`item-${idx}`} className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50">
                       <div className="flex items-center gap-3">
                         <Avatar className="h-8 w-8">
                           <AvatarFallback className="bg-[#1a2744]/10 text-[#1a2744] text-xs">
@@ -656,7 +656,7 @@ const Client360View = () => {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {client.insurance.map((ins, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-2 rounded-lg border">
+                    <div key={`item-${idx}`} className="flex items-center justify-between p-2 rounded-lg border">
                       <div>
                         <p className="font-medium text-sm">{ins.type}</p>
                         <p className="text-xs text-muted-foreground">{ins.provider}</p>
@@ -682,7 +682,7 @@ const Client360View = () => {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {client.keyDates.slice(0, 5).map((kd, idx) => (
-                    <div key={idx} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50">
+                    <div key={`item-${idx}`} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50">
                       <div className={`w-2 h-2 rounded-full ${
                         kd.type === 'review' ? 'bg-amber-500' :
                         kd.type === 'birthday' ? 'bg-pink-500' :
@@ -754,7 +754,7 @@ const Client360View = () => {
                               </h4>
                               <div className="space-y-2">
                                 {category.holdings.map((holding, idx) => (
-                                  <Card key={idx} className="bg-muted/30">
+                                  <Card key={`item-${idx}`} className="bg-muted/30">
                                     <CardContent className="p-3">
                                       <div className="flex items-center justify-between">
                                         <div>
@@ -809,7 +809,7 @@ const Client360View = () => {
                                   </h4>
                                   <div className="space-y-2">
                                     {category.research.map((report, idx) => (
-                                      <Card key={idx} className="bg-blue-50/50 border-blue-200">
+                                      <Card key={`item-${idx}`} className="bg-blue-50/50 border-blue-200">
                                         <CardContent className="p-3">
                                           <div className="flex items-start justify-between">
                                             <div>
