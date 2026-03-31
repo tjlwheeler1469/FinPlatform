@@ -7,7 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import {
   Mic, MicOff, Send, Loader2, Calculator, DollarSign, Calendar, TrendingUp,
-  Shield, AlertTriangle, CheckCircle, Users, Building2, Landmark, Info, Target
+  Shield, AlertTriangle, CheckCircle, Users, Building2, Landmark, Info, Target, Download
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -208,7 +208,42 @@ const RetirementVoicePanel = () => {
           </div>
         )}
 
-        {analysis && <AnalysisResults analysis={analysis} whatIfHistory={whatIfHistory} />}
+        {analysis && (
+          <div className="space-y-3">
+            <div className="flex justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 gap-1 text-xs"
+                onClick={async () => {
+                  try {
+                    const res = await fetch(`${API_URL}/api/pdf-report/generate`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ analysis_data: analysis }),
+                    });
+                    if (res.ok) {
+                      const blob = await res.blob();
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `Halcyon_retirement_analysis.pdf`;
+                      document.body.appendChild(a);
+                      a.click();
+                      document.body.removeChild(a);
+                      URL.revokeObjectURL(url);
+                      toast.success('PDF downloaded');
+                    }
+                  } catch { toast.error('PDF generation failed'); }
+                }}
+                data-testid="retirement-download-pdf"
+              >
+                <Download className="h-3 w-3" /> Download PDF Report
+              </Button>
+            </div>
+            <AnalysisResults analysis={analysis} whatIfHistory={whatIfHistory} />
+          </div>
+        )}
       </CardContent>
     </Card>
   );

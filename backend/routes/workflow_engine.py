@@ -387,7 +387,7 @@ WORKFLOW_TEMPLATES = {
 }
 
 
-def serialize_doc(doc):
+def serialize_doc(doc) -> dict:
     """Convert MongoDB document to JSON-serializable format."""
     if doc is None:
         return None
@@ -429,7 +429,7 @@ class WorkflowFilter(BaseModel):
 # ==================== API ENDPOINTS ====================
 
 @router.get("/templates")
-async def get_workflow_templates():
+async def get_workflow_templates() -> dict:
     """Get all available workflow templates."""
     templates = []
     for template_id, template in WORKFLOW_TEMPLATES.items():
@@ -451,7 +451,7 @@ async def get_workflow_templates():
 
 
 @router.get("/templates/{template_id}")
-async def get_workflow_template(template_id: str):
+async def get_workflow_template(template_id: str) -> dict:
     """Get detailed workflow template."""
     # Handle both full ID and short name
     template = None
@@ -467,7 +467,7 @@ async def get_workflow_template(template_id: str):
 
 
 @router.post("/create")
-async def create_workflow(workflow: WorkflowCreate):
+async def create_workflow(workflow: WorkflowCreate) -> dict:
     """Create a new workflow instance from template or custom definition."""
     workflow_id = f"wf_{uuid.uuid4().hex[:8]}"
     now = datetime.now(timezone.utc)
@@ -545,7 +545,7 @@ async def get_workflow_instances(
     client_id: Optional[str] = None,
     status: Optional[str] = None,
     limit: int = 50
-):
+) -> dict:
     """Get all workflow instances with optional filtering."""
     if DB_AVAILABLE:
         query = {}
@@ -578,7 +578,7 @@ async def get_workflow_instances(
 
 
 @router.get("/instances/{workflow_id}")
-async def get_workflow_instance(workflow_id: str):
+async def get_workflow_instance(workflow_id: str) -> dict:
     """Get detailed workflow instance."""
     if DB_AVAILABLE:
         workflow = await workflow_instances_collection.find_one({"workflow_id": workflow_id})
@@ -603,7 +603,7 @@ async def get_workflow_instance(workflow_id: str):
 
 
 @router.put("/instances/{workflow_id}/steps/{step_id}")
-async def update_workflow_step(workflow_id: str, step_id: str, update: StepUpdate):
+async def update_workflow_step(workflow_id: str, step_id: str, update: StepUpdate) -> dict:
     """Update a specific step in a workflow."""
     now = datetime.now(timezone.utc)
     
@@ -688,7 +688,7 @@ async def update_workflow_step(workflow_id: str, step_id: str, update: StepUpdat
 
 
 @router.post("/instances/{workflow_id}/pause")
-async def pause_workflow(workflow_id: str, reason: Optional[str] = None):
+async def pause_workflow(workflow_id: str, reason: Optional[str] = None) -> dict:
     """Pause a workflow."""
     if DB_AVAILABLE:
         result = await workflow_instances_collection.update_one(
@@ -712,7 +712,7 @@ async def pause_workflow(workflow_id: str, reason: Optional[str] = None):
 
 
 @router.post("/instances/{workflow_id}/resume")
-async def resume_workflow(workflow_id: str):
+async def resume_workflow(workflow_id: str) -> dict:
     """Resume a paused workflow."""
     if DB_AVAILABLE:
         result = await workflow_instances_collection.update_one(
@@ -735,7 +735,7 @@ async def resume_workflow(workflow_id: str):
 
 
 @router.post("/instances/{workflow_id}/cancel")
-async def cancel_workflow(workflow_id: str, reason: Optional[str] = None):
+async def cancel_workflow(workflow_id: str, reason: Optional[str] = None) -> dict:
     """Cancel a workflow."""
     if DB_AVAILABLE:
         result = await workflow_instances_collection.update_one(
@@ -759,7 +759,7 @@ async def cancel_workflow(workflow_id: str, reason: Optional[str] = None):
 
 
 @router.get("/dashboard")
-async def get_workflow_dashboard(advisor_id: str = "default"):
+async def get_workflow_dashboard(advisor_id: str = "default") -> dict:
     """Get workflow dashboard with summary metrics."""
     if DB_AVAILABLE:
         active_count = await workflow_instances_collection.count_documents({"status": WorkflowStatus.ACTIVE})
@@ -814,7 +814,7 @@ async def get_workflow_dashboard(advisor_id: str = "default"):
 
 
 @router.get("/by-client/{client_id}/active")
-async def get_active_workflows_for_client(client_id: str):
+async def get_active_workflows_for_client(client_id: str) -> dict:
     """Get all active workflows for a specific client."""
     if DB_AVAILABLE:
         cursor = workflow_instances_collection.find({
@@ -840,7 +840,7 @@ async def quick_start_workflow(
     template_key: str,
     client_id: str,
     client_name: str
-):
+) -> dict:
     """Quick start a workflow from a template key."""
     if template_key not in WORKFLOW_TEMPLATES:
         raise HTTPException(status_code=404, detail=f"Template '{template_key}' not found")
@@ -859,7 +859,7 @@ async def quick_start_workflow(
 
 
 @router.get("/stats")
-async def get_workflow_stats():
+async def get_workflow_stats() -> dict:
     """Get comprehensive workflow statistics."""
     if DB_AVAILABLE:
         total = await workflow_instances_collection.count_documents({})

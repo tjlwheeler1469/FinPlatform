@@ -500,7 +500,7 @@ async def generate_scenarios(inputs: ScenarioInputs, request: Request):
             {"rule": "scenario_types", "value": scenario_types}
         ],
         "assumptions_applied": [
-            f"Risk-free rate: 4.0%",
+            "Risk-free rate: 4.0%",
             f"Investment timeframe: {inputs.investment_timeframe_years} years",
             f"Monthly contributions: ${inputs.monthly_contribution:,.0f}",
             "Returns are before-tax estimates",

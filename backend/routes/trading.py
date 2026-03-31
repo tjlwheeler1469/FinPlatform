@@ -340,7 +340,7 @@ def get_cgt_recommendation(cgt_calc: Dict) -> Dict:
     elif cgt_calc["eligible_for_discount"]:
         recommendations.append({
             "type": "cgt_discount",
-            "message": f"50% CGT discount applies (held > 12 months)",
+            "message": "50% CGT discount applies (held > 12 months)",
             "benefit": f"Saves ${cgt_calc['discount_applied']:,.2f} in tax",
             "priority": "info"
         })

@@ -28,7 +28,7 @@ class InMemoryCache:
     In production, replace with Redis for distributed caching.
     """
     
-    def __init__(self, default_ttl: int = 300):
+    def __init__(self, default_ttl: int = 300) -> dict:
         self._cache: Dict[str, Dict[str, Any]] = {}
         self._default_ttl = default_ttl
         self._stats = {
@@ -105,11 +105,11 @@ class InMemoryCache:
 cache = InMemoryCache(default_ttl=300)  # 5 minute default TTL
 
 
-def cached(ttl: int = 300, key_prefix: str = ""):
+def cached(ttl: int = 300, key_prefix: str = "") -> dict:
     """Decorator to cache function results."""
-    def decorator(func: Callable):
+    def decorator(func: Callable) -> dict:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> dict:
             # Generate cache key from function name and arguments
             key_parts = [key_prefix or func.__name__]
             key_parts.extend(str(arg) for arg in args)
@@ -137,7 +137,7 @@ class RateLimiter:
     In production, use Redis for distributed rate limiting.
     """
     
-    def __init__(self):
+    def __init__(self) -> dict:
         self._buckets: Dict[str, Dict[str, Any]] = {}
         self._default_config = {
             "requests_per_minute": 60,
@@ -239,7 +239,7 @@ class BackgroundJobQueue:
     In production, use Celery with Redis/RabbitMQ.
     """
     
-    def __init__(self, max_workers: int = 5):
+    def __init__(self, max_workers: int = 5) -> dict:
         self._queue: asyncio.Queue = asyncio.Queue()
         self._workers: List[asyncio.Task] = []
         self._max_workers = max_workers
@@ -252,7 +252,7 @@ class BackgroundJobQueue:
         }
         self._running = False
     
-    async def _worker(self, worker_id: int):
+    async def _worker(self, worker_id: int) -> dict:
         """Background worker that processes jobs."""
         while self._running:
             try:
@@ -292,7 +292,7 @@ class BackgroundJobQueue:
             except Exception as e:
                 logger.error(f"Worker {worker_id} error: {e}")
     
-    async def start(self):
+    async def start(self) -> dict:
         """Start background workers."""
         if self._running:
             return
@@ -303,7 +303,7 @@ class BackgroundJobQueue:
             self._workers.append(task)
         logger.info(f"Started {self._max_workers} background workers")
     
-    async def stop(self):
+    async def stop(self) -> dict:
         """Stop background workers."""
         self._running = False
         for task in self._workers:
@@ -359,7 +359,7 @@ class ConnectionPoolManager:
     Manages MongoDB connection pools for high concurrency.
     """
     
-    def __init__(self):
+    def __init__(self) -> dict:
         self._pools: Dict[str, Any] = {}
         self._config = {
             "min_pool_size": 10,
@@ -405,13 +405,13 @@ pool_manager = ConnectionPoolManager()
 class SystemMetrics:
     """Collects and reports system metrics for monitoring."""
     
-    def __init__(self):
+    def __init__(self) -> dict:
         self._start_time = datetime.now(timezone.utc)
         self._request_counts: Dict[str, int] = defaultdict(int)
         self._response_times: List[float] = []
         self._error_counts: Dict[str, int] = defaultdict(int)
     
-    def record_request(self, endpoint: str, response_time: float, status_code: int):
+    def record_request(self, endpoint: str, response_time: float, status_code: int) -> dict:
         """Record a request metric."""
         self._request_counts[endpoint] += 1
         self._response_times.append(response_time)
@@ -463,7 +463,7 @@ metrics = SystemMetrics()
 # ==================== API ENDPOINTS ====================
 
 @router.get("/health")
-async def health_check():
+async def health_check() -> dict:
     """Comprehensive health check for load balancers."""
     return {
         "status": "healthy",
@@ -479,7 +479,7 @@ async def health_check():
 
 
 @router.get("/metrics")
-async def get_system_metrics():
+async def get_system_metrics() -> dict:
     """Get comprehensive system metrics."""
     return {
         "system": metrics.get_metrics(),
@@ -491,7 +491,7 @@ async def get_system_metrics():
 
 
 @router.post("/cache/clear")
-async def clear_cache():
+async def clear_cache() -> dict:
     """Clear all cache entries (admin only)."""
     cleared = cache.clear()
     return {
@@ -502,7 +502,7 @@ async def clear_cache():
 
 
 @router.get("/rate-limit/status")
-async def check_rate_limit_status(request: Request):
+async def check_rate_limit_status(request: Request) -> dict:
     """Check rate limit status for current client."""
     client_ip = request.client.host if request.client else "unknown"
     status = rate_limiter.check_rate_limit(client_ip)
@@ -510,9 +510,9 @@ async def check_rate_limit_status(request: Request):
 
 
 @router.post("/jobs/submit")
-async def submit_background_job(job_type: str = "test"):
+async def submit_background_job(job_type: str = "test") -> dict:
     """Submit a background job for processing."""
-    async def sample_job():
+    async def sample_job() -> dict:
         await asyncio.sleep(2)
         return {"message": "Job completed", "timestamp": datetime.now(timezone.utc).isoformat()}
     
@@ -525,7 +525,7 @@ async def submit_background_job(job_type: str = "test"):
 
 
 @router.get("/jobs/{job_id}/status")
-async def get_job_status(job_id: str):
+async def get_job_status(job_id: str) -> dict:
     """Get status of a background job."""
     status = job_queue.get_job_status(job_id)
     if not status:
@@ -534,7 +534,7 @@ async def get_job_status(job_id: str):
 
 
 @router.get("/scaling/config")
-async def get_scaling_config():
+async def get_scaling_config() -> dict:
     """Get current scaling configuration."""
     return {
         "target_users": 20000,

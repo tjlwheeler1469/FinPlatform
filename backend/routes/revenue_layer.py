@@ -295,7 +295,7 @@ def generate_invoice(client_id: str, period_start: str, period_end: str) -> Dict
 # ==================== API ENDPOINTS ====================
 
 @router.get("/status")
-async def get_revenue_status():
+async def get_revenue_status() -> dict:
     """Get revenue system status."""
     total_arr = sum(
         calculate_tiered_fee(c["aum"], FEE_SCHEDULES[c["fee_schedule"]]["tiers"])
@@ -315,7 +315,7 @@ async def get_revenue_status():
 
 
 @router.get("/fee-schedules")
-async def get_fee_schedules():
+async def get_fee_schedules() -> dict:
     """Get all fee schedules."""
     return {
         "schedules": list(FEE_SCHEDULES.values())
@@ -323,7 +323,7 @@ async def get_fee_schedules():
 
 
 @router.get("/fee-schedules/{schedule_id}")
-async def get_fee_schedule(schedule_id: str):
+async def get_fee_schedule(schedule_id: str) -> dict:
     """Get specific fee schedule."""
     if schedule_id not in FEE_SCHEDULES:
         raise HTTPException(status_code=404, detail="Fee schedule not found")
@@ -331,7 +331,7 @@ async def get_fee_schedule(schedule_id: str):
 
 
 @router.get("/subscription-plans")
-async def get_subscription_plans():
+async def get_subscription_plans() -> dict:
     """Get all subscription plans."""
     return {
         "plans": list(SUBSCRIPTION_PLANS.values()),
@@ -340,7 +340,7 @@ async def get_subscription_plans():
 
 
 @router.get("/client/{client_id}/fees")
-async def get_client_fees(client_id: str):
+async def get_client_fees(client_id: str) -> dict:
     """Get client fee assignment and history."""
     if client_id not in CLIENT_FEE_ASSIGNMENTS:
         raise HTTPException(status_code=404, detail="Client not found")
@@ -378,7 +378,7 @@ async def get_client_fees(client_id: str):
 
 
 @router.post("/client/{client_id}/assign-schedule")
-async def assign_fee_schedule(client_id: str, schedule_id: str, discount_percent: float = 0):
+async def assign_fee_schedule(client_id: str, schedule_id: str, discount_percent: float = 0) -> dict:
     """Assign a fee schedule to a client."""
     if schedule_id not in FEE_SCHEDULES:
         raise HTTPException(status_code=404, detail="Fee schedule not found")
@@ -410,7 +410,7 @@ async def calculate_fee(
     aum: float,
     schedule_id: str = "standard_aum",
     discount_percent: float = 0
-):
+) -> dict:
     """Calculate fee for given AUM and schedule."""
     if schedule_id not in FEE_SCHEDULES:
         raise HTTPException(status_code=404, detail="Fee schedule not found")
@@ -447,7 +447,7 @@ async def calculate_fee(
 
 
 @router.post("/calculate-trading-fee")
-async def calculate_trading_fee_endpoint(asset_class: str, trade_value: float):
+async def calculate_trading_fee_endpoint(asset_class: str, trade_value: float) -> dict:
     """Calculate trading commission."""
     fee = calculate_trading_fee(asset_class, trade_value)
     
@@ -460,7 +460,7 @@ async def calculate_trading_fee_endpoint(asset_class: str, trade_value: float):
 
 
 @router.post("/invoice/generate/{client_id}")
-async def generate_client_invoice(client_id: str, period_start: str, period_end: str):
+async def generate_client_invoice(client_id: str, period_start: str, period_end: str) -> dict:
     """Generate an invoice for a client."""
     invoice = generate_invoice(client_id, period_start, period_end)
     
@@ -474,7 +474,7 @@ async def generate_client_invoice(client_id: str, period_start: str, period_end:
 async def get_invoices(
     client_id: Optional[str] = None,
     status: Optional[PaymentStatus] = None
-):
+) -> dict:
     """Get all invoices."""
     invoices = list(INVOICES.values())
     
@@ -491,7 +491,7 @@ async def get_invoices(
 
 
 @router.get("/invoices/{invoice_id}")
-async def get_invoice(invoice_id: str):
+async def get_invoice(invoice_id: str) -> dict:
     """Get specific invoice."""
     if invoice_id not in INVOICES:
         raise HTTPException(status_code=404, detail="Invoice not found")
@@ -499,7 +499,7 @@ async def get_invoice(invoice_id: str):
 
 
 @router.post("/invoices/{invoice_id}/pay")
-async def mark_invoice_paid(invoice_id: str, payment_method: str = "bank_transfer"):
+async def mark_invoice_paid(invoice_id: str, payment_method: str = "bank_transfer") -> dict:
     """Mark an invoice as paid."""
     if invoice_id not in INVOICES:
         raise HTTPException(status_code=404, detail="Invoice not found")
@@ -522,7 +522,7 @@ async def mark_invoice_paid(invoice_id: str, payment_method: str = "bank_transfe
 
 
 @router.get("/revenue-report")
-async def get_revenue_report(year: int = 2025):
+async def get_revenue_report(year: int = 2025) -> dict:
     """Get comprehensive revenue report."""
     # Calculate totals
     total_aum = sum(c["aum"] for c in CLIENT_FEE_ASSIGNMENTS.values())

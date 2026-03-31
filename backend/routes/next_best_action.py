@@ -249,10 +249,10 @@ def generate_next_best_actions() -> List[Dict]:
                     "deadline": "June 30, 2025",
                     "days_until_deadline": days_to_eofy,
                     "action_steps": [
-                        f"Review positions with unrealized losses",
-                        f"Confirm no wash sale implications",
-                        f"Execute sell orders before June 30",
-                        f"Consider replacement holdings"
+                        "Review positions with unrealized losses",
+                        "Confirm no wash sale implications",
+                        "Execute sell orders before June 30",
+                        "Consider replacement holdings"
                     ],
                     "one_click_action": "execute_tax_harvest",
                     "estimated_time": "15 minutes",
@@ -280,8 +280,8 @@ def generate_next_best_actions() -> List[Dict]:
                     "days_until_deadline": days_to_eofy,
                     "action_steps": [
                         f"Confirm ${unused_cap:,} available cap",
-                        f"Arrange salary sacrifice or personal contribution",
-                        f"Lodge notice of intent to claim deduction"
+                        "Arrange salary sacrifice or personal contribution",
+                        "Lodge notice of intent to claim deduction"
                     ],
                     "one_click_action": "prepare_super_advice",
                     "estimated_time": "20 minutes",
@@ -317,8 +317,8 @@ def generate_next_best_actions() -> List[Dict]:
                 "action_steps": [
                     f"Reduce: {', '.join(overweight)}" if overweight else "No reductions needed",
                     f"Increase: {', '.join(underweight)}" if underweight else "No increases needed",
-                    f"Execute rebalance trades",
-                    f"Update client on changes"
+                    "Execute rebalance trades",
+                    "Update client on changes"
                 ],
                 "one_click_action": "generate_rebalance_orders",
                 "estimated_time": "30 minutes",
@@ -348,9 +348,9 @@ def generate_next_best_actions() -> List[Dict]:
                     "impact_type": ActionImpact.LONG_TERM,
                     "deadline": None,
                     "action_steps": [
-                        f"Review client's liquidity needs",
-                        f"Propose investment options aligned with risk profile",
-                        f"Execute deployment strategy"
+                        "Review client's liquidity needs",
+                        "Propose investment options aligned with risk profile",
+                        "Execute deployment strategy"
                     ],
                     "one_click_action": "propose_cash_deployment",
                     "estimated_time": "25 minutes",
@@ -375,10 +375,10 @@ def generate_next_best_actions() -> List[Dict]:
                 "impact_type": ActionImpact.IMMEDIATE,
                 "deadline": client.get("review_due"),
                 "action_steps": [
-                    f"Generate meeting prep brief",
-                    f"Schedule review meeting",
-                    f"Complete SOA update",
-                    f"Document in compliance system"
+                    "Generate meeting prep brief",
+                    "Schedule review meeting",
+                    "Complete SOA update",
+                    "Document in compliance system"
                 ],
                 "one_click_action": "schedule_review",
                 "estimated_time": "60 minutes",
@@ -401,10 +401,10 @@ def generate_next_best_actions() -> List[Dict]:
                 "impact_type": ActionImpact.LONG_TERM,
                 "deadline": None,
                 "action_steps": [
-                    f"Review recent interactions",
-                    f"Send personalized check-in message",
-                    f"Schedule portfolio review call",
-                    f"Demonstrate value with insight report"
+                    "Review recent interactions",
+                    "Send personalized check-in message",
+                    "Schedule portfolio review call",
+                    "Demonstrate value with insight report"
                 ],
                 "one_click_action": "send_checkin",
                 "estimated_time": "15 minutes",
@@ -431,10 +431,10 @@ def generate_next_best_actions() -> List[Dict]:
                 "impact_type": ActionImpact.LONG_TERM,
                 "deadline": None,
                 "action_steps": [
-                    f"Run updated retirement projection",
-                    f"Model contribution increase scenarios",
-                    f"Discuss goal adjustment options",
-                    f"Implement agreed strategy"
+                    "Run updated retirement projection",
+                    "Model contribution increase scenarios",
+                    "Discuss goal adjustment options",
+                    "Implement agreed strategy"
                 ],
                 "one_click_action": "run_retirement_scenario",
                 "estimated_time": "45 minutes",

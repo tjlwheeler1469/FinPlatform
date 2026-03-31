@@ -22,22 +22,22 @@ router = APIRouter(prefix="/realtime", tags=["Real-Time Data Layer"])
 class ConnectionManager:
     """Manages WebSocket connections for real-time updates."""
     
-    def __init__(self):
+    def __init__(self) -> dict:
         self.active_connections: Dict[str, Set[WebSocket]] = {}  # channel -> connections
         self.user_connections: Dict[str, WebSocket] = {}  # user_id -> connection
         self.subscriptions: Dict[str, Set[str]] = {}  # connection_id -> channels
     
-    async def connect(self, websocket: WebSocket, user_id: str):
+    async def connect(self, websocket: WebSocket, user_id: str) -> dict:
         await websocket.accept()
         self.user_connections[user_id] = websocket
         logger.info(f"WebSocket connected: {user_id}")
     
-    def disconnect(self, user_id: str):
+    def disconnect(self, user_id: str) -> dict:
         if user_id in self.user_connections:
             del self.user_connections[user_id]
             logger.info(f"WebSocket disconnected: {user_id}")
     
-    async def subscribe(self, user_id: str, channel: str):
+    async def subscribe(self, user_id: str, channel: str) -> dict:
         if channel not in self.active_connections:
             self.active_connections[channel] = set()
         
@@ -46,12 +46,12 @@ class ConnectionManager:
             self.active_connections[channel].add(websocket)
             logger.info(f"User {user_id} subscribed to {channel}")
     
-    async def unsubscribe(self, user_id: str, channel: str):
+    async def unsubscribe(self, user_id: str, channel: str) -> dict:
         websocket = self.user_connections.get(user_id)
         if websocket and channel in self.active_connections:
             self.active_connections[channel].discard(websocket)
     
-    async def broadcast(self, channel: str, message: dict):
+    async def broadcast(self, channel: str, message: dict) -> dict:
         if channel in self.active_connections:
             for connection in self.active_connections[channel]:
                 try:
@@ -59,7 +59,7 @@ class ConnectionManager:
                 except Exception as e:
                     logger.error(f"Broadcast error: {e}")
     
-    async def send_to_user(self, user_id: str, message: dict):
+    async def send_to_user(self, user_id: str, message: dict) -> dict:
         websocket = self.user_connections.get(user_id)
         if websocket:
             try:
@@ -159,7 +159,7 @@ def simulate_price_update(symbol: str) -> Dict:
     return current
 
 
-async def check_alerts(symbol: str, price: float):
+async def check_alerts(symbol: str, price: float) -> dict:
     """Check and trigger price alerts."""
     for alert_id, alert in ACTIVE_ALERTS.items():
         if alert["symbol"] != symbol or alert["triggered"]:
@@ -188,7 +188,7 @@ async def check_alerts(symbol: str, price: float):
 # ==================== API ENDPOINTS ====================
 
 @router.get("/status")
-async def get_realtime_status():
+async def get_realtime_status() -> dict:
     """Get real-time data layer status."""
     return {
         "status": "operational",
@@ -201,7 +201,7 @@ async def get_realtime_status():
 
 
 @router.get("/prices")
-async def get_all_prices():
+async def get_all_prices() -> dict:
     """Get all live prices."""
     return {
         "prices": LIVE_PRICES,
@@ -210,7 +210,7 @@ async def get_all_prices():
 
 
 @router.get("/prices/{symbol}")
-async def get_price(symbol: str):
+async def get_price(symbol: str) -> dict:
     """Get live price for a symbol."""
     symbol = symbol.upper()
     
@@ -225,7 +225,7 @@ async def get_price(symbol: str):
 
 
 @router.get("/indices")
-async def get_indices():
+async def get_indices() -> dict:
     """Get market indices."""
     return {
         "indices": MARKET_INDICES,
@@ -240,7 +240,7 @@ async def create_alert(
     alert_type: str,
     target_price: Optional[float] = None,
     direction: str = "above"
-):
+) -> dict:
     """Create a price alert."""
     alert_id = f"ALT_{uuid.uuid4().hex[:8]}"
     
@@ -265,7 +265,7 @@ async def create_alert(
 
 
 @router.get("/alerts")
-async def get_alerts(user_id: Optional[str] = None, triggered: Optional[bool] = None):
+async def get_alerts(user_id: Optional[str] = None, triggered: Optional[bool] = None) -> dict:
     """Get alerts."""
     alerts = list(ACTIVE_ALERTS.values())
     
@@ -281,7 +281,7 @@ async def get_alerts(user_id: Optional[str] = None, triggered: Optional[bool] = 
 
 
 @router.delete("/alerts/{alert_id}")
-async def delete_alert(alert_id: str):
+async def delete_alert(alert_id: str) -> dict:
     """Delete an alert."""
     if alert_id not in ACTIVE_ALERTS:
         raise HTTPException(status_code=404, detail="Alert not found")
@@ -291,7 +291,7 @@ async def delete_alert(alert_id: str):
 
 
 @router.get("/market-summary")
-async def get_market_summary():
+async def get_market_summary() -> dict:
     """Get comprehensive market summary."""
     
     # Top movers
@@ -316,7 +316,7 @@ async def get_market_summary():
 
 
 @router.post("/simulate-update/{symbol}")
-async def simulate_update(symbol: str):
+async def simulate_update(symbol: str) -> dict:
     """Simulate a price update (for testing)."""
     symbol = symbol.upper()
     
@@ -343,7 +343,7 @@ async def simulate_update(symbol: str):
 
 # WebSocket endpoint for real-time updates
 @router.websocket("/ws/{user_id}")
-async def websocket_endpoint(websocket: WebSocket, user_id: str):
+async def websocket_endpoint(websocket: WebSocket, user_id: str) -> dict:
     """WebSocket endpoint for real-time updates."""
     await manager.connect(websocket, user_id)
     

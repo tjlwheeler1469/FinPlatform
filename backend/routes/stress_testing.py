@@ -28,7 +28,7 @@ router = APIRouter(prefix="/stress-test", tags=["Stress Testing"])
 MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
 DB_NAME = os.environ.get("DB_NAME", "wealth_command")
 
-async def get_db():
+async def get_db() -> dict:
     client = AsyncIOMotorClient(MONGO_URL)
     return client[DB_NAME]
 
@@ -94,7 +94,7 @@ async def simulate_user_session(
     endpoints: List[str],
     results_collector: Dict,
     duration_seconds: int
-):
+) -> dict:
     """Simulate a single user session"""
     import httpx
     
@@ -140,7 +140,7 @@ async def simulate_user_session(
             # Random delay between requests (50-500ms)
             await asyncio.sleep(_rng.uniform(0.05, 0.5))
 
-async def run_stress_test(config: StressTestConfig, test_state: Dict):
+async def run_stress_test(config: StressTestConfig, test_state: Dict) -> dict:
     """Run the actual stress test"""
     db = await get_db()
     
@@ -250,7 +250,7 @@ async def run_stress_test(config: StressTestConfig, test_state: Dict):
 # ==================== API ENDPOINTS ====================
 
 @router.post("/start")
-async def start_stress_test(config: StressTestConfig, background_tasks: BackgroundTasks):
+async def start_stress_test(config: StressTestConfig, background_tasks: BackgroundTasks) -> dict:
     """Start a stress test"""
     
     # Validate configuration
@@ -283,7 +283,7 @@ async def start_stress_test(config: StressTestConfig, background_tasks: Backgrou
     }
 
 @router.get("/status/{test_id}")
-async def get_test_status(test_id: str):
+async def get_test_status(test_id: str) -> dict:
     """Get status of a stress test"""
     
     # Check active tests first
@@ -303,7 +303,7 @@ async def get_test_status(test_id: str):
     return result
 
 @router.get("/results/{test_id}")
-async def get_test_results(test_id: str):
+async def get_test_results(test_id: str) -> dict:
     """Get full results of a completed stress test"""
     db = await get_db()
     
@@ -325,7 +325,7 @@ async def get_test_results(test_id: str):
     return result
 
 @router.get("/history")
-async def get_test_history(limit: int = 20):
+async def get_test_history(limit: int = 20) -> dict:
     """Get history of stress tests"""
     db = await get_db()
     
@@ -341,7 +341,7 @@ async def get_test_history(limit: int = 20):
     }
 
 @router.delete("/cancel/{test_id}")
-async def cancel_test(test_id: str):
+async def cancel_test(test_id: str) -> dict:
     """Cancel a running stress test"""
     
     if test_id in active_tests:
@@ -360,7 +360,7 @@ async def cancel_test(test_id: str):
 # ==================== QUICK TEST PRESETS ====================
 
 @router.post("/quick/light")
-async def quick_light_test(background_tasks: BackgroundTasks):
+async def quick_light_test(background_tasks: BackgroundTasks) -> dict:
     """Quick light stress test: 100 users, 30 seconds"""
     config = StressTestConfig(
         concurrent_users=100,
@@ -370,7 +370,7 @@ async def quick_light_test(background_tasks: BackgroundTasks):
     return await start_stress_test(config, background_tasks)
 
 @router.post("/quick/medium")
-async def quick_medium_test(background_tasks: BackgroundTasks):
+async def quick_medium_test(background_tasks: BackgroundTasks) -> dict:
     """Quick medium stress test: 1,000 users, 60 seconds"""
     config = StressTestConfig(
         concurrent_users=1000,
@@ -380,7 +380,7 @@ async def quick_medium_test(background_tasks: BackgroundTasks):
     return await start_stress_test(config, background_tasks)
 
 @router.post("/quick/heavy")
-async def quick_heavy_test(background_tasks: BackgroundTasks):
+async def quick_heavy_test(background_tasks: BackgroundTasks) -> dict:
     """Quick heavy stress test: 5,000 users, 120 seconds"""
     config = StressTestConfig(
         concurrent_users=5000,
@@ -390,7 +390,7 @@ async def quick_heavy_test(background_tasks: BackgroundTasks):
     return await start_stress_test(config, background_tasks)
 
 @router.post("/quick/extreme")
-async def quick_extreme_test(background_tasks: BackgroundTasks):
+async def quick_extreme_test(background_tasks: BackgroundTasks) -> dict:
     """Extreme stress test: 20,000 users, 180 seconds"""
     config = StressTestConfig(
         concurrent_users=20000,
@@ -406,7 +406,7 @@ async def notification_flood_test(
     user_count: int = 1000,
     notifications_per_user: int = 10,
     background_tasks: BackgroundTasks = None
-):
+) -> dict:
     """Flood test for notification system"""
     db = await get_db()
     
@@ -435,7 +435,7 @@ async def notification_flood_test(
                 }
                 await db.in_app_notifications.insert_one(notification)
                 notifications_created += 1
-            except Exception as e:
+            except Exception:
                 errors += 1
     
     duration_ms = (time.time() - start_time) * 1000
@@ -464,7 +464,7 @@ async def notification_flood_test(
 async def websocket_connection_test(
     max_connections: int = 1000,
     hold_duration_seconds: int = 30
-):
+) -> dict:
     """Test WebSocket connection capacity"""
     import websockets
     
@@ -480,7 +480,7 @@ async def websocket_connection_test(
     failed = 0
     errors = []
     
-    async def connect_and_hold():
+    async def connect_and_hold() -> dict:
         nonlocal connected, failed
         try:
             ws = await websockets.connect(ws_url, close_timeout=5)
@@ -520,7 +520,7 @@ async def websocket_connection_test(
 # ==================== SYSTEM METRICS ====================
 
 @router.get("/system/metrics")
-async def get_system_metrics():
+async def get_system_metrics() -> dict:
     """Get current system metrics"""
     import psutil
     
@@ -543,7 +543,7 @@ async def get_system_metrics():
     }
 
 @router.get("/system/capacity-estimate")
-async def estimate_capacity():
+async def estimate_capacity() -> dict:
     """Estimate system capacity based on current metrics"""
     import psutil
     

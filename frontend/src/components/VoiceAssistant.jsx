@@ -8,7 +8,7 @@ import {
   Mic, MicOff, Send, X, Loader2, Bot, User, AlertCircle, Calculator,
   TrendingUp, TrendingDown, Shield, CheckCircle, DollarSign, Building2,
   Landmark, Users as UsersIcon, Calendar, BarChart3, Target, Sparkles,
-  FileText, Scale, Heart, Briefcase, PieChart, BookOpen, XCircle
+  FileText, Scale, Heart, Briefcase, PieChart, BookOpen, XCircle, Download
 } from 'lucide-react';
 import { useLanguage } from './LanguageContext';
 
@@ -302,7 +302,44 @@ const ResultCard = ({ type, data }) => {
     general: GeneralCard,
   };
   const Comp = cards[type] || GeneralCard;
-  return <div className="ml-10 mt-2"><Comp data={data} /></div>;
+
+  const downloadPDF = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/pdf-report/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ analysis_data: data }),
+      });
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const disposition = res.headers.get('content-disposition');
+        const filename = disposition?.match(/filename="(.+)"/)?.[1] || `Halcyon_${type}_report.pdf`;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+    } catch { /* silent fail */ }
+  };
+
+  return (
+    <div className="ml-10 mt-2 relative group">
+      <Comp data={data} />
+      <Button
+        variant="outline"
+        size="sm"
+        className="absolute top-2 right-2 h-7 gap-1 opacity-0 group-hover:opacity-100 transition-opacity text-[10px] bg-white/90"
+        onClick={downloadPDF}
+        data-testid="download-pdf-btn"
+      >
+        <Download className="h-3 w-3" /> PDF
+      </Button>
+    </div>
+  );
 };
 
 /* ─── Retirement ─── */

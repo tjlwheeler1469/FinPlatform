@@ -48,7 +48,7 @@ CLIENT_BOOK = {
 }
 
 
-def analyze_sector_concentration():
+def analyze_sector_concentration() -> dict:
     """Analyze sector concentration across the book."""
     sector_totals = {}
     total_aum = sum(c["aum"] for c in CLIENT_BOOK.values())
@@ -88,7 +88,7 @@ def analyze_sector_concentration():
     }
 
 
-def analyze_risk_distribution():
+def analyze_risk_distribution() -> dict:
     """Analyze risk profile distribution across the book."""
     risk_profiles = {}
     
@@ -117,7 +117,7 @@ def analyze_risk_distribution():
     }
 
 
-def analyze_tax_opportunities():
+def analyze_tax_opportunities() -> dict:
     """Analyze tax-loss harvesting opportunities across the book."""
     opportunities = []
     total_harvestable = 0
@@ -144,7 +144,7 @@ def analyze_tax_opportunities():
     }
 
 
-def analyze_engagement_health():
+def analyze_engagement_health() -> dict:
     """Analyze client engagement and identify at-risk relationships."""
     at_risk = []
     healthy = []
@@ -187,7 +187,7 @@ def analyze_engagement_health():
     }
 
 
-def analyze_retirement_readiness():
+def analyze_retirement_readiness() -> dict:
     """Analyze retirement readiness across the book."""
     near_retirement = []  # Within 10 years
     mid_term = []  # 10-20 years
@@ -225,7 +225,7 @@ def analyze_retirement_readiness():
     }
 
 
-def generate_book_insights():
+def generate_book_insights() -> dict:
     """Generate comprehensive insights for the entire book."""
     insights = []
     now = datetime.now(timezone.utc)
@@ -307,7 +307,7 @@ def generate_book_insights():
 # ==================== API ENDPOINTS ====================
 
 @router.get("/overview")
-async def get_book_overview():
+async def get_book_overview() -> dict:
     """Get high-level overview of the entire client book."""
     total_aum = sum(c["aum"] for c in CLIENT_BOOK.values())
     total_unrealized_gains = sum(c["unrealized_gains"] for c in CLIENT_BOOK.values())
@@ -331,7 +331,7 @@ async def get_book_overview():
 
 
 @router.get("/insights")
-async def get_book_insights(limit: int = 10):
+async def get_book_insights(limit: int = 10) -> dict:
     """Get AI-generated insights for the book."""
     insights = generate_book_insights()
     
@@ -345,7 +345,7 @@ async def get_book_insights(limit: int = 10):
 
 
 @router.get("/sector-analysis")
-async def get_sector_analysis():
+async def get_sector_analysis() -> dict:
     """Get detailed sector concentration analysis."""
     analysis = analyze_sector_concentration()
     
@@ -362,7 +362,7 @@ async def get_sector_analysis():
 
 
 @router.get("/tax-opportunities")
-async def get_tax_opportunities():
+async def get_tax_opportunities() -> dict:
     """Get tax-loss harvesting opportunities across the book."""
     return {
         **analyze_tax_opportunities(),
@@ -372,7 +372,7 @@ async def get_tax_opportunities():
 
 
 @router.get("/engagement-health")
-async def get_engagement_health():
+async def get_engagement_health() -> dict:
     """Get client engagement and retention analysis."""
     return {
         **analyze_engagement_health(),
@@ -381,7 +381,7 @@ async def get_engagement_health():
 
 
 @router.get("/retirement-analysis")
-async def get_retirement_analysis():
+async def get_retirement_analysis() -> dict:
     """Get retirement readiness analysis across the book."""
     return {
         **analyze_retirement_readiness(),
@@ -390,7 +390,7 @@ async def get_retirement_analysis():
 
 
 @router.get("/risk-analysis")
-async def get_risk_analysis():
+async def get_risk_analysis() -> dict:
     """Get risk profile distribution analysis."""
     return {
         **analyze_risk_distribution(),
@@ -399,7 +399,7 @@ async def get_risk_analysis():
 
 
 @router.get("/clients-needing-action")
-async def get_clients_needing_action():
+async def get_clients_needing_action() -> dict:
     """Get all clients that need immediate attention."""
     
     # Combine multiple analyses
@@ -456,7 +456,7 @@ async def get_clients_needing_action():
 
 
 @router.get("/performance-attribution")
-async def get_performance_attribution():
+async def get_performance_attribution() -> dict:
     """Get book-level performance attribution analysis."""
     
     # Simulate performance data
@@ -500,7 +500,7 @@ async def get_performance_attribution():
 
 
 @router.post("/generate-report")
-async def generate_book_report(report_type: str = "comprehensive"):
+async def generate_book_report(report_type: str = "comprehensive") -> dict:
     """Generate a comprehensive book intelligence report."""
     
     overview = await get_book_overview()

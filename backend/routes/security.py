@@ -58,7 +58,7 @@ class AuditLogRequest(BaseModel):
 
 # MFA Endpoints
 @router.get("/mfa/status/{user_id}")
-async def get_mfa_status(user_id: str):
+async def get_mfa_status(user_id: str) -> dict:
     """Get MFA configuration status for a user."""
     setup = MFA_SETUP.get(user_id, {})
     
@@ -76,7 +76,7 @@ async def get_mfa_status(user_id: str):
 
 
 @router.post("/mfa/setup")
-async def setup_mfa(request: MFASetupRequest):
+async def setup_mfa(request: MFASetupRequest) -> dict:
     """Initialize MFA setup."""
     if request.method == "totp":
         # Generate TOTP secret
@@ -125,7 +125,7 @@ async def setup_mfa(request: MFASetupRequest):
 
 
 @router.post("/mfa/verify")
-async def verify_mfa(request: MFAVerifyRequest):
+async def verify_mfa(request: MFAVerifyRequest) -> dict:
     """Verify MFA code."""
     setup = MFA_SETUP.get(request.user_id, {})
     
@@ -165,7 +165,7 @@ async def verify_mfa(request: MFAVerifyRequest):
 
 
 @router.post("/mfa/disable")
-async def disable_mfa(user_id: str, password: str):
+async def disable_mfa(user_id: str, password: str) -> dict:
     """Disable MFA for a user."""
     # In production, verify password first
     if user_id in MFA_SETUP:
@@ -178,7 +178,7 @@ async def disable_mfa(user_id: str, password: str):
 
 # SMS Verification Endpoints
 @router.post("/sms/send-verification")
-async def send_sms_verification(request: SMSVerificationRequest):
+async def send_sms_verification(request: SMSVerificationRequest) -> dict:
     """Send SMS verification code."""
     try:
         if sms_service:
@@ -200,7 +200,7 @@ async def send_sms_verification(request: SMSVerificationRequest):
 
 
 @router.post("/sms/verify-code")
-async def verify_sms_code(user_id: str, code: str):
+async def verify_sms_code(user_id: str, code: str) -> dict:
     """Verify SMS code."""
     # Mock verification
     if code == "123456":  # Demo code
@@ -214,7 +214,7 @@ async def verify_sms_code(user_id: str, code: str):
 
 
 @router.get("/sms/status")
-async def get_sms_status():
+async def get_sms_status() -> dict:
     """Get SMS service status."""
     return {
         "configured": False,
@@ -229,7 +229,7 @@ async def get_audit_logs(
     user_id: Optional[str] = None,
     action: Optional[str] = None,
     limit: int = 100
-):
+) -> dict:
     """Get audit logs."""
     try:
         if audit_service:
@@ -248,7 +248,7 @@ async def get_audit_logs(
 
 
 @router.post("/audit/log")
-async def create_audit_log(request: AuditLogRequest):
+async def create_audit_log(request: AuditLogRequest) -> dict:
     """Create an audit log entry."""
     log_entry = {
         "id": f"log_{uuid.uuid4().hex[:8]}",
@@ -270,7 +270,7 @@ async def create_audit_log(request: AuditLogRequest):
 
 
 @router.get("/audit/compliance-report")
-async def get_compliance_report():
+async def get_compliance_report() -> dict:
     """Generate SOC2 compliance report."""
     return {
         "report_date": datetime.now(timezone.utc).isoformat(),
@@ -299,7 +299,7 @@ async def get_compliance_report():
 
 
 @router.get("/audit/alerts")
-async def get_security_alerts():
+async def get_security_alerts() -> dict:
     """Get active security alerts."""
     return {
         "alerts": SECURITY_ALERTS,
@@ -308,7 +308,7 @@ async def get_security_alerts():
 
 
 @router.post("/audit/alerts/acknowledge")
-async def acknowledge_alert(alert_id: str):
+async def acknowledge_alert(alert_id: str) -> dict:
     """Acknowledge a security alert."""
     for alert in SECURITY_ALERTS:
         if alert.get("id") == alert_id:
@@ -321,7 +321,7 @@ async def acknowledge_alert(alert_id: str):
 
 # Security Settings
 @router.get("/settings/{user_id}")
-async def get_security_settings(user_id: str):
+async def get_security_settings(user_id: str) -> dict:
     """Get security settings for a user."""
     mfa_status = MFA_SETUP.get(user_id, {})
     
@@ -349,7 +349,7 @@ async def get_security_settings(user_id: str):
 
 
 @router.put("/settings/{user_id}")
-async def update_security_settings(user_id: str, settings: Dict[str, Any]):
+async def update_security_settings(user_id: str, settings: Dict[str, Any]) -> dict:
     """Update security settings."""
     # In production, validate and save to database
     return {

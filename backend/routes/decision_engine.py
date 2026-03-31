@@ -54,7 +54,7 @@ class ScenarioRequest(BaseModel):
 # ==================== HEALTH SCORE ====================
 
 @router.post("/health-score-v2")
-async def calculate_health_score_v2(request: HealthScoreRequest):
+async def calculate_health_score_v2(request: HealthScoreRequest) -> dict:
     """Calculate comprehensive financial health score with dummy data."""
     
     # Calculate derived metrics
@@ -133,7 +133,7 @@ async def calculate_health_score_v2(request: HealthScoreRequest):
 
 
 @router.post("/recommendations-v2")
-async def get_recommendations_v2(request: HealthScoreRequest):
+async def get_recommendations_v2(request: HealthScoreRequest) -> dict:
     """Get personalized financial recommendations with dummy data."""
     
     recommendations = []
@@ -240,7 +240,7 @@ async def get_net_worth_projection(
     annual_savings: float = 50000,
     years: int = 25,
     growth_rate: float = 0.07
-):
+) -> dict:
     """Project net worth growth over time with dummy data."""
     
     projections = []
@@ -291,7 +291,7 @@ async def get_net_worth_projection(
 # ==================== MONTE CARLO SIMULATION ====================
 
 @router.post("/monte-carlo-advanced")
-async def run_monte_carlo_advanced(request: MonteCarloRequest):
+async def run_monte_carlo_advanced(request: MonteCarloRequest) -> dict:
     """Run Monte Carlo simulation with dummy data."""
     
     # Generate simulated results
@@ -353,7 +353,7 @@ async def run_monte_carlo_advanced(request: MonteCarloRequest):
 # ==================== SCENARIO ANALYSIS ====================
 
 @router.post("/scenario/{scenario_id}")
-async def run_scenario(scenario_id: str, request: ScenarioRequest):
+async def run_scenario(scenario_id: str, request: ScenarioRequest) -> dict:
     """Run life scenario analysis with dummy data."""
     
     base_projection = []
@@ -412,7 +412,7 @@ async def run_scenario(scenario_id: str, request: ScenarioRequest):
 # ==================== WEALTH BRIEF ====================
 
 @router.get("/wealth-brief")
-async def get_wealth_brief():
+async def get_wealth_brief() -> dict:
     """Get AI-generated wealth brief with dummy data."""
     
     return {
@@ -446,7 +446,7 @@ async def get_wealth_brief():
 # ==================== QUICK ANALYSIS ====================
 
 @router.get("/quick-analysis")
-async def get_quick_analysis():
+async def get_quick_analysis() -> dict:
     """Get quick financial analysis with dummy data."""
     
     return {

@@ -107,7 +107,7 @@ class RebalanceRequest(BaseModel):
 class BrokerInterface:
     """Base interface for all broker integrations."""
     
-    def __init__(self, broker_type: BrokerType):
+    def __init__(self, broker_type: BrokerType) -> dict:
         self.broker_type = broker_type
         self.connected = False
         self.paper_trading = True
@@ -131,7 +131,7 @@ class BrokerInterface:
 class AlpacaBroker(BrokerInterface):
     """Alpaca Trading API integration."""
     
-    def __init__(self):
+    def __init__(self) -> dict:
         super().__init__(BrokerType.ALPACA)
         self.api_key = os.environ.get("ALPACA_API_KEY")
         self.api_secret = os.environ.get("ALPACA_SECRET_KEY")
@@ -287,7 +287,7 @@ class AlpacaBroker(BrokerInterface):
 class CryptoBroker(BrokerInterface):
     """Unified crypto exchange integration using CCXT."""
     
-    def __init__(self, exchange: str = "binance"):
+    def __init__(self, exchange: str = "binance") -> dict:
         super().__init__(BrokerType.BINANCE if exchange == "binance" else BrokerType.COINBASE)
         self.exchange_name = exchange
         self.exchange = None
@@ -408,7 +408,7 @@ class CryptoBroker(BrokerInterface):
         except:
             return False
     
-    async def close(self):
+    async def close(self) -> dict:
         if self.exchange:
             await self.exchange.close()
 
@@ -438,7 +438,7 @@ BLOCK_ORDERS_DB: Dict[str, BlockOrder] = {}
 # ==================== API ENDPOINTS ====================
 
 @router.get("/status")
-async def get_execution_status():
+async def get_execution_status() -> dict:
     """Get execution layer status and connected brokers."""
     alpaca = get_broker(BrokerType.ALPACA)
     await alpaca.connect()
@@ -478,7 +478,7 @@ async def submit_order(
     order_type: OrderType = OrderType.MARKET,
     limit_price: Optional[float] = None,
     broker: BrokerType = BrokerType.ALPACA
-):
+) -> dict:
     """
     Submit a single order - the 1-click execution.
     Insight → Action → Execution
@@ -525,7 +525,7 @@ async def submit_order(
 
 
 @router.post("/block-order")
-async def submit_block_order(block: BlockOrder):
+async def submit_block_order(block: BlockOrder) -> dict:
     """
     Submit a block order for multiple clients.
     Execute once → Allocate to many clients.
@@ -597,7 +597,7 @@ async def submit_block_order(block: BlockOrder):
 
 
 @router.get("/orders")
-async def get_orders(client_id: Optional[str] = None, status: Optional[OrderStatus] = None):
+async def get_orders(client_id: Optional[str] = None, status: Optional[OrderStatus] = None) -> dict:
     """Get order history."""
     orders = list(ORDERS_DB.values())
     
@@ -613,7 +613,7 @@ async def get_orders(client_id: Optional[str] = None, status: Optional[OrderStat
 
 
 @router.get("/orders/{order_id}")
-async def get_order(order_id: str):
+async def get_order(order_id: str) -> dict:
     """Get specific order details."""
     if order_id not in ORDERS_DB:
         raise HTTPException(status_code=404, detail="Order not found")
@@ -621,7 +621,7 @@ async def get_order(order_id: str):
 
 
 @router.delete("/orders/{order_id}")
-async def cancel_order(order_id: str):
+async def cancel_order(order_id: str) -> dict:
     """Cancel an order."""
     if order_id not in ORDERS_DB:
         raise HTTPException(status_code=404, detail="Order not found")
@@ -637,7 +637,7 @@ async def cancel_order(order_id: str):
 
 
 @router.get("/positions/{account_id}")
-async def get_positions(account_id: str, broker: BrokerType = BrokerType.ALPACA):
+async def get_positions(account_id: str, broker: BrokerType = BrokerType.ALPACA) -> dict:
     """Get positions from a broker."""
     broker_instance = get_broker(broker)
     await broker_instance.connect()
@@ -654,7 +654,7 @@ async def get_positions(account_id: str, broker: BrokerType = BrokerType.ALPACA)
 
 
 @router.get("/account/{account_id}")
-async def get_account(account_id: str, broker: BrokerType = BrokerType.ALPACA):
+async def get_account(account_id: str, broker: BrokerType = BrokerType.ALPACA) -> dict:
     """Get account details from a broker."""
     broker_instance = get_broker(broker)
     await broker_instance.connect()

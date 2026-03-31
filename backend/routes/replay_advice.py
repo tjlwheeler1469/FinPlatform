@@ -79,7 +79,7 @@ class ComplianceRecord(BaseModel):
 # ==================== SESSION MANAGEMENT ====================
 
 @router.post("/session/start")
-async def start_advice_session(session: AdviceSession):
+async def start_advice_session(session: AdviceSession) -> dict:
     """Start a new advice session for full replay capability."""
     session_id = f"ADV-{datetime.now(timezone.utc).strftime('%Y%m%d')}-{uuid.uuid4().hex[:8].upper()}"
     now = datetime.now(timezone.utc).isoformat()
@@ -130,7 +130,7 @@ async def start_advice_session(session: AdviceSession):
     }
 
 @router.post("/session/{session_id}/input")
-async def capture_input(session_id: str, input_data: AdviceInput):
+async def capture_input(session_id: str, input_data: AdviceInput) -> dict:
     """Capture an input during the advice session."""
     now = datetime.now(timezone.utc).isoformat()
     
@@ -159,7 +159,7 @@ async def capture_input(session_id: str, input_data: AdviceInput):
     return {"success": True, "input_id": input_record["id"]}
 
 @router.post("/session/{session_id}/scenario")
-async def record_scenario(session_id: str, scenario: ScenarioRecord):
+async def record_scenario(session_id: str, scenario: ScenarioRecord) -> dict:
     """Record scenario generation for replay."""
     now = datetime.now(timezone.utc).isoformat()
     
@@ -189,7 +189,7 @@ async def record_scenario(session_id: str, scenario: ScenarioRecord):
     return {"success": True, "scenario_id": scenario.scenario_id}
 
 @router.post("/session/{session_id}/decision")
-async def record_decision(session_id: str, decision: DecisionRecord):
+async def record_decision(session_id: str, decision: DecisionRecord) -> dict:
     """Record adviser decision for replay."""
     now = datetime.now(timezone.utc).isoformat()
     
@@ -220,7 +220,7 @@ async def record_decision(session_id: str, decision: DecisionRecord):
     return {"success": True, "decision_id": decision_record["id"]}
 
 @router.post("/session/{session_id}/compliance")
-async def record_compliance(session_id: str, compliance: ComplianceRecord):
+async def record_compliance(session_id: str, compliance: ComplianceRecord) -> dict:
     """Record compliance check results."""
     now = datetime.now(timezone.utc).isoformat()
     
@@ -250,7 +250,7 @@ async def record_compliance(session_id: str, compliance: ComplianceRecord):
     return {"success": True, "compliance_id": compliance_record["id"]}
 
 @router.post("/session/{session_id}/end")
-async def end_advice_session(session_id: str, adviser_id: str):
+async def end_advice_session(session_id: str, adviser_id: str) -> dict:
     """End the advice session."""
     now = datetime.now(timezone.utc).isoformat()
     
@@ -276,7 +276,7 @@ async def end_advice_session(session_id: str, adviser_id: str):
 # ==================== REPLAY ENDPOINTS ====================
 
 @router.get("/session/{session_id}")
-async def get_session_for_replay(session_id: str):
+async def get_session_for_replay(session_id: str) -> dict:
     """Get full advice session for replay."""
     session = await advice_sessions_col.find_one({"id": session_id}, {"_id": 0})
     
@@ -286,7 +286,7 @@ async def get_session_for_replay(session_id: str):
     return session
 
 @router.get("/session/{session_id}/timeline")
-async def get_session_timeline(session_id: str):
+async def get_session_timeline(session_id: str) -> dict:
     """Get timeline view of advice session."""
     session = await advice_sessions_col.find_one({"id": session_id}, {"_id": 0})
     
@@ -314,7 +314,7 @@ async def list_client_sessions(
     client_id: str,
     licensee_id: str = "lic_default",
     limit: int = 20
-):
+) -> dict:
     """List all advice sessions for a client."""
     sessions = await advice_sessions_col.find(
         {"client_id": client_id, "licensee_id": licensee_id},
@@ -333,7 +333,7 @@ async def list_all_sessions(
     status: Optional[str] = None,
     adviser_id: Optional[str] = None,
     limit: int = 50
-):
+) -> dict:
     """List all advice sessions with filters."""
     query = {"licensee_id": licensee_id}
     if status:
@@ -354,7 +354,7 @@ async def list_all_sessions(
 # ==================== ASIC-READY EXPORT ====================
 
 @router.get("/session/{session_id}/export")
-async def export_session_asic_ready(session_id: str, format: str = "json"):
+async def export_session_asic_ready(session_id: str, format: str = "json") -> dict:
     """Export advice session in ASIC-ready format."""
     session = await advice_sessions_col.find_one({"id": session_id}, {"_id": 0})
     
@@ -485,7 +485,7 @@ async def export_session_asic_ready(session_id: str, format: str = "json"):
     return export_data
 
 @router.get("/dashboard/stats")
-async def replay_dashboard_stats(licensee_id: str = "lic_default"):
+async def replay_dashboard_stats(licensee_id: str = "lic_default") -> dict:
     """Get replay/advice session statistics."""
     now = datetime.now(timezone.utc)
     month_ago = (now - timedelta(days=30)).isoformat()
@@ -528,7 +528,7 @@ async def replay_dashboard_stats(licensee_id: str = "lic_default"):
 # ==================== MOCK DATA FOR DEMO ====================
 
 @router.post("/demo/create-sample-session")
-async def create_sample_session():
+async def create_sample_session() -> dict:
     """Create a sample advice session for demo purposes."""
     session_id = f"ADV-DEMO-{uuid.uuid4().hex[:6].upper()}"
     now = datetime.now(timezone.utc)

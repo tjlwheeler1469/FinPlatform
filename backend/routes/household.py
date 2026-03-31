@@ -330,7 +330,7 @@ HOUSEHOLDS: Dict[str, Dict] = {
 # ==================== HOUSEHOLD ENDPOINTS ====================
 
 @router.get("/list")
-async def list_households():
+async def list_households() -> dict:
     """List all households."""
     households = []
     for hh_id, hh in HOUSEHOLDS.items():
@@ -360,7 +360,7 @@ async def list_households():
 
 
 @router.get("/{household_id}")
-async def get_household(household_id: str):
+async def get_household(household_id: str) -> dict:
     """Get complete household details including family tree, entities, and professionals."""
     if household_id not in HOUSEHOLDS:
         raise HTTPException(status_code=404, detail="Household not found")
@@ -388,7 +388,7 @@ async def get_household(household_id: str):
 
 
 @router.get("/{household_id}/family-tree")
-async def get_family_tree(household_id: str):
+async def get_family_tree(household_id: str) -> dict:
     """Get family tree structure for visualization."""
     if household_id not in HOUSEHOLDS:
         raise HTTPException(status_code=404, detail="Household not found")
@@ -440,7 +440,7 @@ async def get_family_tree(household_id: str):
     }
 
 
-def _count_generations(nodes, edges):
+def _count_generations(nodes, edges) -> dict:
     """Count number of generations in family tree."""
     parent_edges = [e for e in edges if e["type"] in ["parent", "grandparent"]]
     if not parent_edges:
@@ -450,7 +450,7 @@ def _count_generations(nodes, edges):
 
 
 @router.get("/{household_id}/entities")
-async def get_household_entities(household_id: str):
+async def get_household_entities(household_id: str) -> dict:
     """Get all entities (trusts, companies, SMSFs) for a household."""
     if household_id not in HOUSEHOLDS:
         raise HTTPException(status_code=404, detail="Household not found")
@@ -505,7 +505,7 @@ async def get_household_entities(household_id: str):
 
 
 @router.get("/{household_id}/professionals")
-async def get_household_professionals(household_id: str):
+async def get_household_professionals(household_id: str) -> dict:
     """Get professional network for a household."""
     if household_id not in HOUSEHOLDS:
         raise HTTPException(status_code=404, detail="Household not found")
@@ -535,7 +535,7 @@ async def get_household_professionals(household_id: str):
 
 
 @router.get("/{household_id}/net-worth")
-async def get_household_net_worth(household_id: str):
+async def get_household_net_worth(household_id: str) -> dict:
     """Calculate complete household net worth across all members and entities."""
     if household_id not in HOUSEHOLDS:
         raise HTTPException(status_code=404, detail="Household not found")
@@ -604,7 +604,7 @@ async def get_household_net_worth(household_id: str):
 # ==================== MEMBER MANAGEMENT ====================
 
 @router.post("/{household_id}/members")
-async def add_member(household_id: str, member: FamilyMember):
+async def add_member(household_id: str, member: FamilyMember) -> dict:
     """Add a new member to a household."""
     if household_id not in HOUSEHOLDS:
         raise HTTPException(status_code=404, detail="Household not found")
@@ -623,7 +623,7 @@ async def add_member(household_id: str, member: FamilyMember):
 
 
 @router.post("/{household_id}/relationships")
-async def add_relationship(household_id: str, relationship: Relationship):
+async def add_relationship(household_id: str, relationship: Relationship) -> dict:
     """Add a relationship between two members."""
     if household_id not in HOUSEHOLDS:
         raise HTTPException(status_code=404, detail="Household not found")
@@ -642,7 +642,7 @@ async def add_relationship(household_id: str, relationship: Relationship):
 # ==================== ENTITY MANAGEMENT ====================
 
 @router.post("/{household_id}/entities")
-async def add_entity(household_id: str, entity: Entity):
+async def add_entity(household_id: str, entity: Entity) -> dict:
     """Add a new entity (trust, company, SMSF) to a household."""
     if household_id not in HOUSEHOLDS:
         raise HTTPException(status_code=404, detail="Household not found")
@@ -664,7 +664,7 @@ async def add_entity(household_id: str, entity: Entity):
 
 
 @router.post("/{household_id}/entity-roles")
-async def add_entity_role(household_id: str, role: EntityRole):
+async def add_entity_role(household_id: str, role: EntityRole) -> dict:
     """Add a member's role in an entity."""
     if household_id not in HOUSEHOLDS:
         raise HTTPException(status_code=404, detail="Household not found")
@@ -687,7 +687,7 @@ async def add_entity_role(household_id: str, role: EntityRole):
 # ==================== PROFESSIONAL MANAGEMENT ====================
 
 @router.post("/{household_id}/professionals")
-async def add_professional(household_id: str, professional: Professional):
+async def add_professional(household_id: str, professional: Professional) -> dict:
     """Add a professional to a household's network."""
     if household_id not in HOUSEHOLDS:
         raise HTTPException(status_code=404, detail="Household not found")
@@ -711,7 +711,7 @@ async def add_professional(household_id: str, professional: Professional):
 # ==================== HOUSEHOLD CREATION ====================
 
 @router.post("/create")
-async def create_household(name: str, primary_client_id: str):
+async def create_household(name: str, primary_client_id: str) -> dict:
     """Create a new household."""
     household_id = f"hh_{uuid.uuid4().hex[:8]}"
     

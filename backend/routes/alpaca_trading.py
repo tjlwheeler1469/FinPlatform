@@ -684,7 +684,7 @@ async def place_demo_market_order(order: MarketOrder):
     import random
     
     # Simulate a price
-    simulated_price = _rng.uniform(100, 500)
+    simulated_price = random.uniform(100, 500)
     
     return {
         "success": True,

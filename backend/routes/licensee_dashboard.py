@@ -84,7 +84,7 @@ class ComplianceRule(BaseModel):
 # ==================== LICENSEE ENDPOINTS ====================
 
 @router.post("/create")
-async def create_licensee(licensee: LicenseeCreate):
+async def create_licensee(licensee: LicenseeCreate) -> dict:
     """Create a new licensee (AFSL holder)."""
     # Check if AFSL already exists
     existing = await licensees_col.find_one({"afsl_number": licensee.afsl_number})
@@ -137,7 +137,7 @@ async def create_licensee(licensee: LicenseeCreate):
     }
 
 @router.get("/{licensee_id}")
-async def get_licensee(licensee_id: str):
+async def get_licensee(licensee_id: str) -> dict:
     """Get licensee details."""
     licensee = await licensees_col.find_one({"id": licensee_id}, {"_id": 0})
     if not licensee:
@@ -145,7 +145,7 @@ async def get_licensee(licensee_id: str):
     return licensee
 
 @router.put("/{licensee_id}")
-async def update_licensee(licensee_id: str, updates: LicenseeUpdate):
+async def update_licensee(licensee_id: str, updates: LicenseeUpdate) -> dict:
     """Update licensee details."""
     licensee = await licensees_col.find_one({"id": licensee_id})
     if not licensee:
@@ -159,7 +159,7 @@ async def update_licensee(licensee_id: str, updates: LicenseeUpdate):
     return {"success": True, "message": "Licensee updated"}
 
 @router.get("/{licensee_id}/dashboard")
-async def get_licensee_dashboard(licensee_id: str):
+async def get_licensee_dashboard(licensee_id: str) -> dict:
     """Get comprehensive licensee dashboard with metrics."""
     licensee = await licensees_col.find_one({"id": licensee_id}, {"_id": 0})
     if not licensee:
@@ -267,7 +267,7 @@ async def get_licensee_dashboard(licensee_id: str):
     }
 
 @router.get("/list/all")
-async def list_all_licensees():
+async def list_all_licensees() -> dict:
     """List all licensees (admin view)."""
     licensees = await licensees_col.find({}, {"_id": 0}).to_list(100)
     
@@ -284,7 +284,7 @@ async def list_all_licensees():
 # ==================== ADVISER MANAGEMENT ====================
 
 @router.post("/{licensee_id}/advisers")
-async def add_adviser(licensee_id: str, adviser: AdviserCreate):
+async def add_adviser(licensee_id: str, adviser: AdviserCreate) -> dict:
     """Add an adviser to a licensee."""
     licensee = await licensees_col.find_one({"id": licensee_id})
     if not licensee:
@@ -313,7 +313,7 @@ async def add_adviser(licensee_id: str, adviser: AdviserCreate):
     }
 
 @router.get("/{licensee_id}/advisers")
-async def get_licensee_advisers(licensee_id: str):
+async def get_licensee_advisers(licensee_id: str) -> dict:
     """Get all advisers for a licensee."""
     advisers = await advisers_col.find(
         {"licensee_id": licensee_id},
@@ -336,7 +336,7 @@ async def get_licensee_advisers(licensee_id: str):
     }
 
 @router.put("/{licensee_id}/advisers/{adviser_id}/status")
-async def update_adviser_status(licensee_id: str, adviser_id: str, status: str):
+async def update_adviser_status(licensee_id: str, adviser_id: str, status: str) -> dict:
     """Update adviser status (active, suspended, terminated)."""
     result = await advisers_col.update_one(
         {"id": adviser_id, "licensee_id": licensee_id},
@@ -368,7 +368,7 @@ async def update_adviser_status(licensee_id: str, adviser_id: str, status: str):
 # ==================== APL MANAGEMENT ====================
 
 @router.post("/{licensee_id}/apl")
-async def add_apl_product(licensee_id: str, product: APLProduct):
+async def add_apl_product(licensee_id: str, product: APLProduct) -> dict:
     """Add a product to the Approved Product List."""
     licensee = await licensees_col.find_one({"id": licensee_id})
     if not licensee:
@@ -391,7 +391,7 @@ async def add_apl_product(licensee_id: str, product: APLProduct):
     }
 
 @router.get("/{licensee_id}/apl")
-async def get_apl(licensee_id: str, product_type: Optional[str] = None):
+async def get_apl(licensee_id: str, product_type: Optional[str] = None) -> dict:
     """Get Approved Product List for a licensee."""
     query = {"licensee_id": licensee_id, "active": True}
     if product_type:
@@ -406,7 +406,7 @@ async def get_apl(licensee_id: str, product_type: Optional[str] = None):
     }
 
 @router.delete("/{licensee_id}/apl/{product_id}")
-async def remove_apl_product(licensee_id: str, product_id: str):
+async def remove_apl_product(licensee_id: str, product_id: str) -> dict:
     """Remove a product from the APL (soft delete)."""
     result = await apl_col.update_one(
         {"id": product_id, "licensee_id": licensee_id},
@@ -421,7 +421,7 @@ async def remove_apl_product(licensee_id: str, product_id: str):
 # ==================== COMPLIANCE RULES ====================
 
 @router.post("/{licensee_id}/rules")
-async def add_compliance_rule(licensee_id: str, rule: ComplianceRule):
+async def add_compliance_rule(licensee_id: str, rule: ComplianceRule) -> dict:
     """Add a custom compliance rule for the licensee."""
     licensee = await licensees_col.find_one({"id": licensee_id})
     if not licensee:
@@ -440,7 +440,7 @@ async def add_compliance_rule(licensee_id: str, rule: ComplianceRule):
     return {"success": True, "message": f"Rule '{rule.rule_name}' added"}
 
 @router.get("/{licensee_id}/rules")
-async def get_compliance_rules(licensee_id: str):
+async def get_compliance_rules(licensee_id: str) -> dict:
     """Get all compliance rules for a licensee."""
     licensee = await licensees_col.find_one({"id": licensee_id}, {"_id": 0})
     if not licensee:
@@ -496,7 +496,7 @@ async def get_compliance_rules(licensee_id: str):
     }
 
 @router.put("/{licensee_id}/rules/standard")
-async def update_standard_rules(licensee_id: str, rules: Dict[str, Any]):
+async def update_standard_rules(licensee_id: str, rules: Dict[str, Any]) -> dict:
     """Update standard compliance rule values."""
     licensee = await licensees_col.find_one({"id": licensee_id})
     if not licensee:
@@ -531,7 +531,7 @@ async def get_licensee_breaches(
     licensee_id: str,
     status: Optional[str] = None,
     severity: Optional[str] = None
-):
+) -> dict:
     """Get compliance breaches for a licensee."""
     query = {"licensee_id": licensee_id}
     if status:
@@ -556,7 +556,7 @@ async def resolve_breach(
     licensee_id: str,
     breach_id: str,
     resolution_note: str
-):
+) -> dict:
     """Resolve a compliance breach."""
     result = await breach_flags_col.update_one(
         {"id": breach_id, "licensee_id": licensee_id},
@@ -581,7 +581,7 @@ async def get_licensee_audit_trail(
     licensee_id: str,
     limit: int = 100,
     entity_type: Optional[str] = None
-):
+) -> dict:
     """Get audit trail for licensee activities."""
     # Get all adviser IDs for this licensee
     advisers = await advisers_col.find(

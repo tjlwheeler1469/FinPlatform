@@ -18,7 +18,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
 DB_NAME = os.environ.get("DB_NAME", "adviceos")
 
-async def get_db():
+async def get_db() -> dict:
     client = AsyncIOMotorClient(MONGO_URL)
     return client[DB_NAME]
 
@@ -396,7 +396,7 @@ async def seed_demo_compliance_data() -> Dict[str, Any]:
 
 
 @router.post("/document")
-async def create_compliance_document(doc: ComplianceDocument):
+async def create_compliance_document(doc: ComplianceDocument) -> dict:
     """Create a new SOA/ROA compliance document"""
     db = await get_db()
     
@@ -428,7 +428,7 @@ async def create_compliance_document(doc: ComplianceDocument):
     return doc_dict
 
 @router.get("/document/{document_id}")
-async def get_document(document_id: str):
+async def get_document(document_id: str) -> dict:
     """Get a specific compliance document"""
     db = await get_db()
     
@@ -443,7 +443,7 @@ async def get_document(document_id: str):
     return doc
 
 @router.get("/client/{client_id}")
-async def get_client_documents(client_id: str, document_type: Optional[str] = None, status: Optional[str] = None):
+async def get_client_documents(client_id: str, document_type: Optional[str] = None, status: Optional[str] = None) -> dict:
     """Get all compliance documents for a client"""
     db = await get_db()
     
@@ -467,7 +467,7 @@ async def get_client_documents(client_id: str, document_type: Optional[str] = No
     }
 
 @router.put("/document/{document_id}/status")
-async def update_document_status(document_id: str, update: DocumentStatusUpdate):
+async def update_document_status(document_id: str, update: DocumentStatusUpdate) -> dict:
     """Update document status"""
     db = await get_db()
     
@@ -507,7 +507,7 @@ async def update_document_status(document_id: str, update: DocumentStatusUpdate)
     return {"status": "updated", "document_id": document_id, "new_status": update.status.value}
 
 @router.post("/document/{document_id}/review")
-async def submit_document_review(document_id: str, review: DocumentReview):
+async def submit_document_review(document_id: str, review: DocumentReview) -> dict:
     """Submit compliance review for a document"""
     db = await get_db()
     
@@ -556,7 +556,7 @@ async def submit_document_review(document_id: str, review: DocumentReview):
     }
 
 @router.get("/adviser/{adviser_id}")
-async def get_adviser_documents(adviser_id: str, pending_only: bool = False):
+async def get_adviser_documents(adviser_id: str, pending_only: bool = False) -> dict:
     """Get all documents for an adviser"""
     db = await get_db()
     
@@ -585,7 +585,7 @@ async def get_adviser_documents(adviser_id: str, pending_only: bool = False):
     }
 
 @router.get("/reviews/pending")
-async def get_pending_reviews(reviewer_id: Optional[str] = None):
+async def get_pending_reviews(reviewer_id: Optional[str] = None) -> dict:
     """Get documents pending compliance review"""
     db = await get_db()
     
@@ -607,7 +607,7 @@ async def get_pending_reviews(reviewer_id: Optional[str] = None):
     }
 
 @router.get("/reviews/due")
-async def get_reviews_due(days: int = 30):
+async def get_reviews_due(days: int = 30) -> dict:
     """Get documents with reviews due within specified days"""
     db = await get_db()
     

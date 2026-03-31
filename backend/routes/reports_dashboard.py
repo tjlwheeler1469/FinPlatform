@@ -52,7 +52,7 @@ class ReportRequest(BaseModel):
 # ==================== DASHBOARD SUMMARY ====================
 
 @router.get("/dashboard/summary")
-async def get_dashboard_summary(licensee_id: str = "lic_default"):
+async def get_dashboard_summary(licensee_id: str = "lic_default") -> dict:
     """
     Get high-level summary for the reports dashboard.
     Shows key metrics for compliance, scenarios, and adviser activity.
@@ -132,7 +132,7 @@ async def get_adviser_activity_report(
     adviser_id: str = "adv_default",
     start_date: Optional[str] = None,
     end_date: Optional[str] = None
-):
+) -> dict:
     """
     Generate adviser activity report with scenarios, decisions, compliance metrics.
     """
@@ -199,7 +199,7 @@ async def get_compliance_summary_report(
     licensee_id: str = "lic_default",
     start_date: Optional[str] = None,
     end_date: Optional[str] = None
-):
+) -> dict:
     """
     Generate compliance summary report with rule violations and trends.
     """
@@ -278,7 +278,7 @@ async def get_scenario_history_report(
     client_id: Optional[str] = None,
     adviser_id: Optional[str] = None,
     limit: int = 50
-):
+) -> dict:
     """
     Get scenario history with full details including inputs, outputs, and trade-offs.
     """
@@ -326,7 +326,7 @@ async def get_audit_export(
     start_date: Optional[str] = None,
     end_date: Optional[str] = None,
     limit: int = 1000
-):
+) -> dict:
     """
     Export audit logs for regulatory compliance.
     Supports filtering by entity, user, and date range.
@@ -365,7 +365,7 @@ async def get_audit_export(
 # ==================== CLIENT FILE EXPORT ====================
 
 @router.get("/client-file/{client_id}")
-async def get_client_file_export(client_id: str):
+async def get_client_file_export(client_id: str) -> dict:
     """
     Export complete client file for regulatory or handover purposes.
     Includes all scenarios, decisions, compliance checks, and audit trail.
@@ -425,7 +425,7 @@ async def get_breach_report(
     adviser_id: Optional[str] = None,
     status: Optional[str] = None,
     severity: Optional[str] = None
-):
+) -> dict:
     """
     Generate breach report with filtering options.
     """
@@ -478,7 +478,7 @@ async def download_report_csv(
     report_type: str,
     client_id: Optional[str] = None,
     adviser_id: Optional[str] = None
-):
+) -> dict:
     """
     Download report as CSV file.
     """
@@ -571,7 +571,7 @@ async def download_report_csv(
 # ==================== GENERATE DEMO DATA ====================
 
 @router.post("/generate-demo-data")
-async def generate_demo_data():
+async def generate_demo_data() -> dict:
     """
     Generate demo compliance data for testing the dashboard.
     """
@@ -700,7 +700,7 @@ async def generate_demo_data():
 # ==================== XPLAN REPORTS ====================
 
 @router.get("/xplan/sync-history")
-async def get_xplan_sync_history():
+async def get_xplan_sync_history() -> dict:
     """Get Xplan synchronization history report."""
     now = datetime.now(timezone.utc)
     
@@ -765,7 +765,7 @@ async def get_xplan_sync_history():
     }
 
 @router.get("/xplan/client-mapping")
-async def get_xplan_client_mapping():
+async def get_xplan_client_mapping() -> dict:
     """Get Xplan to Wealth Command client mapping report."""
     now = datetime.now(timezone.utc)
     
@@ -835,7 +835,7 @@ async def get_xplan_client_mapping():
     }
 
 @router.get("/xplan/file-notes")
-async def get_xplan_file_notes_report():
+async def get_xplan_file_notes_report() -> dict:
     """Get Xplan file notes synchronization report."""
     now = datetime.now(timezone.utc)
     
@@ -912,7 +912,7 @@ async def get_xplan_file_notes_report():
 # ==================== STOCK CALCULATOR REPORTS ====================
 
 @router.get("/calculators/cgt")
-async def get_cgt_calculator_report(client_id: str = "client_1", financial_year: str = "2025-26"):
+async def get_cgt_calculator_report(client_id: str = "client_1", financial_year: str = "2025-26") -> dict:
     """Get Capital Gains Tax calculator report."""
     now = datetime.now(timezone.utc)
     
@@ -1016,7 +1016,7 @@ async def get_cgt_calculator_report(client_id: str = "client_1", financial_year:
     }
 
 @router.get("/calculators/dividend-income")
-async def get_dividend_income_report(client_id: str = "client_1", financial_year: str = "2025-26"):
+async def get_dividend_income_report(client_id: str = "client_1", financial_year: str = "2025-26") -> dict:
     """Get dividend income and franking credits report."""
     now = datetime.now(timezone.utc)
     
@@ -1118,7 +1118,7 @@ async def get_dividend_income_report(client_id: str = "client_1", financial_year
     }
 
 @router.get("/calculators/portfolio-performance")
-async def get_portfolio_performance_report(client_id: str = "client_1", period: str = "1Y"):
+async def get_portfolio_performance_report(client_id: str = "client_1", period: str = "1Y") -> dict:
     """Get detailed portfolio performance analysis report."""
     now = datetime.now(timezone.utc)
     
@@ -1249,7 +1249,7 @@ async def get_portfolio_performance_report(client_id: str = "client_1", period: 
     }
 
 @router.get("/calculators/retirement-projection")
-async def get_retirement_projection_report(client_id: str = "client_1"):
+async def get_retirement_projection_report(client_id: str = "client_1") -> dict:
     """Get retirement income projection calculator report."""
     now = datetime.now(timezone.utc)
     
@@ -1324,7 +1324,7 @@ async def get_retirement_projection_report(client_id: str = "client_1"):
 # ==================== COMPLIANCE REPORTS ====================
 
 @router.get("/compliance/apl-check")
-async def get_apl_compliance_report(licensee_id: str = "lic_default"):
+async def get_apl_compliance_report(licensee_id: str = "lic_default") -> dict:
     """Get Approved Product List compliance check report."""
     now = datetime.now(timezone.utc)
     
@@ -1412,7 +1412,7 @@ async def get_apl_compliance_report(licensee_id: str = "lic_default"):
     }
 
 @router.get("/compliance/risk-profile-alignment")
-async def get_risk_alignment_report(licensee_id: str = "lic_default"):
+async def get_risk_alignment_report(licensee_id: str = "lic_default") -> dict:
     """Get risk profile alignment compliance report."""
     now = datetime.now(timezone.utc)
     
@@ -1495,7 +1495,7 @@ async def get_risk_alignment_report(licensee_id: str = "lic_default"):
     }
 
 @router.get("/compliance/fee-disclosure")
-async def get_fee_disclosure_report(licensee_id: str = "lic_default"):
+async def get_fee_disclosure_report(licensee_id: str = "lic_default") -> dict:
     """Get fee disclosure and compliance report."""
     now = datetime.now(timezone.utc)
     
@@ -1594,7 +1594,7 @@ async def get_fee_disclosure_report(licensee_id: str = "lic_default"):
 # ==================== EXPORT REPORTS ====================
 
 @router.get("/export/full-client-pack/{client_id}")
-async def get_full_client_export_pack(client_id: str):
+async def get_full_client_export_pack(client_id: str) -> dict:
     """Get complete client export pack with all reports."""
     now = datetime.now(timezone.utc)
     
@@ -1645,7 +1645,7 @@ async def get_full_client_export_pack(client_id: str):
     }
 
 @router.get("/export/regulatory-pack")
-async def get_regulatory_export_pack(licensee_id: str = "lic_default"):
+async def get_regulatory_export_pack(licensee_id: str = "lic_default") -> dict:
     """Get regulatory compliance export pack for ASIC/auditors."""
     now = datetime.now(timezone.utc)
     
@@ -1710,7 +1710,7 @@ async def get_regulatory_export_pack(licensee_id: str = "lic_default"):
     }
 
 @router.get("/export/advice-file/{client_id}")
-async def get_advice_file_export(client_id: str):
+async def get_advice_file_export(client_id: str) -> dict:
     """Get complete advice file for a client."""
     now = datetime.now(timezone.utc)
     

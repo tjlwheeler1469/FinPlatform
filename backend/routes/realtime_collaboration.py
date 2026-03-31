@@ -22,7 +22,7 @@ router = APIRouter(prefix="/collaboration", tags=["Real-time Collaboration"])
 MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
 DB_NAME = os.environ.get("DB_NAME", "wealth_command")
 
-async def get_db():
+async def get_db() -> dict:
     client = AsyncIOMotorClient(MONGO_URL)
     return client[DB_NAME]
 
@@ -32,7 +32,7 @@ async def get_db():
 class ConnectionManager:
     """Manages WebSocket connections for real-time collaboration."""
     
-    def __init__(self):
+    def __init__(self) -> dict:
         # session_id -> list of websockets
         self._active_connections: Dict[str, List[WebSocket]] = {}
         # websocket -> user info
@@ -40,7 +40,7 @@ class ConnectionManager:
         # session_id -> session state
         self._session_state: Dict[str, Dict[str, Any]] = {}
     
-    async def connect(self, websocket: WebSocket, session_id: str, user_info: Dict[str, Any]):
+    async def connect(self, websocket: WebSocket, session_id: str, user_info: Dict[str, Any]) -> dict:
         """Connect a user to a collaboration session."""
         await websocket.accept()
         
@@ -82,7 +82,7 @@ class ConnectionManager:
         
         logger.info(f"User {user_info.get('name')} joined session {session_id}")
     
-    def disconnect(self, websocket: WebSocket):
+    def disconnect(self, websocket: WebSocket) -> dict:
         """Disconnect a user from their session."""
         user_info = self._user_info.get(websocket)
         if not user_info:
@@ -108,7 +108,7 @@ class ConnectionManager:
         
         logger.info(f"User {user_info.get('name')} left session {session_id}")
     
-    async def broadcast(self, session_id: str, message: Dict[str, Any], exclude: WebSocket = None):
+    async def broadcast(self, session_id: str, message: Dict[str, Any], exclude: WebSocket = None) -> dict:
         """Broadcast message to all users in a session."""
         if session_id not in self._active_connections:
             return
@@ -120,7 +120,7 @@ class ConnectionManager:
                 except Exception as e:
                     logger.error(f"Failed to send message: {e}")
     
-    async def send_to_user(self, session_id: str, user_id: str, message: Dict[str, Any]):
+    async def send_to_user(self, session_id: str, user_id: str, message: Dict[str, Any]) -> dict:
         """Send message to specific user."""
         if session_id not in self._active_connections:
             return
@@ -132,7 +132,7 @@ class ConnectionManager:
                 except Exception as e:
                     logger.error(f"Failed to send message to user: {e}")
     
-    def update_session_state(self, session_id: str, key: str, value: Any):
+    def update_session_state(self, session_id: str, key: str, value: Any) -> dict:
         """Update session state."""
         if session_id in self._session_state:
             self._session_state[session_id][key] = value
@@ -177,7 +177,7 @@ class ChatMessage(BaseModel):
 # ==================== REST API ENDPOINTS ====================
 
 @router.post("/sessions/create")
-async def create_collaboration_session(request: CreateSessionRequest):
+async def create_collaboration_session(request: CreateSessionRequest) -> dict:
     """Create a new collaboration session."""
     db = await get_db()
     
@@ -205,7 +205,7 @@ async def create_collaboration_session(request: CreateSessionRequest):
 
 
 @router.get("/sessions/{session_id}")
-async def get_session_info(session_id: str):
+async def get_session_info(session_id: str) -> dict:
     """Get session information."""
     db = await get_db()
     
@@ -229,7 +229,7 @@ async def get_session_info(session_id: str):
 
 
 @router.get("/sessions")
-async def list_active_sessions(advisor_id: Optional[str] = None):
+async def list_active_sessions(advisor_id: Optional[str] = None) -> dict:
     """List active collaboration sessions."""
     db = await get_db()
     
@@ -251,7 +251,7 @@ async def list_active_sessions(advisor_id: Optional[str] = None):
 
 
 @router.post("/sessions/{session_id}/end")
-async def end_session(session_id: str):
+async def end_session(session_id: str) -> dict:
     """End a collaboration session."""
     db = await get_db()
     
@@ -420,7 +420,7 @@ async def collaboration_websocket(
 # ==================== COLLABORATION FEATURES ====================
 
 @router.post("/sessions/{session_id}/snapshot")
-async def save_session_snapshot(session_id: str):
+async def save_session_snapshot(session_id: str) -> dict:
     """Save current session state as a snapshot."""
     db = await get_db()
     
@@ -444,7 +444,7 @@ async def save_session_snapshot(session_id: str):
 
 
 @router.get("/sessions/{session_id}/chat-history")
-async def get_chat_history(session_id: str):
+async def get_chat_history(session_id: str) -> dict:
     """Get chat history for a session."""
     state = manager.get_session_state(session_id)
     

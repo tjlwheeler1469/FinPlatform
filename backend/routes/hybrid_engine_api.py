@@ -41,7 +41,7 @@ router = APIRouter(prefix="/hybrid-engine", tags=["Hybrid Retirement Engine"])
 MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
 DB_NAME = os.environ.get("DB_NAME", "wealth_command")
 
-async def get_db():
+async def get_db() -> dict:
     client = AsyncIOMotorClient(MONGO_URL)
     return client[DB_NAME]
 
@@ -57,7 +57,7 @@ class RealTimeState:
     2. PRESENTATION MODE - Advisor-controlled, no auto-overwriting
     """
     
-    def __init__(self):
+    def __init__(self) -> dict:
         # client_id -> state
         self._background_state: Dict[str, Dict[str, Any]] = {}
         self._presentation_state: Dict[str, Dict[str, Any]] = {}
@@ -74,7 +74,7 @@ class RealTimeState:
         state = self._presentation_state.get(client_id)
         return state.get("confidence_score") if state else None
     
-    def update_background(self, client_id: str, result: Dict[str, Any]):
+    def update_background(self, client_id: str, result: Dict[str, Any]) -> dict:
         """Update background state (real-time)."""
         self._background_state[client_id] = {
             **result,
@@ -83,7 +83,7 @@ class RealTimeState:
         }
         self._last_update[client_id] = datetime.now(timezone.utc)
     
-    def update_presentation(self, client_id: str, result: Dict[str, Any]):
+    def update_presentation(self, client_id: str, result: Dict[str, Any]) -> dict:
         """Update presentation state (advisor-controlled)."""
         self._presentation_state[client_id] = {
             **result,
@@ -107,19 +107,19 @@ class RealTimeState:
             "delta": round((pres.get("confidence_score", 0) or 0) - (bg.get("confidence_score", 0) or 0), 1)
         }
     
-    async def subscribe(self, client_id: str, websocket: WebSocket):
+    async def subscribe(self, client_id: str, websocket: WebSocket) -> dict:
         """Subscribe to real-time updates."""
         if client_id not in self._subscribers:
             self._subscribers[client_id] = []
         self._subscribers[client_id].append(websocket)
     
-    def unsubscribe(self, client_id: str, websocket: WebSocket):
+    def unsubscribe(self, client_id: str, websocket: WebSocket) -> dict:
         """Unsubscribe from updates."""
         if client_id in self._subscribers:
             if websocket in self._subscribers[client_id]:
                 self._subscribers[client_id].remove(websocket)
     
-    async def broadcast_update(self, client_id: str, update_type: str, data: Dict[str, Any]):
+    async def broadcast_update(self, client_id: str, update_type: str, data: Dict[str, Any]) -> dict:
         """
         SECTION 18: Event-Driven Updates
         Broadcast updates to all subscribers.
@@ -148,7 +148,7 @@ state_manager = RealTimeState()
 # ==================== MAIN CALCULATION ENDPOINT ====================
 
 @router.post("/calculate")
-async def calculate_hybrid_confidence(request: HybridEngineRequest):
+async def calculate_hybrid_confidence(request: HybridEngineRequest) -> dict:
     """
     Main endpoint: Run full hybrid engine calculation.
     
@@ -318,7 +318,7 @@ class ScenarioComparisonRequest(BaseModel):
 
 
 @router.post("/compare-scenarios")
-async def compare_scenarios(request: ScenarioComparisonRequest):
+async def compare_scenarios(request: ScenarioComparisonRequest) -> dict:
     """
     SECTION 12: Scenario Comparison
     
@@ -390,7 +390,7 @@ async def compare_scenarios(request: ScenarioComparisonRequest):
 # ==================== SECTION 16: REAL-TIME CONFIDENCE ====================
 
 @router.get("/confidence/{client_id}")
-async def get_dual_confidence(client_id: str):
+async def get_dual_confidence(client_id: str) -> dict:
     """
     SECTION 16: Get both live and presentation confidence states.
     
@@ -460,7 +460,7 @@ async def calculate_impact(
 # ==================== SECTION 19: AI ASSIST (NOT AUTO-CONTROL) ====================
 
 @router.post("/ai-suggestions")
-async def get_ai_suggestions(request: HybridEngineRequest):
+async def get_ai_suggestions(request: HybridEngineRequest) -> dict:
     """
     SECTION 19: AI Assist (Not Auto-Control)
     
@@ -540,7 +540,7 @@ async def get_ai_suggestions(request: HybridEngineRequest):
 # ==================== WEBSOCKET FOR REAL-TIME UPDATES ====================
 
 @router.websocket("/ws/{client_id}")
-async def realtime_updates(websocket: WebSocket, client_id: str):
+async def realtime_updates(websocket: WebSocket, client_id: str) -> dict:
     """
     SECTION 13 & 18: Real-Time Data Engine & Event-Driven Updates
     
@@ -631,7 +631,7 @@ async def quick_calculate(
 
 
 @router.get("/defaults")
-async def get_default_params():
+async def get_default_params() -> dict:
     """Get default engine parameters."""
     return {
         "defaults": DEFAULT_PARAMS,

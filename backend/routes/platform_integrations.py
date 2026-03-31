@@ -18,7 +18,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
 DB_NAME = os.environ.get("DB_NAME", "adviceos")
 
-async def get_db():
+async def get_db() -> dict:
     client = AsyncIOMotorClient(MONGO_URL)
     return client[DB_NAME]
 
@@ -286,7 +286,7 @@ async def log_sync_event(
     status: str,
     records_affected: int,
     details: Optional[Dict] = None
-):
+) -> dict:
     """Log sync event for audit trail"""
     db = await get_db()
     log_entry = {
@@ -306,7 +306,7 @@ async def log_sync_event(
     
     return log_entry
 
-async def get_mock_data(platform: str, category: str, client_id: Optional[str] = None):
+async def get_mock_data(platform: str, category: str, client_id: Optional[str] = None) -> dict:
     """Get mock data for a platform"""
     if category == "client":
         clients = MOCK_CLIENTS.get(platform, [])
@@ -323,7 +323,7 @@ async def get_mock_data(platform: str, category: str, client_id: Optional[str] =
 # ============== ENDPOINTS ==============
 
 @router.get("/available")
-async def get_available_platforms():
+async def get_available_platforms() -> dict:
     """Get list of available platform integrations with capabilities"""
     platforms = []
     for key, config in PLATFORM_CONFIGS.items():
@@ -345,7 +345,7 @@ async def get_available_platforms():
     }
 
 @router.get("/status")
-async def get_all_connection_status():
+async def get_all_connection_status() -> dict:
     """Get connection status for all platforms"""
     statuses = []
     for platform_id in PLATFORM_CONFIGS.keys():
@@ -362,7 +362,7 @@ async def get_all_connection_status():
     return {"connections": statuses}
 
 @router.post("/connect/{platform}")
-async def connect_platform(platform: Platform, credentials: Optional[PlatformCredentials] = None):
+async def connect_platform(platform: Platform, credentials: Optional[PlatformCredentials] = None) -> dict:
     """
     Connect to a platform (demo mode if no credentials provided)
     """
@@ -420,7 +420,7 @@ async def connect_platform(platform: Platform, credentials: Optional[PlatformCre
     }
 
 @router.delete("/disconnect/{platform}")
-async def disconnect_platform(platform: Platform):
+async def disconnect_platform(platform: Platform) -> dict:
     """Disconnect from a platform"""
     platform_key = platform.value
     
@@ -441,7 +441,7 @@ async def disconnect_platform(platform: Platform):
     raise HTTPException(status_code=404, detail=f"No active connection for {platform}")
 
 @router.get("/{platform}/clients")
-async def get_platform_clients(platform: Platform):
+async def get_platform_clients(platform: Platform) -> dict:
     """
     READ: Fetch clients from a platform
     """
@@ -472,7 +472,7 @@ async def get_platform_clients(platform: Platform):
     }
 
 @router.get("/{platform}/clients/{client_id}")
-async def get_platform_client_detail(platform: Platform, client_id: str):
+async def get_platform_client_detail(platform: Platform, client_id: str) -> dict:
     """
     READ: Get detailed client data including portfolio
     """
@@ -501,7 +501,7 @@ async def get_platform_client_detail(platform: Platform, client_id: str):
     }
 
 @router.post("/sync")
-async def sync_platform_data(request: SyncRequest):
+async def sync_platform_data(request: SyncRequest) -> dict:
     """
     Bi-directional sync with a platform
     """
@@ -564,7 +564,7 @@ async def sync_platform_data(request: SyncRequest):
     return sync_results
 
 @router.post("/write-back")
-async def write_back_to_platform(request: WriteBackRequest):
+async def write_back_to_platform(request: WriteBackRequest) -> dict:
     """
     WRITE: Push data back to a platform
     Supports: file_notes, scenarios, documents
@@ -629,7 +629,7 @@ async def write_back_to_platform(request: WriteBackRequest):
     }
 
 @router.post("/push-retirement-data")
-async def push_retirement_data(request: RetirementDataPush):
+async def push_retirement_data(request: RetirementDataPush) -> dict:
     """
     Push retirement calculator results to client profiles on platforms
     Supports both accumulation and decumulation data
@@ -703,7 +703,7 @@ async def get_sync_logs(
     platform: Optional[Platform] = None,
     direction: Optional[SyncDirection] = None,
     limit: int = 50
-):
+) -> dict:
     """Get sync audit logs"""
     db = await get_db()
     
@@ -728,7 +728,7 @@ async def get_sync_logs(
     }
 
 @router.get("/demo/all-clients")
-async def get_all_demo_clients():
+async def get_all_demo_clients() -> dict:
     """Get all demo clients across all platforms for testing"""
     all_clients = []
     for platform, clients in MOCK_CLIENTS.items():
@@ -746,7 +746,7 @@ async def get_all_demo_clients():
     }
 
 @router.get("/demo/portfolio-summary")
-async def get_demo_portfolio_summary():
+async def get_demo_portfolio_summary() -> dict:
     """Get summary of all demo portfolios"""
     summary = []
     total_value = 0

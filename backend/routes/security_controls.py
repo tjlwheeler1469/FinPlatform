@@ -129,7 +129,7 @@ DEFAULT_ROLES = {
     }
 }
 
-async def init_default_roles():
+async def init_default_roles() -> dict:
     """Initialize default RBAC roles."""
     for role_name, role_data in DEFAULT_ROLES.items():
         existing = await roles_col.find_one({"name": role_name})
@@ -183,7 +183,7 @@ def check_rate_limit(identifier: str) -> tuple:
 
 # ==================== SECURITY EVENT LOGGING ====================
 
-async def log_security_event(event: SecurityEvent):
+async def log_security_event(event: SecurityEvent) -> dict:
     """Log a security event."""
     event_doc = {
         "id": f"sec_{uuid.uuid4().hex[:12]}",
@@ -205,7 +205,7 @@ async def log_security_event(event: SecurityEvent):
 # ==================== API ENDPOINTS ====================
 
 @router.post("/roles/init")
-async def initialize_roles():
+async def initialize_roles() -> dict:
     """Initialize default RBAC roles."""
     await init_default_roles()
     roles = await roles_col.find({}, {"_id": 0}).to_list(20)
@@ -216,13 +216,13 @@ async def initialize_roles():
     }
 
 @router.get("/roles")
-async def list_roles():
+async def list_roles() -> dict:
     """List all roles."""
     roles = await roles_col.find({}, {"_id": 0}).to_list(50)
     return {"roles": roles, "count": len(roles)}
 
 @router.get("/roles/{role_name}")
-async def get_role(role_name: str):
+async def get_role(role_name: str) -> dict:
     """Get role details with permissions."""
     role = await roles_col.find_one({"name": role_name}, {"_id": 0})
     if not role:
@@ -230,7 +230,7 @@ async def get_role(role_name: str):
     return role
 
 @router.post("/roles")
-async def create_role(role: Role):
+async def create_role(role: Role) -> dict:
     """Create a custom role."""
     existing = await roles_col.find_one({"name": role.name})
     if existing:
@@ -250,7 +250,7 @@ async def create_role(role: Role):
     return {"success": True, "role_id": role_doc["id"]}
 
 @router.post("/check-permission")
-async def check_user_permission(user_id: str, permission: str):
+async def check_user_permission(user_id: str, permission: str) -> dict:
     """Check if a user has a specific permission."""
     user = await users_col.find_one({"id": user_id})
     if not user:
@@ -270,7 +270,7 @@ async def check_user_permission(user_id: str, permission: str):
     }
 
 @router.get("/rate-limit/status")
-async def get_rate_limit_status(request: Request):
+async def get_rate_limit_status(request: Request) -> dict:
     """Get current rate limit status for the requesting IP."""
     ip = request.client.host if request.client else "unknown"
     within_limit, current_count = check_rate_limit(ip)
@@ -290,7 +290,7 @@ async def get_security_events(
     severity: Optional[str] = None,
     user_id: Optional[str] = None,
     limit: int = 100
-):
+) -> dict:
     """Get security events."""
     query = {}
     if event_type:
@@ -308,7 +308,7 @@ async def get_security_events(
     return {"events": events, "count": len(events)}
 
 @router.post("/events/log")
-async def log_event(event: SecurityEvent, request: Request):
+async def log_event(event: SecurityEvent, request: Request) -> dict:
     """Log a security event."""
     event.ip_address = request.client.host if request.client else None
     event.user_agent = request.headers.get("user-agent")
@@ -317,7 +317,7 @@ async def log_event(event: SecurityEvent, request: Request):
     return {"success": True, "logged": True}
 
 @router.get("/controls/status")
-async def get_security_controls_status():
+async def get_security_controls_status() -> dict:
     """Get status of all security controls."""
     return {
         "controls": {
@@ -373,7 +373,7 @@ async def get_security_controls_status():
     }
 
 @router.get("/api-keys")
-async def list_api_keys(licensee_id: str = "lic_default"):
+async def list_api_keys(licensee_id: str = "lic_default") -> dict:
     """List API keys for a licensee (masked)."""
     keys = await api_keys_col.find(
         {"licensee_id": licensee_id},
@@ -392,7 +392,7 @@ async def generate_api_key(
     name: str,
     licensee_id: str = "lic_default",
     permissions: List[str] = None
-):
+) -> dict:
     """Generate a new API key."""
     # Generate key
     raw_key = f"wc_{uuid.uuid4().hex}{uuid.uuid4().hex[:8]}"
@@ -428,7 +428,7 @@ async def generate_api_key(
     }
 
 @router.delete("/api-keys/{key_id}")
-async def revoke_api_key(key_id: str):
+async def revoke_api_key(key_id: str) -> dict:
     """Revoke an API key."""
     result = await api_keys_col.update_one(
         {"id": key_id},
@@ -452,7 +452,7 @@ async def revoke_api_key(key_id: str):
     return {"success": True, "message": "API key revoked"}
 
 @router.get("/dashboard")
-async def get_security_dashboard():
+async def get_security_dashboard() -> dict:
     """Get security dashboard overview."""
     now = datetime.now(timezone.utc)
     day_ago = (now - timedelta(days=1)).isoformat()

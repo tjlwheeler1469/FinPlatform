@@ -176,7 +176,7 @@ async def fathom_api_request(method: str, endpoint: str, data: Dict = None) -> D
 
 
 @router.get("/status")
-async def get_fathom_status():
+async def get_fathom_status() -> dict:
     """Check Fathom integration status."""
     return {
         "status": "connected" if FATHOM_API_KEY else "mock_mode",
@@ -195,7 +195,7 @@ async def get_fathom_status():
 
 
 @router.post("/meetings")
-async def create_meeting(meeting: MeetingCreate):
+async def create_meeting(meeting: MeetingCreate) -> dict:
     """Create a new meeting record."""
     meeting_id = f"MTG-{uuid.uuid4().hex[:8].upper()}"
     created_at = datetime.now(timezone.utc).isoformat()
@@ -234,7 +234,7 @@ async def create_meeting(meeting: MeetingCreate):
 
 
 @router.get("/meetings/{meeting_id}")
-async def get_meeting(meeting_id: str):
+async def get_meeting(meeting_id: str) -> dict:
     """Get meeting details including transcript and summary."""
     # Check stored meetings first
     if meeting_id in MEETINGS_STORE:
@@ -260,7 +260,7 @@ async def list_meetings(
     advisor_id: Optional[str] = None,
     status: Optional[str] = None,
     limit: int = 20
-):
+) -> dict:
     """List meetings with optional filters."""
     # Combine stored and mock meetings
     all_meetings = list(MEETINGS_STORE.values()) + list(MOCK_MEETINGS.values())
@@ -284,7 +284,7 @@ async def list_meetings(
 
 
 @router.put("/meetings/{meeting_id}")
-async def update_meeting(meeting_id: str, update: MeetingUpdate):
+async def update_meeting(meeting_id: str, update: MeetingUpdate) -> dict:
     """Update meeting details."""
     if meeting_id not in MEETINGS_STORE and meeting_id not in MOCK_MEETINGS:
         raise HTTPException(status_code=404, detail="Meeting not found")
@@ -307,7 +307,7 @@ async def update_meeting(meeting_id: str, update: MeetingUpdate):
 
 
 @router.post("/meetings/{meeting_id}/complete")
-async def complete_meeting(meeting_id: str):
+async def complete_meeting(meeting_id: str) -> dict:
     """Mark a meeting as complete and trigger AI processing."""
     if meeting_id not in MEETINGS_STORE and meeting_id not in MOCK_MEETINGS:
         raise HTTPException(status_code=404, detail="Meeting not found")
@@ -332,7 +332,7 @@ async def complete_meeting(meeting_id: str):
 
 
 @router.get("/meetings/{meeting_id}/transcript")
-async def get_meeting_transcript(meeting_id: str):
+async def get_meeting_transcript(meeting_id: str) -> dict:
     """Get the full meeting transcript."""
     meeting = None
     
@@ -353,7 +353,7 @@ async def get_meeting_transcript(meeting_id: str):
 
 
 @router.get("/meetings/{meeting_id}/summary")
-async def get_meeting_summary(meeting_id: str):
+async def get_meeting_summary(meeting_id: str) -> dict:
     """Get the AI-generated meeting summary."""
     meeting = None
     
@@ -376,7 +376,7 @@ async def get_meeting_summary(meeting_id: str):
 
 
 @router.get("/meetings/{meeting_id}/action-items")
-async def get_meeting_action_items(meeting_id: str):
+async def get_meeting_action_items(meeting_id: str) -> dict:
     """Get extracted action items from a meeting."""
     meeting = None
     
@@ -407,7 +407,7 @@ async def get_meeting_action_items(meeting_id: str):
 
 
 @router.post("/meetings/{meeting_id}/action-items/{item_id}/complete")
-async def complete_action_item(meeting_id: str, item_id: str):
+async def complete_action_item(meeting_id: str, item_id: str) -> dict:
     """Mark an action item as complete."""
     return {
         "success": True,
@@ -419,19 +419,19 @@ async def complete_action_item(meeting_id: str, item_id: str):
 
 
 @router.get("/client/{client_id}/meetings")
-async def get_client_meetings(client_id: str, limit: int = 10):
+async def get_client_meetings(client_id: str, limit: int = 10) -> dict:
     """Get all meetings for a specific client."""
     return await list_meetings(client_id=client_id, limit=limit)
 
 
 @router.get("/advisor/{advisor_id}/meetings")
-async def get_advisor_meetings(advisor_id: str, limit: int = 20):
+async def get_advisor_meetings(advisor_id: str, limit: int = 20) -> dict:
     """Get all meetings for a specific advisor."""
     return await list_meetings(advisor_id=advisor_id, limit=limit)
 
 
 @router.post("/webhook/fathom")
-async def fathom_webhook(payload: Dict[str, Any]):
+async def fathom_webhook(payload: Dict[str, Any]) -> dict:
     """
     Webhook endpoint for Fathom callbacks.
     Fathom will call this when meeting transcription/summary is ready.

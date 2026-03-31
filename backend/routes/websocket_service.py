@@ -22,7 +22,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
 DB_NAME = os.environ.get("DB_NAME", "adviceos")
 
-async def get_db():
+async def get_db() -> dict:
     client = AsyncIOMotorClient(MONGO_URL)
     return client[DB_NAME]
 
@@ -31,7 +31,7 @@ async def get_db():
 class ConnectionManager:
     """Manages WebSocket connections for different channels"""
     
-    def __init__(self):
+    def __init__(self) -> dict:
         # Channel -> Set of WebSocket connections
         self.active_connections: Dict[str, Set[WebSocket]] = {
             "enterprise": set(),      # Enterprise dashboard updates
@@ -43,7 +43,7 @@ class ConnectionManager:
         }
         self.connection_metadata: Dict[WebSocket, Dict] = {}
     
-    async def connect(self, websocket: WebSocket, channel: str, user_id: Optional[str] = None):
+    async def connect(self, websocket: WebSocket, channel: str, user_id: Optional[str] = None) -> dict:
         await websocket.accept()
         if channel not in self.active_connections:
             self.active_connections[channel] = set()
@@ -55,14 +55,14 @@ class ConnectionManager:
         }
         logger.info(f"WebSocket connected to channel: {channel}, total: {len(self.active_connections[channel])}")
     
-    def disconnect(self, websocket: WebSocket, channel: str):
+    def disconnect(self, websocket: WebSocket, channel: str) -> dict:
         if channel in self.active_connections:
             self.active_connections[channel].discard(websocket)
         if websocket in self.connection_metadata:
             del self.connection_metadata[websocket]
         logger.info(f"WebSocket disconnected from channel: {channel}")
     
-    async def broadcast(self, channel: str, message: Dict[str, Any]):
+    async def broadcast(self, channel: str, message: Dict[str, Any]) -> dict:
         """Broadcast message to all connections in a channel"""
         if channel not in self.active_connections:
             return
@@ -83,7 +83,7 @@ class ConnectionManager:
             if conn in self.connection_metadata:
                 del self.connection_metadata[conn]
     
-    async def send_to_user(self, user_id: str, message: Dict[str, Any]):
+    async def send_to_user(self, user_id: str, message: Dict[str, Any]) -> dict:
         """Send message to specific user across all their connections"""
         message_json = json.dumps(message)
         for ws, metadata in self.connection_metadata.items():
@@ -112,7 +112,7 @@ class WebSocketEvent(BaseModel):
 # ============== WEBSOCKET ENDPOINTS ==============
 
 @router.websocket("/enterprise")
-async def websocket_enterprise(websocket: WebSocket):
+async def websocket_enterprise(websocket: WebSocket) -> dict:
     """WebSocket for Enterprise Dashboard real-time updates"""
     await manager.connect(websocket, "enterprise")
     try:
@@ -139,7 +139,7 @@ async def websocket_enterprise(websocket: WebSocket):
         manager.disconnect(websocket, "enterprise")
 
 @router.websocket("/platform-sync")
-async def websocket_platform_sync(websocket: WebSocket):
+async def websocket_platform_sync(websocket: WebSocket) -> dict:
     """WebSocket for Platform Sync real-time updates"""
     await manager.connect(websocket, "platform_sync")
     try:
@@ -179,7 +179,7 @@ async def websocket_platform_sync(websocket: WebSocket):
         manager.disconnect(websocket, "platform_sync")
 
 @router.websocket("/compliance")
-async def websocket_compliance(websocket: WebSocket):
+async def websocket_compliance(websocket: WebSocket) -> dict:
     """WebSocket for Compliance alerts real-time"""
     await manager.connect(websocket, "compliance")
     try:
@@ -201,7 +201,7 @@ async def websocket_compliance(websocket: WebSocket):
         manager.disconnect(websocket, "compliance")
 
 @router.websocket("/notifications")
-async def websocket_notifications(websocket: WebSocket):
+async def websocket_notifications(websocket: WebSocket) -> dict:
     """WebSocket for general notifications"""
     await manager.connect(websocket, "notifications")
     try:
@@ -224,7 +224,7 @@ async def websocket_notifications(websocket: WebSocket):
 
 # ============== BROADCAST FUNCTIONS (Called from other modules) ==============
 
-async def broadcast_platform_sync_event(platform: str, event_type: str, data: Dict[str, Any]):
+async def broadcast_platform_sync_event(platform: str, event_type: str, data: Dict[str, Any]) -> dict:
     """Broadcast platform sync event to all connected clients"""
     await manager.broadcast("platform_sync", {
         "event_type": event_type,
@@ -233,7 +233,7 @@ async def broadcast_platform_sync_event(platform: str, event_type: str, data: Di
         "timestamp": datetime.now(timezone.utc).isoformat()
     })
 
-async def broadcast_compliance_alert(alert_type: str, severity: str, data: Dict[str, Any]):
+async def broadcast_compliance_alert(alert_type: str, severity: str, data: Dict[str, Any]) -> dict:
     """Broadcast compliance alert to all connected clients"""
     await manager.broadcast("compliance", {
         "event_type": "compliance_alert",
@@ -243,7 +243,7 @@ async def broadcast_compliance_alert(alert_type: str, severity: str, data: Dict[
         "timestamp": datetime.now(timezone.utc).isoformat()
     })
 
-async def broadcast_breach_notification(breach_data: Dict[str, Any]):
+async def broadcast_breach_notification(breach_data: Dict[str, Any]) -> dict:
     """Broadcast breach notification"""
     await manager.broadcast("breaches", {
         "event_type": "new_breach",
@@ -257,7 +257,7 @@ async def broadcast_breach_notification(breach_data: Dict[str, Any]):
         "timestamp": datetime.now(timezone.utc).isoformat()
     })
 
-async def broadcast_incident_update(incident_data: Dict[str, Any], update_type: str = "new"):
+async def broadcast_incident_update(incident_data: Dict[str, Any], update_type: str = "new") -> dict:
     """Broadcast incident update"""
     await manager.broadcast("incidents", {
         "event_type": f"incident_{update_type}",
@@ -271,7 +271,7 @@ async def broadcast_incident_update(incident_data: Dict[str, Any], update_type: 
         "timestamp": datetime.now(timezone.utc).isoformat()
     })
 
-async def broadcast_notification(notification_type: str, title: str, message: str, data: Optional[Dict] = None):
+async def broadcast_notification(notification_type: str, title: str, message: str, data: Optional[Dict] = None) -> dict:
     """Broadcast general notification"""
     await manager.broadcast("notifications", {
         "event_type": "notification",
@@ -285,7 +285,7 @@ async def broadcast_notification(notification_type: str, title: str, message: st
 # ============== REST ENDPOINTS ==============
 
 @router.get("/stats")
-async def get_websocket_stats():
+async def get_websocket_stats() -> dict:
     """Get WebSocket connection statistics"""
     return {
         "connections": manager.get_stats(),
@@ -294,7 +294,7 @@ async def get_websocket_stats():
     }
 
 @router.post("/broadcast/{channel}")
-async def broadcast_to_channel(channel: str, event_type: str, data: Dict[str, Any]):
+async def broadcast_to_channel(channel: str, event_type: str, data: Dict[str, Any]) -> dict:
     """Manually broadcast a message to a channel (for testing)"""
     if channel not in manager.active_connections:
         raise HTTPException(status_code=404, detail=f"Channel {channel} not found")
@@ -312,7 +312,7 @@ async def broadcast_to_channel(channel: str, event_type: str, data: Dict[str, An
     }
 
 @router.post("/test-notification")
-async def send_test_notification():
+async def send_test_notification() -> dict:
     """Send a test notification to all channels"""
     test_message = {
         "event_type": "test",

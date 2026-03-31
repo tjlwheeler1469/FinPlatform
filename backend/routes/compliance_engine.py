@@ -41,7 +41,7 @@ explainability_col = db["explainability_records"]
 
 # ==================== AUDIT LOGGING ====================
 
-def sanitize_for_json(obj):
+def sanitize_for_json(obj) -> dict:
     """Remove MongoDB ObjectId and other non-serializable objects"""
     if obj is None:
         return None
@@ -66,7 +66,7 @@ async def log_audit(
     metadata: Optional[Dict] = None,
     ip_address: Optional[str] = None,
     user_agent: Optional[str] = None
-):
+) -> dict:
     """Create immutable audit log entry"""
     timestamp = datetime.now(timezone.utc).isoformat()
     
@@ -289,7 +289,7 @@ async def create_licensee(
     afsl_number: str,
     contact_email: str,
     request: Request
-):
+) -> dict:
     """Create a new licensee (AFSL holder)"""
     licensee_id = f"lic_{uuid.uuid4().hex[:12]}"
     now = datetime.now(timezone.utc).isoformat()
@@ -323,7 +323,7 @@ async def create_licensee(
     return licensee
 
 @router.get("/licensee/{licensee_id}")
-async def get_licensee(licensee_id: str):
+async def get_licensee(licensee_id: str) -> dict:
     """Get licensee details"""
     licensee = await licensees_col.find_one({"id": licensee_id}, {"_id": 0})
     if not licensee:
@@ -335,7 +335,7 @@ async def update_licensee_rules(
     licensee_id: str,
     rules_config: Dict[str, Any],
     request: Request
-):
+) -> dict:
     """Update licensee compliance rules"""
     licensee = await licensees_col.find_one({"id": licensee_id})
     if not licensee:
@@ -374,7 +374,7 @@ async def create_adviser(
     email: str,
     ar_number: Optional[str] = None,
     request: Request = None
-):
+) -> dict:
     """Create a new adviser"""
     adviser_id = f"adv_{uuid.uuid4().hex[:12]}"
     now = datetime.now(timezone.utc).isoformat()
@@ -413,7 +413,7 @@ async def create_adviser(
     return adviser
 
 @router.get("/adviser/{adviser_id}")
-async def get_adviser(adviser_id: str):
+async def get_adviser(adviser_id: str) -> dict:
     """Get adviser details"""
     adviser = await advisers_col.find_one({"id": adviser_id}, {"_id": 0})
     if not adviser:
@@ -421,7 +421,7 @@ async def get_adviser(adviser_id: str):
     return adviser
 
 @router.get("/licensee/{licensee_id}/advisers")
-async def get_licensee_advisers(licensee_id: str):
+async def get_licensee_advisers(licensee_id: str) -> dict:
     """Get all advisers for a licensee"""
     advisers = await advisers_col.find({"licensee_id": licensee_id}, {"_id": 0}).to_list(1000)
     return {"advisers": advisers, "count": len(advisers)}
@@ -489,7 +489,7 @@ async def run_compliance_check(
     return compliance_check
 
 @router.get("/check/{check_id}")
-async def get_compliance_check(check_id: str):
+async def get_compliance_check(check_id: str) -> dict:
     """Get compliance check details"""
     check = await compliance_checks_col.find_one({"id": check_id}, {"_id": 0})
     if not check:
@@ -582,7 +582,7 @@ async def record_adviser_decision(
     return adviser_decision
 
 @router.get("/decision/{decision_id}")
-async def get_adviser_decision(decision_id: str):
+async def get_adviser_decision(decision_id: str) -> dict:
     """Get adviser decision details"""
     decision = await adviser_decisions_col.find_one({"id": decision_id}, {"_id": 0})
     if not decision:
@@ -600,7 +600,7 @@ async def get_audit_logs(
     start_date: Optional[str] = None,
     end_date: Optional[str] = None,
     limit: int = 100
-):
+) -> dict:
     """Get audit logs with filtering"""
     query = {}
     
@@ -624,7 +624,7 @@ async def get_audit_logs(
     return {"logs": logs, "count": len(logs)}
 
 @router.get("/audit-logs/replay/{entity_type}/{entity_id}")
-async def replay_audit_trail(entity_type: str, entity_id: str):
+async def replay_audit_trail(entity_type: str, entity_id: str) -> dict:
     """Replay full audit trail for an entity"""
     logs = await audit_logs_col.find(
         {"entity_type": entity_type, "entity_id": entity_id},
@@ -647,7 +647,7 @@ async def get_breaches(
     status: Optional[str] = None,
     severity: Optional[str] = None,
     limit: int = 100
-):
+) -> dict:
     """Get breach flags"""
     query = {}
     if licensee_id:
@@ -668,7 +668,7 @@ async def resolve_breach(
     resolution_notes: str,
     reviewed_by: str,
     request: Request
-):
+) -> dict:
     """Resolve a breach flag"""
     breach = await breach_flags_col.find_one({"id": breach_id})
     if not breach:
@@ -727,7 +727,7 @@ def get_mock_apl() -> List[Dict[str, Any]]:
 # --- Initialize Default Licensee ---
 
 @router.post("/init-default")
-async def initialize_default_licensee():
+async def initialize_default_licensee() -> dict:
     """Initialize default licensee and adviser for demo"""
     # Check if already exists
     existing = await licensees_col.find_one({"id": "lic_default"})

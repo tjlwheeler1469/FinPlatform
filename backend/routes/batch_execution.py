@@ -217,7 +217,7 @@ def generate_sector_reduction_trades(client_id: str, sector: str, target_reducti
 # ==================== API ENDPOINTS ====================
 
 @router.get("/status")
-async def get_execution_status():
+async def get_execution_status() -> dict:
     """Get batch execution system status."""
     return {
         "status": "operational",
@@ -230,7 +230,7 @@ async def get_execution_status():
 
 
 @router.post("/preview/rebalance")
-async def preview_rebalance(client_ids: List[str]):
+async def preview_rebalance(client_ids: List[str]) -> dict:
     """Preview rebalancing trades for multiple clients."""
     previews = []
     total_trades = 0
@@ -267,7 +267,7 @@ async def preview_rebalance(client_ids: List[str]):
 
 
 @router.post("/preview/tax-harvest")
-async def preview_tax_harvest(client_ids: List[str]):
+async def preview_tax_harvest(client_ids: List[str]) -> dict:
     """Preview tax-loss harvesting trades."""
     previews = []
     total_savings = 0
@@ -304,7 +304,7 @@ async def preview_sector_reduction(
     client_ids: List[str],
     sector: str,
     target_reduction_pct: float = 10.0
-):
+) -> dict:
     """Preview sector exposure reduction trades."""
     previews = []
     
@@ -335,7 +335,7 @@ async def preview_sector_reduction(
 
 
 @router.post("/execute")
-async def execute_batch(request: BatchExecutionRequest):
+async def execute_batch(request: BatchExecutionRequest) -> dict:
     """Execute a batch of trades across multiple clients."""
     batch_id = f"batch_{uuid.uuid4().hex[:8]}"
     now = datetime.now(timezone.utc)
@@ -429,7 +429,7 @@ async def execute_batch(request: BatchExecutionRequest):
 
 
 @router.post("/batches/{batch_id}/approve")
-async def approve_batch(batch_id: str):
+async def approve_batch(batch_id: str) -> dict:
     """Approve a pending batch for execution."""
     if batch_id not in BATCH_JOBS:
         raise HTTPException(status_code=404, detail="Batch not found")
@@ -452,7 +452,7 @@ async def approve_batch(batch_id: str):
 
 
 @router.post("/batches/{batch_id}/execute-approved")
-async def execute_approved_batch(batch_id: str):
+async def execute_approved_batch(batch_id: str) -> dict:
     """Execute an approved batch."""
     if batch_id not in BATCH_JOBS:
         raise HTTPException(status_code=404, detail="Batch not found")
@@ -489,7 +489,7 @@ async def execute_approved_batch(batch_id: str):
 
 
 @router.get("/batches")
-async def get_batches(status: Optional[str] = None, limit: int = 50):
+async def get_batches(status: Optional[str] = None, limit: int = 50) -> dict:
     """Get all batch jobs."""
     batches = list(BATCH_JOBS.values())
     
@@ -507,7 +507,7 @@ async def get_batches(status: Optional[str] = None, limit: int = 50):
 
 
 @router.get("/batches/{batch_id}")
-async def get_batch(batch_id: str):
+async def get_batch(batch_id: str) -> dict:
     """Get a specific batch job."""
     if batch_id not in BATCH_JOBS:
         raise HTTPException(status_code=404, detail="Batch not found")
@@ -516,7 +516,7 @@ async def get_batch(batch_id: str):
 
 
 @router.delete("/batches/{batch_id}")
-async def cancel_batch(batch_id: str):
+async def cancel_batch(batch_id: str) -> dict:
     """Cancel a pending batch."""
     if batch_id not in BATCH_JOBS:
         raise HTTPException(status_code=404, detail="Batch not found")
@@ -532,7 +532,7 @@ async def cancel_batch(batch_id: str):
 
 
 @router.get("/history")
-async def get_execution_history(limit: int = 100):
+async def get_execution_history(limit: int = 100) -> dict:
     """Get execution history."""
     history = list(EXECUTION_HISTORY.values())
     history = sorted(history, key=lambda x: x.get("timestamp", ""), reverse=True)[:limit]
@@ -549,7 +549,7 @@ async def get_execution_history(limit: int = 100):
 
 
 @router.get("/one-click-actions")
-async def get_one_click_actions():
+async def get_one_click_actions() -> dict:
     """Get available one-click execution actions based on Book Intelligence."""
     # These would be generated from Book Intelligence insights
     actions = [

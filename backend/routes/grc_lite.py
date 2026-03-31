@@ -68,7 +68,7 @@ class ControlMapping(BaseModel):
 # ==================== RISK REGISTER ====================
 
 @router.post("/risk/create")
-async def create_risk_entry(risk: RiskEntry):
+async def create_risk_entry(risk: RiskEntry) -> dict:
     """Manually create a risk register entry."""
     risk_id = f"risk_{uuid.uuid4().hex[:12]}"
     
@@ -99,7 +99,7 @@ def calculate_risk_score(severity: str, likelihood: str) -> int:
     likelihood_scores = {"rare": 1, "unlikely": 2, "possible": 3, "likely": 4, "almost_certain": 5}
     return severity_scores.get(severity, 2) * likelihood_scores.get(likelihood, 3)
 
-async def auto_generate_risk_from_breach(breach_doc: Dict[str, Any]):
+async def auto_generate_risk_from_breach(breach_doc: Dict[str, Any]) -> dict:
     """Auto-generate risk register entry from a compliance breach."""
     risk_id = f"risk_auto_{uuid.uuid4().hex[:8]}"
     
@@ -130,14 +130,14 @@ async def auto_generate_risk_from_breach(breach_doc: Dict[str, Any]):
     await risk_register_col.insert_one(risk_doc)
     return risk_id
 
-async def auto_generate_risk_from_override(override_doc: Dict[str, Any]):
+async def auto_generate_risk_from_override(override_doc: Dict[str, Any]) -> dict:
     """Auto-generate risk register entry from an adviser override."""
     risk_id = f"risk_auto_{uuid.uuid4().hex[:8]}"
     
     risk_doc = {
         "id": risk_id,
         "risk_type": "conduct",
-        "description": f"Adviser override of compliance guidance",
+        "description": "Adviser override of compliance guidance",
         "linked_activity": "adviser_decision",
         "linked_entity_id": override_doc.get("id"),
         "severity": "medium",
@@ -163,7 +163,7 @@ async def get_risk_register(
     severity: Optional[str] = None,
     risk_type: Optional[str] = None,
     limit: int = 100
-):
+) -> dict:
     """Get risk register entries with optional filtering."""
     query = {}
     if status:
@@ -206,7 +206,7 @@ async def get_risk_register(
     }
 
 @router.put("/risk/{risk_id}/update")
-async def update_risk_entry(risk_id: str, updates: Dict[str, Any]):
+async def update_risk_entry(risk_id: str, updates: Dict[str, Any]) -> dict:
     """Update a risk register entry."""
     allowed_fields = ["status", "severity", "likelihood", "owner", "mitigation", "description"]
     update_dict = {k: v for k, v in updates.items() if k in allowed_fields}
@@ -232,7 +232,7 @@ async def update_risk_entry(risk_id: str, updates: Dict[str, Any]):
     return {"success": True, "message": "Risk entry updated"}
 
 @router.post("/risk/auto-populate")
-async def auto_populate_risk_register():
+async def auto_populate_risk_register() -> dict:
     """Auto-populate risk register from breaches and overrides."""
     now = datetime.now(timezone.utc)
     thirty_days_ago = (now - timedelta(days=30)).isoformat()
@@ -274,7 +274,7 @@ async def auto_populate_risk_register():
 # ==================== INCIDENT TRACKING (CPS 230) ====================
 
 @router.post("/incident/create")
-async def create_incident(incident: IncidentCreate):
+async def create_incident(incident: IncidentCreate) -> dict:
     """Create a new incident record."""
     incident_id = f"inc_{uuid.uuid4().hex[:12]}"
     
@@ -325,7 +325,7 @@ async def get_incidents(
     severity: Optional[str] = None,
     incident_type: Optional[str] = None,
     limit: int = 50
-):
+) -> dict:
     """Get incident records."""
     query = {}
     if status:
@@ -354,7 +354,7 @@ async def get_incidents(
     }
 
 @router.put("/incident/{incident_id}/resolve")
-async def resolve_incident(incident_id: str, resolution_notes: str):
+async def resolve_incident(incident_id: str, resolution_notes: str) -> dict:
     """Resolve an incident."""
     now = datetime.now(timezone.utc).isoformat()
     
@@ -376,7 +376,7 @@ async def resolve_incident(incident_id: str, resolution_notes: str):
     return {"success": True, "message": "Incident resolved"}
 
 @router.post("/incident/auto-detect")
-async def auto_detect_incidents():
+async def auto_detect_incidents() -> dict:
     """Auto-detect incidents from system patterns."""
     now = datetime.now(timezone.utc)
     one_hour_ago = (now - timedelta(hours=1)).isoformat()
@@ -448,7 +448,7 @@ async def auto_detect_incidents():
 # ==================== CONTROL MAPPING ====================
 
 @router.post("/control/create")
-async def create_control(control: ControlMapping):
+async def create_control(control: ControlMapping) -> dict:
     """Create a control mapping."""
     control_id = f"ctrl_{uuid.uuid4().hex[:12]}"
     
@@ -465,7 +465,7 @@ async def create_control(control: ControlMapping):
     return {"success": True, "control_id": control_id}
 
 @router.get("/controls")
-async def get_controls(status: Optional[str] = None):
+async def get_controls(status: Optional[str] = None) -> dict:
     """Get all control mappings."""
     query = {}
     if status:
@@ -489,7 +489,7 @@ async def get_controls(status: Optional[str] = None):
     }
 
 @router.post("/controls/init-default")
-async def init_default_controls():
+async def init_default_controls() -> dict:
     """Initialize default control mappings based on compliance rules."""
     default_controls = [
         {
@@ -587,7 +587,7 @@ async def init_default_controls():
 # ==================== GRC DASHBOARDS ====================
 
 @router.get("/dashboard/compliance")
-async def get_compliance_dashboard(licensee_id: str = "lic_default"):
+async def get_compliance_dashboard(licensee_id: str = "lic_default") -> dict:
     """Get compliance dashboard for licensee."""
     now = datetime.now(timezone.utc)
     thirty_days_ago = (now - timedelta(days=30)).isoformat()
@@ -646,7 +646,7 @@ async def get_compliance_dashboard(licensee_id: str = "lic_default"):
     }
 
 @router.get("/dashboard/risk")
-async def get_risk_dashboard():
+async def get_risk_dashboard() -> dict:
     """Get risk dashboard."""
     now = datetime.now(timezone.utc)
     
@@ -702,7 +702,7 @@ async def get_risk_dashboard():
     }
 
 @router.get("/dashboard/adviser-productivity")
-async def get_adviser_productivity_dashboard(adviser_id: Optional[str] = None):
+async def get_adviser_productivity_dashboard(adviser_id: Optional[str] = None) -> dict:
     """Get adviser productivity dashboard."""
     now = datetime.now(timezone.utc)
     thirty_days_ago = (now - timedelta(days=30)).isoformat()

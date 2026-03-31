@@ -45,7 +45,7 @@ class ComplianceCreate(BaseModel):
 
 
 # Initialize sample adviser data
-def init_sample_advisers():
+def init_sample_advisers() -> dict:
     if not ADVISERS:
         ADVISERS["adv_001"] = {
             "id": "adv_001",
@@ -63,7 +63,7 @@ init_sample_advisers()
 
 
 @router.get("/dashboard")
-async def get_practice_dashboard():
+async def get_practice_dashboard() -> dict:
     """Get practice management dashboard data."""
     time_entries = list(TIME_ENTRIES.values())
     invoices = list(INVOICES.values())
@@ -102,7 +102,7 @@ async def get_practice_dashboard():
 
 # Time entries endpoints
 @router.post("/time-entries")
-async def create_time_entry(request: TimeEntryCreate):
+async def create_time_entry(request: TimeEntryCreate) -> dict:
     """Create a new time entry."""
     entry_id = f"time_{uuid.uuid4().hex[:8]}"
     
@@ -126,7 +126,7 @@ async def get_time_entries(
     client_id: Optional[str] = None,
     start_date: Optional[str] = None,
     end_date: Optional[str] = None
-):
+) -> dict:
     """Get time entries with optional filtering."""
     entries = list(TIME_ENTRIES.values())
     
@@ -137,7 +137,7 @@ async def get_time_entries(
 
 
 @router.delete("/time-entries/{entry_id}")
-async def delete_time_entry(entry_id: str):
+async def delete_time_entry(entry_id: str) -> dict:
     """Delete a time entry."""
     if entry_id not in TIME_ENTRIES:
         raise HTTPException(status_code=404, detail="Time entry not found")
@@ -148,7 +148,7 @@ async def delete_time_entry(entry_id: str):
 
 # Invoice endpoints
 @router.post("/invoices")
-async def create_invoice(request: InvoiceCreate):
+async def create_invoice(request: InvoiceCreate) -> dict:
     """Create a new invoice."""
     invoice_id = f"inv_{uuid.uuid4().hex[:8]}"
     
@@ -172,7 +172,7 @@ async def create_invoice(request: InvoiceCreate):
 async def get_invoices(
     client_id: Optional[str] = None,
     status: Optional[str] = None
-):
+) -> dict:
     """Get invoices with optional filtering."""
     invoices = list(INVOICES.values())
     
@@ -185,7 +185,7 @@ async def get_invoices(
 
 
 @router.put("/invoices/{invoice_id}/status")
-async def update_invoice_status(invoice_id: str, status: str):
+async def update_invoice_status(invoice_id: str, status: str) -> dict:
     """Update invoice status."""
     if invoice_id not in INVOICES:
         raise HTTPException(status_code=404, detail="Invoice not found")
@@ -198,7 +198,7 @@ async def update_invoice_status(invoice_id: str, status: str):
 
 # Compliance endpoints
 @router.post("/compliance")
-async def create_compliance_record(request: ComplianceCreate):
+async def create_compliance_record(request: ComplianceCreate) -> dict:
     """Create a new compliance record."""
     record_id = f"comp_{uuid.uuid4().hex[:8]}"
     
@@ -217,14 +217,14 @@ async def create_compliance_record(request: ComplianceCreate):
 
 
 @router.get("/compliance/{client_id}")
-async def get_compliance_records(client_id: str):
+async def get_compliance_records(client_id: str) -> dict:
     """Get compliance records for a client."""
     records = [r for r in COMPLIANCE_RECORDS.values() if r.get("client_id") == client_id]
     return {"compliance_records": records}
 
 
 @router.put("/compliance/{record_id}")
-async def update_compliance_record(record_id: str, updates: Dict[str, Any]):
+async def update_compliance_record(record_id: str, updates: Dict[str, Any]) -> dict:
     """Update a compliance record."""
     if record_id not in COMPLIANCE_RECORDS:
         raise HTTPException(status_code=404, detail="Compliance record not found")
@@ -237,13 +237,13 @@ async def update_compliance_record(record_id: str, updates: Dict[str, Any]):
 
 # Adviser endpoints
 @router.get("/advisers")
-async def get_advisers():
+async def get_advisers() -> dict:
     """Get all advisers."""
     return {"advisers": list(ADVISERS.values())}
 
 
 @router.get("/advisers/{adviser_id}")
-async def get_adviser(adviser_id: str):
+async def get_adviser(adviser_id: str) -> dict:
     """Get a specific adviser."""
     adviser = ADVISERS.get(adviser_id)
     if not adviser:
@@ -252,7 +252,7 @@ async def get_adviser(adviser_id: str):
 
 
 @router.get("/revenue/{adviser_id}")
-async def get_adviser_revenue(adviser_id: str):
+async def get_adviser_revenue(adviser_id: str) -> dict:
     """Get revenue data for an adviser."""
     return {
         "adviser_id": adviser_id,

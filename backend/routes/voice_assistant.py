@@ -101,7 +101,7 @@ async def transcribe_and_respond(
         return {
             "session_id": session_id,
             "transcription": "",
-            "response": f"Sorry, I encountered an issue processing your request. Please try again.",
+            "response": "Sorry, I encountered an issue processing your request. Please try again.",
             "error": True,
             "detail": str(e)
         }

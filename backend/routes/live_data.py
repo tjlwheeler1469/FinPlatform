@@ -137,7 +137,7 @@ def generate_mock_stock_data(symbol: str) -> Dict:
     }
     
     base_price = base_prices.get(symbol, 50.00)
-    change = _rng.uniform(-2, 2)
+    change = random.uniform(-2, 2)
     change_pct = (change / base_price) * 100
     
     return {
@@ -147,10 +147,10 @@ def generate_mock_stock_data(symbol: str) -> Dict:
         "price": round(base_price + change, 2),
         "change": round(change, 2),
         "change_percent": round(change_pct, 2),
-        "volume": _rng.randint(500000, 5000000),
-        "market_cap": _rng.randint(10000000000, 200000000000),
-        "pe_ratio": round(_rng.uniform(10, 30), 1),
-        "dividend_yield": round(_rng.uniform(2, 6), 2),
+        "volume": random.randint(500000, 5000000),
+        "market_cap": random.randint(10000000000, 200000000000),
+        "pe_ratio": round(random.uniform(10, 30), 1),
+        "dividend_yield": round(random.uniform(2, 6), 2),
         "52w_high": round(base_price * 1.2, 2),
         "52w_low": round(base_price * 0.8, 2),
         "data_source": "mock",

@@ -315,7 +315,7 @@ async def transcribe_voice(
     return response
 
 @router.post("/command")
-async def process_voice_command(text: str):
+async def process_voice_command(text: str) -> dict:
     """
     Process a text command as if it were transcribed from voice.
     Useful for testing voice command parsing.
@@ -345,7 +345,7 @@ async def process_voice_command(text: str):
     }
 
 @router.get("/commands")
-async def get_voice_commands(limit: int = 20):
+async def get_voice_commands(limit: int = 20) -> dict:
     """Get recent voice commands."""
     commands = await voice_commands_col.find(
         {},
@@ -358,7 +358,7 @@ async def get_voice_commands(limit: int = 20):
     }
 
 @router.get("/transcriptions")
-async def get_transcriptions(limit: int = 20):
+async def get_transcriptions(limit: int = 20) -> dict:
     """Get recent transcriptions."""
     transcriptions = await voice_transcriptions_col.find(
         {},
@@ -371,7 +371,7 @@ async def get_transcriptions(limit: int = 20):
     }
 
 @router.get("/supported-commands")
-async def get_supported_commands():
+async def get_supported_commands() -> dict:
     """Get list of supported voice commands."""
     return {
         "commands": [
@@ -426,7 +426,7 @@ async def get_supported_commands():
     }
 
 @router.get("/status")
-async def get_voice_status():
+async def get_voice_status() -> dict:
     """Check voice interface status."""
     return {
         "whisper_configured": bool(EMERGENT_LLM_KEY),

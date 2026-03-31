@@ -26,7 +26,7 @@ router = APIRouter(prefix="/push", tags=["Push Notifications"])
 MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
 DB_NAME = os.environ.get("DB_NAME", "wealth_command")
 
-async def get_db():
+async def get_db() -> dict:
     client = AsyncIOMotorClient(MONGO_URL)
     return client[DB_NAME]
 
@@ -108,7 +108,7 @@ class NotificationPreferences(BaseModel):
 # ==================== SUBSCRIPTION MANAGEMENT ====================
 
 @router.post("/subscribe")
-async def subscribe_push(subscription: PushSubscription):
+async def subscribe_push(subscription: PushSubscription) -> dict:
     """Register a push notification subscription"""
     db = await get_db()
     
@@ -139,7 +139,7 @@ async def subscribe_push(subscription: PushSubscription):
     }
 
 @router.delete("/unsubscribe/{user_id}")
-async def unsubscribe_push(user_id: str, device_token: Optional[str] = None):
+async def unsubscribe_push(user_id: str, device_token: Optional[str] = None) -> dict:
     """Unregister push notification subscription"""
     db = await get_db()
     
@@ -155,7 +155,7 @@ async def unsubscribe_push(user_id: str, device_token: Optional[str] = None):
     }
 
 @router.get("/subscriptions/{user_id}")
-async def get_user_subscriptions(user_id: str):
+async def get_user_subscriptions(user_id: str) -> dict:
     """Get all push subscriptions for a user"""
     db = await get_db()
     
@@ -173,7 +173,7 @@ async def get_user_subscriptions(user_id: str):
 # ==================== NOTIFICATION PREFERENCES ====================
 
 @router.post("/preferences")
-async def save_preferences(preferences: NotificationPreferences):
+async def save_preferences(preferences: NotificationPreferences) -> dict:
     """Save user notification preferences"""
     db = await get_db()
     
@@ -189,7 +189,7 @@ async def save_preferences(preferences: NotificationPreferences):
     return {"success": True, "message": "Preferences saved"}
 
 @router.get("/preferences/{user_id}")
-async def get_preferences(user_id: str):
+async def get_preferences(user_id: str) -> dict:
     """Get user notification preferences"""
     db = await get_db()
     
@@ -207,7 +207,7 @@ async def get_preferences(user_id: str):
 # ==================== IN-APP NOTIFICATIONS ====================
 
 @router.post("/send")
-async def send_notification(notification: InAppNotification, background_tasks: BackgroundTasks):
+async def send_notification(notification: InAppNotification, background_tasks: BackgroundTasks) -> dict:
     """Send an in-app notification to a user"""
     db = await get_db()
     
@@ -254,7 +254,7 @@ async def send_notification(notification: InAppNotification, background_tasks: B
     }
 
 @router.post("/broadcast")
-async def broadcast_notification(broadcast: BroadcastNotification, background_tasks: BackgroundTasks):
+async def broadcast_notification(broadcast: BroadcastNotification, background_tasks: BackgroundTasks) -> dict:
     """Broadcast a notification to multiple users"""
     db = await get_db()
     
@@ -318,7 +318,7 @@ async def get_user_notifications(
     limit: int = 50,
     unread_only: bool = False,
     category: Optional[str] = None
-):
+) -> dict:
     """Get notifications for a user"""
     db = await get_db()
     
@@ -347,7 +347,7 @@ async def get_user_notifications(
     }
 
 @router.put("/notifications/{notification_id}/read")
-async def mark_notification_read(notification_id: str):
+async def mark_notification_read(notification_id: str) -> dict:
     """Mark a notification as read"""
     db = await get_db()
     
@@ -359,7 +359,7 @@ async def mark_notification_read(notification_id: str):
     return {"success": result.modified_count > 0}
 
 @router.put("/notifications/{user_id}/read-all")
-async def mark_all_read(user_id: str):
+async def mark_all_read(user_id: str) -> dict:
     """Mark all notifications as read for a user"""
     db = await get_db()
     
@@ -371,7 +371,7 @@ async def mark_all_read(user_id: str):
     return {"success": True, "marked_read": result.modified_count}
 
 @router.delete("/notifications/{notification_id}")
-async def dismiss_notification(notification_id: str):
+async def dismiss_notification(notification_id: str) -> dict:
     """Dismiss (soft delete) a notification"""
     db = await get_db()
     
@@ -383,7 +383,7 @@ async def dismiss_notification(notification_id: str):
     return {"success": result.modified_count > 0}
 
 @router.delete("/notifications/{user_id}/clear-all")
-async def clear_all_notifications(user_id: str):
+async def clear_all_notifications(user_id: str) -> dict:
     """Clear all notifications for a user"""
     db = await get_db()
     
@@ -396,7 +396,7 @@ async def clear_all_notifications(user_id: str):
 
 # ==================== PUSH DELIVERY FUNCTIONS ====================
 
-async def broadcast_to_user(user_id: str, notification: Dict[str, Any]):
+async def broadcast_to_user(user_id: str, notification: Dict[str, Any]) -> dict:
     """Broadcast notification to user via WebSocket"""
     try:
         from .websocket_service import manager
@@ -407,7 +407,7 @@ async def broadcast_to_user(user_id: str, notification: Dict[str, Any]):
     except Exception as e:
         logger.error(f"Failed to broadcast to user {user_id}: {e}")
 
-async def broadcast_to_channels(notification: Dict[str, Any]):
+async def broadcast_to_channels(notification: Dict[str, Any]) -> dict:
     """Broadcast notification to relevant WebSocket channels"""
     try:
         from .websocket_service import broadcast_notification
@@ -420,7 +420,7 @@ async def broadcast_to_channels(notification: Dict[str, Any]):
     except Exception as e:
         logger.error(f"Failed to broadcast to channels: {e}")
 
-async def send_push_to_user(user_id: str, notification: Dict[str, Any]):
+async def send_push_to_user(user_id: str, notification: Dict[str, Any]) -> dict:
     """Send push notification to user's registered devices"""
     db = await get_db()
     
@@ -438,7 +438,7 @@ async def send_push_to_user(user_id: str, notification: Dict[str, Any]):
         except Exception as e:
             logger.error(f"Failed to send push to {sub.get('subscription_type')}: {e}")
 
-async def send_web_push(subscription: Dict, notification: Dict):
+async def send_web_push(subscription: Dict, notification: Dict) -> dict:
     """Send Web Push notification (mock implementation)"""
     db = await get_db()
     
@@ -459,7 +459,7 @@ async def send_web_push(subscription: Dict, notification: Dict):
     
     logger.info(f"MOCK WEB PUSH: {notification.get('title')} to {subscription.get('user_id')}")
 
-async def send_fcm_push(subscription: Dict, notification: Dict):
+async def send_fcm_push(subscription: Dict, notification: Dict) -> dict:
     """Send Firebase Cloud Messaging push notification"""
     db = await get_db()
     
@@ -523,7 +523,7 @@ async def trigger_breach_notification(
     adviser_id: str,
     description: str,
     background_tasks: BackgroundTasks
-):
+) -> dict:
     """Trigger breach notification to relevant users"""
     db = await get_db()
     
@@ -585,7 +585,7 @@ async def trigger_sync_complete(
     records_updated: int,
     user_id: str,
     background_tasks: BackgroundTasks
-):
+) -> dict:
     """Trigger notification when platform sync completes"""
     notification = InAppNotification(
         user_id=user_id,
@@ -611,7 +611,7 @@ async def trigger_portfolio_alert(
     message: str,
     portfolio_data: Dict[str, Any],
     background_tasks: BackgroundTasks
-):
+) -> dict:
     """Trigger portfolio alert notification"""
     notification = InAppNotification(
         user_id=user_id,
@@ -632,7 +632,7 @@ async def trigger_portfolio_alert(
 # ==================== STATUS ENDPOINTS ====================
 
 @router.get("/status")
-async def get_push_status():
+async def get_push_status() -> dict:
     """Get push notification service status"""
     db = await get_db()
     
@@ -670,7 +670,7 @@ async def get_push_status():
     }
 
 @router.get("/logs")
-async def get_push_logs(limit: int = 50, notification_type: Optional[str] = None):
+async def get_push_logs(limit: int = 50, notification_type: Optional[str] = None) -> dict:
     """Get push notification delivery logs"""
     db = await get_db()
     
@@ -691,7 +691,7 @@ async def get_push_logs(limit: int = 50, notification_type: Optional[str] = None
 # ==================== TEST ENDPOINTS ====================
 
 @router.post("/test/send-all")
-async def test_send_all_channels(user_id: str = "test_user"):
+async def test_send_all_channels(user_id: str = "test_user") -> dict:
     """Send test notification through all channels"""
     db = await get_db()
     
@@ -725,7 +725,7 @@ async def test_send_all_channels(user_id: str = "test_user"):
     }
 
 @router.post("/demo/seed-notifications")
-async def seed_demo_notifications(user_id: str = "demo_user"):
+async def seed_demo_notifications(user_id: str = "demo_user") -> dict:
     """Seed demo notifications for testing"""
     db = await get_db()
     

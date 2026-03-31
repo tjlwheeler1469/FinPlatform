@@ -44,22 +44,22 @@ event_rules_col = db["event_rules"]
 class EventBus:
     """In-process event bus for real-time event distribution."""
     
-    def __init__(self):
+    def __init__(self) -> dict:
         self.subscribers: Dict[str, List[Callable]] = defaultdict(list)
         self.websocket_clients: Dict[str, List[WebSocket]] = defaultdict(list)
         self.event_history: List[Dict[str, Any]] = []
         self.max_history = 1000
     
-    def subscribe(self, event_type: str, callback: Callable):
+    def subscribe(self, event_type: str, callback: Callable) -> dict:
         """Subscribe to an event type."""
         self.subscribers[event_type].append(callback)
     
-    def unsubscribe(self, event_type: str, callback: Callable):
+    def unsubscribe(self, event_type: str, callback: Callable) -> dict:
         """Unsubscribe from an event type."""
         if callback in self.subscribers[event_type]:
             self.subscribers[event_type].remove(callback)
     
-    async def publish(self, event_type: str, payload: Dict[str, Any], source: str = "system"):
+    async def publish(self, event_type: str, payload: Dict[str, Any], source: str = "system") -> dict:
         """Publish an event to all subscribers."""
         event = {
             "id": f"evt_{uuid.uuid4().hex[:12]}",
@@ -99,7 +99,7 @@ class EventBus:
         
         return event
     
-    async def _push_to_websockets(self, event_type: str, event: Dict[str, Any]):
+    async def _push_to_websockets(self, event_type: str, event: Dict[str, Any]) -> dict:
         """Push event to connected WebSocket clients."""
         # Push to specific event type subscribers
         for ws in self.websocket_clients.get(event_type, []):
@@ -115,11 +115,11 @@ class EventBus:
             except Exception as e:
                 logger.warning(f"WebSocket send failed: {e}")
     
-    def add_websocket(self, event_type: str, ws: WebSocket):
+    def add_websocket(self, event_type: str, ws: WebSocket) -> dict:
         """Add a WebSocket client for event type."""
         self.websocket_clients[event_type].append(ws)
     
-    def remove_websocket(self, event_type: str, ws: WebSocket):
+    def remove_websocket(self, event_type: str, ws: WebSocket) -> dict:
         """Remove a WebSocket client."""
         if ws in self.websocket_clients[event_type]:
             self.websocket_clients[event_type].remove(ws)
@@ -249,7 +249,7 @@ class EventRule(BaseModel):
 # ==================== API ENDPOINTS ====================
 
 @router.get("/types")
-async def list_event_types():
+async def list_event_types() -> dict:
     """List all available event types."""
     return {
         "event_types": EVENT_TYPES,
@@ -257,7 +257,7 @@ async def list_event_types():
     }
 
 @router.post("/publish")
-async def publish_event(event: PublishEvent):
+async def publish_event(event: PublishEvent) -> dict:
     """Publish an event to the event bus."""
     if event.event_type not in EVENT_TYPES and not event.event_type.startswith("custom."):
         raise HTTPException(
@@ -292,7 +292,7 @@ async def get_event_stream(
     severity: Optional[str] = None,
     licensee_id: str = "lic_default",
     limit: int = 100
-):
+) -> dict:
     """Get recent events from the stream."""
     query = {"licensee_id": licensee_id}
     
@@ -312,7 +312,7 @@ async def get_event_stream(
     }
 
 @router.get("/stream/live")
-async def get_live_events(limit: int = 50, event_type: Optional[str] = None):
+async def get_live_events(limit: int = 50, event_type: Optional[str] = None) -> dict:
     """Get live events from in-memory buffer."""
     events = event_bus.get_recent_events(event_type, limit)
     return {
@@ -322,7 +322,7 @@ async def get_live_events(limit: int = 50, event_type: Optional[str] = None):
     }
 
 @router.websocket("/ws/{event_type}")
-async def websocket_events(websocket: WebSocket, event_type: str):
+async def websocket_events(websocket: WebSocket, event_type: str) -> dict:
     """WebSocket endpoint for real-time event streaming."""
     await websocket.accept()
     
@@ -356,7 +356,7 @@ async def websocket_events(websocket: WebSocket, event_type: str):
         event_bus.remove_websocket(event_type, websocket)
 
 @router.post("/rules")
-async def create_event_rule(rule: EventRule):
+async def create_event_rule(rule: EventRule) -> dict:
     """Create an event processing rule."""
     rule_id = f"rule_{uuid.uuid4().hex[:8]}"
     
@@ -381,7 +381,7 @@ async def create_event_rule(rule: EventRule):
     }
 
 @router.get("/rules")
-async def list_event_rules(licensee_id: str = "lic_default"):
+async def list_event_rules(licensee_id: str = "lic_default") -> dict:
     """List event processing rules."""
     rules = await event_rules_col.find(
         {"licensee_id": licensee_id},
@@ -391,7 +391,7 @@ async def list_event_rules(licensee_id: str = "lic_default"):
     return {"rules": rules, "count": len(rules)}
 
 @router.get("/dashboard/metrics")
-async def event_metrics(licensee_id: str = "lic_default"):
+async def event_metrics(licensee_id: str = "lic_default") -> dict:
     """Get event stream metrics."""
     now = datetime.now(timezone.utc)
     hour_ago = (now - timedelta(hours=1)).isoformat()
@@ -435,18 +435,18 @@ async def event_metrics(licensee_id: str = "lic_default"):
 
 # ==================== HELPER FUNCTIONS FOR OTHER MODULES ====================
 
-async def emit_audit_event(event_type: str, payload: Dict[str, Any]):
+async def emit_audit_event(event_type: str, payload: Dict[str, Any]) -> dict:
     """Helper to emit audit events from other modules."""
     await event_bus.publish(f"audit.{event_type}", payload, "audit_service")
 
-async def emit_compliance_event(event_type: str, payload: Dict[str, Any]):
+async def emit_compliance_event(event_type: str, payload: Dict[str, Any]) -> dict:
     """Helper to emit compliance events from other modules."""
     await event_bus.publish(f"compliance.{event_type}", payload, "compliance_engine")
 
-async def emit_security_event(event_type: str, payload: Dict[str, Any]):
+async def emit_security_event(event_type: str, payload: Dict[str, Any]) -> dict:
     """Helper to emit security events from other modules."""
     await event_bus.publish(f"security.{event_type}", payload, "security_service")
 
-async def emit_incident_event(event_type: str, payload: Dict[str, Any]):
+async def emit_incident_event(event_type: str, payload: Dict[str, Any]) -> dict:
     """Helper to emit incident events from other modules."""
     await event_bus.publish(f"incident.{event_type}", payload, "incident_management")

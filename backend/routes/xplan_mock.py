@@ -14,6 +14,7 @@ Endpoints simulate:
 
 import os
 import uuid
+import random
 import secrets
 _rng = secrets.SystemRandom()
 from datetime import datetime, timezone, timedelta

@@ -114,7 +114,7 @@ DEMO_TRANSACTIONS = {
 
 
 # Initialize demo data
-def initialize_demo_data():
+def initialize_demo_data() -> dict:
     """Initialize the data store with demo data."""
     LIVE_DATA_STORE["portfolios"] = DEMO_PORTFOLIOS.copy()
     LIVE_DATA_STORE["market_data"] = DEMO_MARKET_DATA.copy()
@@ -133,7 +133,7 @@ def initialize_demo_data():
 initialize_demo_data()
 
 
-async def simulate_price_update():
+async def simulate_price_update() -> dict:
     """Simulate real-time price updates."""
     for symbol, data in LIVE_DATA_STORE["market_data"].items():
         # Random price movement (-1% to +1%)
@@ -145,7 +145,7 @@ async def simulate_price_update():
     LIVE_DATA_STORE["last_updates"]["market_data"] = datetime.now(timezone.utc).isoformat()
 
 
-async def update_portfolio_values():
+async def update_portfolio_values() -> dict:
     """Update portfolio values based on current market prices."""
     market_data = LIVE_DATA_STORE["market_data"]
     
@@ -169,7 +169,7 @@ async def update_portfolio_values():
 # ==================== API ENDPOINTS ====================
 
 @router.get("/status")
-async def get_sync_status():
+async def get_sync_status() -> dict:
     """Get real-time data synchronization status."""
     return {
         "status": "operational",
@@ -197,7 +197,7 @@ async def get_sync_status():
 
 
 @router.get("/portfolios")
-async def get_all_portfolios():
+async def get_all_portfolios() -> dict:
     """Get all portfolios from the single source of truth."""
     await update_portfolio_values()
     
@@ -221,7 +221,7 @@ async def get_all_portfolios():
 
 
 @router.get("/portfolios/{client_id}")
-async def get_portfolio(client_id: str):
+async def get_portfolio(client_id: str) -> dict:
     """Get a specific client's portfolio."""
     await update_portfolio_values()
     
@@ -237,7 +237,7 @@ async def get_portfolio(client_id: str):
 
 
 @router.get("/market-data")
-async def get_market_data():
+async def get_market_data() -> dict:
     """Get current market data."""
     await simulate_price_update()
     
@@ -249,7 +249,7 @@ async def get_market_data():
 
 
 @router.get("/market-data/{symbol}")
-async def get_symbol_data(symbol: str):
+async def get_symbol_data(symbol: str) -> dict:
     """Get market data for a specific symbol."""
     symbol = symbol.upper()
     data = LIVE_DATA_STORE["market_data"].get(symbol)
@@ -265,7 +265,7 @@ async def get_symbol_data(symbol: str):
 
 
 @router.get("/transactions/{client_id}")
-async def get_transactions(client_id: str, limit: int = 50):
+async def get_transactions(client_id: str, limit: int = 50) -> dict:
     """Get transactions for a client."""
     transactions = LIVE_DATA_STORE["transactions"].get(client_id, [])
     
@@ -278,7 +278,7 @@ async def get_transactions(client_id: str, limit: int = 50):
 
 
 @router.post("/refresh")
-async def refresh_all_data():
+async def refresh_all_data() -> dict:
     """Force refresh all data (simulates custodian sync)."""
     await simulate_price_update()
     await update_portfolio_values()
@@ -302,7 +302,7 @@ async def execute_trade(
     action: str,  # "buy" or "sell"
     shares: int,
     reason: str = ""
-):
+) -> dict:
     """
     Execute a trade and update the single source of truth.
     This closes the loop: Insight → Decision → Action → Execution → Update
@@ -402,12 +402,12 @@ async def execute_trade(
         "new_portfolio_value": portfolio["total_value"],
         "new_cash_balance": portfolio["cash"],
         "timestamp": now.isoformat(),
-        "message": f"Trade executed and portfolio updated in real-time"
+        "message": "Trade executed and portfolio updated in real-time"
     }
 
 
 @router.get("/insights/drift")
-async def get_portfolio_drift():
+async def get_portfolio_drift() -> dict:
     """Get real-time portfolio drift analysis."""
     await update_portfolio_values()
     
@@ -455,7 +455,7 @@ async def get_portfolio_drift():
 
 
 @router.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
+async def websocket_endpoint(websocket: WebSocket) -> dict:
     """WebSocket for real-time data streaming."""
     await websocket.accept()
     ACTIVE_CONNECTIONS.append(websocket)
@@ -480,7 +480,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
 
 @router.get("/integration-status")
-async def get_integration_status():
+async def get_integration_status() -> dict:
     """Get status of available integrations."""
     return {
         "available_integrations": {

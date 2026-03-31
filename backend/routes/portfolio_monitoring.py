@@ -324,7 +324,7 @@ def scan_portfolio(client_id: str, client_data: Dict) -> Dict:
 
 
 @router.get("/daily-scan")
-async def run_daily_scan():
+async def run_daily_scan() -> dict:
     """Run comprehensive daily portfolio scan across all clients."""
     results = {
         "scan_time": datetime.now(timezone.utc).isoformat(),
@@ -370,7 +370,7 @@ async def run_daily_scan():
 
 
 @router.get("/client/{client_id}")
-async def scan_single_client(client_id: str):
+async def scan_single_client(client_id: str) -> dict:
     """Scan a single client's portfolio."""
     if client_id not in MONITORED_PORTFOLIOS:
         raise HTTPException(status_code=404, detail="Client not found")
@@ -379,7 +379,7 @@ async def scan_single_client(client_id: str):
 
 
 @router.get("/alerts/summary")
-async def get_alerts_summary():
+async def get_alerts_summary() -> dict:
     """Get summary of all current alerts across practice."""
     all_alerts = []
     
@@ -403,13 +403,13 @@ async def get_alerts_summary():
 
 
 @router.get("/thresholds")
-async def get_thresholds():
+async def get_thresholds() -> dict:
     """Get current monitoring thresholds."""
     return THRESHOLDS
 
 
 @router.post("/thresholds")
-async def update_thresholds(new_thresholds: Dict[str, float]):
+async def update_thresholds(new_thresholds: Dict[str, float]) -> dict:
     """Update monitoring thresholds."""
     for key, value in new_thresholds.items():
         if key in THRESHOLDS:
@@ -418,7 +418,7 @@ async def update_thresholds(new_thresholds: Dict[str, float]):
 
 
 @router.get("/book-insights")
-async def get_book_insights():
+async def get_book_insights() -> dict:
     """Get aggregated insights across entire client book."""
     total_aum = sum(p.get("aum", 0) for p in MONITORED_PORTFOLIOS.values())
     

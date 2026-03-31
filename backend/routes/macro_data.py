@@ -24,7 +24,7 @@ executor = ThreadPoolExecutor(max_workers=10)
 _cache = {}
 _cache_ttl = 300  # 5 minutes - market data doesn't change that frequently for display purposes
 
-def get_cached(key: str):
+def get_cached(key: str) -> dict:
     """Get cached data if not expired."""
     if key in _cache:
         data, timestamp = _cache[key]
@@ -32,11 +32,11 @@ def get_cached(key: str):
             return data
     return None
 
-def set_cached(key: str, data):
+def set_cached(key: str, data) -> dict:
     """Cache data with timestamp."""
     _cache[key] = (data, datetime.now(timezone.utc))
 
-def fetch_live_indices():
+def fetch_live_indices() -> dict:
     """Fetch live index data using yfinance with batch download for speed."""
     try:
         import yfinance as yf
@@ -91,7 +91,7 @@ def fetch_live_indices():
         logger.error(f"yfinance indices fetch failed: {e}")
         return None
 
-def fetch_live_currencies():
+def fetch_live_currencies() -> dict:
     """Fetch live currency data using yfinance with batch download for speed."""
     try:
         import yfinance as yf
@@ -141,7 +141,7 @@ def fetch_live_currencies():
         logger.error(f"yfinance currency fetch failed: {e}")
         return None
 
-def fetch_live_commodities():
+def fetch_live_commodities() -> dict:
     """Fetch live commodity data using yfinance with batch download for speed."""
     try:
         import yfinance as yf
@@ -193,7 +193,7 @@ def fetch_live_commodities():
         logger.error(f"yfinance commodities fetch failed: {e}")
         return None
 
-def fetch_live_crypto():
+def fetch_live_crypto() -> dict:
     """Fetch live crypto data using yfinance with batch download for speed."""
     try:
         import yfinance as yf
@@ -443,7 +443,7 @@ def update_data_with_jitter(data_list: List[Dict]) -> List[Dict]:
 # ==================== API ENDPOINTS ====================
 
 @router.get("/overview")
-async def get_macro_overview():
+async def get_macro_overview() -> dict:
     """Get a comprehensive macro overview for the dashboard using live yfinance data."""
     
     # Check cache first
@@ -474,22 +474,22 @@ async def get_macro_overview():
         logger.error(f"Live data fetch failed: {e}")
     
     # Build highlights using live data if available, fallback to static
-    def get_index(live_data, region, idx, fallback):
+    def get_index(live_data, region, idx, fallback) -> dict:
         if live_data and region in live_data and len(live_data[region]) > idx:
             return live_data[region][idx]
         return update_data_with_jitter([fallback])[0]
     
-    def get_currency(live_data, category, idx, fallback):
+    def get_currency(live_data, category, idx, fallback) -> dict:
         if live_data and category in live_data and len(live_data[category]) > idx:
             return live_data[category][idx]
         return update_data_with_jitter([fallback])[0]
     
-    def get_commodity(live_data, category, idx, fallback):
+    def get_commodity(live_data, category, idx, fallback) -> dict:
         if live_data and category in live_data and len(live_data[category]) > idx:
             return live_data[category][idx]
         return update_data_with_jitter([fallback])[0]
     
-    def get_crypto_item(live_data, idx, fallback):
+    def get_crypto_item(live_data, idx, fallback) -> dict:
         if live_data and len(live_data) > idx:
             return live_data[idx]
         return update_data_with_jitter([fallback])[0]
@@ -537,7 +537,7 @@ async def get_macro_overview():
 
 
 @router.get("/indices")
-async def get_indices(region: Optional[str] = None):
+async def get_indices(region: Optional[str] = None) -> dict:
     """Get global stock indices with live data."""
     
     # Try live data first
@@ -569,7 +569,7 @@ async def get_indices(region: Optional[str] = None):
 
 
 @router.get("/currencies")
-async def get_currencies(category: Optional[str] = None):
+async def get_currencies(category: Optional[str] = None) -> dict:
     """Get currency exchange rates."""
     if category and category in CURRENCIES:
         return {
@@ -587,7 +587,7 @@ async def get_currencies(category: Optional[str] = None):
 
 
 @router.get("/bonds")
-async def get_bonds(region: Optional[str] = None):
+async def get_bonds(region: Optional[str] = None) -> dict:
     """Get government bond yields."""
     if region and region in BONDS:
         return {
@@ -605,7 +605,7 @@ async def get_bonds(region: Optional[str] = None):
 
 
 @router.get("/commodities")
-async def get_commodities(category: Optional[str] = None):
+async def get_commodities(category: Optional[str] = None) -> dict:
     """Get commodity prices."""
     if category and category in COMMODITIES:
         return {
@@ -623,7 +623,7 @@ async def get_commodities(category: Optional[str] = None):
 
 
 @router.get("/crypto")
-async def get_crypto():
+async def get_crypto() -> dict:
     """Get cryptocurrency prices with live data."""
     
     # Try live data first
@@ -646,7 +646,7 @@ async def get_crypto():
 
 
 @router.get("/futures")
-async def get_futures(category: Optional[str] = None):
+async def get_futures(category: Optional[str] = None) -> dict:
     """Get futures prices."""
     if category and category in FUTURES:
         return {
@@ -664,7 +664,7 @@ async def get_futures(category: Optional[str] = None):
 
 
 @router.get("/stocks")
-async def get_top_stocks(region: Optional[str] = None):
+async def get_top_stocks(region: Optional[str] = None) -> dict:
     """Get top stocks by region."""
     if region and region in TOP_STOCKS:
         return {
@@ -682,7 +682,7 @@ async def get_top_stocks(region: Optional[str] = None):
 
 
 @router.get("/economic-calendar")
-async def get_economic_calendar():
+async def get_economic_calendar() -> dict:
     """Get upcoming economic events."""
     events = [
         {"date": "2025-03-18", "time": "08:30", "country": "US", "event": "Retail Sales (MoM)", "forecast": "0.3%", "previous": "-0.8%", "importance": "high"},
@@ -702,7 +702,7 @@ async def get_economic_calendar():
 
 
 @router.get("/sector-performance")
-async def get_sector_performance():
+async def get_sector_performance() -> dict:
     """Get sector performance data."""
     sectors = [
         {"sector": "Technology", "change_1d": 1.23, "change_1w": 2.45, "change_1m": 5.67, "change_ytd": 12.34},
@@ -726,7 +726,7 @@ async def get_sector_performance():
 
 
 @router.get("/history")
-async def get_historical_data(symbol: str = "^GSPC", period: str = "1mo", interval: str = "1d"):
+async def get_historical_data(symbol: str = "^GSPC", period: str = "1mo", interval: str = "1d") -> dict:
     """Get historical price data for a symbol using yfinance."""
     try:
         import yfinance as yf

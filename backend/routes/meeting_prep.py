@@ -69,7 +69,7 @@ async def generate_meeting_prep(request: MeetingPrepRequest):
         portfolio_insights.append({
             "type": "performance",
             "severity": "positive",
-            "title": f"Strong YTD Performance",
+            "title": "Strong YTD Performance",
             "detail": f"Portfolio up {request.ytd_return * 100:.1f}% YTD, outperforming benchmark by 2.3%",
             "recommendation": "Review profit-taking opportunities"
         })

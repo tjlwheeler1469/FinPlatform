@@ -213,7 +213,7 @@ async def schedule_meeting(meeting: MeetingInput):
         "meeting_id": meeting_id,
         "meeting": meeting_data,
         "prep_task_id": prep_task_id,
-        "message": f"Meeting scheduled and prep task created",
+        "message": "Meeting scheduled and prep task created",
         "storage": "mongodb" if DB_AVAILABLE else "in-memory"
     }
 

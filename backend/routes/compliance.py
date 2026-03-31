@@ -353,7 +353,7 @@ async def get_record_of_advice(client_id: str):
             "id": f"roi_{i}",
             "date": (datetime.now() - timedelta(days=30 * i)).strftime("%Y-%m-%d"),
             "advice_type": ["Investment", "Insurance", "Super", "Tax"][i % 4],
-            "summary": f"Advice provided regarding portfolio rebalancing and strategy review",
+            "summary": "Advice provided regarding portfolio rebalancing and strategy review",
             "outcome": "Implemented",
             "advisor": "Wealth Command Advisers",
             "documents": [f"SOA_{client_id}_{i}.pdf", f"FDS_{client_id}_{i}.pdf"]

@@ -17,11 +17,11 @@ router = APIRouter(prefix="/notifications", tags=["Notifications"])
 
 # WebSocket connection manager
 class ConnectionManager:
-    def __init__(self):
+    def __init__(self) -> dict:
         self.active_connections: Dict[str, List[WebSocket]] = {}  # user_id -> connections
         self.connection_info: Dict[str, Dict] = {}  # connection_id -> metadata
     
-    async def connect(self, websocket: WebSocket, user_id: str):
+    async def connect(self, websocket: WebSocket, user_id: str) -> dict:
         await websocket.accept()
         connection_id = str(uuid.uuid4())
         
@@ -38,7 +38,7 @@ class ConnectionManager:
         logger.info(f"WebSocket connected: user={user_id}, connection={connection_id}")
         return connection_id
     
-    def disconnect(self, websocket: WebSocket, user_id: str):
+    def disconnect(self, websocket: WebSocket, user_id: str) -> dict:
         if user_id in self.active_connections:
             if websocket in self.active_connections[user_id]:
                 self.active_connections[user_id].remove(websocket)
@@ -53,7 +53,7 @@ class ConnectionManager:
         
         logger.info(f"WebSocket disconnected: user={user_id}")
     
-    async def send_personal(self, user_id: str, message: dict):
+    async def send_personal(self, user_id: str, message: dict) -> dict:
         """Send message to specific user."""
         if user_id in self.active_connections:
             for connection in self.active_connections[user_id]:
@@ -62,7 +62,7 @@ class ConnectionManager:
                 except Exception as e:
                     logger.error(f"Error sending to user {user_id}: {e}")
     
-    async def broadcast(self, message: dict, exclude_users: List[str] = None):
+    async def broadcast(self, message: dict, exclude_users: List[str] = None) -> dict:
         """Broadcast message to all connected users."""
         exclude_users = exclude_users or []
         for user_id, connections in self.active_connections.items():
@@ -389,7 +389,7 @@ def generate_email_html(title: str, message: str, notification_type: str, action
 
 # WebSocket endpoint
 @router.websocket("/ws/{user_id}")
-async def websocket_endpoint(websocket: WebSocket, user_id: str):
+async def websocket_endpoint(websocket: WebSocket, user_id: str) -> dict:
     """WebSocket connection for real-time notifications."""
     connection_id = await manager.connect(websocket, user_id)
     
@@ -446,7 +446,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
 async def send_notification(
     notification: NotificationCreate,
     background_tasks: BackgroundTasks
-):
+) -> dict:
     """Send a notification to a user."""
     result = await create_and_send_notification(
         user_id=notification.user_id,
@@ -472,7 +472,7 @@ async def broadcast_notification(
     notification_type: str = "system",
     priority: str = "medium",
     exclude_users: List[str] = None
-):
+) -> dict:
     """Broadcast notification to all connected users."""
     notification = {
         "id": f"notif_{uuid.uuid4().hex[:8]}",
@@ -496,7 +496,7 @@ async def broadcast_notification(
 
 
 @router.get("/user/{user_id}")
-async def get_user_notifications(user_id: str, limit: int = 50, unread_only: bool = False):
+async def get_user_notifications(user_id: str, limit: int = 50, unread_only: bool = False) -> dict:
     """Get notifications for a user."""
     user_notifications = [n for n in NOTIFICATIONS if n.get("user_id") == user_id]
     
@@ -513,7 +513,7 @@ async def get_user_notifications(user_id: str, limit: int = 50, unread_only: boo
 
 
 @router.post("/user/{user_id}/mark-read")
-async def mark_notifications_read(user_id: str, notification_ids: List[str] = None):
+async def mark_notifications_read(user_id: str, notification_ids: List[str] = None) -> dict:
     """Mark notifications as read."""
     count = 0
     for n in NOTIFICATIONS:
@@ -530,13 +530,13 @@ async def mark_notifications_read(user_id: str, notification_ids: List[str] = No
 
 
 @router.get("/user/{user_id}/preferences")
-async def get_notification_preferences(user_id: str):
+async def get_notification_preferences(user_id: str) -> dict:
     """Get notification preferences for a user."""
     return get_user_preferences(user_id)
 
 
 @router.put("/user/{user_id}/preferences")
-async def update_notification_preferences(user_id: str, preferences: Dict):
+async def update_notification_preferences(user_id: str, preferences: Dict) -> dict:
     """Update notification preferences for a user."""
     if user_id not in NOTIFICATION_PREFERENCES:
         NOTIFICATION_PREFERENCES[user_id] = {}
@@ -550,7 +550,7 @@ async def update_notification_preferences(user_id: str, preferences: Dict):
 
 
 @router.get("/connections")
-async def get_active_connections():
+async def get_active_connections() -> dict:
     """Get list of active WebSocket connections."""
     return {
         "connected_users": manager.get_connected_users(),
@@ -559,7 +559,7 @@ async def get_active_connections():
 
 
 @router.post("/test-email")
-async def test_email_notification(to_email: EmailStr, background_tasks: BackgroundTasks):
+async def test_email_notification(to_email: EmailStr, background_tasks: BackgroundTasks) -> dict:
     """Send a test email notification."""
     html_content = generate_email_html(
         "Test Notification",
@@ -590,7 +590,7 @@ async def trigger_portfolio_drift_alert(
     client_id: str,
     drift_percent: float,
     background_tasks: BackgroundTasks
-):
+) -> dict:
     """Trigger portfolio drift alert."""
     return await create_and_send_notification(
         user_id=user_id,
@@ -612,7 +612,7 @@ async def trigger_tax_opportunity_alert(
     potential_saving: float,
     opportunity_type: str,
     background_tasks: BackgroundTasks
-):
+) -> dict:
     """Trigger tax opportunity alert."""
     return await create_and_send_notification(
         user_id=user_id,
@@ -634,7 +634,7 @@ async def trigger_compliance_alert(
     review_type: str,
     days_until_due: int,
     background_tasks: BackgroundTasks
-):
+) -> dict:
     """Trigger compliance review due alert."""
     priority = "critical" if days_until_due < 0 else "high" if days_until_due < 7 else "medium"
     
@@ -658,7 +658,7 @@ async def trigger_meeting_reminder(
     meeting_time: str,
     meeting_type: str,
     background_tasks: BackgroundTasks
-):
+) -> dict:
     """Trigger meeting reminder."""
     return await create_and_send_notification(
         user_id=user_id,
@@ -843,7 +843,7 @@ DEMO_NOTIFICATIONS = [
 
 
 @router.get("/demo")
-async def get_demo_notifications():
+async def get_demo_notifications() -> dict:
     """
     Get demo notifications showing what would be sent.
     This demonstrates the notification types, channels, and content.
@@ -888,7 +888,7 @@ async def get_demo_notifications():
 
 
 @router.get("/demo/email-preview/{notification_id}")
-async def get_email_preview(notification_id: str):
+async def get_email_preview(notification_id: str) -> dict:
     """Get HTML email preview for a demo notification."""
     notification = next((n for n in DEMO_NOTIFICATIONS if n["id"] == notification_id), None)
     
@@ -916,7 +916,7 @@ async def simulate_notification_delivery(
     notification_type: str,
     client_id: str = "client_1",
     background_tasks: BackgroundTasks = None
-):
+) -> dict:
     """
     Simulate sending a notification through all channels.
     Shows what would happen without actually sending external messages.
@@ -990,7 +990,7 @@ async def simulate_notification_delivery(
 
 
 @router.get("/summary")
-async def get_notification_summary():
+async def get_notification_summary() -> dict:
     """Get summary of notification system status and stats."""
     return {
         "system_status": {

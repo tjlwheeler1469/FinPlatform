@@ -64,7 +64,7 @@ class MeetingCreate(BaseModel):
 
 
 # Comprehensive sample data initialization
-def init_comprehensive_data():
+def init_comprehensive_data() -> dict:
     """Initialize comprehensive CRM data with clients, accounts, transactions."""
     global CLIENTS, TASKS, HOUSEHOLDS
     
@@ -512,7 +512,7 @@ async def get_clients(
     status: Optional[str] = None,
     search: Optional[str] = None,
     type: Optional[str] = None
-):
+) -> dict:
     """Get all clients with summary statistics for CRM dashboard."""
     clients_list = list(CLIENTS.values())
     
@@ -556,7 +556,7 @@ async def get_clients(
 
 
 @router.get("/clients/{client_id}")
-async def get_client(client_id: str):
+async def get_client(client_id: str) -> dict:
     """Get a specific client by ID with full details."""
     client = CLIENTS.get(client_id)
     if not client:
@@ -602,7 +602,7 @@ class ClientUpdate(BaseModel):
 
 
 @router.post("/clients")
-async def create_client(client_data: ClientCreate):
+async def create_client(client_data: ClientCreate) -> dict:
     """Create a new client."""
     # Generate unique client ID
     client_id = f"client_{uuid.uuid4().hex[:8]}"
@@ -674,7 +674,7 @@ async def create_client(client_data: ClientCreate):
 
 
 @router.put("/clients/{client_id}")
-async def update_client(client_id: str, updates: ClientUpdate):
+async def update_client(client_id: str, updates: ClientUpdate) -> dict:
     """Update an existing client."""
     if client_id not in CLIENTS:
         raise HTTPException(status_code=404, detail="Client not found")
@@ -701,7 +701,7 @@ async def update_client(client_id: str, updates: ClientUpdate):
 
 
 @router.delete("/clients/{client_id}")
-async def delete_client(client_id: str):
+async def delete_client(client_id: str) -> dict:
     """Delete a client (soft delete - marks as inactive)."""
     if client_id not in CLIENTS:
         raise HTTPException(status_code=404, detail="Client not found")
@@ -720,7 +720,7 @@ async def delete_client(client_id: str):
 
 
 @router.get("/analytics")
-async def get_crm_analytics():
+async def get_crm_analytics() -> dict:
     """Get comprehensive CRM analytics for adviser dashboard."""
     clients_list = list(CLIENTS.values())
     tasks_list = list(TASKS.values())
@@ -790,7 +790,7 @@ async def get_crm_analytics():
 async def get_households(
     status: Optional[str] = None,
     search: Optional[str] = None
-):
+) -> dict:
     """Get all households with optional filtering."""
     households = list(HOUSEHOLDS.values())
     
@@ -808,7 +808,7 @@ async def get_households(
 
 
 @router.get("/households/{household_id}")
-async def get_household(household_id: str):
+async def get_household(household_id: str) -> dict:
     """Get a specific household by ID."""
     household = HOUSEHOLDS.get(household_id)
     if not household:
@@ -817,7 +817,7 @@ async def get_household(household_id: str):
 
 
 @router.post("/households")
-async def create_household(request: HouseholdCreate):
+async def create_household(request: HouseholdCreate) -> dict:
     """Create a new household."""
     household_id = f"hh_{uuid.uuid4().hex[:8]}"
     
@@ -841,7 +841,7 @@ async def create_household(request: HouseholdCreate):
 
 
 @router.put("/households/{household_id}")
-async def update_household(household_id: str, updates: Dict[str, Any]):
+async def update_household(household_id: str, updates: Dict[str, Any]) -> dict:
     """Update a household."""
     if household_id not in HOUSEHOLDS:
         raise HTTPException(status_code=404, detail="Household not found")
@@ -853,7 +853,7 @@ async def update_household(household_id: str, updates: Dict[str, Any]):
 
 
 @router.delete("/households/{household_id}")
-async def delete_household(household_id: str):
+async def delete_household(household_id: str) -> dict:
     """Delete a household."""
     if household_id not in HOUSEHOLDS:
         raise HTTPException(status_code=404, detail="Household not found")
@@ -864,7 +864,7 @@ async def delete_household(household_id: str):
 
 # Notes endpoints
 @router.post("/notes")
-async def create_note(request: NoteCreate):
+async def create_note(request: NoteCreate) -> dict:
     """Create a new note for a household."""
     note_id = f"note_{uuid.uuid4().hex[:8]}"
     
@@ -882,14 +882,14 @@ async def create_note(request: NoteCreate):
 
 
 @router.get("/notes/{household_id}")
-async def get_notes(household_id: str):
+async def get_notes(household_id: str) -> dict:
     """Get all notes for a household."""
     household_notes = [n for n in NOTES.values() if n["household_id"] == household_id]
     return {"notes": household_notes}
 
 
 @router.delete("/notes/{note_id}")
-async def delete_note(note_id: str):
+async def delete_note(note_id: str) -> dict:
     """Delete a note."""
     if note_id not in NOTES:
         raise HTTPException(status_code=404, detail="Note not found")
@@ -904,7 +904,7 @@ async def get_tasks(
     status: Optional[str] = None,
     priority: Optional[str] = None,
     household_id: Optional[str] = None
-):
+) -> dict:
     """Get tasks with optional filtering."""
     tasks = list(TASKS.values())
     
@@ -919,7 +919,7 @@ async def get_tasks(
 
 
 @router.post("/tasks")
-async def create_task(request: TaskCreate):
+async def create_task(request: TaskCreate) -> dict:
     """Create a new task."""
     task_id = f"task_{uuid.uuid4().hex[:8]}"
     
@@ -940,7 +940,7 @@ async def create_task(request: TaskCreate):
 
 
 @router.put("/tasks/{task_id}")
-async def update_task(task_id: str, updates: Dict[str, Any]):
+async def update_task(task_id: str, updates: Dict[str, Any]) -> dict:
     """Update a task."""
     if task_id not in TASKS:
         raise HTTPException(status_code=404, detail="Task not found")
@@ -952,7 +952,7 @@ async def update_task(task_id: str, updates: Dict[str, Any]):
 
 
 @router.delete("/tasks/{task_id}")
-async def delete_task(task_id: str):
+async def delete_task(task_id: str) -> dict:
     """Delete a task."""
     if task_id not in TASKS:
         raise HTTPException(status_code=404, detail="Task not found")
@@ -967,7 +967,7 @@ async def get_meetings(
     household_id: Optional[str] = None,
     start_date: Optional[str] = None,
     end_date: Optional[str] = None
-):
+) -> dict:
     """Get meetings with optional filtering."""
     meetings = list(MEETINGS.values())
     
@@ -981,7 +981,7 @@ async def get_meetings(
 
 
 @router.post("/meetings")
-async def create_meeting(request: MeetingCreate):
+async def create_meeting(request: MeetingCreate) -> dict:
     """Schedule a new meeting."""
     meeting_id = f"meet_{uuid.uuid4().hex[:8]}"
     
@@ -1004,7 +1004,7 @@ async def create_meeting(request: MeetingCreate):
 
 
 @router.put("/meetings/{meeting_id}")
-async def update_meeting(meeting_id: str, updates: Dict[str, Any]):
+async def update_meeting(meeting_id: str, updates: Dict[str, Any]) -> dict:
     """Update a meeting."""
     if meeting_id not in MEETINGS:
         raise HTTPException(status_code=404, detail="Meeting not found")
@@ -1016,7 +1016,7 @@ async def update_meeting(meeting_id: str, updates: Dict[str, Any]):
 
 
 @router.delete("/meetings/{meeting_id}")
-async def delete_meeting(meeting_id: str):
+async def delete_meeting(meeting_id: str) -> dict:
     """Delete a meeting."""
     if meeting_id not in MEETINGS:
         raise HTTPException(status_code=404, detail="Meeting not found")
@@ -1027,7 +1027,7 @@ async def delete_meeting(meeting_id: str):
 
 # Dashboard stats
 @router.get("/stats")
-async def get_crm_stats():
+async def get_crm_stats() -> dict:
     """Get CRM dashboard statistics."""
     households = list(HOUSEHOLDS.values())
     tasks = list(TASKS.values())

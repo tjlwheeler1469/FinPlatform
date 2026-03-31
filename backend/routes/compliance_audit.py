@@ -95,7 +95,7 @@ APPROVALS: Dict[str, Dict] = {}
 
 
 # Pre-populate with demo data
-def _init_demo_data():
+def _init_demo_data() -> dict:
     # Add some audit logs
     global AUDIT_LOG
     AUDIT_LOG = [
@@ -320,7 +320,7 @@ async def get_audit_log(
     resource_type: Optional[str] = None,
     start_date: Optional[str] = None,
     end_date: Optional[str] = None
-):
+) -> dict:
     """Get audit log with filtering options."""
     logs = AUDIT_LOG.copy()
     
@@ -363,7 +363,7 @@ async def create_audit_entry(
     details: Optional[Dict] = None,
     ip_address: Optional[str] = None,
     success: bool = True
-):
+) -> dict:
     """Create a new audit log entry."""
     entry = {
         "log_id": f"log_{uuid.uuid4().hex[:8]}",
@@ -387,7 +387,7 @@ async def create_audit_entry(
 
 
 @router.get("/audit-log/summary")
-async def get_audit_summary(days: int = 7):
+async def get_audit_summary(days: int = 7) -> dict:
     """Get summary of audit activity."""
     cutoff = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
     recent_logs = [l for l in AUDIT_LOG if l.get("timestamp", "") >= cutoff]
@@ -424,7 +424,7 @@ async def get_audit_summary(days: int = 7):
 # ==================== KYC/AML ENDPOINTS ====================
 
 @router.get("/kyc/dashboard")
-async def get_kyc_dashboard():
+async def get_kyc_dashboard() -> dict:
     """Get KYC dashboard with status overview."""
     statuses = {}
     for record in KYC_RECORDS.values():
@@ -459,7 +459,7 @@ async def get_kyc_dashboard():
 
 
 @router.get("/kyc/{client_id}")
-async def get_kyc_status(client_id: str):
+async def get_kyc_status(client_id: str) -> dict:
     """Get KYC status for a client."""
     if client_id not in KYC_RECORDS:
         return {
@@ -487,7 +487,7 @@ async def initiate_kyc(
     client_id: str,
     client_name: str,
     initiated_by: str
-):
+) -> dict:
     """Initiate KYC process for a client."""
     if client_id in KYC_RECORDS and KYC_RECORDS[client_id]["status"] == KYCStatus.APPROVED:
         raise HTTPException(status_code=400, detail="KYC already approved for this client")
@@ -542,7 +542,7 @@ async def verify_kyc_document(
     document_type: str,
     verified_by: str,
     notes: Optional[str] = None
-):
+) -> dict:
     """Mark a KYC document as verified."""
     if client_id not in KYC_RECORDS:
         raise HTTPException(status_code=404, detail="KYC record not found")
@@ -579,7 +579,7 @@ async def approve_kyc(
     approved_by: str,
     risk_rating: AMLRisk,
     notes: Optional[str] = None
-):
+) -> dict:
     """Approve KYC for a client."""
     if client_id not in KYC_RECORDS:
         raise HTTPException(status_code=404, detail="KYC record not found")
@@ -615,7 +615,7 @@ async def list_documents(
     client_id: Optional[str] = None,
     document_type: Optional[DocumentType] = None,
     limit: int = 50
-):
+) -> dict:
     """List documents with filtering."""
     docs = list(DOCUMENTS.values())
     
@@ -635,7 +635,7 @@ async def list_documents(
 
 
 @router.get("/documents/{document_id}")
-async def get_document(document_id: str):
+async def get_document(document_id: str) -> dict:
     """Get document details."""
     if document_id not in DOCUMENTS:
         raise HTTPException(status_code=404, detail="Document not found")
@@ -655,7 +655,7 @@ async def upload_document(
     uploaded_by: str,
     tags: Optional[List[str]] = None,
     expiry_date: Optional[str] = None
-):
+) -> dict:
     """Upload a new document (metadata only - actual file would go to S3/storage)."""
     doc_id = f"doc_{uuid.uuid4().hex[:6]}"
     
@@ -698,7 +698,7 @@ async def upload_document(
 
 
 @router.get("/documents/client/{client_id}")
-async def get_client_documents(client_id: str):
+async def get_client_documents(client_id: str) -> dict:
     """Get all documents for a client, grouped by type."""
     docs = [d for d in DOCUMENTS.values() if d.get("client_id") == client_id]
     
@@ -725,7 +725,7 @@ async def list_approvals(
     status: Optional[ApprovalStatus] = None,
     approval_type: Optional[ApprovalType] = None,
     limit: int = 50
-):
+) -> dict:
     """List approval requests."""
     approvals = list(APPROVALS.values())
     
@@ -752,7 +752,7 @@ async def request_approval(
     client_id: str,
     details: Dict,
     notes: Optional[str] = None
-):
+) -> dict:
     """Request approval for an action."""
     appr_id = f"appr_{uuid.uuid4().hex[:6]}"
     
@@ -783,7 +783,7 @@ async def approve_request(
     approval_id: str,
     approved_by: str,
     notes: Optional[str] = None
-):
+) -> dict:
     """Approve a pending request."""
     if approval_id not in APPROVALS:
         raise HTTPException(status_code=404, detail="Approval request not found")
@@ -816,7 +816,7 @@ async def reject_request(
     approval_id: str,
     rejected_by: str,
     reason: str
-):
+) -> dict:
     """Reject a pending request."""
     if approval_id not in APPROVALS:
         raise HTTPException(status_code=404, detail="Approval request not found")
@@ -835,7 +835,7 @@ async def reject_request(
 
 
 @router.get("/approvals/dashboard")
-async def get_approvals_dashboard():
+async def get_approvals_dashboard() -> dict:
     """Get approvals dashboard with pending items."""
     pending = [a for a in APPROVALS.values() if a.get("status") == ApprovalStatus.PENDING]
     escalated = [a for a in APPROVALS.values() if a.get("status") == ApprovalStatus.ESCALATED]
@@ -869,7 +869,7 @@ async def get_approvals_dashboard():
 # ==================== COMPLIANCE DASHBOARD ====================
 
 @router.get("/dashboard")
-async def get_compliance_dashboard():
+async def get_compliance_dashboard() -> dict:
     """Get comprehensive compliance dashboard."""
     # KYC Summary
     kyc_statuses = {}
