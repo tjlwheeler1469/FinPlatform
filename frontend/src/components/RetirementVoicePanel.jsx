@@ -7,7 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import {
   Mic, MicOff, Send, Loader2, Calculator, DollarSign, Calendar, TrendingUp,
-  TrendingDown, Shield, AlertTriangle, CheckCircle, Users, Building2, Landmark, Info
+  Shield, AlertTriangle, CheckCircle, Users, Building2, Landmark, Info, Target
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -25,6 +25,8 @@ const RetirementVoicePanel = () => {
   const [transcription, setTranscription] = useState('');
   const [analysis, setAnalysis] = useState(null);
   const [textResponse, setTextResponse] = useState('');
+  const [whatIfHistory, setWhatIfHistory] = useState([]);
+  const [sessionId] = useState(() => `ret_${Date.now()}`);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
 
@@ -60,30 +62,41 @@ const RetirementVoicePanel = () => {
     }
   };
 
+  const processResponse = (data) => {
+    if (data.transcription) setTranscription(data.transcription);
+
+    const result = data.result || data.analysis;
+    if (!result) {
+      setTextResponse(data.response || 'Could not process. Try again.');
+      return;
+    }
+
+    // Handle unified command response
+    if (result.type === 'retirement_analysis' || result.retirement_analysis) {
+      const analysisData = result.type ? result : data.analysis;
+      if (analysis && result.what_if_comparison) {
+        setWhatIfHistory(prev => [...prev, { input: data.raw_input || transcription, comparison: result.what_if_comparison }]);
+      }
+      setAnalysis(analysisData);
+    } else if (result.response) {
+      setTextResponse(result.response);
+    }
+  };
+
   const analyzeAudio = async (audioBlob) => {
     setIsProcessing(true);
-    setAnalysis(null);
     setTextResponse('');
     const formData = new FormData();
     formData.append('audio', audioBlob, 'recording.webm');
-    formData.append('session_id', `ret_${Date.now()}`);
+    formData.append('page_context', 'retirement');
+    formData.append('session_id', sessionId);
 
     try {
-      const res = await fetch(`${API_URL}/api/voice-retirement/transcribe-and-analyze`, {
-        method: 'POST',
-        body: formData,
+      const res = await fetch(`${API_URL}/api/voice-command/transcribe-and-process`, {
+        method: 'POST', body: formData,
       });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.transcription) setTranscription(data.transcription);
-        if (data.structured && data.analysis) {
-          setAnalysis(data.analysis);
-        } else if (data.response) {
-          setTextResponse(data.response);
-        }
-      } else {
-        toast.error('Analysis failed. Please try again.');
-      }
+      if (res.ok) processResponse(await res.json());
+      else toast.error('Analysis failed. Please try again.');
     } catch {
       toast.error('Connection issue. Please try again.');
     } finally {
@@ -96,26 +109,17 @@ const RetirementVoicePanel = () => {
     if (!text || isProcessing) return;
 
     setIsProcessing(true);
-    setAnalysis(null);
     setTextResponse('');
     setTranscription(text);
 
     try {
-      const res = await fetch(`${API_URL}/api/voice-retirement/analyze`, {
+      const res = await fetch(`${API_URL}/api/voice-command/process`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, session_id: `ret_${Date.now()}` }),
+        body: JSON.stringify({ text, page_context: 'retirement', session_id: sessionId }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.structured && data.analysis) {
-          setAnalysis(data.analysis);
-        } else if (data.response) {
-          setTextResponse(data.response);
-        }
-      } else {
-        toast.error('Analysis failed. Please try again.');
-      }
+      if (res.ok) processResponse(await res.json());
+      else toast.error('Analysis failed. Please try again.');
     } catch {
       toast.error('Connection issue. Please try again.');
     } finally {
@@ -134,7 +138,7 @@ const RetirementVoicePanel = () => {
               Voice Retirement Analyser
             </CardTitle>
             <CardDescription>
-              Speak or type client details for instant retirement analysis with CGT & franking credits
+              Speak or type client details for instant retirement analysis with CGT & franking credits. Supports what-if follow-ups.
             </CardDescription>
           </div>
           <Badge variant="outline" className="text-xs">AI-Powered</Badge>
@@ -157,7 +161,11 @@ const RetirementVoicePanel = () => {
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && analyzeText()}
-            placeholder={isRecording ? 'Listening...' : 'e.g. "Client age 55, wealth $2.5M, super $800K in SMSF, wants to retire at 65"'}
+            placeholder={
+              isRecording ? 'Listening...'
+              : analysis ? 'Try: "What if they add $20K/yr to super?" or "What if they sell the property?"'
+              : 'e.g. "Client age 55, wealth $2.5M, super $800K in SMSF, wants to retire at 65"'
+            }
             disabled={isRecording || isProcessing}
             className="flex-1"
             data-testid="retirement-voice-input"
@@ -173,7 +181,6 @@ const RetirementVoicePanel = () => {
           </Button>
         </div>
 
-        {/* Recording Indicator */}
         {isRecording && (
           <div className="flex items-center gap-2 text-sm text-red-600 animate-pulse">
             <div className="w-2 h-2 rounded-full bg-red-500" />
@@ -181,7 +188,6 @@ const RetirementVoicePanel = () => {
           </div>
         )}
 
-        {/* Processing */}
         {isProcessing && (
           <div className="flex items-center justify-center gap-3 py-6">
             <Loader2 className="h-6 w-6 animate-spin text-[#D4A84C]" />
@@ -189,7 +195,6 @@ const RetirementVoicePanel = () => {
           </div>
         )}
 
-        {/* Transcription */}
         {transcription && !isProcessing && (
           <div className="p-3 bg-muted/50 rounded-lg">
             <p className="text-xs text-muted-foreground mb-1 font-medium">Input received:</p>
@@ -197,21 +202,19 @@ const RetirementVoicePanel = () => {
           </div>
         )}
 
-        {/* Text-only Response */}
         {textResponse && !analysis && (
           <div className="p-4 bg-muted rounded-lg">
             <p className="text-sm whitespace-pre-wrap">{textResponse}</p>
           </div>
         )}
 
-        {/* Structured Analysis Results */}
-        {analysis && <AnalysisResults analysis={analysis} />}
+        {analysis && <AnalysisResults analysis={analysis} whatIfHistory={whatIfHistory} />}
       </CardContent>
     </Card>
   );
 };
 
-const AnalysisResults = ({ analysis }) => {
+const AnalysisResults = ({ analysis, whatIfHistory = [] }) => {
   const cs = analysis.client_summary || {};
   const cp = analysis.current_position || {};
   const ra = analysis.retirement_analysis || {};
@@ -220,19 +223,73 @@ const AnalysisResults = ({ analysis }) => {
   const entities = analysis.entities || [];
   const recs = analysis.recommendations || [];
   const assumptions = analysis.assumptions || [];
+  const wif = analysis.what_if_comparison;
 
   return (
     <ScrollArea className="max-h-[500px]" data-testid="retirement-analysis-results">
       <div className="space-y-4">
+        {/* What-If Comparison (if present) */}
+        {wif && wif.summary && (
+          <Card className="border-blue-200 bg-blue-50/50">
+            <CardContent className="p-3 space-y-2">
+              <div className="flex items-center gap-2">
+                <Target className="h-5 w-5 text-blue-600" />
+                <p className="font-semibold text-sm text-blue-700">What-If Comparison</p>
+              </div>
+              <p className="text-sm text-blue-600">{wif.summary}</p>
+              <div className="grid grid-cols-3 gap-2 text-xs">
+                {wif.original_shortfall !== undefined && (
+                  <div>
+                    <p className="text-muted-foreground">Original</p>
+                    <p className="font-bold">{formatCurrency(wif.original_shortfall)}</p>
+                  </div>
+                )}
+                {wif.new_shortfall !== undefined && (
+                  <div>
+                    <p className="text-muted-foreground">After Change</p>
+                    <p className="font-bold">{formatCurrency(wif.new_shortfall)}</p>
+                  </div>
+                )}
+                {wif.improvement !== undefined && (
+                  <div>
+                    <p className="text-muted-foreground">Improvement</p>
+                    <p className={`font-bold ${wif.improvement >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {wif.improvement >= 0 ? '+' : ''}{formatCurrency(wif.improvement)}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* What-If History */}
+        {whatIfHistory.length > 0 && (
+          <div className="space-y-1">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Scenario History</p>
+            {whatIfHistory.map((wh, i) => (
+              <div key={`wh-${i}`} className="flex items-center gap-2 text-xs p-2 bg-muted/30 rounded">
+                <Badge variant="outline" className="text-[9px] h-4">#{i + 1}</Badge>
+                <span className="flex-1 text-muted-foreground">{wh.input}</span>
+                {wh.comparison?.improvement !== undefined && (
+                  <span className={`font-bold ${wh.comparison.improvement >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {wh.comparison.improvement >= 0 ? '+' : ''}{formatCurrency(wh.comparison.improvement)}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Client Summary */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <MiniStat icon={<Users className="h-4 w-4" />} label="Age" value={cs.age || '—'} />
-          <MiniStat icon={<Calendar className="h-4 w-4" />} label="Retire at" value={cs.retirement_age || '—'} />
-          <MiniStat icon={<Calculator className="h-4 w-4" />} label="Years to go" value={cs.years_to_retirement || '—'} />
+          <MiniStat icon={<Users className="h-4 w-4" />} label="Age" value={cs.age || '-'} />
+          <MiniStat icon={<Calendar className="h-4 w-4" />} label="Retire at" value={cs.retirement_age || '-'} />
+          <MiniStat icon={<Calculator className="h-4 w-4" />} label="Years to go" value={cs.years_to_retirement || '-'} />
           <MiniStat icon={<DollarSign className="h-4 w-4" />} label="Total Wealth" value={formatCurrency(cp.total_wealth)} />
         </div>
 
-        {/* Current Position Breakdown */}
+        {/* Current Position */}
         {cp.total_wealth > 0 && (
           <Card className="bg-muted/30">
             <CardContent className="p-3 space-y-2">
@@ -399,7 +456,6 @@ const AnalysisResults = ({ analysis }) => {
           </div>
         )}
 
-        {/* Disclaimer */}
         {analysis.disclaimer && (
           <p className="text-[10px] text-muted-foreground flex items-start gap-1 p-2 bg-amber-50 rounded">
             <AlertTriangle className="h-3 w-3 flex-shrink-0 mt-0.5 text-amber-500" />

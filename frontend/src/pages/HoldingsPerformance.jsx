@@ -120,7 +120,8 @@ const HoldingsPerformance = () => {
   const totalReturnWithDividends = totalReturn + dividendYield;
 
   // Generate historical data based on time range
-  const months = timeRange === "3m" ? 3 : timeRange === "6m" ? 6 : timeRange === "1y" ? 12 : 24;
+  const MONTH_MAP = { "3m": 3, "6m": 6, "1y": 12 };
+  const months = MONTH_MAP[timeRange] || 24;
   const historicalData = useMemo(() => generateHistoricalData(sharePortfolio, months), [sharePortfolio, months]);
 
   // Sector allocation data

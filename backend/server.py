@@ -47,7 +47,7 @@ app.add_middleware(
 # ==================== HEALTH CHECK ====================
 
 @app.get("/api/health")
-async def health_check():
+async def health_check() -> dict:
     """Health check endpoint."""
     return {
         "status": "healthy",
@@ -178,7 +178,7 @@ async def health_check():
 # ==================== LIFECYCLE ====================
 
 @app.on_event("shutdown")
-async def shutdown_db_client():
+async def shutdown_db_client() -> None:
     """Clean up database connection on shutdown."""
     client.close()
     logger.info("Database connection closed")

@@ -107,7 +107,8 @@ const MacroDashboard = () => {
       console.error("Error fetching chart data:", error);
       // Generate mock data for demo
       const points = timeframe === "1d" ? 78 : timeframe === "1w" ? 40 : 30;
-      const baseValue = selectedSymbol === "BTC-USD" ? 73000 : selectedSymbol === "GC=F" ? 2650 : selectedSymbol.includes("USD") ? 0.65 : 5500;
+      const BASE_VALUES = { "BTC-USD": 73000, "GC=F": 2650 };
+      const baseValue = BASE_VALUES[selectedSymbol] || (selectedSymbol.includes("USD") ? 0.65 : 5500);
       const mockData = Array.from({ length: points }, (_, i) => {
         const variance = (Math.random() - 0.5) * baseValue * 0.02;
         return {

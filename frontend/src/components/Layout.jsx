@@ -179,7 +179,7 @@ const Layout = ({ children }) => {
       <button onClick={() => setVoiceOpen(true)} className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg hover:shadow-xl transition-all flex items-center justify-center group" data-testid="voice-assistant-fab">
         <Mic className="h-6 w-6 group-hover:scale-110 transition-transform" />
       </button>
-      <VoiceAssistant isOpen={voiceOpen} onClose={() => setVoiceOpen(false)} />
+      <VoiceAssistant isOpen={voiceOpen} onClose={() => setVoiceOpen(false)} currentPath={location.pathname} />
     </div>
   );
 };
