@@ -57,12 +57,14 @@ import {
   Settings,
   Bot,
   LayoutDashboard,
-  Globe
+  Globe,
+  Sliders
 } from "lucide-react";
 import { toast } from "sonner";
 import { ComplianceFooter } from "@/components/ComplianceDisclaimer";
 import KnowledgeGraphPanel from "@/components/KnowledgeGraphPanel";
 import ClientPackScheduler from "@/components/ClientPackScheduler";
+import DecisionCenter from "@/pages/DecisionCenter";
 
 const API_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || "";
 
@@ -102,6 +104,7 @@ const AdvisorCommandCenter = () => {
   const [selectedAction, setSelectedAction] = useState(null);
   const [graphOverview, setGraphOverview] = useState(null);
   const [graphInsights, setGraphInsights] = useState([]);
+  const [topTab, setTopTab] = useState("dashboard");
   
   const [data, setData] = useState({
     commandCenter: null,
@@ -344,7 +347,18 @@ const AdvisorCommandCenter = () => {
           </div>
         </div>
 
-        {/* ===== ZONE 4: KEY METRICS ROW ===== */}
+        {/* ===== TOP-LEVEL TABS: Dashboard + Decision Centre ===== */}
+        <Tabs value={topTab} onValueChange={setTopTab}>
+          <TabsList className="bg-white border h-10">
+            <TabsTrigger value="dashboard" className="gap-1.5 data-[state=active]:bg-[#1a2744] data-[state=active]:text-white" data-testid="tab-dashboard">
+              <LayoutDashboard className="h-3.5 w-3.5" /> Dashboard
+            </TabsTrigger>
+            <TabsTrigger value="decisions" className="gap-1.5 data-[state=active]:bg-[#1a2744] data-[state=active]:text-white" data-testid="tab-decisions">
+              <Sliders className="h-3.5 w-3.5" /> Decision Centre
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="dashboard" className="mt-4 space-y-4">
         <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
           <Card className="bg-gradient-to-br from-[#1a2744] to-[#2a3754] text-white">
             <CardContent className="pt-4 pb-4">
@@ -1260,6 +1274,13 @@ const AdvisorCommandCenter = () => {
         )}
 
         <ComplianceFooter />
+
+          </TabsContent>
+
+          <TabsContent value="decisions" className="mt-4">
+            <DecisionCenter embedded />
+          </TabsContent>
+        </Tabs>
       </div>
     </Layout>
   );

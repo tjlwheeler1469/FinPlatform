@@ -97,7 +97,7 @@ const BEST_RATES = [
   { bank: "ME Bank", rate: 4.95, term: "6 months" }
 ];
 
-const CashDeposits = () => {
+const CashDeposits = ({ embedded = false }) => {
   const [accounts, setAccounts] = useState(DEMO_ACCOUNTS);
   const [termDeposits, setTermDeposits] = useState(DEMO_TERM_DEPOSITS);
   const [activeTab, setActiveTab] = useState("overview");
@@ -133,8 +133,7 @@ const CashDeposits = () => {
     return days;
   };
 
-  return (
-    <Layout>
+  const content = (
       <div className="space-y-6" data-testid="cash-deposits-page">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -412,8 +411,9 @@ const CashDeposits = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </Layout>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default CashDeposits;

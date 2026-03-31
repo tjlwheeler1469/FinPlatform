@@ -1148,7 +1148,7 @@ const AppRouter = () => {
       
       {/* AI routes - consolidate to primary */}
       <Route path="/ai-copilot" element={<Navigate to="/ai-copilot-advanced" replace />} />
-      <Route path="/decision-center" element={<DecisionCenter />} />
+      <Route path="/decision-center" element={<Navigate to="/advisor-command-center" replace />} />
       <Route path="/client-insights" element={<Navigate to="/ai-copilot-advanced" replace />} />
       <Route path="/intelligence-feed" element={<Navigate to="/ai-copilot-advanced" replace />} />
       <Route path="/ai-insights" element={<Navigate to="/ai-copilot-advanced" replace />} />

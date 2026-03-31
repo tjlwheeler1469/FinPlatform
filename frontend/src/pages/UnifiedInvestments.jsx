@@ -1,7 +1,7 @@
 import { useState, lazy, Suspense } from "react";
 import Layout from "@/components/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, BarChart3, Building2, Landmark, Bitcoin, PiggyBank, Briefcase, Lock } from "lucide-react";
+import { Loader2, BarChart3, Building2, Landmark, Bitcoin, PiggyBank, Briefcase, Lock, DollarSign, Shield } from "lucide-react";
 
 const SharePortfolio = lazy(() => import("@/pages/SharePortfolio"));
 const BondsTrading = lazy(() => import("@/pages/BondsTrading"));
@@ -10,6 +10,7 @@ const CryptoPortfolio = lazy(() => import("@/pages/CryptoPortfolio"));
 const SuperannuationGuarantee = lazy(() => import("@/pages/SuperannuationGuarantee"));
 const ManagedFunds = lazy(() => import("@/pages/ManagedFunds"));
 const UnlistedInvestments = lazy(() => import("@/pages/UnlistedInvestments"));
+const CashDeposits = lazy(() => import("@/pages/CashDeposits"));
 
 const TabLoader = () => (
   <div className="flex items-center justify-center py-20">
@@ -22,7 +23,8 @@ const TABS = [
   { value: "bonds", label: "Bonds", icon: Landmark },
   { value: "property", label: "Property", icon: Building2 },
   { value: "crypto", label: "Crypto", icon: Bitcoin },
-  { value: "super", label: "Super", icon: PiggyBank },
+  { value: "cash", label: "Cash & TDs", icon: DollarSign },
+  { value: "super", label: "Super & Pension", icon: Shield },
   { value: "managed", label: "Managed Funds", icon: Briefcase },
   { value: "unlisted", label: "Unlisted", icon: Lock },
 ];
@@ -59,6 +61,9 @@ const UnifiedInvestments = () => {
             </TabsContent>
             <TabsContent value="crypto" className="mt-0">
               <Suspense fallback={<TabLoader />}><CryptoPortfolio embedded /></Suspense>
+            </TabsContent>
+            <TabsContent value="cash" className="mt-0">
+              <Suspense fallback={<TabLoader />}><CashDeposits embedded /></Suspense>
             </TabsContent>
             <TabsContent value="super" className="mt-0">
               <Suspense fallback={<TabLoader />}><SuperannuationGuarantee embedded /></Suspense>

@@ -81,7 +81,6 @@ export const adviserBaseNav = [
     items: [
       { path: "/ai-copilot-advanced", label: "AI Assistant", icon: MessageSquare, title: "AI Copilot & Tasks", badge: "AI" },
       { path: "/meeting-prep", label: "Meeting Prep", icon: Sparkles, title: "Meeting Preparation" },
-      { path: "/decision-center", label: "Decision Center", icon: Zap, title: "Scenario Modeling" },
     ]
   },
   {
@@ -144,6 +143,7 @@ export const clientContextNav = [
     items: [
       { path: "/investments", label: "All Investments", icon: TrendingUp, title: "Investment Portfolio", badge: "NEW" },
       { path: "/cash-deposits", label: "Cash & TDs", icon: PiggyBank, title: "Cash & Term Deposits" },
+      { path: "/super-pension", label: "Super & Pension", icon: Shield, title: "Superannuation & Pension" },
     ]
   },
   {

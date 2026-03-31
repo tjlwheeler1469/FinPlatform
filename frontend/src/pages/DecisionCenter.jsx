@@ -33,7 +33,7 @@ const formatCurrency = (value) => {
   return `$${value.toFixed(0)}`;
 };
 
-const DecisionCenter = () => {
+const DecisionCenter = ({ embedded = false }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState(null);
   
@@ -129,10 +129,10 @@ const DecisionCenter = () => {
     toast.success("Scenario applied");
   };
 
-  return (
-    <Layout>
+  const content = (
     <div className="space-y-6" data-testid="decision-center-page">
       {/* Header */}
+      {!embedded && (
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#1a2744] to-[#2a3a5c] flex items-center justify-center">
@@ -150,6 +150,7 @@ const DecisionCenter = () => {
           </Badge>
         )}
       </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Controls Panel */}
@@ -416,8 +417,9 @@ const DecisionCenter = () => {
         </div>
       </div>
     </div>
-    </Layout>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default DecisionCenter;

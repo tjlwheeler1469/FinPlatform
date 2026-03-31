@@ -659,205 +659,229 @@ const Client360View = () => {
   return (
     <Layout>
       <div className="space-y-6" data-testid="client-360-view">
-        {/* Back Button & Header */}
+        {/* Back Button */}
         <div className="flex items-center gap-4">
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={() => navigate("/crm-command-center")}
             data-testid="back-to-crm"
+            className="text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to CRM
           </Button>
         </div>
 
-        {/* Client Header Card */}
-        <Card className="overflow-hidden">
-          <div className="bg-gradient-to-r from-[#1a2744] to-[#2a3f5f] p-6 text-white">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-              <div className="flex items-center gap-4">
-                <Avatar className="h-20 w-20 border-4 border-white/20">
-                  <AvatarFallback className="bg-[#D4A84C] text-[#1a2744] text-2xl font-bold">
-                    {getInitials(client.name)}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <div className="flex items-center gap-3">
-                    <h1 className="text-2xl font-bold">{client.name}</h1>
-                    <Badge className="bg-emerald-500 text-white">{client.status}</Badge>
+        {/* Redesigned Client Header */}
+        <div className="rounded-xl overflow-hidden border shadow-sm" data-testid="client-header">
+          {/* Top Section - Name & Wealth */}
+          <div className="bg-[#0f1d35] px-8 py-6">
+            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+              {/* Client Identity */}
+              <div className="flex items-start gap-5">
+                <div className="h-16 w-16 rounded-full bg-gradient-to-br from-[#D4A84C] to-[#b8922f] flex items-center justify-center text-[#0f1d35] text-xl font-bold shrink-0 ring-2 ring-white/10">
+                  {getInitials(client.name)}
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <h1 className="text-2xl font-semibold text-white tracking-tight" data-testid="client-name">{client.name}</h1>
+                    <Badge className={`text-xs font-medium ${
+                      client.status === 'active' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' :
+                      client.status === 'prospect' ? 'bg-blue-500/20 text-blue-300 border-blue-500/30' :
+                      'bg-amber-500/20 text-amber-300 border-amber-500/30'
+                    }`} data-testid="client-status">
+                      {client.status}
+                    </Badge>
                     {client.satisfaction >= 90 && (
-                      <Star className="h-5 w-5 text-amber-400 fill-amber-400" />
+                      <Star className="h-4 w-4 text-amber-400 fill-amber-400" />
                     )}
                   </div>
-                  <div className="flex items-center gap-4 mt-2 text-white/70">
-                    <span className="flex items-center gap-1">
-                      <Mail className="h-4 w-4" /> {client.email}
+                  <div className="flex items-center gap-5 text-sm text-white/50">
+                    <span className="flex items-center gap-1.5">
+                      <Briefcase className="h-3.5 w-3.5" /> {client.type === 'household' ? 'Household' : client.type === 'trust' ? 'Trust' : client.type === 'smsf' ? 'SMSF' : 'Individual'}
                     </span>
-                    <span className="flex items-center gap-1">
-                      <Phone className="h-4 w-4" /> {client.phone}
+                    <span className="flex items-center gap-1.5">
+                      <MapPin className="h-3.5 w-3.5" /> {client.address.split(',').slice(-1)[0].trim()}
                     </span>
-                    <span className="flex items-center gap-1">
-                      <MapPin className="h-4 w-4" /> {client.address.split(',')[1]}
+                    <span className="flex items-center gap-1.5">
+                      <Calendar className="h-3.5 w-3.5" /> Since {formatDate(client.clientSince)}
                     </span>
-                  </div>
-                  <div className="flex items-center gap-4 mt-2 text-sm text-white/60">
-                    <span>Client since {formatDate(client.clientSince)}</span>
-                    <span>•</span>
-                    <span>Advisor: {client.advisor}</span>
-                    <span>•</span>
-                    <span>Risk Profile: {client.riskProfile}</span>
                   </div>
                 </div>
               </div>
 
-              {/* Wealth Summary */}
-              <div className="flex items-center gap-6">
-                <div className="text-right">
-                  <p className="text-white/60 text-sm">Total Wealth</p>
-                  <p className="text-3xl font-bold">{formatCurrency(client.wealth.total)}</p>
-                  <p className={`text-sm flex items-center justify-end gap-1 ${
+              {/* Wealth Display */}
+              <div className="flex items-start gap-6">
+                <div className="text-right space-y-1">
+                  <p className="text-xs font-medium uppercase tracking-wider text-white/40">Total Wealth</p>
+                  <p className="text-4xl font-bold text-white tabular-nums" data-testid="client-wealth">{formatCurrency(client.wealth.total)}</p>
+                  <p className={`text-sm font-medium flex items-center justify-end gap-1 ${
                     client.wealth.changePercent >= 0 ? "text-emerald-400" : "text-red-400"
                   }`}>
                     {client.wealth.changePercent >= 0 ? (
-                      <ArrowUpRight className="h-4 w-4" />
+                      <ArrowUpRight className="h-3.5 w-3.5" />
                     ) : (
-                      <ArrowDownRight className="h-4 w-4" />
+                      <ArrowDownRight className="h-3.5 w-3.5" />
                     )}
-                    {client.wealth.changePercent >= 0 ? "+" : ""}{formatCurrency(client.wealth.change)} ({client.wealth.changePercent}%)
+                    {client.wealth.changePercent >= 0 ? "+" : ""}{formatCurrency(Math.abs(client.wealth.change))} ({Math.abs(client.wealth.changePercent)}%)
                   </p>
                 </div>
-                <div className="flex flex-col gap-2">
-                  <Button size="sm" className="bg-white text-[#1a2744] hover:bg-white/90">
-                    <Phone className="h-4 w-4 mr-2" /> Call
+                <Separator orientation="vertical" className="h-16 bg-white/10 hidden lg:block" />
+                <div className="flex flex-col gap-1.5">
+                  <Button size="sm" className="bg-white text-[#0f1d35] hover:bg-white/90 h-8 text-xs font-medium" data-testid="call-btn">
+                    <Phone className="h-3.5 w-3.5 mr-1.5" /> Call
                   </Button>
-                  <Button size="sm" variant="outline" className="border-white/30 text-white hover:bg-white/10">
-                    <Mail className="h-4 w-4 mr-2" /> Email
+                  <Button size="sm" variant="outline" className="border-white/20 text-white hover:bg-white/10 h-8 text-xs" data-testid="email-btn">
+                    <Mail className="h-3.5 w-3.5 mr-1.5" /> Email
                   </Button>
                   <Button 
                     size="sm" 
                     variant="outline" 
-                    className="border-[#D4A84C]/50 text-[#D4A84C] hover:bg-[#D4A84C]/10"
+                    className="border-[#D4A84C]/40 text-[#D4A84C] hover:bg-[#D4A84C]/10 h-8 text-xs"
                     onClick={() => {
                       localStorage.setItem("selected_client", JSON.stringify(client));
                       navigate(`/transaction-modeler?client=${client.id}`);
                     }}
                     data-testid="transaction-modeler-btn"
                   >
-                    <Calculator className="h-4 w-4 mr-2" /> Model Transaction
+                    <Calculator className="h-3.5 w-3.5 mr-1.5" /> Model
                   </Button>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Quick Stats Bar */}
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-4 p-4 bg-muted/30">
-            <div className="text-center">
-              <p className="text-2xl font-bold">{client.accounts.length}</p>
-              <p className="text-xs text-muted-foreground">Accounts</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold">{client.tasks.filter(t => t.status === 'pending').length}</p>
-              <p className="text-xs text-muted-foreground">Open Tasks</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold">{client.documents.length}</p>
-              <p className="text-xs text-muted-foreground">Documents</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold text-emerald-600">{client.satisfaction}%</p>
-              <p className="text-xs text-muted-foreground">Satisfaction</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold">{client.nps}</p>
-              <p className="text-xs text-muted-foreground">NPS Score</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold">{formatDate(client.nextReview)}</p>
-              <p className="text-xs text-muted-foreground">Next Review</p>
-            </div>
+          {/* Info Strip */}
+          <div className="bg-[#162240] px-8 py-3 flex items-center gap-6 text-sm text-white/60 border-t border-white/5 overflow-x-auto">
+            <span className="flex items-center gap-1.5 whitespace-nowrap">
+              <Mail className="h-3.5 w-3.5 text-white/30" /> {client.email}
+            </span>
+            <span className="w-px h-4 bg-white/10" />
+            <span className="flex items-center gap-1.5 whitespace-nowrap">
+              <Phone className="h-3.5 w-3.5 text-white/30" /> {client.phone}
+            </span>
+            <span className="w-px h-4 bg-white/10" />
+            <span className="flex items-center gap-1.5 whitespace-nowrap">
+              <UserCircle className="h-3.5 w-3.5 text-white/30" /> Advisor: {client.advisor}
+            </span>
+            <span className="w-px h-4 bg-white/10" />
+            <span className="flex items-center gap-1.5 whitespace-nowrap">
+              <Activity className="h-3.5 w-3.5 text-white/30" /> Risk: {client.riskProfile}
+            </span>
           </div>
-        </Card>
+
+          {/* Metrics Bar */}
+          <div className="grid grid-cols-3 md:grid-cols-6 bg-white">
+            {[
+              { label: "Accounts", value: client.accounts.length, color: "" },
+              { label: "Open Tasks", value: client.tasks.filter(t => t.status === 'pending' || t.status === 'overdue').length, color: client.tasks.some(t => t.status === 'overdue') ? "text-red-600" : "" },
+              { label: "Documents", value: client.documents.length, color: "" },
+              { label: "Satisfaction", value: client.satisfaction ? `${client.satisfaction}%` : "N/A", color: client.satisfaction >= 90 ? "text-emerald-600" : client.satisfaction >= 70 ? "text-amber-600" : "text-red-600" },
+              { label: "NPS Score", value: client.nps || "N/A", color: "" },
+              { label: "Next Review", value: client.nextReview ? formatDate(client.nextReview) : "TBD", color: "" },
+            ].map((metric, idx) => (
+              <div key={idx} className="text-center py-4 px-2 border-r last:border-r-0 border-b md:border-b-0">
+                <p className={`text-xl font-bold ${metric.color}`} data-testid={`metric-${metric.label.toLowerCase().replace(/\s/g, '-')}`}>{metric.value}</p>
+                <p className="text-[11px] text-muted-foreground uppercase tracking-wider mt-0.5">{metric.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* Main Content Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid w-full grid-cols-8">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="holdings">Holdings</TabsTrigger>
-            <TabsTrigger value="performance">Performance</TabsTrigger>
-            <TabsTrigger value="accounts">Accounts</TabsTrigger>
-            <TabsTrigger value="transactions">Activity</TabsTrigger>
-            <TabsTrigger value="documents">Documents</TabsTrigger>
-            <TabsTrigger value="communications">Timeline</TabsTrigger>
-            <TabsTrigger value="contact">Contact</TabsTrigger>
+          <TabsList className="bg-white border h-10 w-full justify-start gap-0 rounded-lg px-1 overflow-x-auto">
+            {[
+              { value: "overview", label: "Overview" },
+              { value: "holdings", label: "Holdings" },
+              { value: "performance", label: "Performance" },
+              { value: "accounts", label: "Accounts" },
+              { value: "transactions", label: "Activity" },
+              { value: "documents", label: "Documents" },
+              { value: "communications", label: "Timeline" },
+              { value: "contact", label: "Contact" },
+            ].map(tab => (
+              <TabsTrigger 
+                key={tab.value} 
+                value={tab.value}
+                className="text-sm data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white data-[state=active]:shadow-sm"
+                data-testid={`tab-${tab.value}`}
+              >
+                {tab.label}
+              </TabsTrigger>
+            ))}
           </TabsList>
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Goals */}
-              <Card className="lg:col-span-2">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+              <Card className="lg:col-span-2 border-0 shadow-sm">
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center gap-2 text-base">
                     <Target className="h-5 w-5 text-[#D4A84C]" />
                     Financial Goals
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  {client.goals.map((goal) => (
-                    <div key={goal.id} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <goal.icon className="h-4 w-4 text-muted-foreground" />
-                          <span className="font-medium">{goal.name}</span>
+                <CardContent className="space-y-5">
+                  {client.goals.map((goal) => {
+                    const GoalIcon = goal.icon;
+                    const progressColor = goal.progress >= 75 ? "bg-emerald-500" : goal.progress >= 40 ? "bg-[#D4A84C]" : "bg-blue-500";
+                    return (
+                      <div key={goal.id} className="p-3 rounded-lg border bg-muted/20 hover:bg-muted/40 transition-colors">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2.5">
+                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${progressColor}/10`}>
+                              <GoalIcon className={`h-4 w-4 ${goal.progress >= 75 ? 'text-emerald-600' : goal.progress >= 40 ? 'text-[#D4A84C]' : 'text-blue-600'}`} />
+                            </div>
+                            <span className="font-medium text-sm">{goal.name}</span>
+                          </div>
+                          <span className="text-xs font-semibold tabular-nums px-2 py-0.5 rounded-full bg-muted">
+                            {goal.progress}%
+                          </span>
                         </div>
-                        <span className="text-sm text-muted-foreground">
-                          {formatCurrency(goal.current)} / {formatCurrency(goal.target)}
-                        </span>
+                        <Progress value={goal.progress} className="h-1.5 mb-2" />
+                        <div className="flex justify-between text-xs text-muted-foreground">
+                          <span className="tabular-nums">{formatCurrency(goal.current)} / {formatCurrency(goal.target)}</span>
+                          <span>Target: {formatDate(goal.targetDate)}</span>
+                        </div>
                       </div>
-                      <Progress value={goal.progress} className="h-2" />
-                      <div className="flex justify-between text-xs text-muted-foreground">
-                        <span>{goal.progress}% complete</span>
-                        <span>Target: {formatDate(goal.targetDate)}</span>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </CardContent>
               </Card>
 
               {/* Family Members */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+              <Card className="border-0 shadow-sm">
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center gap-2 text-base">
                     <Users className="h-5 w-5 text-[#D4A84C]" />
                     Family
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent className="space-y-2">
                   {client.family.map((member, idx) => (
-                    <div key={`item-${idx}`} className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50">
+                    <div key={`item-${idx}`} className="flex items-center justify-between p-2.5 rounded-lg hover:bg-muted/50 transition-colors">
                       <div className="flex items-center gap-3">
-                        <Avatar className="h-8 w-8">
-                          <AvatarFallback className="bg-[#1a2744]/10 text-[#1a2744] text-xs">
-                            {getInitials(member.name)}
-                          </AvatarFallback>
-                        </Avatar>
+                        <div className="h-9 w-9 rounded-full bg-[#0f1d35]/5 flex items-center justify-center text-[#0f1d35] text-xs font-semibold">
+                          {getInitials(member.name)}
+                        </div>
                         <div>
                           <p className="font-medium text-sm">{member.name}</p>
-                          <p className="text-xs text-muted-foreground">{member.relationship}</p>
+                          <p className="text-xs text-muted-foreground capitalize">{member.relationship}</p>
                         </div>
                       </div>
-                      <span className="text-sm text-muted-foreground">Age {member.age}</span>
+                      <span className="text-xs font-medium text-muted-foreground tabular-nums bg-muted px-2 py-0.5 rounded">Age {member.age}</span>
                     </div>
                   ))}
                 </CardContent>
               </Card>
 
               {/* Asset Allocation */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+              <Card className="border-0 shadow-sm">
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center gap-2 text-base">
                     <BarChart3 className="h-5 w-5 text-[#D4A84C]" />
                     Asset Allocation
                   </CardTitle>
@@ -876,9 +900,9 @@ const Client360View = () => {
               </Card>
 
               {/* Insurance Summary */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+              <Card className="border-0 shadow-sm">
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center gap-2 text-base">
                     <Shield className="h-5 w-5 text-[#D4A84C]" />
                     Insurance
                   </CardTitle>
@@ -902,9 +926,9 @@ const Client360View = () => {
               </Card>
 
               {/* Key Dates */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+              <Card className="border-0 shadow-sm">
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center gap-2 text-base">
                     <Calendar className="h-5 w-5 text-[#D4A84C]" />
                     Key Dates
                   </CardTitle>
