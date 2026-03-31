@@ -15,70 +15,44 @@ Build a comprehensive Australian wealth management platform for financial advise
 /app/backend/
 ├── server.py              # Main app (refactored, uses route_registry)
 ├── route_registry.py      # Centralized route registration (120+ routes)
-├── db.py                  # Database connection
-└── routes/                # 120+ route modules
-    └── buffett_engine.py  # Live Buffett-style stock screening (Yahoo Finance)
+└── routes/
+    └── buffett_engine.py  # Live Buffett-style stock screening
 
 /app/frontend/src/
-├── App.js                 # Routing + LanguageProvider
-├── utils/
-│   ├── apiClient.ts       # Typed API client (includes BuffettScreenResponse)
-│   ├── formatters.ts      # Typed formatters
-│   ├── types.ts           # Shared TS types (DashboardSummary, AuditLog, etc.)
-│   └── hooks.ts           # Shared typed utilities
+├── App.js                 # PortfolioProvider with per-client data switching (CLIENT_FAMILY_DATA)
 ├── components/
-│   ├── Layout.jsx          # Nav + language selector + voice FAB
-│   ├── VoiceAssistant.jsx  # Voice/text chat panel
-│   ├── LanguageContext.jsx  # i18n (4 languages, 90+ keys per language)
-│   ├── onboarding/         # 7 extracted section components
-│   └── advice_os/          # 7 extracted AdviceOS sub-components
-│       ├── OverviewTab.jsx
-│       ├── ScenariosTab.jsx
-│       ├── ComplianceTab.jsx
-│       ├── AuditTrailTab.jsx
-│       ├── ReportsTab.jsx
-│       ├── ScenarioGeneratorDialog.jsx
-│       ├── DecisionDialog.jsx
-│       └── index.js
-└── pages/                  # All page components
+│   ├── advice_os/         # 7 extracted AdviceOS sub-components
+│   ├── onboarding/        # 7 extracted onboarding section components
+│   └── LanguageContext.jsx # i18n (4 languages, 90+ keys per language)
+├── utils/
+│   ├── apiClient.ts       # Typed API client (BuffettScreenResponse, etc.)
+│   ├── types.ts           # Shared TS types
+│   └── hooks.ts           # Shared typed utilities
+└── pages/                 # All page components
 ```
 
-## What's Been Implemented (All Complete)
+## What's Been Implemented
 
-### P0-P3 Features (March 2026)
-- [x] StockTrading with live Buffett Ideas tab (5 tabs, API-driven)
-- [x] Live newsfeeds from backend API
-- [x] 17 market indicators (indices, currencies, commodities)
-- [x] Compliance Dashboard with MongoDB persistence
-- [x] Voice-activated financial planning assistant (GPT-5.2)
-- [x] Multi-language support (EN, ZH, VI, EL) — 90+ keys per language
+### Per-Client Data Switching (March 31, 2026)
+- [x] CLIENT_FAMILY_DATA: 5 client datasets (Wheeler, Chen, Mitchell, Williams, Patel)
+- [x] PortfolioProvider listens to selectedClient from localStorage and swaps familyMembers/trust/company
+- [x] Client360View: DEMO_CLIENT_DATA for all 5 clients
+- [x] Fixed TrustDistributionAnalysis crash on empty beneficiaries
 
-### Code Quality Fixes (March 2026)
-- [x] eval() → ast.literal_eval + safe arithmetic parser
-- [x] XSS: DOMPurify for dangerouslySetInnerHTML & document.write
-- [x] Auth tokens: localStorage → sessionStorage
-- [x] MD5 → SHA-256
-- [x] Hardcoded secrets → env vars
-- [x] React hook dependencies fixed
-- [x] Nested ternaries refactored into helper functions (RetirementConfidence, StrategicPlanning)
-- [x] 317 instances of == True/False → is True/False in test files
-
-### Refactoring (March 2026)
-- [x] server.py: 129 imports → route_registry.py (120+ routes loaded)
-- [x] DigitalOnboarding: 1369 → 601 lines (7 sections extracted)
-- [x] AdviceOSDashboard: 1084 → 356 lines (7 sub-components extracted)
+### Code Quality (March 2026)
+- [x] AdviceOSDashboard: 1084 → 356 lines (7 sub-components)
+- [x] DigitalOnboarding: 1369 → 601 lines (7 sections)
 - [x] Buffett Ideas: Mock data → Live Yahoo Finance API
-- [x] random → secrets.SystemRandom() in 25+ files
-- [x] console.log/warn/debug/info removed from production
-- [x] 180 index-as-key patterns fixed
-- [x] Python type hints on public API endpoints
-- [x] TypeScript: tsconfig.json + apiClient.ts + formatters.ts + types.ts + hooks.ts
+- [x] Nested ternaries refactored in RetirementConfidence, StrategicPlanning
+- [x] i18n: 90+ translation keys across EN, ZH, VI, EL
+- [x] TypeScript: apiClient.ts, types.ts, hooks.ts
+- [x] Security patches (eval, XSS, sessionStorage, secrets module)
 
 ## Remaining Backlog
-- [ ] Wire up i18n translation keys in actual page JSX (keys exist, not yet consumed by UI)
-- [ ] Continue TS migration: Convert context providers (AuthContext, LanguageContext) to .tsx
-- [ ] Add unit tests for new advice_os sub-components
+- [ ] Wire i18n keys into page JSX (keys exist, not consumed yet)
+- [ ] Convert AuthContext.jsx, LanguageContext.jsx to .tsx
+- [ ] Sidebar shows "Personal Mode" even when client selected (needs appMode integration fix)
 
 ## Testing
-- iteration_123: Backend 93% (14/15), Frontend 100% (all features working)
-- iteration_122: Backend 100% (7/7), Frontend 100% (14/14 total)
+- iteration_124: Frontend 100% — bug fix verified (per-client data switching)
+- iteration_123: Backend 93%, Frontend 100% — refactoring validated
