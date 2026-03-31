@@ -169,7 +169,8 @@ const ClientLogin = ({ onLogin }) => {
 
       const data = await response.json();
       localStorage.setItem("client_token", data.token);
-      localStorage.setItem("client_data", JSON.stringify(data));
+      // Only store non-sensitive client data (name, id - not token)
+      sessionStorage.setItem("client_session", JSON.stringify({ client_id: data.client_id, name: data.name, email: data.email }));
       toast.success(isLogin ? "Welcome back!" : "Account created successfully!");
       onLogin(data);
     } catch (error) {
@@ -189,7 +190,7 @@ const ClientLogin = ({ onLogin }) => {
       adviser_name: "David Chen"
     };
     localStorage.setItem("client_token", demoData.token);
-    localStorage.setItem("client_data", JSON.stringify(demoData));
+    sessionStorage.setItem("client_session", JSON.stringify({ client_id: demoData.client_id, name: demoData.name, email: demoData.email }));
     toast.success("Demo login successful!");
     onLogin(demoData);
   };
@@ -332,7 +333,7 @@ const ClientDashboard = ({ clientAuth, onLogout }) => {
       console.error("Logout error:", error);
     }
     localStorage.removeItem("client_token");
-    localStorage.removeItem("client_data");
+    sessionStorage.removeItem("client_session");
     onLogout();
   };
 
@@ -819,9 +820,9 @@ const ClientPortalMerged = () => {
     // Check for existing session
     const checkAuth = async () => {
       const token = localStorage.getItem("client_token");
-      const storedData = localStorage.getItem("client_data");
+      const storedSession = sessionStorage.getItem("client_session");
       
-      if (token && storedData) {
+      if (token && storedSession) {
         try {
           // Verify token with backend
           const response = await fetch(`${API_URL}/api/client/me`, {
@@ -836,13 +837,13 @@ const ClientPortalMerged = () => {
             setClientAuth(data);
           } else {
             // Token invalid, use stored data for demo
-            const data = JSON.parse(storedData);
-            if (data.token === "demo_token") {
-              setClientAuth(data);
+            const sessionData = JSON.parse(storedSession);
+            if (token === "demo_token") {
+              setClientAuth({ ...sessionData, token: "demo_token" });
             } else {
               // Clear invalid session
               localStorage.removeItem("client_token");
-              localStorage.removeItem("client_data");
+              sessionStorage.removeItem("client_session");
             }
           }
         } catch (error) {

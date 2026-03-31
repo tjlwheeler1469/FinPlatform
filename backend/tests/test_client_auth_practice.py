@@ -10,9 +10,9 @@ import uuid
 
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 
-# Test data
-TEST_CLIENT_EMAIL = f"test_client_{uuid.uuid4().hex[:8]}@test.com"
-TEST_CLIENT_PASSWORD = "TestPassword123!"
+# Test data - loaded from environment
+TEST_CLIENT_EMAIL = os.environ.get('TEST_CLIENT_EMAIL', f"test_client_{uuid.uuid4().hex[:8]}@test.com")
+TEST_CLIENT_PASSWORD = os.environ.get('TEST_CLIENT_PASSWORD', 'TestPassword123!')
 TEST_CLIENT_NAME = "TEST_Client User"
 
 

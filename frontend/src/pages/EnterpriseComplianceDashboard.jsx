@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import DOMPurify from 'dompurify';
 import Layout from '../components/Layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
@@ -246,7 +247,7 @@ export default function EnterpriseComplianceDashboard() {
       `;
       
       const printWindow = window.open('', '_blank', 'width=800,height=600');
-      printWindow.document.write(printContent);
+      printWindow.document.write(DOMPurify.sanitize(printContent, { WHOLE_DOCUMENT: true, ADD_TAGS: ['html', 'head', 'body', 'style', 'title'] }));
       printWindow.document.close();
       printWindow.focus();
       setTimeout(() => {

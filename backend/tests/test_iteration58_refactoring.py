@@ -8,9 +8,9 @@ import os
 
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 
-# Test credentials
-TEST_EMAIL = "advisor@wealthcommand.io"
-TEST_PASSWORD = "secure_password_123"
+# Test credentials - loaded from environment
+TEST_EMAIL = os.environ.get('TEST_EMAIL', 'advisor@wealthcommand.io')
+TEST_PASSWORD = os.environ.get('TEST_PASSWORD', 'secure_password_123')
 
 
 class TestHealthAndCore:

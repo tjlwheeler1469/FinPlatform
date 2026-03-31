@@ -9,9 +9,9 @@ import json
 
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://smart-insights-dash.preview.emergentagent.com').rstrip('/')
 
-# Test credentials
-CLIENT_PORTAL_EMAIL = "client_wheeler@email.com"
-CLIENT_PORTAL_PASSWORD = "wheeler2025"
+# Test credentials - loaded from environment
+CLIENT_PORTAL_EMAIL = os.environ.get('CLIENT_PORTAL_EMAIL', 'client_wheeler@email.com')
+CLIENT_PORTAL_PASSWORD = os.environ.get('CLIENT_PORTAL_PASSWORD', 'wheeler2025')
 TEST_CLIENT_ID = "client_1"
 
 

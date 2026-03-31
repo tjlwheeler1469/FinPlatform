@@ -15,14 +15,14 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(() => localStorage.getItem("auth_token"));
+  const [token, setToken] = useState(() => sessionStorage.getItem("auth_token"));
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Check authentication status on mount
   useEffect(() => {
     const checkAuth = async () => {
-      const savedToken = localStorage.getItem("auth_token");
+      const savedToken = sessionStorage.getItem("auth_token");
       if (savedToken) {
         try {
           const response = await fetch(`${API_URL}/api/auth/verify-token?token=${savedToken}`);
@@ -39,14 +39,14 @@ export const AuthProvider = ({ children }) => {
             }
           } else {
             // Token invalid, clear it
-            localStorage.removeItem("auth_token");
+            sessionStorage.removeItem("auth_token");
             setToken(null);
             setIsAuthenticated(false);
           }
         } catch (error) {
           console.error("Auth check failed:", error);
-          localStorage.removeItem("auth_token");
-          setToken(null);
+          sessionStorage.removeItem("auth_token");
+            setToken(null);
           setIsAuthenticated(false);
         }
       }
@@ -77,8 +77,8 @@ export const AuthProvider = ({ children }) => {
         return { requiresMFA: true };
       }
 
-      // Store token
-      localStorage.setItem("auth_token", data.access_token);
+      // Store token in sessionStorage (more secure than localStorage)
+      sessionStorage.setItem("auth_token", data.access_token);
       setToken(data.access_token);
       setUser(data.user);
       setIsAuthenticated(true);
@@ -123,7 +123,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = useCallback(async () => {
     try {
-      const sessionId = localStorage.getItem("session_id");
+      const sessionId = sessionStorage.getItem("session_id");
       await fetch(`${API_URL}/api/auth/logout`, {
         method: "POST",
         headers: {
@@ -135,8 +135,8 @@ export const AuthProvider = ({ children }) => {
       console.error("Logout error:", error);
     }
 
-    localStorage.removeItem("auth_token");
-    localStorage.removeItem("session_id");
+    sessionStorage.removeItem("auth_token");
+    sessionStorage.removeItem("session_id");
     setToken(null);
     setUser(null);
     setIsAuthenticated(false);
@@ -161,7 +161,7 @@ export const AuthProvider = ({ children }) => {
       }
 
       const data = await response.json();
-      localStorage.setItem("auth_token", data.access_token);
+      sessionStorage.setItem("auth_token", data.access_token);
       setToken(data.access_token);
       return true;
     } catch (error) {
@@ -192,7 +192,7 @@ export const AuthProvider = ({ children }) => {
       const refreshed = await refreshToken();
       if (refreshed) {
         // Retry request with new token
-        headers["Authorization"] = `Bearer ${localStorage.getItem("auth_token")}`;
+        headers["Authorization"] = `Bearer ${sessionStorage.getItem("auth_token")}`;
         return fetch(url, { ...options, headers });
       }
     }

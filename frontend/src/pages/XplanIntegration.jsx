@@ -78,6 +78,7 @@ const XplanIntegration = () => {
   useEffect(() => {
     fetchConnectionStatus();
     fetchSyncHistory();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   
   const fetchConnectionStatus = async () => {

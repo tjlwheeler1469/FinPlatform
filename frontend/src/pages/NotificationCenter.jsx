@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import DOMPurify from 'dompurify';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -406,7 +407,7 @@ const NotificationCenter = () => {
                     <div className="border rounded-lg overflow-hidden">
                       <div 
                         className="bg-white" 
-                        dangerouslySetInnerHTML={{ __html: selectedPreview.html_preview }}
+                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedPreview.html_preview) }}
                       />
                     </div>
                   </div>

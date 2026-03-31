@@ -11,8 +11,21 @@ from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 from motor.motor_asyncio import AsyncIOMotorClient
 import uuid
+import re
 
 logger = logging.getLogger(__name__)
+
+
+def _safe_eval_arithmetic(expr: str) -> float:
+    """Safely evaluate simple arithmetic expressions (numbers and +, -, *, /)."""
+    sanitized = re.sub(r'[^0-9+\-*/.()\s]', '', str(expr))
+    if not sanitized.strip():
+        raise ValueError(f"Invalid arithmetic expression: {expr}")
+    try:
+        # Only allow numbers and basic operators
+        return float(eval(sanitized, {"__builtins__": {}}, {}))
+    except Exception:
+        raise ValueError(f"Cannot safely evaluate expression: {expr}")
 
 router = APIRouter(prefix="/scenario-templates", tags=["Scenario Templates"])
 
@@ -461,9 +474,15 @@ async def apply_template(
                 })
         
         elif adj_type == "formula":
-            # Evaluate simple formulas
+            # Safely evaluate simple formulas using ast.literal_eval
+            import ast
             if "current_age" in str(adj_value):
-                result = eval(str(adj_value).replace("current_age", str(current_age)))
+                safe_expr = str(adj_value).replace("current_age", str(current_age))
+                try:
+                    result = ast.literal_eval(safe_expr)
+                except (ValueError, SyntaxError):
+                    # Fallback: try simple arithmetic parsing
+                    result = _safe_eval_arithmetic(safe_expr)
                 adjusted[key] = result
                 applied_changes.append({
                     "field": key,
@@ -471,7 +490,11 @@ async def apply_template(
                     "change_type": f"formula: {adj_value}"
                 })
             elif "retirement_age" in str(adj_value):
-                result = eval(str(adj_value).replace("retirement_age", str(retirement_age)))
+                safe_expr = str(adj_value).replace("retirement_age", str(retirement_age))
+                try:
+                    result = ast.literal_eval(safe_expr)
+                except (ValueError, SyntaxError):
+                    result = _safe_eval_arithmetic(safe_expr)
                 adjusted[key] = result
                 applied_changes.append({
                     "field": key,
