@@ -13,7 +13,7 @@ import os
 # Get backend URL from environment
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 if not BASE_URL:
-    BASE_URL = "https://secure-rebuild-3.preview.emergentagent.com"
+    BASE_URL = "https://voice-wealth-engine.preview.emergentagent.com"
 
 class TestHealthEndpoint:
     """Test v7.4.0 health endpoint with 32 capabilities"""

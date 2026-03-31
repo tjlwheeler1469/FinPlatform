@@ -1030,7 +1030,7 @@ const AppRouter = () => {
       <Route path="/goal-tracker" element={<GoalTracker />} />
       <Route path="/goals" element={<GoalTracker />} />
       <Route path="/scenario-modelling" element={<ScenarioModelling />} />
-      <Route path="/knowledge-graph" element={<KnowledgeGraphDashboard />} />
+      <Route path="/knowledge-graph" element={<Navigate to="/advisor-command-center" replace />} />
       <Route path="/ai-advisor" element={<AIAdvisor />} />
       <Route path="/portfolio-aggregator" element={<PortfolioAggregator />} />
       <Route path="/net-worth-trend" element={<NetWorthTrend />} />
@@ -1185,6 +1185,7 @@ const AppRouter = () => {
       
       {/* Next Best Actions */}
       <Route path="/next-best-actions" element={<NextBestActions />} />
+      <Route path="/next-actions" element={<Navigate to="/next-best-actions" replace />} />
       
       {/* Meeting Notes with Fathom */}
       <Route path="/meeting-notes" element={<MeetingNotes />} />

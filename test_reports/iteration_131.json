@@ -1,0 +1,122 @@
+{
+  "summary": "Iteration 131 - Route Redirects, Knowledge Graph Integration, Client Pack Voice Command & PDF. Backend: 13/13 tests passed (100%). Frontend: All tested features working correctly. Route redirects (/next-actions → /next-best-actions, /knowledge-graph → /advisor-command-center) work correctly. Knowledge Graph nav item removed from sidebar. AI Knowledge Graph section integrated into Advisor Command Center with graph stats, query buttons, and copilot input. Client pack voice command and PDF generation working.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Compliance Modal", "issues": ["Modal appears on every page load - consider persisting 'Don't show again' preference"]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration131_features.py",
+    "/app/test_reports/pytest/pytest_iteration131.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Route redirects correctly implemented in App.js (lines 1033, 1187-1188) using React Router Navigate",
+    "Knowledge Graph nav item correctly removed from navData.js adviserBaseNav (line 76 area)",
+    "AI Knowledge Graph section correctly integrated into AdvisorCommandCenter.jsx (lines 949-1055) with graph stats, query buttons, search input, and insights",
+    "client_pack intent correctly added to voice_command.py SYSTEM_PROMPT (lines 175-197)",
+    "build_client_pack_pdf function correctly implemented in pdf_report.py (lines 472-587)",
+    "ClientPackCard component correctly implemented in VoiceAssistant.jsx (lines 629-659) and mapped in ResultCard (line 301)"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration131_features.py"
+  ],
+  "success_rate": {
+    "backend": "100% (13/13 tests passed)",
+    "frontend": "100% (all tested features working)"
+  },
+  "test_credentials": "No auth needed - all endpoints are open",
+  "seed_data_creation": "None - used test payloads for PDF generation",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Iteration 131 verified: (1) /next-actions redirects to /next-best-actions, (2) /knowledge-graph redirects to /advisor-command-center, (3) Knowledge Graph nav item removed from Adviser Mode sidebar, (4) AI Knowledge Graph section integrated into Advisor Command Center with graph stats (nodes, relationships, insights, pending), query buttons, copilot input, and graph insights, (5) Voice command with client_pack intent returns client_pack type, (6) PDF generation for client_pack type returns valid PDF, (7) VoiceAssistant.jsx has ClientPackCard component mapped. All Knowledge Graph APIs (/api/graph/overview, /api/graph/insights) working. All Advisor Command Center APIs working.",
+  "features_tested": {
+    "health_endpoint": {
+      "status": "PASS",
+      "endpoint": "GET /api/health",
+      "notes": "Returns healthy status"
+    },
+    "route_redirect_next_actions": {
+      "status": "PASS",
+      "route": "/next-actions → /next-best-actions",
+      "notes": "React Router Navigate redirect working"
+    },
+    "route_redirect_knowledge_graph": {
+      "status": "PASS",
+      "route": "/knowledge-graph → /advisor-command-center",
+      "notes": "React Router Navigate redirect working"
+    },
+    "knowledge_graph_nav_removed": {
+      "status": "PASS",
+      "notes": "Knowledge Graph nav item NOT in Adviser Mode sidebar"
+    },
+    "graph_overview_api": {
+      "status": "PASS",
+      "endpoint": "GET /api/graph/overview",
+      "notes": "Returns graph statistics"
+    },
+    "graph_insights_api": {
+      "status": "PASS",
+      "endpoint": "GET /api/graph/insights",
+      "notes": "Returns insights list"
+    },
+    "command_center_daily_digest": {
+      "status": "PASS",
+      "endpoint": "GET /api/command-center/daily-digest",
+      "notes": "Returns daily digest data"
+    },
+    "monitoring_daily_scan": {
+      "status": "PASS",
+      "endpoint": "GET /api/monitoring/daily-scan",
+      "notes": "Returns monitoring alerts"
+    },
+    "practice_health_dashboard": {
+      "status": "PASS",
+      "endpoint": "GET /api/practice-health/dashboard",
+      "notes": "Returns practice health metrics"
+    },
+    "next_action_today": {
+      "status": "PASS",
+      "endpoint": "GET /api/next-action/today",
+      "notes": "Returns next best actions"
+    },
+    "voice_command_client_pack": {
+      "status": "PASS",
+      "endpoint": "POST /api/voice-command/process",
+      "notes": "Client pack intent recognized and processed"
+    },
+    "pdf_generation_client_pack": {
+      "status": "PASS",
+      "endpoint": "POST /api/pdf-report/generate",
+      "notes": "Returns valid PDF for client_pack type"
+    },
+    "advisor_command_center_dashboard": {
+      "status": "PASS",
+      "route": "/advisor-command-center",
+      "notes": "Dashboard loads with all zones: metrics, next actions, intelligence, insights, alerts, tasks, market, KG, meeting prep"
+    },
+    "ai_knowledge_graph_section": {
+      "status": "PASS",
+      "notes": "Graph stats, query buttons, copilot input, and insights visible in Advisor Command Center"
+    },
+    "voice_assistant_fab": {
+      "status": "PASS",
+      "data_testid": "voice-assistant-fab",
+      "notes": "Floating button visible at bottom-right"
+    }
+  },
+  "mocked_apis": {
+    "Most client data": "MOCK - CLIENT_FAMILY_DATA in App.js",
+    "Portfolio alerts": "MOCK - stubbed data",
+    "Practice health": "MOCK - stubbed metrics",
+    "Voice command": "REAL - GPT-5.2 via Emergent LLM key",
+    "Knowledge Graph": "REAL - GPT-5.2 via Emergent LLM key",
+    "PDF generation": "REAL - reportlab-based PDF generation"
+  }
+}

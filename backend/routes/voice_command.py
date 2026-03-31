@@ -181,6 +181,39 @@ RESPONSE TYPES - Choose the best match and ALWAYS return valid JSON:
   "disclaimer": "General information only. Seek professional advice for your specific situation."
 }}
 
+12. "client_pack" — Generate Client Pack (bundled quarterly review PDF)
+{{
+  "type": "client_pack",
+  "client_name": "str",
+  "pack_title": "str (e.g. Quarterly Review Pack - Q1 2026)",
+  "portfolio_summary": {{
+    "total_value": N,
+    "asset_allocation": [{{"asset_class": "str", "value": N, "percentage": "str"}}],
+    "top_holdings": [{{"name": "str", "value": N, "weight": "str", "return_ytd": "str"}}],
+    "cash_position": N
+  }},
+  "performance_report": {{
+    "period": "str (e.g. 1 Jan 2026 - 31 Mar 2026)",
+    "portfolio_return": "str",
+    "benchmark_return": "str",
+    "alpha": "str",
+    "commentary": "str",
+    "attribution": [{{"factor": "str", "contribution": "str"}}]
+  }},
+  "compliance_checklist": {{
+    "review_status": "str (Current/Overdue/Due Soon)",
+    "last_soa_date": "str",
+    "next_review_due": "str",
+    "fee_disclosure_current": true/false,
+    "risk_profile_current": true/false,
+    "items": [{{"item": "str", "status": "Complete/Pending/Overdue", "notes": "str"}}]
+  }},
+  "key_recommendations": ["str"],
+  "next_steps": ["str"],
+  "adviser_notes": "str",
+  "disclaimer": "This client pack is for internal adviser use and client review meetings. It does not constitute personal financial advice."
+}}
+
 AUSTRALIAN FINANCIAL RULES (apply to ALL calculations):
 - CGT: 50% discount for individuals/trusts holding assets >12 months. Small business 50% active asset reduction. Main residence exemption.
 - Franking credits: 30% corporate tax credit on fully franked dividends. Excess refundable for individuals. 45-day holding rule applies.

@@ -8,7 +8,7 @@ import {
   Mic, MicOff, Send, X, Loader2, Bot, User, AlertCircle, Calculator,
   TrendingUp, TrendingDown, Shield, CheckCircle, DollarSign, Building2,
   Landmark, Users as UsersIcon, Calendar, BarChart3, Target, Sparkles,
-  FileText, Scale, Heart, Briefcase, PieChart, BookOpen, XCircle, Download
+  FileText, Scale, Heart, Briefcase, PieChart, BookOpen, XCircle, Download, ArrowRight
 } from 'lucide-react';
 import { useLanguage } from './LanguageContext';
 
@@ -121,6 +121,7 @@ const VoiceAssistant = ({ isOpen, onClose, currentPath }) => {
       trust_strategy: () => `${r.trust_type || 'Trust'} strategy: ${r.summary || 'Analysis complete.'}`.slice(0, 200),
       scenario_analysis: () => r.summary || 'Scenario analysis complete.',
       stock_insight: () => r.summary || 'Market insight generated.',
+      client_pack: () => `Client Pack prepared for ${r.client_name || 'client'}: ${r.pack_title || 'Review Pack ready'}`,
       general: () => r.response || JSON.stringify(r)
     };
 
@@ -299,6 +300,7 @@ const ResultCard = ({ type, data }) => {
     trust_strategy: TrustCard,
     scenario_analysis: ScenarioCard,
     stock_insight: StockCard,
+    client_pack: ClientPackCard,
     general: GeneralCard,
   };
   const Comp = cards[type] || GeneralCard;
@@ -621,6 +623,40 @@ const StockCard = ({ data }) => (
       <div key={`dp-${i}`} className="flex justify-between text-xs"><span className="text-muted-foreground">{dp.label}</span><span className="font-semibold">{dp.value}</span></div>
     ))}
     {data.recommendation && <p className="text-xs text-blue-600 pt-1 border-t border-blue-200">{data.recommendation}</p>}
+  </div>
+);
+
+/* ─── Client Pack ─── */
+const ClientPackCard = ({ data }) => (
+  <div className="p-3 bg-gradient-to-br from-[#1a2744]/5 to-[#D4A84C]/10 rounded-xl border border-[#D4A84C]/30 space-y-2" data-testid="voice-client-pack-result">
+    <CardLabel icon={<FileText className="h-3 w-3" />} text={data.pack_title || "Client Review Pack"} color="amber" />
+    <p className="text-xs font-medium text-[#1a2744]">{data.client_name}</p>
+    {data.portfolio_summary && (
+      <div className="text-xs grid grid-cols-2 gap-1">
+        <MF label="Portfolio" value={fmt(data.portfolio_summary.total_value)} />
+        <MF label="Cash" value={fmt(data.portfolio_summary.cash_position)} />
+      </div>
+    )}
+    {data.performance_report && (
+      <div className="text-xs grid grid-cols-2 gap-1 pt-1 border-t border-[#D4A84C]/20">
+        <MF label="Return" value={data.performance_report.portfolio_return || 'N/A'} cn={String(data.performance_report.portfolio_return).includes('-') ? 'text-red-600' : 'text-green-600'} />
+        <MF label="Alpha" value={data.performance_report.alpha || 'N/A'} />
+      </div>
+    )}
+    {data.compliance_checklist && (
+      <div className="text-xs pt-1 border-t border-[#D4A84C]/20">
+        <MF label="Review Status" value={data.compliance_checklist.review_status || 'N/A'} cn={data.compliance_checklist.review_status === 'Overdue' ? 'text-red-600' : 'text-green-600'} />
+      </div>
+    )}
+    <Recs items={data.key_recommendations} />
+    {data.next_steps?.length > 0 && (
+      <div className="text-xs space-y-1 pt-1 border-t border-[#D4A84C]/20">
+        <p className="font-semibold text-[#1a2744]">Next Steps</p>
+        {data.next_steps.slice(0, 3).map((s, i) => (
+          <p key={`ns-${i}`} className="flex items-start gap-1"><ArrowRight className="h-3 w-3 text-[#D4A84C] flex-shrink-0 mt-0.5" />{s}</p>
+        ))}
+      </div>
+    )}
   </div>
 );
 

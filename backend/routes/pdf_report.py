@@ -470,6 +470,145 @@ def build_generic_pdf(data: dict, title: str = "Analysis Report") -> io.BytesIO:
     return buf
 
 
+def build_client_pack_pdf(data: dict) -> io.BytesIO:
+    """Build a multi-section Client Review Pack PDF."""
+    buf = io.BytesIO()
+    doc = SimpleDocTemplate(buf, pagesize=A4, leftMargin=20 * mm, rightMargin=20 * mm, topMargin=15 * mm, bottomMargin=15 * mm)
+    s = build_styles()
+    el: list = []
+
+    client_name = data.get("client_name", "Client")
+    pack_title = data.get("pack_title", "Client Review Pack")
+    add_header(el, s, pack_title, f"Prepared for: {client_name}")
+
+    # ── SECTION 1: Portfolio Summary ──
+    ps = data.get("portfolio_summary", {})
+    if ps:
+        el.append(Paragraph("Portfolio Summary", s["h2"]))
+        summary_items = [("Total Value", fmt_cur(ps.get("total_value"))), ("Cash Position", fmt_cur(ps.get("cash_position")))]
+        el.append(metrics_table(summary_items))
+        el.append(Spacer(1, 3 * mm))
+
+        # Asset allocation table
+        alloc = ps.get("asset_allocation", [])
+        if alloc:
+            el.append(Paragraph("Asset Allocation", s["h3"]))
+            alloc_data = [["Asset Class", "Value", "Weight"]]
+            for a in alloc:
+                alloc_data.append([str(a.get("asset_class", "")), fmt_cur(a.get("value")), str(a.get("percentage", ""))])
+            t = Table(alloc_data, colWidths=[200, 160, 160])
+            t.setStyle(TableStyle([
+                ("BACKGROUND", (0, 0), (-1, 0), NAVY), ("TEXTCOLOR", (0, 0), (-1, 0), WHITE),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"), ("FONTSIZE", (0, 0), (-1, -1), 9),
+                ("BACKGROUND", (0, 1), (-1, -1), LIGHT_GRAY),
+                ("BOX", (0, 0), (-1, -1), 0.5, MEDIUM_GRAY), ("INNERGRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#E0E0E0")),
+                ("TOPPADDING", (0, 0), (-1, -1), 4), ("BOTTOMPADDING", (0, 0), (-1, -1), 4), ("LEFTPADDING", (0, 0), (-1, -1), 6),
+            ]))
+            el.append(t)
+            el.append(Spacer(1, 3 * mm))
+
+        # Top holdings
+        holdings = ps.get("top_holdings", [])
+        if holdings:
+            el.append(Paragraph("Top Holdings", s["h3"]))
+            hold_data = [["Holding", "Value", "Weight", "YTD Return"]]
+            for h in holdings:
+                hold_data.append([str(h.get("name", "")), fmt_cur(h.get("value")), str(h.get("weight", "")), str(h.get("return_ytd", ""))])
+            t = Table(hold_data, colWidths=[180, 120, 100, 120])
+            t.setStyle(TableStyle([
+                ("BACKGROUND", (0, 0), (-1, 0), NAVY), ("TEXTCOLOR", (0, 0), (-1, 0), WHITE),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"), ("FONTSIZE", (0, 0), (-1, -1), 9),
+                ("BACKGROUND", (0, 1), (-1, -1), LIGHT_GRAY),
+                ("BOX", (0, 0), (-1, -1), 0.5, MEDIUM_GRAY), ("INNERGRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#E0E0E0")),
+                ("TOPPADDING", (0, 0), (-1, -1), 4), ("BOTTOMPADDING", (0, 0), (-1, -1), 4), ("LEFTPADDING", (0, 0), (-1, -1), 6),
+            ]))
+            el.append(t)
+
+    # ── SECTION 2: Performance Report ──
+    perf = data.get("performance_report", {})
+    if perf:
+        el.append(Spacer(1, 4 * mm))
+        el.append(Paragraph("Performance Report", s["h2"]))
+        perf_items = [
+            ("Period", str(perf.get("period", ""))),
+            ("Portfolio Return", str(perf.get("portfolio_return", ""))),
+            ("Benchmark Return", str(perf.get("benchmark_return", ""))),
+            ("Alpha", str(perf.get("alpha", ""))),
+        ]
+        el.append(metrics_table(perf_items))
+        if perf.get("commentary"):
+            el.append(Spacer(1, 2 * mm))
+            el.append(Paragraph(perf["commentary"], s["body"]))
+        attr = perf.get("attribution", [])
+        if attr:
+            el.append(Paragraph("Performance Attribution", s["h3"]))
+            attr_data = [["Factor", "Contribution"]]
+            for a in attr:
+                attr_data.append([str(a.get("factor", "")), str(a.get("contribution", ""))])
+            t = Table(attr_data, colWidths=[300, 220])
+            t.setStyle(TableStyle([
+                ("BACKGROUND", (0, 0), (-1, 0), NAVY), ("TEXTCOLOR", (0, 0), (-1, 0), WHITE),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"), ("FONTSIZE", (0, 0), (-1, -1), 9),
+                ("BACKGROUND", (0, 1), (-1, -1), LIGHT_GRAY),
+                ("BOX", (0, 0), (-1, -1), 0.5, MEDIUM_GRAY), ("INNERGRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#E0E0E0")),
+                ("TOPPADDING", (0, 0), (-1, -1), 4), ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+            ]))
+            el.append(t)
+
+    # ── SECTION 3: Compliance Checklist ──
+    comp = data.get("compliance_checklist", {})
+    if comp:
+        el.append(Spacer(1, 4 * mm))
+        el.append(Paragraph("Compliance Checklist", s["h2"]))
+        comp_items = [
+            ("Review Status", str(comp.get("review_status", "N/A"))),
+            ("Last SOA", str(comp.get("last_soa_date", "N/A"))),
+            ("Next Review", str(comp.get("next_review_due", "N/A"))),
+        ]
+        el.append(metrics_table(comp_items))
+
+        # Status flags
+        flags = []
+        if comp.get("fee_disclosure_current") is not None:
+            flags.append(f"Fee Disclosure: {'Current' if comp['fee_disclosure_current'] else 'OVERDUE'}")
+        if comp.get("risk_profile_current") is not None:
+            flags.append(f"Risk Profile: {'Current' if comp['risk_profile_current'] else 'NEEDS UPDATE'}")
+        if flags:
+            el.append(Paragraph(" | ".join(flags), s["body"]))
+
+        items = comp.get("items", [])
+        if items:
+            el.append(Spacer(1, 2 * mm))
+            el.append(checklist_table([
+                {"item": it.get("item", ""), "status": it.get("status", ""), "action_needed": it.get("notes", "")}
+                for it in items
+            ]))
+
+    # ── SECTION 4: Recommendations & Next Steps ──
+    recs = data.get("key_recommendations", [])
+    if recs:
+        el.append(Spacer(1, 4 * mm))
+        el.append(Paragraph("Key Recommendations", s["h2"]))
+        for rec in recs:
+            el.append(Paragraph(f"  {rec}", s["rec"]))
+
+    steps = data.get("next_steps", [])
+    if steps:
+        el.append(Paragraph("Next Steps", s["h2"]))
+        for step in steps:
+            el.append(Paragraph(f"  {step}", s["rec"]))
+
+    if data.get("adviser_notes"):
+        el.append(Paragraph("Adviser Notes", s["h2"]))
+        el.append(Paragraph(data["adviser_notes"], s["body"]))
+
+    add_disclaimer(el, s, data.get("disclaimer", "This client pack is for internal adviser use and client review meetings."))
+    doc.build(el)
+    buf.seek(0)
+    return buf
+
+
+
 TYPE_TITLES = {
     "retirement_analysis": "Retirement Analysis Report",
     "buffett_analysis": "Buffett Investment Analysis",
@@ -481,6 +620,7 @@ TYPE_TITLES = {
     "investment_comparison": "Investment Comparison Report",
     "scenario_analysis": "Scenario Analysis Report",
     "stock_insight": "Market Insight Report",
+    "client_pack": "Client Review Pack",
     "general": "Financial Analysis Report",
 }
 
@@ -505,6 +645,8 @@ async def generate_pdf(request: PDFRequest) -> StreamingResponse:
             buf = build_buffett_pdf(data)
         elif rtype == "soa_draft":
             buf = build_soa_pdf(data)
+        elif rtype == "client_pack":
+            buf = build_client_pack_pdf(data)
         else:
             buf = build_generic_pdf(data, title)
 

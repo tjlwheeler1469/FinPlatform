@@ -7,7 +7,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://secure-rebuild-3.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://voice-wealth-engine.preview.emergentagent.com').rstrip('/')
 
 class TestHealthAndStatus:
     """Health check and version verification"""

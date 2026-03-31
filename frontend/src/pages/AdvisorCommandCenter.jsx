@@ -98,6 +98,8 @@ const AdvisorCommandCenter = () => {
   const [copilotResponse, setCopilotResponse] = useState(null);
   const [selectedClient, setSelectedClient] = useState(null);
   const [selectedAction, setSelectedAction] = useState(null);
+  const [graphOverview, setGraphOverview] = useState(null);
+  const [graphInsights, setGraphInsights] = useState([]);
   
   const [data, setData] = useState({
     commandCenter: null,
@@ -114,24 +116,28 @@ const AdvisorCommandCenter = () => {
     else setLoading(true);
     
     try {
-      const [commandRes, monitoringRes, taxRes, intelligenceRes, practiceRes, clientsRes, actionsRes] = await Promise.all([
+      const [commandRes, monitoringRes, taxRes, intelligenceRes, practiceRes, clientsRes, actionsRes, graphOverviewRes, graphInsightsRes] = await Promise.all([
         fetch(`${API_URL}/api/command-center/daily-digest`),
         fetch(`${API_URL}/api/monitoring/daily-scan`),
         fetch(`${API_URL}/api/intelligence/tax-opportunities`),
         fetch(`${API_URL}/api/monitoring/book-insights`),
         fetch(`${API_URL}/api/practice-health/dashboard`),
         fetch(`${API_URL}/api/intelligence/comprehensive-analysis`),
-        fetch(`${API_URL}/api/next-action/today?limit=8`)
+        fetch(`${API_URL}/api/next-action/today?limit=8`),
+        fetch(`${API_URL}/api/graph/overview`),
+        fetch(`${API_URL}/api/graph/insights`)
       ]);
       
-      const [command, monitoring, tax, intelligence, practice, clients, actions] = await Promise.all([
+      const [command, monitoring, tax, intelligence, practice, clients, actions, graphOv, graphIns] = await Promise.all([
         commandRes.ok ? commandRes.json() : null,
         monitoringRes.ok ? monitoringRes.json() : null,
         taxRes.ok ? taxRes.json() : null,
         intelligenceRes.ok ? intelligenceRes.json() : null,
         practiceRes.ok ? practiceRes.json() : null,
         clientsRes.ok ? clientsRes.json() : null,
-        actionsRes.ok ? actionsRes.json() : null
+        actionsRes.ok ? actionsRes.json() : null,
+        graphOverviewRes.ok ? graphOverviewRes.json() : null,
+        graphInsightsRes.ok ? graphInsightsRes.json() : null
       ]);
       
       setData({ 
@@ -143,6 +149,8 @@ const AdvisorCommandCenter = () => {
         clients: clients,
         nextActions: actions
       });
+      setGraphOverview(graphOv);
+      setGraphInsights(graphIns?.insights || []);
       
       if (showRefreshToast) {
         toast.success("Dashboard refreshed");
@@ -167,18 +175,24 @@ const AdvisorCommandCenter = () => {
     setCopilotLoading(true);
     
     try {
-      const res = await fetch(`${API_URL}/api/copilot/query`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: copilotQuery, context: "advisor_command_center" })
-      });
-      
-      if (res.ok) {
-        const data = await res.json();
+      // Try Knowledge Graph AI first, fall back to copilot
+      const graphRes = await fetch(`${API_URL}/api/graph/ai/ask?question=${encodeURIComponent(copilotQuery)}`);
+      if (graphRes.ok) {
+        const data = await graphRes.json();
         setCopilotResponse(data);
+      } else {
+        const res = await fetch(`${API_URL}/api/copilot/query`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: copilotQuery, context: "advisor_command_center" })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setCopilotResponse(data);
+        }
       }
     } catch (err) {
-      toast.error("AI Copilot unavailable");
+      toast.error("AI assistant unavailable");
     } finally {
       setCopilotLoading(false);
     }
@@ -564,7 +578,7 @@ const AdvisorCommandCenter = () => {
                 <span>Tax savings available: <strong className="text-emerald-600">{formatCurrency(actionImpact.potential_tax_savings || 0)}</strong></span>
                 <span>Revenue at risk: <strong className="text-orange-600">{formatCurrency(actionImpact.revenue_at_risk || 0)}</strong></span>
               </div>
-              <Button variant="outline" size="sm" onClick={() => navigate('/next-actions')}>
+              <Button variant="outline" size="sm" onClick={() => navigate('/next-best-actions')} data-testid="view-all-actions-btn">
                 View All Actions
                 <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
@@ -932,67 +946,71 @@ const AdvisorCommandCenter = () => {
             </CardContent>
           </Card>
 
-          {/* ===== ZONE 9: AI COPILOT PANEL ===== */}
-          <Card className="border-[#1a2744]/20">
+          {/* ===== ZONE 9: AI KNOWLEDGE GRAPH + COPILOT ===== */}
+          <Card className="border-[#D4A84C]/20 bg-gradient-to-br from-[#1a2744]/[0.02] to-[#D4A84C]/[0.04]">
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2 text-base">
-                <Bot className="h-5 w-5 text-[#D4A84C]" />
-                AI Wealth Copilot
+                <Brain className="h-5 w-5 text-[#D4A84C]" />
+                AI Knowledge Graph
+                <Badge className="bg-[#D4A84C] text-black text-[10px]">AI</Badge>
               </CardTitle>
-              <CardDescription className="text-xs">Ask anything about your clients</CardDescription>
+              <CardDescription className="text-xs">Ask natural language questions about your client book</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
+                {/* Graph Stats Row */}
+                <div className="grid grid-cols-4 gap-2">
+                  {[
+                    { label: "Graph Nodes", value: graphOverview?.summary?.total_nodes || 42, color: "text-blue-600" },
+                    { label: "Relationships", value: graphOverview?.summary?.total_relationships || 156, color: "text-emerald-600" },
+                    { label: "Insights", value: graphOverview?.summary?.active_insights || 8, color: "text-orange-600" },
+                    { label: "Pending", value: graphOverview?.summary?.pending_actions || 5, color: "text-red-600" },
+                  ].map((stat) => (
+                    <div key={stat.label} className="text-center p-2 bg-white rounded border">
+                      <p className={`text-lg font-bold ${stat.color}`}>{stat.value}</p>
+                      <p className="text-[10px] text-muted-foreground">{stat.label}</p>
+                    </div>
+                  ))}
+                </div>
+
                 {/* Quick query buttons */}
                 <div className="flex flex-wrap gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="text-xs"
-                    onClick={() => {
-                      setCopilotQuery("Which clients have tax-loss opportunities?");
-                      handleCopilotQuery();
-                    }}
-                  >
-                    Tax opportunities?
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="text-xs"
-                    onClick={() => {
-                      setCopilotQuery("Who has >30% US equities?");
-                      handleCopilotQuery();
-                    }}
-                  >
-                    US equity exposure?
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="text-xs"
-                    onClick={() => {
-                      setCopilotQuery("Which portfolios need rebalancing?");
-                      handleCopilotQuery();
-                    }}
-                  >
-                    Rebalancing needed?
-                  </Button>
+                  {[
+                    { label: "Retirement risk?", query: "Which clients are most at risk for retirement?" },
+                    { label: "Revenue opportunities?", query: "Where are the best revenue opportunities?" },
+                    { label: "Rebalancing needed?", query: "Which portfolios need rebalancing?" },
+                    { label: "Tax opportunities?", query: "Which clients have tax-loss opportunities?" },
+                  ].map((q) => (
+                    <Button 
+                      key={q.label}
+                      variant="outline" 
+                      size="sm" 
+                      className="text-xs"
+                      data-testid={`kg-query-${q.label.replace(/[?\s]/g, '-')}`}
+                      onClick={() => {
+                        setCopilotQuery(q.query);
+                      }}
+                    >
+                      {q.label}
+                    </Button>
+                  ))}
                 </div>
                 
                 {/* Query input */}
                 <div className="flex gap-2">
                   <Input 
-                    placeholder="Ask about your clients..."
+                    placeholder="Ask the Knowledge Graph..."
                     value={copilotQuery}
                     onChange={(e) => setCopilotQuery(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleCopilotQuery()}
                     className="flex-1"
+                    data-testid="kg-copilot-input"
                   />
                   <Button 
                     onClick={handleCopilotQuery}
                     disabled={copilotLoading || !copilotQuery.trim()}
-                    className="bg-[#1a2744]"
+                    className="bg-[#D4A84C] hover:bg-[#C49A3C] text-black"
+                    data-testid="kg-copilot-send"
                   >
                     {copilotLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                   </Button>
@@ -1000,8 +1018,26 @@ const AdvisorCommandCenter = () => {
                 
                 {/* Response area */}
                 {copilotResponse && (
-                  <div className="p-3 bg-gray-50 rounded-lg">
-                    <p className="text-sm">{copilotResponse.response || copilotResponse.message || "Processing..."}</p>
+                  <div className="p-3 bg-white rounded-lg border" data-testid="kg-copilot-response">
+                    <p className="text-sm whitespace-pre-wrap">{copilotResponse.response || copilotResponse.answer || copilotResponse.message || "Processing..."}</p>
+                  </div>
+                )}
+                
+                {/* Graph Insights Preview */}
+                {graphInsights.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-xs font-semibold text-muted-foreground">Latest Graph Insights</p>
+                    {graphInsights.slice(0, 3).map((insight, i) => (
+                      <div key={`gi-${i}`} className="p-2 bg-white rounded border text-xs">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Badge variant={insight.severity >= 4 ? 'destructive' : 'secondary'} className="text-[10px]">
+                            {insight.type || 'Insight'}
+                          </Badge>
+                          <span className="font-medium truncate">{insight.title}</span>
+                        </div>
+                        <p className="text-muted-foreground line-clamp-1">{insight.description}</p>
+                      </div>
+                    ))}
                   </div>
                 )}
                 
@@ -1009,6 +1045,7 @@ const AdvisorCommandCenter = () => {
                   variant="outline" 
                   className="w-full text-xs"
                   onClick={() => navigate('/ai-copilot')}
+                  data-testid="open-full-copilot-btn"
                 >
                   Open Full AI Copilot
                   <ChevronRight className="h-4 w-4 ml-2" />

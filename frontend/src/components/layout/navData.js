@@ -4,7 +4,7 @@ import {
   Users, Lightbulb, PieChart, CalendarDays, Eye, LineChart,
   Target, Activity, Bot, Upload, Database, Link2, Shield,
   UserPlus, Sparkles, Bell, Zap, CreditCard,
-  Settings, MessageSquare, Brain, ListTodo, Video, Network,
+  Settings, MessageSquare, Brain, ListTodo, Video,
   Bitcoin, Coins, Cable, Gauge, Calendar, TrendingUp as TrendingUpIcon
 } from "lucide-react";
 
@@ -73,7 +73,7 @@ export const adviserBaseNav = [
       { path: "/advisor-command-center", label: "Command Center", icon: LayoutDashboard, title: "Advisor Command Center" },
       { path: "/daily-briefing", label: "Daily Briefing", icon: Calendar, title: "Daily Briefing", badge: "NEW" },
       { path: "/macro-dashboard", label: "Markets", icon: BarChart3, title: "Live Markets", badge: "LIVE" },
-      { path: "/knowledge-graph", label: "Knowledge Graph", icon: Network, title: "AI Intelligence", badge: "AI" },
+      
     ]
   },
   {

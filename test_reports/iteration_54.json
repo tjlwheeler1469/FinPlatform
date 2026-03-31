@@ -37,7 +37,7 @@
     "frontend": "100% (Notification Center and Data Aggregators pages working)"
   },
   "test_credentials": {
-    "api_base_url": "https://secure-rebuild-3.preview.emergentagent.com"
+    "api_base_url": "https://voice-wealth-engine.preview.emergentagent.com"
   },
   "seed_data_creation": "None - uses mock data in notifications.py and data_aggregators.py",
   "retest_needed": false,

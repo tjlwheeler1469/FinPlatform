@@ -35,7 +35,7 @@
     "frontend": "100% (Both /feedback-analytics and /realtime-data pages load correctly)"
   },
   "test_credentials": {
-    "api_base_url": "https://secure-rebuild-3.preview.emergentagent.com"
+    "api_base_url": "https://voice-wealth-engine.preview.emergentagent.com"
   },
   "seed_data_creation": "No seed data needed - all APIs use in-memory demo data",
   "retest_needed": false,
