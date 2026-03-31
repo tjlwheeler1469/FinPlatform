@@ -31,35 +31,9 @@ import {
   Database
 } from "lucide-react";
 import { toast } from "sonner";
+import { generateSecret, generateBackupCodes, verifyTOTP, formatSecret } from "./mfaUtils";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || "";
-
-// Generate mock TOTP secret
-const generateSecret = () => {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-  let secret = '';
-  for (let i = 0; i < 32; i++) {
-    secret += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return secret;
-};
-
-// Generate mock backup codes
-const generateBackupCodes = () => {
-  const codes = [];
-  for (let i = 0; i < 10; i++) {
-    const code = Math.random().toString(36).substring(2, 6).toUpperCase() + '-' +
-                 Math.random().toString(36).substring(2, 6).toUpperCase();
-    codes.push({ code, used: false });
-  }
-  return codes;
-};
-
-// Mock TOTP verification (in production, this would verify against actual TOTP)
-const verifyTOTP = (code) => {
-  // Accept any 6-digit code for mock purposes
-  return /^\d{6}$/.test(code);
-};
 
 const MFASetup = ({ userId, userEmail, onMFAEnabled, onMFADisabled }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -255,11 +229,6 @@ const MFASetup = ({ userId, userEmail, onMFAEnabled, onMFADisabled }) => {
     setMfaStatus(updatedStatus);
     toast.success("New backup codes generated");
     setShowBackupCodes(true);
-  };
-
-  // Format secret for display (groups of 4)
-  const formatSecret = (secret) => {
-    return secret?.match(/.{1,4}/g)?.join(' ') || '';
   };
 
   // Show loading state

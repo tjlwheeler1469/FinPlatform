@@ -32,7 +32,7 @@
     "frontend": "100% (all features verified)"
   },
   "test_credentials": {
-    "preview_url": "https://dashboard-split-1.preview.emergentagent.com",
+    "preview_url": "https://secure-rebuild-3.preview.emergentagent.com",
     "compliance_bypass": "localStorage.setItem('wealth_command_compliance_v5', 'permanent')"
   },
   "seed_data_creation": "None",
