@@ -1,0 +1,95 @@
+{
+  "summary": "Iteration 137 - Frontend testing for bug fixes: Health Score header hidden, Daily Briefing header hidden, Budget page and sidebar. 8/9 tests passed. One issue found: Budget link not visible in Client Context sidebar PLANNING section (section doesn't expand when clicked from other pages).",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Client Context Sidebar - PLANNING section",
+        "issue": "Budget link not visible when PLANNING section is clicked to expand from Client Context mode. The section appears to not expand properly. However, navigating directly to /budget shows Budget correctly in Personal Mode sidebar.",
+        "selector": "aside button:has-text('PLANNING')",
+        "priority": "MEDIUM"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "All pages",
+        "issues": ["Compliance Modal appears on page load blocking interactions - user must dismiss it before interacting. Known from previous iterations."]
+      },
+      {
+        "screen": "Charts",
+        "issues": ["Recharts console warnings about width/height -1 on initial render - cosmetic only, charts render correctly after layout settles"]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_137.json"
+  ],
+  "action_items": [
+    "Verify Client Context sidebar PLANNING section expands correctly to show Budget and Actions links"
+  ],
+  "critical_code_review_comments": [
+    "navData.js correctly defines Budget in both personalNavGroups (line 26) and clientContextNav (line 131) under Planning section",
+    "DecisionEngine.jsx correctly implements embedded prop to hide header (line 131)",
+    "DailyBriefing.jsx correctly implements embedded prop to hide header (line 245)",
+    "HouseholdBudget.jsx has proper data-testid attributes for testing"
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "N/A (frontend only testing)",
+    "frontend": "89% (8/9 tests passed)"
+  },
+  "test_credentials": "No auth required - public access",
+  "seed_data_creation": "None - used existing DEMO_CLIENT_DATA",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All major features working: Health Score tab hides 'Financial Decision Engine' header when embedded, Daily Briefing tab hides header when embedded, Budget page loads at /budget with income/expenses/cashflow charts, Investments page has 9+ tabs including SMSF, Client Context /dashboard has 5 tabs. One issue: Client Context sidebar PLANNING section may not expand properly to show Budget link - needs verification.",
+  "features_tested": {
+    "health_score_header_hidden": {
+      "status": "PASS",
+      "details": "Health Score tab in Client Context /dashboard does NOT show 'Financial Decision Engine' header - embedded prop working correctly"
+    },
+    "daily_briefing_header_hidden": {
+      "status": "PASS",
+      "details": "Daily Briefing tab in Adviser Command Center does NOT show 'Daily Briefing' header - embedded prop working correctly"
+    },
+    "budget_page_loads": {
+      "status": "PASS",
+      "details": "Budget page at /budget loads HouseholdBudget with income, expenses, and cashflow charts (data-testid='household-budget-page')"
+    },
+    "personal_mode_sidebar_budget": {
+      "status": "PASS",
+      "details": "Personal Mode sidebar PLANNING section includes Budget (NEW) entry - visible when navigating to /budget"
+    },
+    "client_context_sidebar_budget": {
+      "status": "FAIL",
+      "details": "Client Context sidebar PLANNING section does not expand to show Budget link when clicked. navData.js has correct entry but sidebar section doesn't expand."
+    },
+    "client_context_5_tabs": {
+      "status": "PASS",
+      "details": "Client Context /dashboard shows 5 tabs: Overview, Net Worth, Wealth Trends, Health Score, Goals & Scenarios"
+    },
+    "goals_scenarios_tab": {
+      "status": "PASS",
+      "details": "Goals & Scenarios tab content loads without duplicate headers"
+    },
+    "homepage_no_runtime_errors": {
+      "status": "PASS",
+      "details": "Homepage loads without runtime errors (Chrome extension errors are external, not app code)"
+    },
+    "investments_page_9_tabs": {
+      "status": "PASS",
+      "details": "Investments page at /investments loads with 13 tabs including SMSF (more than required 9)"
+    }
+  },
+  "mocked_apis": {
+    "has_mocked_apis": true,
+    "mocked_apis_list": [
+      "DEMO_CLIENT_DATA in Client360View.jsx",
+      "HouseholdBudget demo data"
+    ]
+  }
+}

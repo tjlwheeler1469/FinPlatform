@@ -23,6 +23,7 @@ export const personalNavGroups = [
     items: [
       { path: "/retirement-confidence", label: "Retirement", icon: Gauge, title: "Retirement Planning & Confidence", badge: "PRO" },
       { path: "/scenario-modelling", label: "Goals & Scenarios", icon: Target, title: "Goals, Scenarios & Monte Carlo" },
+      { path: "/budget", label: "Budget", icon: PiggyBank, title: "Budget Management", badge: "NEW" },
       { path: "/portfolio-rebalancing", label: "Rebalancing", icon: BarChart3, title: "Portfolio Rebalancing" },
       { path: "/stock-research", label: "Research Centre", icon: LineChart, title: "Research & Comparison", badge: "NEW" },
     ]
@@ -127,6 +128,7 @@ export const clientContextNav = [
     icon: Target,
     items: [
       { path: "/next-best-actions", label: "Actions", icon: Zap, title: "Next Best Actions" },
+      { path: "/budget", label: "Budget", icon: PiggyBank, title: "Budget Management", badge: "NEW" },
     ]
   },
   {

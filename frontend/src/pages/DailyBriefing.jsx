@@ -241,7 +241,8 @@ const DailyBriefing = ({ embedded = false }) => {
 
   const content = (
       <div className="space-y-6" data-testid="daily-briefing">
-        {/* Header */}
+        {/* Header - hidden when embedded */}
+        {!embedded && (
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-2">
@@ -259,6 +260,7 @@ const DailyBriefing = ({ embedded = false }) => {
             </Button>
           </div>
         </div>
+        )}
 
         {/* Summary Cards */}
         <div className="grid md:grid-cols-5 gap-4">

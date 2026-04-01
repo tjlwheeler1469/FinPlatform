@@ -127,7 +127,8 @@ const DecisionEngine = ({ embedded = false }) => {
 
   const content = (
       <div className="space-y-6" data-testid="decision-engine-page">
-        {/* Header */}
+        {/* Header - hidden when embedded */}
+        {!embedded && (
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-foreground">
@@ -151,6 +152,7 @@ const DecisionEngine = ({ embedded = false }) => {
             </Button>
           </div>
         </div>
+        )}
 
         {/* Health Score + Total Impact */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
