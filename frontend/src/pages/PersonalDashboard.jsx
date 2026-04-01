@@ -1,6 +1,7 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, lazy, Suspense } from 'react';
 import Layout from '@/components/Layout';
 import SmartInsights from '@/components/SmartInsights';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -26,13 +27,15 @@ import {
   RefreshCw, Target, Clock, DollarSign, Users, Eye, ChevronRight,
   CheckCircle2, XCircle, ArrowUp, ArrowDown, PieChart, Wallet,
   Lightbulb, Calendar, Bell, Activity, FileText, Building2, Landmark,
-  BarChart3, ArrowLeftRight, AlertCircle, Sun, Settings, Edit2, User
+  BarChart3, ArrowLeftRight, AlertCircle, Sun, Settings, Edit2, User, Loader2
 } from 'lucide-react';
 import {
   PieChart as RechartsPie, Pie, Cell, BarChart, Bar, XAxis, YAxis,
   CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadialBarChart,
   RadialBar, LineChart, Line, AreaChart, Area
 } from 'recharts';
+
+const NetWorthTrend = lazy(() => import("@/pages/NetWorthTrend"));
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || '';
 
@@ -651,17 +654,17 @@ const PersonalDashboard = ({ embedded = false }) => {
               <Gauge className="h-4 w-4" />
               Retirement
             </TabsTrigger>
-            <TabsTrigger value="portfolio" className="flex items-center gap-1" data-testid="tab-portfolio">
-              <PieChart className="h-4 w-4" />
-              Portfolio
+            <TabsTrigger value="insights" className="flex items-center gap-1" data-testid="tab-insights">
+              <Brain className="h-4 w-4" />
+              Insights
+            </TabsTrigger>
+            <TabsTrigger value="wealth-trends" className="flex items-center gap-1" data-testid="tab-wealth-trends">
+              <TrendingUp className="h-4 w-4" />
+              Wealth Trends
             </TabsTrigger>
             <TabsTrigger value="assets" className="flex items-center gap-1" data-testid="tab-assets">
               <Wallet className="h-4 w-4" />
               Assets
-            </TabsTrigger>
-            <TabsTrigger value="insights" className="flex items-center gap-1" data-testid="tab-insights">
-              <Brain className="h-4 w-4" />
-              Insights
             </TabsTrigger>
           </TabsList>
 
@@ -841,6 +844,102 @@ const PersonalDashboard = ({ embedded = false }) => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Portfolio & Net Worth (merged) */}
+            <div className="grid lg:grid-cols-2 gap-6">
+              {/* Asset Allocation */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <PieChart className="h-5 w-5 text-blue-500" />
+                    Asset Allocation
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[250px]">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+                      <RechartsPie>
+                        <Pie
+                          data={allocationData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={100}
+                          paddingAngle={2}
+                          dataKey="value"
+                        >
+                          {allocationData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip formatter={(value) => formatCurrency(value)} />
+                        <Legend />
+                      </RechartsPie>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Entity Breakdown */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Building2 className="h-5 w-5 text-purple-500" />
+                    Holdings by Entity
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[250px]">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+                      <BarChart data={entityData} layout="vertical">
+                        <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
+                        <XAxis type="number" tickFormatter={(v) => `$${(v/1000000).toFixed(1)}M`} />
+                        <YAxis dataKey="name" type="category" width={80} />
+                        <Tooltip formatter={(value) => formatCurrency(value)} />
+                        <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+                          {entityData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Portfolio Rebalancing */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ArrowLeftRight className="h-5 w-5 text-amber-500" />
+                  Portfolio Rebalancing Suggestions
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {mockRebalancing.map((item, index) => (
+                    <div key={`item-${index}`} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                      <div className="flex items-center gap-4">
+                        <span className="font-medium w-40">{item.asset}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-muted-foreground">Current: {item.current}%</span>
+                          <ChevronRight className="h-4 w-4" />
+                          <span className="text-sm font-medium">Target: {item.target}%</span>
+                        </div>
+                      </div>
+                      <Badge className={
+                        item.action === 'Buy' ? 'bg-green-500' : 
+                        item.action === 'Sell' ? 'bg-red-500' : 
+                        'bg-gray-500'
+                      }>
+                        {item.action} {Math.abs(item.diff)}%
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* ==================== TAB 2: RETIREMENT ==================== */}
@@ -965,105 +1064,27 @@ const PersonalDashboard = ({ embedded = false }) => {
             </Card>
           </TabsContent>
 
-          {/* ==================== TAB 3: PORTFOLIO ==================== */}
-          <TabsContent value="portfolio" className="space-y-6">
-            <div className="grid lg:grid-cols-2 gap-6">
-              {/* Asset Allocation */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <PieChart className="h-5 w-5 text-blue-500" />
-                    Asset Allocation
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[250px]">
-                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-                      <RechartsPie>
-                        <Pie
-                          data={allocationData}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={60}
-                          outerRadius={100}
-                          paddingAngle={2}
-                          dataKey="value"
-                        >
-                          {allocationData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
-                        </Pie>
-                        <Tooltip formatter={(value) => formatCurrency(value)} />
-                        <Legend />
-                      </RechartsPie>
-                    </ResponsiveContainer>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Entity Breakdown */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Building2 className="h-5 w-5 text-purple-500" />
-                    Holdings by Entity
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[250px]">
-                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-                      <BarChart data={entityData} layout="vertical">
-                        <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
-                        <XAxis type="number" tickFormatter={(v) => `$${(v/1000000).toFixed(1)}M`} />
-                        <YAxis dataKey="name" type="category" width={80} />
-                        <Tooltip formatter={(value) => formatCurrency(value)} />
-                        <Bar dataKey="value" radius={[0, 4, 4, 0]}>
-                          {entityData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
-                        </Bar>
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Portfolio Rebalancing */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ArrowLeftRight className="h-5 w-5 text-amber-500" />
-                  Portfolio Rebalancing Suggestions
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {mockRebalancing.map((item, index) => (
-                    <div key={`item-${index}`} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-                      <div className="flex items-center gap-4">
-                        <span className="font-medium w-40">{item.asset}</span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-muted-foreground">Current: {item.current}%</span>
-                          <ChevronRight className="h-4 w-4" />
-                          <span className="text-sm font-medium">Target: {item.target}%</span>
-                        </div>
-                      </div>
-                      <Badge className={
-                        item.action === 'Buy' ? 'bg-green-500' : 
-                        item.action === 'Sell' ? 'bg-red-500' : 
-                        'bg-gray-500'
-                      }>
-                        {item.action} {Math.abs(item.diff)}%
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+          {/* ==================== TAB 3: INSIGHTS (Full Smart Insights) ==================== */}
+          <TabsContent value="insights" className="space-y-6">
+            <SmartInsights 
+              clientId="thompson_family"
+              portfolioData={portfolioDataForInsights}
+              retirementData={retirementData}
+              isAdvisor={false}
+              compact={false}
+            />
           </TabsContent>
 
-          {/* ==================== TAB 4: ASSETS ==================== */}
+          {/* ==================== TAB 4: WEALTH TRENDS ==================== */}
+          <TabsContent value="wealth-trends" className="space-y-6">
+            <ErrorBoundary label="Wealth Trends">
+              <Suspense fallback={<div className="flex items-center justify-center py-20"><Loader2 className="h-6 w-6 animate-spin text-[#D4A84C]" /></div>}>
+                <NetWorthTrend embedded />
+              </Suspense>
+            </ErrorBoundary>
+          </TabsContent>
+
+          {/* ==================== TAB 5: ASSETS ==================== */}
           <TabsContent value="assets" className="space-y-6">
             {/* Entity Filter */}
             <div className="flex items-center gap-4">
@@ -1133,17 +1154,6 @@ const PersonalDashboard = ({ embedded = false }) => {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
-
-          {/* ==================== TAB 5: INSIGHTS (Full Smart Insights) ==================== */}
-          <TabsContent value="insights" className="space-y-6">
-            <SmartInsights 
-              clientId="thompson_family"
-              portfolioData={portfolioDataForInsights}
-              retirementData={retirementData}
-              isAdvisor={false}
-              compact={false}
-            />
           </TabsContent>
         </Tabs>
       </div>

@@ -110,7 +110,6 @@ export const adviserBaseNav = [
     icon: Settings,
     items: [
       { path: "/notification-center", label: "Notifications", icon: Bell, title: "Notification Center", badge: "NEW" },
-      { path: "/stress-test", label: "Stress Test", icon: Zap, title: "Stress Test", badge: "NEW" },
     ]
   }
 ];

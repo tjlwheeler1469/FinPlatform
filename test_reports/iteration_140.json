@@ -1,0 +1,73 @@
+{
+  "summary": "Iteration 140 - Frontend testing for 4 UI restructuring changes: Personal Dashboard tabs, Overview tab content, Xplan LHS sidebar, Adviser mode Stress Test removal. ALL 4 FEATURES PASSED.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_140.json"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "PersonalDashboard.jsx: Tabs correctly ordered as Overview/Retirement/Insights/Wealth Trends/Assets (lines 648-669)",
+    "PersonalDashboard.jsx: Overview tab contains Asset Allocation pie chart, Holdings by Entity bar chart, Portfolio Rebalancing Suggestions (lines 849-942)",
+    "PersonalDashboard.jsx: NetWorthTrend lazy-loaded in Wealth Trends tab (line 38, 1079-1085)",
+    "UnifiedDashboard.jsx: Simplified to render PersonalDashboard embedded directly, no wrapper tabs (lines 14-26)",
+    "XplanSyncPage.jsx: Wrapped with <Layout> component for LHS sidebar navigation (lines 152-596)",
+    "navData.js: adviserBaseNav does NOT contain 'Stress Test' - correctly removed"
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "N/A (frontend only testing)",
+    "frontend": "100% (4/4 features passed)"
+  },
+  "test_credentials": "No auth required - public access",
+  "seed_data_creation": "None - used existing mock data",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All 4 UI restructuring changes verified working. Personal Dashboard at /dashboard has tabs: Overview/Retirement/Insights/Wealth Trends/Assets. Overview tab contains merged Portfolio content (Asset Allocation, Holdings by Entity, Portfolio Rebalancing). Xplan page at /xplan has LHS sidebar. Adviser mode sidebar does NOT have Stress Test link. ComplianceModal appears on first visit - dismiss by clicking checkbox then 'I Understand & Accept'.",
+  "features_tested": {
+    "personal_dashboard_tabs": {
+      "status": "PASS",
+      "route": "/dashboard",
+      "details": "Tabs are Overview/Retirement/Insights/Wealth Trends/Assets in correct order. No Portfolio or Net Worth tabs."
+    },
+    "overview_tab_content": {
+      "status": "PASS",
+      "route": "/dashboard (Overview tab)",
+      "details": "Overview tab contains: Retirement Readiness, Net Worth, Quick Actions, Smart Insights, Documents & Actions, Asset Allocation pie chart, Holdings by Entity bar chart, Portfolio Rebalancing Suggestions"
+    },
+    "wealth_trends_tab_position": {
+      "status": "PASS",
+      "route": "/dashboard",
+      "details": "Wealth Trends tab is positioned between Insights (index 2) and Assets (index 4) at index 3"
+    },
+    "xplan_lhs_sidebar": {
+      "status": "PASS",
+      "route": "/xplan",
+      "details": "Xplan page wrapped with Layout component, LHS sidebar navigation visible with Dashboard, Markets, Planning, Investments, Tools, Settings"
+    },
+    "adviser_no_stress_test": {
+      "status": "PASS",
+      "route": "Adviser mode sidebar",
+      "details": "Stress Test link NOT found in sidebar. Code review confirms adviserBaseNav in navData.js does not contain Stress Test"
+    },
+    "unified_dashboard_no_wrapper": {
+      "status": "PASS",
+      "route": "/dashboard",
+      "details": "UnifiedDashboard renders PersonalDashboard embedded directly. Only one tablist found (from PersonalDashboard), no wrapper tabs"
+    }
+  },
+  "mocked_apis": {
+    "has_mocked_apis": true,
+    "mocked_apis_list": [
+      "Demo client data mocked in App.js",
+      "Market data fallback to mock when API unavailable"
+    ]
+  }
+}

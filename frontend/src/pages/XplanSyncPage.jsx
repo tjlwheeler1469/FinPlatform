@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import Layout from '@/components/Layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Button } from '../components/ui/button';
@@ -139,14 +140,17 @@ export default function XplanSyncPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <RefreshCw className="w-8 h-8 animate-spin text-primary" />
-        <span className="ml-2">Loading Xplan Integration...</span>
-      </div>
+      <Layout>
+        <div className="flex items-center justify-center h-screen">
+          <RefreshCw className="w-8 h-8 animate-spin text-primary" />
+          <span className="ml-2">Loading Xplan Integration...</span>
+        </div>
+      </Layout>
     );
   }
 
   return (
+    <Layout>
     <div className="min-h-screen bg-background p-6" data-testid="xplan-sync-page">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
@@ -589,5 +593,6 @@ export default function XplanSyncPage() {
         </TabsContent>
       </Tabs>
     </div>
+    </Layout>
   );
 }
