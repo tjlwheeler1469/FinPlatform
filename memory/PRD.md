@@ -7,87 +7,90 @@ Build an AFSL-grade wealth management platform with consolidated views, client c
 - **Frontend**: React (CRA) with Shadcn/UI, Recharts, Lucide icons, jsPDF
 - **Backend**: FastAPI + MongoDB
 - **AI**: OpenAI GPT-5.2 (Emergent LLM Key) for copilot, whisper for voice
-- **Market Data**: CoinGecko (live crypto, rate-limited gracefully)
+- **Market Data**: CoinGecko (live crypto)
 
-## Personal Dashboard Tab Structure
-- **Overview**: Health Score, Retirement Readiness, Net Worth pie, Quick Actions, Smart Insights, Documents, Asset Allocation pie, Holdings by Entity bar, Rebalancing Suggestions
-- **Retirement**: Full retirement readiness gauge, confidence drivers, timeline
-- **Insights**: Full Smart Insights (AI + manual)
-- **Wealth Trends**: NetWorthTrend embedded (lazy loaded)
-- **Assets**: Entity filter + full assets table
+## Personal Dashboard Tab Structure (6 tabs)
+1. **Overview**: Health Score, Retirement Readiness, Net Worth pie, Quick Actions, Smart Insights, Documents, Asset Allocation, Entity Breakdown, Rebalancing
+2. **Net Worth**: FamilyWealthDashboard embedded
+3. **Retirement**: Full retirement readiness gauge, confidence drivers, timeline
+4. **Insights**: Full Smart Insights (AI + manual)
+5. **Wealth Trends**: NetWorthTrend embedded
+6. **Investments**: All investments sorted alphabetically with entity filter
 
-## Sidebar Structure
+## Sidebar Structure (All items alphabetical)
 
 ### Personal Mode
-- DASHBOARD: My Dashboard (HOME), Markets (LIVE)
-- PLANNING: Retirement (PRO), Goals & Scenarios, Budget (NEW, What-If), Rebalancing, Research Centre (NEW)
-- INVESTMENTS: All Investments (9 tabs)
-- TOOLS: Tax Centre (NEW), Loan Calculator
-- SETTINGS: Security, Bank Feeds, Import/Export, Documents
+- DASHBOARD: Markets (LIVE), My Dashboard (HOME)
+- INVESTMENTS: All Investments
+- PLANNING: Budget (NEW), Goals & Scenarios, Rebalancing, Research Centre, Retirement (PRO)
+- SETTINGS: Bank Feeds, Documents, Import/Export, Security
+- TOOLS: Loan Calculator, Tax Centre
 
 ### Adviser Mode
-- DASHBOARD: Command Center (3 tabs), Markets (LIVE)
-- CRM: Client Hub (HUB), Health Dashboard (NEW), Compare Clients (NEW)
 - AI & TASKS: AI Assistant, Meeting Prep
+- COMPLIANCE: Compliance Centre, Security
+- CRM: Client Hub, Compare Clients (NEW), Health Dashboard (NEW)
+- DASHBOARD: Command Center, Markets (LIVE)
 - EXECUTION: Batch Execute
-- COMPLIANCE: Compliance Centre (NEW), Security
-- INTEGRATIONS: Xplan, Platforms, Live Sync
+- INTEGRATIONS: Live Sync, Platforms, Xplan Sync
 - TOOLS: Notifications
 
 ### Client Context Mode
-- OVERVIEW: Client Overview (4 tabs), Retirement, Tax Centre
-- PLANNING: Goals & Scenarios, Actions, Budget (NEW)
-- INVESTMENTS: All Investments (9 tabs)
-- DOCUMENTS: Vault, Meeting Notes, Reports, Compliance
+- DOCUMENTS: Compliance, Meeting Notes, Reports, Vault
+- OVERVIEW: Client Overview (2 tabs: Overview + Investments), Retirement, Tax Centre
+- PLANNING: Actions, Budget, Goals & Scenarios
 
-## Key Features Implemented
+## Features Implemented
 
-### Page Consolidation (30+ pages consolidated)
-- [x] UnifiedDashboard renders PersonalDashboard directly (no wrapper tabs)
-- [x] UnifiedInvestments - 9 asset class tabs with ErrorBoundary
-- [x] UnifiedTaxCentre - 8 tax tools
-- [x] UnifiedResearchCentre - 4 research tools
-- [x] UnifiedComplianceCentre - 4 compliance tools
-- [x] UnifiedGoalsPlanning - Goals & Scenarios + Monte Carlo
-- [x] AdvisorCommandCenter - Dashboard + Daily Briefing + Decision Centre
+### Page Consolidation & Deduplication
+- [x] UnifiedDashboard renders PersonalDashboard directly
+- [x] UnifiedClientOverview: 2 tabs (Overview + Investments) — no duplication
+- [x] UnifiedInvestments: 9 asset class tabs with ErrorBoundary, supports embedded prop
+- [x] UnifiedTaxCentre: 8 tax tools
+- [x] UnifiedResearchCentre: 4 research tools
+- [x] UnifiedComplianceCentre: 4 compliance tools
+- [x] UnifiedGoalsPlanning: Goals & Scenarios + Monte Carlo
+- [x] AdvisorCommandCenter: 2 tabs (Dashboard & Briefing merged + Decision Centre)
 
-### UI Restructuring (Feb 2026 - Latest)
-- [x] Merged Net Worth/Portfolio content into Overview tab
-- [x] Moved Wealth Trends tab next to Insights (tab order: Overview, Retirement, Insights, Wealth Trends, Assets)
-- [x] Added Layout wrapper to XplanSyncPage for LHS sidebar navigation
-- [x] Removed Stress Test from Adviser mode sidebar
-
-### ErrorBoundary Implementation
-- [x] All Suspense boundaries wrapped in ErrorBoundary
-- [x] Global ErrorBoundary in App.js
+### ErrorBoundary
+- [x] All Suspense boundaries wrapped, global ErrorBoundary in App.js
 
 ### Client Health Dashboard
-- [x] RAG status for 5 demo clients
-- [x] Search and filter (All/Red/Amber/Green)
+- [x] RAG status for 5 demo clients with search/filter
 
 ### Portfolio Health Score Widget
-- [x] Inline widget on Personal Dashboard with RAG indicators
+- [x] Inline widget on Personal Dashboard
 
 ### What-If Budget Mode
-- [x] Toggle with 5 adjustment controls (Income %, Expense %, Savings, Lump Sum, Mortgage Rate)
+- [x] Toggle with 5 adjustment controls
+- [x] Investable surplus callout with "View Investments" action button
 
 ### Client Comparison View
-- [x] Side-by-side 2-3 clients with radar/bar charts
+- [x] Side-by-side 2-3 clients with charts
 
 ### Meeting Mode Enhancements
-- [x] Keyboard shortcuts (Arrow keys, Escape, F, 1-6, Space)
-- [x] PDF export via jsPDF
+- [x] Keyboard shortcuts + PDF export via jsPDF
 
 ### Auto-Email for Client Pack Scheduler
-- [x] Email field + auto-email toggle (MOCKED - no real email service)
+- [x] Email field + toggle (MOCKED)
+
+### Tax Loss Harvesting Fix
+- [x] Client-side fallback calculation when API unavailable
+
+### Chrome Extension Error Suppression
+- [x] index.js suppresses frame_ant and other extension errors
 
 ## Bugs Fixed
 - [x] SMSFOptimizer crash (optional chaining)
 - [x] Webpack chunk load failures (ErrorBoundary)
-- [x] Chrome extension interference (Global ErrorBoundary)
+- [x] Chrome extension interference (suppressed + ErrorBoundary)
 - [x] HouseholdBudget crash on portfolio.expenses
-- [x] Xplan missing LHS navigation
+- [x] Tax Loss Harvesting "calculations didn't work" (client-side fallback)
+- [x] Xplan missing LHS navigation (Layout wrapper added)
+- [x] Duplication: Goals & Scenarios removed from Client Overview (already standalone)
+- [x] Duplication: Dashboard + Daily Briefing merged into one tab
 
 ## Backlog
 - [ ] P3: Real email integration for Client Pack auto-delivery
 - [ ] P3: What-If Budget scenario saving/comparison
+- [ ] P3: ComplianceModal "Don't show again" should persist across sessions
