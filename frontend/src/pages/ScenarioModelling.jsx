@@ -100,7 +100,7 @@ const ASSET_TYPES = [
   { id: "cash", label: "Cash & TDs", icon: PiggyBank, color: "#6B7280", returnRange: [3, 5] },
 ];
 
-const ScenarioModelling = () => {
+const ScenarioModelling = ({ embedded = false }) => {
   const [activeTab, setActiveTab] = useState("goals");
   const [goals, setGoals] = useState(MOCK_GOALS);
   const [selectedGoal, setSelectedGoal] = useState(null);
@@ -410,8 +410,8 @@ const ScenarioModelling = () => {
     );
   };
 
-  return (
-    <Layout title="Scenario Modelling" subtitle="Goals, Strategy & What-If Analysis">
+  const content = (
+    <>
       <div className="space-y-6" data-testid="scenario-modelling-page">
         {/* Header Stats - Clean Card Design like FamilyWealthDashboard */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -998,8 +998,10 @@ const ScenarioModelling = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </Layout>
+    </>
   );
+
+  return embedded ? content : <Layout title="Scenario Modelling" subtitle="Goals, Strategy & What-If Analysis">{content}</Layout>;
 };
 
 export default ScenarioModelling;

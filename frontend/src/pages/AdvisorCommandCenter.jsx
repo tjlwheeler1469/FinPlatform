@@ -65,6 +65,7 @@ import { ComplianceFooter } from "@/components/ComplianceDisclaimer";
 import KnowledgeGraphPanel from "@/components/KnowledgeGraphPanel";
 import ClientPackScheduler from "@/components/ClientPackScheduler";
 import DecisionCenter from "@/pages/DecisionCenter";
+import DailyBriefing from "@/pages/DailyBriefing";
 
 const API_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || "";
 
@@ -352,6 +353,9 @@ const AdvisorCommandCenter = () => {
           <TabsList className="bg-white border h-10">
             <TabsTrigger value="dashboard" className="gap-1.5 data-[state=active]:bg-[#1a2744] data-[state=active]:text-white" data-testid="tab-dashboard">
               <LayoutDashboard className="h-3.5 w-3.5" /> Dashboard
+            </TabsTrigger>
+            <TabsTrigger value="briefing" className="gap-1.5 data-[state=active]:bg-[#1a2744] data-[state=active]:text-white" data-testid="tab-briefing">
+              <Calendar className="h-3.5 w-3.5" /> Daily Briefing
             </TabsTrigger>
             <TabsTrigger value="decisions" className="gap-1.5 data-[state=active]:bg-[#1a2744] data-[state=active]:text-white" data-testid="tab-decisions">
               <Sliders className="h-3.5 w-3.5" /> Decision Centre
@@ -1275,6 +1279,10 @@ const AdvisorCommandCenter = () => {
 
         <ComplianceFooter />
 
+          </TabsContent>
+
+          <TabsContent value="briefing" className="mt-4">
+            <DailyBriefing embedded />
           </TabsContent>
 
           <TabsContent value="decisions" className="mt-4">

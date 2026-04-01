@@ -216,7 +216,7 @@ const ClientCard = ({ client, priority }) => {
 
 // ==================== MAIN COMPONENT ====================
 
-const DailyBriefing = () => {
+const DailyBriefing = ({ embedded = false }) => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
 
@@ -239,8 +239,7 @@ const DailyBriefing = () => {
     { name: 'On Track (85%+)', count: stableClients.length, color: '#22c55e' },
   ];
 
-  return (
-    <Layout>
+  const content = (
       <div className="space-y-6" data-testid="daily-briefing">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -499,8 +498,9 @@ const DailyBriefing = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </Layout>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default DailyBriefing;

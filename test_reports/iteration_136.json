@@ -1,0 +1,111 @@
+{
+  "summary": "Iteration 136 - All 17 requested features tested successfully. Personal Mode sidebar correctly shows INVESTMENTS with only 'All Investments', PLANNING with Retirement/Goals & Scenarios/Rebalancing/Research Centre, TOOLS with Tax Centre/Loan Calculator (no Monte Carlo, no SMSF). Goals & Scenarios page has 2 tabs (Goals & Scenarios + Monte Carlo). All Investments page has 9 tabs including SMSF. Advisor Command Center has 3 tabs (Dashboard, Daily Briefing, Decision Centre). Client context shows 5 tabs and correct sidebar structure. All 4 redirect routes work correctly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "All pages", "issues": ["Compliance Modal appears on page load blocking interactions - user must dismiss it before interacting. Known from previous iterations."]},
+      {"screen": "Charts", "issues": ["Recharts console warnings about width/height -1 on initial render - cosmetic only, charts render correctly after layout settles"]}
+    ]
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_136.json"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "N/A (frontend only testing)",
+    "frontend": "100% (29/29 tests passed)"
+  },
+  "test_credentials": "No auth required - public access",
+  "seed_data_creation": "None - used existing DEMO_CLIENT_DATA",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All sidebar consolidation features working correctly. Personal Mode: INVESTMENTS has only 'All Investments', PLANNING has Retirement/Goals & Scenarios/Rebalancing/Research Centre, TOOLS has Tax Centre/Loan Calculator. Goals & Scenarios at /scenario-modelling has 2 tabs. All Investments at /investments has 9 tabs. Advisor Command Center at /advisor-command-center has 3 tabs. Client context at /dashboard (with selected_client) shows 5 tabs. All redirect routes work.",
+  "features_tested": {
+    "personal_mode_investments_sidebar": {
+      "status": "PASS",
+      "details": "INVESTMENTS section has only 'All Investments' (no Cash & TDs, no Super & Pension)"
+    },
+    "personal_mode_planning_sidebar": {
+      "status": "PASS",
+      "details": "PLANNING section has Retirement (PRO), Goals & Scenarios, Rebalancing, Research Centre (NEW)"
+    },
+    "personal_mode_tools_sidebar": {
+      "status": "PASS",
+      "details": "TOOLS section has Tax Centre (NEW), Loan Calculator (no Monte Carlo, no SMSF)"
+    },
+    "goals_scenarios_page_loads": {
+      "status": "PASS",
+      "details": "UnifiedGoalsPlanning at /scenario-modelling loads with data-testid='unified-goals-planning'"
+    },
+    "goals_scenarios_2_tabs": {
+      "status": "PASS",
+      "details": "Goals & Scenarios tab (tab-goals) and Monte Carlo tab (tab-monte-carlo) both present"
+    },
+    "monte_carlo_tab_content": {
+      "status": "PASS",
+      "details": "Monte Carlo tab loads Monte Carlo Simulation content with parameters and presets"
+    },
+    "investments_page_loads": {
+      "status": "PASS",
+      "details": "UnifiedInvestments at /investments loads with data-testid='unified-investments'"
+    },
+    "investments_9_tabs": {
+      "status": "PASS",
+      "details": "All 9 tabs found: shares, bonds, property, crypto, cash, super, smsf, managed, unlisted"
+    },
+    "smsf_tab_content": {
+      "status": "PASS",
+      "details": "SMSF tab loads SMSF Contribution Optimizer content"
+    },
+    "advisor_command_center_loads": {
+      "status": "PASS",
+      "details": "AdvisorCommandCenter at /advisor-command-center loads with data-testid='advisor-command-center'"
+    },
+    "advisor_command_center_3_tabs": {
+      "status": "PASS",
+      "details": "Dashboard (tab-dashboard), Daily Briefing (tab-briefing), Decision Centre (tab-decisions) all present"
+    },
+    "daily_briefing_tab_content": {
+      "status": "PASS",
+      "details": "Daily Briefing tab loads briefing content"
+    },
+    "adviser_sidebar_dashboard_section": {
+      "status": "PASS",
+      "details": "DASHBOARD section has Command Center and Markets (no Daily Briefing)"
+    },
+    "client_context_5_tabs": {
+      "status": "PASS",
+      "details": "UnifiedClientOverview shows 5 tabs: Overview, Net Worth, Wealth Trends, Health Score, Goals & Scenarios"
+    },
+    "client_context_overview_sidebar": {
+      "status": "PASS",
+      "details": "OVERVIEW section has Client Overview (360), Retirement (PRO), Tax Centre"
+    },
+    "client_context_investments_sidebar": {
+      "status": "PASS",
+      "details": "INVESTMENTS section has only 'All Investments' (no Cash & TDs, no Super)"
+    },
+    "redirect_routes": {
+      "status": "PASS",
+      "details": [
+        "/monte-carlo -> /scenario-modelling",
+        "/smsf-optimizer -> /investments",
+        "/daily-briefing -> /advisor-command-center",
+        "/decision-engine -> /dashboard"
+      ]
+    }
+  },
+  "mocked_apis": {
+    "has_mocked_apis": true,
+    "mocked_apis_list": [
+      "DEMO_CLIENT_DATA in Client360View.jsx - hardcoded client profiles for 5 clients (client_1 through client_5)"
+    ]
+  }
+}

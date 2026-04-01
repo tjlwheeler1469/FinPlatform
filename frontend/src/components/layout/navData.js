@@ -22,8 +22,9 @@ export const personalNavGroups = [
     icon: Target,
     items: [
       { path: "/retirement-confidence", label: "Retirement", icon: Gauge, title: "Retirement Planning & Confidence", badge: "PRO" },
-      { path: "/scenario-modelling", label: "Goals & Scenarios", icon: Target, title: "Goals & Scenario Modelling" },
+      { path: "/scenario-modelling", label: "Goals & Scenarios", icon: Target, title: "Goals, Scenarios & Monte Carlo" },
       { path: "/portfolio-rebalancing", label: "Rebalancing", icon: BarChart3, title: "Portfolio Rebalancing" },
+      { path: "/stock-research", label: "Research Centre", icon: LineChart, title: "Research & Comparison", badge: "NEW" },
     ]
   },
   {
@@ -31,8 +32,6 @@ export const personalNavGroups = [
     icon: TrendingUp,
     items: [
       { path: "/investments", label: "All Investments", icon: TrendingUp, title: "Investment Portfolio", badge: "NEW" },
-      { path: "/cash-deposits", label: "Cash & TDs", icon: PiggyBank, title: "Cash & Term Deposits" },
-      { path: "/super-pension", label: "Super & Pension", icon: Shield, title: "Superannuation & Pension" },
     ]
   },
   {
@@ -41,9 +40,6 @@ export const personalNavGroups = [
     items: [
       { path: "/tax-analysis-sync", label: "Tax Centre", icon: Calculator, title: "Unified Tax Centre", badge: "NEW" },
       { path: "/loan-calculator", label: "Loan Calculator", icon: Landmark, title: "Loan Calculator" },
-      { path: "/monte-carlo", label: "Monte Carlo", icon: BarChart3, title: "Monte Carlo Simulator" },
-      { path: "/smsf-optimizer", label: "SMSF", icon: PiggyBank, title: "SMSF Optimizer" },
-      { path: "/stock-research", label: "Research Centre", icon: LineChart, title: "Research & Comparison", badge: "NEW" },
     ]
   },
   {
@@ -63,8 +59,7 @@ export const adviserBaseNav = [
     name: "Dashboard",
     icon: LayoutDashboard,
     items: [
-      { path: "/advisor-command-center", label: "Command Center", icon: LayoutDashboard, title: "Advisor Command Center" },
-      { path: "/daily-briefing", label: "Daily Briefing", icon: Calendar, title: "Daily Briefing", badge: "NEW" },
+      { path: "/advisor-command-center", label: "Command Center", icon: LayoutDashboard, title: "Dashboard, Briefing & Decisions" },
       { path: "/macro-dashboard", label: "Markets", icon: BarChart3, title: "Live Markets", badge: "LIVE" },
     ]
   },
@@ -122,18 +117,16 @@ export const clientContextNav = [
     name: "Overview",
     icon: Eye,
     items: [
-      { path: "/dashboard", label: "Client Overview", icon: Wallet, title: "Client 360 & Net Worth", badge: "360" },
+      { path: "/dashboard", label: "Client Overview", icon: Wallet, title: "Overview, Health & Goals", badge: "360" },
       { path: "/retirement-confidence", label: "Retirement", icon: Gauge, title: "Retirement Planning & Confidence", badge: "PRO" },
-      { path: "/decision-engine", label: "Health Score", icon: Zap, title: "Financial Health Score" },
+      { path: "/tax-analysis-sync", label: "Tax Centre", icon: Calculator, title: "Tax Analysis & CGT" },
     ]
   },
   {
     name: "Planning",
     icon: Target,
     items: [
-      { path: "/scenario-modelling", label: "Goals & Scenarios", icon: Target, title: "Goals & Scenario Modelling" },
       { path: "/next-best-actions", label: "Actions", icon: Zap, title: "Next Best Actions" },
-      { path: "/tax-analysis-sync", label: "Tax Centre", icon: FileText, title: "Tax Analysis & CGT" },
     ]
   },
   {
@@ -141,8 +134,6 @@ export const clientContextNav = [
     icon: TrendingUp,
     items: [
       { path: "/investments", label: "All Investments", icon: TrendingUp, title: "Investment Portfolio", badge: "NEW" },
-      { path: "/cash-deposits", label: "Cash & TDs", icon: PiggyBank, title: "Cash & Term Deposits" },
-      { path: "/super-pension", label: "Super & Pension", icon: Shield, title: "Superannuation & Pension" },
     ]
   },
   {

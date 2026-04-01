@@ -40,7 +40,7 @@ const formatCurrency = (value) => {
   }).format(value);
 };
 
-const MonteCarloSimulation = () => {
+const MonteCarloSimulation = ({ embedded = false }) => {
   const [initialValue, setInitialValue] = useState(100000);
   const [expectedReturn, setExpectedReturn] = useState(7);
   const [volatility, setVolatility] = useState(15);
@@ -90,8 +90,7 @@ const MonteCarloSimulation = () => {
     { name: "Aggressive", return: 12, volatility: 25 }
   ];
 
-  return (
-    <Layout>
+  const content = (
       <div className="space-y-8" data-testid="monte-carlo-page">
         {/* Header */}
         <div>
@@ -450,8 +449,9 @@ const MonteCarloSimulation = () => {
           </CardContent>
         </Card>
       </div>
-    </Layout>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default MonteCarloSimulation;

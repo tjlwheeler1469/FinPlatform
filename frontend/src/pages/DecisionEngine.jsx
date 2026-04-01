@@ -77,7 +77,7 @@ const DIFFICULTY_LABELS = {
   complex: { label: 'Complex', color: 'bg-red-500' }
 };
 
-const DecisionEngine = () => {
+const DecisionEngine = ({ embedded = false }) => {
   const navigate = useNavigate();
   const { portfolio } = usePortfolio();
   const [healthScore, setHealthScore] = useState(null);
@@ -125,8 +125,7 @@ const DecisionEngine = () => {
 
   const totalPotentialImpact = recommendations.reduce((sum, r) => sum + r.impact_primary, 0);
 
-  return (
-    <Layout>
+  const content = (
       <div className="space-y-6" data-testid="decision-engine-page">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -410,8 +409,9 @@ const DecisionEngine = () => {
           </CardContent>
         </Card>
       </div>
-    </Layout>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default DecisionEngine;

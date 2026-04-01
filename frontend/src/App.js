@@ -263,6 +263,8 @@ const Login = lazy(() => import("@/pages/Login"));
 const UnifiedTaxCentre = lazy(() => import("@/pages/UnifiedTaxCentre"));
 const UnifiedResearchCentre = lazy(() => import("@/pages/UnifiedResearchCentre"));
 const UnifiedComplianceCentre = lazy(() => import("@/pages/UnifiedComplianceCentre"));
+const UnifiedGoalsPlanning = lazy(() => import("@/pages/UnifiedGoalsPlanning"));
+const UnifiedClientOverview = lazy(() => import("@/pages/UnifiedClientOverview"));
 
 // Compliance Modal
 import { ComplianceModal } from "@/components/ComplianceDisclaimer";
@@ -1061,7 +1063,7 @@ const AppRouter = () => {
       {/* Tax - consolidate */}
       <Route path="/tax-analysis" element={<Navigate to="/tax-analysis-sync" replace />} />
       <Route path="/property-portfolio" element={<Navigate to="/investments" replace />} />
-      <Route path="/monte-carlo" element={<MonteCarloSimulation />} />
+      <Route path="/monte-carlo" element={<Navigate to="/scenario-modelling" replace />} />
       <Route path="/loan-calculator" element={<LoanCalculator />} />
       {/* Scenario routes - consolidate to /scenario-modelling */}
       <Route path="/scenarios" element={<Navigate to="/scenario-modelling" replace />} />
@@ -1071,7 +1073,7 @@ const AppRouter = () => {
       <Route path="/cgt-calculator" element={<Navigate to="/cgt" replace />} />
       <Route path="/cgt-events" element={<Navigate to="/cgt" replace />} />
       <Route path="/historical-tax" element={<Navigate to="/tax-analysis-sync" replace />} />
-      <Route path="/smsf-optimizer" element={<SMSFOptimizer />} />
+      <Route path="/smsf-optimizer" element={<Navigate to="/investments" replace />} />
       <Route path="/reports" element={<ReportGenerator />} />
       <Route path="/salary-packaging" element={<Navigate to="/tax-analysis-sync" replace />} />
       <Route path="/property-comparison" element={<Navigate to="/stock-research" replace />} />
@@ -1089,7 +1091,7 @@ const AppRouter = () => {
       <Route path="/holdings-performance" element={<HoldingsPerformance />} />
       <Route path="/calculation-methodology" element={<CalculationMethodology />} />
       <Route path="/sg-calculator" element={<SuperannuationGuarantee />} />
-      <Route path="/super-pension" element={<SuperannuationGuarantee />} />
+      <Route path="/super-pension" element={<Navigate to="/investments" replace />} />
       <Route path="/rental-yield-optimizer" element={<RentalYieldOptimizer />} />
       <Route path="/export" element={<ExportData />} />
       <Route path="/tax-analysis-sync" element={<UnifiedTaxCentre />} />
@@ -1107,9 +1109,9 @@ const AppRouter = () => {
       <Route path="/statement-of-advice" element={<StatementOfAdvice />} />
       <Route path="/onboarding" element={<ClientOnboarding />} />
       <Route path="/copilot" element={<Navigate to="/ai-copilot-advanced" replace />} />
-      <Route path="/daily-briefing" element={<DailyBriefing />} />
+      <Route path="/daily-briefing" element={<Navigate to="/advisor-command-center" replace />} />
       {/* Unified Dashboard (Net Worth + Dashboard) */}
-      <Route path="/dashboard" element={<UnifiedDashboard />} />
+      <Route path="/dashboard" element={<DashboardRouter />} />
       <Route path="/personal-dashboard" element={<Navigate to="/dashboard" replace />} />
       <Route path="/family-wealth" element={<Navigate to="/dashboard" replace />} />
 
@@ -1125,7 +1127,7 @@ const AppRouter = () => {
       <Route path="/security" element={<SecuritySettings />} />
       <Route path="/data-import-export" element={<DataImportExportPage />} />
       <Route path="/investment-comparison" element={<Navigate to="/stock-research" replace />} />
-      <Route path="/decision-engine" element={<DecisionEngine />} />
+      <Route path="/decision-engine" element={<Navigate to="/dashboard" replace />} />
       <Route path="/decision-dashboard" element={<DecisionDashboard />} />
       <Route path="/life-timeline" element={<LifeTimelinePlanner />} />
       <Route path="/timeline" element={<LifeTimeline />} />
@@ -1134,7 +1136,7 @@ const AppRouter = () => {
       <Route path="/client-crm" element={<Navigate to="/adviser-hub" replace />} />
       <Route path="/goal-tracker" element={<GoalTracker />} />
       <Route path="/goals" element={<GoalTracker />} />
-      <Route path="/scenario-modelling" element={<ScenarioModelling />} />
+      <Route path="/scenario-modelling" element={<UnifiedGoalsPlanning />} />
       <Route path="/knowledge-graph" element={<Navigate to="/advisor-command-center" replace />} />
       <Route path="/ai-advisor" element={<Navigate to="/ai-copilot-advanced" replace />} />
       <Route path="/portfolio-aggregator" element={<PortfolioAggregator />} />
@@ -1218,7 +1220,7 @@ const AppRouter = () => {
       
       {/* New Trading Pages */}
       <Route path="/bonds-trading" element={<Navigate to="/investments" replace />} />
-      <Route path="/cash-deposits" element={<CashDeposits />} />
+      <Route path="/cash-deposits" element={<Navigate to="/investments" replace />} />
       <Route path="/managed-funds" element={<Navigate to="/investments" replace />} />
       <Route path="/hybrids-trading" element={<Navigate to="/investments" replace />} />
       <Route path="/crypto-portfolio" element={<Navigate to="/investments" replace />} />
@@ -1295,6 +1297,16 @@ const AppRouter = () => {
       <Route path="/adviser-hub" element={<AdviserHub />} />
     </Routes>
   );
+};
+
+// Smart router: shows different dashboard based on client context
+const DashboardRouter = () => {
+  const stored = localStorage.getItem("selected_client");
+  const mode = localStorage.getItem("app_mode");
+  if (stored && mode === "adviser") {
+    return <UnifiedClientOverview />;
+  }
+  return <UnifiedDashboard />;
 };
 
 function App() {

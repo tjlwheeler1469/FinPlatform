@@ -43,7 +43,7 @@ const formatCurrency = (value) => {
   }).format(value);
 };
 
-const SMSFOptimizer = () => {
+const SMSFOptimizer = ({ embedded = false }) => {
   const [age, setAge] = useState(45);
   const [superBalance, setSuperBalance] = useState(350000);
   const [taxableIncome, setTaxableIncome] = useState(150000);
@@ -101,8 +101,7 @@ const SMSFOptimizer = () => {
   const projectionData = generateProjectionData();
   const concessionalCapUsed = result ? (result.contributions.total_concessional / 30000) * 100 : 0;
 
-  return (
-    <Layout>
+  const content = (
       <div className="space-y-8" data-testid="smsf-optimizer-page">
         {/* Header */}
         <div>
@@ -498,8 +497,9 @@ const SMSFOptimizer = () => {
           </Card>
         </div>
       </div>
-    </Layout>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default SMSFOptimizer;
