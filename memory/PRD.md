@@ -9,67 +9,83 @@ Build an AFSL-grade wealth management platform with consolidated views, client c
 - **AI**: OpenAI GPT-5.2 (Emergent LLM Key) for copilot, whisper for voice
 - **Market Data**: CoinGecko (live crypto, rate-limited gracefully)
 
+## Sidebar Structure (Current)
+
+### Personal Mode
+- DASHBOARD: My Dashboard (HOME), Markets (LIVE)
+- PLANNING: Retirement (PRO), Goals & Scenarios, Rebalancing, Research Centre (NEW)
+- INVESTMENTS: All Investments (NEW) — 9 tabs: Shares, Bonds, Property, Crypto, Cash & TDs, Super & Pension, SMSF, Managed Funds, Unlisted
+- TOOLS: Tax Centre (NEW), Loan Calculator
+- SETTINGS: Security, Bank Feeds, Import/Export, Documents
+
+### Adviser Mode
+- DASHBOARD: Command Center (3 tabs: Dashboard + Daily Briefing + Decision Centre), Markets (LIVE)
+- CRM: Client Hub
+- AI & TASKS: AI Assistant, Meeting Prep
+- EXECUTION: Batch Execute
+- COMPLIANCE: Compliance Centre (NEW), Security
+- INTEGRATIONS: Xplan, Platforms, Live Sync
+- TOOLS: Notifications, Stress Test
+
+### Client Context Mode
+- OVERVIEW: Client Overview (5 tabs: Overview + Net Worth + Wealth Trends + Health Score + Goals & Scenarios), Retirement, Tax Centre
+- PLANNING: Actions
+- INVESTMENTS: All Investments (9 tabs)
+- DOCUMENTS: Vault, Meeting Notes, Reports, Compliance
+
 ## Key Features Implemented
 
-### Page Consolidation (Phase 1 - Sessions 1-3)
-- [x] UnifiedDashboard.jsx - Overview, Net Worth, Wealth Trends tabs
-- [x] UnifiedInvestments.jsx - 8 tabs: Shares, Bonds, Property, Crypto, Cash & TDs, Super & Pension, Managed Funds, Unlisted
-- [x] AdvisorCommandCenter.jsx - Dashboard + Decision Centre tabs (merged)
+### Page Consolidation (Phase 1)
+- [x] UnifiedDashboard.jsx — Overview, Net Worth, Wealth Trends tabs
+- [x] AdvisorCommandCenter.jsx — Dashboard + Daily Briefing + Decision Centre tabs
 - [x] 15+ standalone pages replaced with tabbed views + redirects
 
-### Page Consolidation (Phase 2 - Current Session)
-- [x] UnifiedTaxCentre.jsx - 8 tabs: Tax Analysis, Capital Gains, Tax Loss Harvesting, Tax Calendar, BAS Calculator, Income Splitting, Trust Distributions, Division 7A
-- [x] UnifiedResearchCentre.jsx - 4 tabs: Stock Research, Broker Research, Investment Comparison, Property Comparison
-- [x] UnifiedComplianceCentre.jsx - 4 tabs: AdviceOS, Compliance Dashboard, Breach Register, Risk Controls
-- [x] 15+ additional redirect routes for old standalone pages
+### Page Consolidation (Phase 2)
+- [x] UnifiedTaxCentre.jsx — 8 tax pages combined
+- [x] UnifiedResearchCentre.jsx — 4 research pages combined
+- [x] UnifiedComplianceCentre.jsx — 4 compliance pages combined
 
-### Meeting Mode Enhancement
+### Page Consolidation (Phase 3 — Current Session)
+- [x] UnifiedInvestments.jsx — 9 tabs (added SMSF from SMSF Optimizer)
+- [x] UnifiedGoalsPlanning.jsx — Goals & Scenarios + Monte Carlo combined
+- [x] UnifiedClientOverview.jsx — Overview + Net Worth + Wealth Trends + Health Score + Goals & Scenarios
+- [x] AdvisorCommandCenter.jsx — Added Daily Briefing as a tab
+- [x] Sidebar simplified: removed duplicate entries (Cash & TDs, Super, Monte Carlo, SMSF, Daily Briefing)
+- [x] Research Centre moved from Tools to Planning
+- [x] Tax Centre moved to Overview in client context
+
+### Meeting Mode
 - [x] Full-screen presentation overlay (MeetingMode.jsx)
-- [x] 6 slides: Client Overview, Financial Goals, Asset Allocation, Family, Action Items, Key Dates
-- [x] Previous/Next navigation with dot indicators
-- [x] Exit button returns to normal view
+- [x] 6 slides: Client Overview, Goals, Assets, Family, Actions, Key Dates
 - [x] Triggered from "Meeting" button in Client360View header
 
 ### Client Management
 - [x] Client context switching via PortfolioProvider + localStorage
-- [x] Distinct DEMO_CLIENT_DATA for 5 clients (Wheeler, Chen, Mitchell, Williams, Patel)
-- [x] Redesigned Client360View with dark header, gold initials, info strip, metrics bar
-- [x] Client Hub (AdviserHub) with all client cards
-
-### Investments
-- [x] All 8 asset class tabs in unified view
-- [x] Cash & TDs with savings accounts and term deposits
-- [x] Super & Pension with superannuation guarantee calculator
+- [x] Distinct DEMO_CLIENT_DATA for 5 clients
+- [x] Redesigned Client360View with dark header, gold initials
+- [x] DashboardRouter — context-aware routing (personal vs client)
 
 ### AI & Automation
-- [x] Voice Command engine (11 intents including Client Pack generation)
+- [x] Voice Command engine (11 intents)
 - [x] AI Copilot with GPT-5.2
 - [x] Client Pack Scheduler API
-- [x] Knowledge Graph visualization (react-force-graph-2d)
-
-### Navigation
-- [x] Xplan under Integrations section
-- [x] Tax Centre (NEW) replaces 5 separate tax tools in sidebar
-- [x] Research Centre (NEW) replaces stock/broker/comparison in sidebar
-- [x] Compliance Centre (NEW) replaces AdviceOS/Enterprise/Breach/Risk in sidebar
-- [x] Decision Center redirects to Command Centre
-
-### Data & Markets
-- [x] Live CoinGecko crypto data with rate-limit fallback
-- [x] 400+ backend lint errors fixed
-- [x] 100% backend test pass rate
+- [x] Knowledge Graph visualization
 
 ## Route Consolidation Summary
 | Old Routes | New Route | Via |
 |---|---|---|
-| /cgt, /tax-loss-harvesting, /tax-calendar, /bas-calculator, /income-splitting, /trust-distributions, /division-7a, /historical-tax, /salary-packaging | /tax-analysis-sync | UnifiedTaxCentre |
+| /monte-carlo | /scenario-modelling | UnifiedGoalsPlanning |
+| /smsf-optimizer | /investments | UnifiedInvestments (SMSF tab) |
+| /daily-briefing | /advisor-command-center | AdvisorCommandCenter (tab) |
+| /decision-engine | /dashboard | UnifiedClientOverview (Health tab) |
+| /cash-deposits, /super-pension | /investments | UnifiedInvestments (tabs) |
+| /cgt, /tax-loss-harvesting, /tax-calendar, /bas-calculator, etc. | /tax-analysis-sync | UnifiedTaxCentre |
 | /broker-research, /investment-comparison, /property-comparison | /stock-research | UnifiedResearchCentre |
 | /enterprise, /breach-register, /risk-control | /adviceos | UnifiedComplianceCentre |
 | /decision-center | /advisor-command-center | AdvisorCommandCenter |
-| /bonds-trading, /crypto-portfolio, /managed-funds, /unlisted-investments | /investments | UnifiedInvestments |
 
 ## Backlog
 - [ ] P2: Client comparison view (side-by-side 2-3 clients)
 - [ ] P2: Auto-email delivery for Client Pack Scheduler
-- [ ] P3: Keyboard shortcuts for Meeting Mode (arrow keys)
-- [ ] P3: Print/export Meeting Mode slides as PDF
+- [ ] P3: Keyboard shortcuts for Meeting Mode
+- [ ] P3: Export Meeting Mode slides as PDF
