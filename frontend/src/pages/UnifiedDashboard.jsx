@@ -2,6 +2,7 @@ import { useState, lazy, Suspense } from "react";
 import Layout from "@/components/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, LayoutDashboard, Wallet, TrendingUp } from "lucide-react";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const PersonalDashboard = lazy(() => import("@/pages/PersonalDashboard"));
 const FamilyWealthDashboard = lazy(() => import("@/pages/FamilyWealthDashboard"));
@@ -34,21 +35,13 @@ const UnifiedDashboard = () => {
             </TabsList>
 
             <TabsContent value="overview" className="mt-0">
-              <Suspense fallback={<TabLoader />}>
-                <PersonalDashboard embedded />
-              </Suspense>
+              <ErrorBoundary label="Overview"><Suspense fallback={<TabLoader />}><PersonalDashboard embedded /></Suspense></ErrorBoundary>
             </TabsContent>
-            
             <TabsContent value="net-worth" className="mt-0">
-              <Suspense fallback={<TabLoader />}>
-                <FamilyWealthDashboard embedded />
-              </Suspense>
+              <ErrorBoundary label="Net Worth"><Suspense fallback={<TabLoader />}><FamilyWealthDashboard embedded /></Suspense></ErrorBoundary>
             </TabsContent>
-            
             <TabsContent value="wealth-trends" className="mt-0">
-              <Suspense fallback={<TabLoader />}>
-                <NetWorthTrend embedded />
-              </Suspense>
+              <ErrorBoundary label="Wealth Trends"><Suspense fallback={<TabLoader />}><NetWorthTrend embedded /></Suspense></ErrorBoundary>
             </TabsContent>
           </Tabs>
         </div>

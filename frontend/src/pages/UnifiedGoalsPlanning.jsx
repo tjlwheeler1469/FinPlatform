@@ -2,6 +2,7 @@ import { useState, lazy, Suspense } from "react";
 import Layout from "@/components/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Target, BarChart3 } from "lucide-react";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const ScenarioModelling = lazy(() => import("@/pages/ScenarioModelling"));
 const MonteCarloSimulation = lazy(() => import("@/pages/MonteCarloSimulation"));
@@ -30,10 +31,10 @@ const UnifiedGoalsPlanning = () => {
             </TabsList>
 
             <TabsContent value="goals" className="mt-0">
-              <Suspense fallback={<TabLoader />}><ScenarioModelling embedded /></Suspense>
+              <ErrorBoundary label="Goals & Scenarios"><Suspense fallback={<TabLoader />}><ScenarioModelling embedded /></Suspense></ErrorBoundary>
             </TabsContent>
             <TabsContent value="monte-carlo" className="mt-0">
-              <Suspense fallback={<TabLoader />}><MonteCarloSimulation embedded /></Suspense>
+              <ErrorBoundary label="Monte Carlo"><Suspense fallback={<TabLoader />}><MonteCarloSimulation embedded /></Suspense></ErrorBoundary>
             </TabsContent>
           </Tabs>
         </div>

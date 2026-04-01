@@ -1,7 +1,8 @@
 import { useState, lazy, Suspense } from "react";
 import Layout from "@/components/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Calculator, TrendingUp, Calendar, Scissors, DollarSign, Building2, FileText, Receipt, Briefcase } from "lucide-react";
+import { Loader2, Calculator, TrendingUp, Calendar, Scissors, DollarSign, Building2, Receipt, Briefcase } from "lucide-react";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const TaxAnalysisSync = lazy(() => import("@/pages/TaxAnalysisSync"));
 const CGT = lazy(() => import("@/pages/CGT"));
@@ -54,28 +55,28 @@ const UnifiedTaxCentre = () => {
 
           <div className="mt-4">
             <TabsContent value="analysis" className="mt-0">
-              <Suspense fallback={<TabLoader />}><TaxAnalysisSync embedded /></Suspense>
+              <ErrorBoundary label="Tax Analysis"><Suspense fallback={<TabLoader />}><TaxAnalysisSync embedded /></Suspense></ErrorBoundary>
             </TabsContent>
             <TabsContent value="cgt" className="mt-0">
-              <Suspense fallback={<TabLoader />}><CGT embedded /></Suspense>
+              <ErrorBoundary label="Capital Gains"><Suspense fallback={<TabLoader />}><CGT embedded /></Suspense></ErrorBoundary>
             </TabsContent>
             <TabsContent value="harvesting" className="mt-0">
-              <Suspense fallback={<TabLoader />}><TaxLossHarvesting embedded /></Suspense>
+              <ErrorBoundary label="Tax Loss Harvesting"><Suspense fallback={<TabLoader />}><TaxLossHarvesting embedded /></Suspense></ErrorBoundary>
             </TabsContent>
             <TabsContent value="calendar" className="mt-0">
-              <Suspense fallback={<TabLoader />}><TaxCalendar embedded /></Suspense>
+              <ErrorBoundary label="Tax Calendar"><Suspense fallback={<TabLoader />}><TaxCalendar embedded /></Suspense></ErrorBoundary>
             </TabsContent>
             <TabsContent value="bas" className="mt-0">
-              <Suspense fallback={<TabLoader />}><BASCalculator embedded /></Suspense>
+              <ErrorBoundary label="BAS Calculator"><Suspense fallback={<TabLoader />}><BASCalculator embedded /></Suspense></ErrorBoundary>
             </TabsContent>
             <TabsContent value="income-split" className="mt-0">
-              <Suspense fallback={<TabLoader />}><IncomeSplitting embedded /></Suspense>
+              <ErrorBoundary label="Income Splitting"><Suspense fallback={<TabLoader />}><IncomeSplitting embedded /></Suspense></ErrorBoundary>
             </TabsContent>
             <TabsContent value="trusts" className="mt-0">
-              <Suspense fallback={<TabLoader />}><TrustDistributionAnalysis embedded /></Suspense>
+              <ErrorBoundary label="Trust Distributions"><Suspense fallback={<TabLoader />}><TrustDistributionAnalysis embedded /></Suspense></ErrorBoundary>
             </TabsContent>
             <TabsContent value="div7a" className="mt-0">
-              <Suspense fallback={<TabLoader />}><Division7ACalculator embedded /></Suspense>
+              <ErrorBoundary label="Division 7A"><Suspense fallback={<TabLoader />}><Division7ACalculator embedded /></Suspense></ErrorBoundary>
             </TabsContent>
           </div>
         </Tabs>

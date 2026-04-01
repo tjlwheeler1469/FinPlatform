@@ -1,156 +1,151 @@
 <analysis>**original_problem_statement**: 
-The user's ongoing objective is to build a highly consolidated, AFSL-grade wealth management platform. Recent requests focused on massive UI/UX page consolidations (combining Net Worth, Dashboards, and Investments into tabbed views), ensuring data correctly flows from individual investments up to retirement models, and fixing data mismatches where the Wheeler Family data was incorrectly showing for all other clients. The very latest requests include moving Xplan back under Integrations, redesigning the client profile UI, adding Cash/Super to investment tabs, and merging the Decision Centre with the Command Centre.
+The user requested a massive consolidation of the platform's UI into unified, tab-based views to reduce sprawl. This included merging Tax, Research, Compliance, Investments, and Adviser Command Center views. Additionally, the user requested distinct mock data for all dummy clients (resolving a bug where Wheeler Family data showed for everyone), a redesign of the Client Profile, a new Budget Management feature, and the resolution of persistent runtime errors and Webpack cache crashes. 
 
 **PRODUCT REQUIREMENTS**:
-- Provide unified, tab-based views rather than sprawling separate pages (Unified Dashboard, Unified Investments).
-- Ensure client context switching actually changes the underlying data (mock data needs to be distinct for all dummy clients).
-- Keep Xplan integration inside the platform but categorized under Integrations in the sidebar.
-- Improve the visual design of Client Profiles.
-- Include Cash/TDs and Super/Pension in all consolidated investment views.
-- Combine Adviser Decision Centre with the Command Centre.
+- Provide unified, tab-based views rather than sprawling separate pages (Unified Dashboard, Unified Investments, Unified Tax Centre, etc.).
+- Ensure client context switching actually changes the underlying data.
+- Improve the visual design of Client Profiles and introduce a Meeting Mode presentation view.
+- Combine Adviser Decision Centre and Daily Briefing with the Command Centre.
+- Provide Budget Management in both Personal and Client context modes.
+- Resolve all runtime errors and stress-test the platform.
 
 **User's preferred language**: English (INSTRUCT next agent to respond in English only)
 
 **what currently exists?** 
-A mature, deeply consolidated React + FastAPI + MongoDB wealth management app. Over 15+ duplicate/standalone routes were recently merged into  and  using embedded tab architectures. The backend is lint-free (400+ errors fixed) and boasts a 100% test pass rate. A universal Voice Command engine handles 11 intents including generating PDF Client Packs. The  was updated to accurately track  for context switching, but the underlying mock data source for the profiles still needs expansion.
+A mature React + FastAPI + MongoDB wealth management platform with heavily consolidated unified pages. The app now heavily relies on the  prop to render formerly standalone pages as tabs within wrappers like , , and . The routing is context-aware (e.g.,  changes layout based on whether a client is selected). The frontend uses  loading and  extensively for these tabs.
 
 **Last working item**: 
-    - Last item agent was working: The agent was addressing the final batch of 6 user feedback items: 1) Moving Xplan under Integrations in , 2) Fixing a runtime icon error, 3) Expanding  in  so clients like Chen and Mitchell have unique data instead of defaulting to Wheeler, 4) Redesigning the client profile, 5) Adding Cash/Super to investment tabs, and 6) Merging Decision Centre into Command Centre. The agent successfully restarted the frontend to clear the cache error and just updated  for Xplan.
+    - Last item agent was working: The agent was addressing a final user complaint about Far too Many Runtime errors. The user uploaded screenshots showing an  crash (reading  of undefined), Webpack chunk load failures, and Chrome extension () conflicts. The agent had just cleared the Webpack cache and was about to patch  with safe optional chaining for the  variable.
     - Status: IN PROGRESS
     - Agent Testing Done: N
-    - Which testing method agent to use? Frontend testing agent (testing_agent_v3_fork) after UI changes are complete.
+    - Which testing method agent to use? frontend testing agent (after applying fixes across the app to ensure stability).
     - User Testing Done: N
 
 **All Pending/In progress Issue list**:  
-  Issue 1: Runtime Error (Bitcoin icon / Webpack Cache) (P0)
-     - Attempted fixes: The agent restarted the frontend supervisor to clear the Webpack cache.
-     - Next debug checklist: Verify the frontend loads without the Unexpected token < or icon import error. If it persists, run frontend: ERROR (not running)
-frontend: started.
-     - Why fix this issue and what will be achieved with the fix? Blocks UI rendering and testing.
+  Issue 1: SMSFOptimizer Runtime Crash (P0)
+     - Attempted fixes: Agent identified the issue ( is throwing an error because  or  is null/undefined) and cleared the Webpack cache to start debugging.
+     - Next debug checklist: Open . Add safe optional chaining () to all  object references.
+     - Why fix this issue and what will be achieved with the fix? Prevents the Super & SMSF tab from completely crashing the Unified Investments view.
      - Status: IN PROGRESS
+     - Is recurring issue? N
+     - Should Test frontend/backend/both after fix? Frontend
+     - Blocked on other issue: N/A
+
+  Issue 2: Webpack Chunk Load Failures / App Instability (P0)
+     - Attempted fixes: Agent restarted frontend supervisor and deleted .
+     - Next debug checklist: Because the app now heavily relies on  and  for the tabbed components, network disconnects or stale caches cause chunk load errors that crash the whole React tree. Implement an  component to wrap  boundaries in the Unified pages (like , ) so individual tab failures don't crash the entire wrapper page.
+     - Why fix this issue and what will be achieved with the fix? Stops white screen of death when switching tabs or when a Chrome extension interferes.
+     - Status: NOT STARTED
      - Is recurring issue? Y
      - Should Test frontend/backend/both after fix? Frontend
      - Blocked on other issue: N/A
 
-  Issue 2: Data Mismatch - Wheeler data showing for all clients (P0)
-     - Attempted fixes: Agent previously fixed  to track . However, in  (and potentially ),  only contains a key for .
-     - Next debug checklist: Open  (and any other mock data dictionaries). Add distinct dummy data objects for  (Chen Family Trust),  (Robert Mitchell), etc., so the UI physically changes when switching clients.
-     - Why fix this issue and what will be achieved with the fix? Satisfies user's explicit complaint about data duplication across accounts.
-     - Status: NOT STARTED
-     - Is recurring issue? N
-     - Should Test frontend/backend/both after fix? Frontend
-
-  Issue 3: Redesign Client Profiles (P1)
-     - Attempted fixes: Analyzed user's uploaded image 5 for design direction.
-     - Next debug checklist: Update the UI/CSS in  (or relevant profile component) to match a more modern, cleaner aesthetic as requested.
-     - Why fix this issue and what will be achieved with the fix? Direct user UI request.
-     - Status: NOT STARTED
-     - Is recurring issue? N
-     - Should Test frontend/backend/both after fix? Frontend
-
 **In progress Task List**:
-  Task 1: Add Cash/TDs and Super/Pension to all investment views (P1)
-     - Where to resume:  and any relevant components in Personal/Adviser/Client views.
-     - What will be achieved with this? Gives a complete holistic view of all asset classes in the consolidated tabs.
+  Task 1: Stress test the platform (P1)
+     - Where to resume: Across all newly consolidated unified pages.
+     - What will be achieved with this? Fulfils the user's explicit request to stress test the platform after fixing the runtime errors.
      - Status: NOT STARTED
-     - Should Test frontend/backend/both after fix? Frontend
-     - Blocked on something: N/A
-
-  Task 2: Combine Adviser Decision Centre with Command Centre (P1)
-     - Where to resume:  and .
-     - What will be achieved with this? Further reduces page bloat by bringing decision-making tools directly into the main adviser dashboard.
-     - Status: NOT STARTED
-     - Should Test frontend/backend/both after fix? Frontend
-     - Blocked on something: N/A
+     - Should Test frontend/backend/both after fix? Frontend testing agent
+     - Blocked on something: Needs Issue 1 & 2 resolved first.
 
 **Upcoming and Future Tasks**
     Upcoming Tasks:
-    - P2: Review any remaining standalone pages for further consolidation.
+    - P2: Global Error Boundary wrapper implementation for .
     
     Future Tasks:
-    - Client Comparison view: A side-by-side dashboard comparing 2-3 clients' portfolio allocation, performance, and risk metrics.
-    - Auto-email delivery system for the Client Pack Scheduler.
+    - Client Health Dashboard (RAG status across all clients for drift/reviews).
+    - What-If Budget mode toggle in Budget Management.
 
 **Completed work in this session**
-- Fixed  broken route (redirects to ) (DONE)
-- Combined Knowledge Graph into Dashboard with  (DONE)
-- Built Auto-scheduler API for Generate Client Pack (DONE)
-- Connected Crypto data to live CoinGecko API with graceful rate-limit fallback (DONE)
-- Fixed 400+ backend lint errors (F841, E741, bare excepts) (DONE)
-- Created  (Overview, Net Worth, Wealth Trends) and  (7 asset tabs) to replace 15+ standalone pages (DONE)
-- Added Tasks panel to AI Copilot and Command Center (DONE)
-- Fixed  to listen to  for dynamic context switching (DONE)
-- Moved Xplan sync under Integrations in  (DONE)
+- Fixed Bitcoin icon runtime error (cleared Webpack cache) (DONE)
+- Expanded  for all 5 dummy clients so data switching works (DONE)
+- Added Cash/TDs and Super/Pension tabs to investments (DONE)
+- Consolidated Decision Centre, Command Centre, and Daily Briefing into one page (DONE)
+- Redesigned Client360 Profile and added full-screen Meeting Mode (DONE)
+- Consolidated 14 separate pages into , , and  (DONE)
+- Merged Monte Carlo into Goals & Scenarios (DONE)
+- Handled dynamic sidebar navigation states for Personal vs Adviser vs Client Context (DONE)
+- Integrated  into sidebar and fixed  crash (DONE)
+- Hid duplicate headers on embedded pages (DecisionEngine, ScenarioModelling) (DONE)
 
 **Earlier issues found/mentioned but not fixed**
-None.
+   Issue 1: Chrome Extension  errors crashing app  
+   - Debug checklist: Build an ErrorBoundary and wrap it around main route endpoints or App root.
+   - Why to solve this issue and what will be achieved with this? Prevents external browser extensions from unmounting the React DOM.
+   - Should Test frontend/backend/both after fix: Frontend
+   - Is recurring issue? Y
 
 **Known issue recurrence from previous fork**
-  - Issue recurrence in previous fork: Webpack Cache Runtime Crash ( or icon import failures).
-  - Recurrence count: 6+ 
-  - Status: IN PROGRESS (Restarted frontend in last step. If it fails, delete  folder).
+  - Issue recurrence in previous fork: Webpack Cache Runtime Crash (Chunk load failures/Syntax errors from cache).
+  - Recurrence count: 7+ 
+  - Status: IN PROGRESS (Frontend cache cleared, needs Error Boundaries for permanent resilience).
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- React Context () is now used heavily to pass client-specific data down to the unified embedded components.
-- The UI relies heavily on conditional rendering ( prop) to render components cleanly inside tabs without nested Layout wrappers.
+- React Context () handles client-specific data down to embedded components.
+- The  prop is heavily used across the platform to hide  wrappers and s when a page is injected as a tab inside a Unified view.
+- Heavy use of  imports for routing and tab content.
 
 **key DB schema**
   - 
   - 
-  -  (New)
 
 **changes in tech stack**
-  - Added  for Knowledge Graph visualizations.
+  - N/A
 
 **All files of reference** 
--  (Needs mock data expansion for clients 2-5)
--  (Navigation state)
--  (Needs Cash and Super tabs added)
--  (Needs Decision Centre merged in)
+-  (Currently crashing, needs fixes)
+-  (Re-activated and fixed)
+-  (Contains navigation logic)
+-  (Contains routing and Context providers)
 
 **Areas that need refactoring**: 
--  across the frontend files (, ) needs to be fully populated for the 5 dummy clients so that UI testing of the Client Context Switcher works visibly.
+-  fallbacks in the Unified views (e.g., ) need  wrappers. Currently, if one lazy-loaded tab fails, it throws an uncaught error that breaks the whole app.
 
 **key api endpoints**
 - 
+- 
 
 **Critical Info for New Agent** 
-- The agent just finished a massive UI consolidation replacing 15+ pages with tabbed unified views (, ). Do not undo this. 
-- The user's complaint about Wheeler data showing for Chen is because the  fix applied earlier worked logically, but the actual hardcoded dictionary  (or ) only has distinct numbers for . You MUST add varied dummy data for the other clients.
-- If frontend fails to load due to a random icon error (e.g., Bitcoin icon), clear the webpack cache.
+- The previous agent successfully completed a *massive* UI consolidation, moving dozens of individual pages into tabbed unified wrappers. DO NOT undo this architecture. 
+- The current user blocker is runtime instability. The app is fragile because components assume data objects (like , ) exist. You *must* add optional chaining () to the  file immediately.
+- The  prop is the key architectural pattern right now. If you modify any standalone page, ensure you account for 
 
 **documents and test reports created in this job** 
   - 
-  -  (Passed 100% backend/frontend)
+  - 
+  - 
+  - 
+  - 
 
 **Last 10 User Messages and any pending HUMAN messages** 
 1. *User*: Please use ask_human tool and confirm your plan now.
-2. *User*: proceed with that
-3. *User*: complete all...
-4. *User*: yes - consolidate as many pages as possible, enhance the voice commands as much as possible and make sure all market data is live, website links work and no runtime erros occur
-5. *User*: ensure the right profile matches the data... Combine Net Worth with Dashboard tabs... Combine all investment pages to one, using tabs... Adviser - Combine AI assistant with Tasks... Adviser - put Xplan Integration within the platform... personal - Markets page to load faster...
-6. *User*: Put Xplan sync under Integrations, however keep it in the platform with the navigation on LHS. Fix the runtime error. Wheeler family data pops up for Chen and robert mitchell - please ensure all dummy accounts have their own data. The design of client profiles needs better design - image 5. Add Cash/ TDs and Super/ Pension to all investments. Combine Adviser Decision centre with command centre. (PENDING FIXES)
+2. *User*: Fix the runtime error... Complete all and the feedback below : Wheeler family data pops up for Chen... The design of client profiles needs better design... Add Cash/ TDs and Super/ Pension... Combine Adviser Decision centre...
+3. *User*: Review remaining standalone pages for further consolidation and the Enhancement idea
+4. *User*: All 4 - Also review the code and look to simplify it.
+5. *User*: Personal - include Cash/TDs and Super/ SMSF to one investment page... Combine Montre Carlo tab with Goals & Sceniaros tab... Move Research centre to Planning... Adviser.- I don't understand the differences between Dashboard, Command centre and daily briefing - simplify and combine to one page...
+6. *User*: please continue (During a long terminal output)
+7. *User*: Design error Where is the budget management for client and personal inputs? Runtime error
+8. *User*: Far too Many Runtime errors - Review, fix and stress test the platform (PENDING FIXES)
 
 **Project Health Check:**
-- Broken: Potential frontend Webpack cache error regarding Lucide icons.
-- Mocked:  is incomplete for clients 2 through 5.
+- Broken:  crashes due to undefined properties; Lazy loading chunks fail intermittently.
+- Mocked:  extended across all 5 clients.
 
 **3rd Party Integrations** 
 - OpenAI GPT-5.2 — uses Emergent LLM Key
-- OpenAI Whisper — uses Emergent LLM Key 
-- CoinGecko (Live Crypto) — Free tier (rate limits handled gracefully)
+- CoinGecko (Live Crypto) — Free tier 
 
 **Testing status**
-  - Testing agent used after significant changes: YES (Iteration 133)
+  - Testing agent used after significant changes: YES (Iterations 134, 135, 136, 137)
   - Troubleshoot agent used after agent stuck in loop: NO
   - Test files created: 
-  - Known regressions: None, but missing mock data makes the app look broken to the user.
+  - Known regressions:  crashes due to undefined .
 
 **Credentials to test flow:**
 Available in .
 
 **What agent forgot to execute**
-The agent was perfectly following the final user prompt but ran out of context before it could expand the mock data for clients 2-5, redesign the client profile, add Cash/Super to the unified investments view, and merge the Decision Centre. These must be picked up immediately.</analysis>
+The agent was in the middle of fixing the  runtime error and implementing the user's request to stress test the platform when the context window was reached. This must be the immediate next step. Add Error Boundaries to prevent future full-page crashes.</analysis>

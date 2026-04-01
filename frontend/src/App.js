@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { XplanSyncProvider, XplanSyncIndicator } from "@/components/XplanSyncNotification";
 import { LanguageProvider } from "@/components/LanguageContext";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 // Loading component for lazy loaded pages
 const PageLoader = () => (
@@ -1319,9 +1320,11 @@ function App() {
               <NotificationsProvider>
                 <XplanSyncProvider>
                   <ComplianceModal />
-                  <Suspense fallback={<PageLoader />}>
-                    <AppRouter />
-                  </Suspense>
+                  <ErrorBoundary label="Application">
+                    <Suspense fallback={<PageLoader />}>
+                      <AppRouter />
+                    </Suspense>
+                  </ErrorBoundary>
                   <Toaster position="top-right" richColors />
                   <XplanSyncIndicator />
                 </XplanSyncProvider>

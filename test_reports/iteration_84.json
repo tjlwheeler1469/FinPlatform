@@ -36,7 +36,7 @@
     "frontend": "100% (both pages load live data, refresh works)"
   },
   "test_credentials": {
-    "preview_url": "https://wealth-consolidation.preview.emergentagent.com",
+    "preview_url": "https://smsf-stability-fix.preview.emergentagent.com",
     "crypto_page": "/crypto-portfolio",
     "hybrids_page": "/hybrids-trading"
   },

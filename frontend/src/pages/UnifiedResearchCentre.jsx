@@ -2,6 +2,7 @@ import { useState, lazy, Suspense } from "react";
 import Layout from "@/components/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Search, BarChart3, Building2, LineChart } from "lucide-react";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const StockResearch = lazy(() => import("@/pages/StockResearch"));
 const BrokerResearch = lazy(() => import("@/pages/BrokerResearch"));
@@ -46,16 +47,16 @@ const UnifiedResearchCentre = () => {
 
           <div className="mt-4">
             <TabsContent value="stocks" className="mt-0">
-              <Suspense fallback={<TabLoader />}><StockResearch embedded /></Suspense>
+              <ErrorBoundary label="Stock Research"><Suspense fallback={<TabLoader />}><StockResearch embedded /></Suspense></ErrorBoundary>
             </TabsContent>
             <TabsContent value="broker" className="mt-0">
-              <Suspense fallback={<TabLoader />}><BrokerResearch embedded /></Suspense>
+              <ErrorBoundary label="Broker Research"><Suspense fallback={<TabLoader />}><BrokerResearch embedded /></Suspense></ErrorBoundary>
             </TabsContent>
             <TabsContent value="compare" className="mt-0">
-              <Suspense fallback={<TabLoader />}><InvestmentComparison embedded /></Suspense>
+              <ErrorBoundary label="Investment Comparison"><Suspense fallback={<TabLoader />}><InvestmentComparison embedded /></Suspense></ErrorBoundary>
             </TabsContent>
             <TabsContent value="property" className="mt-0">
-              <Suspense fallback={<TabLoader />}><PropertyComparison embedded /></Suspense>
+              <ErrorBoundary label="Property Comparison"><Suspense fallback={<TabLoader />}><PropertyComparison embedded /></Suspense></ErrorBoundary>
             </TabsContent>
           </div>
         </Tabs>

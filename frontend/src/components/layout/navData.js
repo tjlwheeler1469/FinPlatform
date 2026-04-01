@@ -127,6 +127,7 @@ export const clientContextNav = [
     name: "Planning",
     icon: Target,
     items: [
+      { path: "/scenario-modelling", label: "Goals & Scenarios", icon: Target, title: "Goals, Scenarios & Monte Carlo" },
       { path: "/next-best-actions", label: "Actions", icon: Zap, title: "Next Best Actions" },
       { path: "/budget", label: "Budget", icon: PiggyBank, title: "Budget Management", badge: "NEW" },
     ]

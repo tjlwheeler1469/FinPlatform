@@ -36,7 +36,7 @@
     "frontend": "100% (Stock Trading page verified, all features working)"
   },
   "test_credentials": {
-    "api_base_url": "https://wealth-consolidation.preview.emergentagent.com"
+    "api_base_url": "https://smsf-stability-fix.preview.emergentagent.com"
   },
   "seed_data_creation": "None - uses mock data for demo mode services",
   "retest_needed": false,

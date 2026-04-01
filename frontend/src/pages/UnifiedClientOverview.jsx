@@ -1,13 +1,13 @@
 import { useState, lazy, Suspense } from "react";
 import Layout from "@/components/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, LayoutDashboard, Wallet, TrendingUp, Activity, Target } from "lucide-react";
+import { Loader2, LayoutDashboard, Wallet, TrendingUp, Activity } from "lucide-react";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const PersonalDashboard = lazy(() => import("@/pages/PersonalDashboard"));
 const FamilyWealthDashboard = lazy(() => import("@/pages/FamilyWealthDashboard"));
 const NetWorthTrend = lazy(() => import("@/pages/NetWorthTrend"));
 const DecisionEngine = lazy(() => import("@/pages/DecisionEngine"));
-const ScenarioModelling = lazy(() => import("@/pages/ScenarioModelling"));
 
 const TabLoader = () => (
   <div className="flex items-center justify-center py-20">
@@ -36,25 +36,19 @@ const UnifiedClientOverview = () => {
               <TabsTrigger value="health" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="tab-health">
                 <Activity className="h-3.5 w-3.5" /> Health Score
               </TabsTrigger>
-              <TabsTrigger value="goals" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="tab-goals">
-                <Target className="h-3.5 w-3.5" /> Goals & Scenarios
-              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview" className="mt-0">
-              <Suspense fallback={<TabLoader />}><PersonalDashboard embedded /></Suspense>
+              <ErrorBoundary label="Overview"><Suspense fallback={<TabLoader />}><PersonalDashboard embedded /></Suspense></ErrorBoundary>
             </TabsContent>
             <TabsContent value="net-worth" className="mt-0">
-              <Suspense fallback={<TabLoader />}><FamilyWealthDashboard embedded /></Suspense>
+              <ErrorBoundary label="Net Worth"><Suspense fallback={<TabLoader />}><FamilyWealthDashboard embedded /></Suspense></ErrorBoundary>
             </TabsContent>
             <TabsContent value="wealth-trends" className="mt-0">
-              <Suspense fallback={<TabLoader />}><NetWorthTrend embedded /></Suspense>
+              <ErrorBoundary label="Wealth Trends"><Suspense fallback={<TabLoader />}><NetWorthTrend embedded /></Suspense></ErrorBoundary>
             </TabsContent>
             <TabsContent value="health" className="mt-0">
-              <Suspense fallback={<TabLoader />}><DecisionEngine embedded /></Suspense>
-            </TabsContent>
-            <TabsContent value="goals" className="mt-0">
-              <Suspense fallback={<TabLoader />}><ScenarioModelling embedded /></Suspense>
+              <ErrorBoundary label="Health Score"><Suspense fallback={<TabLoader />}><DecisionEngine embedded /></Suspense></ErrorBoundary>
             </TabsContent>
           </Tabs>
         </div>

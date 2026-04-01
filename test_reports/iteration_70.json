@@ -34,7 +34,7 @@
     "frontend": "100% (All 10 features verified)"
   },
   "test_credentials": {
-    "api_base_url": "https://wealth-consolidation.preview.emergentagent.com"
+    "api_base_url": "https://smsf-stability-fix.preview.emergentagent.com"
   },
   "seed_data_creation": "No seed data needed - all CRM data is DEMO/MOCKED in frontend",
   "retest_needed": false,

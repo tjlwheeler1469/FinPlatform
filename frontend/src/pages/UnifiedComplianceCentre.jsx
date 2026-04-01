@@ -2,6 +2,7 @@ import { useState, lazy, Suspense } from "react";
 import Layout from "@/components/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Shield, AlertTriangle, GitBranch } from "lucide-react";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const AdviceOSDashboard = lazy(() => import("@/pages/AdviceOSDashboard"));
 const EnterpriseComplianceDashboard = lazy(() => import("@/pages/EnterpriseComplianceDashboard"));
@@ -46,16 +47,16 @@ const UnifiedComplianceCentre = () => {
 
           <div className="mt-4">
             <TabsContent value="adviceos" className="mt-0">
-              <Suspense fallback={<TabLoader />}><AdviceOSDashboard embedded /></Suspense>
+              <ErrorBoundary label="AdviceOS"><Suspense fallback={<TabLoader />}><AdviceOSDashboard embedded /></Suspense></ErrorBoundary>
             </TabsContent>
             <TabsContent value="dashboard" className="mt-0">
-              <Suspense fallback={<TabLoader />}><EnterpriseComplianceDashboard embedded /></Suspense>
+              <ErrorBoundary label="Compliance Dashboard"><Suspense fallback={<TabLoader />}><EnterpriseComplianceDashboard embedded /></Suspense></ErrorBoundary>
             </TabsContent>
             <TabsContent value="breaches" className="mt-0">
-              <Suspense fallback={<TabLoader />}><BreachRegister embedded /></Suspense>
+              <ErrorBoundary label="Breach Register"><Suspense fallback={<TabLoader />}><BreachRegister embedded /></Suspense></ErrorBoundary>
             </TabsContent>
             <TabsContent value="risk-controls" className="mt-0">
-              <Suspense fallback={<TabLoader />}><RiskControlMapping embedded /></Suspense>
+              <ErrorBoundary label="Risk Controls"><Suspense fallback={<TabLoader />}><RiskControlMapping embedded /></Suspense></ErrorBoundary>
             </TabsContent>
           </div>
         </Tabs>

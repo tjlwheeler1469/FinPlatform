@@ -80,14 +80,15 @@ const SMSFOptimizer = ({ embedded = false }) => {
 
   // Generate projection chart data
   const generateProjectionData = () => {
-    if (!result) return [];
+    if (!result?.projections) return [];
     
     const data = [];
     let balance = superBalance;
-    const annualContribution = result.projections.annual_contribution;
+    const annualContribution = result.projections?.annual_contribution || 0;
     const growthRate = 0.07;
+    const yearsToRetirement = result.projections?.years_to_retirement || 20;
     
-    for (let year = 0; year <= result.projections.years_to_retirement; year++) {
+    for (let year = 0; year <= yearsToRetirement; year++) {
       data.push({
         year: `Age ${age + year}`,
         balance: Math.round(balance)
@@ -99,7 +100,7 @@ const SMSFOptimizer = ({ embedded = false }) => {
   };
 
   const projectionData = generateProjectionData();
-  const concessionalCapUsed = result ? (result.contributions.total_concessional / 30000) * 100 : 0;
+  const concessionalCapUsed = result?.contributions?.total_concessional ? (result.contributions.total_concessional / 30000) * 100 : 0;
 
   const content = (
       <div className="space-y-8" data-testid="smsf-optimizer-page">
@@ -252,27 +253,27 @@ const SMSFOptimizer = ({ embedded = false }) => {
                     <CardContent className="p-4">
                       <p className="text-sm text-muted-foreground">Tax Saved</p>
                       <p className="text-xl font-bold text-[#10B981]">
-                        {formatCurrency(result.tax_analysis.total_tax_benefit)}
+                        {formatCurrency(result?.tax_analysis?.total_tax_benefit || 0)}
                       </p>
                     </CardContent>
                   </Card>
                   <Card>
                     <CardContent className="p-4">
                       <p className="text-sm text-muted-foreground">Years to 67</p>
-                      <p className="text-xl font-bold">{result.projections.years_to_retirement}</p>
+                      <p className="text-xl font-bold">{result?.projections?.years_to_retirement || 0}</p>
                     </CardContent>
                   </Card>
                   <Card>
                     <CardContent className="p-4">
                       <p className="text-sm text-muted-foreground">Marginal Rate</p>
-                      <p className="text-xl font-bold">{result.tax_analysis.marginal_tax_rate}%</p>
+                      <p className="text-xl font-bold">{result?.tax_analysis?.marginal_tax_rate || 0}%</p>
                     </CardContent>
                   </Card>
                   <Card className="bg-[#1a2744] text-white">
                     <CardContent className="p-4">
                       <p className="text-sm text-white/80">Projected at 67</p>
                       <p className="text-xl font-bold">
-                        {formatCurrency(result.projections.projected_balance_at_67)}
+                        {formatCurrency(result?.projections?.projected_balance_at_67 || 0)}
                       </p>
                     </CardContent>
                   </Card>
@@ -286,17 +287,17 @@ const SMSFOptimizer = ({ embedded = false }) => {
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
-                        <span>Used: {formatCurrency(result.contributions.total_concessional)}</span>
-                        <span>Cap: {formatCurrency(result.caps.concessional_cap)}</span>
+                        <span>Used: {formatCurrency(result?.contributions?.total_concessional || 0)}</span>
+                        <span>Cap: {formatCurrency(result?.caps?.concessional_cap || 30000)}</span>
                       </div>
                       <Progress 
                         value={Math.min(concessionalCapUsed, 100)} 
                         className={concessionalCapUsed > 100 ? "bg-destructive/20" : ""}
                       />
-                      {result.caps.cap_exceeded && (
+                      {result?.caps?.cap_exceeded && (
                         <div className="flex items-center gap-2 text-destructive text-sm">
                           <AlertCircle className="h-4 w-4" />
-                          Cap exceeded by {formatCurrency(result.caps.excess_amount)}
+                          Cap exceeded by {formatCurrency(result?.caps?.excess_amount || 0)}
                         </div>
                       )}
                     </div>
@@ -305,25 +306,25 @@ const SMSFOptimizer = ({ embedded = false }) => {
                       <div className="p-3 rounded-lg bg-muted">
                         <p className="text-sm text-muted-foreground">Remaining Cap</p>
                         <p className="text-lg font-bold text-[#10B981]">
-                          {formatCurrency(result.caps.concessional_remaining)}
+                          {formatCurrency(result?.caps?.concessional_remaining || 0)}
                         </p>
                       </div>
                       <div className="p-3 rounded-lg bg-muted">
                         <p className="text-sm text-muted-foreground">Non-Concessional Cap</p>
                         <p className="text-lg font-bold">
-                          {formatCurrency(result.caps.non_concessional_cap)}
+                          {formatCurrency(result?.caps?.non_concessional_cap || 120000)}
                         </p>
                       </div>
                     </div>
 
-                    {result.caps.bring_forward_available && (
+                    {result?.caps?.bring_forward_available && (
                       <div className="p-3 rounded-lg bg-[#D4A84C]/10 border border-[#D4A84C]/30">
                         <div className="flex items-center gap-2">
                           <CheckCircle className="h-4 w-4 text-[#D4A84C]" />
                           <p className="font-medium text-sm">Bring Forward Available</p>
                         </div>
                         <p className="text-sm text-muted-foreground mt-1">
-                          You can contribute up to {formatCurrency(result.caps.bring_forward_cap)} non-concessional over 3 years
+                          You can contribute up to {formatCurrency(result?.caps?.bring_forward_cap || 0)} non-concessional over 3 years
                         </p>
                       </div>
                     )}
@@ -335,7 +336,7 @@ const SMSFOptimizer = ({ embedded = false }) => {
                   <CardHeader>
                     <CardTitle className="">Balance Projection to Retirement</CardTitle>
                     <CardDescription>
-                      Assuming {result.projections.assumed_growth_rate}% annual return
+                      Assuming {result?.projections?.assumed_growth_rate || 7}% annual return
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -386,23 +387,23 @@ const SMSFOptimizer = ({ embedded = false }) => {
                       <div className="p-3 rounded-lg bg-[#10B981]/10">
                         <p className="text-sm text-muted-foreground">Salary Sacrifice Savings</p>
                         <p className="text-lg font-bold text-[#10B981]">
-                          {formatCurrency(result.tax_analysis.tax_saved_salary_sacrifice)}
+                          {formatCurrency(result?.tax_analysis?.tax_saved_salary_sacrifice || 0)}
                         </p>
                         <p className="text-xs text-muted-foreground mt-1">
-                          {result.tax_analysis.marginal_tax_rate}% → 15% tax
+                          {result?.tax_analysis?.marginal_tax_rate || 0}% → 15% tax
                         </p>
                       </div>
                       <div className="p-3 rounded-lg bg-muted">
                         <p className="text-sm text-muted-foreground">Spouse Tax Offset</p>
                         <p className="text-lg font-bold">
-                          {formatCurrency(result.tax_analysis.spouse_tax_offset)}
+                          {formatCurrency(result?.tax_analysis?.spouse_tax_offset || 0)}
                         </p>
                       </div>
-                      <div className={`p-3 rounded-lg ${result.tax_analysis.div_293_applicable ? 'bg-destructive/10' : 'bg-muted'}`}>
+                      <div className={`p-3 rounded-lg ${result?.tax_analysis?.div_293_applicable ? 'bg-destructive/10' : 'bg-muted'}`}>
                         <p className="text-sm text-muted-foreground">Division 293</p>
-                        <p className={`text-lg font-bold ${result.tax_analysis.div_293_applicable ? 'text-destructive' : ''}`}>
-                          {result.tax_analysis.div_293_applicable 
-                            ? `-${formatCurrency(result.tax_analysis.div_293_additional_tax)}`
+                        <p className={`text-lg font-bold ${result?.tax_analysis?.div_293_applicable ? 'text-destructive' : ''}`}>
+                          {result?.tax_analysis?.div_293_applicable 
+                            ? `-${formatCurrency(result?.tax_analysis?.div_293_additional_tax || 0)}`
                             : "Not Applicable"
                           }
                         </p>
@@ -410,7 +411,7 @@ const SMSFOptimizer = ({ embedded = false }) => {
                       <div className="p-3 rounded-lg bg-[#1a2744] text-white">
                         <p className="text-sm text-white/80">Net Tax Benefit</p>
                         <p className="text-lg font-bold">
-                          {formatCurrency(result.tax_analysis.total_tax_benefit)}
+                          {formatCurrency(result?.tax_analysis?.total_tax_benefit || 0)}
                         </p>
                       </div>
                     </div>
@@ -427,7 +428,7 @@ const SMSFOptimizer = ({ embedded = false }) => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {result.recommendations.map((rec, index) => (
+                      {(result?.recommendations || []).map((rec, index) => (
                         <div 
                           key={`item-${index}`} 
                           className="flex items-start gap-3 p-3 rounded-lg bg-muted/50"

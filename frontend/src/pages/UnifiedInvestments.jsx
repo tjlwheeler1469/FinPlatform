@@ -2,6 +2,7 @@ import { useState, lazy, Suspense } from "react";
 import Layout from "@/components/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, BarChart3, Building2, Landmark, Bitcoin, Briefcase, Lock, DollarSign, Shield, PiggyBank } from "lucide-react";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const SharePortfolio = lazy(() => import("@/pages/SharePortfolio"));
 const BondsTrading = lazy(() => import("@/pages/BondsTrading"));
@@ -53,31 +54,31 @@ const UnifiedInvestments = () => {
             </TabsList>
 
             <TabsContent value="shares" className="mt-0">
-              <Suspense fallback={<TabLoader />}><SharePortfolio embedded /></Suspense>
+              <ErrorBoundary label="Shares & ETFs"><Suspense fallback={<TabLoader />}><SharePortfolio embedded /></Suspense></ErrorBoundary>
             </TabsContent>
             <TabsContent value="bonds" className="mt-0">
-              <Suspense fallback={<TabLoader />}><BondsTrading embedded /></Suspense>
+              <ErrorBoundary label="Bonds"><Suspense fallback={<TabLoader />}><BondsTrading embedded /></Suspense></ErrorBoundary>
             </TabsContent>
             <TabsContent value="property" className="mt-0">
-              <Suspense fallback={<TabLoader />}><PropertyPortfolio embedded /></Suspense>
+              <ErrorBoundary label="Property"><Suspense fallback={<TabLoader />}><PropertyPortfolio embedded /></Suspense></ErrorBoundary>
             </TabsContent>
             <TabsContent value="crypto" className="mt-0">
-              <Suspense fallback={<TabLoader />}><CryptoPortfolio embedded /></Suspense>
+              <ErrorBoundary label="Crypto"><Suspense fallback={<TabLoader />}><CryptoPortfolio embedded /></Suspense></ErrorBoundary>
             </TabsContent>
             <TabsContent value="cash" className="mt-0">
-              <Suspense fallback={<TabLoader />}><CashDeposits embedded /></Suspense>
+              <ErrorBoundary label="Cash & TDs"><Suspense fallback={<TabLoader />}><CashDeposits embedded /></Suspense></ErrorBoundary>
             </TabsContent>
             <TabsContent value="super" className="mt-0">
-              <Suspense fallback={<TabLoader />}><SuperannuationGuarantee embedded /></Suspense>
+              <ErrorBoundary label="Super & Pension"><Suspense fallback={<TabLoader />}><SuperannuationGuarantee embedded /></Suspense></ErrorBoundary>
             </TabsContent>
             <TabsContent value="smsf" className="mt-0">
-              <Suspense fallback={<TabLoader />}><SMSFOptimizer embedded /></Suspense>
+              <ErrorBoundary label="SMSF"><Suspense fallback={<TabLoader />}><SMSFOptimizer embedded /></Suspense></ErrorBoundary>
             </TabsContent>
             <TabsContent value="managed" className="mt-0">
-              <Suspense fallback={<TabLoader />}><ManagedFunds embedded /></Suspense>
+              <ErrorBoundary label="Managed Funds"><Suspense fallback={<TabLoader />}><ManagedFunds embedded /></Suspense></ErrorBoundary>
             </TabsContent>
             <TabsContent value="unlisted" className="mt-0">
-              <Suspense fallback={<TabLoader />}><UnlistedInvestments embedded /></Suspense>
+              <ErrorBoundary label="Unlisted"><Suspense fallback={<TabLoader />}><UnlistedInvestments embedded /></Suspense></ErrorBoundary>
             </TabsContent>
           </Tabs>
         </div>
