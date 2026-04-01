@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
 import { 
   Wallet,
   DollarSign,
@@ -28,7 +30,9 @@ import {
   Calendar,
   PiggyBank,
   AlertCircle,
-  CheckCircle
+  CheckCircle,
+  FlaskConical,
+  RotateCcw
 } from "lucide-react";
 import { usePortfolio } from "@/App";
 import {
@@ -145,24 +149,38 @@ const HouseholdBudget = () => {
 
   const [activeTab, setActiveTab] = useState("overview");
 
+  // What-If Mode
+  const [whatIfMode, setWhatIfMode] = useState(false);
+  const [whatIfAdjustments, setWhatIfAdjustments] = useState({
+    incomeChange: 0,    // percentage change
+    expenseChange: 0,   // percentage change
+    extraSavings: 0,    // additional monthly savings
+    lumpSum: 0,         // one-off injection
+    mortgageRateChange: 0, // basis points change
+  });
+
   // Helper to convert any frequency to monthly
   const toMonthly = (amount, frequency) => {
     return amount * (FREQUENCY_TO_MONTHLY[frequency] || 1);
   };
 
-  // Calculate totals
+  // Calculate totals (with What-If adjustments)
+  const incomeMultiplier = whatIfMode ? 1 + (whatIfAdjustments.incomeChange / 100) : 1;
+  const expenseMultiplier = whatIfMode ? 1 + (whatIfAdjustments.expenseChange / 100) : 1;
+  const extraSavings = whatIfMode ? whatIfAdjustments.extraSavings : 0;
+
   const totalMonthlyIncome = incomes.reduce((sum, inc) => {
     return sum + toMonthly(inc.amount, inc.frequency);
-  }, 0);
+  }, 0) * incomeMultiplier;
 
   const totalMonthlyExpenses = expenses.reduce((sum, exp) => {
     return sum + toMonthly(exp.amount, exp.frequency);
-  }, 0);
+  }, 0) * expenseMultiplier;
 
-  const totalAnnualOneOff = oneOffCosts.reduce((sum, cost) => sum + cost.amount, 0);
+  const totalAnnualOneOff = oneOffCosts.reduce((sum, cost) => sum + cost.amount, 0) + (whatIfMode ? whatIfAdjustments.lumpSum : 0);
   const averageMonthlyOneOff = totalAnnualOneOff / 12;
 
-  const monthlySurplus = totalMonthlyIncome - totalMonthlyExpenses - averageMonthlyOneOff;
+  const monthlySurplus = totalMonthlyIncome - totalMonthlyExpenses - averageMonthlyOneOff + extraSavings;
   const annualSurplus = monthlySurplus * 12;
 
   // Add handlers
@@ -239,14 +257,86 @@ const HouseholdBudget = () => {
     <Layout>
       <div className="space-y-6" data-testid="household-budget-page">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold  text-foreground">
-            Household Budget
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Track income, expenses, and plan for one-off costs
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">
+              Household Budget
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Track income, expenses, and plan for one-off costs
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 cursor-pointer" data-testid="whatif-toggle">
+              <FlaskConical className={`h-4 w-4 ${whatIfMode ? "text-purple-600" : "text-muted-foreground"}`} />
+              <span className={`text-sm font-medium ${whatIfMode ? "text-purple-600" : "text-muted-foreground"}`}>What-If</span>
+              <Switch checked={whatIfMode} onCheckedChange={setWhatIfMode} />
+            </label>
+            {whatIfMode && (
+              <Button variant="ghost" size="sm" onClick={() => setWhatIfAdjustments({ incomeChange: 0, expenseChange: 0, extraSavings: 0, lumpSum: 0, mortgageRateChange: 0 })} data-testid="reset-whatif">
+                <RotateCcw className="h-3.5 w-3.5 mr-1" /> Reset
+              </Button>
+            )}
+          </div>
         </div>
+
+        {/* What-If Scenario Panel */}
+        {whatIfMode && (
+          <Card className="border-purple-200 bg-purple-50/50" data-testid="whatif-panel">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <FlaskConical className="h-4 w-4 text-purple-600" />
+                <p className="text-sm font-semibold text-purple-700">What-If Scenario Adjustments</p>
+                <Badge className="bg-purple-100 text-purple-700 border-purple-200 text-[10px]">Simulation</Badge>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Income Change</Label>
+                  <div className="flex items-center gap-2">
+                    <Slider value={[whatIfAdjustments.incomeChange]} min={-50} max={50} step={5}
+                      onValueChange={([v]) => setWhatIfAdjustments(p => ({...p, incomeChange: v}))}
+                      className="flex-1" />
+                    <span className={`text-xs font-bold min-w-[40px] text-right ${whatIfAdjustments.incomeChange >= 0 ? "text-emerald-600" : "text-red-600"}`}>
+                      {whatIfAdjustments.incomeChange > 0 ? "+" : ""}{whatIfAdjustments.incomeChange}%
+                    </span>
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Expense Change</Label>
+                  <div className="flex items-center gap-2">
+                    <Slider value={[whatIfAdjustments.expenseChange]} min={-50} max={50} step={5}
+                      onValueChange={([v]) => setWhatIfAdjustments(p => ({...p, expenseChange: v}))}
+                      className="flex-1" />
+                    <span className={`text-xs font-bold min-w-[40px] text-right ${whatIfAdjustments.expenseChange <= 0 ? "text-emerald-600" : "text-red-600"}`}>
+                      {whatIfAdjustments.expenseChange > 0 ? "+" : ""}{whatIfAdjustments.expenseChange}%
+                    </span>
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Extra Monthly Savings</Label>
+                  <Input type="number" value={whatIfAdjustments.extraSavings} onChange={e => setWhatIfAdjustments(p => ({...p, extraSavings: Number(e.target.value)}))}
+                    className="h-8 text-xs" placeholder="$0" data-testid="whatif-extra-savings" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Annual Lump Sum</Label>
+                  <Input type="number" value={whatIfAdjustments.lumpSum} onChange={e => setWhatIfAdjustments(p => ({...p, lumpSum: Number(e.target.value)}))}
+                    className="h-8 text-xs" placeholder="$0" data-testid="whatif-lump-sum" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Mortgage Rate (bps)</Label>
+                  <div className="flex items-center gap-2">
+                    <Slider value={[whatIfAdjustments.mortgageRateChange]} min={-200} max={200} step={25}
+                      onValueChange={([v]) => setWhatIfAdjustments(p => ({...p, mortgageRateChange: v}))}
+                      className="flex-1" />
+                    <span className={`text-xs font-bold min-w-[40px] text-right ${whatIfAdjustments.mortgageRateChange <= 0 ? "text-emerald-600" : "text-red-600"}`}>
+                      {whatIfAdjustments.mortgageRateChange > 0 ? "+" : ""}{whatIfAdjustments.mortgageRateChange}bp
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Summary Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

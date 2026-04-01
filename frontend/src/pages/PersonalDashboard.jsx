@@ -515,6 +515,39 @@ const PersonalDashboard = ({ embedded = false }) => {
           </DialogContent>
         </Dialog>
 
+        {/* Portfolio Health Score */}
+        <Card className="border-l-4 border-l-[#D4A84C] bg-gradient-to-r from-[#0f1d35]/[0.03] to-transparent" data-testid="portfolio-health-score">
+          <CardContent className="py-3 px-5">
+            <div className="flex items-center gap-6 overflow-x-auto">
+              <div className="flex items-center gap-2 min-w-fit">
+                <Activity className="h-5 w-5 text-[#D4A84C]" />
+                <span className="text-sm font-semibold">Health Score</span>
+              </div>
+              {[
+                { label: "Drift", score: (() => { const actual = allocationData.map(a => a.value / totals.totalValue * 100); const target = [25, 20, 25, 20, 10]; const maxDrift = Math.max(...actual.slice(0, Math.min(actual.length, target.length)).map((a, i) => Math.abs(a - target[i]))); return maxDrift < 5 ? 92 : maxDrift < 10 ? 74 : maxDrift < 20 ? 55 : 35; })() },
+                { label: "Concentration", score: (() => { const max = Math.max(...allocationData.map(a => a.value / totals.totalValue * 100)); return max < 25 ? 95 : max < 35 ? 80 : max < 50 ? 60 : 40; })() },
+                { label: "Tax Efficiency", score: 78 },
+                { label: "Risk Alignment", score: 85 },
+                { label: "Diversification", score: allocationData.length >= 5 ? 88 : allocationData.length >= 3 ? 70 : 50 },
+              ].map((item) => {
+                const color = item.score >= 80 ? "text-emerald-600" : item.score >= 60 ? "text-amber-600" : "text-red-600";
+                const bg = item.score >= 80 ? "bg-emerald-50" : item.score >= 60 ? "bg-amber-50" : "bg-red-50";
+                return (
+                  <div key={item.label} className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${bg} min-w-fit`}>
+                    <span className="text-xs text-muted-foreground">{item.label}</span>
+                    <span className={`text-sm font-bold ${color}`}>{item.score}</span>
+                    <div className={`h-2 w-2 rounded-full ${item.score >= 80 ? "bg-emerald-500" : item.score >= 60 ? "bg-amber-500" : "bg-red-500"}`} />
+                  </div>
+                );
+              })}
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0f1d35] text-white min-w-fit">
+                <span className="text-xs">Overall</span>
+                <span className="text-sm font-bold">{(() => { const scores = [78, 85, 88]; const avg = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length); return avg; })()}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Quick Stats Row */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">

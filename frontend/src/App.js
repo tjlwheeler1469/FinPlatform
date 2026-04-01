@@ -266,6 +266,8 @@ const UnifiedResearchCentre = lazy(() => import("@/pages/UnifiedResearchCentre")
 const UnifiedComplianceCentre = lazy(() => import("@/pages/UnifiedComplianceCentre"));
 const UnifiedGoalsPlanning = lazy(() => import("@/pages/UnifiedGoalsPlanning"));
 const UnifiedClientOverview = lazy(() => import("@/pages/UnifiedClientOverview"));
+const ClientHealthDashboard = lazy(() => import("@/pages/ClientHealthDashboard"));
+const ClientComparison = lazy(() => import("@/pages/ClientComparison"));
 
 // Compliance Modal
 import { ComplianceModal } from "@/components/ComplianceDisclaimer";
@@ -1296,6 +1298,12 @@ const AppRouter = () => {
       
       {/* Adviser Hub (Combined CRM) */}
       <Route path="/adviser-hub" element={<AdviserHub />} />
+      
+      {/* Client Health Dashboard */}
+      <Route path="/client-health" element={<ClientHealthDashboard />} />
+      
+      {/* Client Comparison */}
+      <Route path="/client-comparison" element={<ClientComparison />} />
     </Routes>
   );
 };

@@ -69,6 +69,8 @@ export const adviserBaseNav = [
     icon: Users,
     items: [
       { path: "/adviser-hub", label: "Client Hub", icon: Zap, title: "Clients & Portfolio", badge: "HUB" },
+      { path: "/client-health", label: "Health Dashboard", icon: Activity, title: "Client Health RAG Status", badge: "NEW" },
+      { path: "/client-comparison", label: "Compare Clients", icon: BarChart3, title: "Side-by-Side Client Comparison", badge: "NEW" },
     ]
   },
   {

@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import {
   X, Phone, Mail, Target, Shield, TrendingUp, ArrowUpRight, ArrowDownRight,
-  Users, Calendar, Clock, FileText, CheckCircle2, AlertCircle, Maximize2
+  Users, Calendar, Clock, FileText, CheckCircle2, AlertCircle, Maximize2,
+  ChevronLeft, ChevronRight, Download, Keyboard
 } from "lucide-react";
+import { toast } from "sonner";
 
 const formatCurrency = (value) => {
   if (value === undefined || value === null || isNaN(value)) return "$0";
@@ -22,11 +24,145 @@ const formatDate = (dateStr) => {
 
 const MeetingMode = ({ client, onExit }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [exporting, setExporting] = useState(false);
+  const containerRef = useRef(null);
+
+  // Keyboard shortcuts
+  const handleKeyDown = useCallback((e) => {
+    if (e.key === "Escape") { onExit(); return; }
+    if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); setCurrentSlide(s => Math.min(5, s + 1)); }
+    if (e.key === "ArrowLeft") { setCurrentSlide(s => Math.max(0, s - 1)); }
+    if (e.key === "f" || e.key === "F") {
+      if (!document.fullscreenElement) {
+        containerRef.current?.requestFullscreen?.();
+      } else {
+        document.exitFullscreen?.();
+      }
+    }
+    // Number keys 1-6 to jump to slide
+    const num = parseInt(e.key);
+    if (num >= 1 && num <= 6) setCurrentSlide(num - 1);
+  }, [onExit]);
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
 
   if (!client) return null;
 
   const pendingTasks = client.tasks?.filter(t => t.status === "pending" || t.status === "overdue") || [];
   const overdueTasks = client.tasks?.filter(t => t.status === "overdue") || [];
+
+  // PDF Export
+  const handleExportPDF = async () => {
+    setExporting(true);
+    try {
+      // Build a simple text-based PDF content
+      const { jsPDF } = await import("jspdf");
+      const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+
+      const darkBg = [15, 29, 53];
+      const gold = [212, 168, 76];
+      const white = [255, 255, 255];
+
+      // Slide 1: Client Overview
+      doc.setFillColor(...darkBg);
+      doc.rect(0, 0, 297, 210, "F");
+      doc.setTextColor(...gold);
+      doc.setFontSize(32);
+      doc.text(client.name || "Client", 148, 60, { align: "center" });
+      doc.setTextColor(...white);
+      doc.setFontSize(14);
+      doc.text(`Net Worth: ${formatCurrency(client.wealth?.total)}`, 148, 80, { align: "center" });
+      doc.setFontSize(10);
+      doc.text(`Risk Profile: ${client.riskProfile || "N/A"} | ${client.type || ""} | Since ${formatDate(client.clientSince)}`, 148, 95, { align: "center" });
+      doc.text(`Phone: ${client.phone || "N/A"} | Email: ${client.email || "N/A"}`, 148, 108, { align: "center" });
+
+      // Slide 2: Goals
+      doc.addPage();
+      doc.setFillColor(...darkBg);
+      doc.rect(0, 0, 297, 210, "F");
+      doc.setTextColor(...gold);
+      doc.setFontSize(24);
+      doc.text("Financial Goals", 20, 30);
+      doc.setTextColor(...white);
+      doc.setFontSize(11);
+      (client.goals || []).forEach((goal, i) => {
+        const y = 50 + i * 25;
+        doc.text(`${goal.name} — ${goal.progress}%`, 25, y);
+        doc.text(`${formatCurrency(goal.current)} of ${formatCurrency(goal.target)}`, 25, y + 8);
+        doc.setDrawColor(...gold);
+        doc.rect(25, y + 12, 120, 3);
+        doc.setFillColor(...gold);
+        doc.rect(25, y + 12, 120 * (goal.progress / 100), 3, "F");
+      });
+
+      // Slide 3: Asset Allocation
+      doc.addPage();
+      doc.setFillColor(...darkBg);
+      doc.rect(0, 0, 297, 210, "F");
+      doc.setTextColor(...gold);
+      doc.setFontSize(24);
+      doc.text("Asset Allocation", 20, 30);
+      doc.setTextColor(...white);
+      doc.setFontSize(12);
+      (client.assetAllocation || []).forEach((a, i) => {
+        const y = 55 + i * 18;
+        doc.text(`${a.name}: ${a.percentage}% (${formatCurrency(a.value)})`, 25, y);
+      });
+
+      // Slide 4: Family
+      doc.addPage();
+      doc.setFillColor(...darkBg);
+      doc.rect(0, 0, 297, 210, "F");
+      doc.setTextColor(...gold);
+      doc.setFontSize(24);
+      doc.text("Family Members", 20, 30);
+      doc.setTextColor(...white);
+      doc.setFontSize(12);
+      (client.family || []).forEach((m, i) => {
+        doc.text(`${m.name} — ${m.relationship}, Age ${m.age}`, 25, 55 + i * 14);
+      });
+
+      // Slide 5: Action Items
+      doc.addPage();
+      doc.setFillColor(...darkBg);
+      doc.rect(0, 0, 297, 210, "F");
+      doc.setTextColor(...gold);
+      doc.setFontSize(24);
+      doc.text("Action Items", 20, 30);
+      doc.setTextColor(...white);
+      doc.setFontSize(11);
+      pendingTasks.forEach((t, i) => {
+        const y = 55 + i * 14;
+        doc.setTextColor(t.status === "overdue" ? 239 : 251, t.status === "overdue" ? 68 : 191, t.status === "overdue" ? 68 : 36);
+        doc.text(`[${t.status?.toUpperCase()}] ${t.title || t.name} — Due: ${formatDate(t.dueDate || t.due)}`, 25, y);
+      });
+
+      // Slide 6: Key Dates
+      doc.addPage();
+      doc.setFillColor(...darkBg);
+      doc.rect(0, 0, 297, 210, "F");
+      doc.setTextColor(...gold);
+      doc.setFontSize(24);
+      doc.text("Key Dates & Summary", 20, 30);
+      doc.setTextColor(...white);
+      doc.setFontSize(12);
+      (client.keyDates || []).forEach((d, i) => {
+        doc.text(`${d.label}: ${formatDate(d.date)}`, 25, 55 + i * 14);
+      });
+      doc.text(`Next Review: ${formatDate(client.nextReview)}`, 25, 55 + (client.keyDates?.length || 0) * 14 + 10);
+
+      doc.save(`${client.name?.replace(/\s/g, "_")}_Meeting_Slides.pdf`);
+      toast.success("Meeting slides exported as PDF");
+    } catch (err) {
+      console.error("PDF export error:", err);
+      toast.error("Failed to export PDF — ensure jsPDF is available");
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const slides = [
     // Slide 0: Client Overview
@@ -53,7 +189,7 @@ const MeetingMode = ({ client, onExit }) => {
       </div>
     ),
 
-    // Slide 1: Goals & Progress
+    // Slide 1: Goals
     () => (
       <div className="flex flex-col h-full">
         <h2 className="text-3xl font-bold text-white mb-8 flex items-center gap-3">
@@ -102,7 +238,7 @@ const MeetingMode = ({ client, onExit }) => {
       </div>
     ),
 
-    // Slide 3: Family Members
+    // Slide 3: Family
     () => (
       <div className="flex flex-col h-full">
         <h2 className="text-3xl font-bold text-white mb-8 flex items-center gap-3">
@@ -126,7 +262,7 @@ const MeetingMode = ({ client, onExit }) => {
       </div>
     ),
 
-    // Slide 4: Action Items & Tasks
+    // Slide 4: Action Items
     () => (
       <div className="flex flex-col h-full">
         <h2 className="text-3xl font-bold text-white mb-8 flex items-center gap-3">
@@ -162,7 +298,7 @@ const MeetingMode = ({ client, onExit }) => {
       </div>
     ),
 
-    // Slide 5: Key Dates & Review
+    // Slide 5: Key Dates
     () => (
       <div className="flex flex-col h-full">
         <h2 className="text-3xl font-bold text-white mb-8 flex items-center gap-3">
@@ -213,7 +349,7 @@ const MeetingMode = ({ client, onExit }) => {
   ];
 
   return (
-    <div className="fixed inset-0 z-[100] bg-[#0a1628] flex flex-col" data-testid="meeting-mode">
+    <div ref={containerRef} className="fixed inset-0 z-[100] bg-[#0a1628] flex flex-col" data-testid="meeting-mode">
       {/* Top Bar */}
       <div className="flex items-center justify-between px-8 py-4 border-b border-white/5">
         <div className="flex items-center gap-3">
@@ -221,7 +357,22 @@ const MeetingMode = ({ client, onExit }) => {
           <span className="text-white/70 text-sm font-medium tracking-wider uppercase">Meeting Mode</span>
           <Badge className="bg-[#D4A84C]/20 text-[#D4A84C] border-[#D4A84C]/30 text-xs">{client.name}</Badge>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleExportPDF}
+            disabled={exporting}
+            className="text-white/50 hover:text-white hover:bg-white/10"
+            data-testid="export-meeting-pdf"
+          >
+            <Download className="h-4 w-4 mr-1.5" /> {exporting ? "Exporting..." : "Export PDF"}
+          </Button>
+          <span className="text-white/20">|</span>
+          <span className="text-white/30 text-xs flex items-center gap-1.5">
+            <Keyboard className="h-3.5 w-3.5" />
+            <span className="hidden md:inline">Arrow keys / Esc / F</span>
+          </span>
           <span className="text-white/30 text-sm tabular-nums">{currentSlide + 1} / {slides.length}</span>
           <Button
             variant="ghost"
@@ -240,7 +391,7 @@ const MeetingMode = ({ client, onExit }) => {
         {slides[currentSlide]()}
       </div>
 
-      {/* Navigation Dots */}
+      {/* Navigation */}
       <div className="flex items-center justify-center gap-3 py-5 border-t border-white/5">
         <Button
           variant="ghost"
@@ -250,7 +401,7 @@ const MeetingMode = ({ client, onExit }) => {
           className="text-white/50 hover:text-white hover:bg-white/10 disabled:opacity-20"
           data-testid="meeting-prev"
         >
-          Previous
+          <ChevronLeft className="h-4 w-4 mr-1" /> Previous
         </Button>
         <div className="flex gap-2">
           {slides.map((_, idx) => (
@@ -272,7 +423,7 @@ const MeetingMode = ({ client, onExit }) => {
           className="text-white/50 hover:text-white hover:bg-white/10 disabled:opacity-20"
           data-testid="meeting-next"
         >
-          Next
+          Next <ChevronRight className="h-4 w-4 ml-1" />
         </Button>
       </div>
     </div>

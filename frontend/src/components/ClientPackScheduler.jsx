@@ -4,8 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, Download, FileText, Plus, Play, Trash2, Clock, CheckCircle, RefreshCw } from "lucide-react";
+import { Calendar, Download, FileText, Plus, Play, Trash2, Clock, CheckCircle, RefreshCw, Mail, Send } from "lucide-react";
 import { toast } from "sonner";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || "";
 
@@ -15,7 +17,7 @@ const ClientPackScheduler = () => {
   const [showForm, setShowForm] = useState(false);
   const [generating, setGenerating] = useState(null);
   const [runningAll, setRunningAll] = useState(false);
-  const [form, setForm] = useState({ client_name: "", client_id: "", frequency: "quarterly" });
+  const [form, setForm] = useState({ client_name: "", client_id: "", frequency: "quarterly", email: "", autoEmail: false });
 
   const fetchData = useCallback(async () => {
     try {
@@ -47,7 +49,7 @@ const ClientPackScheduler = () => {
       if (res.ok) {
         toast.success("Schedule created");
         setShowForm(false);
-        setForm({ client_name: "", client_id: "", frequency: "quarterly" });
+        setForm({ client_name: "", client_id: "", frequency: "quarterly", email: "", autoEmail: false });
         fetchData();
       }
     } catch {
@@ -211,6 +213,21 @@ const ClientPackScheduler = () => {
                 </SelectContent>
               </Select>
             </div>
+            <div className="flex items-center gap-2">
+              <Input
+                placeholder="Client email (for auto-delivery)"
+                value={form.email}
+                type="email"
+                onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                className="text-sm flex-1"
+                data-testid="schedule-client-email"
+              />
+              <label className="flex items-center gap-1.5 cursor-pointer min-w-fit" data-testid="auto-email-toggle">
+                <Mail className={`h-3.5 w-3.5 ${form.autoEmail ? "text-[#D4A84C]" : "text-muted-foreground"}`} />
+                <span className="text-xs">Auto-email</span>
+                <Switch checked={form.autoEmail} onCheckedChange={(v) => setForm(f => ({...f, autoEmail: v}))} />
+              </label>
+            </div>
             <div className="flex justify-end gap-2">
               <Button variant="ghost" size="sm" onClick={() => setShowForm(false)}>Cancel</Button>
               <Button size="sm" className="bg-[#D4A84C] hover:bg-[#C49A3C] text-black" onClick={handleCreate} data-testid="create-schedule-btn">
@@ -235,6 +252,11 @@ const ClientPackScheduler = () => {
                       {s.frequency} · Next: {new Date(s.next_run).toLocaleDateString()}
                       {s.packs_generated > 0 && (
                         <span className="ml-1">· {s.packs_generated} generated</span>
+                      )}
+                      {s.auto_email && (
+                        <Badge className="ml-1 bg-[#D4A84C]/10 text-[#D4A84C] border-[#D4A84C]/30 text-[9px] px-1">
+                          <Send className="h-2.5 w-2.5 mr-0.5" />Auto-email
+                        </Badge>
                       )}
                     </p>
                   </div>
