@@ -36,6 +36,7 @@ import {
 } from 'recharts';
 
 const NetWorthTrend = lazy(() => import("@/pages/NetWorthTrend"));
+const FamilyWealthDashboard = lazy(() => import("@/pages/FamilyWealthDashboard"));
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || '';
 
@@ -643,12 +644,16 @@ const PersonalDashboard = ({ embedded = false }) => {
           </CardContent>
         </Card>
 
-        {/* Main Tabs - Combined Overview + Retirement + Portfolio + Assets + Management */}
+        {/* Main Tabs - Combined Overview + Retirement + Insights + Wealth Trends + Net Worth + Investments */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid grid-cols-5 w-full max-w-3xl">
+          <TabsList className="grid grid-cols-6 w-full max-w-4xl">
             <TabsTrigger value="overview" className="flex items-center gap-1" data-testid="tab-overview">
               <Eye className="h-4 w-4" />
               Overview
+            </TabsTrigger>
+            <TabsTrigger value="net-worth" className="flex items-center gap-1" data-testid="tab-net-worth">
+              <Wallet className="h-4 w-4" />
+              Net Worth
             </TabsTrigger>
             <TabsTrigger value="retirement" className="flex items-center gap-1" data-testid="tab-retirement">
               <Gauge className="h-4 w-4" />
@@ -662,9 +667,9 @@ const PersonalDashboard = ({ embedded = false }) => {
               <TrendingUp className="h-4 w-4" />
               Wealth Trends
             </TabsTrigger>
-            <TabsTrigger value="assets" className="flex items-center gap-1" data-testid="tab-assets">
-              <Wallet className="h-4 w-4" />
-              Assets
+            <TabsTrigger value="investments" className="flex items-center gap-1" data-testid="tab-investments">
+              <BarChart3 className="h-4 w-4" />
+              Investments
             </TabsTrigger>
           </TabsList>
 
@@ -942,6 +947,16 @@ const PersonalDashboard = ({ embedded = false }) => {
             </Card>
           </TabsContent>
 
+
+          {/* ==================== TAB 1b: NET WORTH ==================== */}
+          <TabsContent value="net-worth" className="space-y-6">
+            <ErrorBoundary label="Net Worth">
+              <Suspense fallback={<div className="flex items-center justify-center py-20"><Loader2 className="h-6 w-6 animate-spin text-[#D4A84C]" /></div>}>
+                <FamilyWealthDashboard embedded />
+              </Suspense>
+            </ErrorBoundary>
+          </TabsContent>
+
           {/* ==================== TAB 2: RETIREMENT ==================== */}
           <TabsContent value="retirement" className="space-y-6">
             <div className="grid lg:grid-cols-2 gap-6">
@@ -1084,8 +1099,8 @@ const PersonalDashboard = ({ embedded = false }) => {
             </ErrorBoundary>
           </TabsContent>
 
-          {/* ==================== TAB 5: ASSETS ==================== */}
-          <TabsContent value="assets" className="space-y-6">
+          {/* ==================== TAB 5: INVESTMENTS (alphabetical) ==================== */}
+          <TabsContent value="investments" className="space-y-6">
             {/* Entity Filter */}
             <div className="flex items-center gap-4">
               <span className="text-sm font-medium">Filter by Entity:</span>
@@ -1102,21 +1117,21 @@ const PersonalDashboard = ({ embedded = false }) => {
                 </SelectContent>
               </Select>
               <Badge variant="outline" className="ml-auto">
-                {totals.assets.length} assets | {formatCurrency(totals.totalValue)}
+                {totals.assets.length} investments | {formatCurrency(totals.totalValue)}
               </Badge>
             </div>
 
-            {/* Assets Table */}
+            {/* Investments Table — sorted alphabetically */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Wallet className="h-5 w-5 text-green-500" />
-                  All Assets
+                  <BarChart3 className="h-5 w-5 text-[#D4A84C]" />
+                  All Investments
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {totals.assets.map((asset) => (
+                  {[...totals.assets].sort((a, b) => a.name.localeCompare(b.name)).map((asset) => (
                     <div key={asset.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/30 transition-colors">
                       <div className="flex items-center gap-4">
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center ${

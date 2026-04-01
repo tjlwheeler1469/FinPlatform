@@ -32,13 +32,12 @@ const TABS = [
   { value: "unlisted", label: "Unlisted", icon: Lock },
 ];
 
-const UnifiedInvestments = () => {
+const UnifiedInvestments = ({ embedded = false }) => {
   const [tab, setTab] = useState("shares");
 
-  return (
-    <Layout>
+  const content = (
       <div className="min-h-screen bg-gray-50" data-testid="unified-investments">
-        <div className="max-w-[1800px] mx-auto px-4 sm:px-6 pt-4">
+        <div className={embedded ? "" : "max-w-[1800px] mx-auto px-4 sm:px-6 pt-4"}>
           <Tabs value={tab} onValueChange={setTab}>
             <TabsList className="bg-white border mb-4 h-10 w-full justify-start gap-0 px-1 overflow-x-auto">
               {TABS.map(({ value, label, icon: Icon }) => (
@@ -83,8 +82,9 @@ const UnifiedInvestments = () => {
           </Tabs>
         </div>
       </div>
-    </Layout>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default UnifiedInvestments;

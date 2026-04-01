@@ -117,8 +117,67 @@ const TaxLossHarvesting = ({ embedded = false }) => {
       setResult(response.data);
       toast.success("Analysis complete");
     } catch (error) {
-      console.error("Error analyzing:", error);
-      toast.error("Failed to analyze holdings");
+      console.error("API unavailable, using client-side calculation:", error);
+      // Client-side fallback calculation
+      const analyzed = holdingsToAnalyze.map(h => {
+        const costBase = h.purchase_price * h.quantity;
+        const marketValue = h.current_price * h.quantity;
+        const gainLoss = marketValue - costBase;
+        const gainLossPercent = costBase > 0 ? ((marketValue - costBase) / costBase) * 100 : 0;
+        const purchaseDate = new Date(h.purchase_date);
+        const now = new Date();
+        const monthsHeld = Math.max(1, Math.round((now - purchaseDate) / (1000 * 60 * 60 * 24 * 30)));
+        const isLongTerm = monthsHeld >= 12;
+        return {
+          ...h,
+          cost_base: costBase,
+          market_value: marketValue,
+          gain_loss: gainLoss,
+          gain_loss_percent: gainLossPercent,
+          months_held: monthsHeld,
+          is_long_term: isLongTerm,
+          harvestable: gainLoss < 0,
+          tax_saving: gainLoss < 0 ? Math.abs(gainLoss) * (marginalRate / 100) : 0,
+          wash_sale_risk: false
+        };
+      });
+
+      const totalGains = analyzed.filter(h => h.gain_loss > 0).reduce((s, h) => s + h.gain_loss, 0);
+      const totalLosses = analyzed.filter(h => h.gain_loss < 0).reduce((s, h) => s + Math.abs(h.gain_loss), 0);
+      const harvestable = analyzed.filter(h => h.harvestable);
+      const totalHarvestable = harvestable.reduce((s, h) => s + Math.abs(h.gain_loss), 0);
+      const netPosition = realizedGains + totalGains - totalLosses;
+      const taxWithout = Math.max(0, realizedGains + totalGains) * (marginalRate / 100);
+      const taxWith = Math.max(0, netPosition) * (marginalRate / 100);
+      const potentialSaving = Math.max(0, taxWithout - taxWith);
+
+      setResult({
+        holdings: analyzed,
+        summary: {
+          total_unrealized_gains: totalGains,
+          total_unrealized_losses: totalLosses,
+          total_harvestable_losses: totalHarvestable,
+          net_unrealized_position: totalGains - totalLosses,
+          realized_gains_entered: realizedGains,
+          net_taxable_position: netPosition,
+          tax_without_harvesting: taxWithout,
+          tax_with_harvesting: taxWith,
+          potential_tax_saving: potentialSaving,
+          effective_tax_rate: marginalRate
+        },
+        recommendations: harvestable.length > 0 ? [
+          { type: "harvest", message: `Consider selling ${harvestable.length} position(s) at a loss to offset ${formatCurrency(realizedGains)} in realized gains`, priority: "high" },
+          { type: "offset", message: `Potential tax saving of ${formatCurrency(potentialSaving)} at ${marginalRate}% marginal rate`, priority: "high" },
+          ...harvestable.map(h => ({
+            type: "sell",
+            message: `${h.symbol} (${h.name}): Loss of ${formatCurrency(Math.abs(h.gain_loss))} — tax saving ${formatCurrency(h.tax_saving)}`,
+            priority: h.tax_saving > 1000 ? "high" : "medium"
+          }))
+        ] : [
+          { type: "info", message: "No harvesting opportunities found — all positions are in profit", priority: "low" }
+        ]
+      });
+      toast.success("Analysis complete (client-side calculation)");
     } finally {
       setLoading(false);
     }
@@ -288,7 +347,7 @@ const TaxLossHarvesting = ({ embedded = false }) => {
                     <CardContent className="p-4">
                       <p className="text-sm text-white/80">Potential Tax Savings</p>
                       <p className="text-xl font-bold">
-                        {formatCurrency(result.summary.potential_tax_savings)}
+                        {formatCurrency(result.summary?.potential_tax_saving || result.summary?.potential_tax_savings || 0)}
                       </p>
                     </CardContent>
                   </Card>
@@ -296,7 +355,7 @@ const TaxLossHarvesting = ({ embedded = false }) => {
                     <CardContent className="p-4">
                       <p className="text-sm text-muted-foreground">Harvestable Losses</p>
                       <p className="text-xl font-bold text-destructive">
-                        {formatCurrency(result.summary.total_unrealized_losses)}
+                        {formatCurrency(result.summary?.total_unrealized_losses || 0)}
                       </p>
                     </CardContent>
                   </Card>
@@ -304,7 +363,7 @@ const TaxLossHarvesting = ({ embedded = false }) => {
                     <CardContent className="p-4">
                       <p className="text-sm text-muted-foreground">Unrealized Gains</p>
                       <p className="text-xl font-bold text-[#10B981]">
-                        {formatCurrency(result.summary.total_unrealized_gains)}
+                        {formatCurrency(result.summary?.total_unrealized_gains || 0)}
                       </p>
                     </CardContent>
                   </Card>
@@ -312,7 +371,7 @@ const TaxLossHarvesting = ({ embedded = false }) => {
                     <CardContent className="p-4">
                       <p className="text-sm text-muted-foreground">Realized Gains YTD</p>
                       <p className="text-xl font-bold">
-                        {formatCurrency(result.summary.realized_gains_ytd)}
+                        {formatCurrency(result.summary?.realized_gains_entered || result.summary?.realized_gains_ytd || realizedGains)}
                       </p>
                     </CardContent>
                   </Card>
@@ -323,20 +382,13 @@ const TaxLossHarvesting = ({ embedded = false }) => {
                   {/* Gains vs Losses Pie */}
                   <Card data-testid="gains-losses-chart">
                     <CardHeader>
-                      <CardTitle className="">Unrealized Position</CardTitle>
+                      <CardTitle>Unrealized Position</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="h-[200px]">
                         <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                           <PieChart>
-                            <Pie
-                              data={pieData}
-                              cx="50%"
-                              cy="50%"
-                              innerRadius={50}
-                              outerRadius={80}
-                              dataKey="value"
-                            >
+                            <Pie data={pieData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value">
                               {pieData.map((entry, index) => (
                                 <Cell key={`item-${index}`} fill={entry.color} />
                               ))}
@@ -359,26 +411,26 @@ const TaxLossHarvesting = ({ embedded = false }) => {
                   {/* Tax Impact */}
                   <Card data-testid="tax-impact">
                     <CardHeader>
-                      <CardTitle className="">Tax Impact</CardTitle>
+                      <CardTitle>Tax Impact</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
                         <div className="p-3 rounded-lg bg-muted">
                           <p className="text-sm text-muted-foreground">Before Harvesting</p>
                           <p className="text-lg font-bold">
-                            Tax on {formatCurrency(result.summary.realized_gains_ytd)} gains
+                            Tax on {formatCurrency(result.summary?.realized_gains_entered || realizedGains)} gains
                           </p>
                           <p className="text-destructive font-semibold">
-                            ~{formatCurrency(result.summary.realized_gains_ytd * 0.5 * (marginalRate/100))} (with CGT discount)
+                            ~{formatCurrency(result.summary?.tax_without_harvesting || (realizedGains * 0.5 * (marginalRate/100)))} (with CGT discount)
                           </p>
                         </div>
                         <div className="p-3 rounded-lg bg-[#10B981]/10">
                           <p className="text-sm text-muted-foreground">After Harvesting</p>
                           <p className="text-lg font-bold">
-                            Tax on {formatCurrency(result.summary.net_gains_after_harvest)} net gains
+                            Tax on {formatCurrency(result.summary?.net_taxable_position || result.summary?.net_gains_after_harvest || 0)} net gains
                           </p>
                           <p className="text-[#10B981] font-semibold">
-                            ~{formatCurrency(result.summary.tax_on_net_gains)} (with CGT discount)
+                            ~{formatCurrency(result.summary?.tax_with_harvesting || result.summary?.tax_on_net_gains || 0)} (with CGT discount)
                           </p>
                         </div>
                       </div>
@@ -386,60 +438,61 @@ const TaxLossHarvesting = ({ embedded = false }) => {
                   </Card>
                 </div>
 
-                {/* Opportunities Table */}
-                {result.opportunities.length > 0 && (
-                  <Card data-testid="opportunities-table">
-                    <CardHeader>
-                      <CardTitle className=" flex items-center gap-2">
-                        <Scissors className="h-5 w-5 text-[#D4A84C]" />
-                        Harvesting Opportunities
-                      </CardTitle>
-                      <CardDescription>Holdings with unrealized losses to consider selling</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-sm">
-                          <thead>
-                            <tr className="border-b">
-                              <th className="text-left p-3 font-semibold">Holding</th>
-                              <th className="text-right p-3 font-semibold">Cost Basis</th>
-                              <th className="text-right p-3 font-semibold">Current Value</th>
-                              <th className="text-right p-3 font-semibold">Loss</th>
-                              <th className="text-right p-3 font-semibold">Tax Benefit</th>
-                              <th className="text-center p-3 font-semibold">Action</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {result.opportunities.map((opp, i) => (
-                              <tr key={`item-${i}`} className="border-b">
-                                <td className="p-3">
-                                  <div className="font-medium">{opp.symbol}</div>
-                                  <div className="text-xs text-muted-foreground">{opp.name}</div>
-                                </td>
-                                <td className="text-right p-3">{formatCurrency(opp.cost_basis)}</td>
-                                <td className="text-right p-3">{formatCurrency(opp.current_value)}</td>
-                                <td className="text-right p-3">
-                                  <span className="text-destructive font-medium">
-                                    -{formatCurrency(opp.unrealized_loss)}
-                                  </span>
-                                  <div className="text-xs text-muted-foreground">{opp.gain_loss_pct}%</div>
-                                </td>
-                                <td className="text-right p-3 text-[#10B981] font-medium">
-                                  {formatCurrency(opp.tax_benefit)}
-                                </td>
-                                <td className="text-center p-3">
-                                  <Badge className="bg-[#D4A84C]/10 text-[#D4A84C]">
-                                    Harvest
-                                  </Badge>
-                                </td>
+                {/* Opportunities Table — from holdings with losses */}
+                {(() => {
+                  const opportunities = result.opportunities || (result.holdings || []).filter(h => h.harvestable);
+                  return opportunities.length > 0 ? (
+                    <Card data-testid="opportunities-table">
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Scissors className="h-5 w-5 text-[#D4A84C]" />
+                          Harvesting Opportunities
+                        </CardTitle>
+                        <CardDescription>Holdings with unrealized losses to consider selling</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-sm">
+                            <thead>
+                              <tr className="border-b">
+                                <th className="text-left p-3 font-semibold">Holding</th>
+                                <th className="text-right p-3 font-semibold">Cost Basis</th>
+                                <th className="text-right p-3 font-semibold">Current Value</th>
+                                <th className="text-right p-3 font-semibold">Loss</th>
+                                <th className="text-right p-3 font-semibold">Tax Benefit</th>
+                                <th className="text-center p-3 font-semibold">Action</th>
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
+                            </thead>
+                            <tbody>
+                              {opportunities.map((opp, i) => (
+                                <tr key={`item-${i}`} className="border-b">
+                                  <td className="p-3">
+                                    <div className="font-medium">{opp.symbol}</div>
+                                    <div className="text-xs text-muted-foreground">{opp.name}</div>
+                                  </td>
+                                  <td className="text-right p-3">{formatCurrency(opp.cost_basis || opp.cost_base || 0)}</td>
+                                  <td className="text-right p-3">{formatCurrency(opp.current_value || opp.market_value || 0)}</td>
+                                  <td className="text-right p-3">
+                                    <span className="text-destructive font-medium">
+                                      -{formatCurrency(opp.unrealized_loss || Math.abs(opp.gain_loss || 0))}
+                                    </span>
+                                    <div className="text-xs text-muted-foreground">{(opp.gain_loss_pct || opp.gain_loss_percent || 0).toFixed(1)}%</div>
+                                  </td>
+                                  <td className="text-right p-3 text-[#10B981] font-medium">
+                                    {formatCurrency(opp.tax_benefit || opp.tax_saving || 0)}
+                                  </td>
+                                  <td className="text-center p-3">
+                                    <Badge className="bg-[#D4A84C]/10 text-[#D4A84C]">Harvest</Badge>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ) : null;
+                })()}
 
                 {/* Wash Sale Warning */}
                 <Card className="border-[#D4A84C]">
@@ -461,17 +514,17 @@ const TaxLossHarvesting = ({ embedded = false }) => {
                 {/* Recommendations */}
                 <Card data-testid="recommendations">
                   <CardHeader>
-                    <CardTitle className=" flex items-center gap-2">
+                    <CardTitle className="flex items-center gap-2">
                       <Lightbulb className="h-5 w-5 text-[#D4A84C]" />
                       Recommendations
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
-                      {result.recommendations.map((rec, index) => (
+                      {(result.recommendations || []).map((rec, index) => (
                         <div key={`item-${index}`} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
                           <CheckCircle className="h-5 w-5 text-[#10B981] flex-shrink-0 mt-0.5" />
-                          <p className="text-sm">{rec}</p>
+                          <p className="text-sm">{typeof rec === 'string' ? rec : rec.message}</p>
                         </div>
                       ))}
                     </div>

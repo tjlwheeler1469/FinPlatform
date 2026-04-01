@@ -378,6 +378,32 @@ const HouseholdBudget = () => {
           </Card>
         </div>
 
+        {/* Investable Surplus Callout */}
+        {monthlySurplus > 0 && (
+          <Card className="border-l-4 border-l-[#D4A84C] bg-gradient-to-r from-[#D4A84C]/5 to-transparent" data-testid="investable-surplus">
+            <CardContent className="p-4 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-full bg-[#D4A84C]/10 flex items-center justify-center">
+                  <PiggyBank className="h-6 w-6 text-[#D4A84C]" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Available to Invest</p>
+                  <p className="text-2xl font-bold text-[#1a2744]">{formatCurrency(monthlySurplus)}<span className="text-sm font-normal text-muted-foreground">/month</span></p>
+                  <p className="text-xs text-muted-foreground">{formatCurrency(annualSurplus)}/year after all expenses & one-offs</p>
+                </div>
+              </div>
+              <Button
+                className="bg-[#D4A84C] hover:bg-[#C49A3C] text-black"
+                onClick={() => window.location.href = "/investments"}
+                data-testid="invest-surplus-btn"
+              >
+                <TrendingUp className="h-4 w-4 mr-2" />
+                View Investments
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full max-w-lg grid-cols-4">

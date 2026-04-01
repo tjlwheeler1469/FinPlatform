@@ -1,13 +1,11 @@
 import { useState, lazy, Suspense } from "react";
 import Layout from "@/components/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, LayoutDashboard, Wallet, TrendingUp, Activity } from "lucide-react";
+import { Loader2, LayoutDashboard, TrendingUp, Wallet } from "lucide-react";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
 const PersonalDashboard = lazy(() => import("@/pages/PersonalDashboard"));
-const FamilyWealthDashboard = lazy(() => import("@/pages/FamilyWealthDashboard"));
-const NetWorthTrend = lazy(() => import("@/pages/NetWorthTrend"));
-const DecisionEngine = lazy(() => import("@/pages/DecisionEngine"));
+const UnifiedInvestments = lazy(() => import("@/pages/UnifiedInvestments"));
 
 const TabLoader = () => (
   <div className="flex items-center justify-center py-20">
@@ -27,28 +25,24 @@ const UnifiedClientOverview = () => {
               <TabsTrigger value="overview" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="tab-overview">
                 <LayoutDashboard className="h-3.5 w-3.5" /> Overview
               </TabsTrigger>
-              <TabsTrigger value="net-worth" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="tab-net-worth">
-                <Wallet className="h-3.5 w-3.5" /> Net Worth
-              </TabsTrigger>
-              <TabsTrigger value="wealth-trends" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="tab-wealth-trends">
-                <TrendingUp className="h-3.5 w-3.5" /> Wealth Trends
-              </TabsTrigger>
-              <TabsTrigger value="health" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="tab-health">
-                <Activity className="h-3.5 w-3.5" /> Health Score
+              <TabsTrigger value="investments" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="tab-investments">
+                <TrendingUp className="h-3.5 w-3.5" /> Investments
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview" className="mt-0">
-              <ErrorBoundary label="Overview"><Suspense fallback={<TabLoader />}><PersonalDashboard embedded /></Suspense></ErrorBoundary>
+              <ErrorBoundary label="Overview">
+                <Suspense fallback={<TabLoader />}>
+                  <PersonalDashboard embedded />
+                </Suspense>
+              </ErrorBoundary>
             </TabsContent>
-            <TabsContent value="net-worth" className="mt-0">
-              <ErrorBoundary label="Net Worth"><Suspense fallback={<TabLoader />}><FamilyWealthDashboard embedded /></Suspense></ErrorBoundary>
-            </TabsContent>
-            <TabsContent value="wealth-trends" className="mt-0">
-              <ErrorBoundary label="Wealth Trends"><Suspense fallback={<TabLoader />}><NetWorthTrend embedded /></Suspense></ErrorBoundary>
-            </TabsContent>
-            <TabsContent value="health" className="mt-0">
-              <ErrorBoundary label="Health Score"><Suspense fallback={<TabLoader />}><DecisionEngine embedded /></Suspense></ErrorBoundary>
+            <TabsContent value="investments" className="mt-0">
+              <ErrorBoundary label="Investments">
+                <Suspense fallback={<TabLoader />}>
+                  <UnifiedInvestments embedded />
+                </Suspense>
+              </ErrorBoundary>
             </TabsContent>
           </Tabs>
         </div>
