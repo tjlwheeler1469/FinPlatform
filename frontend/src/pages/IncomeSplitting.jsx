@@ -93,7 +93,7 @@ const getMarginalRate = (income) => {
 
 const COLORS = ['#1a2744', '#D4A84C', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'];
 
-const IncomeSplitting = () => {
+const IncomeSplitting = ({ embedded = false }) => {
   const { 
     familyMembers, 
     updateFamilyMember, 
@@ -253,8 +253,7 @@ const IncomeSplitting = () => {
       color: COLORS[i % COLORS.length]
     }));
 
-  return (
-    <Layout>
+  const content = (
       <div className="space-y-6" data-testid="income-splitting-page">
         {/* Header */}
         <div>
@@ -780,8 +779,9 @@ const IncomeSplitting = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </Layout>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default IncomeSplitting;

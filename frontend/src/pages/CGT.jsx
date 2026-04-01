@@ -129,7 +129,7 @@ const ASSET_TYPES = {
 
 const COLORS = ['#10B981', '#EF4444', '#D4A84C', '#3B82F6', '#8B5CF6'];
 
-const CGT = () => {
+const CGT = ({ embedded = false }) => {
   const [activeTab, setActiveTab] = useState("events");
   const [selectedYear, setSelectedYear] = useState("2024-25");
   const [parcels, setParcels] = useState(DEMO_PARCELS);
@@ -284,8 +284,7 @@ const CGT = () => {
     }
   };
 
-  return (
-    <Layout>
+  const content = (
       <div className="space-y-6" data-testid="cgt-page">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -651,8 +650,9 @@ const CGT = () => {
           </div>
         )}
       </div>
-    </Layout>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default CGT;

@@ -59,7 +59,7 @@ const DEMO_HOLDINGS = [
 
 const COLORS = ['#EF4444', '#10B981', '#D4A84C', '#3B82F6'];
 
-const TaxLossHarvesting = () => {
+const TaxLossHarvesting = ({ embedded = false }) => {
   const { portfolio } = usePortfolio();
   const [activeTab, setActiveTab] = useState("portfolio");
   const [holdings, setHoldings] = useState(DEMO_HOLDINGS);
@@ -129,8 +129,7 @@ const TaxLossHarvesting = () => {
     { name: "Unrealized Losses", value: result.summary.total_unrealized_losses, color: "#EF4444" }
   ].filter(d => d.value > 0) : [];
 
-  return (
-    <Layout>
+  const content = (
       <div className="space-y-8" data-testid="tax-loss-harvesting-page">
         {/* Header */}
         <div>
@@ -495,8 +494,9 @@ const TaxLossHarvesting = () => {
           </div>
         </div>
       </div>
-    </Layout>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default TaxLossHarvesting;

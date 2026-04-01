@@ -45,7 +45,7 @@ const formatCurrency = (value) => {
 // Division 7A benchmark interest rate (updated annually by ATO)
 const DIV7A_BENCHMARK_RATE = 8.77; // 2024-25 rate
 
-const Division7ACalculator = () => {
+const Division7ACalculator = ({ embedded = false }) => {
   const [loanAmount, setLoanAmount] = useState(100000);
   const [loanDate, setLoanDate] = useState("2024-07-01");
   const [loanTerm, setLoanTerm] = useState(7); // 7 years unsecured, 25 years secured
@@ -128,8 +128,7 @@ const Division7ACalculator = () => {
     principal: s.principal_component
   })) || [];
 
-  return (
-    <Layout>
+  const content = (
       <div className="space-y-6" data-testid="div7a-calculator-page">
         {/* Header */}
         <div>
@@ -525,8 +524,9 @@ const Division7ACalculator = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </Layout>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default Division7ACalculator;

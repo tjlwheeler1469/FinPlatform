@@ -17,7 +17,7 @@ import {
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-export default function RiskControlMapping() {
+export default function RiskControlMapping({ embedded = false }) {
   const [activeTab, setActiveTab] = useState('matrix');
   const [viewMode, setViewMode] = useState('matrix'); // matrix or table
   const [loading, setLoading] = useState(true);

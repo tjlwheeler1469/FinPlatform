@@ -61,7 +61,7 @@ const PACKAGING_ITEMS = [
 
 const COLORS = ['#1a2744', '#D4A84C', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'];
 
-const SalaryPackaging = () => {
+const SalaryPackaging = ({ embedded = false }) => {
   const [grossSalary, setGrossSalary] = useState(150000);
   const [isNFP, setIsNFP] = useState(false);
   const [nfpCap, setNfpCap] = useState(17000);
@@ -118,8 +118,7 @@ const SalaryPackaging = () => {
     { name: "FBT Liable", value: result.total_fbt_liable, color: "#D4A84C" }
   ].filter(d => d.value > 0) : [];
 
-  return (
-    <Layout>
+  const content = (
       <div className="space-y-8" data-testid="salary-packaging-page">
         {/* Header */}
         <div>
@@ -505,8 +504,9 @@ const SalaryPackaging = () => {
           </Card>
         </div>
       </div>
-    </Layout>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default SalaryPackaging;

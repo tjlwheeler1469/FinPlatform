@@ -24,7 +24,7 @@ import { toast } from "sonner";
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
-const BrokerResearch = () => {
+const BrokerResearch = ({ embedded = false }) => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [topRated, setTopRated] = useState([]);
@@ -90,17 +90,16 @@ const BrokerResearch = () => {
   };
 
   if (loading && topRated.length === 0) {
-    return (
-      <Layout>
+    const content = (
         <div className="flex items-center justify-center h-96">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
-      </Layout>
-    );
+  );
+
+  return embedded ? content : <Layout>{content}</Layout>;
   }
 
-  return (
-    <Layout>
+  const content = (
       <div className="space-y-6" data-testid="broker-research">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -367,8 +366,9 @@ const BrokerResearch = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </Layout>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default BrokerResearch;

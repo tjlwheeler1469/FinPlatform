@@ -100,7 +100,7 @@ const getStructureIcon = (structure) => {
   }
 };
 
-const InvestmentComparison = () => {
+const InvestmentComparison = ({ embedded = false }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState(null);
   const [assetClasses, setAssetClasses] = useState({});
@@ -286,8 +286,7 @@ const InvestmentComparison = () => {
     }));
   };
 
-  return (
-    <Layout>
+  const content = (
       <div className="space-y-6" data-testid="investment-comparison-page">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -655,8 +654,9 @@ const InvestmentComparison = () => {
           </CardContent>
         </Card>
       </div>
-    </Layout>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default InvestmentComparison;

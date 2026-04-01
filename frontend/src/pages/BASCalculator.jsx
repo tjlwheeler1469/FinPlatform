@@ -69,7 +69,7 @@ const MOCK_GST_DATA = {
   }
 };
 
-const BASCalculator = () => {
+const BASCalculator = ({ embedded = false }) => {
   const [selectedPeriod, setSelectedPeriod] = useState("2025-Q2");
   const [activeTab, setActiveTab] = useState("worksheet");
   const [dataSource, setDataSource] = useState("manual"); // manual, xero, myob
@@ -235,8 +235,7 @@ Note: This is a calculation only. Lodge via ATO Business Portal or through your 
   const isOverdue = dueDate && dueDate < new Date();
   const daysUntilDue = dueDate ? Math.ceil((dueDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : 0;
 
-  return (
-    <Layout>
+  const content = (
       <div className="space-y-6" data-testid="bas-calculator-page">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -672,8 +671,9 @@ Note: This is a calculation only. Lodge via ATO Business Portal or through your 
 
         <ComplianceFooter />
       </div>
-    </Layout>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default BASCalculator;

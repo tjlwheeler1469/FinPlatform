@@ -259,6 +259,11 @@ import { AuthProvider } from "@/context/AuthContext";
 // Auth components
 const Login = lazy(() => import("@/pages/Login"));
 
+// Consolidated pages
+const UnifiedTaxCentre = lazy(() => import("@/pages/UnifiedTaxCentre"));
+const UnifiedResearchCentre = lazy(() => import("@/pages/UnifiedResearchCentre"));
+const UnifiedComplianceCentre = lazy(() => import("@/pages/UnifiedComplianceCentre"));
+
 // Compliance Modal
 import { ComplianceModal } from "@/components/ComplianceDisclaimer";
 
@@ -1062,24 +1067,24 @@ const AppRouter = () => {
       <Route path="/scenarios" element={<Navigate to="/scenario-modelling" replace />} />
       <Route path="/scenario-builder" element={<ScenarioBuilder />} />
       <Route path="/scenario-builder/:scenarioId" element={<ScenarioBuilder />} />
-      <Route path="/cgt" element={<CGT />} />
+      <Route path="/cgt" element={<Navigate to="/tax-analysis-sync" replace />} />
       <Route path="/cgt-calculator" element={<Navigate to="/cgt" replace />} />
       <Route path="/cgt-events" element={<Navigate to="/cgt" replace />} />
-      <Route path="/historical-tax" element={<HistoricalTaxComparison />} />
+      <Route path="/historical-tax" element={<Navigate to="/tax-analysis-sync" replace />} />
       <Route path="/smsf-optimizer" element={<SMSFOptimizer />} />
       <Route path="/reports" element={<ReportGenerator />} />
-      <Route path="/salary-packaging" element={<SalaryPackaging />} />
-      <Route path="/property-comparison" element={<PropertyComparison />} />
+      <Route path="/salary-packaging" element={<Navigate to="/tax-analysis-sync" replace />} />
+      <Route path="/property-comparison" element={<Navigate to="/stock-research" replace />} />
       <Route path="/scenario-comparison" element={<Navigate to="/scenario-modelling" replace />} />
       <Route path="/scenario-simulator" element={<Navigate to="/scenario-modelling" replace />} />
       <Route path="/market-data" element={<Suspense fallback={<PageLoader />}><MarketData /></Suspense>} />
-      <Route path="/tax-loss-harvesting" element={<TaxLossHarvesting />} />
+      <Route path="/tax-loss-harvesting" element={<Navigate to="/tax-analysis-sync" replace />} />
       <Route path="/dividend-reinvestment" element={<DividendReinvestment />} />
-      <Route path="/income-splitting" element={<IncomeSplitting />} />
-      <Route path="/division-7a" element={<Division7ACalculator />} />
-      <Route path="/trust-distributions" element={<TrustDistributionAnalysis />} />
+      <Route path="/income-splitting" element={<Navigate to="/tax-analysis-sync" replace />} />
+      <Route path="/division-7a" element={<Navigate to="/tax-analysis-sync" replace />} />
+      <Route path="/trust-distributions" element={<Navigate to="/tax-analysis-sync" replace />} />
       <Route path="/recommendations" element={<FinancialRecommendations />} />
-      <Route path="/tax-calendar" element={<TaxCalendar />} />
+      <Route path="/tax-calendar" element={<Navigate to="/tax-analysis-sync" replace />} />
       <Route path="/share-portfolio" element={<SharePortfolio />} />
       <Route path="/holdings-performance" element={<HoldingsPerformance />} />
       <Route path="/calculation-methodology" element={<CalculationMethodology />} />
@@ -1087,7 +1092,7 @@ const AppRouter = () => {
       <Route path="/super-pension" element={<SuperannuationGuarantee />} />
       <Route path="/rental-yield-optimizer" element={<RentalYieldOptimizer />} />
       <Route path="/export" element={<ExportData />} />
-      <Route path="/tax-analysis-sync" element={<TaxAnalysisSync />} />
+      <Route path="/tax-analysis-sync" element={<UnifiedTaxCentre />} />
       <Route path="/scenario-modeling" element={<Navigate to="/strategic-planning" replace />} />
       <Route path="/family-member/:memberId" element={<FamilyMemberProfile />} />
       <Route path="/lifecycle-planning" element={<Navigate to="/strategic-planning" replace />} />
@@ -1096,7 +1101,7 @@ const AppRouter = () => {
       <Route path="/data-import" element={<DataImport />} />
       <Route path="/bank-feeds" element={<BankFeeds />} />
       <Route path="/accounting-integrations" element={<AccountingIntegrations />} />
-      <Route path="/bas-calculator" element={<BASCalculator />} />
+      <Route path="/bas-calculator" element={<Navigate to="/tax-analysis-sync" replace />} />
       <Route path="/collaboration" element={<Collaboration />} />
       <Route path="/risk-profiler" element={<RiskProfiler />} />
       <Route path="/statement-of-advice" element={<StatementOfAdvice />} />
@@ -1119,7 +1124,7 @@ const AppRouter = () => {
       <Route path="/portfolio-rebalancing" element={<PortfolioRebalancing />} />
       <Route path="/security" element={<SecuritySettings />} />
       <Route path="/data-import-export" element={<DataImportExportPage />} />
-      <Route path="/investment-comparison" element={<InvestmentComparison />} />
+      <Route path="/investment-comparison" element={<Navigate to="/stock-research" replace />} />
       <Route path="/decision-engine" element={<DecisionEngine />} />
       <Route path="/decision-dashboard" element={<DecisionDashboard />} />
       <Route path="/life-timeline" element={<LifeTimelinePlanner />} />
@@ -1156,7 +1161,7 @@ const AppRouter = () => {
       
       {/* Super App Features */}
       <Route path="/meeting-prep" element={<MeetingPrep />} />
-      <Route path="/stock-research" element={<StockResearch />} />
+      <Route path="/stock-research" element={<UnifiedResearchCentre />} />
       <Route path="/compliance" element={<ClientCompliance />} />
       <Route path="/wealth-dashboard" element={<Navigate to="/dashboard" replace />} />
       
@@ -1188,7 +1193,7 @@ const AppRouter = () => {
       <Route path="/macro-dashboard" element={<MacroDashboard />} />
       
       {/* Broker Research Reports */}
-      <Route path="/broker-research" element={<BrokerResearch />} />
+      <Route path="/broker-research" element={<Navigate to="/stock-research" replace />} />
       
       {/* Workflow Engine */}
       <Route path="/workflows" element={<WorkflowDashboard />} />
@@ -1222,10 +1227,10 @@ const AppRouter = () => {
       <Route path="/xplan-integration" element={<XplanIntegration />} />
       
       {/* AdviceOS Dashboard - Compliance-First Decision Support */}
-      <Route path="/adviceos" element={<AdviceOSDashboard />} />
+      <Route path="/adviceos" element={<UnifiedComplianceCentre />} />
       
       {/* Enterprise Compliance Dashboard - ASIC/APRA/ISO Compliance Center */}
-      <Route path="/enterprise" element={<EnterpriseComplianceDashboard />} />
+      <Route path="/enterprise" element={<Navigate to="/adviceos" replace />} />
       
       {/* Xplan Integration - Sync Page */}
       <Route path="/xplan" element={<XplanSyncPage />} />
@@ -1233,8 +1238,8 @@ const AppRouter = () => {
       {/* Enterprise System of Record Features */}
       <Route path="/replay-advice" element={<ReplayAdvicePage />} />
       <Route path="/cost-reduction" element={<CostReductionDashboard />} />
-      <Route path="/risk-control" element={<RiskControlMapping />} />
-      <Route path="/breach-register" element={<BreachRegister />} />
+      <Route path="/risk-control" element={<Navigate to="/adviceos" replace />} />
+      <Route path="/breach-register" element={<Navigate to="/adviceos" replace />} />
       
       {/* Retirement - consolidate duplicates */}
       <Route path="/retirement-calculator" element={<Navigate to="/retirement-confidence" replace />} />

@@ -51,7 +51,7 @@ const formatCurrency = (value) => {
 
 const COLORS = ['#1a2744', '#D4A84C', '#10B981', '#3B82F6', '#8B5CF6'];
 
-const PropertyComparison = () => {
+const PropertyComparison = ({ embedded = false }) => {
   const { portfolio } = usePortfolio();
   const [properties, setProperties] = useState(portfolio.investments.properties.map(p => ({...p})));
   const [marginalRate, setMarginalRate] = useState(30);
@@ -130,8 +130,7 @@ const PropertyComparison = () => {
     safety: c.scores.risk_score
   })) || [];
 
-  return (
-    <Layout>
+  const content = (
       <div className="space-y-8" data-testid="property-comparison-page">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -491,8 +490,9 @@ const PropertyComparison = () => {
           </>
         )}
       </div>
-    </Layout>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default PropertyComparison;

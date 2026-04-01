@@ -140,7 +140,7 @@ const calculateTax = (income) => {
 
 const COLORS = ['#1a2744', '#D4A84C', '#10B981', '#3B82F6', '#8B5CF6'];
 
-const TaxAnalysisSync = () => {
+const TaxAnalysisSync = ({ embedded = false }) => {
   const { 
     familyMembers, 
     updateFamilyMember, 
@@ -242,8 +242,7 @@ const TaxAnalysisSync = () => {
     updateFamilyMember(id, { taxableIncome: Number(income) });
   };
 
-  return (
-    <Layout>
+  const content = (
       <div className="space-y-6" data-testid="tax-analysis-sync-page">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -792,8 +791,9 @@ const TaxAnalysisSync = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </Layout>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default TaxAnalysisSync;

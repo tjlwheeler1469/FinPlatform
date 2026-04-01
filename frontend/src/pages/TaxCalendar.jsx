@@ -92,7 +92,7 @@ const MONTHS = [
   "July", "August", "September", "October", "November", "December"
 ];
 
-const TaxCalendar = () => {
+const TaxCalendar = ({ embedded = false }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
   const [customEvents, setCustomEvents] = useState([]);
@@ -335,8 +335,7 @@ const TaxCalendar = () => {
   const calendarDays = generateCalendarDays();
   const monthEvents = getEventsForMonth(currentDate.getFullYear(), currentDate.getMonth());
 
-  return (
-    <Layout>
+  const content = (
       <div className="space-y-6" data-testid="tax-calendar-page">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -857,8 +856,9 @@ const TaxCalendar = () => {
 
         <ComplianceFooter />
       </div>
-    </Layout>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default TaxCalendar;

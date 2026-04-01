@@ -12,7 +12,7 @@ import axios from "axios";
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-export default function StockResearch() {
+export default function StockResearch({ embedded = false }) {
   const [stocks, setStocks] = useState([]);
   const [intrinsicValues, setIntrinsicValues] = useState([]);
   const [dividends, setDividends] = useState([]);
@@ -107,17 +107,16 @@ export default function StockResearch() {
   };
 
   if (loading && stocks.length === 0) {
-    return (
-      <Layout>
+    const content = (
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin w-8 h-8 border-2 border-[#1a2744] border-t-transparent rounded-full" />
         </div>
-      </Layout>
-    );
+  );
+
+  return embedded ? content : <Layout>{content}</Layout>;
   }
 
-  return (
-    <Layout>
+  const content = (
       <div className="space-y-6" data-testid="stock-research-page">
         <div className="flex items-center justify-between">
           <div>
@@ -480,6 +479,7 @@ export default function StockResearch() {
         </div>
       )}
       </div>
-    </Layout>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 }

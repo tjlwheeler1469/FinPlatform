@@ -21,7 +21,7 @@ import {
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || "";
 
-const AdviceOSDashboard = () => {
+const AdviceOSDashboard = ({ embedded = false }) => {
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState("overview");
   const [loading, setLoading] = useState(true);
@@ -192,16 +192,15 @@ const AdviceOSDashboard = () => {
   };
 
   if (loading) {
-    return (
-      <Layout title="AdviceOS" subtitle="Compliance-First Decision Support">
+    const loadingContent = (
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#D4A84C]" />
             <p className="text-muted-foreground">Loading AdviceOS Dashboard...</p>
           </div>
         </div>
-      </Layout>
     );
+    return embedded ? loadingContent : <Layout title="AdviceOS" subtitle="Compliance-First Decision Support">{loadingContent}</Layout>;
   }
 
   const summary = dashboardData?.summary || {
@@ -212,8 +211,8 @@ const AdviceOSDashboard = () => {
     decisions: { total: 0, approved: 0, overrides: 0 }
   };
 
-  return (
-    <Layout title={t('adviceos.title')} subtitle={t('adviceos.subtitle')}>
+  const content = (
+    <>
       <div className="space-y-6" data-testid="adviceos-dashboard">
         {/* Compliance Disclaimer Banner */}
         <Card className="bg-blue-50 border-blue-200">
@@ -350,8 +349,10 @@ const AdviceOSDashboard = () => {
         onFormChange={(updates) => setDecisionForm(prev => ({ ...prev, ...updates }))}
         onSubmit={submitDecision}
       />
-    </Layout>
+    </>
   );
+
+  return embedded ? content : <Layout title={t('adviceos.title')} subtitle={t('adviceos.subtitle')}>{content}</Layout>;
 };
 
 export default AdviceOSDashboard;

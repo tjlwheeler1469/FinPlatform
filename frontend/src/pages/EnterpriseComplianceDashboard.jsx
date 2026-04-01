@@ -18,7 +18,7 @@ import {
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-export default function EnterpriseComplianceDashboard() {
+export default function EnterpriseComplianceDashboard({ embedded = false }) {
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
   
@@ -267,18 +267,16 @@ export default function EnterpriseComplianceDashboard() {
   };
 
   if (loading) {
-    return (
-      <Layout>
+    const loadingContent = (
         <div className="flex items-center justify-center h-screen">
           <RefreshCw className="w-8 h-8 animate-spin text-primary" />
           <span className="ml-2">Loading Compliance Dashboard...</span>
         </div>
-      </Layout>
     );
+    return embedded ? loadingContent : <Layout>{loadingContent}</Layout>;
   }
 
-  return (
-    <Layout>
+  const content = (
       <div className="space-y-6" data-testid="enterprise-dashboard">
         {/* Header */}
         <div className="flex justify-between items-center">
@@ -784,6 +782,7 @@ export default function EnterpriseComplianceDashboard() {
         </TabsContent>
       </Tabs>
       </div>
-    </Layout>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 }

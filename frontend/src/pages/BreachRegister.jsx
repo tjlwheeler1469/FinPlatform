@@ -19,7 +19,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, 
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-export default function BreachRegister() {
+export default function BreachRegister({ embedded = false }) {
   const [activeTab, setActiveTab] = useState('register');
   const [loading, setLoading] = useState(true);
   

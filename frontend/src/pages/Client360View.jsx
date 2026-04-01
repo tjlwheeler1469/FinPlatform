@@ -62,9 +62,11 @@ import {
   BookOpen,
   ExternalLink,
   X,
-  Landmark
+  Landmark,
+  Maximize2
 } from "lucide-react";
 import { toast } from "sonner";
+import MeetingMode from "@/components/MeetingMode";
 import {
   AreaChart,
   Area,
@@ -620,6 +622,7 @@ const Client360View = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState("overview");
+  const [meetingMode, setMeetingMode] = useState(false);
   
   // Get client from localStorage or URL params
   const storedClient = localStorage.getItem("selected_client");
@@ -655,6 +658,10 @@ const Client360View = () => {
       default: return MessageSquare;
     }
   };
+
+  if (meetingMode) {
+    return <MeetingMode client={client} onExit={() => setMeetingMode(false)} />;
+  }
 
   return (
     <Layout>
@@ -746,6 +753,14 @@ const Client360View = () => {
                     data-testid="transaction-modeler-btn"
                   >
                     <Calculator className="h-3.5 w-3.5 mr-1.5" /> Model
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="bg-[#D4A84C] text-[#0f1d35] hover:bg-[#c49b3f] h-8 text-xs font-medium"
+                    onClick={() => setMeetingMode(true)}
+                    data-testid="meeting-mode-btn"
+                  >
+                    <Maximize2 className="h-3.5 w-3.5 mr-1.5" /> Meeting
                   </Button>
                 </div>
               </div>

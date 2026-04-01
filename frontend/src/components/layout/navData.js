@@ -39,11 +39,11 @@ export const personalNavGroups = [
     name: "Tools",
     icon: Calculator,
     items: [
+      { path: "/tax-analysis-sync", label: "Tax Centre", icon: Calculator, title: "Unified Tax Centre", badge: "NEW" },
       { path: "/loan-calculator", label: "Loan Calculator", icon: Landmark, title: "Loan Calculator" },
       { path: "/monte-carlo", label: "Monte Carlo", icon: BarChart3, title: "Monte Carlo Simulator" },
       { path: "/smsf-optimizer", label: "SMSF", icon: PiggyBank, title: "SMSF Optimizer" },
-      { path: "/tax-analysis-sync", label: "Tax Analysis", icon: Calculator, title: "Tax Analysis" },
-      { path: "/cgt", label: "Capital Gains", icon: TrendingUp, title: "CGT Calculator" },
+      { path: "/stock-research", label: "Research Centre", icon: LineChart, title: "Research & Comparison", badge: "NEW" },
     ]
   },
   {
@@ -94,8 +94,7 @@ export const adviserBaseNav = [
     name: "Compliance",
     icon: Shield,
     items: [
-      { path: "/adviceos", label: "AdviceOS", icon: Shield, title: "Compliance-First Decisions", badge: "NEW" },
-      { path: "/enterprise", label: "Compliance Dashboard", icon: Shield, title: "Compliance Dashboard", badge: "NEW" },
+      { path: "/adviceos", label: "Compliance Centre", icon: Shield, title: "Unified Compliance Centre", badge: "NEW" },
       { path: "/security", label: "Security", icon: Shield, title: "Security" },
     ]
   },
@@ -134,7 +133,7 @@ export const clientContextNav = [
     items: [
       { path: "/scenario-modelling", label: "Goals & Scenarios", icon: Target, title: "Goals & Scenario Modelling" },
       { path: "/next-best-actions", label: "Actions", icon: Zap, title: "Next Best Actions" },
-      { path: "/tax-analysis-sync", label: "Tax Analysis", icon: FileText, title: "Tax Analysis & CGT" },
+      { path: "/tax-analysis-sync", label: "Tax Centre", icon: FileText, title: "Tax Analysis & CGT" },
     ]
   },
   {

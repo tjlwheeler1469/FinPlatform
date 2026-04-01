@@ -41,7 +41,7 @@ const formatCurrency = (value) => {
   }).format(value);
 };
 
-const HistoricalTaxComparison = () => {
+const HistoricalTaxComparison = ({ embedded = false }) => {
   const [taxableIncome, setTaxableIncome] = useState(120000);
   const [historicalRates, setHistoricalRates] = useState(null);
   const [comparison, setComparison] = useState(null);
@@ -95,8 +95,7 @@ const HistoricalTaxComparison = () => {
 
   const incomeScenarios = [50000, 80000, 120000, 150000, 200000, 250000];
 
-  return (
-    <Layout>
+  const content = (
       <div className="space-y-8" data-testid="historical-tax-page">
         {/* Header */}
         <div>
@@ -347,8 +346,9 @@ const HistoricalTaxComparison = () => {
           </Card>
         )}
       </div>
-    </Layout>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default HistoricalTaxComparison;
