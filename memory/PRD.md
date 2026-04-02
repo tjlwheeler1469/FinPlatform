@@ -6,23 +6,38 @@ Build an AFSL-grade wealth management platform with consolidated views, client c
 ## Core Architecture
 - **Frontend**: React (CRA) with Shadcn/UI, Recharts, Lucide icons, jsPDF
 - **Backend**: FastAPI + MongoDB
-- **AI**: OpenAI GPT-5.2 (Emergent LLM Key) for copilot, whisper for voice
+- **AI**: OpenAI GPT-5.2 (Emergent LLM Key), whisper for voice
 - **Market Data**: CoinGecko (live crypto)
 
-## Personal Dashboard Tab Structure (6 tabs)
-1. **Overview**: Health Score, Retirement Readiness, Net Worth pie, Quick Actions, Smart Insights, Documents, Asset Allocation, Entity Breakdown, Rebalancing
+## Personal Dashboard Tab Structure (7 tabs)
+1. **Overview**: Health Score, Retirement Readiness, Net Worth, Quick Actions, Smart Insights, Documents, Asset Allocation, Entity Breakdown, Rebalancing
 2. **Net Worth**: FamilyWealthDashboard embedded
-3. **Retirement**: Full retirement readiness gauge, confidence drivers, timeline
-4. **Insights**: Full Smart Insights (AI + manual)
-5. **Wealth Trends**: NetWorthTrend embedded
-6. **Investments**: All investments sorted alphabetically with entity filter
+3. **Investments**: InvestmentsOverview (shared component — same data as /investments Overview)
+4. **Retirement**: Full retirement readiness gauge
+5. **Insights**: Full Smart Insights
+6. **Wealth Trends**: NetWorthTrend embedded
+7. **Transactions**: All investments sorted alphabetically with entity filter
+
+## /investments Page Tab Structure (11 tabs)
+1. Overview (InvestmentsOverview — matches Dashboard)
+2. Shares & ETFs
+3. Bonds
+4. Property
+5. Crypto
+6. Cash & TDs
+7. Super & Pension
+8. SMSF
+9. Managed Funds
+10. Unlisted
+11. Rebalancing (PortfolioRebalancing embedded)
 
 ## Sidebar Structure (All items alphabetical)
 
 ### Personal Mode
 - DASHBOARD: Markets (LIVE), My Dashboard (HOME)
-- INVESTMENTS: All Investments
-- PLANNING: Budget (NEW), Goals & Scenarios, Rebalancing, Research Centre, Retirement (PRO)
+- INVESTMENTS: All Investments (NEW), Rebalancing
+- PLANNING: Budget (NEW), Goals & Scenarios, Retirement (PRO)
+- RESEARCH: Research Centre (NEW)
 - SETTINGS: Bank Feeds, Documents, Import/Export, Security
 - TOOLS: Loan Calculator, Tax Centre
 
@@ -37,60 +52,15 @@ Build an AFSL-grade wealth management platform with consolidated views, client c
 
 ### Client Context Mode
 - DOCUMENTS: Compliance, Meeting Notes, Reports, Vault
-- OVERVIEW: Client Overview (2 tabs: Overview + Investments), Retirement, Tax Centre
+- OVERVIEW: Client Overview (Overview + Investments tabs), Retirement, Tax Centre
 - PLANNING: Actions, Budget, Goals & Scenarios
 
-## Features Implemented
-
-### Page Consolidation & Deduplication
-- [x] UnifiedDashboard renders PersonalDashboard directly
-- [x] UnifiedClientOverview: 2 tabs (Overview + Investments) — no duplication
-- [x] UnifiedInvestments: 9 asset class tabs with ErrorBoundary, supports embedded prop
-- [x] UnifiedTaxCentre: 8 tax tools
-- [x] UnifiedResearchCentre: 4 research tools
-- [x] UnifiedComplianceCentre: 4 compliance tools
-- [x] UnifiedGoalsPlanning: Goals & Scenarios + Monte Carlo
-- [x] AdvisorCommandCenter: 2 tabs (Dashboard & Briefing merged + Decision Centre)
-
-### ErrorBoundary
-- [x] All Suspense boundaries wrapped, global ErrorBoundary in App.js
-
-### Client Health Dashboard
-- [x] RAG status for 5 demo clients with search/filter
-
-### Portfolio Health Score Widget
-- [x] Inline widget on Personal Dashboard
-
-### What-If Budget Mode
-- [x] Toggle with 5 adjustment controls
-- [x] Investable surplus callout with "View Investments" action button
-
-### Client Comparison View
-- [x] Side-by-side 2-3 clients with charts
-
-### Meeting Mode Enhancements
-- [x] Keyboard shortcuts + PDF export via jsPDF
-
-### Auto-Email for Client Pack Scheduler
-- [x] Email field + toggle (MOCKED)
-
-### Tax Loss Harvesting Fix
-- [x] Client-side fallback calculation when API unavailable
-
-### Chrome Extension Error Suppression
-- [x] index.js suppresses frame_ant and other extension errors
-
-## Bugs Fixed
-- [x] SMSFOptimizer crash (optional chaining)
-- [x] Webpack chunk load failures (ErrorBoundary)
-- [x] Chrome extension interference (suppressed + ErrorBoundary)
-- [x] HouseholdBudget crash on portfolio.expenses
-- [x] Tax Loss Harvesting "calculations didn't work" (client-side fallback)
-- [x] Xplan missing LHS navigation (Layout wrapper added)
-- [x] Duplication: Goals & Scenarios removed from Client Overview (already standalone)
-- [x] Duplication: Dashboard + Daily Briefing merged into one tab
+## Shared Components
+- **InvestmentsOverview** (`/components/InvestmentsOverview.jsx`): Portfolio summary with asset allocation pie, entity breakdown bar, top holdings, rebalancing. Uses `PORTFOLIO_ASSETS` and `REBALANCING_DATA` constants. Rendered in both Dashboard Investments tab and /investments Overview tab.
+- **ErrorBoundary** (`/components/ErrorBoundary.jsx`): Wraps all Suspense boundaries
+- **MeetingMode** (`/components/MeetingMode.jsx`): 6-slide presentation with keyboard shortcuts + PDF export
 
 ## Backlog
 - [ ] P3: Real email integration for Client Pack auto-delivery
 - [ ] P3: What-If Budget scenario saving/comparison
-- [ ] P3: ComplianceModal "Don't show again" should persist across sessions
+- [ ] P3: ComplianceModal "Don't show again" persistence across sessions
