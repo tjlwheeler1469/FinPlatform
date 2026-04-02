@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 import { 
   TrendingDown,
   TrendingUp,
@@ -19,8 +19,6 @@ import {
   Lightbulb,
   Scissors
 } from "lucide-react";
-import { usePortfolio } from "@/App";
-import axios from "axios";
 import { toast } from "sonner";
 import {
   BarChart,
@@ -34,9 +32,6 @@ import {
   Pie,
   Cell
 } from "recharts";
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
 
 const formatCurrency = (value) => {
   return new Intl.NumberFormat('en-AU', {
@@ -60,7 +55,6 @@ const DEMO_HOLDINGS = [
 const COLORS = ['#EF4444', '#10B981', '#D4A84C', '#3B82F6'];
 
 const TaxLossHarvesting = ({ embedded = false }) => {
-  const { portfolio } = usePortfolio();
   const [activeTab, setActiveTab] = useState("portfolio");
   const [holdings, setHoldings] = useState(DEMO_HOLDINGS);
   const [manualHoldings, setManualHoldings] = useState([]);
@@ -102,20 +96,22 @@ const TaxLossHarvesting = ({ embedded = false }) => {
     setLoading(true);
     const holdingsToAnalyze = activeTab === "portfolio" ? holdings : manualHoldings;
     
-    if (holdingsToAnalyze.length === 0) {
+    if (!holdingsToAnalyze || holdingsToAnalyze.length === 0) {
       toast.error("Please add holdings to analyze");
       setLoading(false);
       return;
     }
 
     try {
-      // Client-side tax loss harvesting calculation
       const analyzed = holdingsToAnalyze.map(h => {
-        const costBase = h.purchase_price * h.quantity;
-        const marketValue = h.current_price * h.quantity;
+        const purchasePrice = Number(h.purchase_price) || 0;
+        const currentPrice = Number(h.current_price) || 0;
+        const quantity = Number(h.quantity) || 0;
+        const costBase = purchasePrice * quantity;
+        const marketValue = currentPrice * quantity;
         const gainLoss = marketValue - costBase;
         const gainLossPercent = costBase > 0 ? ((marketValue - costBase) / costBase) * 100 : 0;
-        const purchaseDate = new Date(h.purchase_date);
+        const purchaseDate = new Date(h.purchase_date || Date.now());
         const now = new Date();
         const monthsHeld = Math.max(1, Math.round((now - purchaseDate) / (1000 * 60 * 60 * 24 * 30)));
         const isLongTerm = monthsHeld >= 12;
@@ -233,15 +229,39 @@ const TaxLossHarvesting = ({ embedded = false }) => {
                 </Select>
               </div>
 
-              {/* Data Source Tabs */}
-              <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="portfolio">Demo Portfolio</TabsTrigger>
-                  <TabsTrigger value="manual">Manual Entry</TabsTrigger>
-                </TabsList>
+              {/* Data Source Toggle — buttons instead of nested Tabs to avoid Radix conflicts */}
+              <div>
+                <div className="grid w-full grid-cols-2 bg-muted rounded-lg p-1">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("portfolio")}
+                    className={cn(
+                      "rounded-md px-3 py-1.5 text-sm font-medium transition-all",
+                      activeTab === "portfolio"
+                        ? "bg-background text-foreground shadow"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                    data-testid="source-portfolio-btn"
+                  >
+                    Demo Portfolio
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("manual")}
+                    className={cn(
+                      "rounded-md px-3 py-1.5 text-sm font-medium transition-all",
+                      activeTab === "manual"
+                        ? "bg-background text-foreground shadow"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                    data-testid="source-manual-btn"
+                  >
+                    Manual Entry
+                  </button>
+                </div>
 
-                <TabsContent value="portfolio" className="mt-4">
-                  <div className="text-sm text-muted-foreground">
+                {activeTab === "portfolio" && (
+                  <div className="text-sm text-muted-foreground mt-4">
                     <p className="mb-2">{holdings.length} holdings loaded</p>
                     <ul className="space-y-1">
                       {holdings.slice(0, 4).map(h => (
@@ -255,69 +275,71 @@ const TaxLossHarvesting = ({ embedded = false }) => {
                       {holdings.length > 4 && <li>+{holdings.length - 4} more...</li>}
                     </ul>
                   </div>
-                </TabsContent>
+                )}
 
-                <TabsContent value="manual" className="mt-4 space-y-3">
-                  <Button variant="outline" size="sm" onClick={addManualHolding} className="w-full">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Holding
-                  </Button>
-                  
-                  {manualHoldings.length === 0 && (
-                    <p className="text-sm text-muted-foreground text-center py-4">
-                      No holdings added yet
-                    </p>
-                  )}
-                  
-                  {manualHoldings.map((h, idx) => (
-                    <div key={`item-${idx}`} className="p-3 rounded-lg border space-y-2">
-                      <div className="flex justify-between items-center">
+                {activeTab === "manual" && (
+                  <div className="mt-4 space-y-3">
+                    <Button variant="outline" size="sm" onClick={addManualHolding} className="w-full">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Holding
+                    </Button>
+                    
+                    {manualHoldings.length === 0 && (
+                      <p className="text-sm text-muted-foreground text-center py-4">
+                        No holdings added yet
+                      </p>
+                    )}
+                    
+                    {manualHoldings.map((h, idx) => (
+                      <div key={`item-${idx}`} className="p-3 rounded-lg border space-y-2">
+                        <div className="flex justify-between items-center">
+                          <Input
+                            placeholder="Symbol"
+                            value={h.symbol}
+                            onChange={(e) => updateManualHolding(idx, 'symbol', e.target.value)}
+                            className="w-20"
+                          />
+                          <Button variant="ghost" size="icon" onClick={() => removeManualHolding(idx)}>
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
                         <Input
-                          placeholder="Symbol"
-                          value={h.symbol}
-                          onChange={(e) => updateManualHolding(idx, 'symbol', e.target.value)}
-                          className="w-20"
+                          placeholder="Company Name"
+                          value={h.name}
+                          onChange={(e) => updateManualHolding(idx, 'name', e.target.value)}
                         />
-                        <Button variant="ghost" size="icon" onClick={() => removeManualHolding(idx)}>
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
+                        <div className="grid grid-cols-2 gap-2">
+                          <Input
+                            type="number"
+                            placeholder="Buy Price"
+                            value={h.purchase_price || ''}
+                            onChange={(e) => updateManualHolding(idx, 'purchase_price', Number(e.target.value))}
+                          />
+                          <Input
+                            type="number"
+                            placeholder="Current Price"
+                            value={h.current_price || ''}
+                            onChange={(e) => updateManualHolding(idx, 'current_price', Number(e.target.value))}
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <Input
+                            type="number"
+                            placeholder="Quantity"
+                            value={h.quantity || ''}
+                            onChange={(e) => updateManualHolding(idx, 'quantity', Number(e.target.value))}
+                          />
+                          <Input
+                            type="date"
+                            value={h.purchase_date}
+                            onChange={(e) => updateManualHolding(idx, 'purchase_date', e.target.value)}
+                          />
+                        </div>
                       </div>
-                      <Input
-                        placeholder="Company Name"
-                        value={h.name}
-                        onChange={(e) => updateManualHolding(idx, 'name', e.target.value)}
-                      />
-                      <div className="grid grid-cols-2 gap-2">
-                        <Input
-                          type="number"
-                          placeholder="Buy Price"
-                          value={h.purchase_price || ''}
-                          onChange={(e) => updateManualHolding(idx, 'purchase_price', Number(e.target.value))}
-                        />
-                        <Input
-                          type="number"
-                          placeholder="Current Price"
-                          value={h.current_price || ''}
-                          onChange={(e) => updateManualHolding(idx, 'current_price', Number(e.target.value))}
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <Input
-                          type="number"
-                          placeholder="Quantity"
-                          value={h.quantity || ''}
-                          onChange={(e) => updateManualHolding(idx, 'quantity', Number(e.target.value))}
-                        />
-                        <Input
-                          type="date"
-                          value={h.purchase_date}
-                          onChange={(e) => updateManualHolding(idx, 'purchase_date', e.target.value)}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </TabsContent>
-              </Tabs>
+                    ))}
+                  </div>
+                )}
+              </div>
 
               <Button 
                 onClick={analyzeHarvesting}

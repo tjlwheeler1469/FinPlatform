@@ -41,7 +41,7 @@
     "frontend": "100% (all pages verified working)"
   },
   "test_credentials": {
-    "api_base_url": "https://smsf-stability-fix.preview.emergentagent.com"
+    "api_base_url": "https://nested-tabs-debug.preview.emergentagent.com"
   },
   "seed_data_creation": "No seed data needed - all APIs use simulated/demo data with price jitter",
   "retest_needed": false,

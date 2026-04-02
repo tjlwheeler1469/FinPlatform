@@ -37,7 +37,7 @@
   "test_credentials": {
     "email": "advisor@wealthcommand.io",
     "password": "secure_password_123",
-    "api_base_url": "https://smsf-stability-fix.preview.emergentagent.com",
+    "api_base_url": "https://nested-tabs-debug.preview.emergentagent.com",
     "test_client_ids": ["client_1", "client_2", "client_4"]
   },
   "seed_data_creation": "Used existing demo data. Revenue Layer has 3 clients (Wheeler Family, Chen Investment Trust, Patel Holdings). FX Trading has 2 demo accounts (demo_mt5, demo_ctrader).",

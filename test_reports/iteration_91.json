@@ -38,7 +38,7 @@
     "frontend": "100% (navigation verified)"
   },
   "test_credentials": {
-    "preview_url": "https://smsf-stability-fix.preview.emergentagent.com"
+    "preview_url": "https://nested-tabs-debug.preview.emergentagent.com"
   },
   "seed_data_creation": "None - using existing demo data",
   "retest_needed": false,

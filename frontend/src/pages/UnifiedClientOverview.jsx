@@ -25,19 +25,19 @@ const UnifiedClientOverview = () => {
         <div className="max-w-[1800px] mx-auto px-4 sm:px-6 pt-4">
           <Tabs value={tab} onValueChange={setTab}>
             <TabsList className="bg-white border mb-4 h-10 w-full justify-start gap-0 px-1 overflow-x-auto">
-              <TabsTrigger value="overview" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="tab-overview">
+              <TabsTrigger value="overview" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="client-tab-overview">
                 <LayoutDashboard className="h-3.5 w-3.5" /> Overview
               </TabsTrigger>
-              <TabsTrigger value="actions" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="tab-actions">
+              <TabsTrigger value="actions" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="client-tab-actions">
                 <Zap className="h-3.5 w-3.5" /> Actions
               </TabsTrigger>
-              <TabsTrigger value="retirement" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="tab-retirement">
+              <TabsTrigger value="retirement" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="client-tab-retirement">
                 <Gauge className="h-3.5 w-3.5" /> Retirement
               </TabsTrigger>
-              <TabsTrigger value="tax" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="tab-tax">
+              <TabsTrigger value="tax" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="client-tab-tax">
                 <Calculator className="h-3.5 w-3.5" /> Tax Centre
               </TabsTrigger>
-              <TabsTrigger value="transactions" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="tab-transactions">
+              <TabsTrigger value="transactions" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="client-tab-transactions">
                 <FileText className="h-3.5 w-3.5" /> Transactions
               </TabsTrigger>
             </TabsList>
