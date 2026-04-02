@@ -29,7 +29,6 @@ const TABS = [
   { value: "crypto", label: "Crypto", icon: Bitcoin },
   { value: "managed", label: "Managed Funds", icon: Briefcase },
   { value: "property", label: "Property", icon: Building2 },
-  { value: "rebalancing", label: "Rebalancing", icon: ArrowLeftRight },
   { value: "shares", label: "Shares & ETFs", icon: BarChart3 },
   { value: "smsf", label: "SMSF", icon: PiggyBank },
   { value: "super", label: "Super & Pension", icon: Shield },
@@ -85,9 +84,6 @@ const UnifiedInvestments = ({ embedded = false }) => {
             </TabsContent>
             <TabsContent value="unlisted" className="mt-0">
               <ErrorBoundary label="Unlisted"><Suspense fallback={<TabLoader />}><UnlistedInvestments embedded /></Suspense></ErrorBoundary>
-            </TabsContent>
-            <TabsContent value="rebalancing" className="mt-0">
-              <ErrorBoundary label="Rebalancing"><Suspense fallback={<TabLoader />}><PortfolioRebalancing embedded /></Suspense></ErrorBoundary>
             </TabsContent>
           </Tabs>
         </div>

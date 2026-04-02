@@ -32,6 +32,7 @@ export const personalNavGroups = [
       { path: "/budget", label: "Budget", icon: PiggyBank, title: "Budget Management", badge: "NEW" },
       { path: "/scenario-modelling", label: "Goals & Scenarios", icon: Target, title: "Goals, Scenarios & Monte Carlo" },
       { path: "/retirement-confidence", label: "Retirement", icon: Gauge, title: "Retirement Planning & Confidence", badge: "PRO" },
+      { path: "/tax-analysis-sync", label: "Tax Centre", icon: Calculator, title: "Unified Tax Centre", badge: "NEW" },
     ]
   },
   {
@@ -56,7 +57,6 @@ export const personalNavGroups = [
     icon: Calculator,
     items: [
       { path: "/loan-calculator", label: "Loan Calculator", icon: Landmark, title: "Loan Calculator" },
-      { path: "/tax-analysis-sync", label: "Tax Centre", icon: Calculator, title: "Unified Tax Centre", badge: "NEW" },
     ]
   },
 ];
@@ -83,7 +83,6 @@ export const adviserBaseNav = [
     icon: Users,
     items: [
       { path: "/adviser-hub", label: "Client Hub", icon: Zap, title: "Clients & Portfolio", badge: "HUB" },
-      { path: "/client-comparison", label: "Compare Clients", icon: BarChart3, title: "Side-by-Side Client Comparison", badge: "NEW" },
       { path: "/client-health", label: "Health Dashboard", icon: Activity, title: "Client Health RAG Status", badge: "NEW" },
     ]
   },
@@ -91,7 +90,7 @@ export const adviserBaseNav = [
     name: "Dashboard",
     icon: LayoutDashboard,
     items: [
-      { path: "/advisor-command-center", label: "Command Center", icon: LayoutDashboard, title: "Dashboard, Briefing & Decisions" },
+      { path: "/advisor-command-center", label: "Dashboard", icon: LayoutDashboard, title: "Adviser Dashboard" },
       { path: "/macro-dashboard", label: "Markets", icon: BarChart3, title: "Live Markets", badge: "LIVE" },
     ]
   },

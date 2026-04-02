@@ -647,7 +647,7 @@ const PersonalDashboard = ({ embedded = false }) => {
 
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid grid-cols-7 w-full max-w-5xl">
+          <TabsList className="grid grid-cols-5 w-full max-w-4xl">
             <TabsTrigger value="overview" className="flex items-center gap-1" data-testid="tab-overview">
               <Eye className="h-4 w-4" />
               Overview
@@ -656,21 +656,13 @@ const PersonalDashboard = ({ embedded = false }) => {
               <Wallet className="h-4 w-4" />
               Net Worth
             </TabsTrigger>
-            <TabsTrigger value="investments" className="flex items-center gap-1" data-testid="tab-investments">
-              <BarChart3 className="h-4 w-4" />
-              Investments
-            </TabsTrigger>
-            <TabsTrigger value="retirement" className="flex items-center gap-1" data-testid="tab-retirement">
-              <Gauge className="h-4 w-4" />
-              Retirement
+            <TabsTrigger value="wealth-trends" className="flex items-center gap-1" data-testid="tab-wealth-trends">
+              <TrendingUp className="h-4 w-4" />
+              Wealth Trends
             </TabsTrigger>
             <TabsTrigger value="insights" className="flex items-center gap-1" data-testid="tab-insights">
               <Brain className="h-4 w-4" />
               Insights
-            </TabsTrigger>
-            <TabsTrigger value="wealth-trends" className="flex items-center gap-1" data-testid="tab-wealth-trends">
-              <TrendingUp className="h-4 w-4" />
-              Wealth Trends
             </TabsTrigger>
             <TabsTrigger value="transactions" className="flex items-center gap-1" data-testid="tab-transactions">
               <FileText className="h-4 w-4" />
@@ -963,134 +955,16 @@ const PersonalDashboard = ({ embedded = false }) => {
           </TabsContent>
 
 
-          {/* ==================== TAB 1c: INVESTMENTS OVERVIEW ==================== */}
-          <TabsContent value="investments" className="space-y-6">
-            <InvestmentsOverview />
+          {/* ==================== TAB 2: WEALTH TRENDS ==================== */}
+          <TabsContent value="wealth-trends" className="space-y-6">
+            <ErrorBoundary label="Wealth Trends">
+              <Suspense fallback={<div className="flex items-center justify-center py-20"><Loader2 className="h-6 w-6 animate-spin text-[#D4A84C]" /></div>}>
+                <NetWorthTrend embedded />
+              </Suspense>
+            </ErrorBoundary>
           </TabsContent>
 
-          {/* ==================== TAB 2: RETIREMENT ==================== */}
-          <TabsContent value="retirement" className="space-y-6">
-            <div className="grid lg:grid-cols-2 gap-6">
-              {/* Retirement Readiness Gauge */}
-              <Card className="border-2 border-primary/20">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Gauge className="h-5 w-5 text-primary" />
-                    Retirement Readiness
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-center">
-                    <div className="relative w-48 h-48">
-                      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-                        <RadialBarChart 
-                          cx="50%" 
-                          cy="50%" 
-                          innerRadius="60%" 
-                          outerRadius="100%" 
-                          data={[{ value: confidence, fill: getConfidenceColor(confidence) }]}
-                          startAngle={180}
-                          endAngle={0}
-                        >
-                          <RadialBar dataKey="value" cornerRadius={10} background />
-                        </RadialBarChart>
-                      </ResponsiveContainer>
-                      <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <p className="text-4xl font-bold" style={{ color: getConfidenceColor(confidence) }}>
-                          {confidence.toFixed(0)}%
-                        </p>
-                        <p className="text-sm text-muted-foreground">Confidence</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-4 mt-6">
-                    <div className="text-center p-3 bg-green-50 rounded-lg">
-                      <p className="text-xs text-muted-foreground">Success Rate</p>
-                      <p className="text-xl font-bold text-green-600">
-                        {retirementData?.monte_carlo?.success_rate_percent?.toFixed(0) || '--'}%
-                      </p>
-                    </div>
-                    <div className="text-center p-3 bg-blue-50 rounded-lg">
-                      <p className="text-xs text-muted-foreground">Median Outcome</p>
-                      <p className="text-xl font-bold text-blue-600">
-                        {formatCurrency(retirementData?.monte_carlo?.percentiles?.p50_median || 0)}
-                      </p>
-                    </div>
-                    <div className="text-center p-3 bg-purple-50 rounded-lg">
-                      <p className="text-xs text-muted-foreground">Years Left</p>
-                      <p className="text-xl font-bold text-purple-600">{yearsToRetirement}</p>
-                    </div>
-                  </div>
-                  
-                  <Link to="/retirement-confidence">
-                    <Button className="w-full mt-4">
-                      Open Full Retirement Planner <ChevronRight className="h-4 w-4 ml-1" />
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-
-              {/* Confidence Drivers */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BarChart3 className="h-5 w-5 text-blue-500" />
-                    Confidence Drivers
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {[
-                      { name: 'Savings Strength', value: (retirementData?.confidence_breakdown?.raw_factors?.monte_carlo_success || 0) * 100, color: '#3b82f6' },
-                      { name: 'Market Protection', value: (retirementData?.confidence_breakdown?.raw_factors?.downside_protection || 0) * 100, color: '#22c55e' },
-                      { name: 'Longevity Coverage', value: (retirementData?.confidence_breakdown?.raw_factors?.longevity_protection || 0) * 100, color: '#ec4899' },
-                      { name: 'Spending Flexibility', value: (retirementData?.confidence_breakdown?.raw_factors?.spending_flexibility || 0) * 100, color: '#f59e0b' },
-                      { name: 'Diversification', value: (retirementData?.confidence_breakdown?.raw_factors?.diversification || 0) * 100, color: '#06b6d4' },
-                    ].map((driver) => (
-                      <div key={driver.name} className="space-y-1">
-                        <div className="flex justify-between text-sm">
-                          <span>{driver.name}</span>
-                          <span className="font-medium">{driver.value.toFixed(0)}%</span>
-                        </div>
-                        <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full rounded-full transition-all duration-500"
-                            style={{ width: `${driver.value}%`, backgroundColor: driver.value >= 70 ? '#22c55e' : driver.value >= 40 ? driver.color : '#ef4444' }}
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Projected Timeline */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Retirement Timeline</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
-                  <div className="text-center">
-                    <p className="text-sm text-muted-foreground">Current Age</p>
-                    <p className="text-2xl font-bold">{userProfile.age}</p>
-                  </div>
-                  <div className="flex-1 mx-8">
-                    <Progress value={((userProfile.retirementAge - userProfile.age - yearsToRetirement) / (userProfile.retirementAge - 30)) * 100 + 50} className="h-4" />
-                    <p className="text-center text-sm text-muted-foreground mt-2">{yearsToRetirement} years to go</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm text-muted-foreground">Target Retirement</p>
-                    <p className="text-2xl font-bold">{userProfile.retirementAge}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* ==================== TAB 3: INSIGHTS (Full Smart Insights) ==================== */}
+          {/* ==================== TAB 3: INSIGHTS ==================== */}
           <TabsContent value="insights" className="space-y-6">
             <SmartInsights 
               clientId="thompson_family"
@@ -1099,15 +973,6 @@ const PersonalDashboard = ({ embedded = false }) => {
               isAdvisor={false}
               compact={false}
             />
-          </TabsContent>
-
-          {/* ==================== TAB 4: WEALTH TRENDS ==================== */}
-          <TabsContent value="wealth-trends" className="space-y-6">
-            <ErrorBoundary label="Wealth Trends">
-              <Suspense fallback={<div className="flex items-center justify-center py-20"><Loader2 className="h-6 w-6 animate-spin text-[#D4A84C]" /></div>}>
-                <NetWorthTrend embedded />
-              </Suspense>
-            </ErrorBoundary>
           </TabsContent>
 
           {/* ==================== TAB 5: TRANSACTIONS ==================== */}

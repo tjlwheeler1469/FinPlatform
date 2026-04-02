@@ -37,8 +37,8 @@ const UnifiedClientOverview = () => {
               <TabsTrigger value="tax" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="client-tab-tax">
                 <Calculator className="h-3.5 w-3.5" /> Tax Centre
               </TabsTrigger>
-              <TabsTrigger value="transactions" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="client-tab-transactions">
-                <FileText className="h-3.5 w-3.5" /> Transactions
+              <TabsTrigger value="investments" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="client-tab-investments">
+                <TrendingUp className="h-3.5 w-3.5" /> Investments
               </TabsTrigger>
             </TabsList>
 
@@ -70,8 +70,8 @@ const UnifiedClientOverview = () => {
                 </Suspense>
               </ErrorBoundary>
             </TabsContent>
-            <TabsContent value="transactions" className="mt-0">
-              <ErrorBoundary label="Transactions">
+            <TabsContent value="investments" className="mt-0">
+              <ErrorBoundary label="Investments">
                 <Suspense fallback={<TabLoader />}>
                   <UnifiedInvestments embedded />
                 </Suspense>
