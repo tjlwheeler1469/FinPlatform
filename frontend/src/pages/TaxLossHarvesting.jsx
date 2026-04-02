@@ -109,16 +109,7 @@ const TaxLossHarvesting = ({ embedded = false }) => {
     }
 
     try {
-      const response = await axios.post(`${API}/analyze/tax-loss-harvesting`, {
-        holdings: holdingsToAnalyze,
-        realized_gains: realizedGains,
-        marginal_tax_rate: marginalRate / 100
-      });
-      setResult(response.data);
-      toast.success("Analysis complete");
-    } catch (error) {
-      console.error("API unavailable, using client-side calculation:", error);
-      // Client-side fallback calculation
+      // Client-side tax loss harvesting calculation
       const analyzed = holdingsToAnalyze.map(h => {
         const costBase = h.purchase_price * h.quantity;
         const marketValue = h.current_price * h.quantity;
@@ -147,8 +138,8 @@ const TaxLossHarvesting = ({ embedded = false }) => {
       const harvestable = analyzed.filter(h => h.harvestable);
       const totalHarvestable = harvestable.reduce((s, h) => s + Math.abs(h.gain_loss), 0);
       const netPosition = realizedGains + totalGains - totalLosses;
-      const taxWithout = Math.max(0, realizedGains + totalGains) * (marginalRate / 100);
-      const taxWith = Math.max(0, netPosition) * (marginalRate / 100);
+      const taxWithout = Math.max(0, (realizedGains + totalGains) * 0.5) * (marginalRate / 100);
+      const taxWith = Math.max(0, netPosition * 0.5) * (marginalRate / 100);
       const potentialSaving = Math.max(0, taxWithout - taxWith);
 
       setResult({
@@ -170,14 +161,17 @@ const TaxLossHarvesting = ({ embedded = false }) => {
           { type: "offset", message: `Potential tax saving of ${formatCurrency(potentialSaving)} at ${marginalRate}% marginal rate`, priority: "high" },
           ...harvestable.map(h => ({
             type: "sell",
-            message: `${h.symbol} (${h.name}): Loss of ${formatCurrency(Math.abs(h.gain_loss))} — tax saving ${formatCurrency(h.tax_saving)}`,
+            message: `${h.symbol} (${h.name}): Loss of ${formatCurrency(Math.abs(h.gain_loss))} — tax saving of ${formatCurrency(h.tax_saving)}`,
             priority: h.tax_saving > 1000 ? "high" : "medium"
           }))
         ] : [
           { type: "info", message: "No harvesting opportunities found — all positions are in profit", priority: "low" }
         ]
       });
-      toast.success("Analysis complete (client-side calculation)");
+      toast.success("Analysis complete");
+    } catch (error) {
+      console.error("Analysis error:", error);
+      toast.error("Failed to analyze — check your holdings data");
     } finally {
       setLoading(false);
     }

@@ -548,7 +548,7 @@ const FactorBreakdown = ({ factors }) => {
 
 // ==================== MAIN COMPONENT ====================
 
-const RetirementConfidence = () => {
+const RetirementConfidence = ({ embedded = false }) => {
   const { t } = useLanguage();
   const portfolioCtx = usePortfolio();
   // Engine mode: 'quick' or 'advanced'
@@ -858,10 +858,10 @@ const RetirementConfidence = () => {
     }
   }, [engineMode]);
 
-  return (
-    <Layout>
+  const content = (
       <div className="space-y-6" data-testid="retirement-confidence">
         {/* Header */}
+        {!embedded && (
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold">{t('retirement.title')}</h1>
@@ -930,6 +930,7 @@ const RetirementConfidence = () => {
             </Button>
           </div>
         </div>
+        )}
 
         {/* Main Confidence Display */}
         {result && (
@@ -1456,8 +1457,9 @@ const RetirementConfidence = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </Layout>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default RetirementConfidence;

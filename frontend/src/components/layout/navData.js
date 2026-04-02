@@ -135,16 +135,13 @@ export const clientContextNav = [
     name: "Overview",
     icon: Eye,
     items: [
-      { path: "/dashboard", label: "Client Overview", icon: Wallet, title: "Overview & Investments", badge: "360" },
-      { path: "/retirement-confidence", label: "Retirement", icon: Gauge, title: "Retirement Planning & Confidence", badge: "PRO" },
-      { path: "/tax-analysis-sync", label: "Tax Centre", icon: Calculator, title: "Tax Analysis & CGT" },
+      { path: "/dashboard", label: "Client Overview", icon: Wallet, title: "Overview, Actions, Retirement, Tax & Transactions", badge: "360" },
     ]
   },
   {
     name: "Planning",
     icon: Target,
     items: [
-      { path: "/next-best-actions", label: "Actions", icon: Zap, title: "Next Best Actions" },
       { path: "/budget", label: "Budget", icon: PiggyBank, title: "Budget Management", badge: "NEW" },
       { path: "/scenario-modelling", label: "Goals & Scenarios", icon: Target, title: "Goals, Scenarios & Monte Carlo" },
     ]

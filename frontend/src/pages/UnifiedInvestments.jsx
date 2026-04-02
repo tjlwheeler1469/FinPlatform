@@ -24,16 +24,16 @@ const TabLoader = () => (
 
 const TABS = [
   { value: "overview", label: "Overview", icon: Eye },
-  { value: "shares", label: "Shares & ETFs", icon: BarChart3 },
   { value: "bonds", label: "Bonds", icon: Landmark },
-  { value: "property", label: "Property", icon: Building2 },
-  { value: "crypto", label: "Crypto", icon: Bitcoin },
   { value: "cash", label: "Cash & TDs", icon: DollarSign },
-  { value: "super", label: "Super & Pension", icon: Shield },
-  { value: "smsf", label: "SMSF", icon: PiggyBank },
+  { value: "crypto", label: "Crypto", icon: Bitcoin },
   { value: "managed", label: "Managed Funds", icon: Briefcase },
-  { value: "unlisted", label: "Unlisted", icon: Lock },
+  { value: "property", label: "Property", icon: Building2 },
   { value: "rebalancing", label: "Rebalancing", icon: ArrowLeftRight },
+  { value: "shares", label: "Shares & ETFs", icon: BarChart3 },
+  { value: "smsf", label: "SMSF", icon: PiggyBank },
+  { value: "super", label: "Super & Pension", icon: Shield },
+  { value: "unlisted", label: "Unlisted", icon: Lock },
 ];
 
 const UnifiedInvestments = ({ embedded = false }) => {

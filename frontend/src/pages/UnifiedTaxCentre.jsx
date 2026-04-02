@@ -30,11 +30,10 @@ const TabLoader = () => (
   </div>
 );
 
-const UnifiedTaxCentre = () => {
+const UnifiedTaxCentre = ({ embedded = false }) => {
   const [activeTab, setActiveTab] = useState("analysis");
 
-  return (
-    <Layout>
+  const content = (
       <div className="space-y-4" data-testid="unified-tax-centre">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="bg-white border h-10 w-full justify-start gap-0 overflow-x-auto px-1">
@@ -81,8 +80,9 @@ const UnifiedTaxCentre = () => {
           </div>
         </Tabs>
       </div>
-    </Layout>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default UnifiedTaxCentre;

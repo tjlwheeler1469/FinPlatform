@@ -299,7 +299,7 @@ const RecommendationCard = ({ rec, onExecute, onModel }) => {
   );
 };
 
-const NextBestActions = () => {
+const NextBestActions = ({ embedded = false }) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const clientId = searchParams.get("client") || "client_1";
@@ -325,10 +325,10 @@ const NextBestActions = () => {
     navigate(`/transaction-modeler?client=${clientId}`);
   };
 
-  return (
-    <Layout>
+  const content = (
       <div className="space-y-6" data-testid="next-best-actions">
         {/* Header */}
+        {!embedded && (
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-3">
@@ -373,6 +373,7 @@ const NextBestActions = () => {
             </Button>
           </div>
         </div>
+        )}
 
         {/* Summary Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -446,8 +447,9 @@ const NextBestActions = () => {
           ))}
         </div>
       </div>
-    </Layout>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default NextBestActions;
