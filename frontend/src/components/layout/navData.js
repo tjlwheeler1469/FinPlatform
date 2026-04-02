@@ -22,6 +22,7 @@ export const personalNavGroups = [
     icon: TrendingUp,
     items: [
       { path: "/investments", label: "All Investments", icon: TrendingUp, title: "Investment Portfolio", badge: "NEW" },
+      { path: "/portfolio-rebalancing", label: "Rebalancing", icon: BarChart3, title: "Portfolio Rebalancing" },
     ]
   },
   {
@@ -30,9 +31,14 @@ export const personalNavGroups = [
     items: [
       { path: "/budget", label: "Budget", icon: PiggyBank, title: "Budget Management", badge: "NEW" },
       { path: "/scenario-modelling", label: "Goals & Scenarios", icon: Target, title: "Goals, Scenarios & Monte Carlo" },
-      { path: "/portfolio-rebalancing", label: "Rebalancing", icon: BarChart3, title: "Portfolio Rebalancing" },
-      { path: "/stock-research", label: "Research Centre", icon: LineChart, title: "Research & Comparison", badge: "NEW" },
       { path: "/retirement-confidence", label: "Retirement", icon: Gauge, title: "Retirement Planning & Confidence", badge: "PRO" },
+    ]
+  },
+  {
+    name: "Research",
+    icon: LineChart,
+    items: [
+      { path: "/stock-research", label: "Research Centre", icon: LineChart, title: "Research & Comparison", badge: "NEW" },
     ]
   },
   {

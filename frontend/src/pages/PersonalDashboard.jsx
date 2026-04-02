@@ -37,6 +37,7 @@ import {
 
 const NetWorthTrend = lazy(() => import("@/pages/NetWorthTrend"));
 const FamilyWealthDashboard = lazy(() => import("@/pages/FamilyWealthDashboard"));
+import InvestmentsOverview from "@/components/InvestmentsOverview";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || '';
 
@@ -644,9 +645,9 @@ const PersonalDashboard = ({ embedded = false }) => {
           </CardContent>
         </Card>
 
-        {/* Main Tabs - Combined Overview + Retirement + Insights + Wealth Trends + Net Worth + Investments */}
+        {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid grid-cols-6 w-full max-w-4xl">
+          <TabsList className="grid grid-cols-7 w-full max-w-5xl">
             <TabsTrigger value="overview" className="flex items-center gap-1" data-testid="tab-overview">
               <Eye className="h-4 w-4" />
               Overview
@@ -654,6 +655,10 @@ const PersonalDashboard = ({ embedded = false }) => {
             <TabsTrigger value="net-worth" className="flex items-center gap-1" data-testid="tab-net-worth">
               <Wallet className="h-4 w-4" />
               Net Worth
+            </TabsTrigger>
+            <TabsTrigger value="investments" className="flex items-center gap-1" data-testid="tab-investments">
+              <BarChart3 className="h-4 w-4" />
+              Investments
             </TabsTrigger>
             <TabsTrigger value="retirement" className="flex items-center gap-1" data-testid="tab-retirement">
               <Gauge className="h-4 w-4" />
@@ -667,9 +672,9 @@ const PersonalDashboard = ({ embedded = false }) => {
               <TrendingUp className="h-4 w-4" />
               Wealth Trends
             </TabsTrigger>
-            <TabsTrigger value="investments" className="flex items-center gap-1" data-testid="tab-investments">
-              <BarChart3 className="h-4 w-4" />
-              Investments
+            <TabsTrigger value="transactions" className="flex items-center gap-1" data-testid="tab-transactions">
+              <FileText className="h-4 w-4" />
+              Transactions
             </TabsTrigger>
           </TabsList>
 
@@ -957,6 +962,12 @@ const PersonalDashboard = ({ embedded = false }) => {
             </ErrorBoundary>
           </TabsContent>
 
+
+          {/* ==================== TAB 1c: INVESTMENTS OVERVIEW ==================== */}
+          <TabsContent value="investments" className="space-y-6">
+            <InvestmentsOverview />
+          </TabsContent>
+
           {/* ==================== TAB 2: RETIREMENT ==================== */}
           <TabsContent value="retirement" className="space-y-6">
             <div className="grid lg:grid-cols-2 gap-6">
@@ -1099,8 +1110,8 @@ const PersonalDashboard = ({ embedded = false }) => {
             </ErrorBoundary>
           </TabsContent>
 
-          {/* ==================== TAB 5: INVESTMENTS (alphabetical) ==================== */}
-          <TabsContent value="investments" className="space-y-6">
+          {/* ==================== TAB 5: TRANSACTIONS ==================== */}
+          <TabsContent value="transactions" className="space-y-6">
             {/* Entity Filter */}
             <div className="flex items-center gap-4">
               <span className="text-sm font-medium">Filter by Entity:</span>

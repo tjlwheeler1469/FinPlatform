@@ -1,8 +1,9 @@
 import { useState, lazy, Suspense } from "react";
 import Layout from "@/components/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, BarChart3, Building2, Landmark, Bitcoin, Briefcase, Lock, DollarSign, Shield, PiggyBank } from "lucide-react";
+import { Loader2, BarChart3, Building2, Landmark, Bitcoin, Briefcase, Lock, DollarSign, Shield, PiggyBank, Eye, ArrowLeftRight } from "lucide-react";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import InvestmentsOverview from "@/components/InvestmentsOverview";
 
 const SharePortfolio = lazy(() => import("@/pages/SharePortfolio"));
 const BondsTrading = lazy(() => import("@/pages/BondsTrading"));
@@ -13,6 +14,7 @@ const SMSFOptimizer = lazy(() => import("@/pages/SMSFOptimizer"));
 const ManagedFunds = lazy(() => import("@/pages/ManagedFunds"));
 const UnlistedInvestments = lazy(() => import("@/pages/UnlistedInvestments"));
 const CashDeposits = lazy(() => import("@/pages/CashDeposits"));
+const PortfolioRebalancing = lazy(() => import("@/pages/PortfolioRebalancing"));
 
 const TabLoader = () => (
   <div className="flex items-center justify-center py-20">
@@ -21,6 +23,7 @@ const TabLoader = () => (
 );
 
 const TABS = [
+  { value: "overview", label: "Overview", icon: Eye },
   { value: "shares", label: "Shares & ETFs", icon: BarChart3 },
   { value: "bonds", label: "Bonds", icon: Landmark },
   { value: "property", label: "Property", icon: Building2 },
@@ -30,10 +33,11 @@ const TABS = [
   { value: "smsf", label: "SMSF", icon: PiggyBank },
   { value: "managed", label: "Managed Funds", icon: Briefcase },
   { value: "unlisted", label: "Unlisted", icon: Lock },
+  { value: "rebalancing", label: "Rebalancing", icon: ArrowLeftRight },
 ];
 
 const UnifiedInvestments = ({ embedded = false }) => {
-  const [tab, setTab] = useState("shares");
+  const [tab, setTab] = useState("overview");
 
   const content = (
       <div className="min-h-screen bg-gray-50" data-testid="unified-investments">
@@ -52,6 +56,9 @@ const UnifiedInvestments = ({ embedded = false }) => {
               ))}
             </TabsList>
 
+            <TabsContent value="overview" className="mt-0">
+              <ErrorBoundary label="Investments Overview"><InvestmentsOverview /></ErrorBoundary>
+            </TabsContent>
             <TabsContent value="shares" className="mt-0">
               <ErrorBoundary label="Shares & ETFs"><Suspense fallback={<TabLoader />}><SharePortfolio embedded /></Suspense></ErrorBoundary>
             </TabsContent>
@@ -78,6 +85,9 @@ const UnifiedInvestments = ({ embedded = false }) => {
             </TabsContent>
             <TabsContent value="unlisted" className="mt-0">
               <ErrorBoundary label="Unlisted"><Suspense fallback={<TabLoader />}><UnlistedInvestments embedded /></Suspense></ErrorBoundary>
+            </TabsContent>
+            <TabsContent value="rebalancing" className="mt-0">
+              <ErrorBoundary label="Rebalancing"><Suspense fallback={<TabLoader />}><PortfolioRebalancing embedded /></Suspense></ErrorBoundary>
             </TabsContent>
           </Tabs>
         </div>

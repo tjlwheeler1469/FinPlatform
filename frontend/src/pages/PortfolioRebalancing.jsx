@@ -125,7 +125,7 @@ const RISK_PROFILES = {
   }
 };
 
-const PortfolioRebalancing = () => {
+const PortfolioRebalancing = ({ embedded = false }) => {
   const { sharePortfolio, properties, familyMembers, budget } = usePortfolio();
   
   const [selectedProfile, setSelectedProfile] = useState("balanced");
@@ -297,10 +297,10 @@ const PortfolioRebalancing = () => {
     toast.success("Rebalancing plan exported");
   };
 
-  return (
-    <Layout>
+  const content = (
       <div className="space-y-6" data-testid="portfolio-rebalancing-page">
         {/* Header */}
+        {!embedded && (
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold  text-foreground flex items-center gap-2">
@@ -317,6 +317,7 @@ const PortfolioRebalancing = () => {
             </Button>
           </div>
         </div>
+        )}
 
         {/* Alert Banner */}
         {needsRebalancing ? (
@@ -812,8 +813,10 @@ const PortfolioRebalancing = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </Layout>
   );
+
+  const wrapper = embedded ? content : <Layout>{content}</Layout>;
+  return wrapper;
 };
 
 export default PortfolioRebalancing;
