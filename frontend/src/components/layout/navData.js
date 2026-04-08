@@ -84,6 +84,7 @@ export const adviserBaseNav = [
     items: [
       { path: "/adviser-hub", label: "Client Hub", icon: Zap, title: "Clients & Portfolio", badge: "HUB" },
       { path: "/client-health", label: "Health Dashboard", icon: Activity, title: "Client Health RAG Status", badge: "NEW" },
+      { path: "/client-setup", label: "New Client", icon: UserPlus, title: "Setup New Client", badge: "NEW" },
     ]
   },
   {

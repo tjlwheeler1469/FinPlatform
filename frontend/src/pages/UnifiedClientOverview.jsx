@@ -1,7 +1,7 @@
 import { useState, lazy, Suspense } from "react";
 import Layout from "@/components/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, LayoutDashboard, TrendingUp, Gauge, Calculator, Zap, FileText } from "lucide-react";
+import { Loader2, LayoutDashboard, TrendingUp, Gauge, Calculator, Zap, UserCircle } from "lucide-react";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
 const PersonalDashboard = lazy(() => import("@/pages/PersonalDashboard"));
@@ -9,6 +9,7 @@ const UnifiedInvestments = lazy(() => import("@/pages/UnifiedInvestments"));
 const RetirementConfidence = lazy(() => import("@/pages/RetirementConfidence"));
 const UnifiedTaxCentre = lazy(() => import("@/pages/UnifiedTaxCentre"));
 const NextBestActions = lazy(() => import("@/pages/NextBestActions"));
+const ClientProfileTab = lazy(() => import("@/components/ClientProfileTab"));
 
 const TabLoader = () => (
   <div className="flex items-center justify-center py-20">
@@ -18,6 +19,18 @@ const TabLoader = () => (
 
 const UnifiedClientOverview = () => {
   const [tab, setTab] = useState("overview");
+
+  // Get selected client ID from localStorage
+  const getClientId = () => {
+    try {
+      const saved = localStorage.getItem("selected_client");
+      if (saved) {
+        const client = JSON.parse(saved);
+        return client?.id || client?.client_id || "thompson_family";
+      }
+    } catch { /* ignore */ }
+    return "thompson_family";
+  };
 
   return (
     <Layout>
@@ -30,6 +43,9 @@ const UnifiedClientOverview = () => {
               </TabsTrigger>
               <TabsTrigger value="actions" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="client-tab-actions">
                 <Zap className="h-3.5 w-3.5" /> Actions
+              </TabsTrigger>
+              <TabsTrigger value="profile" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="client-tab-profile">
+                <UserCircle className="h-3.5 w-3.5" /> Profile
               </TabsTrigger>
               <TabsTrigger value="retirement" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="client-tab-retirement">
                 <Gauge className="h-3.5 w-3.5" /> Retirement
@@ -53,6 +69,13 @@ const UnifiedClientOverview = () => {
               <ErrorBoundary label="Actions">
                 <Suspense fallback={<TabLoader />}>
                   <NextBestActions embedded />
+                </Suspense>
+              </ErrorBoundary>
+            </TabsContent>
+            <TabsContent value="profile" className="mt-0">
+              <ErrorBoundary label="Profile">
+                <Suspense fallback={<TabLoader />}>
+                  <ClientProfileTab clientId={getClientId()} />
                 </Suspense>
               </ErrorBoundary>
             </TabsContent>

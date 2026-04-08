@@ -1,0 +1,117 @@
+{
+  "summary": "Iteration 146 - Client Personal Info features (TFN, ID docs, custom fields, Xplan sync) fully tested. Backend: 20/20 tests passed after fixing route ordering bug. Frontend: Profile tab, Client Setup Wizard, and New Client navigation all working correctly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration146_client_personal_info.py",
+    "/app/test_reports/pytest/pytest_iteration146.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "FIXED: Route ordering bug in client_personal_info.py - /setup route was after /{client_id} causing 'setup' to be treated as client_id. Moved /setup before parameterized routes.",
+    "Encryption service (AES-256-GCM) working correctly - TFN and ID numbers encrypted at rest, decrypted on demand",
+    "TFN masking format correct: ***-***-XXX (last 3 digits visible)",
+    "ID number masking correct: shows last 4 characters only",
+    "Xplan sync (MOCKED) working - bidirectional sync with mock data for XP-001, XP-002, XP-003",
+    "Client ID mapping: thompson_family -> XP-002, james_mitchell -> XP-001, michael_chen -> XP-003"
+  ],
+  "updated_files": [
+    "/app/backend/routes/client_personal_info.py",
+    "/app/backend/tests/test_iteration146_client_personal_info.py"
+  ],
+  "success_rate": {
+    "backend": "100% (20/20 tests passed)",
+    "frontend": "100% (all features verified)"
+  },
+  "test_credentials": "No auth required - public access",
+  "seed_data_creation": "Test clients created with TEST_ prefix during backend testing",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Client Personal Info features fully implemented and tested. Key endpoints: POST/GET /api/client-personal-info/{client_id}, GET /api/client-personal-info/{client_id}/unmasked, POST /api/client-personal-info/{client_id}/xplan-sync, GET /api/client-personal-info/{client_id}/xplan-status, POST /api/client-personal-info/setup. Xplan sync is MOCKED - returns fake data for known client IDs.",
+  "features_tested": {
+    "backend_save_personal_info": {
+      "status": "PASS",
+      "details": "POST /api/client-personal-info/{client_id} saves TFN (encrypted), ID documents (encrypted), custom fields. Returns masked TFN and counts."
+    },
+    "backend_get_masked_data": {
+      "status": "PASS",
+      "details": "GET /api/client-personal-info/{client_id} returns masked TFN (***-***-XXX) and masked ID numbers (last 4 chars visible)."
+    },
+    "backend_get_unmasked_data": {
+      "status": "PASS",
+      "details": "GET /api/client-personal-info/{client_id}/unmasked returns decrypted TFN and ID numbers. Returns 404 for non-existent clients."
+    },
+    "backend_xplan_sync": {
+      "status": "PASS",
+      "details": "POST /api/client-personal-info/{client_id}/xplan-sync triggers bidirectional sync (MOCKED). thompson_family maps to XP-002."
+    },
+    "backend_xplan_status": {
+      "status": "PASS",
+      "details": "GET /api/client-personal-info/{client_id}/xplan-status returns sync status and history (last 5 entries)."
+    },
+    "backend_client_setup": {
+      "status": "PASS",
+      "details": "POST /api/client-personal-info/setup creates new client with all fields. Returns status='created', client_id, masked TFN."
+    },
+    "frontend_profile_tab_exists": {
+      "status": "PASS",
+      "details": "Profile tab (data-testid='client-tab-profile') exists in Adviser Client Overview between Actions and Retirement tabs."
+    },
+    "frontend_profile_tab_content": {
+      "status": "PASS",
+      "details": "Profile tab shows TFN input, ID documents section, custom fields section, Xplan sync banner with status."
+    },
+    "frontend_profile_add_id": {
+      "status": "PASS",
+      "details": "Add ID button (data-testid='add-id-btn') adds new ID document form. Can select type, enter number, expiry, authority."
+    },
+    "frontend_profile_add_custom_field": {
+      "status": "PASS",
+      "details": "Add Field button (data-testid='add-custom-field-btn') adds new custom field form with label and value inputs."
+    },
+    "frontend_profile_save": {
+      "status": "PASS",
+      "details": "Save Personal Information button (data-testid='save-personal-info-btn') saves data and shows success toast."
+    },
+    "frontend_profile_xplan_sync": {
+      "status": "PASS",
+      "details": "Sync with Xplan button (data-testid='xplan-sync-btn') triggers sync and shows 'Xplan sync complete — bidirectional' toast."
+    },
+    "frontend_client_setup_wizard": {
+      "status": "PASS",
+      "details": "4-step wizard at /client-setup: Step 1 (Personal Details with first/last name required), Step 2 (TFN & ID), Step 3 (Additional Fields), Step 4 (Review & Submit)."
+    },
+    "frontend_wizard_navigation": {
+      "status": "PASS",
+      "details": "Next/Previous buttons work correctly. Previous disabled on Step 1. Submit button appears on Step 4."
+    },
+    "frontend_new_client_sidebar": {
+      "status": "PASS",
+      "details": "New Client link exists in adviser sidebar under CRM section with 'NEW' badge. Links to /client-setup."
+    },
+    "frontend_new_client_header_button": {
+      "status": "PASS",
+      "details": "+ New Client button exists in Client Hub header for quick access to client setup wizard."
+    }
+  },
+  "mocked_apis": {
+    "has_mocked_apis": true,
+    "mocked_apis_list": [
+      "Xplan bidirectional sync - returns mock TFN/ID data for XP-001, XP-002, XP-003",
+      "Client ID mapping: thompson_family -> XP-002, james_mitchell -> XP-001, michael_chen -> XP-003"
+    ]
+  },
+  "bug_fixed": {
+    "issue": "FastAPI route ordering bug - /setup endpoint was being matched by /{client_id} pattern",
+    "root_cause": "In FastAPI, specific routes must be defined before parameterized routes. /setup was defined after /{client_id}.",
+    "fix": "Moved @router.post('/setup') before @router.post('/{client_id}') in client_personal_info.py",
+    "file": "/app/backend/routes/client_personal_info.py"
+  }
+}

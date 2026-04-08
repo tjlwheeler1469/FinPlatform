@@ -98,6 +98,7 @@ const EstatePlanning = lazy(() => import("@/pages/EstatePlanning"));
 const ProductMarketplace = lazy(() => import("@/pages/ProductMarketplace"));
 const PortfolioAnalyzer = lazy(() => import("@/pages/PortfolioAnalyzer"));
 const ConnectedAccounts = lazy(() => import("@/pages/ConnectedAccounts"));
+const ClientSetupWizard = lazy(() => import("@/pages/ClientSetupWizard"));
 
 // New AI-Powered Features
 const AICopilot = lazy(() => import("@/pages/AICopilot"));
@@ -1298,6 +1299,7 @@ const AppRouter = () => {
       
       {/* Adviser Hub (Combined CRM) */}
       <Route path="/adviser-hub" element={<AdviserHub />} />
+      <Route path="/client-setup" element={<Suspense fallback={<PageLoader />}><ClientSetupWizard /></Suspense>} />
       
       {/* Client Health Dashboard */}
       <Route path="/client-health" element={<ClientHealthDashboard />} />

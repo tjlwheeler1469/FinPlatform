@@ -153,6 +153,7 @@ ROUTE_REGISTRY = [
     ("routes.pdf_report", "router", "/api", "PDF Report Generator"),
     ("routes.client_pack_scheduler", "router", "", "Client Pack Scheduler"),
     ("routes.buffett_engine", "router", "/api", "Buffett Engine"),
+    ("routes.client_personal_info", "router", "/api", "Client Personal Info"),
 ]
 
 
