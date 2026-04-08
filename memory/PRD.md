@@ -10,12 +10,15 @@ Build an AFSL-grade wealth management platform with consolidated views, client c
 - **Market Data**: CoinGecko (live crypto)
 - **Encryption**: AES-256-GCM for PII (TFN, ID numbers)
 
-## Adviser Client Overview Tab Structure (6 tabs)
-1. Overview, 2. Actions, 3. Profile (TFN/ID/entities/retirement projection), 4. Retirement, 5. Tax Centre, 6. Investments
+## Adviser Client Overview Tab Structure (7 tabs)
+1. Overview, 2. Actions, 3. Retirement, 4. Investments, 5. Budget, 6. Tax Centre, 7. Profile
+
+## Investments Tab Structure (11 tabs)
+1. Overview, 2. Rebalancing, 3. Bonds, 4. Cash & TDs, 5. Crypto, 6. Managed Funds, 7. Property, 8. Shares & ETFs, 9. SMSF, 10. Super & Pension, 11. Unlisted
 
 ## Client Setup Wizard (/client-setup)
-- **Single Client Mode**: 6 steps — Mode → Personal Details → Entities → TFN & ID → Additional Fields → Review
-- **Bulk Import Mode**: 3 steps — Mode → CSV Upload → Preview & Import
+- **Single Client Mode**: 6 steps — Mode > Personal Details > Entities > TFN & ID > Additional Fields > Review
+- **Bulk Import Mode**: 3 steps — Mode > CSV Upload > Preview & Import
 - **Entity Types**: Individual, Joint, Family Trust, Discretionary Trust, Unit Trust, Company (Pty Ltd), SMSF, Partnership
 - **CSV Format**: first_name, last_name, email, phone, date_of_birth, address, tfn, id_type, id_number
 
@@ -40,8 +43,8 @@ Build an AFSL-grade wealth management platform with consolidated views, client c
 - `client_personal_info`, `client_xplan_sync_log`, `retirement_projections`
 
 ## Sidebar Structure
-### Personal: DASHBOARD, INVESTMENTS, PLANNING (Budget, Goals, Retirement, Tax Centre), RESEARCH, SETTINGS, TOOLS
-### Adviser: AI & TASKS, COMPLIANCE, CRM (Client Hub, Health Dashboard, New Client), DASHBOARD, EXECUTION, INTEGRATIONS, TOOLS
+### Personal: DASHBOARD (My Dashboard, Markets), INVESTMENTS (All Investments, Rebalancing), PLANNING (Budget, Goals, Retirement, Tax Centre), RESEARCH, SETTINGS (Bank Feeds, Documents, Security), TOOLS
+### Adviser: DASHBOARD, CRM (Client Hub, Health Dashboard, New Client, Import/Export), AI & TASKS, EXECUTION, COMPLIANCE, INTEGRATIONS, TOOLS
 
 ## Completed (as of 8 April 2026)
 - [x] ComplianceModal "Don't show again" persistence (any dismissal = permanent)
@@ -51,9 +54,19 @@ Build an AFSL-grade wealth management platform with consolidated views, client c
 - [x] Client Profile tab with TFN/ID/custom fields/Xplan sync
 - [x] AES-256-GCM encryption for all PII
 - [x] Xplan bidirectional sync (MOCKED)
+- [x] Reorder Unified Client Overview tabs: Overview > Actions > Retirement > Investments > Budget > Tax Centre > Profile
+- [x] Budget tab added to Unified Client Overview (HouseholdBudget with embedded prop)
+- [x] Rebalancing tab moved to 2nd position in Investments navigation
+- [x] Removed Data Import/Export from Personal sidebar Settings
+- [x] Added Import/Export to Adviser CRM sidebar section
+- [x] Tidied sidebar navigation (professional styling, reduced badge clutter, cleaner group headers)
+- [x] Reordered Adviser sidebar: Dashboard > CRM > AI & Tasks > Execution > Compliance > Integrations > Tools
+- [x] Verified all dummy data calculates correctly (Net Worth $1,608,800, Gross Assets $2,278,000, Liabilities $669,200)
 - [x] All previous UI reorganization and bug fixes
 
 ## Backlog
 - [ ] P2: Real email integration for Client Pack auto-delivery
 - [ ] P2: What-If Budget scenario saving/comparison
 - [ ] P2: Budget Calculator Investment Callout verification
+- [ ] P3: Consolidate and centralize demo client data across components
+- [ ] P3: Replace Mock Xplan integration with real API when credentials available
