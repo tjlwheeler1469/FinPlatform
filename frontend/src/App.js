@@ -289,13 +289,11 @@ export const usePortfolio = () => {
 const CLIENT_FAMILY_DATA = {
   client_1: {
     familyMembers: [
-      { id: 1, name: "James Wheeler", relationship: "primary", age: 45, taxableIncome: 120000, salaryIncome: 120000, dividendIncome: 8500, rentalIncome: 18000, otherIncome: 0, deductions: 5200, superBalance: 320000, isTrustBeneficiary: true, trustDistribution: 30 },
-      { id: 2, name: "Sarah Wheeler", relationship: "spouse", age: 43, taxableIncome: 65000, salaryIncome: 65000, dividendIncome: 4200, rentalIncome: 18000, otherIncome: 0, deductions: 2800, superBalance: 260000, isTrustBeneficiary: true, trustDistribution: 30 },
-      { id: 3, name: "Emily Wheeler", relationship: "adult_child", age: 22, taxableIncome: 25000, salaryIncome: 25000, dividendIncome: 0, rentalIncome: 0, otherIncome: 0, deductions: 0, superBalance: 15000, isTrustBeneficiary: true, trustDistribution: 20 },
-      { id: 4, name: "Michael Wheeler", relationship: "adult_child", age: 19, taxableIncome: 0, salaryIncome: 0, dividendIncome: 0, rentalIncome: 0, otherIncome: 0, deductions: 0, superBalance: 5000, isTrustBeneficiary: true, trustDistribution: 20 }
+      { id: 1, name: "David Thompson", relationship: "primary", age: 50, taxableIncome: 120000, salaryIncome: 120000, dividendIncome: 3500, rentalIncome: 16000, otherIncome: 0, deductions: 5200, superBalance: 245000, isTrustBeneficiary: false, trustDistribution: 0 },
+      { id: 2, name: "Sarah Thompson", relationship: "spouse", age: 48, taxableIncome: 65000, salaryIncome: 65000, dividendIncome: 2000, rentalIncome: 16000, otherIncome: 0, deductions: 2800, superBalance: 198000, isTrustBeneficiary: false, trustDistribution: 0 }
     ],
-    trust: { name: "Wheeler Family Trust", type: "discretionary", netIncome: 150000, financialYear: "2024-25", companyDividendsReceived: 0 },
-    company: { name: "Wheeler Investments Pty Ltd", abn: "12 345 678 901", acn: "123 456 789", isBaseRateEntity: true, taxRate: 0.25, frankingAccountBalance: 45000, retainedEarnings: 180000, financialYear: "2024-25" }
+    trust: { name: "Thompson Family Trust", type: "discretionary", netIncome: 0, financialYear: "2024-25", companyDividendsReceived: 0 },
+    company: { name: "Thompson Investments Pty Ltd", abn: "12 345 678 901", acn: "123 456 789", isBaseRateEntity: true, taxRate: 0.25, frankingAccountBalance: 0, retainedEarnings: 0, financialYear: "2024-25" }
   },
   client_2: {
     familyMembers: [
@@ -335,7 +333,7 @@ const CLIENT_FAMILY_DATA = {
   }
 };
 
-// Default uses client_1 (Wheeler) as fallback
+// Default uses client_1 (Thompson) as fallback
 const DEFAULT_FAMILY_MEMBERS = CLIENT_FAMILY_DATA.client_1.familyMembers;
 
 // Default Trust Configuration (uses client_1 as fallback)
@@ -347,12 +345,12 @@ const DEFAULT_COMPANY = CLIENT_FAMILY_DATA.client_1.company;
 // Per-client portfolio data for data flow consistency
 const CLIENT_PORTFOLIO_DATA = {
   client_1: {
-    personal: { name: "Wheeler Family", age: 45, taxableIncome: 185000, entityType: "personal" },
-    investments: { cash_savings: 75000, term_deposit_amount: 150000, term_deposit_rate: 4.8, shares_value: 320000, shares_dividend_yield: 4.2, franking_percentage: 85, bonds_value: 80000, bonds_yield: 5.2, etf_value: 145000, etf_yield: 3.5, smsf_balance: 580000, properties: [
-      { property_id: "prop_001", name: "Sydney Investment Unit", value: 850000, rental_income: 36000, mortgage_amount: 510000, mortgage_rate: 6.29, mortgage_term_years: 25, annual_expenses: 8500, depreciation_building: 6500, depreciation_fixtures: 3200 },
-      { property_id: "prop_002", name: "Melbourne Townhouse", value: 720000, rental_income: 32000, mortgage_amount: 432000, mortgage_rate: 6.15, mortgage_term_years: 28, annual_expenses: 7200, depreciation_building: 5800, depreciation_fixtures: 2800 }
+    personal: { name: "Thompson Family", age: 50, taxableIncome: 185000, entityType: "personal" },
+    investments: { cash_savings: 28000, term_deposit_amount: 35000, term_deposit_rate: 4.8, shares_value: 84500, shares_dividend_yield: 4.2, franking_percentage: 85, bonds_value: 0, bonds_yield: 0, etf_value: 42000, etf_yield: 3.5, smsf_balance: 443000, properties: [
+      { property_id: "prop_001", name: "Family Home - Glen Waverley", value: 985000, rental_income: 0, mortgage_amount: 285000, mortgage_rate: 6.19, mortgage_term_years: 25, annual_expenses: 8500, depreciation_building: 0, depreciation_fixtures: 0 },
+      { property_id: "prop_002", name: "Investment Unit - Brunswick", value: 620000, rental_income: 32000, mortgage_amount: 380000, mortgage_rate: 6.49, mortgage_term_years: 28, annual_expenses: 7200, depreciation_building: 5800, depreciation_fixtures: 2800 }
     ]},
-    summary: { totalAssets: 2920000, totalDebt: 942000, netWorth: 1978000, annualIncome: 253400, totalTax: 58200, netIncome: 195200 }
+    summary: { totalAssets: 2278000, totalDebt: 669200, netWorth: 1608800, annualIncome: 185000, totalTax: 42000, netIncome: 143000 }
   },
   client_2: {
     personal: { name: "Chen Family Trust", age: 52, taxableIncome: 280000, entityType: "trust" },
@@ -415,107 +413,47 @@ const CLIENT_SHARE_DATA = {
 
 // Default Share Portfolio with ownership types
 const DEFAULT_SHARE_PORTFOLIO = [
-  // Personal Holdings
   { 
     id: 1, 
-    symbol: "CBA", 
-    name: "Commonwealth Bank", 
-    ownership: "personal", 
-    ownerId: 1, // James Wheeler
-    quantity: 200, 
-    purchasePrice: 98.50, 
-    currentPrice: 118.50, 
+    symbol: "VGH", 
+    name: "Vanguard High Growth ETF", 
+    ownership: "joint",
+    ownerId: null,
+    quantity: 400, 
+    purchasePrice: 92.00, 
+    currentPrice: 105.00, 
     purchaseDate: "2022-03-15",
-    dividendYield: 4.2,
-    frankingPercentage: 100,
-    sector: "Financials"
+    dividendYield: 3.5,
+    frankingPercentage: 0,
+    sector: "ETF"
   },
   { 
     id: 2, 
     symbol: "BHP", 
-    name: "BHP Group", 
+    name: "BHP Group Shares", 
     ownership: "personal",
-    ownerId: 1, // James Wheeler
-    quantity: 300, 
-    purchasePrice: 45.20, 
-    currentPrice: 42.80, 
+    ownerId: 1,
+    quantity: 400, 
+    purchasePrice: 42.00, 
+    currentPrice: 46.25, 
     purchaseDate: "2023-06-20",
     dividendYield: 5.8,
     frankingPercentage: 100,
     sector: "Materials"
   },
-  // Joint Holdings (50/50 James & Sarah)
   { 
     id: 3, 
-    symbol: "VAS", 
-    name: "Vanguard Australian Shares ETF", 
-    ownership: "joint",
-    ownerId: null, // Split between primary & spouse
-    quantity: 500, 
-    purchasePrice: 88.00, 
-    currentPrice: 96.50, 
+    symbol: "CBA", 
+    name: "CBA Shares (DRP)", 
+    ownership: "personal",
+    ownerId: 2,
+    quantity: 200, 
+    purchasePrice: 105.00, 
+    currentPrice: 120.00, 
     purchaseDate: "2022-08-01",
-    dividendYield: 3.8,
-    frankingPercentage: 85,
-    sector: "ETF"
-  },
-  { 
-    id: 4, 
-    symbol: "CSL", 
-    name: "CSL Limited", 
-    ownership: "joint",
-    ownerId: null,
-    quantity: 50, 
-    purchasePrice: 285.00, 
-    currentPrice: 298.00, 
-    purchaseDate: "2024-01-10",
-    dividendYield: 1.2,
-    frankingPercentage: 100,
-    sector: "Healthcare"
-  },
-  // Company Holdings
-  { 
-    id: 5, 
-    symbol: "WBC", 
-    name: "Westpac Banking", 
-    ownership: "company",
-    ownerId: null,
-    quantity: 1000, 
-    purchasePrice: 22.50, 
-    currentPrice: 26.80, 
-    purchaseDate: "2023-02-15",
-    dividendYield: 5.2,
+    dividendYield: 4.2,
     frankingPercentage: 100,
     sector: "Financials"
-  },
-  { 
-    id: 6, 
-    symbol: "TLS", 
-    name: "Telstra Group", 
-    ownership: "company",
-    ownerId: null,
-    quantity: 2000, 
-    purchasePrice: 3.85, 
-    currentPrice: 4.05, 
-    purchaseDate: "2023-05-20",
-    dividendYield: 4.4,
-    frankingPercentage: 100,
-    sector: "Telecommunications"
-  },
-  // Spouse Personal Holdings
-  { 
-    id: 7, 
-    symbol: "WOW", 
-    name: "Woolworths Group", 
-    ownership: "personal",
-    ownerId: 2, // Sarah Wheeler
-    quantity: 150, 
-    purchasePrice: 36.50, 
-    currentPrice: 31.20, 
-    purchaseDate: "2023-09-10",
-    dividendYield: 3.5,
-    frankingPercentage: 100,
-    sector: "Consumer Staples"
   }
 ];
 
@@ -529,8 +467,8 @@ const DEFAULT_BUDGET = {
   income: {
     salary1: 10000,
     salary2: 5417,
-    rental: 3000,
-    dividends: 1058,
+    rental: 2667,
+    dividends: 375,
     other: 0
   },
   expenses: {
@@ -539,7 +477,7 @@ const DEFAULT_BUDGET = {
     groceries: 1200,
     transport: 800,
     insurance: 650,
-    schoolFees: 2333,
+    schoolFees: 0,
     childcare: 0,
     entertainment: 600,
     dining: 400,
@@ -553,43 +491,43 @@ const DEFAULT_BUDGET = {
 // Default Portfolio Data
 const DEFAULT_PORTFOLIO = {
   personal: {
-    name: "Wheeler Family",
-    age: 45,
+    name: "Thompson Family",
+    age: 50,
     taxableIncome: 185000,
     entityType: "personal"
   },
   investments: {
-    cash_savings: 75000,
-    term_deposit_amount: 150000,
+    cash_savings: 28000,
+    term_deposit_amount: 35000,
     term_deposit_rate: 4.8,
-    shares_value: 320000,
+    shares_value: 84500,
     shares_dividend_yield: 4.2,
     franking_percentage: 85,
-    bonds_value: 80000,
-    bonds_yield: 5.2,
-    etf_value: 145000,
+    bonds_value: 0,
+    bonds_yield: 0,
+    etf_value: 42000,
     etf_yield: 3.5,
-    smsf_balance: 580000,
+    smsf_balance: 443000,
     properties: [
       {
         property_id: "prop_001",
-        name: "Sydney Investment Unit",
-        value: 850000,
-        rental_income: 36000,
-        mortgage_amount: 510000,
-        mortgage_rate: 6.29,
+        name: "Family Home - Glen Waverley",
+        value: 985000,
+        rental_income: 0,
+        mortgage_amount: 285000,
+        mortgage_rate: 6.19,
         mortgage_term_years: 25,
         annual_expenses: 8500,
-        depreciation_building: 6500,
-        depreciation_fixtures: 3200
+        depreciation_building: 0,
+        depreciation_fixtures: 0
       },
       {
         property_id: "prop_002",
-        name: "Melbourne Townhouse",
-        value: 720000,
+        name: "Investment Unit - Brunswick",
+        value: 620000,
         rental_income: 32000,
-        mortgage_amount: 432000,
-        mortgage_rate: 6.15,
+        mortgage_amount: 380000,
+        mortgage_rate: 6.49,
         mortgage_term_years: 28,
         annual_expenses: 7200,
         depreciation_building: 5800,
@@ -598,7 +536,7 @@ const DEFAULT_PORTFOLIO = {
     ]
   },
   expenses: {
-    school_fees: 28000,
+    school_fees: 0,
     childcare: 0,
     health_insurance: 4200,
     private_expenses: 65000,
@@ -606,12 +544,12 @@ const DEFAULT_PORTFOLIO = {
     other_deductible: 2200
   },
   summary: {
-    totalAssets: 2920000,
-    totalDebt: 942000,
-    netWorth: 1978000,
-    annualIncome: 253400,
-    totalTax: 58200,
-    netIncome: 195200
+    totalAssets: 2278000,
+    totalDebt: 669200,
+    netWorth: 1608800,
+    annualIncome: 185000,
+    totalTax: 42000,
+    netIncome: 143000
   }
 };
 

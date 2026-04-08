@@ -850,7 +850,7 @@ const PersonalDashboard = ({ embedded = false }) => {
           <TabsContent value="wealth-trends" className="space-y-6">
             <ErrorBoundary label="Wealth Trends">
               <Suspense fallback={<div className="flex items-center justify-center py-20"><Loader2 className="h-6 w-6 animate-spin text-[#D4A84C]" /></div>}>
-                <NetWorthTrend embedded />
+                <NetWorthTrend embedded netWorthOverride={netWorthValue} />
               </Suspense>
             </ErrorBoundary>
           </TabsContent>

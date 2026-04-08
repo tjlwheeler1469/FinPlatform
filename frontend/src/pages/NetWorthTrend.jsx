@@ -44,46 +44,74 @@ const formatCompact = (value) => {
 };
 
 // Generate historical net worth data (simulated for demo)
+// Uses a seeded approach so the last point always equals currentNetWorth
 const generateHistoricalData = (currentNetWorth, months = 24) => {
   const data = [];
   const now = new Date();
-  let netWorth = currentNetWorth * 0.75; // Start from 75% of current
-  
+  const debtRatio = 669200 / 2278000; // liabilities / assets ratio
+
+  // Build path backward from current value
+  // Start from ~75% and interpolate, ensuring last point = currentNetWorth
+  const startValue = currentNetWorth * 0.75;
+
+  // Use a seeded random to get consistent values per session
+  let seed = 42;
+  const seededRandom = () => {
+    seed = (seed * 16807) % 2147483647;
+    return (seed - 1) / 2147483646;
+  };
+
+  // Generate raw growth factors
+  const rawFactors = [];
+  for (let i = 0; i < months; i++) {
+    rawFactors.push(0.005 + seededRandom() * 0.015 + (seededRandom() - 0.5) * 0.02);
+  }
+
+  // Calculate what the raw path gives us
+  let rawEnd = startValue;
+  for (const f of rawFactors) rawEnd *= (1 + f);
+
+  // Scale factors so the path lands exactly on currentNetWorth
+  const scaleFactor = Math.log(currentNetWorth / startValue) / Math.log(rawEnd / startValue);
+
+  let nw = startValue;
   for (let i = months; i >= 0; i--) {
     const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    
-    // Simulate growth with some volatility
-    const monthlyGrowth = 0.005 + (Math.random() * 0.015); // 0.5% to 2% monthly
-    const volatility = (Math.random() - 0.5) * 0.02; // ±1% volatility
-    
-    netWorth = netWorth * (1 + monthlyGrowth + volatility);
-    
-    // Calculate components
-    const assets = netWorth * 1.45;
-    const liabilities = assets - netWorth;
-    
+    const idx = months - i;
+
+    if (idx > 0) {
+      const adjustedRate = rawFactors[idx - 1] * scaleFactor;
+      nw = nw * (1 + adjustedRate);
+    }
+    // Force last point to exact value
+    if (i === 0) nw = currentNetWorth;
+
+    const assets = nw / (1 - debtRatio);
+    const liabilities = assets - nw;
+
     data.push({
       date: date.toISOString().slice(0, 7),
       month: date.toLocaleDateString('en-AU', { month: 'short', year: '2-digit' }),
-      netWorth: Math.round(netWorth),
+      netWorth: Math.round(nw),
       assets: Math.round(assets),
       liabilities: Math.round(liabilities)
     });
   }
-  
+
   return data;
 };
 
-const NetWorthTrend = ({ embedded = false }) => {
+const NetWorthTrend = ({ embedded = false, netWorthOverride }) => {
   const { portfolio } = usePortfolio();
+  const baseNetWorth = netWorthOverride || portfolio.summary.netWorth || 1608800;
   const [timeRange, setTimeRange] = useState("24");
   const [chartType, setChartType] = useState("area");
   const [historicalData, setHistoricalData] = useState([]);
 
   useEffect(() => {
-    const data = generateHistoricalData(portfolio.summary.netWorth, parseInt(timeRange));
+    const data = generateHistoricalData(baseNetWorth, parseInt(timeRange));
     setHistoricalData(data);
-  }, [portfolio.summary.netWorth, timeRange]);
+  }, [baseNetWorth, timeRange]);
 
   // Calculate stats
   const currentNetWorth = historicalData[historicalData.length - 1]?.netWorth || 0;
