@@ -12,7 +12,7 @@ import requests
 import os
 import time
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://nested-tabs-debug.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://dashboard-unify-6.preview.emergentagent.com').rstrip('/')
 
 
 class TestHybridEngineDefaults:

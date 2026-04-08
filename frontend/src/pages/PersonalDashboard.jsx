@@ -520,131 +520,6 @@ const PersonalDashboard = ({ embedded = false }) => {
           </DialogContent>
         </Dialog>
 
-        {/* Portfolio Health Score */}
-        <Card className="border-l-4 border-l-[#D4A84C] bg-gradient-to-r from-[#0f1d35]/[0.03] to-transparent" data-testid="portfolio-health-score">
-          <CardContent className="py-3 px-5">
-            <div className="flex items-center gap-6 overflow-x-auto">
-              <div className="flex items-center gap-2 min-w-fit">
-                <Activity className="h-5 w-5 text-[#D4A84C]" />
-                <span className="text-sm font-semibold">Health Score</span>
-              </div>
-              {[
-                { label: "Drift", score: (() => { const actual = allocationData.map(a => a.value / totals.totalValue * 100); const target = [25, 20, 25, 20, 10]; const maxDrift = Math.max(...actual.slice(0, Math.min(actual.length, target.length)).map((a, i) => Math.abs(a - target[i]))); return maxDrift < 5 ? 92 : maxDrift < 10 ? 74 : maxDrift < 20 ? 55 : 35; })() },
-                { label: "Concentration", score: (() => { const max = Math.max(...allocationData.map(a => a.value / totals.totalValue * 100)); return max < 25 ? 95 : max < 35 ? 80 : max < 50 ? 60 : 40; })() },
-                { label: "Tax Efficiency", score: 78 },
-                { label: "Risk Alignment", score: 85 },
-                { label: "Diversification", score: allocationData.length >= 5 ? 88 : allocationData.length >= 3 ? 70 : 50 },
-              ].map((item) => {
-                const color = item.score >= 80 ? "text-emerald-600" : item.score >= 60 ? "text-amber-600" : "text-red-600";
-                const bg = item.score >= 80 ? "bg-emerald-50" : item.score >= 60 ? "bg-amber-50" : "bg-red-50";
-                return (
-                  <div key={item.label} className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${bg} min-w-fit`}>
-                    <span className="text-xs text-muted-foreground">{item.label}</span>
-                    <span className={`text-sm font-bold ${color}`}>{item.score}</span>
-                    <div className={`h-2 w-2 rounded-full ${item.score >= 80 ? "bg-emerald-500" : item.score >= 60 ? "bg-amber-500" : "bg-red-500"}`} />
-                  </div>
-                );
-              })}
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0f1d35] text-white min-w-fit">
-                <span className="text-xs">Overall</span>
-                <span className="text-sm font-bold">{(() => { const scores = [78, 85, 88]; const avg = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length); return avg; })()}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Quick Stats Row */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Gauge className="h-5 w-5 text-blue-600" />
-                <span className="text-sm text-muted-foreground">Retirement Confidence</span>
-              </div>
-              <p className="text-3xl font-bold" style={{ color: getConfidenceColor(confidence) }}>
-                {confidence.toFixed(0)}%
-              </p>
-              <Badge className={confidence >= 80 ? 'bg-green-500' : confidence >= 60 ? 'bg-blue-500' : 'bg-amber-500'}>
-                {getConfidenceLabel(confidence)}
-              </Badge>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Wallet className="h-5 w-5 text-green-600" />
-                <span className="text-sm text-muted-foreground">Net Worth</span>
-              </div>
-              <p className="text-3xl font-bold text-green-600">
-                {formatCurrency(netWorthValue)}
-              </p>
-              <p className="text-sm text-green-600">
-                <ArrowUp className="h-3 w-3 inline" /> +5.8% YTD
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-purple-50 to-violet-50 border-purple-200">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Clock className="h-5 w-5 text-purple-600" />
-                <span className="text-sm text-muted-foreground">Years to Retirement</span>
-              </div>
-              <p className="text-3xl font-bold text-purple-600">{yearsToRetirement}</p>
-              <p className="text-sm text-muted-foreground">At age {userProfile.retirementAge}</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Shield className="h-5 w-5 text-amber-600" />
-                <span className="text-sm text-muted-foreground">Combined Super</span>
-              </div>
-              <p className="text-3xl font-bold text-amber-600">
-                {formatCurrency(mockAssets.filter(a => a.type === 'Super').reduce((sum, a) => sum + a.value, 0))}
-              </p>
-              <p className="text-sm text-amber-600">2 accounts</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-slate-50 to-gray-50 border-slate-200">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <BarChart3 className="h-5 w-5 text-slate-600" />
-                <span className="text-sm text-muted-foreground">ASX 200</span>
-              </div>
-              <p className="text-3xl font-bold text-slate-700">{marketIndicators[0]?.value?.toLocaleString() || '--'}</p>
-              <p className={`text-sm ${(marketIndicators[0]?.change || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {(marketIndicators[0]?.change || 0) >= 0 ? '+' : ''}{marketIndicators[0]?.change || 0}%
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Market Indicators Bar */}
-        <Card className="bg-slate-50">
-          <CardContent className="py-3">
-            <div className="flex items-center justify-between overflow-x-auto gap-6">
-              {marketIndicators.map((indicator, idx) => (
-                <div key={`item-${idx}`} className="flex items-center gap-3 min-w-fit">
-                  <span className="text-sm font-medium text-muted-foreground">{indicator.name}</span>
-                  <span className="font-semibold">{indicator.value?.toLocaleString() || '--'}</span>
-                  <span className={`text-sm ${(indicator.change || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {(indicator.change || 0) >= 0 ? '+' : ''}{indicator.change || 0}%
-                  </span>
-                </div>
-              ))}
-              {marketDataSource === 'live' && (
-                <Badge variant="outline" className="bg-green-50 border-green-200 text-green-700 text-xs">
-                  <Activity className="h-3 w-3 mr-1" /> Live Data
-                </Badge>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid grid-cols-5 w-full max-w-4xl">
@@ -670,7 +545,7 @@ const PersonalDashboard = ({ embedded = false }) => {
             </TabsTrigger>
           </TabsList>
 
-          {/* ==================== TAB 1: OVERVIEW (Combined Daily Briefing + Overview) ==================== */}
+          {/* ==================== TAB 1: OVERVIEW (Simplified) ==================== */}
           <TabsContent value="overview" className="space-y-6">
             <div className="grid lg:grid-cols-3 gap-6">
               {/* Retirement Readiness Summary */}
@@ -709,7 +584,7 @@ const PersonalDashboard = ({ embedded = false }) => {
                       {getConfidenceLabel(confidence)}
                     </Badge>
                     <p className="text-sm text-muted-foreground mt-2">
-                      {yearsToRetirement} years to retirement
+                      {yearsToRetirement} years to retirement (age {userProfile.retirementAge})
                     </p>
                   </div>
                   <Link to="/retirement-confidence">
@@ -720,7 +595,7 @@ const PersonalDashboard = ({ embedded = false }) => {
                 </CardContent>
               </Card>
 
-              {/* Net Worth Overview */}
+              {/* Net Worth Summary */}
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2">
@@ -730,36 +605,23 @@ const PersonalDashboard = ({ embedded = false }) => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-center mb-4">
-                    <p className="text-3xl font-bold text-green-600">{formatCurrency(totals.totalValue)}</p>
-                    <p className="text-sm text-green-600"><ArrowUp className="h-3 w-3 inline" /> +8.2% YTD</p>
+                    <p className="text-3xl font-bold text-green-600">{formatCurrency(netWorthValue)}</p>
+                    <p className="text-sm text-green-600"><ArrowUp className="h-3 w-3 inline" /> +5.8% YTD</p>
                   </div>
-                  <div className="h-[120px]">
-                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-                      <RechartsPie>
-                        <Pie
-                          data={entityData.slice(0, 4)}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={35}
-                          outerRadius={55}
-                          paddingAngle={2}
-                          dataKey="value"
-                        >
-                          {entityData.slice(0, 4).map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
-                        </Pie>
-                        <Tooltip formatter={(value) => formatCurrency(value)} />
-                      </RechartsPie>
-                    </ResponsiveContainer>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 mt-2 text-xs">
-                    {entityData.slice(0, 4).map((item, idx) => (
-                      <div key={`item-${idx}`} className="flex items-center gap-1">
-                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
-                        <span className="truncate">{item.name}</span>
-                      </div>
-                    ))}
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Gross Assets</span>
+                      <span className="font-medium">{formatCurrency(grossAssets)}</span>
+                    </div>
+                    <div className="flex justify-between text-red-600">
+                      <span>Liabilities</span>
+                      <span className="font-medium">-{formatCurrency(totalLiabilities)}</span>
+                    </div>
+                    <div className="h-px bg-border" />
+                    <div className="flex justify-between font-semibold">
+                      <span>Net Worth</span>
+                      <span className="text-green-600">{formatCurrency(netWorthValue)}</span>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -804,141 +666,35 @@ const PersonalDashboard = ({ embedded = false }) => {
               </Card>
             </div>
 
-            {/* Smart Insights (AI + Manual) */}
-            <SmartInsights 
-              clientId="thompson_family"
-              portfolioData={portfolioDataForInsights}
-              retirementData={retirementData}
-              isAdvisor={false}
-              compact={true}
-              maxInsights={4}
-            />
-
-            {/* Documents Needing Attention */}
+            {/* Asset Allocation */}
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-amber-500" />
-                  Documents & Actions
-                  <Badge variant="destructive">{mockDocuments.length}</Badge>
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <PieChart className="h-5 w-5 text-blue-500" />
+                  Asset Allocation
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid md:grid-cols-3 gap-3">
-                  {mockDocuments.map((doc) => (
-                    <div key={doc.id} className={`p-3 rounded-lg border ${
-                      doc.status === 'urgent' ? 'bg-red-50 border-red-200' : 'bg-amber-50 border-amber-200'
-                    }`}>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium text-sm">{doc.name}</p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <Badge variant="outline" className="text-xs">{doc.type}</Badge>
-                            <span className="text-xs text-muted-foreground">Due: {doc.dueDate}</span>
-                          </div>
-                        </div>
-                        <Badge className={doc.status === 'urgent' ? 'bg-red-500' : 'bg-amber-500'}>
-                          {doc.status}
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Portfolio & Net Worth (merged) */}
-            <div className="grid lg:grid-cols-2 gap-6">
-              {/* Asset Allocation */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <PieChart className="h-5 w-5 text-blue-500" />
-                    Asset Allocation
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[250px]">
-                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-                      <RechartsPie>
-                        <Pie
-                          data={allocationData}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={60}
-                          outerRadius={100}
-                          paddingAngle={2}
-                          dataKey="value"
-                        >
-                          {allocationData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
-                        </Pie>
-                        <Tooltip formatter={(value) => formatCurrency(value)} />
-                        <Legend />
-                      </RechartsPie>
-                    </ResponsiveContainer>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Entity Breakdown */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Building2 className="h-5 w-5 text-purple-500" />
-                    Holdings by Entity
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[250px]">
-                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-                      <BarChart data={entityData} layout="vertical">
-                        <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
-                        <XAxis type="number" tickFormatter={(v) => `$${(v/1000000).toFixed(1)}M`} />
-                        <YAxis dataKey="name" type="category" width={80} />
-                        <Tooltip formatter={(value) => formatCurrency(value)} />
-                        <Bar dataKey="value" radius={[0, 4, 4, 0]}>
-                          {entityData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
-                        </Bar>
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Portfolio Rebalancing */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ArrowLeftRight className="h-5 w-5 text-amber-500" />
-                  Portfolio Rebalancing Suggestions
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {mockRebalancing.map((item, index) => (
-                    <div key={`item-${index}`} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-                      <div className="flex items-center gap-4">
-                        <span className="font-medium w-40">{item.asset}</span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-muted-foreground">Current: {item.current}%</span>
-                          <ChevronRight className="h-4 w-4" />
-                          <span className="text-sm font-medium">Target: {item.target}%</span>
-                        </div>
-                      </div>
-                      <Badge className={
-                        item.action === 'Buy' ? 'bg-green-500' : 
-                        item.action === 'Sell' ? 'bg-red-500' : 
-                        'bg-gray-500'
-                      }>
-                        {item.action} {Math.abs(item.diff)}%
-                      </Badge>
-                    </div>
-                  ))}
+                <div className="h-[200px]">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+                    <RechartsPie>
+                      <Pie
+                        data={allocationData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={55}
+                        outerRadius={85}
+                        paddingAngle={2}
+                        dataKey="value"
+                      >
+                        {allocationData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(value) => formatCurrency(value)} />
+                      <Legend />
+                    </RechartsPie>
+                  </ResponsiveContainer>
                 </div>
               </CardContent>
             </Card>

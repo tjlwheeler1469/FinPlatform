@@ -24,6 +24,7 @@ const TabLoader = () => (
 
 const TABS = [
   { value: "overview", label: "Overview", icon: Eye },
+  { value: "rebalancing", label: "Rebalancing", icon: ArrowLeftRight },
   { value: "bonds", label: "Bonds", icon: Landmark },
   { value: "cash", label: "Cash & TDs", icon: DollarSign },
   { value: "crypto", label: "Crypto", icon: Bitcoin },
@@ -84,6 +85,9 @@ const UnifiedInvestments = ({ embedded = false }) => {
             </TabsContent>
             <TabsContent value="unlisted" className="mt-0">
               <ErrorBoundary label="Unlisted"><Suspense fallback={<TabLoader />}><UnlistedInvestments embedded /></Suspense></ErrorBoundary>
+            </TabsContent>
+            <TabsContent value="rebalancing" className="mt-0">
+              <ErrorBoundary label="Rebalancing"><Suspense fallback={<TabLoader />}><PortfolioRebalancing embedded /></Suspense></ErrorBoundary>
             </TabsContent>
           </Tabs>
         </div>

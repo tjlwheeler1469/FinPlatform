@@ -13,7 +13,7 @@ import os
 # Get backend URL from environment
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 if not BASE_URL:
-    BASE_URL = "https://nested-tabs-debug.preview.emergentagent.com"
+    BASE_URL = "https://dashboard-unify-6.preview.emergentagent.com"
 
 class TestHealthEndpoint:
     """Test v7.4.0 health endpoint with 32 capabilities"""
