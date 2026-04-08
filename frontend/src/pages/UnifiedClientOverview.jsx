@@ -1,7 +1,7 @@
 import { useState, lazy, Suspense } from "react";
 import Layout from "@/components/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, LayoutDashboard, TrendingUp, Gauge, Calculator, Zap, UserCircle } from "lucide-react";
+import { Loader2, LayoutDashboard, TrendingUp, Gauge, Calculator, Zap, UserCircle, PiggyBank } from "lucide-react";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
 const PersonalDashboard = lazy(() => import("@/pages/PersonalDashboard"));
@@ -9,6 +9,7 @@ const UnifiedInvestments = lazy(() => import("@/pages/UnifiedInvestments"));
 const RetirementConfidence = lazy(() => import("@/pages/RetirementConfidence"));
 const UnifiedTaxCentre = lazy(() => import("@/pages/UnifiedTaxCentre"));
 const NextBestActions = lazy(() => import("@/pages/NextBestActions"));
+const HouseholdBudget = lazy(() => import("@/pages/HouseholdBudget"));
 const ClientProfileTab = lazy(() => import("@/components/ClientProfileTab"));
 
 const TabLoader = () => (
@@ -20,7 +21,6 @@ const TabLoader = () => (
 const UnifiedClientOverview = () => {
   const [tab, setTab] = useState("overview");
 
-  // Get selected client ID from localStorage
   const getClientId = () => {
     try {
       const saved = localStorage.getItem("selected_client");
@@ -44,17 +44,20 @@ const UnifiedClientOverview = () => {
               <TabsTrigger value="actions" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="client-tab-actions">
                 <Zap className="h-3.5 w-3.5" /> Actions
               </TabsTrigger>
-              <TabsTrigger value="profile" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="client-tab-profile">
-                <UserCircle className="h-3.5 w-3.5" /> Profile
-              </TabsTrigger>
               <TabsTrigger value="retirement" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="client-tab-retirement">
                 <Gauge className="h-3.5 w-3.5" /> Retirement
+              </TabsTrigger>
+              <TabsTrigger value="investments" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="client-tab-investments">
+                <TrendingUp className="h-3.5 w-3.5" /> Investments
+              </TabsTrigger>
+              <TabsTrigger value="budget" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="client-tab-budget">
+                <PiggyBank className="h-3.5 w-3.5" /> Budget
               </TabsTrigger>
               <TabsTrigger value="tax" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="client-tab-tax">
                 <Calculator className="h-3.5 w-3.5" /> Tax Centre
               </TabsTrigger>
-              <TabsTrigger value="investments" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="client-tab-investments">
-                <TrendingUp className="h-3.5 w-3.5" /> Investments
+              <TabsTrigger value="profile" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="client-tab-profile">
+                <UserCircle className="h-3.5 w-3.5" /> Profile
               </TabsTrigger>
             </TabsList>
 
@@ -72,17 +75,24 @@ const UnifiedClientOverview = () => {
                 </Suspense>
               </ErrorBoundary>
             </TabsContent>
-            <TabsContent value="profile" className="mt-0">
-              <ErrorBoundary label="Profile">
-                <Suspense fallback={<TabLoader />}>
-                  <ClientProfileTab clientId={getClientId()} />
-                </Suspense>
-              </ErrorBoundary>
-            </TabsContent>
             <TabsContent value="retirement" className="mt-0">
               <ErrorBoundary label="Retirement">
                 <Suspense fallback={<TabLoader />}>
                   <RetirementConfidence embedded />
+                </Suspense>
+              </ErrorBoundary>
+            </TabsContent>
+            <TabsContent value="investments" className="mt-0">
+              <ErrorBoundary label="Investments">
+                <Suspense fallback={<TabLoader />}>
+                  <UnifiedInvestments embedded />
+                </Suspense>
+              </ErrorBoundary>
+            </TabsContent>
+            <TabsContent value="budget" className="mt-0">
+              <ErrorBoundary label="Budget">
+                <Suspense fallback={<TabLoader />}>
+                  <HouseholdBudget embedded />
                 </Suspense>
               </ErrorBoundary>
             </TabsContent>
@@ -93,10 +103,10 @@ const UnifiedClientOverview = () => {
                 </Suspense>
               </ErrorBoundary>
             </TabsContent>
-            <TabsContent value="investments" className="mt-0">
-              <ErrorBoundary label="Investments">
+            <TabsContent value="profile" className="mt-0">
+              <ErrorBoundary label="Profile">
                 <Suspense fallback={<TabLoader />}>
-                  <UnifiedInvestments embedded />
+                  <ClientProfileTab clientId={getClientId()} />
                 </Suspense>
               </ErrorBoundary>
             </TabsContent>

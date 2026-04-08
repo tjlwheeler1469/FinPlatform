@@ -5,7 +5,7 @@ import {
   Target, Activity, Bot, Upload, Database, Link2, Shield,
   UserPlus, Sparkles, Bell, Zap, CreditCard,
   Settings, MessageSquare, Brain, ListTodo, Video,
-  Bitcoin, Coins, Cable, Gauge, Calendar, TrendingUp as TrendingUpIcon
+  Bitcoin, Coins, Cable, Gauge, Calendar
 } from "lucide-react";
 
 export const personalNavGroups = [
@@ -13,15 +13,15 @@ export const personalNavGroups = [
     name: "Dashboard",
     icon: LayoutDashboard,
     items: [
-      { path: "/macro-dashboard", label: "Markets", icon: BarChart3, title: "Live Markets", badge: "LIVE" },
       { path: "/dashboard", label: "My Dashboard", icon: Eye, title: "Dashboard & Net Worth", badge: "HOME" },
+      { path: "/macro-dashboard", label: "Markets", icon: BarChart3, title: "Live Markets", badge: "LIVE" },
     ]
   },
   {
     name: "Investments",
     icon: TrendingUp,
     items: [
-      { path: "/investments", label: "All Investments", icon: TrendingUp, title: "Investment Portfolio", badge: "NEW" },
+      { path: "/investments", label: "All Investments", icon: TrendingUp, title: "Investment Portfolio" },
       { path: "/portfolio-rebalancing", label: "Rebalancing", icon: BarChart3, title: "Portfolio Rebalancing" },
     ]
   },
@@ -29,17 +29,17 @@ export const personalNavGroups = [
     name: "Planning",
     icon: Target,
     items: [
-      { path: "/budget", label: "Budget", icon: PiggyBank, title: "Budget Management", badge: "NEW" },
+      { path: "/budget", label: "Budget", icon: PiggyBank, title: "Budget Management" },
       { path: "/scenario-modelling", label: "Goals & Scenarios", icon: Target, title: "Goals, Scenarios & Monte Carlo" },
-      { path: "/retirement-confidence", label: "Retirement", icon: Gauge, title: "Retirement Planning & Confidence", badge: "PRO" },
-      { path: "/tax-analysis-sync", label: "Tax Centre", icon: Calculator, title: "Unified Tax Centre", badge: "NEW" },
+      { path: "/retirement-confidence", label: "Retirement", icon: Gauge, title: "Retirement Planning & Confidence" },
+      { path: "/tax-analysis-sync", label: "Tax Centre", icon: Calculator, title: "Unified Tax Centre" },
     ]
   },
   {
     name: "Research",
     icon: LineChart,
     items: [
-      { path: "/stock-research", label: "Research Centre", icon: LineChart, title: "Research & Comparison", badge: "NEW" },
+      { path: "/stock-research", label: "Research Centre", icon: LineChart, title: "Research & Comparison" },
     ]
   },
   {
@@ -48,7 +48,6 @@ export const personalNavGroups = [
     items: [
       { path: "/bank-feeds", label: "Bank Feeds", icon: Landmark, title: "Bank Feeds" },
       { path: "/documents", label: "Documents", icon: FileText, title: "Documents" },
-      { path: "/data-import-export", label: "Import/Export", icon: Database, title: "Data Import/Export" },
       { path: "/security", label: "Security", icon: Shield, title: "Security" },
     ]
   },
@@ -63,19 +62,11 @@ export const personalNavGroups = [
 
 export const adviserBaseNav = [
   {
-    name: "AI & Tasks",
-    icon: Bot,
+    name: "Dashboard",
+    icon: LayoutDashboard,
     items: [
-      { path: "/ai-copilot-advanced", label: "AI Assistant", icon: MessageSquare, title: "AI Copilot & Tasks", badge: "AI" },
-      { path: "/meeting-prep", label: "Meeting Prep", icon: Sparkles, title: "Meeting Preparation" },
-    ]
-  },
-  {
-    name: "Compliance",
-    icon: Shield,
-    items: [
-      { path: "/adviceos", label: "Compliance Centre", icon: Shield, title: "Unified Compliance Centre", badge: "NEW" },
-      { path: "/security", label: "Security", icon: Shield, title: "Security" },
+      { path: "/advisor-command-center", label: "Dashboard", icon: LayoutDashboard, title: "Adviser Dashboard" },
+      { path: "/macro-dashboard", label: "Markets", icon: BarChart3, title: "Live Markets", badge: "LIVE" },
     ]
   },
   {
@@ -83,16 +74,17 @@ export const adviserBaseNav = [
     icon: Users,
     items: [
       { path: "/adviser-hub", label: "Client Hub", icon: Zap, title: "Clients & Portfolio", badge: "HUB" },
-      { path: "/client-health", label: "Health Dashboard", icon: Activity, title: "Client Health RAG Status", badge: "NEW" },
-      { path: "/client-setup", label: "New Client", icon: UserPlus, title: "Setup New Client", badge: "NEW" },
+      { path: "/client-health", label: "Health Dashboard", icon: Activity, title: "Client Health RAG Status" },
+      { path: "/client-setup", label: "New Client", icon: UserPlus, title: "Setup New Client" },
+      { path: "/data-import-export", label: "Import / Export", icon: Database, title: "Data Import & Export" },
     ]
   },
   {
-    name: "Dashboard",
-    icon: LayoutDashboard,
+    name: "AI & Tasks",
+    icon: Bot,
     items: [
-      { path: "/advisor-command-center", label: "Dashboard", icon: LayoutDashboard, title: "Adviser Dashboard" },
-      { path: "/macro-dashboard", label: "Markets", icon: BarChart3, title: "Live Markets", badge: "LIVE" },
+      { path: "/ai-copilot-advanced", label: "AI Assistant", icon: MessageSquare, title: "AI Copilot & Tasks", badge: "AI" },
+      { path: "/meeting-prep", label: "Meeting Prep", icon: Sparkles, title: "Meeting Preparation" },
     ]
   },
   {
@@ -103,11 +95,19 @@ export const adviserBaseNav = [
     ]
   },
   {
+    name: "Compliance",
+    icon: Shield,
+    items: [
+      { path: "/adviceos", label: "Compliance Centre", icon: Shield, title: "Unified Compliance Centre" },
+      { path: "/security", label: "Security", icon: Shield, title: "Security" },
+    ]
+  },
+  {
     name: "Integrations",
     icon: Link2,
     items: [
       { path: "/live-sync", label: "Live Sync", icon: Activity, title: "Live Sync Dashboard", badge: "LIVE" },
-      { path: "/platform-integrations", label: "Platforms", icon: Cable, title: "Platform Integrations", badge: "NEW" },
+      { path: "/platform-integrations", label: "Platforms", icon: Cable, title: "Platform Integrations" },
       { path: "/xplan", label: "Xplan Sync", icon: Cable, title: "Xplan Integration" },
     ]
   },
@@ -115,34 +115,34 @@ export const adviserBaseNav = [
     name: "Tools",
     icon: Settings,
     items: [
-      { path: "/notification-center", label: "Notifications", icon: Bell, title: "Notification Center", badge: "NEW" },
+      { path: "/notification-center", label: "Notifications", icon: Bell, title: "Notification Center" },
     ]
   }
 ];
 
 export const clientContextNav = [
   {
+    name: "Overview",
+    icon: Eye,
+    items: [
+      { path: "/dashboard", label: "Client Overview", icon: Wallet, title: "Overview, Actions, Retirement, Tax & Investments", badge: "360" },
+    ]
+  },
+  {
     name: "Documents",
     icon: FileText,
     items: [
       { path: "/adviser-compliance", label: "Compliance", icon: Shield, title: "Adviser Compliance Dashboard" },
-      { path: "/meeting-notes", label: "Meeting Notes", icon: Video, title: "Meeting Notes", badge: "NEW" },
+      { path: "/meeting-notes", label: "Meeting Notes", icon: Video, title: "Meeting Notes" },
       { path: "/reports", label: "Reports", icon: FileText, title: "Reports" },
       { path: "/document-vault", label: "Vault", icon: FolderOpen, title: "Document Vault" },
-    ]
-  },
-  {
-    name: "Overview",
-    icon: Eye,
-    items: [
-      { path: "/dashboard", label: "Client Overview", icon: Wallet, title: "Overview, Actions, Retirement, Tax & Transactions", badge: "360" },
     ]
   },
   {
     name: "Planning",
     icon: Target,
     items: [
-      { path: "/budget", label: "Budget", icon: PiggyBank, title: "Budget Management", badge: "NEW" },
+      { path: "/budget", label: "Budget", icon: PiggyBank, title: "Budget Management" },
       { path: "/scenario-modelling", label: "Goals & Scenarios", icon: Target, title: "Goals, Scenarios & Monte Carlo" },
     ]
   },
@@ -151,7 +151,7 @@ export const clientContextNav = [
 export const mobileBottomNav = [
   { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { path: "/investments", label: "Investments", icon: TrendingUp },
-  { path: "/goal-tracker", label: "Goals", icon: Target },
+  { path: "/scenario-modelling", label: "Goals", icon: Target },
   { path: "/reports", label: "Reports", icon: FileText },
   { path: "/loan-calculator", label: "Calc", icon: Calculator },
 ];

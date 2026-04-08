@@ -108,7 +108,7 @@ const FREQUENCY_OPTIONS = [
   { value: "annual", label: "Annual" }
 ];
 
-const HouseholdBudget = () => {
+const HouseholdBudget = ({ embedded = false }) => {
   const { portfolio } = usePortfolio();
   
   // Income sources - integrated from portfolio
@@ -253,8 +253,7 @@ const HouseholdBudget = () => {
     return acc;
   }, []);
 
-  return (
-    <Layout>
+  const content = (
       <div className="space-y-6" data-testid="household-budget-page">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -780,8 +779,9 @@ const HouseholdBudget = () => {
           </CardContent>
         </Card>
       </div>
-    </Layout>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default HouseholdBudget;

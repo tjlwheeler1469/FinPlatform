@@ -1,0 +1,98 @@
+{
+  "summary": "Iteration 148 - Frontend testing for tab reordering, sidebar navigation, and dashboard numbers. Fixed critical bug in HouseholdBudget component (missing embedded prop). All 8 features verified successfully.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "HouseholdBudget",
+        "issue": "FIXED - Component was missing 'embedded' prop causing ReferenceError when loaded in UnifiedClientOverview Budget tab",
+        "selector": "[data-testid='household-budget-page']",
+        "priority": "HIGH",
+        "status": "FIXED"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Charts",
+        "issues": ["Console warnings about chart width/height being -1 - charts still render but may have initial sizing issues"]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_148.json"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "UnifiedClientOverview tab order is correct: Overview, Actions, Retirement, Investments, Budget, Tax Centre, Profile",
+    "UnifiedInvestments TABS array has Rebalancing at index 1 (after Overview) - verified in code and UI",
+    "Personal mode sidebar Settings does NOT contain Import/Export - verified",
+    "Adviser mode sidebar CRM section DOES contain Import/Export - verified",
+    "Dashboard numbers match: Net Worth $1,608,800, Gross Assets $2,278,000, Liabilities $669,200 - verified",
+    "Adviser mode sidebar order is correct: Dashboard, CRM, AI & Tasks, Execution, Compliance, Integrations, Tools"
+  ],
+  "updated_files": [
+    "/app/frontend/src/pages/HouseholdBudget.jsx"
+  ],
+  "success_rate": {
+    "backend": "N/A (frontend only testing)",
+    "frontend": "100% (8/8 features verified)"
+  },
+  "test_credentials": "No auth required - public access",
+  "seed_data_creation": "None - used existing thompson_family client data",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All 8 features verified. HouseholdBudget component was fixed (added embedded prop). To test Unified Client Overview tabs, set localStorage: app_mode='adviser' and selected_client=JSON with id 'thompson_family', then navigate to /dashboard. Adviser sidebar shows full nav when no client selected, shows client context nav when client is selected.",
+  "features_tested": {
+    "unified_client_overview_tab_order": {
+      "status": "PASS",
+      "details": "Tab order verified: Overview, Actions, Retirement, Investments, Budget, Tax Centre, Profile (7 tabs in correct order)"
+    },
+    "budget_tab_loads_household_budget": {
+      "status": "PASS (after fix)",
+      "details": "HouseholdBudget component now loads correctly in Budget tab after adding missing 'embedded' prop"
+    },
+    "investments_rebalancing_position": {
+      "status": "PASS",
+      "details": "Rebalancing tab is at position 2 (after Overview) in UnifiedInvestments TABS array"
+    },
+    "personal_mode_no_import_export": {
+      "status": "PASS",
+      "details": "Personal mode sidebar Settings section does NOT contain Import/Export"
+    },
+    "adviser_mode_has_import_export": {
+      "status": "PASS",
+      "details": "Adviser mode sidebar CRM section contains Import/Export link"
+    },
+    "dashboard_numbers_match": {
+      "status": "PASS",
+      "details": "Net Worth $1,608,800, Gross Assets $2,278,000, Liabilities $669,200 - all values match expected"
+    },
+    "sidebar_collapsible_groups": {
+      "status": "PASS",
+      "details": "Sidebar groups are collapsible with chevron indicators"
+    },
+    "adviser_sidebar_order": {
+      "status": "PASS",
+      "details": "Adviser mode sidebar order: Dashboard, CRM, AI & Tasks, Execution, Compliance, Integrations, Tools"
+    }
+  },
+  "bug_fixed": {
+    "file": "/app/frontend/src/pages/HouseholdBudget.jsx",
+    "line": 111,
+    "issue": "Component function signature was 'const HouseholdBudget = () =>' but used 'embedded' variable in return statement",
+    "fix": "Changed to 'const HouseholdBudget = ({ embedded = false }) =>' to accept embedded prop with default value"
+  },
+  "mocked_apis": {
+    "has_mocked_apis": true,
+    "mocked_apis_list": [
+      "Xplan sync - returns mock data",
+      "Client profile data - thompson_family mock data",
+      "DEMO_HOLDINGS - mock investment data",
+      "Tax Loss Harvesting - mocked"
+    ]
+  }
+}

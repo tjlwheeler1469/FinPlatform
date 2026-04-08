@@ -145,30 +145,30 @@ const DesktopSidebar = ({
       )}
 
       {/* Navigation */}
-      <nav ref={sidebarNavRef} onScroll={handleSidebarScroll} className="flex-1 overflow-y-auto py-2 px-2">
+      <nav ref={sidebarNavRef} onScroll={handleSidebarScroll} className="flex-1 overflow-y-auto py-3 px-2">
         {activeNavGroups.map((group) => {
           const GroupIcon = group.icon;
           const groupActive = isGroupActive(group);
           return (
-            <div key={group.name} className="mb-2">
+            <div key={group.name} className="mb-1">
               {!sidebarCollapsed && (
                 <button
                   onClick={() => toggleGroup(group.name)}
                   className={cn(
-                    "w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition-all",
-                    groupActive ? "bg-[#D4A84C]/20 text-[#D4A84C] border-l-2 border-[#D4A84C]" : "text-white/80 hover:text-white hover:bg-white/5"
+                    "w-full flex items-center justify-between px-3 py-1.5 rounded text-[11px] font-semibold uppercase tracking-wider transition-all",
+                    groupActive ? "text-[#D4A84C]" : "text-white/50 hover:text-white/80"
                   )}
                 >
                   <span className="flex items-center gap-2 min-w-0 flex-1">
-                    {GroupIcon && <GroupIcon className={cn("h-4 w-4 flex-shrink-0", groupActive && "text-[#D4A84C]")} />}
+                    {GroupIcon && <GroupIcon className={cn("h-3.5 w-3.5 flex-shrink-0", groupActive && "text-[#D4A84C]")} />}
                     <span className="truncate">{group.name}</span>
                   </span>
-                  <ChevronDown className={cn("h-4 w-4 flex-shrink-0 transition-transform ml-1", expandedGroups[group.name] ? "rotate-0" : "-rotate-90")} />
+                  <ChevronDown className={cn("h-3.5 w-3.5 flex-shrink-0 transition-transform ml-1", expandedGroups[group.name] ? "rotate-0" : "-rotate-90")} />
                 </button>
               )}
               {sidebarCollapsed && GroupIcon && (
                 <div
-                  className={cn("flex items-center justify-center p-2 mb-1 rounded-lg cursor-pointer transition-all", groupActive ? "text-[#D4A84C] bg-[#D4A84C]/20" : "text-white/60 hover:text-white hover:bg-white/10")}
+                  className={cn("flex items-center justify-center p-2 mb-1 rounded-lg cursor-pointer transition-all", groupActive ? "text-[#D4A84C] bg-[#D4A84C]/10" : "text-white/50 hover:text-white hover:bg-white/10")}
                   onClick={() => toggleGroup(group.name)}
                   title={group.name}
                 >
@@ -176,18 +176,32 @@ const DesktopSidebar = ({
                 </div>
               )}
               {(sidebarCollapsed || expandedGroups[group.name]) && (
-                <div className={cn(!sidebarCollapsed && "ml-1")}>
+                <div className={cn(!sidebarCollapsed && "ml-1 mt-0.5")}>
                   {group.items.map((item) => (
                     <Link
                       key={item.path}
                       to={item.path}
                       data-testid={`nav-${item.path.slice(1)}`}
-                      className={cn("flex items-center gap-3 px-3 py-2 rounded-lg mb-0.5 transition-colors", location.pathname === item.path ? "bg-[#D4A84C]/20 text-[#D4A84C]" : "text-white/70 hover:bg-white/10 hover:text-white")}
+                      className={cn(
+                        "flex items-center gap-3 px-3 py-1.5 rounded-md mb-px transition-colors",
+                        location.pathname === item.path
+                          ? "bg-[#D4A84C]/15 text-[#D4A84C] font-medium"
+                          : "text-white/70 hover:bg-white/8 hover:text-white"
+                      )}
                       title={sidebarCollapsed ? item.label : undefined}
                     >
                       <item.icon className="h-4 w-4 flex-shrink-0" />
-                      {!sidebarCollapsed && <span className="text-sm font-medium truncate flex-1">{item.label}</span>}
-                      {!sidebarCollapsed && item.badge && <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-[#D4A84C] text-[#1a2744] rounded">{item.badge}</span>}
+                      {!sidebarCollapsed && <span className="text-sm truncate flex-1">{item.label}</span>}
+                      {!sidebarCollapsed && item.badge && (
+                        <span className={cn(
+                          "px-1.5 py-0.5 text-[9px] font-bold rounded",
+                          item.badge === "LIVE" ? "bg-emerald-500/20 text-emerald-400" :
+                          item.badge === "AI" ? "bg-purple-500/20 text-purple-400" :
+                          item.badge === "360" ? "bg-blue-500/20 text-blue-400" :
+                          item.badge === "HUB" ? "bg-[#D4A84C]/20 text-[#D4A84C]" :
+                          "bg-white/10 text-white/60"
+                        )}>{item.badge}</span>
+                      )}
                     </Link>
                   ))}
                 </div>
