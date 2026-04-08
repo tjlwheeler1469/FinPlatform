@@ -74,17 +74,8 @@ export const adviserBaseNav = [
     icon: Users,
     items: [
       { path: "/adviser-hub", label: "Client Hub", icon: Zap, title: "Clients & Portfolio", badge: "HUB" },
-      { path: "/client-health", label: "Health Dashboard", icon: Activity, title: "Client Health RAG Status" },
       { path: "/client-setup", label: "New Client", icon: UserPlus, title: "Setup New Client" },
       { path: "/data-import-export", label: "Import / Export", icon: Database, title: "Data Import & Export" },
-    ]
-  },
-  {
-    name: "AI & Tasks",
-    icon: Bot,
-    items: [
-      { path: "/ai-copilot-advanced", label: "AI Assistant", icon: MessageSquare, title: "AI Copilot & Tasks", badge: "AI" },
-      { path: "/meeting-prep", label: "Meeting Prep", icon: Sparkles, title: "Meeting Preparation" },
     ]
   },
   {
@@ -92,14 +83,7 @@ export const adviserBaseNav = [
     icon: Zap,
     items: [
       { path: "/batch-execution", label: "Batch Execute", icon: Zap, title: "Batch Execution" },
-    ]
-  },
-  {
-    name: "Compliance",
-    icon: Shield,
-    items: [
-      { path: "/adviceos", label: "Compliance Centre", icon: Shield, title: "Unified Compliance Centre" },
-      { path: "/security", label: "Security", icon: Shield, title: "Security" },
+      { path: "/meeting-prep", label: "Meeting Prep", icon: Sparkles, title: "Meeting Preparation" },
     ]
   },
   {
@@ -116,6 +100,7 @@ export const adviserBaseNav = [
     icon: Settings,
     items: [
       { path: "/notification-center", label: "Notifications", icon: Bell, title: "Notification Center" },
+      { path: "/security", label: "Security", icon: Shield, title: "Security" },
     ]
   }
 ];

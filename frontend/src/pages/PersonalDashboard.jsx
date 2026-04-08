@@ -36,8 +36,6 @@ import {
 } from 'recharts';
 
 const NetWorthTrend = lazy(() => import("@/pages/NetWorthTrend"));
-const FamilyWealthDashboard = lazy(() => import("@/pages/FamilyWealthDashboard"));
-import InvestmentsOverview from "@/components/InvestmentsOverview";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || '';
 
@@ -703,11 +701,148 @@ const PersonalDashboard = ({ embedded = false }) => {
 
           {/* ==================== TAB 1b: NET WORTH ==================== */}
           <TabsContent value="net-worth" className="space-y-6">
-            <ErrorBoundary label="Net Worth">
-              <Suspense fallback={<div className="flex items-center justify-center py-20"><Loader2 className="h-6 w-6 animate-spin text-[#D4A84C]" /></div>}>
-                <FamilyWealthDashboard embedded />
-              </Suspense>
-            </ErrorBoundary>
+            {/* Summary Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Card className="bg-[#1a2744] text-white">
+                <CardContent className="p-4">
+                  <p className="text-xs text-white/70">Net Worth</p>
+                  <p className="text-2xl font-bold text-[#D4A84C]">{formatCurrency(netWorthValue)}</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4">
+                  <p className="text-xs text-muted-foreground">Gross Assets</p>
+                  <p className="text-2xl font-bold">{formatCurrency(grossAssets)}</p>
+                </CardContent>
+              </Card>
+              <Card className="border-red-200">
+                <CardContent className="p-4">
+                  <p className="text-xs text-muted-foreground">Total Liabilities</p>
+                  <p className="text-2xl font-bold text-red-600">{formatCurrency(totalLiabilities)}</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4">
+                  <p className="text-xs text-muted-foreground">Holdings</p>
+                  <p className="text-2xl font-bold">{mockAssets.length}</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Asset Breakdown by Type */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <PieChart className="h-5 w-5 text-blue-500" />
+                  Assets by Category
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm" data-testid="asset-breakdown-table">
+                    <thead>
+                      <tr className="border-b text-left">
+                        <th className="py-2 pr-4 font-medium text-muted-foreground">Category</th>
+                        <th className="py-2 pr-4 font-medium text-muted-foreground text-right">Value</th>
+                        <th className="py-2 font-medium text-muted-foreground text-right">% of Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Object.entries(totals.byType)
+                        .sort((a, b) => b[1] - a[1])
+                        .map(([type, value]) => (
+                          <tr key={type} className="border-b last:border-0">
+                            <td className="py-2 pr-4 font-medium">{type}</td>
+                            <td className="py-2 pr-4 text-right">{formatCurrency(value)}</td>
+                            <td className="py-2 text-right text-muted-foreground">{((value / grossAssets) * 100).toFixed(1)}%</td>
+                          </tr>
+                        ))}
+                      <tr className="border-t-2 font-bold">
+                        <td className="py-2 pr-4">Total Assets</td>
+                        <td className="py-2 pr-4 text-right">{formatCurrency(grossAssets)}</td>
+                        <td className="py-2 text-right">100%</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Full Calculation Table */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Wallet className="h-5 w-5 text-green-500" />
+                  Full Calculation Breakdown
+                </CardTitle>
+                <CardDescription>Every line item contributing to net worth</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm" data-testid="full-calculation-table">
+                    <thead>
+                      <tr className="border-b text-left">
+                        <th className="py-2 pr-4 font-medium text-muted-foreground">Item</th>
+                        <th className="py-2 pr-4 font-medium text-muted-foreground">Type</th>
+                        <th className="py-2 pr-4 font-medium text-muted-foreground">Entity</th>
+                        <th className="py-2 font-medium text-muted-foreground text-right">Value</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[...mockAssets].sort((a, b) => b.value - a.value).map((asset) => (
+                        <tr key={asset.id} className="border-b">
+                          <td className="py-1.5 pr-4">{asset.name}</td>
+                          <td className="py-1.5 pr-4"><Badge variant="outline" className="text-xs">{asset.type}</Badge></td>
+                          <td className="py-1.5 pr-4 text-muted-foreground text-xs">{asset.entity}</td>
+                          <td className="py-1.5 text-right font-medium text-green-700">{formatCurrency(asset.value)}</td>
+                        </tr>
+                      ))}
+                      <tr className="border-t-2 bg-green-50">
+                        <td className="py-2 pr-4 font-bold" colSpan={3}>Total Assets</td>
+                        <td className="py-2 text-right font-bold text-green-700">{formatCurrency(grossAssets)}</td>
+                      </tr>
+                      {mockLiabilities.map((l) => (
+                        <tr key={l.id} className="border-b">
+                          <td className="py-1.5 pr-4">{l.name}</td>
+                          <td className="py-1.5 pr-4"><Badge variant="outline" className="text-xs">{l.type}</Badge></td>
+                          <td className="py-1.5 pr-4 text-muted-foreground text-xs">{l.rate}% p.a.</td>
+                          <td className="py-1.5 text-right font-medium text-red-600">-{formatCurrency(l.value)}</td>
+                        </tr>
+                      ))}
+                      <tr className="border-t-2 bg-red-50">
+                        <td className="py-2 pr-4 font-bold" colSpan={3}>Total Liabilities</td>
+                        <td className="py-2 text-right font-bold text-red-600">-{formatCurrency(totalLiabilities)}</td>
+                      </tr>
+                      <tr className="border-t-2 bg-[#1a2744]/5">
+                        <td className="py-3 pr-4 font-bold text-lg" colSpan={3}>Net Worth</td>
+                        <td className="py-3 text-right font-bold text-lg text-[#D4A84C]">{formatCurrency(netWorthValue)}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Entity Breakdown */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Users className="h-5 w-5 text-purple-500" />
+                  Assets by Entity
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-3 gap-4">
+                  {entityData.map((entity) => (
+                    <div key={entity.name} className="p-3 border rounded-lg">
+                      <p className="text-sm font-medium">{entity.name}</p>
+                      <p className="text-xl font-bold">{formatCurrency(entity.value)}</p>
+                      <p className="text-xs text-muted-foreground">{((entity.value / grossAssets) * 100).toFixed(1)}% of total</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
 
