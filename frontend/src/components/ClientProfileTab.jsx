@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,10 +7,12 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   Shield, Eye, EyeOff, Plus, Trash2, RefreshCw, CheckCircle, 
-  AlertTriangle, FileText, Save, Lock, Fingerprint, CloudCog
+  AlertTriangle, FileText, Save, Lock, Fingerprint, CloudCog, Loader2
 } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
+
+const RetirementProjection = lazy(() => import("@/components/RetirementProjection"));
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -389,6 +391,11 @@ const ClientProfileTab = ({ clientId }) => {
           Save Personal Information
         </Button>
       </div>
+
+      {/* Retirement Portfolio Projection */}
+      <Suspense fallback={<div className="flex items-center justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>}>
+        <RetirementProjection clientId={clientId} />
+      </Suspense>
     </div>
   );
 };

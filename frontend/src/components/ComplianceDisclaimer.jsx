@@ -119,8 +119,6 @@ const COMPLIANCE_CONTENT = {
 
 // Modal component shown on first visit
 export const ComplianceModal = ({ onAccept }) => {
-  const [acknowledged, setAcknowledgedState] = useState(false);
-  const [dontShowAgain, setDontShowAgain] = useState(false);
   const [open, setOpen] = useState(false);
   const hasChecked = useRef(false);
 
@@ -143,15 +141,15 @@ export const ComplianceModal = ({ onAccept }) => {
 
   const handleAccept = () => {
     if (acknowledged) {
-      setAcknowledgement(dontShowAgain);
+      setAcknowledgement(true); // Always persist on explicit accept
       setOpen(false);
       onAccept?.();
     }
   };
 
   const handleQuickDismiss = () => {
-    // Quick dismiss for this session only (user can still use the app)
-    sessionStorage.setItem(SESSION_KEY, new Date().toISOString());
+    // Persist dismissal across sessions — the compliance footer remains visible on all pages
+    setAcknowledgement(true);
     setOpen(false);
   };
 
@@ -220,34 +218,10 @@ export const ComplianceModal = ({ onAccept }) => {
         </div>
 
         <DialogFooter className="flex-col gap-4">
-          <div className="flex items-start gap-2 w-full">
-            <Checkbox 
-              id="acknowledge" 
-              checked={acknowledged}
-              onCheckedChange={setAcknowledgedState}
-              data-testid="disclaimer-checkbox"
-            />
-            <label htmlFor="acknowledge" className="text-sm leading-tight cursor-pointer">
-              I understand this application provides general information only and is not a substitute for professional financial, tax, or legal advice.
-            </label>
-          </div>
-          
           <div className="flex items-center justify-between w-full gap-4">
-            <div className="flex items-center gap-2">
-              <Checkbox 
-                id="dontShowAgain" 
-                checked={dontShowAgain}
-                onCheckedChange={setDontShowAgain}
-                data-testid="dont-show-again-checkbox"
-              />
-              <label htmlFor="dontShowAgain" className="text-sm text-muted-foreground cursor-pointer">
-                Don't show this again
-              </label>
-            </div>
-            
+            <p className="text-xs text-muted-foreground">This notice won't appear again after dismissal.</p>
             <Button 
-              onClick={handleAccept} 
-              disabled={!acknowledged}
+              onClick={handleQuickDismiss}
               className="bg-[#1a2744] hover:bg-[#1a2744]/90"
               data-testid="accept-disclaimer-btn"
             >

@@ -1,0 +1,85 @@
+{
+  "summary": "Iteration 147 - All 4 new features tested successfully: ComplianceModal 'Don't show again' persistence, Multi-entity client onboarding wizard, Bulk CSV import, and Unified Retirement Portfolio Calculator with Monte Carlo projections.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration147_retirement_projection.py",
+    "/app/test_reports/pytest/pytest_iteration147.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Retirement projection API correctly returns success_rate, percentiles, deterministic timeline, tax_summary, and recommendations",
+    "Monte Carlo simulation runs 500-2000 iterations with configurable volatility",
+    "ComplianceModal correctly persists 'permanent' value to localStorage key 'wealth_command_compliance_v5'",
+    "Client Setup Wizard has 6 steps for single client mode and 3 steps for bulk import mode",
+    "Entity types include Individual, Joint, Family Trust, Discretionary Trust, Unit Trust, Company (Pty Ltd), SMSF, Partnership"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration147_retirement_projection.py"
+  ],
+  "success_rate": {
+    "backend": "100% (10/10 tests passed)",
+    "frontend": "100% (all features verified)"
+  },
+  "test_credentials": "No auth required - public access",
+  "seed_data_creation": "Test clients created with TEST_ prefix during backend testing",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All 4 features fully implemented and tested. Key endpoints: POST /api/retirement-projection/calculate (Monte Carlo + deterministic), GET /api/retirement-projection/{client_id}, POST /api/client-personal-info/setup. ComplianceModal uses localStorage key 'wealth_command_compliance_v5'. Client Setup Wizard at /client-setup with mode selection (single/bulk).",
+  "features_tested": {
+    "backend_retirement_projection_calculate": {
+      "status": "PASS",
+      "details": "POST /api/retirement-projection/calculate returns success_rate, percentiles (p10, p25, p50_median, p75, p90), deterministic timeline, tax_summary (total_cgt_lifetime, total_tax_savings, net_tax_impact), and recommendations array."
+    },
+    "backend_retirement_projection_get": {
+      "status": "PASS",
+      "details": "GET /api/retirement-projection/{client_id} returns last saved projection with has_projection=true, or has_projection=false for new clients."
+    },
+    "backend_client_setup": {
+      "status": "PASS",
+      "details": "POST /api/client-personal-info/setup creates new client with entities data stored as custom_fields. Returns status='created', client_id, name, tfn_masked."
+    },
+    "frontend_compliance_modal_persistence": {
+      "status": "PASS",
+      "details": "ComplianceModal correctly checks localStorage 'wealth_command_compliance_v5'. When cleared, modal appears. After clicking 'I Understand & Accept', localStorage is set to 'permanent' and modal does not appear on reload."
+    },
+    "frontend_client_setup_wizard_modes": {
+      "status": "PASS",
+      "details": "Wizard at /client-setup shows 2 mode options: Single Client and Bulk Import (CSV). Both modes have correct step progression."
+    },
+    "frontend_wizard_single_flow": {
+      "status": "PASS",
+      "details": "Single client flow: Step 1 (Mode) -> Step 2 (Personal Details with first/last name) -> Step 3 (Entities with Add Entity button) -> Step 4 (TFN & ID) -> Step 5 (Additional) -> Step 6 (Review)."
+    },
+    "frontend_wizard_entity_types": {
+      "status": "PASS",
+      "details": "Entity type dropdown has all required options: Individual, Joint (Couple), Family Trust, Discretionary Trust, Unit Trust, Company (Pty Ltd), SMSF, Partnership."
+    },
+    "frontend_wizard_bulk_flow": {
+      "status": "PASS",
+      "details": "Bulk import flow: Step 1 (Mode) -> Step 2 (CSV Upload with 'Download Template CSV' button and upload area) -> Step 3 (Preview & Import)."
+    },
+    "frontend_profile_tab_retirement_section": {
+      "status": "PASS",
+      "details": "Profile tab (data-testid='client-tab-profile') shows Retirement Projection section at bottom with Consolidated Portfolio summary ($2.8M) and 'Calculate Retirement Projection' button."
+    },
+    "frontend_retirement_projection_results": {
+      "status": "PASS",
+      "details": "After clicking Calculate: Success Rate card (98.6%), Median Outcome ($20.9M), Depletion Risk (4.8%), Net Tax Impact (+$75K), Portfolio Projection Timeline chart, Outcome Distribution (Monte Carlo) with 5 percentiles, Recommendations section, Lifetime Tax Summary."
+    }
+  },
+  "mocked_apis": {
+    "has_mocked_apis": true,
+    "mocked_apis_list": [
+      "Xplan sync - returns mock data for bidirectional sync",
+      "Demo client data - thompson_family, james_mitchell, michael_chen"
+    ]
+  }
+}
