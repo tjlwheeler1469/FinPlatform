@@ -693,6 +693,9 @@ const RetirementConfidence = ({ embedded = false }) => {
           setHasChanges(true);
         }
         
+        // Auto-compare scenarios with updated inputs
+        setTimeout(() => compareScenarios(), 100);
+        
         toast.success(`Confidence: ${(normalizedResult.confidence_score || normalizedResult.display?.today)?.toFixed(1)}%`);
       } else {
         toast.error('Calculation failed');

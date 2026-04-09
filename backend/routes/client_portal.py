@@ -30,99 +30,52 @@ class NotificationType(str, Enum):
 PORTAL_CLIENTS = {
     "portal_001": {
         "client_id": "portal_001",
-        "name": "James Wheeler",
-        "email": "james.wheeler@email.com",
-        "household_name": "Wheeler Family",
+        "name": "David Thompson",
+        "email": "david.thompson@email.com",
+        "household_name": "Thompson Family",
         "advisor_name": "Sarah Chen",
         "advisor_email": "sarah.chen@wealthcommand.io",
         "relationship_start": "2019-03-15",
         "net_worth": {
-            "total": 3040000,
-            "change_30d": 52000,
-            "change_pct_30d": 1.74,
+            "total": 1608800,
+            "change_30d": 27350,
+            "change_pct_30d": 1.7,
             "breakdown": {
-                "stocks": 389500,
-                "etfs": 1191000,
-                "managed_funds": 114800,
-                "bonds": 128500,
-                "hybrids": 118730,
-                "crypto": 85000,
-                "cash": 145000,
-                "superannuation": 680000,
-                "property": 850000,
-                "other_assets": 95000,
-                "liabilities": -757530
+                "super": 443000,
+                "property": 1605000,
+                "shares": 84500,
+                "etfs": 42000,
+                "cash": 63000,
+                "crypto": 8500,
+                "managed_funds": 32000,
+                "liabilities": -669200
             }
         },
         "portfolios": [
             {
                 "portfolio_id": "pf_001",
-                "name": "Growth Portfolio",
-                "value": 1850000,
-                "change_ytd": 12.4,
-                "risk_profile": "Growth",
+                "name": "Investment Portfolio",
+                "value": 126500,
+                "change_ytd": 8.4,
+                "risk_profile": "Balanced",
                 "holdings": [
-                    {"symbol": "AAPL", "name": "Apple Inc", "type": "stock", "shares": 500, "value": 91000, "change_1d": 1.2},
-                    {"symbol": "MSFT", "name": "Microsoft Corp", "type": "stock", "shares": 300, "value": 118500, "change_1d": 0.8},
-                    {"symbol": "NVDA", "name": "NVIDIA Corp", "type": "stock", "shares": 150, "value": 180000, "change_1d": 2.1},
-                    {"symbol": "VGS", "name": "Vanguard Intl Shares", "type": "etf", "units": 2000, "value": 180000, "change_1d": 0.5},
-                    {"symbol": "VAS", "name": "Vanguard Aus Shares", "type": "etf", "units": 3000, "value": 285000, "change_1d": 0.3},
-                    {"symbol": "MGF", "name": "Magellan Global Fund", "type": "fund", "units": 3500, "value": 114800, "change_1d": -0.2},
+                    {"symbol": "VGH", "name": "Vanguard High Growth ETF", "type": "etf", "units": 400, "value": 42000, "change_1d": 0.5},
+                    {"symbol": "BHP", "name": "BHP Group Shares", "type": "stock", "shares": 400, "value": 18500, "change_1d": 1.2},
+                    {"symbol": "CBA", "name": "CBA Shares (DRP)", "type": "stock", "shares": 200, "value": 24000, "change_1d": 0.3},
+                    {"symbol": "CFS", "name": "Colonial First State Balanced", "type": "fund", "units": 1200, "value": 32000, "change_1d": 0.1},
+                    {"symbol": "BTC", "name": "Bitcoin (Coinbase)", "type": "crypto", "units": 0.09, "value": 8500, "change_1d": 2.1},
                 ],
-                "allocation": {"us_equities": 45, "intl_equities": 25, "aus_equities": 20, "fixed_income": 5, "cash": 5}
+                "allocation": {"aus_equities": 34, "intl_equities": 33, "managed_funds": 25, "crypto": 8}
             },
             {
                 "portfolio_id": "pf_002",
-                "name": "Fixed Income & Hybrids",
-                "value": 280000,
-                "change_ytd": 6.2,
-                "risk_profile": "Conservative",
+                "name": "Superannuation Combined",
+                "value": 443000,
+                "change_ytd": 11.2,
+                "risk_profile": "Balanced Growth",
                 "holdings": [
-                    {"symbol": "CBAPD", "name": "CBA PERLS XI", "type": "hybrid", "units": 500, "value": 49250, "yield": 7.35, "change_1d": 0.1},
-                    {"symbol": "WBCPI", "name": "Westpac Cap Notes 8", "type": "hybrid", "units": 300, "value": 30360, "yield": 7.25, "change_1d": 0.05},
-                    {"symbol": "ANZPJ", "name": "ANZ Cap Notes 7", "type": "hybrid", "units": 400, "value": 39120, "yield": 7.45, "change_1d": -0.1},
-                    {"symbol": "ACGB-34", "name": "Aus Govt 10Y Bond", "type": "bond", "units": 50000, "value": 51000, "yield": 4.2, "change_1d": 0.02},
-                    {"symbol": "BOND", "name": "Corporate Bond Fund", "type": "bond", "units": 30000, "value": 31500, "yield": 5.1, "change_1d": 0.0},
-                    {"symbol": "VAF", "name": "Vanguard Aus Fixed Interest", "type": "bond_etf", "units": 1000, "value": 46000, "yield": 4.8, "change_1d": 0.05},
-                ],
-                "allocation": {"hybrids": 43, "bonds": 45, "cash": 12}
-            },
-            {
-                "portfolio_id": "pf_003",
-                "name": "Cryptocurrency",
-                "value": 85000,
-                "change_ytd": 45.2,
-                "risk_profile": "Aggressive",
-                "holdings": [
-                    {"symbol": "BTC", "name": "Bitcoin", "type": "crypto", "units": 0.65, "value": 62475, "change_1d": 2.5},
-                    {"symbol": "ETH", "name": "Ethereum", "type": "crypto", "units": 5.2, "value": 15600, "change_1d": 1.8},
-                    {"symbol": "SOL", "name": "Solana", "type": "crypto", "units": 35, "value": 6125, "change_1d": 3.2},
-                ],
-                "allocation": {"btc": 74, "eth": 18, "altcoins": 8}
-            },
-            {
-                "portfolio_id": "pf_004",
-                "name": "Cash & Term Deposits",
-                "value": 145000,
-                "change_ytd": 4.8,
-                "risk_profile": "Defensive",
-                "holdings": [
-                    {"symbol": "ING-SAV", "name": "High Interest Savings", "type": "cash", "value": 65000, "rate": 5.0},
-                    {"symbol": "CBA-TD6", "name": "Term Deposit 6M", "type": "term_deposit", "value": 50000, "rate": 4.8, "maturity": "2026-06-15"},
-                    {"symbol": "WBC-TD12", "name": "Term Deposit 12M", "type": "term_deposit", "value": 30000, "rate": 5.1, "maturity": "2026-12-01"},
-                ],
-                "allocation": {"savings": 45, "term_deposits": 55}
-            },
-            {
-                "portfolio_id": "pf_005",
-                "name": "Superannuation",
-                "value": 680000,
-                "change_ytd": 9.8,
-                "risk_profile": "Balanced",
-                "holdings": [
-                    {"symbol": "VDHG", "name": "Vanguard Diversified High Growth", "type": "etf", "units": 5000, "value": 340000, "change_1d": 0.4},
-                    {"symbol": "IVV", "name": "iShares S&P 500", "type": "etf", "units": 500, "value": 280000, "change_1d": 0.6},
-                    {"symbol": "IAF", "name": "iShares Composite Bond", "type": "bond_etf", "units": 500, "value": 60000, "change_1d": 0.1},
+                    {"symbol": "ASUPER", "name": "David - AustralianSuper", "type": "super", "units": 1, "value": 245000, "change_1d": 0.2},
+                    {"symbol": "REST", "name": "Sarah - REST Super", "type": "super", "units": 1, "value": 198000, "change_1d": 0.15},
                 ],
                 "allocation": {"growth": 70, "defensive": 30}
             }
@@ -130,45 +83,45 @@ PORTAL_CLIENTS = {
         "goals": [
             {
                 "goal_id": "goal_001",
-                "name": "Retirement at 60",
-                "target_amount": 3500000,
-                "current_amount": 2530000,
-                "target_date": "2039-06-30",
-                "progress_pct": 72.3,
+                "name": "Retirement at 67",
+                "target_amount": 2500000,
+                "current_amount": 1608800,
+                "target_date": "2043-06-30",
+                "progress_pct": 64.4,
                 "status": GoalStatus.ON_TRACK,
-                "monthly_contribution": 5000,
-                "projected_amount": 3850000,
-                "confidence": 85
+                "monthly_contribution": 3500,
+                "projected_amount": 2750000,
+                "confidence": 84
             },
             {
                 "goal_id": "goal_002",
-                "name": "Children's Education Fund",
-                "target_amount": 200000,
-                "current_amount": 125000,
-                "target_date": "2030-01-01",
-                "progress_pct": 62.5,
+                "name": "Pay Off Investment Loan",
+                "target_amount": 380000,
+                "current_amount": 180000,
+                "target_date": "2035-01-01",
+                "progress_pct": 47.4,
                 "status": GoalStatus.ON_TRACK,
-                "monthly_contribution": 1500,
-                "projected_amount": 215000,
-                "confidence": 90
+                "monthly_contribution": 2000,
+                "projected_amount": 395000,
+                "confidence": 88
             },
             {
                 "goal_id": "goal_003",
-                "name": "Investment Property",
-                "target_amount": 150000,
-                "current_amount": 85000,
-                "target_date": "2026-12-31",
-                "progress_pct": 56.7,
+                "name": "Emergency Fund Target",
+                "target_amount": 60000,
+                "current_amount": 28000,
+                "target_date": "2027-12-31",
+                "progress_pct": 46.7,
                 "status": GoalStatus.AT_RISK,
-                "monthly_contribution": 2000,
-                "projected_amount": 133000,
-                "confidence": 65
+                "monthly_contribution": 1500,
+                "projected_amount": 55000,
+                "confidence": 72
             }
         ],
         "insights": [
-            {"insight_id": "ins_001", "type": "performance", "title": "Strong Quarter", "message": "Your portfolio outperformed the benchmark by 2.3% this quarter.", "date": "2025-12-01"},
-            {"insight_id": "ins_002", "type": "opportunity", "title": "Tax-Loss Harvesting Available", "message": "There's an opportunity to save approximately $2,400 in taxes through strategic selling.", "date": "2025-12-10"},
-            {"insight_id": "ins_003", "type": "milestone", "title": "Goal Progress", "message": "Your retirement fund has crossed $2.5M! You're 72% towards your goal.", "date": "2025-12-15"}
+            {"insight_id": "ins_001", "type": "performance", "title": "Steady Growth", "message": "Your portfolio grew 1.7% this month. Property values remain strong in Glen Waverley.", "date": "2026-03-01"},
+            {"insight_id": "ins_002", "type": "opportunity", "title": "Super Contribution Opportunity", "message": "David has $7,600 remaining in concessional super cap this FY. Consider salary sacrifice before June 30.", "date": "2026-03-10"},
+            {"insight_id": "ins_003", "type": "milestone", "title": "Investment Loan Progress", "message": "Your Brunswick investment loan is now under $380K. At current repayment rates, you'll be ahead of schedule.", "date": "2026-03-15"}
         ],
         "notifications": [
             {"notification_id": "notif_001", "type": NotificationType.ACTION_REQUIRED, "title": "Document Signature Required", "message": "Please review and sign the updated Fee Disclosure Statement.", "action_url": "/documents/sign/fds_2025", "created_at": "2025-12-16T10:00:00Z", "read": False},

@@ -1,7 +1,7 @@
 import { useState, lazy, Suspense } from "react";
 import Layout from "@/components/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, LayoutDashboard, TrendingUp, Gauge, Calculator, Zap, UserCircle, PiggyBank } from "lucide-react";
+import { Loader2, LayoutDashboard, TrendingUp, Gauge, Calculator, Zap, UserCircle, Target } from "lucide-react";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
 const PersonalDashboard = lazy(() => import("@/pages/PersonalDashboard"));
@@ -9,7 +9,7 @@ const UnifiedInvestments = lazy(() => import("@/pages/UnifiedInvestments"));
 const RetirementConfidence = lazy(() => import("@/pages/RetirementConfidence"));
 const UnifiedTaxCentre = lazy(() => import("@/pages/UnifiedTaxCentre"));
 const NextBestActions = lazy(() => import("@/pages/NextBestActions"));
-const HouseholdBudget = lazy(() => import("@/pages/HouseholdBudget"));
+const ScenarioModelling = lazy(() => import("@/pages/ScenarioModelling"));
 const ClientProfileTab = lazy(() => import("@/components/ClientProfileTab"));
 
 const TabLoader = () => (
@@ -50,8 +50,8 @@ const UnifiedClientOverview = () => {
               <TabsTrigger value="investments" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="client-tab-investments">
                 <TrendingUp className="h-3.5 w-3.5" /> Investments
               </TabsTrigger>
-              <TabsTrigger value="budget" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="client-tab-budget">
-                <PiggyBank className="h-3.5 w-3.5" /> Budget
+              <TabsTrigger value="goals" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="client-tab-goals">
+                <Target className="h-3.5 w-3.5" /> Goals
               </TabsTrigger>
               <TabsTrigger value="tax" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="client-tab-tax">
                 <Calculator className="h-3.5 w-3.5" /> Tax Centre
@@ -89,10 +89,10 @@ const UnifiedClientOverview = () => {
                 </Suspense>
               </ErrorBoundary>
             </TabsContent>
-            <TabsContent value="budget" className="mt-0">
-              <ErrorBoundary label="Budget">
+            <TabsContent value="goals" className="mt-0">
+              <ErrorBoundary label="Goals">
                 <Suspense fallback={<TabLoader />}>
-                  <HouseholdBudget embedded />
+                  <ScenarioModelling embedded />
                 </Suspense>
               </ErrorBoundary>
             </TabsContent>

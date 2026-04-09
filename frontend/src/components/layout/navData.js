@@ -84,6 +84,7 @@ export const adviserBaseNav = [
     items: [
       { path: "/batch-execution", label: "Batch Execute", icon: Zap, title: "Batch Execution" },
       { path: "/meeting-prep", label: "Meeting Prep", icon: Sparkles, title: "Meeting Preparation" },
+      { path: "/adviser-compliance", label: "Compliance", icon: Shield, title: "Adviser Compliance Dashboard" },
     ]
   },
   {
@@ -117,7 +118,6 @@ export const clientContextNav = [
     name: "Documents",
     icon: FileText,
     items: [
-      { path: "/adviser-compliance", label: "Compliance", icon: Shield, title: "Adviser Compliance Dashboard" },
       { path: "/meeting-notes", label: "Meeting Notes", icon: Video, title: "Meeting Notes" },
       { path: "/reports", label: "Reports", icon: FileText, title: "Reports" },
       { path: "/document-vault", label: "Vault", icon: FolderOpen, title: "Document Vault" },
@@ -127,7 +127,6 @@ export const clientContextNav = [
     name: "Planning",
     icon: Target,
     items: [
-      { path: "/budget", label: "Budget", icon: PiggyBank, title: "Budget Management" },
       { path: "/scenario-modelling", label: "Goals & Scenarios", icon: Target, title: "Goals, Scenarios & Monte Carlo" },
     ]
   },

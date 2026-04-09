@@ -55,34 +55,46 @@ const DEMO_SCENARIOS = [
     entity_type: "personal",
     taxable_income: 185000,
     investments: {
-      cash_savings: 75000,
-      term_deposit_amount: 150000,
+      cash_savings: 28000,
+      term_deposit_amount: 35000,
       term_deposit_rate: 4.8,
-      shares_value: 320000,
+      shares_value: 84500,
       shares_dividend_yield: 4.2,
       franking_percentage: 85,
-      bonds_value: 80000,
-      bonds_yield: 5.2,
-      etf_value: 145000,
+      bonds_value: 0,
+      bonds_yield: 0,
+      etf_value: 42000,
       etf_yield: 3.5,
-      smsf_balance: 580000,
+      smsf_balance: 443000,
       properties: [
         {
           property_id: "prop_001",
-          name: "Sydney Investment Unit",
-          value: 850000,
-          rental_income: 36000,
-          mortgage_amount: 510000,
-          mortgage_rate: 6.29,
+          name: "Family Home - Glen Waverley",
+          value: 985000,
+          rental_income: 0,
+          mortgage_amount: 285000,
+          mortgage_rate: 6.19,
           mortgage_term_years: 25,
           annual_expenses: 8500,
-          depreciation_building: 6500,
-          depreciation_fixtures: 3200
+          depreciation_building: 0,
+          depreciation_fixtures: 0
+        },
+        {
+          property_id: "prop_002",
+          name: "Investment Unit - Brunswick",
+          value: 620000,
+          rental_income: 32000,
+          mortgage_amount: 380000,
+          mortgage_rate: 6.49,
+          mortgage_term_years: 28,
+          annual_expenses: 7200,
+          depreciation_building: 5800,
+          depreciation_fixtures: 2800
         }
       ]
     },
     expenses: {
-      school_fees: 28000,
+      school_fees: 0,
       childcare: 0,
       health_insurance: 4200,
       private_expenses: 65000,
@@ -93,49 +105,62 @@ const DEMO_SCENARIOS = [
   },
   {
     scenario_id: "demo_002",
-    name: "Retirement Planning 2030",
+    name: "Retirement Planning 2043",
     entity_type: "personal",
-    taxable_income: 150000,
+    taxable_income: 185000,
     investments: {
-      cash_savings: 100000,
-      term_deposit_amount: 200000,
-      term_deposit_rate: 5.0,
-      shares_value: 400000,
-      shares_dividend_yield: 4.5,
-      franking_percentage: 100,
-      bonds_value: 150000,
-      bonds_yield: 5.5,
-      etf_value: 200000,
-      etf_yield: 4.0,
-      smsf_balance: 800000,
-      properties: []
+      cash_savings: 63000,
+      term_deposit_amount: 0,
+      term_deposit_rate: 4.8,
+      shares_value: 84500,
+      shares_dividend_yield: 4.2,
+      franking_percentage: 85,
+      bonds_value: 50000,
+      bonds_yield: 5.0,
+      etf_value: 42000,
+      etf_yield: 3.5,
+      smsf_balance: 443000,
+      properties: [
+        {
+          property_id: "prop_001",
+          name: "Family Home - Glen Waverley",
+          value: 985000,
+          rental_income: 0,
+          mortgage_amount: 285000,
+          mortgage_rate: 6.19,
+          mortgage_term_years: 25,
+          annual_expenses: 8500,
+          depreciation_building: 0,
+          depreciation_fixtures: 0
+        }
+      ]
     },
     expenses: {
       school_fees: 0,
       childcare: 0,
-      health_insurance: 5000,
-      private_expenses: 50000,
+      health_insurance: 4200,
+      private_expenses: 55000,
       work_related: 2000,
       other_deductible: 1500
     },
-    simulation_years: 15
+    simulation_years: 17
   },
   {
     scenario_id: "demo_003",
-    name: "Company Structure Analysis",
+    name: "Thompson Family Trust Analysis",
     entity_type: "company",
-    taxable_income: 350000,
+    taxable_income: 185000,
     investments: {
-      cash_savings: 200000,
-      term_deposit_amount: 100000,
-      term_deposit_rate: 4.5,
-      shares_value: 500000,
-      shares_dividend_yield: 3.8,
-      franking_percentage: 100,
-      bonds_value: 100000,
-      bonds_yield: 5.0,
-      etf_value: 0,
-      etf_yield: 0,
+      cash_savings: 28000,
+      term_deposit_amount: 35000,
+      term_deposit_rate: 4.8,
+      shares_value: 84500,
+      shares_dividend_yield: 4.2,
+      franking_percentage: 85,
+      bonds_value: 0,
+      bonds_yield: 0,
+      etf_value: 42000,
+      etf_yield: 3.5,
       smsf_balance: 0,
       properties: []
     },
@@ -144,8 +169,8 @@ const DEMO_SCENARIOS = [
       childcare: 0,
       health_insurance: 0,
       private_expenses: 0,
-      work_related: 15000,
-      other_deductible: 25000
+      work_related: 5000,
+      other_deductible: 3000
     },
     simulation_years: 10
   }
@@ -161,23 +186,100 @@ const ReportGenerator = () => {
   const generateReport = async (scenario) => {
     setLoading(true);
     setSelectedScenario(scenario);
-    try {
-      const response = await axios.post(`${API}/analyze/full-scenario/report`, {
-        name: scenario.name,
-        entity_type: scenario.entity_type,
-        taxable_income: scenario.taxable_income || 0,
-        investments: scenario.investments || {},
-        expenses: scenario.expenses || {},
-        simulation_years: scenario.simulation_years || 10
-      });
-      setReportData(response.data);
-      toast.success("Report generated");
-    } catch (error) {
-      console.error("Error generating report:", error);
-      toast.error("Failed to generate report");
-    } finally {
-      setLoading(false);
-    }
+    
+    // Generate mock report data client-side
+    await new Promise(r => setTimeout(r, 800)); // Simulate generation time
+    
+    const inv = scenario.investments;
+    const totalInvested = (inv.cash_savings || 0) + (inv.term_deposit_amount || 0) + (inv.shares_value || 0) + (inv.bonds_value || 0) + (inv.etf_value || 0) + (inv.smsf_balance || 0);
+    const propertyTotal = (inv.properties || []).reduce((s, p) => s + p.value, 0);
+    const mortgageTotal = (inv.properties || []).reduce((s, p) => s + (p.mortgage_amount || 0), 0);
+    const grossAssets = totalInvested + propertyTotal;
+    const netWorth = grossAssets - mortgageTotal;
+    
+    const exp = scenario.expenses || {};
+    const totalExpenses = Object.values(exp).reduce((s, v) => s + (v || 0), 0);
+    const taxableIncome = scenario.taxable_income || 0;
+    const estimatedTax = taxableIncome > 180000 ? 51667 + (taxableIncome - 180000) * 0.45 :
+      taxableIncome > 120000 ? 29467 + (taxableIncome - 120000) * 0.37 :
+      taxableIncome > 45000 ? 5092 + (taxableIncome - 45000) * 0.325 :
+      taxableIncome > 18200 ? (taxableIncome - 18200) * 0.19 : 0;
+    
+    const data = {
+      report_title: `${scenario.name} — Halcyon Wealth Report`,
+      generated_at: new Date().toISOString(),
+      client_name: "David & Sarah Thompson",
+      sections: [
+        {
+          title: 'Executive Summary',
+          data: {
+            total_gross_assets: grossAssets,
+            total_invested_assets: totalInvested,
+            total_property: propertyTotal,
+            total_liabilities: mortgageTotal,
+            net_worth: netWorth,
+            annual_income: taxableIncome,
+            annual_expenses: totalExpenses,
+            savings_rate: taxableIncome > 0 ? ((taxableIncome - totalExpenses - estimatedTax) / taxableIncome * 100) : 0,
+          }
+        },
+        {
+          title: 'Income Breakdown',
+          data: {
+            salary_income: taxableIncome,
+            rental_income: (inv.properties || []).reduce((s, p) => s + (p.rental_income || 0), 0),
+            dividend_income: Math.round((inv.shares_value || 0) * (inv.shares_dividend_yield || 0) / 100 + (inv.etf_value || 0) * (inv.etf_yield || 0) / 100),
+            interest_income: Math.round((inv.cash_savings || 0) * 0.04 + (inv.term_deposit_amount || 0) * (inv.term_deposit_rate || 0) / 100),
+          }
+        },
+        {
+          title: 'Tax Analysis',
+          data: {
+            taxable_income: taxableIncome,
+            estimated_tax: Math.round(estimatedTax),
+            effective_rate: taxableIncome > 0 ? (estimatedTax / taxableIncome * 100) : 0,
+            medicare_levy: Math.round(taxableIncome * 0.02),
+            net_after_tax: Math.round(taxableIncome - estimatedTax - taxableIncome * 0.02),
+            breakdown: [
+              { bracket: '$0 - $18,200', rate: 0, taxable: Math.min(taxableIncome, 18200), tax: 0 },
+              { bracket: '$18,201 - $45,000', rate: 19, taxable: Math.min(Math.max(taxableIncome - 18200, 0), 26800), tax: Math.min(Math.max(taxableIncome - 18200, 0), 26800) * 0.19 },
+              { bracket: '$45,001 - $120,000', rate: 32.5, taxable: Math.min(Math.max(taxableIncome - 45000, 0), 75000), tax: Math.min(Math.max(taxableIncome - 45000, 0), 75000) * 0.325 },
+              { bracket: '$120,001 - $180,000', rate: 37, taxable: Math.min(Math.max(taxableIncome - 120000, 0), 60000), tax: Math.min(Math.max(taxableIncome - 120000, 0), 60000) * 0.37 },
+              { bracket: '$180,001+', rate: 45, taxable: Math.max(taxableIncome - 180000, 0), tax: Math.max(taxableIncome - 180000, 0) * 0.45 },
+            ].filter(b => b.taxable > 0)
+          }
+        },
+        ...(inv.properties && inv.properties.length > 0 ? [{
+          title: 'Property Portfolio',
+          data: inv.properties.map(p => ({
+            property_name: p.name,
+            value: p.value,
+            rental_income: p.rental_income,
+            mortgage: p.mortgage_amount,
+            equity: p.value - (p.mortgage_amount || 0),
+            mortgage_rate: `${p.mortgage_rate}%`,
+            net_yield: p.value > 0 ? `${((p.rental_income - (p.annual_expenses || 0)) / p.value * 100).toFixed(1)}%` : '0%',
+          }))
+        }] : []),
+        {
+          title: 'Investment Projections',
+          data: {
+            current_portfolio: totalInvested,
+            expected_annual_return: '7.0%',
+            projected_5yr: Math.round(totalInvested * Math.pow(1.07, 5)),
+            projected_10yr: Math.round(totalInvested * Math.pow(1.07, 10)),
+            projected_20yr: Math.round(totalInvested * Math.pow(1.07, 20)),
+            growth_probability: 87.5,
+            risk_volatility: '12.0%',
+          }
+        },
+      ],
+      disclaimer: "This report is generated for informational purposes only and does not constitute financial advice. Past performance is not a guarantee of future results. Halcyon Wealth Pty Ltd (AFSL 123456). Please consult your adviser before making any financial decisions."
+    };
+    
+    setReportData(data);
+    toast.success("Report generated");
+    setLoading(false);
   };
 
   const printReport = () => {
@@ -187,17 +289,108 @@ const ReportGenerator = () => {
   const downloadReport = () => {
     if (!reportData) return;
     
-    const reportText = generateReportText(reportData);
-    const blob = new Blob([reportText], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${reportData.report_title.replace(/\s+/g, '_')}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast.success("Report downloaded");
+    // Use jsPDF for proper PDF generation
+    import('jspdf').then(({ jsPDF }) => {
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      let y = 20;
+      
+      // Header bar
+      doc.setFillColor(26, 39, 68); // #1a2744
+      doc.rect(0, 0, pageWidth, 35, 'F');
+      doc.setTextColor(212, 168, 76); // #D4A84C
+      doc.setFontSize(20);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Halcyon Wealth', 15, 15);
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(10);
+      doc.text(reportData.report_title, 15, 25);
+      doc.setFontSize(8);
+      doc.text(`Generated: ${formatDate(reportData.generated_at)}`, 15, 31);
+      
+      y = 45;
+      doc.setTextColor(0, 0, 0);
+      
+      // Client
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'bold');
+      doc.text(`Client: ${reportData.client_name}`, 15, y);
+      y += 10;
+      
+      // Sections
+      reportData.sections.forEach((section) => {
+        if (y > 260) { doc.addPage(); y = 20; }
+        
+        // Section header
+        doc.setFillColor(240, 240, 245);
+        doc.rect(15, y - 5, pageWidth - 30, 8, 'F');
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(26, 39, 68);
+        doc.text(section.title, 18, y);
+        y += 10;
+        
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        
+        if (Array.isArray(section.data)) {
+          section.data.forEach((item) => {
+            if (y > 270) { doc.addPage(); y = 20; }
+            Object.entries(item).forEach(([key, value]) => {
+              const label = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+              const val = typeof value === 'number' ? formatCurrency(value) : String(value);
+              doc.text(`${label}: ${val}`, 20, y);
+              y += 5;
+            });
+            y += 3;
+          });
+        } else if (section.data && typeof section.data === 'object') {
+          Object.entries(section.data).forEach(([key, value]) => {
+            if (key === 'breakdown' || typeof value === 'object') return;
+            if (y > 270) { doc.addPage(); y = 20; }
+            const label = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+            let val;
+            if (typeof value === 'number') {
+              val = key.includes('rate') || key.includes('probability') || key.includes('volatility') 
+                ? `${value.toFixed(1)}%` : formatCurrency(value);
+            } else {
+              val = String(value);
+            }
+            doc.text(`${label}: ${val}`, 20, y);
+            y += 5;
+          });
+        }
+        y += 5;
+      });
+      
+      // Disclaimer
+      if (y > 240) { doc.addPage(); y = 20; }
+      y += 5;
+      doc.setFillColor(26, 39, 68);
+      doc.rect(0, y - 5, pageWidth, 30, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(7);
+      doc.setFont('helvetica', 'italic');
+      const disclaimerLines = doc.splitTextToSize(reportData.disclaimer, pageWidth - 30);
+      doc.text(disclaimerLines, 15, y);
+      
+      doc.save(`${reportData.report_title.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`);
+      toast.success("PDF downloaded");
+    }).catch(() => {
+      // Fallback to text download
+      const reportText = generateReportText(reportData);
+      const blob = new Blob([reportText], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${reportData.report_title.replace(/\s+/g, '_')}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success("Report downloaded (text format)");
+    });
   };
 
   const generateReportText = (data) => {

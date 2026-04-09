@@ -227,7 +227,7 @@ const AdviserComplianceDashboard = () => {
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
               <strong>{dashboardMetrics.majorIssues} advice files</strong> have major compliance issues requiring immediate attention.
-              <Button variant="link" className="p-0 h-auto ml-2">View escalation pathways</Button>
+              <Button variant="link" className="p-0 h-auto ml-2" onClick={() => setActiveTab("escalation")}>View escalation pathways</Button>
             </AlertDescription>
           </Alert>
         )}
