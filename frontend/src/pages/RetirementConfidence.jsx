@@ -514,6 +514,15 @@ const ConfidenceGauge = ({ today, afterChanges, afterStress, isAdvanced }) => {
 
 // ==================== FACTOR BREAKDOWN COMPONENT ====================
 
+const FACTOR_EXPLANATIONS = {
+  'Monte Carlo': 'Monte Carlo simulation runs thousands of randomised future scenarios with varying market returns to estimate the probability your portfolio lasts through retirement.',
+  'Downside Protection': 'Measures how well your portfolio can withstand market downturns (e.g. GFC-level crashes) without depleting funds before your life expectancy.',
+  'Income Stability': 'Evaluates the reliability and diversity of your income sources in retirement, including super drawdowns, pensions, and investment income.',
+  'Spending Flexibility': 'Assesses your ability to adjust spending in poor market years. Higher flexibility means you can reduce discretionary spending when needed.',
+  'Diversification': 'Scores how well your portfolio is spread across asset classes (cash, bonds, property, shares, super). Better diversification reduces overall risk.',
+  'Longevity Protection': 'Estimates the risk of outliving your money based on your life expectancy, current age, and projected portfolio depletion timeline.',
+};
+
 const FactorBreakdown = ({ factors }) => {
   if (!factors) return null;
 
@@ -531,7 +540,13 @@ const FactorBreakdown = ({ factors }) => {
       {factorData.map((factor) => (
         <div key={factor.name} className="space-y-1">
           <div className="flex justify-between text-sm">
-            <span>{factor.name}</span>
+            <span className="flex items-center gap-1">
+              {factor.name}
+              <span className="relative group">
+                <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-slate-200 text-slate-600 text-[10px] font-bold cursor-help">*</span>
+                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-60 p-2 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 shadow-lg">{FACTOR_EXPLANATIONS[factor.name]}</span>
+              </span>
+            </span>
             <span className="font-medium">{factor.value.toFixed(0)}% ({factor.weight}% weight)</span>
           </div>
           <div className="h-2 bg-slate-100 rounded-full overflow-hidden">

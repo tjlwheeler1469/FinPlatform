@@ -44,47 +44,26 @@ const formatCompact = (value) => {
 };
 
 // Generate historical net worth data (simulated for demo)
-// Uses a seeded approach so the last point always equals currentNetWorth
+// Uses linear interpolation + seeded noise, last point pinned to exact value
 const generateHistoricalData = (currentNetWorth, months = 24) => {
   const data = [];
   const now = new Date();
-  const debtRatio = 669200 / 2278000; // liabilities / assets ratio
-
-  // Build path backward from current value
-  // Start from ~75% and interpolate, ensuring last point = currentNetWorth
+  const debtRatio = 669200 / 2278000;
   const startValue = currentNetWorth * 0.75;
 
-  // Use a seeded random to get consistent values per session
+  // Seeded random for consistent results
   let seed = 42;
   const seededRandom = () => {
     seed = (seed * 16807) % 2147483647;
     return (seed - 1) / 2147483646;
   };
 
-  // Generate raw growth factors
-  const rawFactors = [];
-  for (let i = 0; i < months; i++) {
-    rawFactors.push(0.005 + seededRandom() * 0.015 + (seededRandom() - 0.5) * 0.02);
-  }
-
-  // Calculate what the raw path gives us
-  let rawEnd = startValue;
-  for (const f of rawFactors) rawEnd *= (1 + f);
-
-  // Scale factors so the path lands exactly on currentNetWorth
-  const scaleFactor = Math.log(currentNetWorth / startValue) / Math.log(rawEnd / startValue);
-
-  let nw = startValue;
   for (let i = months; i >= 0; i--) {
     const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const idx = months - i;
-
-    if (idx > 0) {
-      const adjustedRate = rawFactors[idx - 1] * scaleFactor;
-      nw = nw * (1 + adjustedRate);
-    }
-    // Force last point to exact value
-    if (i === 0) nw = currentNetWorth;
+    const progress = (months - i) / months; // 0 → 1
+    const baseline = startValue + (currentNetWorth - startValue) * progress;
+    const noise = (seededRandom() - 0.5) * 0.03; // ±1.5% noise
+    let nw = i === 0 ? currentNetWorth : Math.round(baseline * (1 + noise));
 
     const assets = nw / (1 - debtRatio);
     const liabilities = assets - nw;

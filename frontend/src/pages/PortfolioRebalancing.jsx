@@ -390,7 +390,7 @@ const PortfolioRebalancing = ({ embedded = false }) => {
                     <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <BarChart data={comparisonData} layout="vertical">
                         <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                        <XAxis type="number" domain={[0, 50]} unit="%" />
+                        <XAxis type="number" domain={[0, 'auto']} tickFormatter={(v) => `${Math.round(v)}%`} />
                         <YAxis dataKey="name" type="category" width={80} />
                         <Tooltip formatter={(v) => formatPercent(v)} />
                         <Legend />
@@ -413,7 +413,7 @@ const PortfolioRebalancing = ({ embedded = false }) => {
                       <RadarChart data={radarData}>
                         <PolarGrid />
                         <PolarAngleAxis dataKey="subject" />
-                        <PolarRadiusAxis angle={30} domain={[0, 50]} />
+                        <PolarRadiusAxis angle={30} domain={[0, 'auto']} />
                         <Radar name="Current" dataKey="current" stroke="#1a2744" fill="#1a2744" fillOpacity={0.5} />
                         <Radar name="Target" dataKey="target" stroke="#D4A84C" fill="#D4A84C" fillOpacity={0.3} />
                         <Legend />

@@ -1,0 +1,102 @@
+{
+  "summary": "Iteration 151 - Frontend testing for 6 bug fixes. All 8 features verified successfully. Wealth Trends Net Worth matches header ($1,608,800). Rebalancing chart shows clean rounded percentages. Stock Research tabs have white text on dark blue active state. /client-360 loads without crashing. Super Guarantee Calculator shows personal super projection with David & Sarah balances. Retirement Confidence Factors tab shows * hover tooltips with Monte Carlo explanations.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "All pages with charts",
+        "issues": ["Console warnings about chart width/height being -1 - charts still render correctly but warnings appear in console"]
+      },
+      {
+        "screen": "/super-guarantee route",
+        "issues": ["Route /super-guarantee shows blank page - the actual calculator is at /sg-calculator. Consider adding redirect or fixing route."]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_151.json"
+  ],
+  "action_items": [
+    "Consider adding redirect from /super-guarantee to /sg-calculator for consistency"
+  ],
+  "critical_code_review_comments": [
+    "TEST 1 - Wealth Trends Net Worth: PASS - Shows $1,608,800 matching header badge exactly",
+    "TEST 2 - Rebalancing Chart Percentages: PASS - All visible percentages are clean (1 decimal max): 5.9%, 10.0%, 50.8%, etc.",
+    "TEST 3 - Stock Research Tab Styling: PASS - Active tabs have white text (rgb(255,255,255)) on dark blue background (rgb(26,39,68))",
+    "TEST 4 - /client-360 Page Load: PASS - Page loads without crashing, shows Wheeler family data",
+    "TEST 5 - Super Guarantee Calculator: PASS - Shows personal super projection with David ($245,000) and Sarah ($198,000) balances at /sg-calculator",
+    "TEST 6 - Retirement Confidence Factors Tooltips: PASS - * hover tooltips show Monte Carlo explanations on hover",
+    "TEST 7 - Dashboard Numbers Consistency: PASS - Net Worth $1,608,800, Gross Assets $2,278,000, Liabilities $669,200",
+    "TEST 8 - No JavaScript Errors: PASS - No error boundaries or error elements visible"
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "N/A (frontend only testing)",
+    "frontend": "100% (8/8 features verified)"
+  },
+  "test_credentials": "No auth required - public access",
+  "seed_data_creation": "None - used existing Thompson family mock data",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All 6 bug fixes verified. Key routes: /dashboard (main), /investments (rebalancing tab), /stock-research, /client-360, /sg-calculator (NOT /super-guarantee), /retirement-confidence (Factors tab). Compliance modal appears on first visit - dismiss by clicking 'I Understand'. For Retirement Confidence factors: click Factors tab, hover over * next to factor names to see tooltips.",
+  "features_tested": {
+    "wealth_trends_net_worth_match": {
+      "status": "PASS",
+      "details": "Wealth Trends tab shows Current Net Worth: $1,608,800 - exact match with header badge"
+    },
+    "rebalancing_chart_clean_percentages": {
+      "status": "PASS",
+      "details": "All visible percentages are properly formatted with max 1 decimal place (5.9%, 10.0%, 50.8%, 6.6%, 11.3%, etc.)"
+    },
+    "stock_research_tab_styling": {
+      "status": "PASS",
+      "details": "Active tabs have white text (rgb(255,255,255)) on dark blue background (rgb(26,39,68) = #1a2744)"
+    },
+    "client_360_page_load": {
+      "status": "PASS",
+      "details": "/client-360 loads without crashing, shows Wheeler family data with financial goals"
+    },
+    "super_guarantee_personal_projection": {
+      "status": "PASS",
+      "details": "Super Guarantee Calculator at /sg-calculator shows personal super projection with David ($245,000) and Sarah ($198,000) balances, NOT employer SG"
+    },
+    "retirement_confidence_factor_tooltips": {
+      "status": "PASS",
+      "details": "Factors tab shows * hover tooltips with Monte Carlo explanations (e.g., 'Monte Carlo simulation runs thousands of randomised future scenarios...')"
+    },
+    "dashboard_numbers_consistency": {
+      "status": "PASS",
+      "details": "Net Worth $1,608,800, Gross Assets $2,278,000, Liabilities $669,200 - all consistent"
+    },
+    "no_javascript_errors": {
+      "status": "PASS",
+      "details": "No error boundaries or error elements visible on any tested page"
+    }
+  },
+  "mocked_apis": {
+    "has_mocked_apis": true,
+    "mocked_apis_list": [
+      "All client data mocked (Thompson family, Wheeler family)",
+      "Stock research data mocked",
+      "Retirement confidence calculations mocked"
+    ]
+  },
+  "screenshots": [
+    ".screenshots/initial_load.png",
+    ".screenshots/wealth_trends_test.png",
+    ".screenshots/rebalancing_chart_test.png",
+    ".screenshots/rebalancing_drift_analysis.png",
+    ".screenshots/stock_research_test.png",
+    ".screenshots/client_360_test.png",
+    ".screenshots/sg_calculator_test.png",
+    ".screenshots/retirement_confidence_initial.png",
+    ".screenshots/retirement_factors_tab.png",
+    ".screenshots/factor_tooltip_hover.png",
+    ".screenshots/dashboard_final.png"
+  ]
+}

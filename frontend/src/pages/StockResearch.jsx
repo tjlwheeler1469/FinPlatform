@@ -156,10 +156,10 @@ export default function StockResearch({ embedded = false }) {
 
       <Tabs defaultValue="screener" className="w-full">
         <TabsList className="bg-muted border border">
-          <TabsTrigger value="screener" className="data-[state=active]:bg-[#1a2744]">Stock Screener</TabsTrigger>
-          <TabsTrigger value="intrinsic" className="data-[state=active]:bg-[#1a2744]">Intrinsic Values</TabsTrigger>
-          <TabsTrigger value="dividends" className="data-[state=active]:bg-[#1a2744]">Dividend Calendar</TabsTrigger>
-          <TabsTrigger value="sectors" className="data-[state=active]:bg-[#1a2744]">Sector Analysis</TabsTrigger>
+          <TabsTrigger value="screener" className="data-[state=active]:bg-[#1a2744] data-[state=active]:text-white">Stock Screener</TabsTrigger>
+          <TabsTrigger value="intrinsic" className="data-[state=active]:bg-[#1a2744] data-[state=active]:text-white">Intrinsic Values</TabsTrigger>
+          <TabsTrigger value="dividends" className="data-[state=active]:bg-[#1a2744] data-[state=active]:text-white">Dividend Calendar</TabsTrigger>
+          <TabsTrigger value="sectors" className="data-[state=active]:bg-[#1a2744] data-[state=active]:text-white">Sector Analysis</TabsTrigger>
         </TabsList>
 
         <TabsContent value="screener" className="mt-4 space-y-4">
