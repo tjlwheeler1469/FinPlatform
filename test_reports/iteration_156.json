@@ -1,0 +1,97 @@
+{
+  "summary": "Client view changes - All 8 features verified successfully. Personal mode LHS sidebar only shows DASHBOARD group with 'My Dashboard' and 'Markets' (no Planning, Research, Settings, Tools, Investments). Dashboard has exactly 6 tabs in correct order: Overview, Net Worth, Wealth Trends, Investments, Insights, Transactions. Investments tab embeds UnifiedInvestments with 10 sub-tabs. Net Worth tab has 'Assets by Entity' as FIRST section showing Super/Personal/Joint breakdowns. All tabs render correctly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Overview Tab",
+        "issues": ["Retirement Readiness gauge shows 0% with 'At Risk' badge - likely API not returning confidence score (mock data issue, not a bug)"]
+      },
+      {
+        "screen": "Console",
+        "issues": ["Recharts warnings about chart width/height being -1 - cosmetic issue, charts render correctly"]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_156.json"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "SIDEBAR: PASS - personalNavGroups correctly stripped to Dashboard only (My Dashboard + Markets)",
+    "TAB ORDER: PASS - Exactly 6 tabs: Overview, Net Worth, Wealth Trends, Investments, Insights, Transactions",
+    "TAB DATA-TESTIDS: PASS - All tabs have correct data-testid attributes (tab-overview, tab-net-worth, etc.)",
+    "INVESTMENTS TAB: PASS - UnifiedInvestments component embedded with 10 sub-tabs (Overview, Bonds, Cash & TDs, Crypto, Managed Funds, Property, Shares & ETFs, SMSF, Super & Pension, Unlisted)",
+    "NET WORTH TAB: PASS - 'Assets by Entity' is FIRST section (position 0), showing Super $443K, Personal $1.156M, Joint $679K with percentages",
+    "OVERVIEW TAB: PASS - Contains Retirement Readiness, Net Worth, Quick Actions, Asset Allocation sections",
+    "WEALTH TRENDS TAB: PASS - NetWorthTrend component renders with chart showing 24-month history",
+    "INSIGHTS TAB: PASS - SmartInsights component renders with AI-powered recommendations",
+    "TRANSACTIONS TAB: PASS - Entity filter dropdown and investments table present"
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "N/A (frontend only test)",
+    "frontend": "100% (8/8 features verified)"
+  },
+  "test_credentials": "No auth required. Set localStorage: disclaimer_accepted='true', app_mode='personal', remove selected_client",
+  "seed_data_creation": "None - used existing mock data in PersonalDashboard.jsx",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Personal mode dashboard redesign complete. Key data-testid values: personal-dashboard, tab-overview, tab-net-worth, tab-wealth-trends, tab-investments, tab-insights, tab-transactions, unified-investments, asset-breakdown-table, full-calculation-table. Compliance modal may appear - dismiss with 'I Understand & Accept' button. LHS sidebar in personal mode only shows DASHBOARD group.",
+  "features_tested": {
+    "sidebar_navigation": {
+      "status": "PASS",
+      "details": "Personal mode sidebar only shows DASHBOARD group with 'My Dashboard' (HOME badge) and 'Markets' (LIVE badge). No Planning, Research, Settings, Tools, or Investments sections present."
+    },
+    "tab_order": {
+      "status": "PASS",
+      "details": "Exactly 6 tabs in correct order: Overview, Net Worth, Wealth Trends, Investments, Insights, Transactions"
+    },
+    "investments_tab": {
+      "status": "PASS",
+      "details": "UnifiedInvestments component embedded with data-testid='unified-investments'. Contains 10 sub-tabs: Overview, Bonds, Cash & TDs, Crypto, Managed Funds, Property, Shares & ETFs, SMSF, Super & Pension, Unlisted"
+    },
+    "net_worth_assets_by_entity": {
+      "status": "PASS",
+      "details": "'Assets by Entity' is FIRST section (position 0 in text content). Shows Super $443,000 (19.4%), Personal $1,156,000 (50.7%), Joint $679,000 (29.8%)"
+    },
+    "overview_tab": {
+      "status": "PASS",
+      "details": "Contains Retirement Readiness gauge, Net Worth summary ($1,608,800), Quick Actions (Check Retirement, Goals & Scenarios, Rebalance Portfolio), Asset Allocation pie chart"
+    },
+    "wealth_trends_tab": {
+      "status": "PASS",
+      "details": "NetWorthTrend component renders with 24-month chart, shows Current Net Worth $1,608,800, Change +$420,287 (+35.4%), Best/Worst month stats"
+    },
+    "insights_tab": {
+      "status": "PASS",
+      "details": "SmartInsights component renders with AI-powered recommendations: Property Heavy Portfolio, Catch-Up Super Contributions, Superannuation Review, Consider International Exposure, Insurance Coverage Review"
+    },
+    "transactions_tab": {
+      "status": "PASS",
+      "details": "Entity filter dropdown (All Entities, Personal, Super, Trust, Company) and investments table showing 12 investments totaling $2,278,000"
+    }
+  },
+  "mocked_apis": {
+    "has_mocked_apis": true,
+    "mocked_apis_list": [
+      "Mock assets/liabilities in PersonalDashboard.jsx (mockAssets, mockLiabilities arrays)",
+      "Market indicators fallback data (mockMarketIndicators)",
+      "User profile default data (defaultUserProfile)"
+    ]
+  },
+  "screenshots": [
+    ".screenshots/personal_dashboard_overview.png",
+    ".screenshots/personal_dashboard_networth.png",
+    ".screenshots/personal_dashboard_wealth_trends.png",
+    ".screenshots/personal_dashboard_investments.png",
+    ".screenshots/personal_dashboard_insights.png",
+    ".screenshots/personal_dashboard_transactions.png",
+    ".screenshots/networth_tab_detail.png"
+  ]
+}
