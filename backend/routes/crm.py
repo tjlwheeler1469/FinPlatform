@@ -481,7 +481,7 @@ def init_comprehensive_data() -> dict:
     sample_tasks = [
         {"id": "task_1", "title": "Annual Review - Robert Mitchell", "client_id": "client_3", "client_name": "Robert Mitchell", "priority": "urgent", "due_date": "2025-12-20", "status": "pending", "type": "review"},
         {"id": "task_2", "title": "SOA Preparation - Chen Family", "client_id": "client_2", "client_name": "Chen Family Trust", "priority": "high", "due_date": "2025-12-22", "status": "pending", "type": "document"},
-        {"id": "task_3", "title": "Insurance Review - Wheeler", "client_id": "client_1", "client_name": "James & Sarah Wheeler", "priority": "medium", "due_date": "2025-12-28", "status": "pending", "type": "review"},
+        {"id": "task_3", "title": "Insurance Review - Thompson", "client_id": "client_1", "client_name": "David & Sarah Thompson", "priority": "medium", "due_date": "2025-12-28", "status": "pending", "type": "review"},
         {"id": "task_4", "title": "Discovery Meeting Follow-up", "client_id": "client_4", "client_name": "Emma & David Williams", "priority": "high", "due_date": "2025-12-19", "status": "pending", "type": "meeting"},
         {"id": "task_5", "title": "SMSF Contribution Strategy", "client_id": "client_5", "client_name": "Patel SMSF", "priority": "medium", "due_date": "2026-01-05", "status": "pending", "type": "planning"},
         {"id": "task_6", "title": "Tax Planning - Chen Trust", "client_id": "client_2", "client_name": "Chen Family Trust", "priority": "medium", "due_date": "2026-01-10", "status": "pending", "type": "planning"},

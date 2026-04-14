@@ -104,27 +104,27 @@ const getPriorityColor = (priority) => {
 const DEMO_CLIENTS = [
   {
     id: "client_1",
-    name: "James & Sarah Wheeler",
-    email: "james.wheeler@email.com",
+    name: "David & Sarah Thompson",
+    email: "david.thompson@email.com",
     phone: "0412 345 678",
     status: "active",
     type: "household",
-    wealth: 2850000,
-    wealthChange: 125000,
-    wealthChangePercent: 4.6,
+    wealth: 1608800,
+    wealthChange: 87000,
+    wealthChangePercent: 5.7,
     lastContact: "2025-12-15",
-    nextReview: "2026-01-15",
-    advisor: "Mark Thompson",
-    riskProfile: "Growth",
-    satisfaction: 95,
+    nextReview: "2026-05-15",
+    advisor: "Sarah Chen",
+    riskProfile: "Balanced",
+    satisfaction: 92,
     accounts: [
-      { type: "Super", balance: 890000, icon: PiggyBank },
-      { type: "Investment", balance: 650000, icon: TrendingUp },
-      { type: "Property", balance: 1200000, icon: Home },
-      { type: "Cash", balance: 110000, icon: DollarSign }
+      { type: "Super", balance: 443000, icon: PiggyBank },
+      { type: "Property", balance: 1605000, icon: Home },
+      { type: "Shares", balance: 84500, icon: TrendingUp },
+      { type: "Cash", balance: 63000, icon: DollarSign }
     ],
-    recentActivity: "Portfolio rebalance completed",
-    pendingTasks: 2,
+    recentActivity: "Quarterly portfolio report sent",
+    pendingTasks: 3,
     pendingDocs: 1
   },
   {
@@ -229,7 +229,7 @@ const DEMO_CLIENTS = [
 const DEMO_TASKS = [
   { id: 1, title: "Annual Review - Robert Mitchell", client: "Robert Mitchell", clientId: "client_3", priority: "urgent", dueDate: "2025-12-20", type: "review" },
   { id: 2, title: "SOA Preparation - Chen Family", client: "Chen Family Trust", clientId: "client_2", priority: "high", dueDate: "2025-12-22", type: "document" },
-  { id: 3, title: "Insurance Review - Wheeler", client: "James & Sarah Wheeler", clientId: "client_1", priority: "medium", dueDate: "2025-12-28", type: "review" },
+  { id: 3, title: "Insurance Review - Thompson", client: "David & Sarah Thompson", clientId: "client_1", priority: "medium", dueDate: "2025-12-28", type: "review" },
   { id: 4, title: "Discovery Meeting Follow-up", client: "Emma & David Williams", clientId: "client_4", priority: "high", dueDate: "2025-12-19", type: "meeting" },
   { id: 5, title: "SMSF Contribution Strategy", client: "Patel SMSF", clientId: "client_5", priority: "medium", dueDate: "2026-01-05", type: "planning" },
   { id: 6, title: "Tax Planning - Chen Trust", client: "Chen Family Trust", clientId: "client_2", priority: "medium", dueDate: "2026-01-10", type: "planning" },
@@ -238,7 +238,7 @@ const DEMO_TASKS = [
 const DEMO_NOTIFICATIONS = [
   { id: 1, message: "Robert Mitchell's annual review is overdue", type: "warning", time: "1 hour ago" },
   { id: 2, message: "New document uploaded by Chen Family", type: "info", time: "3 hours ago" },
-  { id: 3, message: "Wheeler portfolio up 4.6% this month", type: "success", time: "Yesterday" },
+  { id: 3, message: "Thompson portfolio up 5.7% this month", type: "success", time: "Yesterday" },
   { id: 4, message: "Compliance training due in 5 days", type: "warning", time: "Yesterday" },
 ];
 
