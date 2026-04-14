@@ -7,6 +7,23 @@ import { XplanSyncProvider, XplanSyncIndicator } from "@/components/XplanSyncNot
 import { LanguageProvider } from "@/components/LanguageContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
+// Retry wrapper for lazy imports — handles webpack chunk load failures
+const lazyRetry = (importFn) =>
+  lazy(() =>
+    importFn().catch(() =>
+      new Promise((resolve) => setTimeout(resolve, 1500)).then(() =>
+        importFn().catch(() => ({ default: () => (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <p className="font-medium mb-2">This page failed to load.</p>
+            <button className="px-4 py-2 bg-[#1a2744] text-white rounded-md text-sm" onClick={() => window.location.reload()}>
+              Reload
+            </button>
+          </div>
+        )}))
+      )
+    )
+  );
+
 // Loading component for lazy loaded pages
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -22,253 +39,253 @@ import Dashboard from "@/pages/Dashboard";
 import ModeSelector from "@/pages/ModeSelector";
 
 // Lazy loaded pages (loaded on demand)
-const TaxAnalysisSync = lazy(() => import("@/pages/TaxAnalysisSync"));
-const PropertyPortfolio = lazy(() => import("@/pages/PropertyPortfolio"));
-const MonteCarloSimulation = lazy(() => import("@/pages/MonteCarloSimulation"));
-const LoanCalculator = lazy(() => import("@/pages/LoanCalculator"));
-const SavedScenarios = lazy(() => import("@/pages/SavedScenarios"));
-const ScenarioBuilder = lazy(() => import("@/pages/ScenarioBuilder"));
-const CGT = lazy(() => import("@/pages/CGT"));
-const HistoricalTaxComparison = lazy(() => import("@/pages/HistoricalTaxComparison"));
-const SMSFOptimizer = lazy(() => import("@/pages/SMSFOptimizer"));
-const ReportGenerator = lazy(() => import("@/pages/ReportGenerator"));
-const SalaryPackaging = lazy(() => import("@/pages/SalaryPackaging"));
-const PropertyComparison = lazy(() => import("@/pages/PropertyComparison"));
-const TaxLossHarvesting = lazy(() => import("@/pages/TaxLossHarvesting"));
-const DividendReinvestment = lazy(() => import("@/pages/DividendReinvestment"));
-const HouseholdBudget = lazy(() => import("@/pages/HouseholdBudget"));
-const IncomeSplitting = lazy(() => import("@/pages/IncomeSplitting"));
-const Division7ACalculator = lazy(() => import("@/pages/Division7ACalculator"));
-const TrustDistributionAnalysis = lazy(() => import("@/pages/TrustDistributionAnalysis"));
-const FinancialRecommendations = lazy(() => import("@/pages/FinancialRecommendations"));
-const TaxCalendar = lazy(() => import("@/pages/TaxCalendar"));
-const FamilyOverview = lazy(() => import("@/pages/FamilyOverview"));
-const SharePortfolio = lazy(() => import("@/pages/SharePortfolio"));
-const CalculationMethodology = lazy(() => import("@/pages/CalculationMethodology"));
-const SuperannuationGuarantee = lazy(() => import("@/pages/SuperannuationGuarantee"));
-const RentalYieldOptimizer = lazy(() => import("@/pages/RentalYieldOptimizer"));
-const HoldingsPerformance = lazy(() => import("@/pages/HoldingsPerformance"));
-const ExportData = lazy(() => import("@/pages/ExportData"));
-const FamilyMemberProfile = lazy(() => import("@/pages/FamilyMemberProfile"));
-const FamilyWealthDashboard = lazy(() => import("@/pages/FamilyWealthDashboard"));
-const FinancialAdvisorChat = lazy(() => import("@/pages/FinancialAdvisorChat"));
-const StrategicPlanning = lazy(() => import("@/pages/StrategicPlanning"));
-const DataImport = lazy(() => import("@/pages/DataImport"));
-const BankFeeds = lazy(() => import("@/pages/BankFeeds"));
-const AccountingIntegrations = lazy(() => import("@/pages/AccountingIntegrations"));
-const BASCalculator = lazy(() => import("@/pages/BASCalculator"));
-const Collaboration = lazy(() => import("@/pages/Collaboration"));
-const RiskProfiler = lazy(() => import("@/pages/RiskProfiler"));
-const StatementOfAdvice = lazy(() => import("@/pages/StatementOfAdvice"));
-const ClientOnboarding = lazy(() => import("@/pages/ClientOnboarding"));
-const Copilot = lazy(() => import("@/pages/Copilot"));
-const DailyBriefing = lazy(() => import("@/pages/DailyBriefing"));
-const PersonalDashboard = lazy(() => import("@/pages/PersonalDashboard"));
-const UnlistedInvestments = lazy(() => import("@/pages/UnlistedInvestments"));
-const UnifiedDashboard = lazy(() => import("@/pages/UnifiedDashboard"));
-const UnifiedInvestments = lazy(() => import("@/pages/UnifiedInvestments"));
-const AdviserDashboard = lazy(() => import("@/pages/AdviserDashboard"));
-const ClientPortalMerged = lazy(() => import("@/pages/ClientPortalMerged"));
-const PracticeManagement = lazy(() => import("@/pages/PracticeManagement"));
-const DocumentsCommunications = lazy(() => import("@/pages/DocumentsCommunications"));
-const PortfolioRebalancing = lazy(() => import("@/pages/PortfolioRebalancing"));
-const SecuritySettings = lazy(() => import("@/pages/SecuritySettings"));
-const DataImportExportPage = lazy(() => import("@/pages/DataImportExportPage"));
-const InvestmentComparison = lazy(() => import("@/pages/InvestmentComparison"));
-const DecisionDashboard = lazy(() => import("@/pages/DecisionDashboard"));
-const DecisionEngine = lazy(() => import("@/pages/DecisionEngine"));
-const LifeTimeline = lazy(() => import("@/pages/LifeTimeline"));
-const LifeTimelinePlanner = lazy(() => import("@/pages/LifeTimelinePlanner"));
-const ClientCRM = lazy(() => import("@/pages/ClientCRM"));
-const GoalTracker = lazy(() => import("@/pages/GoalTracker"));
-const AIAdvisor = lazy(() => import("@/pages/AIAdvisor"));
-const PortfolioAggregator = lazy(() => import("@/pages/PortfolioAggregator"));
-const NetWorthTrend = lazy(() => import("@/pages/NetWorthTrend"));
-const InsuranceGapAnalysis = lazy(() => import("@/pages/InsuranceGapAnalysis"));
-const DebtPaydownPlanner = lazy(() => import("@/pages/DebtPaydownPlanner"));
-const RevenueBilling = lazy(() => import("@/pages/RevenueBilling"));
-const ScenarioComparison = lazy(() => import("@/pages/ScenarioComparison"));
-const ScenarioSimulator = lazy(() => import("@/pages/ScenarioSimulator"));
-const MarketData = lazy(() => import("@/pages/MarketData"));
-const AdviceWorkflow = lazy(() => import("@/pages/AdviceWorkflow"));
-const FinancialPlanGenerator = lazy(() => import("@/pages/FinancialPlanGenerator"));
-const MeetingSummaryGenerator = lazy(() => import("@/pages/MeetingSummaryGenerator"));
-const DocumentVault = lazy(() => import("@/pages/DocumentVault"));
-const EstatePlanning = lazy(() => import("@/pages/EstatePlanning"));
-const ProductMarketplace = lazy(() => import("@/pages/ProductMarketplace"));
-const PortfolioAnalyzer = lazy(() => import("@/pages/PortfolioAnalyzer"));
-const ConnectedAccounts = lazy(() => import("@/pages/ConnectedAccounts"));
-const ClientSetupWizard = lazy(() => import("@/pages/ClientSetupWizard"));
+const TaxAnalysisSync = lazyRetry(() => import("@/pages/TaxAnalysisSync"));
+const PropertyPortfolio = lazyRetry(() => import("@/pages/PropertyPortfolio"));
+const MonteCarloSimulation = lazyRetry(() => import("@/pages/MonteCarloSimulation"));
+const LoanCalculator = lazyRetry(() => import("@/pages/LoanCalculator"));
+const SavedScenarios = lazyRetry(() => import("@/pages/SavedScenarios"));
+const ScenarioBuilder = lazyRetry(() => import("@/pages/ScenarioBuilder"));
+const CGT = lazyRetry(() => import("@/pages/CGT"));
+const HistoricalTaxComparison = lazyRetry(() => import("@/pages/HistoricalTaxComparison"));
+const SMSFOptimizer = lazyRetry(() => import("@/pages/SMSFOptimizer"));
+const ReportGenerator = lazyRetry(() => import("@/pages/ReportGenerator"));
+const SalaryPackaging = lazyRetry(() => import("@/pages/SalaryPackaging"));
+const PropertyComparison = lazyRetry(() => import("@/pages/PropertyComparison"));
+const TaxLossHarvesting = lazyRetry(() => import("@/pages/TaxLossHarvesting"));
+const DividendReinvestment = lazyRetry(() => import("@/pages/DividendReinvestment"));
+const HouseholdBudget = lazyRetry(() => import("@/pages/HouseholdBudget"));
+const IncomeSplitting = lazyRetry(() => import("@/pages/IncomeSplitting"));
+const Division7ACalculator = lazyRetry(() => import("@/pages/Division7ACalculator"));
+const TrustDistributionAnalysis = lazyRetry(() => import("@/pages/TrustDistributionAnalysis"));
+const FinancialRecommendations = lazyRetry(() => import("@/pages/FinancialRecommendations"));
+const TaxCalendar = lazyRetry(() => import("@/pages/TaxCalendar"));
+const FamilyOverview = lazyRetry(() => import("@/pages/FamilyOverview"));
+const SharePortfolio = lazyRetry(() => import("@/pages/SharePortfolio"));
+const CalculationMethodology = lazyRetry(() => import("@/pages/CalculationMethodology"));
+const SuperannuationGuarantee = lazyRetry(() => import("@/pages/SuperannuationGuarantee"));
+const RentalYieldOptimizer = lazyRetry(() => import("@/pages/RentalYieldOptimizer"));
+const HoldingsPerformance = lazyRetry(() => import("@/pages/HoldingsPerformance"));
+const ExportData = lazyRetry(() => import("@/pages/ExportData"));
+const FamilyMemberProfile = lazyRetry(() => import("@/pages/FamilyMemberProfile"));
+const FamilyWealthDashboard = lazyRetry(() => import("@/pages/FamilyWealthDashboard"));
+const FinancialAdvisorChat = lazyRetry(() => import("@/pages/FinancialAdvisorChat"));
+const StrategicPlanning = lazyRetry(() => import("@/pages/StrategicPlanning"));
+const DataImport = lazyRetry(() => import("@/pages/DataImport"));
+const BankFeeds = lazyRetry(() => import("@/pages/BankFeeds"));
+const AccountingIntegrations = lazyRetry(() => import("@/pages/AccountingIntegrations"));
+const BASCalculator = lazyRetry(() => import("@/pages/BASCalculator"));
+const Collaboration = lazyRetry(() => import("@/pages/Collaboration"));
+const RiskProfiler = lazyRetry(() => import("@/pages/RiskProfiler"));
+const StatementOfAdvice = lazyRetry(() => import("@/pages/StatementOfAdvice"));
+const ClientOnboarding = lazyRetry(() => import("@/pages/ClientOnboarding"));
+const Copilot = lazyRetry(() => import("@/pages/Copilot"));
+const DailyBriefing = lazyRetry(() => import("@/pages/DailyBriefing"));
+const PersonalDashboard = lazyRetry(() => import("@/pages/PersonalDashboard"));
+const UnlistedInvestments = lazyRetry(() => import("@/pages/UnlistedInvestments"));
+const UnifiedDashboard = lazyRetry(() => import("@/pages/UnifiedDashboard"));
+const UnifiedInvestments = lazyRetry(() => import("@/pages/UnifiedInvestments"));
+const AdviserDashboard = lazyRetry(() => import("@/pages/AdviserDashboard"));
+const ClientPortalMerged = lazyRetry(() => import("@/pages/ClientPortalMerged"));
+const PracticeManagement = lazyRetry(() => import("@/pages/PracticeManagement"));
+const DocumentsCommunications = lazyRetry(() => import("@/pages/DocumentsCommunications"));
+const PortfolioRebalancing = lazyRetry(() => import("@/pages/PortfolioRebalancing"));
+const SecuritySettings = lazyRetry(() => import("@/pages/SecuritySettings"));
+const DataImportExportPage = lazyRetry(() => import("@/pages/DataImportExportPage"));
+const InvestmentComparison = lazyRetry(() => import("@/pages/InvestmentComparison"));
+const DecisionDashboard = lazyRetry(() => import("@/pages/DecisionDashboard"));
+const DecisionEngine = lazyRetry(() => import("@/pages/DecisionEngine"));
+const LifeTimeline = lazyRetry(() => import("@/pages/LifeTimeline"));
+const LifeTimelinePlanner = lazyRetry(() => import("@/pages/LifeTimelinePlanner"));
+const ClientCRM = lazyRetry(() => import("@/pages/ClientCRM"));
+const GoalTracker = lazyRetry(() => import("@/pages/GoalTracker"));
+const AIAdvisor = lazyRetry(() => import("@/pages/AIAdvisor"));
+const PortfolioAggregator = lazyRetry(() => import("@/pages/PortfolioAggregator"));
+const NetWorthTrend = lazyRetry(() => import("@/pages/NetWorthTrend"));
+const InsuranceGapAnalysis = lazyRetry(() => import("@/pages/InsuranceGapAnalysis"));
+const DebtPaydownPlanner = lazyRetry(() => import("@/pages/DebtPaydownPlanner"));
+const RevenueBilling = lazyRetry(() => import("@/pages/RevenueBilling"));
+const ScenarioComparison = lazyRetry(() => import("@/pages/ScenarioComparison"));
+const ScenarioSimulator = lazyRetry(() => import("@/pages/ScenarioSimulator"));
+const MarketData = lazyRetry(() => import("@/pages/MarketData"));
+const AdviceWorkflow = lazyRetry(() => import("@/pages/AdviceWorkflow"));
+const FinancialPlanGenerator = lazyRetry(() => import("@/pages/FinancialPlanGenerator"));
+const MeetingSummaryGenerator = lazyRetry(() => import("@/pages/MeetingSummaryGenerator"));
+const DocumentVault = lazyRetry(() => import("@/pages/DocumentVault"));
+const EstatePlanning = lazyRetry(() => import("@/pages/EstatePlanning"));
+const ProductMarketplace = lazyRetry(() => import("@/pages/ProductMarketplace"));
+const PortfolioAnalyzer = lazyRetry(() => import("@/pages/PortfolioAnalyzer"));
+const ConnectedAccounts = lazyRetry(() => import("@/pages/ConnectedAccounts"));
+const ClientSetupWizard = lazyRetry(() => import("@/pages/ClientSetupWizard"));
 
 // New AI-Powered Features
-const AICopilot = lazy(() => import("@/pages/AICopilot"));
-const DecisionCenter = lazy(() => import("@/pages/DecisionCenter"));
-const ClientIntelligenceFeed = lazy(() => import("@/pages/ClientIntelligenceFeed"));
-const ClientPortal = lazy(() => import("@/pages/ClientPortal"));
+const AICopilot = lazyRetry(() => import("@/pages/AICopilot"));
+const DecisionCenter = lazyRetry(() => import("@/pages/DecisionCenter"));
+const ClientIntelligenceFeed = lazyRetry(() => import("@/pages/ClientIntelligenceFeed"));
+const ClientPortal = lazyRetry(() => import("@/pages/ClientPortal"));
 
 // Super App Features - Meeting Prep, Research, Compliance, Wealth
-const MeetingPrep = lazy(() => import("@/pages/MeetingPrep"));
-const StockResearch = lazy(() => import("@/pages/StockResearch"));
-const ComplianceCenter = lazy(() => import("@/pages/ComplianceCenter"));
-const WealthDashboard = lazy(() => import("@/pages/WealthDashboard"));
+const MeetingPrep = lazyRetry(() => import("@/pages/MeetingPrep"));
+const StockResearch = lazyRetry(() => import("@/pages/StockResearch"));
+const ComplianceCenter = lazyRetry(() => import("@/pages/ComplianceCenter"));
+const WealthDashboard = lazyRetry(() => import("@/pages/WealthDashboard"));
 
 // Client-Level Pages (within app, consistent design)
-const ClientWealth = lazy(() => import("@/pages/ClientWealth"));
-const ClientCompliance = lazy(() => import("@/pages/ClientCompliance"));
-const AIInsights = lazy(() => import("@/pages/AIInsights"));
+const ClientWealth = lazyRetry(() => import("@/pages/ClientWealth"));
+const ClientCompliance = lazyRetry(() => import("@/pages/ClientCompliance"));
+const AIInsights = lazyRetry(() => import("@/pages/AIInsights"));
 
 // Command Center - Daily Adviser Hub
-const CommandCenter = lazy(() => import("@/pages/CommandCenter"));
+const CommandCenter = lazyRetry(() => import("@/pages/CommandCenter"));
 
 // Cross-Client Intelligence Engine
-const IntelligenceEngine = lazy(() => import("@/pages/IntelligenceEngine"));
+const IntelligenceEngine = lazyRetry(() => import("@/pages/IntelligenceEngine"));
 
 // Advisor Intelligence Dashboard - Daily Operating System
-const AdvisorIntelligenceDashboard = lazy(() => import("@/pages/AdvisorIntelligenceDashboard"));
+const AdvisorIntelligenceDashboard = lazyRetry(() => import("@/pages/AdvisorIntelligenceDashboard"));
 
 // Ultimate Advisor Command Center - The Daily Operating System
-const AdvisorCommandCenter = lazy(() => import("@/pages/AdvisorCommandCenter"));
+const AdvisorCommandCenter = lazyRetry(() => import("@/pages/AdvisorCommandCenter"));
 
 // Notification Center
-const NotificationCenter = lazy(() => import("@/pages/NotificationCenter"));
+const NotificationCenter = lazyRetry(() => import("@/pages/NotificationCenter"));
 
 // Data Aggregators Research
-const DataAggregators = lazy(() => import("@/pages/DataAggregators"));
+const DataAggregators = lazyRetry(() => import("@/pages/DataAggregators"));
 
 // Stock Trading with CGT
-const StockTrading = lazy(() => import("@/pages/StockTrading"));
+const StockTrading = lazyRetry(() => import("@/pages/StockTrading"));
 
 // Macro Dashboard - Global Markets
-const MacroDashboard = lazy(() => import("@/pages/MacroDashboard"));
+const MacroDashboard = lazyRetry(() => import("@/pages/MacroDashboard"));
 
 // Broker Research Reports
-const BrokerResearch = lazy(() => import("@/pages/BrokerResearch"));
+const BrokerResearch = lazyRetry(() => import("@/pages/BrokerResearch"));
 
 // Workflow Engine
-const WorkflowDashboard = lazy(() => import("@/pages/WorkflowDashboard"));
+const WorkflowDashboard = lazyRetry(() => import("@/pages/WorkflowDashboard"));
 
 // Book Intelligence
-const BookIntelligence = lazy(() => import("@/pages/BookIntelligence"));
+const BookIntelligence = lazyRetry(() => import("@/pages/BookIntelligence"));
 
 // Meeting Automation
-const MeetingAutomation = lazy(() => import("@/pages/MeetingAutomation"));
+const MeetingAutomation = lazyRetry(() => import("@/pages/MeetingAutomation"));
 
 // Batch Execution
-const BatchExecution = lazy(() => import("@/pages/BatchExecution"));
+const BatchExecution = lazyRetry(() => import("@/pages/BatchExecution"));
 
 // Advanced AI Copilot
-const AICopilotAdvanced = lazy(() => import("@/pages/AICopilotAdvanced"));
+const AICopilotAdvanced = lazyRetry(() => import("@/pages/AICopilotAdvanced"));
 
 // Feedback & Learning Analytics
-const FeedbackAnalytics = lazy(() => import("@/pages/FeedbackAnalytics"));
+const FeedbackAnalytics = lazyRetry(() => import("@/pages/FeedbackAnalytics"));
 
 // Real-Time Data Layer
-const RealtimeDataDashboard = lazy(() => import("@/pages/RealtimeDataDashboard"));
+const RealtimeDataDashboard = lazyRetry(() => import("@/pages/RealtimeDataDashboard"));
 
 // New Trading Pages
-const BondsTrading = lazy(() => import("@/pages/BondsTrading"));
-const CashDeposits = lazy(() => import("@/pages/CashDeposits"));
-const ManagedFunds = lazy(() => import("@/pages/ManagedFunds"));
+const BondsTrading = lazyRetry(() => import("@/pages/BondsTrading"));
+const CashDeposits = lazyRetry(() => import("@/pages/CashDeposits"));
+const ManagedFunds = lazyRetry(() => import("@/pages/ManagedFunds"));
 
 // CRM Command Center
-const CRMCommandCenter = lazy(() => import("@/pages/CRMCommandCenter"));
+const CRMCommandCenter = lazyRetry(() => import("@/pages/CRMCommandCenter"));
 
 // Client 360 View
-const Client360View = lazy(() => import("@/pages/Client360View"));
+const Client360View = lazyRetry(() => import("@/pages/Client360View"));
 
 // Transaction Modeler
-const TransactionModeler = lazy(() => import("@/pages/TransactionModeler"));
+const TransactionModeler = lazyRetry(() => import("@/pages/TransactionModeler"));
 
 // Next Best Actions
-const NextBestActions = lazy(() => import("@/pages/NextBestActions"));
+const NextBestActions = lazyRetry(() => import("@/pages/NextBestActions"));
 
 // Meeting Notes with Fathom
-const MeetingNotes = lazy(() => import("@/pages/MeetingNotes"));
+const MeetingNotes = lazyRetry(() => import("@/pages/MeetingNotes"));
 
 // Adviser Hub (Combined CRM)
-const AdviserHub = lazy(() => import("@/pages/AdviserHub"));
+const AdviserHub = lazyRetry(() => import("@/pages/AdviserHub"));
 
 // Scenario Modelling (Combined Goals, Strategy, What-If)
-const ScenarioModelling = lazy(() => import("@/pages/ScenarioModelling"));
+const ScenarioModelling = lazyRetry(() => import("@/pages/ScenarioModelling"));
 
 // Knowledge Graph Dashboard
-const KnowledgeGraphDashboard = lazy(() => import("@/pages/KnowledgeGraphDashboard"));
+const KnowledgeGraphDashboard = lazyRetry(() => import("@/pages/KnowledgeGraphDashboard"));
 
 // Hybrids Trading
-const HybridsTrading = lazy(() => import("@/pages/HybridsTrading"));
+const HybridsTrading = lazyRetry(() => import("@/pages/HybridsTrading"));
 
 // Crypto Portfolio
-const CryptoPortfolio = lazy(() => import("@/pages/CryptoPortfolio"));
+const CryptoPortfolio = lazyRetry(() => import("@/pages/CryptoPortfolio"));
 
 // Xplan Integration
-const XplanIntegration = lazy(() => import("@/pages/XplanIntegration"));
+const XplanIntegration = lazyRetry(() => import("@/pages/XplanIntegration"));
 
 // AdviceOS Dashboard - Compliance-First Decision Support
-const AdviceOSDashboard = lazy(() => import("@/pages/AdviceOSDashboard"));
+const AdviceOSDashboard = lazyRetry(() => import("@/pages/AdviceOSDashboard"));
 
 // Compliance Dashboard - ASIC/APRA/ISO Compliance Center
-const EnterpriseComplianceDashboard = lazy(() => import("@/pages/EnterpriseComplianceDashboard"));
+const EnterpriseComplianceDashboard = lazyRetry(() => import("@/pages/EnterpriseComplianceDashboard"));
 
 // Xplan Integration - Sync Page
-const XplanSyncPage = lazy(() => import("@/pages/XplanSyncPage"));
+const XplanSyncPage = lazyRetry(() => import("@/pages/XplanSyncPage"));
 
 // Enterprise System of Record Features
-const ReplayAdvicePage = lazy(() => import("@/pages/ReplayAdvicePage"));
-const CostReductionDashboard = lazy(() => import("@/pages/CostReductionDashboard"));
-const RiskControlMapping = lazy(() => import("@/pages/RiskControlMapping"));
-const BreachRegister = lazy(() => import("@/pages/BreachRegister"));
+const ReplayAdvicePage = lazyRetry(() => import("@/pages/ReplayAdvicePage"));
+const CostReductionDashboard = lazyRetry(() => import("@/pages/CostReductionDashboard"));
+const RiskControlMapping = lazyRetry(() => import("@/pages/RiskControlMapping"));
+const BreachRegister = lazyRetry(() => import("@/pages/BreachRegister"));
 
 // Retirement Calculator - SMSF Planning
-const RetirementCalculator = lazy(() => import("@/pages/RetirementCalculator"));
+const RetirementCalculator = lazyRetry(() => import("@/pages/RetirementCalculator"));
 
 // Decumulation Calculator - Pension Phase Planning
-const DecumulationCalculator = lazy(() => import("@/pages/DecumulationCalculator"));
+const DecumulationCalculator = lazyRetry(() => import("@/pages/DecumulationCalculator"));
 
 // Unified Retirement Planner - Comprehensive retirement planning
-const RetirementPlanner = lazy(() => import("@/pages/RetirementPlanner"));
+const RetirementPlanner = lazyRetry(() => import("@/pages/RetirementPlanner"));
 
 // Platform Integrations - AMP North, Netwealth, Hub24, Class, IRESS
-const PlatformIntegrations = lazy(() => import("@/pages/PlatformIntegrations"));
+const PlatformIntegrations = lazyRetry(() => import("@/pages/PlatformIntegrations"));
 
 // Live Sync Dashboard - Real-time platform updates
-const LiveSyncDashboard = lazy(() => import("@/pages/LiveSyncDashboard"));
+const LiveSyncDashboard = lazyRetry(() => import("@/pages/LiveSyncDashboard"));
 
 // Client Financial Dashboard - Budget, expenses, goals, milestones
-const ClientFinancialDashboard = lazy(() => import("@/pages/ClientFinancialDashboard"));
+const ClientFinancialDashboard = lazyRetry(() => import("@/pages/ClientFinancialDashboard"));
 
 // Adviser Compliance Dashboard - SOA/ROA tracking
-const AdviserComplianceDashboard = lazy(() => import("@/pages/AdviserComplianceDashboard"));
+const AdviserComplianceDashboard = lazyRetry(() => import("@/pages/AdviserComplianceDashboard"));
 
 // Notification Center - Push notifications management
-const NotificationCenterPage = lazy(() => import("@/pages/NotificationCenterPage"));
+const NotificationCenterPage = lazyRetry(() => import("@/pages/NotificationCenterPage"));
 
 // Stress Test Dashboard - Load testing for 20,000+ users
-const StressTestDashboard = lazy(() => import("@/pages/StressTestDashboard"));
+const StressTestDashboard = lazyRetry(() => import("@/pages/StressTestDashboard"));
 
 // Retirement Confidence Engine - Monte Carlo simulations, 7-phase retirement planning
-const RetirementConfidenceEngine = lazy(() => import("@/pages/RetirementConfidenceEngine"));
+const RetirementConfidenceEngine = lazyRetry(() => import("@/pages/RetirementConfidenceEngine"));
 
 // Hybrid Engine - World-class 19-section retirement calculation engine
-const HybridEngineView = lazy(() => import("@/pages/HybridEngineView"));
+const HybridEngineView = lazyRetry(() => import("@/pages/HybridEngineView"));
 
 // Combined Retirement Confidence (Quick + Advanced toggle)
-const RetirementConfidence = lazy(() => import("@/pages/RetirementConfidence"));
+const RetirementConfidence = lazyRetry(() => import("@/pages/RetirementConfidence"));
 
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import { AuthProvider } from "@/context/AuthContext";
 
 // Auth components
-const Login = lazy(() => import("@/pages/Login"));
+const Login = lazyRetry(() => import("@/pages/Login"));
 
 // Consolidated pages
-const UnifiedTaxCentre = lazy(() => import("@/pages/UnifiedTaxCentre"));
-const UnifiedResearchCentre = lazy(() => import("@/pages/UnifiedResearchCentre"));
-const UnifiedComplianceCentre = lazy(() => import("@/pages/UnifiedComplianceCentre"));
-const UnifiedGoalsPlanning = lazy(() => import("@/pages/UnifiedGoalsPlanning"));
-const UnifiedClientOverview = lazy(() => import("@/pages/UnifiedClientOverview"));
-const ClientHealthDashboard = lazy(() => import("@/pages/ClientHealthDashboard"));
-const ClientComparison = lazy(() => import("@/pages/ClientComparison"));
+const UnifiedTaxCentre = lazyRetry(() => import("@/pages/UnifiedTaxCentre"));
+const UnifiedResearchCentre = lazyRetry(() => import("@/pages/UnifiedResearchCentre"));
+const UnifiedComplianceCentre = lazyRetry(() => import("@/pages/UnifiedComplianceCentre"));
+const UnifiedGoalsPlanning = lazyRetry(() => import("@/pages/UnifiedGoalsPlanning"));
+const UnifiedClientOverview = lazyRetry(() => import("@/pages/UnifiedClientOverview"));
+const ClientHealthDashboard = lazyRetry(() => import("@/pages/ClientHealthDashboard"));
+const ClientComparison = lazyRetry(() => import("@/pages/ClientComparison"));
 
 // Compliance Modal
 import { ComplianceModal } from "@/components/ComplianceDisclaimer";
