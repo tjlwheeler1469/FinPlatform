@@ -1118,7 +1118,7 @@ const AppRouter = () => {
       <Route path="/client-insights" element={<Navigate to="/ai-copilot-advanced" replace />} />
       <Route path="/intelligence-feed" element={<Navigate to="/ai-copilot-advanced" replace />} />
       <Route path="/ai-insights" element={<Navigate to="/ai-copilot-advanced" replace />} />
-      <Route path="/client-portal" element={<ClientPortal />} />
+      <Route path="/client-portal" element={<PersonalDashboard />} />
       
       {/* Super App Features */}
       <Route path="/meeting-prep" element={<MeetingPrep />} />

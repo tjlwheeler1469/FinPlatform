@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, lazy, Suspense } from 'react';
+import { useLocation } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import SmartInsights from '@/components/SmartInsights';
 import ErrorBoundary from '@/components/ErrorBoundary';
@@ -173,9 +174,11 @@ const PersonalDashboard = ({ embedded = false }) => {
   const clientData = CLIENT_DATA[clientId];
   const mockAssets = clientData.assets;
   const mockLiabilities = clientData.liabilities;
+  const location = useLocation();
 
-  // Client/adviser view shows extra tabs + different layout
-  const isClientView = localStorage.getItem('app_mode') === 'adviser' && !!localStorage.getItem('selected_client');
+  // Client view: adviser mode with client selected OR /client-portal route
+  const isClientView = (localStorage.getItem('app_mode') === 'adviser' && !!localStorage.getItem('selected_client'))
+    || location.pathname === '/client-portal';
 
   const [activeTab, setActiveTab] = useState('overview');
   const [entityFilter, setEntityFilter] = useState('all');
