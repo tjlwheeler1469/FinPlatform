@@ -3,40 +3,66 @@ import ReactDOM from "react-dom/client";
 import "@/index.css";
 import App from "@/App";
 
-// Suppress Chrome/Firefox extension errors AND webpack chunk loading errors
-if (process.env.NODE_ENV === "development") {
-  window.addEventListener("error", (e) => {
-    // Suppress extension errors
-    if (e.filename && (e.filename.includes("chrome-extension") || e.filename.includes("moz-extension"))) {
-      e.stopImmediatePropagation();
-      e.preventDefault();
-      return;
-    }
-    if (e.message && (e.message.includes("chrome-extension") || e.message.includes("frame_ant"))) {
-      e.stopImmediatePropagation();
-      e.preventDefault();
-      return;
-    }
-    // Suppress chunk loading errors (show ErrorBoundary instead of red overlay)
-    if (e.message && (e.message.includes("Unexpected token '<'") || e.message.includes("Loading chunk"))) {
-      e.stopImmediatePropagation();
-      e.preventDefault();
-      return;
-    }
-  }, true);
+// Suppress benign errors: Chrome extensions + webpack chunk-load failures
+const SUPPRESS_PATTERNS = [
+  "chrome-extension", "moz-extension", "frame_ant",
+  "Unexpected token", "Loading chunk", "ChunkLoadError",
+  "Response body is already used"
+];
 
-  window.addEventListener("unhandledrejection", (e) => {
-    const reason = e.reason;
-    const msg = reason?.message || "";
-    const stack = reason?.stack || "";
-    if (stack.includes("chrome-extension") || stack.includes("moz-extension") ||
-        msg.includes("frame_ant") || msg.includes("Response body is already used") ||
-        msg.includes("Unexpected token") || msg.includes("Loading chunk") ||
-        msg.includes("ChunkLoadError")) {
-      e.stopImmediatePropagation();
-      e.preventDefault();
+const shouldSuppress = (str) => SUPPRESS_PATTERNS.some(p => str?.includes(p));
+
+window.addEventListener("error", (e) => {
+  if (shouldSuppress(e.filename) || shouldSuppress(e.message)) {
+    e.stopImmediatePropagation();
+    e.preventDefault();
+  }
+}, true);
+
+window.addEventListener("unhandledrejection", (e) => {
+  const msg = e.reason?.message || "";
+  const stack = e.reason?.stack || "";
+  if (shouldSuppress(msg) || shouldSuppress(stack)) {
+    e.stopImmediatePropagation();
+    e.preventDefault();
+  }
+}, true);
+
+// Remove CRA / webpack-dev-server error overlay when it shows benign errors
+if (typeof window !== "undefined") {
+  const removeOverlayIfBenign = () => {
+    // CRA injects an iframe overlay for runtime errors
+    document.querySelectorAll('iframe').forEach(iframe => {
+      try {
+        const style = iframe.getAttribute('style') || '';
+        if (style.includes('position: fixed') || style.includes('position:fixed')) {
+          const body = iframe.contentDocument?.body;
+          const text = body?.textContent || body?.innerText || '';
+          if (shouldSuppress(text)) {
+            iframe.remove();
+          }
+        }
+      } catch { /* cross-origin iframe — ignore */ }
+    });
+    // Also remove the webpack-dev-server overlay div
+    const wdsOverlay = document.getElementById('webpack-dev-server-client-overlay');
+    if (wdsOverlay) {
+      const text = wdsOverlay.textContent || wdsOverlay.shadowRoot?.textContent || '';
+      if (shouldSuppress(text)) wdsOverlay.remove();
     }
-  }, true);
+  };
+
+  const obs = new MutationObserver(() => {
+    setTimeout(removeOverlayIfBenign, 150);
+  });
+  // Start observing once body exists
+  if (document.body) {
+    obs.observe(document.body, { childList: true, subtree: true });
+  } else {
+    document.addEventListener("DOMContentLoaded", () =>
+      obs.observe(document.body, { childList: true, subtree: true })
+    );
+  }
 }
 
 const root = ReactDOM.createRoot(document.getElementById("root"));

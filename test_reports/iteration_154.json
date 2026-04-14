@@ -1,0 +1,105 @@
+{
+  "summary": "Iteration 154 - All 10 features verified successfully. Tab styling uses subtle 10% opacity background with gold underline (not dark blue). Budget tab correctly positioned between Investments and Goals. HouseholdBudget component renders with income/expense/savings data. Goals & Scenarios removed from client context sidebar. Portfolio Rebalancing appears ABOVE Top Holdings in Investments Overview. Allocation Radar (spider chart) present alongside rebalancing. Profile tab shows simplified dashboard with header card, 5 KPI cards, allocation bars, and goals progress. No runtime error overlay visible. Both P1 (Thompson) and P2 (Chen) profiles render with correct distinct data.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "All pages with charts",
+        "issues": ["Console shows Recharts width/height warnings - charts render correctly but log warnings about container dimensions"]
+      },
+      {
+        "screen": "All pages",
+        "issues": ["DataCloneError for market data and user profile fetching - postMessage serialization issue from emergent-main.js, doesn't affect functionality"]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_154.json"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "TEST 1 - Tab Order: PASS - Tabs in correct order: Overview, Actions, Retirement, Investments, Budget, Goals, Tax Centre, Profile",
+    "TEST 2 - Budget Tab Position: PASS - Budget (idx 4) is between Investments (idx 3) and Goals (idx 5)",
+    "TEST 3 - Tab Styling: PASS - Uses data-[state=active]:bg-[#1a2744]/10 (10% opacity, subtle) with gold underline shadow-[inset_0_-2px_0_#D4A84C]",
+    "TEST 4 - Budget Tab Content: PASS - HouseholdBudget renders with Monthly Income, Expenses, Savings, 12-Month Cashflow Projection",
+    "TEST 5 - Sidebar Goals Removed: PASS - 'Goals & Scenarios' and 'Planning' NOT in client context sidebar (only Overview and Documents sections)",
+    "TEST 6 - Rebalancing Position: PASS - Portfolio Rebalancing (pos 784) appears BEFORE Top Holdings (pos 1119)",
+    "TEST 7 - Allocation Radar: PASS - 'Allocation Radar' text found, 3 radar chart SVG elements detected",
+    "TEST 8 - Investments Sub-tab Styling: PASS - All sub-tabs use subtle 10% opacity background",
+    "TEST 9 - Profile Tab (Thompson): PASS - ClientProfileTab renders with header card, 5 KPI cards, Portfolio Allocation, Goals Progress, Net Worth $1,608,800",
+    "TEST 10 - Profile Tab (Chen): PASS - Michael & Lisa Chen profile shows Net Worth $5,200,000, distinct data from Thompson"
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "N/A (frontend only test)",
+    "frontend": "100% (10/10 features verified)"
+  },
+  "test_credentials": "No auth required - public access. Set localStorage: app_mode='adviser', selected_client=JSON.stringify({id:'thompson_family',...}), disclaimer_accepted='true'",
+  "seed_data_creation": "None - used existing mock data",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All 5 requested changes verified: 1) Runtime error suppression working (no overlay), 2) Goals removed from adviser client sidebar (clientContextNav has only Overview and Documents), 3) Portfolio Rebalancing moved above Top Holdings with Allocation Radar chart, 4) Budget tab added between Investments and Goals, 5) Profile tab shows simplified dashboard. Tab styling uses subtle bg-[#1a2744]/10 (10% opacity) with gold underline, NOT the old dark blue bg-[#0f1d35].",
+  "features_tested": {
+    "tab_styling_subtle": {
+      "status": "PASS",
+      "details": "Active tabs use data-[state=active]:bg-[#1a2744]/10 (10% opacity) with gold underline shadow-[inset_0_-2px_0_#D4A84C]. No dark blue bg-[#0f1d35] styling."
+    },
+    "budget_tab_position": {
+      "status": "PASS",
+      "details": "Budget tab at index 4, between Investments (idx 3) and Goals (idx 5). Order: Overview, Actions, Retirement, Investments, Budget, Goals, Tax Centre, Profile"
+    },
+    "budget_tab_content": {
+      "status": "PASS",
+      "details": "HouseholdBudget component renders with Monthly Income ($26,437), Monthly Expenses ($8,676), Annual One-offs ($8,400), Monthly Surplus ($17,061), 12-Month Cashflow Projection chart"
+    },
+    "goals_removed_from_sidebar": {
+      "status": "PASS",
+      "details": "Client context sidebar shows only OVERVIEW (Client Overview) and DOCUMENTS sections. No 'Goals & Scenarios' or 'Planning' section."
+    },
+    "rebalancing_above_top_holdings": {
+      "status": "PASS",
+      "details": "Portfolio Rebalancing section appears at position 784, Top Holdings at position 1119 in page content"
+    },
+    "allocation_radar_chart": {
+      "status": "PASS",
+      "details": "'Allocation Radar' title found, 3 recharts-radar/recharts-polar-grid SVG elements detected"
+    },
+    "profile_simplified_dashboard": {
+      "status": "PASS",
+      "details": "Profile tab shows header card with initials, 5 KPI cards (Net Worth, Gross Assets, Income, Super Balance, Liabilities), quick info row (Insurance, Next Review, Risk Profile), Portfolio Allocation bars, Goals Progress"
+    },
+    "no_runtime_error_overlay": {
+      "status": "PASS",
+      "details": "No webpack-dev-server-client-overlay or fixed position error iframes detected"
+    },
+    "investments_subtab_styling": {
+      "status": "PASS",
+      "details": "All Investments sub-tabs (Overview, Bonds, Cash & TDs, etc.) use subtle 10% opacity background styling"
+    },
+    "p1_p2_profile_data": {
+      "status": "PASS",
+      "details": "Thompson: Net Worth $1,608,800, Gross Assets $2,278,000, Liabilities $669,200. Chen: Net Worth $5,200,000, Gross Assets $5,200,000, Liabilities $0. Completely distinct data."
+    }
+  },
+  "mocked_apis": {
+    "has_mocked_apis": true,
+    "mocked_apis_list": [
+      "Client CRM data (P1/P2) - hardcoded in ClientProfileTab.jsx PROFILES object",
+      "PDF Reports (jsPDF)",
+      "Xplan Integration"
+    ]
+  },
+  "screenshots": [
+    ".screenshots/test1_tab_styling.png",
+    ".screenshots/test3_budget_tab.png",
+    ".screenshots/test5_investments_overview.png",
+    ".screenshots/test8_profile_thompson.png",
+    ".screenshots/test9_profile_chen.png",
+    ".screenshots/sidebar_expanded.png"
+  ]
+}

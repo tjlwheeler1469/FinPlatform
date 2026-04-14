@@ -1,14 +1,14 @@
 import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import {
   TrendingUp, TrendingDown, PieChart, Building2, Wallet, Shield,
   BarChart3, ArrowLeftRight, Landmark, FileText, DollarSign
 } from "lucide-react";
 import {
   PieChart as RechartsPie, Pie, Cell, BarChart, Bar, XAxis, YAxis,
-  CartesianGrid, Tooltip, Legend, ResponsiveContainer
+  CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+  RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar
 } from "recharts";
 
 const CHART_COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#EC4899", "#14B8A6", "#F97316"];
@@ -78,6 +78,16 @@ const InvestmentsOverview = () => {
     const total = PORTFOLIO_ASSETS.reduce((s, a) => s + a.value * (a.change / 100), 0);
     return ((total / totalValue) * 100).toFixed(1);
   }, [totalValue]);
+
+  // Radar chart data for rebalancing
+  const radarData = useMemo(() =>
+    REBALANCING_DATA.map(item => ({
+      subject: item.asset.split(" ")[0],
+      current: item.current,
+      target: item.target,
+      fullMark: 50
+    })),
+  []);
 
   return (
     <div className="space-y-6" data-testid="investments-overview">
@@ -165,6 +175,62 @@ const InvestmentsOverview = () => {
         </Card>
       </div>
 
+      {/* Portfolio Rebalancing — ABOVE Top Holdings, with spider/radar chart */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <ArrowLeftRight className="h-4 w-4 text-amber-500" /> Portfolio Rebalancing
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {REBALANCING_DATA.map((item, i) => (
+                <div key={i} className="flex items-center justify-between p-2.5 bg-muted/30 rounded-lg" data-testid={`rebalance-row-${i}`}>
+                  <div className="flex items-center gap-4">
+                    <span className="font-medium text-sm w-40">{item.asset}</span>
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-muted-foreground">Current: {item.current}%</span>
+                      <span className="text-muted-foreground">-></span>
+                      <span className="font-medium">Target: {item.target}%</span>
+                    </div>
+                  </div>
+                  <Badge className={
+                    item.action === "Buy" ? "bg-green-500" : item.action === "Sell" ? "bg-red-500" : "bg-gray-500"
+                  }>
+                    {item.action} {Math.abs(item.diff)}%
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Spider / Radar Chart */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <BarChart3 className="h-4 w-4 text-[#1a2744]" /> Allocation Radar
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[280px]">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+                <RadarChart data={radarData}>
+                  <PolarGrid />
+                  <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11 }} />
+                  <PolarRadiusAxis angle={30} domain={[0, 50]} tick={{ fontSize: 10 }} />
+                  <Radar name="Current" dataKey="current" stroke="#1a2744" fill="#1a2744" fillOpacity={0.4} />
+                  <Radar name="Target" dataKey="target" stroke="#D4A84C" fill="#D4A84C" fillOpacity={0.25} />
+                  <Legend wrapperStyle={{ fontSize: 11 }} />
+                  <Tooltip />
+                </RadarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Top Holdings */}
       <Card>
         <CardHeader className="pb-2">
@@ -202,36 +268,6 @@ const InvestmentsOverview = () => {
                     {asset.change >= 0 ? "+" : ""}{asset.change}%
                   </p>
                 </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Rebalancing */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-sm">
-            <ArrowLeftRight className="h-4 w-4 text-amber-500" /> Portfolio Rebalancing
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {REBALANCING_DATA.map((item, i) => (
-              <div key={i} className="flex items-center justify-between p-2.5 bg-muted/30 rounded-lg">
-                <div className="flex items-center gap-4">
-                  <span className="font-medium text-sm w-40">{item.asset}</span>
-                  <div className="flex items-center gap-2 text-xs">
-                    <span className="text-muted-foreground">Current: {item.current}%</span>
-                    <span className="text-muted-foreground">→</span>
-                    <span className="font-medium">Target: {item.target}%</span>
-                  </div>
-                </div>
-                <Badge className={
-                  item.action === "Buy" ? "bg-green-500" : item.action === "Sell" ? "bg-red-500" : "bg-gray-500"
-                }>
-                  {item.action} {Math.abs(item.diff)}%
-                </Badge>
               </div>
             ))}
           </div>

@@ -123,13 +123,6 @@ export const clientContextNav = [
       { path: "/document-vault", label: "Vault", icon: FolderOpen, title: "Document Vault" },
     ]
   },
-  {
-    name: "Planning",
-    icon: Target,
-    items: [
-      { path: "/scenario-modelling", label: "Goals & Scenarios", icon: Target, title: "Goals, Scenarios & Monte Carlo" },
-    ]
-  },
 ];
 
 export const mobileBottomNav = [

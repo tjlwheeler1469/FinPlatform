@@ -6,7 +6,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://dashboard-unify-6.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://adviser-layout-fix.preview.emergentagent.com')
 
 class TestMonteCarloAPI:
     """Test Monte Carlo Advanced API endpoint"""

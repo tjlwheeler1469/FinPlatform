@@ -47,7 +47,7 @@ const UnifiedInvestments = ({ embedded = false }) => {
                 <TabsTrigger
                   key={value}
                   value={value}
-                  className="gap-1 text-xs data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white whitespace-nowrap"
+                  className="gap-1 text-xs data-[state=active]:bg-[#1a2744]/10 data-[state=active]:text-[#1a2744] data-[state=active]:font-semibold data-[state=active]:shadow-[inset_0_-2px_0_#D4A84C] whitespace-nowrap"
                   data-testid={`tab-${value}`}
                 >
                   <Icon className="h-3.5 w-3.5" /> {label}
