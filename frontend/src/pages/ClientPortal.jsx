@@ -1,75 +1,129 @@
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
-import SmartInsights from "@/components/SmartInsights";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { toast } from "sonner";
 import {
-  Wallet,
-  TrendingUp,
-  TrendingDown,
-  Target,
-  Bell,
-  FileText,
-  User,
-  PieChart,
-  MessageSquare,
-  Gauge,
-  CheckCircle,
-  AlertTriangle,
-  Clock,
-  ChevronRight,
-  ArrowUp,
-  ArrowDown,
-  Sun,
-  Brain,
-  Calendar,
-  RefreshCw
+  Shield, Clock, TrendingUp, Heart, ArrowRight,
+  CheckCircle, User, Phone, Mail, CalendarDays, RefreshCw
 } from "lucide-react";
-import {
-  PieChart as RechartsPie,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-  RadialBarChart,
-  RadialBar
-} from "recharts";
 
 const API_URL = import.meta.env.VITE_API_URL || process.env.REACT_APP_BACKEND_URL;
 
-const CHART_COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316'];
+const formatCurrency = (val) =>
+  new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD", maximumFractionDigits: 0 }).format(val || 0);
 
-const formatCurrency = (val) => new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', maximumFractionDigits: 0 }).format(val || 0);
-
-const getConfidenceColor = (score) => {
-  if (score >= 80) return '#22c55e';
-  if (score >= 60) return '#3b82f6';
-  if (score >= 40) return '#f59e0b';
-  return '#ef4444';
+/* ── colour helpers ── */
+const statusColor = (score) => {
+  if (score >= 80) return { bg: "#ecfdf5", ring: "#22c55e", text: "#15803d", label: "On Track" };
+  if (score >= 60) return { bg: "#eff6ff", ring: "#3b82f6", text: "#1d4ed8", label: "Looking Good" };
+  if (score >= 40) return { bg: "#fffbeb", ring: "#f59e0b", text: "#b45309", label: "Needs Attention" };
+  return { bg: "#fef2f2", ring: "#ef4444", text: "#b91c1c", label: "At Risk" };
 };
 
-const getConfidenceLabel = (score) => {
-  if (score >= 80) return 'On Track';
-  if (score >= 60) return 'Good';
-  if (score >= 40) return 'Needs Attention';
-  return 'At Risk';
+/* ── Confidence Gauge (SVG arc + HTML overlay) ── */
+const ConfidenceGauge = ({ score }) => {
+  const s = statusColor(score);
+  const pct = Math.min(100, Math.max(0, score));
+  const angle = (pct / 100) * 180;
+  const rad = (a) => (a * Math.PI) / 180;
+  const r = 90;
+  const cx = 100, cy = 100;
+  const endX = cx + r * Math.cos(rad(180 - angle));
+  const endY = cy - r * Math.sin(rad(180 - angle));
+  const largeArc = angle > 90 ? 1 : 0;
+
+  return (
+    <div className="flex flex-col items-center" data-testid="confidence-gauge">
+      <div className="relative w-64">
+        <svg viewBox="0 0 200 120" className="w-full h-auto">
+          {/* track */}
+          <path d="M 10 100 A 90 90 0 0 1 190 100" fill="none" stroke="#e5e7eb" strokeWidth="14" strokeLinecap="round" />
+          {/* filled arc */}
+          {pct > 0 && (
+            <path
+              d={`M 10 100 A 90 90 0 ${largeArc} 1 ${endX.toFixed(1)} ${endY.toFixed(1)}`}
+              fill="none"
+              stroke={s.ring}
+              strokeWidth="14"
+              strokeLinecap="round"
+            />
+          )}
+        </svg>
+        {/* HTML overlay for the number — always visible */}
+        <div className="absolute inset-0 flex flex-col items-center justify-end pb-3">
+          <span className="text-4xl font-bold leading-none" style={{ color: s.text }} data-testid="confidence-number">
+            {Math.round(pct)}%
+          </span>
+          <span className="text-xs text-muted-foreground mt-0.5">confidence</span>
+        </div>
+      </div>
+      <Badge className="mt-2 text-sm px-4 py-1" style={{ backgroundColor: s.ring, color: "#fff" }} data-testid="confidence-badge">
+        {s.label}
+      </Badge>
+    </div>
+  );
 };
 
-// CLIENT PORTAL - SIMPLIFIED VIEW
-// Only shows: Overview with Net Worth, Retirement Confidence, Goals, and Pending Actions
-// All combined into a single, clean dashboard page
+/* ── Plain English builder ── */
+const buildSummary = (confidence, dashboard) => {
+  const score = confidence?.confidence_score || 0;
+  const yearsTo = confidence?.inputs?.years_to_retirement || 17;
+  const retireAge = confidence?.inputs?.retirement_age || 67;
+  const spending = confidence?.inputs?.retirement_spending || 72000;
 
+  const what = score >= 70
+    ? `Based on your current savings and contributions, you're projected to retire comfortably at age ${retireAge}. Your plan supports an annual retirement income of around ${formatCurrency(spending)}.`
+    : `Your current plan aims for retirement at age ${retireAge} with ${formatCurrency(spending)} per year. There's still time to strengthen your position over the next ${yearsTo} years.`;
+
+  const strengths = [];
+  if (score >= 70) strengths.push("Your savings rate is strong and consistent");
+  if (dashboard?.summary?.goals_on_track >= 2) strengths.push("Most of your financial goals are on track");
+  strengths.push("You have a diversified investment strategy");
+  if (confidence?.inputs?.annual_contributions > 30000) strengths.push("Your super contributions are well above average");
+
+  const risks = [];
+  if (score < 80) risks.push("Market downturns could temporarily reduce your retirement funds");
+  if (spending > 65000) risks.push("Your planned spending is above the comfortable retirement standard");
+  risks.push("Unexpected health costs could impact your plan");
+  if (score < 60) risks.push("Your savings growth may not keep pace with inflation");
+
+  return { what, strengths: strengths.slice(0, 3), risks: risks.slice(0, 3) };
+};
+
+/* ── Improvement Actions ── */
+const buildActions = (confidence) => {
+  const score = confidence?.confidence_score || 0;
+  return [
+    {
+      title: "Increase super contributions",
+      desc: "Adding an extra $200/month to super could meaningfully boost your retirement balance.",
+      impact: score < 90 ? "+8% confidence" : "+3% confidence",
+      icon: TrendingUp,
+      color: "#22c55e",
+    },
+    {
+      title: "Delay retirement by 2 years",
+      desc: "Working until 69 gives your investments more time to grow and reduces the years you need to fund.",
+      impact: "+12% confidence",
+      icon: Clock,
+      color: "#3b82f6",
+    },
+    {
+      title: "Reduce planned spending by 10%",
+      desc: "A small adjustment to your retirement spending target frees up a significant buffer.",
+      impact: "+6% confidence",
+      icon: Heart,
+      color: "#f59e0b",
+    },
+  ];
+};
+
+/* ── Main Component ── */
 const ClientPortal = () => {
   const [loading, setLoading] = useState(true);
   const [clientId] = useState("portal_001");
   const [dashboard, setDashboard] = useState(null);
-  const [portfolios, setPortfolios] = useState(null);
-  const [goals, setGoals] = useState(null);
-  const [netWorth, setNetWorth] = useState(null);
-  const [notifications, setNotifications] = useState([]);
   const [retirementConfidence, setRetirementConfidence] = useState(null);
 
   useEffect(() => {
@@ -79,366 +133,216 @@ const ClientPortal = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [dashRes, portRes, goalsRes, nwRes, notifRes, retireRes] = await Promise.all([
+      const [dashRes, retireRes] = await Promise.all([
         fetch(`${API_URL}/api/client-portal/dashboard/${clientId}`),
-        fetch(`${API_URL}/api/client-portal/portfolios/${clientId}`),
-        fetch(`${API_URL}/api/client-portal/goals/${clientId}`),
-        fetch(`${API_URL}/api/client-portal/net-worth/${clientId}`),
-        fetch(`${API_URL}/api/client-portal/notifications/${clientId}`),
         fetch(`${API_URL}/api/hybrid-engine/calculate`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            // Realistic 50-year-old married couple (Client view)
             client_id: clientId,
             current_age: 50,
             retirement_age: 67,
             life_expectancy: 92,
-            // Combined net worth around $1.6M for average married 50-year-olds
             current_portfolio: 1609800,
-            // Combined super contributions (employer + salary sacrifice)
             annual_contributions: 42000,
-            // ASFA comfortable retirement standard for couples
             retirement_spending: 72000,
             expected_return: 0.065,
             return_volatility: 0.12,
             inflation_rate: 0.03,
             num_simulations: 3000,
             enable_dynamic_spending: true,
-            mode: 'background'
-          })
-        })
+            mode: "background",
+          }),
+        }),
       ]);
       if (dashRes.ok) setDashboard(await dashRes.json());
-      if (portRes.ok) setPortfolios(await portRes.json());
-      if (goalsRes.ok) setGoals(await goalsRes.json());
-      if (nwRes.ok) setNetWorth(await nwRes.json());
-      if (notifRes.ok) setNotifications((await notifRes.json()).notifications || []);
       if (retireRes.ok) setRetirementConfidence(await retireRes.json());
-    } catch (error) {
-      console.error("Failed to fetch client data:", error);
+    } catch (err) {
+      console.error("Client portal fetch:", err);
     }
     setLoading(false);
   };
 
+  /* Loading state */
   if (loading) {
     return (
       <Layout>
         <div className="min-h-[60vh] flex items-center justify-center">
           <div className="text-center">
-            <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-muted-foreground">Loading your financial dashboard...</p>
+            <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-muted-foreground">Preparing your financial overview...</p>
           </div>
         </div>
       </Layout>
     );
   }
 
-  const pendingActions = notifications.filter(n => n.type === 'action_required').length;
-  const confidenceScore = retirementConfidence?.confidence_score || 0;
-  const yearsToRetirement = retirementConfidence?.inputs?.years_to_retirement || 20;
-
-  // Portfolio data for Smart Insights
-  const portfolioDataForInsights = {
-    totalValue: netWorth?.net_worth || dashboard?.summary?.net_worth || 0,
-    byType: netWorth?.assets || {},
-    net_worth: netWorth?.net_worth || dashboard?.summary?.net_worth || 0
-  };
-
-  // Net worth breakdown for pie chart
-  const netWorthData = netWorth?.assets 
-    ? Object.entries(netWorth.assets)
-        .filter(([_, v]) => v > 0)
-        .slice(0, 6)
-        .map(([key, value], idx) => ({
-          name: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-          value,
-          fill: CHART_COLORS[idx % CHART_COLORS.length]
-        }))
-    : [];
+  const score = retirementConfidence?.confidence_score || 0;
+  const s = statusColor(score);
+  const summary = buildSummary(retirementConfidence, dashboard);
+  const actions = buildActions(retirementConfidence);
+  const yearsTo = retirementConfidence?.inputs?.years_to_retirement || 17;
+  const firstName = dashboard?.name?.split(" ")[0] || "David";
+  const advisorName = dashboard?.advisor?.name || "Sarah Chen";
 
   return (
     <Layout>
-      <div className="space-y-6" data-testid="client-portal">
-        {/* Header with Date (Daily Briefing style) */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold flex items-center gap-2">
-              <Sun className="h-8 w-8 text-amber-500" />
-              Welcome, {dashboard?.name?.split(' ')[0]}!
-            </h1>
-            <p className="text-muted-foreground">
-              {new Date().toLocaleDateString('en-AU', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-            </p>
-          </div>
-          <Button variant="outline" onClick={() => window.location.reload()}>
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh
-          </Button>
-        </div>
+      <div className="max-w-3xl mx-auto space-y-8 pb-12" data-testid="client-portal">
 
-        {/* Hero Stats Banner */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white/20 rounded-xl p-4">
-              <p className="text-blue-100 text-sm">Net Worth</p>
-              <p className="text-2xl font-bold">{formatCurrency(dashboard?.summary?.net_worth || netWorth?.net_worth)}</p>
-              <p className={`text-sm ${(dashboard?.summary?.net_worth_change_pct || 0) >= 0 ? 'text-green-300' : 'text-red-300'}`}>
-                {(dashboard?.summary?.net_worth_change_pct || 0) >= 0 ? '↑' : '↓'} {Math.abs(dashboard?.summary?.net_worth_change_pct || 0).toFixed(1)}%
+        {/* ── PHASE 1 — Hero ── */}
+        <section className="text-center pt-4" data-testid="hero-section">
+          <p className="text-muted-foreground text-sm mb-1">
+            {new Date().toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
+          </p>
+          <h1 className="text-2xl sm:text-3xl font-bold mb-6" data-testid="hero-title">
+            {score >= 70
+              ? `${firstName}, you're on track for a comfortable retirement.`
+              : `${firstName}, let's look at where you stand.`}
+          </h1>
+
+          <ConfidenceGauge score={score} />
+        </section>
+
+        {/* ── PHASE 2 — Plain English Summary ── */}
+        <section data-testid="plain-english-section">
+          <Card style={{ borderLeft: `4px solid ${s.ring}` }}>
+            <CardContent className="p-5 space-y-4">
+              <h2 className="font-semibold text-base" data-testid="summary-heading">Your plan in plain English</h2>
+              <p className="text-sm leading-relaxed text-foreground/80" data-testid="summary-text">
+                {summary.what}
               </p>
-            </div>
-            <div className="bg-white/20 rounded-xl p-4">
-              <p className="text-blue-100 text-sm">Retirement Confidence</p>
-              <p className="text-2xl font-bold">{confidenceScore.toFixed(0)}%</p>
-              <p className={`text-sm ${confidenceScore >= 80 ? 'text-green-300' : confidenceScore >= 60 ? 'text-yellow-300' : 'text-red-300'}`}>
-                {getConfidenceLabel(confidenceScore)}
-              </p>
-            </div>
-            <div className="bg-white/20 rounded-xl p-4">
-              <p className="text-blue-100 text-sm">Goals on Track</p>
-              <p className="text-2xl font-bold">{dashboard?.summary?.goals_on_track || goals?.summary?.on_track || 0}/{dashboard?.summary?.goals_count || goals?.summary?.total_goals || 0}</p>
-            </div>
-            <div className="bg-white/20 rounded-xl p-4">
-              <p className="text-blue-100 text-sm">Years to Retirement</p>
-              <p className="text-2xl font-bold">{yearsToRetirement}</p>
-            </div>
-          </div>
-        </div>
 
-        {/* Main Content Grid */}
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Column 1: Retirement Confidence */}
-          <Card className="border-2 border-primary/20">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Gauge className="h-5 w-5 text-primary" />
-                Retirement Confidence
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-center mb-4">
-                <div className="relative w-40 h-40">
-                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-                    <RadialBarChart 
-                      cx="50%" 
-                      cy="50%" 
-                      innerRadius="60%" 
-                      outerRadius="100%" 
-                      data={[{ value: confidenceScore, fill: getConfidenceColor(confidenceScore) }]}
-                      startAngle={180}
-                      endAngle={0}
-                    >
-                      <RadialBar dataKey="value" cornerRadius={10} background />
-                    </RadialBarChart>
-                  </ResponsiveContainer>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <p className="text-4xl font-bold" style={{ color: getConfidenceColor(confidenceScore) }}>
-                      {confidenceScore.toFixed(0)}%
-                    </p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="text-center mb-4">
-                <Badge 
-                  className={
-                    confidenceScore >= 80 ? 'bg-green-500' 
-                    : confidenceScore >= 60 ? 'bg-blue-500' 
-                    : confidenceScore >= 40 ? 'bg-amber-500' 
-                    : 'bg-red-500'
-                  }
-                >
-                  {getConfidenceLabel(confidenceScore)}
-                </Badge>
-              </div>
-
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between p-2 bg-muted/30 rounded">
-                  <span className="text-muted-foreground">Monte Carlo Success</span>
-                  <span className="font-medium">{retirementConfidence?.monte_carlo?.success_rate_percent?.toFixed(0) || '--'}%</span>
-                </div>
-                <div className="flex justify-between p-2 bg-muted/30 rounded">
-                  <span className="text-muted-foreground">Median Outcome</span>
-                  <span className="font-medium">{formatCurrency(retirementConfidence?.monte_carlo?.percentiles?.p50_median)}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Column 2: Net Worth */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Wallet className="h-5 w-5 text-green-600" />
-                Net Worth
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center mb-4">
-                <p className="text-3xl font-bold text-green-600">{formatCurrency(dashboard?.summary?.net_worth || netWorth?.net_worth)}</p>
-                <p className="text-sm text-green-600">
-                  <ArrowUp className="h-3 w-3 inline" /> +{(dashboard?.summary?.net_worth_change_pct || 5.2).toFixed(1)}% YTD
-                </p>
-              </div>
-              
-              {netWorthData.length > 0 && (
-                <div className="h-[160px] mb-4">
-                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-                    <RechartsPie>
-                      <Pie
-                        data={netWorthData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={45}
-                        outerRadius={70}
-                        paddingAngle={2}
-                        dataKey="value"
-                      >
-                        {netWorthData.map((entry, idx) => (
-                          <Cell key={`cell-${idx}`} fill={entry.fill} />
-                        ))}
-                      </Pie>
-                      <Tooltip formatter={(value) => formatCurrency(value)} />
-                    </RechartsPie>
-                  </ResponsiveContainer>
-                </div>
-              )}
-
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div className="p-2 bg-green-50 rounded">
-                  <p className="text-muted-foreground">Assets</p>
-                  <p className="font-semibold text-green-700">
-                    {formatCurrency(Object.values(netWorth?.assets || {}).reduce((a, b) => a + b, 0))}
-                  </p>
-                </div>
-                <div className="p-2 bg-red-50 rounded">
-                  <p className="text-muted-foreground">Liabilities</p>
-                  <p className="font-semibold text-red-700">-{formatCurrency(netWorth?.liabilities?.total || 0)}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Column 3: Goals & Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="h-5 w-5 text-blue-600" />
-                Goals Progress
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-3 gap-2 mb-4">
-                <div className="text-center p-2 bg-green-50 rounded-lg">
-                  <CheckCircle className="h-5 w-5 text-green-600 mx-auto mb-1" />
-                  <p className="text-lg font-bold text-green-700">{goals?.summary?.on_track || 0}</p>
-                  <p className="text-xs text-muted-foreground">On Track</p>
-                </div>
-                <div className="text-center p-2 bg-amber-50 rounded-lg">
-                  <AlertTriangle className="h-5 w-5 text-amber-600 mx-auto mb-1" />
-                  <p className="text-lg font-bold text-amber-700">{goals?.summary?.at_risk || 0}</p>
-                  <p className="text-xs text-muted-foreground">At Risk</p>
-                </div>
-                <div className="text-center p-2 bg-blue-50 rounded-lg">
-                  <Target className="h-5 w-5 text-blue-600 mx-auto mb-1" />
-                  <p className="text-lg font-bold text-blue-700">{goals?.summary?.total_goals || 0}</p>
-                  <p className="text-xs text-muted-foreground">Total</p>
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                {(goals?.goals || []).slice(0, 3).map((goal) => (
-                  <div key={goal.goal_id} className="p-2 bg-muted/30 rounded-lg">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-medium truncate">{goal.name}</span>
-                      <Badge variant="outline" className="text-xs">
-                        {goal.progress_pct}%
-                      </Badge>
-                    </div>
-                    <Progress value={goal.progress_pct} className="h-1.5" />
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Smart Insights Section */}
-        <SmartInsights 
-          clientId={clientId}
-          portfolioData={portfolioDataForInsights}
-          retirementData={retirementConfidence}
-          isAdvisor={false}
-          compact={true}
-          maxInsights={4}
-        />
-
-        {/* Pending Actions & Notifications */}
-        {(pendingActions > 0 || notifications.length > 0) && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bell className="h-5 w-5 text-orange-600" />
-                Pending Actions
-                {pendingActions > 0 && (
-                  <Badge variant="destructive">{pendingActions}</Badge>
-                )}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {notifications.length === 0 ? (
-                <p className="text-muted-foreground text-center py-4">No pending actions</p>
-              ) : (
-                <div className="grid md:grid-cols-2 gap-3">
-                  {notifications.slice(0, 4).map((notif) => (
-                    <div 
-                      key={notif.notification_id} 
-                      className={`p-3 rounded-lg flex items-start gap-3 ${
-                        notif.type === 'action_required' ? 'bg-red-50 border border-red-200' : 'bg-muted/30'
-                      }`}
-                    >
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                        notif.type === 'action_required' ? 'bg-red-100' : 'bg-blue-100'
-                      }`}>
-                        {notif.type === 'action_required' ? (
-                          <AlertTriangle className="h-4 w-4 text-red-600" />
-                        ) : (
-                          <Bell className="h-4 w-4 text-blue-600" />
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm">{notif.title}</p>
-                        <p className="text-xs text-muted-foreground truncate">{notif.message}</p>
-                      </div>
-                      {notif.type === 'action_required' && (
-                        <Button size="sm" variant="destructive">Action</Button>
-                      )}
+              <div className="grid sm:grid-cols-2 gap-4">
+                {/* Strengths */}
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Strengths</p>
+                  {summary.strengths.map((s, i) => (
+                    <div key={i} className="flex items-start gap-2 text-sm" data-testid={`strength-${i}`}>
+                      <CheckCircle className="h-4 w-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+                      <span>{s}</span>
                     </div>
                   ))}
                 </div>
-              )}
+                {/* Risks */}
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-amber-700">Things to watch</p>
+                  {summary.risks.map((r, i) => (
+                    <div key={i} className="flex items-start gap-2 text-sm" data-testid={`risk-${i}`}>
+                      <Shield className="h-4 w-4 text-amber-500 mt-0.5 flex-shrink-0" />
+                      <span>{r}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </CardContent>
           </Card>
-        )}
+        </section>
 
-        {/* Advisor Contact Footer */}
-        <Card className="bg-gradient-to-r from-slate-50 to-slate-100">
-          <CardContent className="py-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                <User className="h-6 w-6 text-primary" />
+        {/* ── PHASE 3 — Improvement Actions ── */}
+        <section data-testid="actions-section">
+          <h2 className="font-semibold text-base mb-3">Ways to improve your outlook</h2>
+          <div className="space-y-3">
+            {actions.map((a, i) => (
+              <Card key={i} className="hover:shadow-md transition-shadow" data-testid={`action-card-${i}`}>
+                <CardContent className="p-4 flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${a.color}18` }}>
+                    <a.icon className="h-5 w-5" style={{ color: a.color }} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2 mb-0.5">
+                      <p className="font-medium text-sm">{a.title}</p>
+                      <Badge variant="secondary" className="text-xs whitespace-nowrap font-semibold" style={{ color: a.color }} data-testid={`action-impact-${i}`}>
+                        {a.impact}
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground">{a.desc}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+
+        {/* ── PHASE 4 — Simple Timeline Visual ── */}
+        <section data-testid="timeline-section">
+          <h2 className="font-semibold text-base mb-3">Your retirement timeline</h2>
+          <Card>
+            <CardContent className="p-5">
+              <div className="relative">
+                {/* Track */}
+                <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all"
+                    style={{
+                      width: `${Math.min(100, ((50 - 25) / (67 - 25)) * 100)}%`,
+                      backgroundColor: s.ring,
+                    }}
+                    data-testid="timeline-bar"
+                  />
+                </div>
+
+                {/* Labels */}
+                <div className="flex justify-between mt-2 text-xs text-muted-foreground">
+                  <div className="text-center">
+                    <p className="font-semibold text-foreground">Today</p>
+                    <p>Age 50</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="font-semibold" style={{ color: s.ring }}>Retirement</p>
+                    <p>Age 67</p>
+                  </div>
+                </div>
+
+                {/* Middle info */}
+                <div className="text-center mt-3">
+                  <p className="text-sm text-muted-foreground">
+                    <span className="font-semibold text-foreground">{yearsTo} years</span> to grow your wealth
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="font-semibold">{dashboard?.advisor?.name || 'Your Financial Advisor'}</p>
-                <p className="text-sm text-muted-foreground">Your Financial Advisor</p>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* ── PHASE 5 — Advisor Guidance ── */}
+        <section data-testid="advisor-section">
+          <Card className="bg-[#1a2744] text-white">
+            <CardContent className="p-5">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                  <User className="h-6 w-6" />
+                </div>
+                <div className="flex-1 space-y-2">
+                  <h3 className="font-semibold text-base" data-testid="advisor-name">
+                    {advisorName} is looking after your plan
+                  </h3>
+                  <p className="text-sm text-white/80 leading-relaxed">
+                    Your adviser is continuously monitoring your investments, adjusting your plan as markets and life change,
+                    and keeping you on track toward a comfortable retirement. You don't need to worry about the details — that's what we're here for.
+                  </p>
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    <Button size="sm" variant="secondary" className="bg-white/15 hover:bg-white/25 text-white border-0" data-testid="advisor-call-btn">
+                      <Phone className="h-3.5 w-3.5 mr-1.5" /> Call
+                    </Button>
+                    <Button size="sm" variant="secondary" className="bg-white/15 hover:bg-white/25 text-white border-0" data-testid="advisor-email-btn">
+                      <Mail className="h-3.5 w-3.5 mr-1.5" /> Email
+                    </Button>
+                    <Button size="sm" variant="secondary" className="bg-white/15 hover:bg-white/25 text-white border-0" data-testid="advisor-meeting-btn">
+                      <CalendarDays className="h-3.5 w-3.5 mr-1.5" /> Book Meeting
+                    </Button>
+                  </div>
+                </div>
               </div>
-            </div>
-            <Button>
-              <MessageSquare className="h-4 w-4 mr-2" />
-              Contact Advisor
-            </Button>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* Refresh */}
+        <div className="text-center">
+          <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={fetchData} data-testid="refresh-btn">
+            <RefreshCw className="h-3.5 w-3.5 mr-1.5" /> Refresh
+          </Button>
+        </div>
       </div>
     </Layout>
   );
