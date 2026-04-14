@@ -22,25 +22,30 @@ Build an AFSL-grade wealth management platform with consolidated views, client c
 - Allocation: Trust Portfolio 54%, Super 23%, Property 21%, Cash 2%
 
 ## Tab Structures
-### Client Overview (7 tabs): Overview → Actions → Retirement → Investments → Goals → Tax Centre → Profile
-### Investments (10 tabs): Overview → Bonds → Cash & TDs → Crypto → Managed Funds → Property → Shares & ETFs → SMSF → Super & Pension → Unlisted
-### Personal Dashboard (5 tabs): Overview → Net Worth → Wealth Trends → Insights → Transactions
+### Client Overview (8 tabs): Overview -> Actions -> Retirement -> Investments -> Budget -> Goals -> Tax Centre -> Profile
+### Investments (10 sub-tabs): Overview -> Bonds -> Cash & TDs -> Crypto -> Managed Funds -> Property -> Shares & ETFs -> SMSF -> Super & Pension -> Unlisted
+### Personal Dashboard (5 tabs): Overview -> Net Worth -> Wealth Trends -> Insights -> Transactions
 
 ## Sidebar Structure
-### Personal: DASHBOARD → INVESTMENTS (All Investments, Rebalancing) → PLANNING → RESEARCH → SETTINGS → TOOLS
-### Adviser: DASHBOARD → CRM → EXECUTION (Batch Execute, Meeting Prep, Compliance) → INTEGRATIONS → TOOLS
-### Client Context: OVERVIEW → DOCUMENTS → PLANNING
+### Personal: DASHBOARD -> INVESTMENTS (All Investments, Rebalancing) -> PLANNING -> RESEARCH -> SETTINGS -> TOOLS
+### Adviser: DASHBOARD -> CRM -> EXECUTION (Batch Execute, Meeting Prep, Compliance) -> INTEGRATIONS -> TOOLS
+### Client Context: OVERVIEW -> DOCUMENTS (Goals/Planning section removed)
 
 ## Completed (as of 14 April 2026)
+- [x] Tab styling fixed: subtle 10% opacity bg with gold underline (no more oversized dark blue button)
+- [x] Budget tab added between Investments and Goals in client overview
+- [x] Goals & Scenarios removed from adviser client context sidebar
+- [x] Portfolio Rebalancing moved above Top Holdings + Allocation Radar chart added
+- [x] Client Profile simplified to dashboard (header card, 5 KPI cards, quick info, allocation/goals)
+- [x] Runtime error overlay suppressed (chrome extensions, chunk loading errors, frame_ant)
+- [x] Investments sub-tabs restyled to match new subtle active state
+- [x] P1/P2 profile data isolation confirmed (Thompson vs Chen)
 - [x] Rebalancing removed from Investment tabs, kept in LH nav only
-- [x] P1 (Thompson) and P2 (Chen) adviser client profiles with separate data
-- [x] Simplified Client Profile (allocation bars + goals only)
 - [x] Enhanced ErrorBoundary (chunk error auto-retry + Reload button)
-- [x] Chrome extension + chunk error suppression in index.js
 - [x] All previous UI reorganization, data unification, Monte Carlo tooltips, PDF reports, etc.
 
 ## Backlog
 - [ ] P2: Real email integration for Client Pack auto-delivery
 - [ ] P2: What-If Budget scenario saving/comparison
-- [ ] P3: Centralize demo client data into shared module
+- [ ] P3: Centralize demo client data into shared module (move out of App.js)
 - [ ] P3: Replace Mock Xplan integration with real API
