@@ -36,6 +36,7 @@ import {
 } from 'recharts';
 
 const NetWorthTrend = lazy(() => import("@/pages/NetWorthTrend"));
+const UnifiedInvestments = lazy(() => import("@/pages/UnifiedInvestments"));
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || '';
 
@@ -538,7 +539,7 @@ const PersonalDashboard = ({ embedded = false }) => {
 
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid grid-cols-5 w-full max-w-4xl">
+          <TabsList className="grid grid-cols-6 w-full max-w-5xl">
             <TabsTrigger value="overview" className="flex items-center gap-1" data-testid="tab-overview">
               <Eye className="h-4 w-4" />
               Overview
@@ -550,6 +551,10 @@ const PersonalDashboard = ({ embedded = false }) => {
             <TabsTrigger value="wealth-trends" className="flex items-center gap-1" data-testid="tab-wealth-trends">
               <TrendingUp className="h-4 w-4" />
               Wealth Trends
+            </TabsTrigger>
+            <TabsTrigger value="investments" className="flex items-center gap-1" data-testid="tab-investments">
+              <BarChart3 className="h-4 w-4" />
+              Investments
             </TabsTrigger>
             <TabsTrigger value="insights" className="flex items-center gap-1" data-testid="tab-insights">
               <Brain className="h-4 w-4" />
@@ -719,6 +724,27 @@ const PersonalDashboard = ({ embedded = false }) => {
 
           {/* ==================== TAB 1b: NET WORTH ==================== */}
           <TabsContent value="net-worth" className="space-y-6">
+            {/* Entity Breakdown — AT TOP */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Users className="h-5 w-5 text-purple-500" />
+                  Assets by Entity
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-3 gap-4">
+                  {entityData.map((entity) => (
+                    <div key={entity.name} className="p-3 border rounded-lg">
+                      <p className="text-sm font-medium">{entity.name}</p>
+                      <p className="text-xl font-bold">{formatCurrency(entity.value)}</p>
+                      <p className="text-xs text-muted-foreground">{((entity.value / grossAssets) * 100).toFixed(1)}% of total</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Summary Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <Card className="bg-[#1a2744] text-white">
@@ -840,29 +866,7 @@ const PersonalDashboard = ({ embedded = false }) => {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Entity Breakdown */}
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Users className="h-5 w-5 text-purple-500" />
-                  Assets by Entity
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid md:grid-cols-3 gap-4">
-                  {entityData.map((entity) => (
-                    <div key={entity.name} className="p-3 border rounded-lg">
-                      <p className="text-sm font-medium">{entity.name}</p>
-                      <p className="text-xl font-bold">{formatCurrency(entity.value)}</p>
-                      <p className="text-xs text-muted-foreground">{((entity.value / grossAssets) * 100).toFixed(1)}% of total</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
           </TabsContent>
-
 
           {/* ==================== TAB 2: WEALTH TRENDS ==================== */}
           <TabsContent value="wealth-trends" className="space-y-6">
@@ -873,7 +877,16 @@ const PersonalDashboard = ({ embedded = false }) => {
             </ErrorBoundary>
           </TabsContent>
 
-          {/* ==================== TAB 3: INSIGHTS ==================== */}
+          {/* ==================== TAB 3: INVESTMENTS ==================== */}
+          <TabsContent value="investments" className="space-y-6">
+            <ErrorBoundary label="Investments">
+              <Suspense fallback={<div className="flex items-center justify-center py-20"><Loader2 className="h-6 w-6 animate-spin text-[#D4A84C]" /></div>}>
+                <UnifiedInvestments embedded />
+              </Suspense>
+            </ErrorBoundary>
+          </TabsContent>
+
+          {/* ==================== TAB 4: INSIGHTS ==================== */}
           <TabsContent value="insights" className="space-y-6">
             <SmartInsights 
               clientId={clientId}

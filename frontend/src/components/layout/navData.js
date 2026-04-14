@@ -17,47 +17,6 @@ export const personalNavGroups = [
       { path: "/macro-dashboard", label: "Markets", icon: BarChart3, title: "Live Markets", badge: "LIVE" },
     ]
   },
-  {
-    name: "Investments",
-    icon: TrendingUp,
-    items: [
-      { path: "/investments", label: "All Investments", icon: TrendingUp, title: "Investment Portfolio" },
-      { path: "/portfolio-rebalancing", label: "Rebalancing", icon: BarChart3, title: "Portfolio Rebalancing" },
-    ]
-  },
-  {
-    name: "Planning",
-    icon: Target,
-    items: [
-      { path: "/budget", label: "Budget", icon: PiggyBank, title: "Budget Management" },
-      { path: "/scenario-modelling", label: "Goals & Scenarios", icon: Target, title: "Goals, Scenarios & Monte Carlo" },
-      { path: "/retirement-confidence", label: "Retirement", icon: Gauge, title: "Retirement Planning & Confidence" },
-      { path: "/tax-analysis-sync", label: "Tax Centre", icon: Calculator, title: "Unified Tax Centre" },
-    ]
-  },
-  {
-    name: "Research",
-    icon: LineChart,
-    items: [
-      { path: "/stock-research", label: "Research Centre", icon: LineChart, title: "Research & Comparison" },
-    ]
-  },
-  {
-    name: "Settings",
-    icon: Settings,
-    items: [
-      { path: "/bank-feeds", label: "Bank Feeds", icon: Landmark, title: "Bank Feeds" },
-      { path: "/documents", label: "Documents", icon: FileText, title: "Documents" },
-      { path: "/security", label: "Security", icon: Shield, title: "Security" },
-    ]
-  },
-  {
-    name: "Tools",
-    icon: Calculator,
-    items: [
-      { path: "/loan-calculator", label: "Loan Calculator", icon: Landmark, title: "Loan Calculator" },
-    ]
-  },
 ];
 
 export const adviserBaseNav = [
