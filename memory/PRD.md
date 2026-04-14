@@ -27,11 +27,21 @@ Build an AFSL-grade wealth management platform with consolidated views, client c
 ### Personal Dashboard (5 tabs): Overview -> Net Worth -> Wealth Trends -> Insights -> Transactions
 
 ## Sidebar Structure
-### Personal: DASHBOARD -> INVESTMENTS (All Investments, Rebalancing) -> PLANNING -> RESEARCH -> SETTINGS -> TOOLS
-### Adviser: DASHBOARD -> CRM -> EXECUTION (Batch Execute, Meeting Prep, Compliance) -> INTEGRATIONS -> TOOLS
-### Client Context: OVERVIEW -> DOCUMENTS (Goals/Planning section removed)
+### Personal: DASHBOARD -> INVESTMENTS -> PLANNING -> RESEARCH -> SETTINGS -> TOOLS
+### Adviser: DASHBOARD -> CRM -> EXECUTION -> INTEGRATIONS -> TOOLS
+### Client Context: OVERVIEW -> DOCUMENTS (Goals/Planning removed)
+
+## Client Portal Design Principle
+Core question: "Am I going to be okay?"
+- Phase 1: Hero with confidence gauge (0-100%) + status badge (On Track / At Risk)
+- Phase 2: Plain English summary — what will happen, strengths, things to watch
+- Phase 3: 2-3 improvement actions with "+X% confidence" impact badges
+- Phase 4: One simple visual — retirement timeline (Age 50 -> Age 67)
+- Phase 5: Advisor guidance — "Sarah Chen is looking after your plan" + contact CTA
+- Phase 6: Remove all complexity — no Monte Carlo, no allocation charts, no scenario tables
 
 ## Completed (as of 14 April 2026)
+- [x] Client Portal redesigned: emotionally engaging, 6-phase layout, answers "Am I going to be okay?"
 - [x] Tab styling fixed: subtle 10% opacity bg with gold underline (no more oversized dark blue button)
 - [x] Budget tab added between Investments and Goals in client overview
 - [x] Goals & Scenarios removed from adviser client context sidebar
@@ -40,9 +50,7 @@ Build an AFSL-grade wealth management platform with consolidated views, client c
 - [x] Runtime error overlay suppressed (chrome extensions, chunk loading errors, frame_ant)
 - [x] Investments sub-tabs restyled to match new subtle active state
 - [x] P1/P2 profile data isolation confirmed (Thompson vs Chen)
-- [x] Rebalancing removed from Investment tabs, kept in LH nav only
-- [x] Enhanced ErrorBoundary (chunk error auto-retry + Reload button)
-- [x] All previous UI reorganization, data unification, Monte Carlo tooltips, PDF reports, etc.
+- [x] All previous: data unification, Monte Carlo tooltips, PDF reports, CRM P1/P2, etc.
 
 ## Backlog
 - [ ] P2: Real email integration for Client Pack auto-delivery
