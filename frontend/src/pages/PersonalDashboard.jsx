@@ -66,62 +66,97 @@ const getConfidenceLabel = (score) => {
   return 'At Risk';
 };
 
-// ==================== REALISTIC DATA FOR AVERAGE MARRIED 50-YEAR-OLD AUSTRALIAN COUPLE ====================
-// Based on ABS statistics and ASFA retirement standards for median Australian households
-// Profile: David (50) & Sarah (50) Thompson - Married, 2 adult children, living in Melbourne
+// ==================== CLIENT DATA PROFILES ====================
+// P1: Thompson Family — Married, Age 50, Melbourne
+// P2: Chen Family Trust — Married, Age 49, Sydney
 
-const mockAssets = [
-  // Superannuation - Combined super for couple (avg $240K each at age 50)
-  { id: 1, name: 'David - AustralianSuper', type: 'Super', entity: 'Super', value: 245000, change: 8.2 },
-  { id: 2, name: 'Sarah - REST Super', type: 'Super', entity: 'Super', value: 198000, change: 7.8 },
-  
-  // Family Home (Melbourne median ~$950K, with mortgage offset)
-  { id: 3, name: 'Family Home - Glen Waverley', type: 'Property', entity: 'Personal', value: 985000, change: 4.1 },
-  
-  // Investment Property (common for 50-year-olds building wealth)
-  { id: 4, name: 'Investment Unit - Brunswick', type: 'Property', entity: 'Joint', value: 620000, change: 3.8 },
-  
-  // Shares & ETFs (typical for middle-income earners)
-  { id: 5, name: 'Vanguard High Growth ETF', type: 'Shares', entity: 'Personal', value: 42000, change: 9.5 },
-  { id: 6, name: 'BHP Group Shares', type: 'Shares', entity: 'Personal', value: 18500, change: 6.2 },
-  { id: 7, name: 'CBA Shares (DRP)', type: 'Shares', entity: 'Joint', value: 24000, change: 11.3 },
-  
-  // Cash & Term Deposits (emergency fund + savings)
-  { id: 8, name: 'Emergency Fund - ING Savings', type: 'Cash', entity: 'Personal', value: 28000, change: 4.35 },
-  { id: 9, name: 'Term Deposit - Westpac 12m', type: 'Cash', entity: 'Joint', value: 35000, change: 4.65 },
-  
-  // Managed Funds (common for hands-off investing)
-  { id: 10, name: 'Colonial First State Balanced', type: 'Managed Fund', entity: 'Personal', value: 32000, change: 5.8 },
-  
-  // Small crypto exposure (increasingly common for Gen X)
-  { id: 11, name: 'Bitcoin (Coinbase)', type: 'Crypto', entity: 'Personal', value: 8500, change: 28.4 },
-  
-  // Vehicle (depreciating asset but part of net worth)
-  { id: 12, name: 'Toyota RAV4 Hybrid 2023', type: 'Other', entity: 'Personal', value: 42000, change: -12.0 },
-];
+const CLIENT_DATA = {
+  thompson_family: {
+    assets: [
+      { id: 1, name: 'David - AustralianSuper', type: 'Super', entity: 'Super', value: 245000, change: 8.2 },
+      { id: 2, name: 'Sarah - REST Super', type: 'Super', entity: 'Super', value: 198000, change: 7.8 },
+      { id: 3, name: 'Family Home - Glen Waverley', type: 'Property', entity: 'Personal', value: 985000, change: 4.1 },
+      { id: 4, name: 'Investment Unit - Brunswick', type: 'Property', entity: 'Joint', value: 620000, change: 3.8 },
+      { id: 5, name: 'Vanguard High Growth ETF', type: 'Shares', entity: 'Personal', value: 42000, change: 9.5 },
+      { id: 6, name: 'BHP Group Shares', type: 'Shares', entity: 'Personal', value: 18500, change: 6.2 },
+      { id: 7, name: 'CBA Shares (DRP)', type: 'Shares', entity: 'Joint', value: 24000, change: 11.3 },
+      { id: 8, name: 'Emergency Fund - ING Savings', type: 'Cash', entity: 'Personal', value: 28000, change: 4.35 },
+      { id: 9, name: 'Term Deposit - Westpac 12m', type: 'Cash', entity: 'Joint', value: 35000, change: 4.65 },
+      { id: 10, name: 'Colonial First State Balanced', type: 'Managed Fund', entity: 'Personal', value: 32000, change: 5.8 },
+      { id: 11, name: 'Bitcoin (Coinbase)', type: 'Crypto', entity: 'Personal', value: 8500, change: 28.4 },
+      { id: 12, name: 'Toyota RAV4 Hybrid 2023', type: 'Other', entity: 'Personal', value: 42000, change: -12.0 },
+    ],
+    liabilities: [
+      { id: 1, name: 'Home Loan - CBA', type: 'Mortgage', value: 285000, rate: 6.19 },
+      { id: 2, name: 'Investment Loan - ANZ', type: 'Mortgage', value: 380000, rate: 6.49 },
+      { id: 3, name: 'Credit Card - Visa', type: 'Credit', value: 4200, rate: 19.99 },
+    ],
+    profile: {
+      user_id: 'thompson_family',
+      name: 'David & Sarah Thompson',
+      first_name: 'David',
+      last_name: 'Thompson',
+      partner_first_name: 'Sarah',
+      age: 50,
+      retirementAge: 67,
+      yearsToRetirement: 17,
+      riskProfile: 'Balanced',
+      incomeHousehold: 185000,
+      expensesAnnual: 95000,
+      children: 2,
+      status: 'Married'
+    },
+    retirement: { current_age: 50, retirement_age: 67, life_expectancy: 92, annual_contributions: 42000, retirement_spending: 72000 },
+  },
+  chen_family: {
+    assets: [
+      { id: 1, name: 'Chen Family Trust - Equities', type: 'Trust Portfolio', entity: 'Trust', value: 1400000, change: 12.1 },
+      { id: 2, name: 'Chen Family Trust - Fixed Income', type: 'Trust Portfolio', entity: 'Trust', value: 900000, change: 5.4 },
+      { id: 3, name: 'Chen Family Trust - Alternatives', type: 'Trust Portfolio', entity: 'Trust', value: 500000, change: 8.7 },
+      { id: 4, name: 'Michael - AMP Super', type: 'Super', entity: 'Super', value: 720000, change: 9.1 },
+      { id: 5, name: 'Lisa - Hostplus Super', type: 'Super', entity: 'Super', value: 480000, change: 8.5 },
+      { id: 6, name: 'Family Home - Mosman', type: 'Property', entity: 'Personal', value: 1100000, change: 3.2 },
+      { id: 7, name: 'Cash Management Account', type: 'Cash', entity: 'Trust', value: 100000, change: 4.5 },
+    ],
+    liabilities: [],
+    profile: {
+      user_id: 'chen_family',
+      name: 'Michael & Lisa Chen',
+      first_name: 'Michael',
+      last_name: 'Chen',
+      partner_first_name: 'Lisa',
+      age: 49,
+      retirementAge: 60,
+      yearsToRetirement: 11,
+      riskProfile: 'Balanced',
+      incomeHousehold: 450000,
+      expensesAnnual: 180000,
+      children: 1,
+      status: 'Married'
+    },
+    retirement: { current_age: 49, retirement_age: 60, life_expectancy: 92, annual_contributions: 55000, retirement_spending: 120000 },
+  },
+};
 
-// Liabilities for net worth calculation
-const mockLiabilities = [
-  { id: 1, name: 'Home Loan - CBA', type: 'Mortgage', value: 285000, rate: 6.19 },
-  { id: 2, name: 'Investment Loan - ANZ', type: 'Mortgage', value: 380000, rate: 6.49 },
-  { id: 3, name: 'Credit Card - Visa', type: 'Credit', value: 4200, rate: 19.99 },
-];
+// Aliases
+CLIENT_DATA.client_1 = CLIENT_DATA.thompson_family;
+CLIENT_DATA.client_2 = CLIENT_DATA.chen_family;
 
-const mockDocuments = [
-  { id: 1, name: 'Joint Tax Return 2025', status: 'pending', dueDate: '2026-04-15', type: 'Tax' },
-  { id: 2, name: 'Home & Contents Insurance', status: 'urgent', dueDate: '2026-01-31', type: 'Insurance' },
-  { id: 3, name: 'Super Consolidation Review', status: 'pending', dueDate: '2026-02-28', type: 'Super' },
-  { id: 4, name: 'Investment Property Review', status: 'pending', dueDate: '2026-03-15', type: 'Property' },
-];
-
-// Rebalancing based on age-appropriate allocation (50-year-old = 50% growth, 50% defensive)
-const mockRebalancing = [
-  { asset: 'Australian Shares', current: 28, target: 25, diff: 3, action: 'Sell' },
-  { asset: 'International Shares', current: 12, target: 20, diff: -8, action: 'Buy' },
-  { asset: 'Property', current: 42, target: 25, diff: 17, action: 'Review' },
-  { asset: 'Bonds/Fixed Income', current: 8, target: 20, diff: -12, action: 'Buy' },
-  { asset: 'Cash', current: 10, target: 10, diff: 0, action: 'Hold' },
-];
+// Resolve the active client ID from localStorage
+const getActiveClientId = () => {
+  try {
+    const mode = localStorage.getItem('app_mode');
+    if (mode === 'adviser') {
+      const saved = localStorage.getItem('selected_client');
+      if (saved) {
+        const c = JSON.parse(saved);
+        const id = c?.id || c?.client_id || 'thompson_family';
+        if (CLIENT_DATA[id]) return id;
+      }
+    }
+  } catch { /* ignore */ }
+  return 'thompson_family';
+};
 
 const mockMarketIndicators = [
   { name: 'ASX 200', value: 7842, change: 0.8 },
@@ -130,33 +165,21 @@ const mockMarketIndicators = [
   { name: '10Y Bond', value: 4.25, change: 0.05 },
 ];
 
-// Default user profile for the dashboard
-const defaultUserProfile = {
-  user_id: 'thompson_family',
-  name: 'David & Sarah Thompson',
-  first_name: 'David',
-  last_name: 'Thompson',
-  partner_first_name: 'Sarah',
-  age: 50,
-  retirementAge: 67,
-  yearsToRetirement: 17,
-  riskProfile: 'Balanced',
-  incomeHousehold: 185000,
-  expensesAnnual: 95000,
-  children: 2,
-  status: 'Married'
-};
-
 // ==================== MAIN COMPONENT ====================
 
 const PersonalDashboard = ({ embedded = false }) => {
+  const clientId = getActiveClientId();
+  const clientData = CLIENT_DATA[clientId];
+  const mockAssets = clientData.assets;
+  const mockLiabilities = clientData.liabilities;
+
   const [activeTab, setActiveTab] = useState('overview');
   const [entityFilter, setEntityFilter] = useState('all');
   const [retirementData, setRetirementData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [marketIndicators, setMarketIndicators] = useState(mockMarketIndicators);
   const [marketDataSource, setMarketDataSource] = useState('fallback');
-  const [userProfile, setUserProfile] = useState(defaultUserProfile);
+  const [userProfile, setUserProfile] = useState(clientData.profile);
   const [showProfileEdit, setShowProfileEdit] = useState(false);
 
   // Fetch live market data
@@ -192,7 +215,7 @@ const PersonalDashboard = ({ embedded = false }) => {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await fetch(`${API_URL}/api/user-profile/thompson_family/summary`);
+        const response = await fetch(`${API_URL}/api/user-profile/${clientId}/summary`);
         if (response.ok) {
           const data = await response.json();
           setUserProfile(prev => ({
@@ -228,18 +251,13 @@ const PersonalDashboard = ({ embedded = false }) => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            client_id: 'thompson_family',
-            // 50-year-old couple planning for retirement at 67 (Australian standard)
-            current_age: 50,
-            retirement_age: 67,
-            life_expectancy: 92,
-            // Net worth after liabilities (~$1.6M)
+            client_id: clientId,
+            current_age: clientData.retirement.current_age,
+            retirement_age: clientData.retirement.retirement_age,
+            life_expectancy: clientData.retirement.life_expectancy,
             current_portfolio: netPortfolio,
-            // Combined super contributions (employer + salary sacrifice)
-            annual_contributions: 42000,
-            // ASFA comfortable retirement standard for couples (~$72K/year)
-            retirement_spending: 72000,
-            // Conservative return assumption for balanced portfolio
+            annual_contributions: clientData.retirement.annual_contributions,
+            retirement_spending: clientData.retirement.retirement_spending,
             expected_return: 0.065,
             return_volatility: 0.12,
             inflation_rate: 0.03,
@@ -326,7 +344,7 @@ const PersonalDashboard = ({ embedded = false }) => {
   // Handle profile update
   const handleProfileUpdate = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/user-profile/thompson_family`, {
+      const response = await fetch(`${API_URL}/api/user-profile/${clientId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editForm)
@@ -858,7 +876,7 @@ const PersonalDashboard = ({ embedded = false }) => {
           {/* ==================== TAB 3: INSIGHTS ==================== */}
           <TabsContent value="insights" className="space-y-6">
             <SmartInsights 
-              clientId="thompson_family"
+              clientId={clientId}
               portfolioData={portfolioDataForInsights}
               retirementData={retirementData}
               isAdvisor={false}

@@ -32,6 +32,16 @@ export const PORTFOLIO_ASSETS = [
   { id: 12, name: "Toyota RAV4 Hybrid 2023", type: "Other", entity: "Personal", value: 42000, change: -12.0 },
 ];
 
+const CHEN_ASSETS = [
+  { id: 1, name: "Chen Family Trust - Equities", type: "Trust Portfolio", entity: "Trust", value: 1400000, change: 12.1 },
+  { id: 2, name: "Chen Family Trust - Fixed Income", type: "Trust Portfolio", entity: "Trust", value: 900000, change: 5.4 },
+  { id: 3, name: "Chen Family Trust - Alternatives", type: "Trust Portfolio", entity: "Trust", value: 500000, change: 8.7 },
+  { id: 4, name: "Michael - AMP Super", type: "Super", entity: "Super", value: 720000, change: 9.1 },
+  { id: 5, name: "Lisa - Hostplus Super", type: "Super", entity: "Super", value: 480000, change: 8.5 },
+  { id: 6, name: "Family Home - Mosman", type: "Property", entity: "Personal", value: 1100000, change: 3.2 },
+  { id: 7, name: "Cash Management Account", type: "Cash", entity: "Trust", value: 100000, change: 4.5 },
+];
+
 export const PORTFOLIO_LIABILITIES = [
   { id: 1, name: "Home Loan - CBA", type: "Mortgage", value: 285000, rate: 6.19 },
   { id: 2, name: "Investment Loan - ANZ", type: "Mortgage", value: 380000, rate: 6.49 },
@@ -46,48 +56,75 @@ export const REBALANCING_DATA = [
   { asset: "Cash", current: 10, target: 10, diff: 0, action: "Hold" },
 ];
 
+const CHEN_REBALANCING = [
+  { asset: "Trust Equities", current: 27, target: 30, diff: -3, action: "Buy" },
+  { asset: "Fixed Income", current: 17, target: 20, diff: -3, action: "Buy" },
+  { asset: "Property", current: 21, target: 20, diff: 1, action: "Hold" },
+  { asset: "Super", current: 23, target: 20, diff: 3, action: "Review" },
+  { asset: "Cash", current: 2, target: 5, diff: -3, action: "Buy" },
+  { asset: "Alternatives", current: 10, target: 5, diff: 5, action: "Sell" },
+];
+
+// Resolve active client for Investments view
+const getActiveAssets = () => {
+  try {
+    const mode = localStorage.getItem('app_mode');
+    if (mode === 'adviser') {
+      const saved = localStorage.getItem('selected_client');
+      if (saved) {
+        const c = JSON.parse(saved);
+        const id = c?.id || c?.client_id;
+        if (id === 'chen_family' || id === 'client_2') return { assets: CHEN_ASSETS, liabilities: [], rebalancing: CHEN_REBALANCING };
+      }
+    }
+  } catch { /* ignore */ }
+  return { assets: PORTFOLIO_ASSETS, liabilities: PORTFOLIO_LIABILITIES, rebalancing: REBALANCING_DATA };
+};
+
 const InvestmentsOverview = () => {
-  const totalValue = useMemo(() => PORTFOLIO_ASSETS.reduce((s, a) => s + a.value, 0), []);
-  const totalLiabilities = useMemo(() => PORTFOLIO_LIABILITIES.reduce((s, l) => s + l.value, 0), []);
+  const { assets: activeAssets, liabilities: activeLiabilities, rebalancing: activeRebalancing } = getActiveAssets();
+
+  const totalValue = useMemo(() => activeAssets.reduce((s, a) => s + a.value, 0), [activeAssets]);
+  const totalLiabilities = useMemo(() => activeLiabilities.reduce((s, l) => s + l.value, 0), [activeLiabilities]);
   const netWorth = totalValue - totalLiabilities;
 
   // Allocation by type
   const allocationByType = useMemo(() => {
     const grouped = {};
-    PORTFOLIO_ASSETS.forEach(a => {
+    activeAssets.forEach(a => {
       grouped[a.type] = (grouped[a.type] || 0) + a.value;
     });
     return Object.entries(grouped)
       .map(([name, value], i) => ({ name, value, color: CHART_COLORS[i % CHART_COLORS.length], pct: ((value / totalValue) * 100).toFixed(1) }))
       .sort((a, b) => b.value - a.value);
-  }, [totalValue]);
+  }, [totalValue, activeAssets]);
 
   // Allocation by entity
   const allocationByEntity = useMemo(() => {
     const grouped = {};
-    PORTFOLIO_ASSETS.forEach(a => {
+    activeAssets.forEach(a => {
       grouped[a.entity] = (grouped[a.entity] || 0) + a.value;
     });
     return Object.entries(grouped)
       .map(([name, value], i) => ({ name, value, color: CHART_COLORS[i % CHART_COLORS.length] }))
       .sort((a, b) => b.value - a.value);
-  }, []);
+  }, [activeAssets]);
 
   // Performance summary
   const weightedReturn = useMemo(() => {
-    const total = PORTFOLIO_ASSETS.reduce((s, a) => s + a.value * (a.change / 100), 0);
+    const total = activeAssets.reduce((s, a) => s + a.value * (a.change / 100), 0);
     return ((total / totalValue) * 100).toFixed(1);
-  }, [totalValue]);
+  }, [totalValue, activeAssets]);
 
   // Radar chart data for rebalancing
   const radarData = useMemo(() =>
-    REBALANCING_DATA.map(item => ({
+    activeRebalancing.map(item => ({
       subject: item.asset.split(" ")[0],
       current: item.current,
       target: item.target,
       fullMark: 50
     })),
-  []);
+  [activeRebalancing]);
 
   return (
     <div className="space-y-6" data-testid="investments-overview">
@@ -122,7 +159,7 @@ const InvestmentsOverview = () => {
         <Card>
           <CardContent className="p-3 text-center">
             <p className="text-xs text-muted-foreground">Holdings</p>
-            <p className="text-xl font-bold">{PORTFOLIO_ASSETS.length}</p>
+            <p className="text-xl font-bold">{activeAssets.length}</p>
           </CardContent>
         </Card>
       </div>
@@ -185,7 +222,7 @@ const InvestmentsOverview = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              {REBALANCING_DATA.map((item, i) => (
+              {activeRebalancing.map((item, i) => (
                 <div key={i} className="flex items-center justify-between p-2.5 bg-muted/30 rounded-lg" data-testid={`rebalance-row-${i}`}>
                   <div className="flex items-center gap-4">
                     <span className="font-medium text-sm w-40">{item.asset}</span>
@@ -240,7 +277,7 @@ const InvestmentsOverview = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            {[...PORTFOLIO_ASSETS].sort((a, b) => b.value - a.value).slice(0, 6).map(asset => (
+            {[...activeAssets].sort((a, b) => b.value - a.value).slice(0, 6).map(asset => (
               <div key={asset.id} className="flex items-center justify-between p-2.5 rounded-lg border hover:bg-muted/30 transition-colors">
                 <div className="flex items-center gap-3">
                   <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs ${
