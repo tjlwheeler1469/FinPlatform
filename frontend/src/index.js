@@ -3,12 +3,10 @@ import ReactDOM from "react-dom/client";
 import "@/index.css";
 import App from "@/App";
 
-// Suppress Chrome/Firefox extension errors from React error overlay
-// CRA's react-error-overlay uses window.addEventListener('error') with capture:true
-// We must intercept BEFORE it using a capturing listener added first
+// Suppress Chrome/Firefox extension errors AND webpack chunk loading errors
 if (process.env.NODE_ENV === "development") {
-  // Intercept error events before CRA's overlay catches them
   window.addEventListener("error", (e) => {
+    // Suppress extension errors
     if (e.filename && (e.filename.includes("chrome-extension") || e.filename.includes("moz-extension"))) {
       e.stopImmediatePropagation();
       e.preventDefault();
@@ -19,13 +17,22 @@ if (process.env.NODE_ENV === "development") {
       e.preventDefault();
       return;
     }
-  }, true); // capture phase — runs before CRA's handler
+    // Suppress chunk loading errors (show ErrorBoundary instead of red overlay)
+    if (e.message && (e.message.includes("Unexpected token '<'") || e.message.includes("Loading chunk"))) {
+      e.stopImmediatePropagation();
+      e.preventDefault();
+      return;
+    }
+  }, true);
 
   window.addEventListener("unhandledrejection", (e) => {
     const reason = e.reason;
-    if (reason?.stack?.includes("chrome-extension") || reason?.stack?.includes("moz-extension") ||
-        reason?.message?.includes("chrome-extension") || reason?.message?.includes("frame_ant") ||
-        reason?.message?.includes("Response body is already used")) {
+    const msg = reason?.message || "";
+    const stack = reason?.stack || "";
+    if (stack.includes("chrome-extension") || stack.includes("moz-extension") ||
+        msg.includes("frame_ant") || msg.includes("Response body is already used") ||
+        msg.includes("Unexpected token") || msg.includes("Loading chunk") ||
+        msg.includes("ChunkLoadError")) {
       e.stopImmediatePropagation();
       e.preventDefault();
     }
