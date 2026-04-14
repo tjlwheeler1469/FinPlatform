@@ -8,52 +8,36 @@ Build an AFSL-grade wealth management platform with consolidated views, client c
 - **Backend**: FastAPI + MongoDB
 - **AI**: OpenAI GPT-5.2 (Emergent LLM Key)
 - **Market Data**: CoinGecko (live crypto)
-- **Encryption**: AES-256-GCM for PII (TFN, ID numbers)
+- **Encryption**: AES-256-GCM for PII
 
-## Unified Mock Data (Thompson Family)
-- **Net Worth**: $1,608,800 | **Gross Assets**: $2,278,000 | **Liabilities**: $669,200
-- **Super**: David $245K, Sarah $198K | **Income**: $185K household
-- Consistent across ALL views: Dashboard, Investments, Client Profile, Net Worth, Wealth Trends, Client Portal, Reports
+## Client Profiles (separate data, nothing shared)
+### P1: Thompson Family
+- Net Worth: $1,608,800 | Gross Assets: $2,278,000 | Liabilities: $669,200
+- Income: $185K | Risk: Balanced | Retire at 67
+- Allocation: Property 70%, Super 19%, Shares 4%, Cash 3%, Other 4%
+
+### P2: Chen Family Trust
+- Net Worth: $5,200,000 | Gross Assets: $5,200,000 | Liabilities: $0
+- Income: $450K | Risk: Balanced | Retire at 60
+- Allocation: Trust Portfolio 54%, Super 23%, Property 21%, Cash 2%
 
 ## Tab Structures
-### Adviser Client Overview (7 tabs)
-Overview → Actions → Retirement → Investments → Goals → Tax Centre → Profile
-
-### Investments (11 tabs)
-Overview → Rebalancing → Bonds → Cash & TDs → Crypto → Managed Funds → Property → Shares & ETFs → SMSF → Super & Pension → Unlisted
-
-### Personal Dashboard (5 tabs)
-Overview → Net Worth (full calculation table) → Wealth Trends → Insights → Transactions
+### Client Overview (7 tabs): Overview → Actions → Retirement → Investments → Goals → Tax Centre → Profile
+### Investments (10 tabs): Overview → Bonds → Cash & TDs → Crypto → Managed Funds → Property → Shares & ETFs → SMSF → Super & Pension → Unlisted
+### Personal Dashboard (5 tabs): Overview → Net Worth → Wealth Trends → Insights → Transactions
 
 ## Sidebar Structure
-### Personal: DASHBOARD → INVESTMENTS → PLANNING → RESEARCH → SETTINGS → TOOLS
-### Adviser (no client): DASHBOARD → CRM (Client Hub, New Client, Import/Export) → EXECUTION (Batch Execute, Meeting Prep, Compliance) → INTEGRATIONS → TOOLS
-### Client Context: OVERVIEW → DOCUMENTS (Meeting Notes, Reports, Vault) → PLANNING (Goals & Scenarios)
+### Personal: DASHBOARD → INVESTMENTS (All Investments, Rebalancing) → PLANNING → RESEARCH → SETTINGS → TOOLS
+### Adviser: DASHBOARD → CRM → EXECUTION (Batch Execute, Meeting Prep, Compliance) → INTEGRATIONS → TOOLS
+### Client Context: OVERVIEW → DOCUMENTS → PLANNING
 
-## Key API Endpoints
-- `POST /api/retirement-projection/calculate`, `POST /api/hybrid-engine/calculate`, `POST /api/hybrid-engine/compare-scenarios`
-- `POST /api/client-personal-info/setup`, `GET/POST /api/client-personal-info/{client_id}`
-- `GET /api/client-portal/dashboard/{client_id}`, `GET /api/client-portal/net-worth/{client_id}`
-
-## Completed (as of 9 April 2026)
-- [x] All UI reorganization and tab reordering
-- [x] Data unification across ALL data sources (Thompson family)
-- [x] NetWorthTrend pinned to exact net worth value
-- [x] Rebalancing chart % formatting fixed
-- [x] Stock Research tab styling fixed (text-white on active)
-- [x] Super Guarantee Calculator rewritten as personal super projection
-- [x] Monte Carlo factor tooltips (* hover explanations)
-- [x] Budget removed from client sidebar; Goals added to top tabs
-- [x] Compliance moved from client level to adviser sidebar (under Execution)
-- [x] "View escalation pathways" now switches to Escalation tab
-- [x] Report Generator: client-side mock reports with jsPDF PDF download + Halcyon branding
-- [x] /client-portal fixed and updated to Thompson family data
-- [x] Retirement scenarios auto-compare after each calculation
-- [x] Client Profile simplified to high-level overview
-- [x] Chrome extension error suppression
-- [x] Multi-entity client onboarding, CSV bulk import
-- [x] AES-256-GCM encrypted PII
-- [x] ComplianceModal persistence
+## Completed (as of 14 April 2026)
+- [x] Rebalancing removed from Investment tabs, kept in LH nav only
+- [x] P1 (Thompson) and P2 (Chen) adviser client profiles with separate data
+- [x] Simplified Client Profile (allocation bars + goals only)
+- [x] Enhanced ErrorBoundary (chunk error auto-retry + Reload button)
+- [x] Chrome extension + chunk error suppression in index.js
+- [x] All previous UI reorganization, data unification, Monte Carlo tooltips, PDF reports, etc.
 
 ## Backlog
 - [ ] P2: Real email integration for Client Pack auto-delivery
