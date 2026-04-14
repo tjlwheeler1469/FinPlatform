@@ -125,6 +125,16 @@ export const clientContextNav = [
   },
 ];
 
+export const clientPortalNav = [
+  {
+    name: "Dashboard",
+    icon: LayoutDashboard,
+    items: [
+      { path: "/client-portal", label: "My Dashboard", icon: Eye, title: "Client Dashboard", badge: "HOME" },
+    ]
+  },
+];
+
 export const mobileBottomNav = [
   { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { path: "/investments", label: "Investments", icon: TrendingUp },

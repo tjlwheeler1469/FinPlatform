@@ -21,41 +21,42 @@ const statusColor = (score) => {
   return { bg: "#fef2f2", ring: "#ef4444", text: "#b91c1c", label: "At Risk" };
 };
 
-/* ── Confidence Gauge (SVG arc + HTML overlay) ── */
+/* ── Confidence Gauge (clean single-arc approach) ── */
 const ConfidenceGauge = ({ score }) => {
   const s = statusColor(score);
   const pct = Math.min(100, Math.max(0, score));
-  const angle = (pct / 100) * 180;
-  const rad = (a) => (a * Math.PI) / 180;
-  const r = 90;
-  const cx = 100, cy = 100;
-  const endX = cx + r * Math.cos(rad(180 - angle));
-  const endY = cy - r * Math.sin(rad(180 - angle));
-  const largeArc = angle > 90 ? 1 : 0;
+  // Semi-circle: total arc length for r=90, half-circle = PI * 90 ≈ 282.7
+  const arcLen = Math.PI * 90;
+  const filled = (pct / 100) * arcLen;
 
   return (
     <div className="flex flex-col items-center" data-testid="confidence-gauge">
-      <div className="relative w-64">
-        <svg viewBox="0 0 200 120" className="w-full h-auto">
-          {/* track */}
-          <path d="M 10 100 A 90 90 0 0 1 190 100" fill="none" stroke="#e5e7eb" strokeWidth="14" strokeLinecap="round" />
-          {/* filled arc */}
-          {pct > 0 && (
-            <path
-              d={`M 10 100 A 90 90 0 ${largeArc} 1 ${endX.toFixed(1)} ${endY.toFixed(1)}`}
-              fill="none"
-              stroke={s.ring}
-              strokeWidth="14"
-              strokeLinecap="round"
-            />
-          )}
+      <div className="relative w-56">
+        <svg viewBox="0 0 200 115" className="w-full h-auto">
+          {/* background track */}
+          <path
+            d="M 10 100 A 90 90 0 0 1 190 100"
+            fill="none"
+            stroke="#e5e7eb"
+            strokeWidth="12"
+            strokeLinecap="round"
+          />
+          {/* filled arc — uses dasharray to avoid endpoint blobs */}
+          <path
+            d="M 10 100 A 90 90 0 0 1 190 100"
+            fill="none"
+            stroke={s.ring}
+            strokeWidth="12"
+            strokeLinecap="round"
+            strokeDasharray={`${filled} ${arcLen}`}
+          />
         </svg>
-        {/* HTML overlay for the number — always visible */}
-        <div className="absolute inset-0 flex flex-col items-center justify-end pb-3">
+        {/* number overlay */}
+        <div className="absolute inset-0 flex flex-col items-center justify-end pb-1">
           <span className="text-4xl font-bold leading-none" style={{ color: s.text }} data-testid="confidence-number">
             {Math.round(pct)}%
           </span>
-          <span className="text-xs text-muted-foreground mt-0.5">confidence</span>
+          <span className="text-[11px] text-muted-foreground mt-0.5">confidence</span>
         </div>
       </div>
       <Badge className="mt-2 text-sm px-4 py-1" style={{ backgroundColor: s.ring, color: "#fff" }} data-testid="confidence-badge">

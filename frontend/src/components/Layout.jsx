@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { usePortfolio } from "@/App";
 import DesktopSidebar from "@/components/layout/DesktopSidebar";
 import MobileMenu from "@/components/layout/MobileMenu";
-import { personalNavGroups, adviserBaseNav, clientContextNav, allNavItems } from "@/components/layout/navData";
+import { personalNavGroups, adviserBaseNav, clientContextNav, clientPortalNav, allNavItems } from "@/components/layout/navData";
 
 const Layout = ({ children }) => {
   const location = useLocation();
@@ -35,8 +35,12 @@ const Layout = ({ children }) => {
     if (appMode === "adviser") {
       return selectedClient ? clientContextNav : adviserBaseNav;
     }
+    // Client portal gets minimal nav
+    if (location.pathname === "/client-portal") {
+      return clientPortalNav;
+    }
     return personalNavGroups;
-  }, [appMode, selectedClient]);
+  }, [appMode, selectedClient, location.pathname]);
 
   const activeNavGroups = getActiveNavGroups();
 
