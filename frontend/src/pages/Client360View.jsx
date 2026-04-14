@@ -246,123 +246,99 @@ const getInitials = (name) => {
 const DEMO_CLIENT_DATA = {
   "client_1": {
     id: "client_1",
-    name: "James & Sarah Wheeler",
-    email: "james.wheeler@email.com",
+    name: "David & Sarah Thompson",
+    email: "david.thompson@email.com",
     phone: "0412 345 678",
     mobile: "0412 345 678",
-    address: "42 Harbour View Drive, Mosman NSW 2088",
+    address: "18 Elm Street, Glen Waverley VIC 3150",
     status: "active",
     type: "household",
     clientSince: "2019-03-15",
-    dateOfBirth: "1968-07-22",
-    age: 56,
-    occupation: "Business Owner - Wheeler Consulting",
-    employer: "Self-employed",
-    riskProfile: "Growth",
-    investmentExperience: "Experienced",
-    advisor: "Mark Thompson",
+    dateOfBirth: "1976-03-15",
+    age: 50,
+    occupation: "IT Manager",
+    employer: "NAB",
+    riskProfile: "Balanced",
+    investmentExperience: "Moderate",
+    advisor: "Sarah Chen",
     reviewFrequency: "Annual",
     lastReview: "2025-06-15",
-    nextReview: "2026-01-15",
-    satisfaction: 95,
+    nextReview: "2026-05-15",
+    satisfaction: 92,
     nps: 9,
     
-    // Wealth Summary
+    // Wealth Summary — matches $1,608,800 net worth
     wealth: {
-      total: 2850000,
-      change: 125000,
-      changePercent: 4.6,
-      assetAllocation: {
-        equities: 45,
-        property: 42,
-        fixedIncome: 8,
-        cash: 5
-      }
+      total: 1608800,
+      change: 87000,
+      changePercent: 5.7,
+      assetAllocation: { equities: 4, property: 70, super: 19, cash: 3, other: 4 }
     },
     
-    // Accounts
     accounts: [
-      { id: 1, name: "James Wheeler Super", type: "Superannuation", institution: "AustralianSuper", balance: 520000, change: 28000, changePercent: 5.7, icon: PiggyBank },
-      { id: 2, name: "Sarah Wheeler Super", type: "Superannuation", institution: "REST Super", balance: 370000, change: 18500, changePercent: 5.3, icon: PiggyBank },
-      { id: 3, name: "Joint Investment Portfolio", type: "Investment", institution: "Macquarie", balance: 650000, change: 42000, changePercent: 6.9, icon: TrendingUp },
-      { id: 4, name: "Investment Property - Parramatta", type: "Property", institution: "Direct", balance: 850000, change: 25000, changePercent: 3.0, icon: Home },
-      { id: 5, name: "Family Home - Mosman", type: "Property", institution: "Direct", balance: 2200000, change: 110000, changePercent: 5.3, icon: Home },
-      { id: 6, name: "Mortgage - Family Home", type: "Liability", institution: "CBA", balance: -850000, change: 12000, changePercent: 1.4, icon: Building2 },
-      { id: 7, name: "Emergency Fund", type: "Cash", institution: "ING", balance: 85000, change: 2500, changePercent: 3.0, icon: DollarSign },
-      { id: 8, name: "Offset Account", type: "Cash", institution: "CBA", balance: 25000, change: 5000, changePercent: 25.0, icon: DollarSign },
+      { id: 1, name: "David - AustralianSuper", type: "Superannuation", institution: "AustralianSuper", balance: 245000, change: 18500, changePercent: 8.2, icon: PiggyBank },
+      { id: 2, name: "Sarah - REST Super", type: "Superannuation", institution: "REST", balance: 198000, change: 14300, changePercent: 7.8, icon: PiggyBank },
+      { id: 3, name: "Family Home - Glen Waverley", type: "Property", institution: "Direct", balance: 985000, change: 38500, changePercent: 4.1, icon: Home },
+      { id: 4, name: "Investment Unit - Brunswick", type: "Property", institution: "Direct", balance: 620000, change: 22600, changePercent: 3.8, icon: Home },
+      { id: 5, name: "Vanguard High Growth ETF", type: "Investment", institution: "Vanguard", balance: 42000, change: 3600, changePercent: 9.5, icon: TrendingUp },
+      { id: 6, name: "BHP & CBA Shares", type: "Investment", institution: "CommSec", balance: 42500, change: 3400, changePercent: 8.7, icon: TrendingUp },
+      { id: 7, name: "Colonial First State Balanced", type: "Managed Fund", institution: "CFS", balance: 32000, change: 1750, changePercent: 5.8, icon: TrendingUp },
+      { id: 8, name: "Emergency Fund - ING", type: "Cash", institution: "ING", balance: 28000, change: 1150, changePercent: 4.3, icon: DollarSign },
+      { id: 9, name: "Term Deposit - Westpac", type: "Cash", institution: "Westpac", balance: 35000, change: 1540, changePercent: 4.6, icon: DollarSign },
+      { id: 10, name: "Home Loan - CBA", type: "Liability", institution: "CBA", balance: -285000, change: 15000, changePercent: 5.0, icon: Building2 },
+      { id: 11, name: "Investment Loan - ANZ", type: "Liability", institution: "ANZ", balance: -380000, change: 12000, changePercent: 3.1, icon: Building2 },
+      { id: 12, name: "Credit Card - Visa", type: "Liability", institution: "CBA", balance: -4200, change: 800, changePercent: 16.0, icon: Building2 },
     ],
     
-    // Recent Transactions
     transactions: [
-      { id: 1, date: "2025-12-14", description: "Dividend - BHP Group", amount: 1250, type: "income", account: "Joint Investment Portfolio" },
-      { id: 2, date: "2025-12-12", description: "Buy - Vanguard ETF (VAS)", amount: -15000, type: "investment", account: "Joint Investment Portfolio" },
-      { id: 3, date: "2025-12-10", description: "Salary Sacrifice Contribution", amount: 2500, type: "contribution", account: "James Wheeler Super" },
-      { id: 4, date: "2025-12-08", description: "Rental Income - Parramatta", amount: 2800, type: "income", account: "Emergency Fund" },
-      { id: 5, date: "2025-12-05", description: "Mortgage Payment", amount: -3200, type: "expense", account: "Offset Account" },
-      { id: 6, date: "2025-12-01", description: "Interest Earned", amount: 385, type: "income", account: "Emergency Fund" },
-      { id: 7, date: "2025-11-28", description: "Sell - Telstra (TLS)", amount: 8500, type: "investment", account: "Joint Investment Portfolio" },
-      { id: 8, date: "2025-11-25", description: "Insurance Premium - Life", amount: -450, type: "expense", account: "James Wheeler Super" },
+      { id: 1, date: "2025-12-14", description: "Dividend - BHP Group", amount: 620, type: "income", account: "BHP & CBA Shares" },
+      { id: 2, date: "2025-12-12", description: "DRP Reinvestment - CBA", amount: 480, type: "investment", account: "BHP & CBA Shares" },
+      { id: 3, date: "2025-12-10", description: "Salary Sacrifice", amount: 1750, type: "contribution", account: "David - AustralianSuper" },
+      { id: 4, date: "2025-12-08", description: "Rental Income - Brunswick", amount: 2667, type: "income", account: "Emergency Fund - ING" },
+      { id: 5, date: "2025-12-05", description: "Home Loan Payment", amount: -2800, type: "expense", account: "Home Loan - CBA" },
+      { id: 6, date: "2025-12-01", description: "Interest Earned", amount: 135, type: "income", account: "Term Deposit - Westpac" },
     ],
     
-    // Tasks
     tasks: [
-      { id: 1, title: "Insurance Review - Life & TPD", priority: "high", dueDate: "2025-12-28", status: "pending", type: "review" },
-      { id: 2, title: "Annual SOA Update", priority: "medium", dueDate: "2026-01-15", status: "pending", type: "document" },
-      { id: 3, title: "Tax Planning Discussion", priority: "medium", dueDate: "2026-02-01", status: "pending", type: "planning" },
-      { id: 4, title: "Super Contribution Strategy", priority: "low", dueDate: "2026-03-15", status: "pending", type: "planning" },
+      { id: 1, title: "Super Consolidation Review", priority: "high", dueDate: "2026-02-28", status: "pending", type: "review" },
+      { id: 2, title: "Insurance Gap Analysis", priority: "medium", dueDate: "2026-03-15", status: "pending", type: "planning" },
+      { id: 3, title: "Annual SOA Update", priority: "medium", dueDate: "2026-05-15", status: "pending", type: "document" },
     ],
     
-    // Documents
     documents: [
       { id: 1, name: "Statement of Advice 2025", type: "SOA", date: "2025-06-15", status: "signed" },
-      { id: 2, name: "Risk Profile Assessment", type: "Assessment", date: "2025-06-10", status: "signed" },
-      { id: 3, name: "Insurance Schedule", type: "Insurance", date: "2025-06-15", status: "current" },
-      { id: 4, name: "Investment Policy Statement", type: "IPS", date: "2025-06-15", status: "current" },
-      { id: 5, name: "Fee Disclosure Statement", type: "FDS", date: "2025-06-15", status: "current" },
-      { id: 6, name: "Annual Review Meeting Notes", type: "Notes", date: "2025-06-15", status: "completed" },
+      { id: 2, name: "Fee Disclosure Statement", type: "FDS", date: "2025-12-01", status: "pending_signature" },
+      { id: 3, name: "Q3 2025 Portfolio Report", type: "Report", date: "2025-10-01", status: "available" },
     ],
     
-    // Communication Timeline
     communications: [
-      { id: 1, date: "2025-12-15", type: "call", direction: "outbound", summary: "Discussed portfolio performance and upcoming insurance review", duration: "25 min", by: "Mark Thompson" },
-      { id: 2, date: "2025-12-10", type: "email", direction: "outbound", summary: "Sent monthly portfolio update and market commentary", by: "System" },
-      { id: 3, date: "2025-12-05", type: "email", direction: "inbound", summary: "Question about super contribution limits", by: "James Wheeler" },
-      { id: 4, date: "2025-11-28", type: "meeting", direction: "in-person", summary: "Quarterly review meeting - discussed rebalancing strategy", duration: "1 hr", by: "Mark Thompson" },
-      { id: 5, date: "2025-11-15", type: "call", direction: "inbound", summary: "Sarah called about adding to offset account", duration: "10 min", by: "Sarah Wheeler" },
-      { id: 6, date: "2025-10-20", type: "email", direction: "outbound", summary: "Tax year-end planning recommendations", by: "Mark Thompson" },
+      { id: 1, date: "2025-12-14", type: "email", direction: "outbound", summary: "Sent quarterly portfolio report", by: "Sarah Chen" },
+      { id: 2, date: "2025-12-05", type: "call", direction: "inbound", summary: "David asked about super contribution limits", duration: "15 min", by: "David Thompson" },
+      { id: 3, date: "2025-11-28", type: "meeting", direction: "in-person", summary: "Annual review meeting", duration: "60 min", by: "Sarah Chen" },
     ],
     
-    // Goals
     goals: [
-      { id: 1, name: "Retirement at 62", target: 3500000, current: 2850000, progress: 81, targetDate: "2030-07-22", icon: Target },
-      { id: 2, name: "Pay off mortgage", target: 850000, current: 110000, progress: 13, targetDate: "2035-01-01", icon: Home },
-      { id: 3, name: "Kids' education fund", target: 200000, current: 85000, progress: 43, targetDate: "2028-01-01", icon: GraduationCap },
-      { id: 4, name: "European holiday", target: 25000, current: 15000, progress: 60, targetDate: "2026-06-01", icon: Plane },
+      { id: 1, name: "Retirement at 67", target: 2500000, current: 1608800, progress: 64, targetDate: "2043-06-30", icon: Target },
+      { id: 2, name: "Pay off investment loan", target: 380000, current: 180000, progress: 47, targetDate: "2035-01-01", icon: Home },
+      { id: 3, name: "Emergency fund $60K", target: 60000, current: 28000, progress: 47, targetDate: "2027-12-31", icon: DollarSign },
     ],
     
-    // Family Members
     family: [
-      { name: "James Wheeler", relationship: "Primary", dob: "1968-07-22", age: 56 },
-      { name: "Sarah Wheeler", relationship: "Spouse", dob: "1970-03-15", age: 54 },
-      { name: "Emily Wheeler", relationship: "Daughter", dob: "2000-05-10", age: 24 },
-      { name: "Tom Wheeler", relationship: "Son", dob: "2003-11-22", age: 21 },
+      { name: "David Thompson", relationship: "Primary", dob: "1976-03-15", age: 50 },
+      { name: "Sarah Thompson", relationship: "Spouse", dob: "1976-08-22", age: 50 },
     ],
     
-    // Insurance
     insurance: [
-      { type: "Life", provider: "TAL", sumInsured: 1500000, premium: 1800, premiumFreq: "annual", status: "active" },
-      { type: "TPD", provider: "TAL", sumInsured: 1000000, premium: 1200, premiumFreq: "annual", status: "active" },
-      { type: "Income Protection", provider: "OnePath", sumInsured: 15000, premium: 2400, premiumFreq: "annual", status: "active" },
-      { type: "Trauma", provider: "TAL", sumInsured: 500000, premium: 950, premiumFreq: "annual", status: "review needed" },
+      { type: "Life", provider: "TAL", sumInsured: 1000000, premium: 1400, premiumFreq: "annual", status: "active" },
+      { type: "TPD", provider: "TAL", sumInsured: 750000, premium: 900, premiumFreq: "annual", status: "active" },
+      { type: "Income Protection", provider: "OnePath", sumInsured: 10000, premium: 1800, premiumFreq: "annual", status: "active" },
     ],
     
-    // Key Dates
     keyDates: [
-      { date: "2026-01-15", event: "Annual Review Due", type: "review" },
-      { date: "2026-07-22", event: "James turns 58", type: "birthday" },
-      { date: "2026-03-15", event: "Sarah turns 56", type: "birthday" },
+      { date: "2026-05-15", event: "Annual Review Due", type: "review" },
+      { date: "2026-03-15", event: "David turns 51", type: "birthday" },
+      { date: "2026-08-22", event: "Sarah turns 51", type: "birthday" },
       { date: "2026-06-30", event: "Tax Year End", type: "tax" },
-      { date: "2025-12-25", event: "Wedding Anniversary", type: "personal" },
     ]
   },
   "client_2": {
@@ -612,6 +588,10 @@ const DEMO_CLIENT_DATA = {
     ]
   }
 };
+
+// Aliases for client IDs used by other components
+DEMO_CLIENT_DATA["thompson_family"] = DEMO_CLIENT_DATA["client_1"];
+DEMO_CLIENT_DATA["chen_family"] = DEMO_CLIENT_DATA["client_2"];
 
 // Default to client_1 if no client selected
 const getClientData = (clientId) => {
