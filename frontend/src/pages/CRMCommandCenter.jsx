@@ -342,7 +342,7 @@ const CRMCommandCenter = () => {
       name: client.name,
       email: client.email
     }));
-    navigate("/client-360");
+    navigate("/dashboard");
   };
 
   const handleQuickAction = (action, client) => {

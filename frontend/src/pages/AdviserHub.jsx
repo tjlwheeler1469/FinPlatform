@@ -133,7 +133,7 @@ const AdviserHub = () => {
     };
     setSelectedClient(clientObj);
     localStorage.setItem("selected_client", JSON.stringify(clientObj));
-    navigate("/client-360");
+    navigate("/dashboard");
   };
 
   // Calculate portfolio totals

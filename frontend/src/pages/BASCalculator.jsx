@@ -416,16 +416,17 @@ Note: This is a calculation only. Lodge via ATO Business Portal or through your 
                     { label: "G4", desc: "Input taxed sales", key: "G4" },
                     { label: "G7", desc: "Adjustments", key: "G7" },
                   ].map(field => (
-                    <div key={field.key} className="flex items-center gap-3">
-                      <Badge variant="outline" className="w-10 justify-center">{field.label}</Badge>
-                      <div className="flex-1">
-                        <Input 
-                          type="number"
-                          value={basData[field.key]}
-                          onChange={(e) => setBasData({ ...basData, [field.key]: parseFloat(e.target.value) || 0 })}
-                          className="text-right"
-                        />
+                    <div key={field.key} className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="w-10 justify-center text-xs">{field.label}</Badge>
+                        <span className="text-xs text-muted-foreground">{field.desc}</span>
                       </div>
+                      <Input 
+                        type="number"
+                        value={basData[field.key]}
+                        onChange={(e) => setBasData({ ...basData, [field.key]: parseFloat(e.target.value) || 0 })}
+                        className="text-right"
+                      />
                     </div>
                   ))}
                   <div className="pt-3 border-t space-y-2">
@@ -456,23 +457,24 @@ Note: This is a calculation only. Lodge via ATO Business Portal or through your 
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {[
-                    { label: "G10", desc: "Capital purchases", key: "G10" },
-                    { label: "G11", desc: "Non-capital purchases", key: "G11" },
-                    { label: "G13", desc: "Purchases for input taxed sales", key: "G13" },
-                    { label: "G14", desc: "Purchases without GST", key: "G14" },
-                    { label: "G15", desc: "Private use purchases", key: "G15" },
+                    { label: "G10", desc: "Capital purchases (including GST)", key: "G10" },
+                    { label: "G11", desc: "Non-capital purchases (including GST)", key: "G11" },
+                    { label: "G13", desc: "Purchases for making input taxed sales", key: "G13" },
+                    { label: "G14", desc: "Purchases without GST in the price", key: "G14" },
+                    { label: "G15", desc: "Estimated purchases for private use", key: "G15" },
                     { label: "G18", desc: "Adjustments", key: "G18" },
                   ].map(field => (
-                    <div key={field.key} className="flex items-center gap-3">
-                      <Badge variant="outline" className="w-10 justify-center">{field.label}</Badge>
-                      <div className="flex-1">
-                        <Input 
-                          type="number"
-                          value={basData[field.key]}
-                          onChange={(e) => setBasData({ ...basData, [field.key]: parseFloat(e.target.value) || 0 })}
-                          className="text-right"
-                        />
+                    <div key={field.key} className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="w-10 justify-center text-xs">{field.label}</Badge>
+                        <span className="text-xs text-muted-foreground">{field.desc}</span>
                       </div>
+                      <Input 
+                        type="number"
+                        value={basData[field.key]}
+                        onChange={(e) => setBasData({ ...basData, [field.key]: parseFloat(e.target.value) || 0 })}
+                        className="text-right"
+                      />
                     </div>
                   ))}
                   <div className="pt-3 border-t space-y-2">
