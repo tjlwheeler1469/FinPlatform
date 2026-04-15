@@ -15,38 +15,73 @@ import {
 import { CLIENT_DATA, getActiveClientId, computeClientTotals } from "@/data/clientData";
 
 const fmt = (v) => new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD", maximumFractionDigits: 0 }).format(v || 0);
-const pct = (v) => `${v >= 0 ? "+" : ""}${v.toFixed(1)}%`;
 
-// Projection engine: computes portfolio at retirement given inputs
-const projectRetirement = ({ currentPortfolio, annualContributions, annualSpending, yearsToRetirement, expectedReturn = 0.065, inflationRate = 0.03 }) => {
+// Box-Muller transform for normal random numbers
+const randn = () => {
+  let u = 0, v = 0;
+  while (u === 0) u = Math.random();
+  while (v === 0) v = Math.random();
+  return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+};
+
+// Monte Carlo projection engine
+const NUM_SIMS = 500;
+
+const projectRetirement = ({ currentPortfolio, annualContributions, annualSpending, yearsToRetirement, expectedReturn = 0.065, volatility = 0.12, inflationRate = 0.03 }) => {
   const realReturn = expectedReturn - inflationRate;
-  let balance = currentPortfolio;
-  const netSavings = annualContributions; // contributions during working years
-  const trajectory = [{ year: 0, balance }];
-
-  // Accumulation phase
-  for (let y = 1; y <= yearsToRetirement; y++) {
-    balance = balance * (1 + realReturn) + netSavings;
-    trajectory.push({ year: y, balance, phase: "accumulation" });
-  }
-  const portfolioAtRetirement = balance;
-
-  // Drawdown phase (25 years in retirement)
+  const realVol = volatility;
+  const totalYears = yearsToRetirement + 25; // 25 years in retirement
   const retirementYears = 25;
-  let runOut = false;
-  let runOutYear = 0;
-  for (let y = 1; y <= retirementYears; y++) {
-    balance = balance * (1 + realReturn * 0.7) - annualSpending; // lower return in retirement
-    if (balance < 0 && !runOut) { runOut = true; runOutYear = y; balance = 0; }
-    trajectory.push({ year: yearsToRetirement + y, balance, phase: "drawdown" });
+
+  // Run Monte Carlo simulations
+  const allPaths = [];
+  let successCount = 0;
+
+  for (let sim = 0; sim < NUM_SIMS; sim++) {
+    let balance = currentPortfolio;
+    const path = [balance];
+
+    // Accumulation phase
+    for (let y = 1; y <= yearsToRetirement; y++) {
+      const yearReturn = realReturn + realVol * randn();
+      balance = balance * (1 + yearReturn) + annualContributions;
+      if (balance < 0) balance = 0;
+      path.push(balance);
+    }
+
+    // Drawdown phase
+    for (let y = 1; y <= retirementYears; y++) {
+      const yearReturn = (realReturn * 0.7) + (realVol * 0.8) * randn(); // lower return & vol in retirement
+      balance = balance * (1 + yearReturn) - annualSpending;
+      if (balance < 0) balance = 0;
+      path.push(balance);
+    }
+
+    if (path[path.length - 1] > 0) successCount++;
+    allPaths.push(path);
   }
 
-  // Confidence score (simplified)
-  const targetBalance = annualSpending * retirementYears;
-  const confidenceRaw = Math.min(100, (portfolioAtRetirement / targetBalance) * 100);
-  const confidence = Math.round(confidenceRaw);
+  // Compute percentiles at each year
+  const trajectory = [];
+  for (let y = 0; y <= totalYears; y++) {
+    const values = allPaths.map((p) => p[y] || 0).sort((a, b) => a - b);
+    const p = (pct) => values[Math.floor(pct * values.length / 100)] || 0;
+    trajectory.push({
+      year: y,
+      p10: p(10), p25: p(25), p50: p(50), p75: p(75), p90: p(90),
+      mean: values.reduce((s, v) => s + v, 0) / values.length,
+      phase: y <= yearsToRetirement ? "accumulation" : "drawdown",
+    });
+  }
 
-  return { portfolioAtRetirement, confidence, trajectory, runOut, runOutYear, retirementYears };
+  const portfolioAtRetirement = trajectory[yearsToRetirement]?.p50 || 0;
+  const confidence = Math.round((successCount / NUM_SIMS) * 100);
+
+  // Check if median path runs out
+  const runOut = trajectory[totalYears]?.p50 <= 0;
+  const runOutYear = trajectory.findIndex((t, i) => i > yearsToRetirement && t.p50 <= 0);
+
+  return { portfolioAtRetirement, confidence, trajectory, runOut, runOutYear: runOutYear > 0 ? runOutYear - yearsToRetirement : 0, retirementYears };
 };
 
 const DEFAULT_SCENARIOS = (clientData) => {
@@ -232,13 +267,14 @@ const ScenarioEngine = ({ embedded = false }) => {
         annualSpending: s.retirement.annualSpending,
         yearsToRetirement: Math.max(1, yearsToRetirement),
         expectedReturn: s.investments.expectedReturn / 100,
+        volatility: 0.12,
       });
     });
   }, [scenarios, totals.netWorth, clientData.retirement.current_age]);
 
   const baseResult = results[0];
 
-  // Build trajectory data for the chart — merge all scenario trajectories by age
+  // Build trajectory data for the chart — merge all scenario trajectories by age, with Monte Carlo bands
   const trajectoryData = useMemo(() => {
     const currentAge = clientData.retirement.current_age;
     const maxYears = Math.max(...results.map((r) => r.trajectory.length));
@@ -247,7 +283,12 @@ const ScenarioEngine = ({ embedded = false }) => {
       const point = { age: currentAge + i };
       scenarios.forEach((s, si) => {
         const t = results[si]?.trajectory[i];
-        point[s.name] = t ? Math.max(0, Math.round(t.balance)) : 0;
+        if (t) {
+          point[`${s.name}`] = Math.max(0, Math.round(t.p50));       // median
+          point[`${s.name}_p10`] = Math.max(0, Math.round(t.p10));   // 10th percentile
+          point[`${s.name}_p90`] = Math.max(0, Math.round(t.p90));   // 90th percentile
+          point[`${s.name}_band`] = [Math.max(0, Math.round(t.p10)), Math.max(0, Math.round(t.p90))]; // band range
+        }
       });
       data.push(point);
     }
@@ -294,7 +335,7 @@ const ScenarioEngine = ({ embedded = false }) => {
             <FlowStep icon={Wallet} label="Budget" value={`${fmt(scenarios[0].budget.monthlyIncome - scenarios[0].budget.monthlyExpenses)}/mo`} subtext="net savings" color="#1a2744" />
             <FlowStep icon={TrendingUp} label="Invest" value={fmt(scenarios[0].investments.annualContributions)} subtext="annual" color="#3b82f6" />
             <FlowStep icon={PiggyBank} label="Portfolio" value={fmt(baseResult.portfolioAtRetirement)} subtext={`at age ${scenarios[0].retirement.retirementAge}`} color="#8b5cf6" />
-            <FlowStep icon={Gauge} label="Confidence" value={`${baseResult.confidence}%`} subtext={baseResult.confidence >= 80 ? "on track" : "needs work"} color={baseResult.confidence >= 80 ? "#22c55e" : "#f59e0b"} isLast />
+            <FlowStep icon={Gauge} label="Confidence" value={`${baseResult.confidence}%`} subtext={`${baseResult.confidence >= 80 ? "on track" : baseResult.confidence >= 60 ? "monitor" : "at risk"} (MC)`} color={baseResult.confidence >= 80 ? "#22c55e" : baseResult.confidence >= 60 ? "#3b82f6" : "#f59e0b"} isLast />
           </div>
         </CardContent>
       </Card>
@@ -329,20 +370,23 @@ const ScenarioEngine = ({ embedded = false }) => {
         ))}
       </div>
 
-      {/* Projected Balance Trajectory Chart */}
+      {/* Projected Balance Trajectory Chart with Monte Carlo Bands */}
       <Card data-testid="trajectory-chart">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm">Projected Balance Over Time</CardTitle>
+          <CardTitle className="text-sm flex items-center gap-2">
+            Projected Balance Over Time
+            <Badge variant="secondary" className="text-[10px] font-normal">{NUM_SIMS} simulations</Badge>
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-[320px]">
+          <div className="h-[350px]">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={trajectoryData} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
                 <defs>
                   {scenarios.map((s) => (
-                    <linearGradient key={s.id} id={`grad-${s.id}`} x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={s.color} stopOpacity={0.2} />
-                      <stop offset="95%" stopColor={s.color} stopOpacity={0.02} />
+                    <linearGradient key={`band-${s.id}`} id={`band-${s.id}`} x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={s.color} stopOpacity={0.15} />
+                      <stop offset="95%" stopColor={s.color} stopOpacity={0.03} />
                     </linearGradient>
                   ))}
                 </defs>
@@ -350,7 +394,6 @@ const ScenarioEngine = ({ embedded = false }) => {
                 <XAxis
                   dataKey="age"
                   tick={{ fontSize: 11 }}
-                  tickFormatter={(v) => `${v}`}
                   label={{ value: "Age", position: "insideBottom", offset: -2, fontSize: 11 }}
                 />
                 <YAxis
@@ -359,11 +402,19 @@ const ScenarioEngine = ({ embedded = false }) => {
                   width={60}
                 />
                 <Tooltip
-                  formatter={(v, name) => [fmt(v), name]}
+                  formatter={(v, name) => {
+                    if (Array.isArray(v)) return [null, null];
+                    if (name.includes("_")) return [null, null];
+                    return [fmt(v), name];
+                  }}
                   labelFormatter={(v) => `Age ${v}`}
                   contentStyle={{ fontSize: 12, borderRadius: 8 }}
+                  itemSorter={() => 0}
                 />
-                <Legend wrapperStyle={{ fontSize: 11 }} />
+                <Legend
+                  wrapperStyle={{ fontSize: 11 }}
+                  payload={scenarios.map((s) => ({ value: s.name, type: "line", color: s.color }))}
+                />
                 <ReferenceLine
                   x={clientData.retirement.retirement_age}
                   stroke="#D4A84C"
@@ -371,6 +422,20 @@ const ScenarioEngine = ({ embedded = false }) => {
                   strokeWidth={2}
                   label={{ value: "Retire", fill: "#D4A84C", fontSize: 10, position: "top" }}
                 />
+                {/* Confidence bands (10th-90th percentile) — render FIRST so median lines draw on top */}
+                {scenarios.map((s) => (
+                  <Area
+                    key={`band-${s.id}`}
+                    type="monotone"
+                    dataKey={`${s.name}_band`}
+                    stroke="none"
+                    fill={`url(#band-${s.id})`}
+                    legendType="none"
+                    tooltipType="none"
+                    isAnimationActive={false}
+                  />
+                ))}
+                {/* Median lines */}
                 {scenarios.map((s) => (
                   <Area
                     key={s.id}
@@ -378,7 +443,7 @@ const ScenarioEngine = ({ embedded = false }) => {
                     dataKey={s.name}
                     stroke={s.color}
                     strokeWidth={s.locked ? 2.5 : 1.5}
-                    fill={`url(#grad-${s.id})`}
+                    fill="none"
                     dot={false}
                     strokeDasharray={s.locked ? undefined : "6 3"}
                   />
@@ -387,9 +452,9 @@ const ScenarioEngine = ({ embedded = false }) => {
             </ResponsiveContainer>
           </div>
           <div className="flex items-center justify-center gap-4 mt-2 text-[10px] text-muted-foreground">
-            <span className="flex items-center gap-1"><span className="w-4 h-0.5 bg-[#D4A84C] inline-block" style={{ borderTop: "2px dashed #D4A84C" }} /> Retirement</span>
-            <span>Solid = Base plan</span>
-            <span>Dashed = Scenarios</span>
+            <span>Shaded = 10th-90th percentile range</span>
+            <span>Lines = median outcome</span>
+            <span className="flex items-center gap-1"><span className="w-4 h-0.5 inline-block" style={{ borderTop: "2px dashed #D4A84C" }} /> Retirement</span>
           </div>
         </CardContent>
       </Card>
@@ -448,8 +513,24 @@ const ScenarioEngine = ({ embedded = false }) => {
                       </td>
                     ))}
                   </tr>
+                  <tr className="border-b text-muted-foreground">
+                    <td className="py-1.5 pr-4 pl-2">10th percentile (worst case)</td>
+                    {results.map((r, i) => {
+                      const retYear = scenarios[i].retirement.retirementAge - clientData.retirement.current_age;
+                      const p10 = r.trajectory[retYear]?.p10 || 0;
+                      return <td key={scenarios[i].id} className="py-1.5 px-2 text-center text-xs">{fmt(p10)}</td>;
+                    })}
+                  </tr>
+                  <tr className="border-b text-muted-foreground">
+                    <td className="py-1.5 pr-4 pl-2">90th percentile (best case)</td>
+                    {results.map((r, i) => {
+                      const retYear = scenarios[i].retirement.retirementAge - clientData.retirement.current_age;
+                      const p90 = r.trajectory[retYear]?.p90 || 0;
+                      return <td key={scenarios[i].id} className="py-1.5 px-2 text-center text-xs">{fmt(p90)}</td>;
+                    })}
+                  </tr>
                   <tr className="border-b bg-muted/30">
-                    <td className="py-2 pr-4 font-semibold">Confidence Score</td>
+                    <td className="py-2 pr-4 font-semibold">Monte Carlo Confidence</td>
                     {results.map((r, i) => (
                       <td key={scenarios[i].id} className="py-2 px-2 text-center font-bold text-base" style={{ color: r.confidence >= 80 ? "#22c55e" : r.confidence >= 60 ? "#3b82f6" : "#f59e0b" }}>
                         {r.confidence}%
