@@ -1,48 +1,48 @@
 # Wealth Command Centre - PRD
 
 ## Original Problem Statement
-Build an AFSL-grade wealth management platform with consolidated views, client context switching, live market data, AI-powered insights, and comprehensive adviser tools.
+Build an AFSL-grade wealth management platform for HNW clients with consolidated views, client context switching, scenario modelling, and comprehensive adviser tools.
 
 ## Core Architecture
 - **Frontend**: React (CRA) with Shadcn/UI, Recharts, Lucide icons, jsPDF
 - **Backend**: FastAPI + MongoDB
 - **AI**: OpenAI GPT-5.2 (Emergent LLM Key)
-- **Centralized Data**: `/app/frontend/src/data/clientData.js` — single source of truth for all 7 client profiles
+- **Centralized Data**: `/app/frontend/src/data/clientData.js` — single source of truth
 
-## Client Profiles (all in clientData.js)
-| ID | Name | Net Worth | Age | Risk | Retire |
-|----|------|-----------|-----|------|--------|
-| thompson_family | David & Sarah Thompson | $1,608,800 | 50 | Balanced | 67 |
-| chen_family | Michael & Lisa Chen | $5,200,000 | 49 | Balanced | 60 |
-| client_3 | Robert Mitchell | $1,450,000 | 62 | Conservative | 65 |
-| client_4 | Emma & David Williams | $615,000 | 39 | TBD | 67 |
-| client_5 | Raj & Priya Patel | $3,100,000 | 54 | Aggressive | 60 |
-| client_6 | Anderson Partnership | $4,200,000 | 59 | Balanced | 65 |
-| client_7 | Sarah Kim | $1,625,000 | 34 | Aggressive | 55 |
+## HNW Client Profiles (all in clientData.js)
+| ID | Name | Net Worth | Gross Assets | Age | Risk | Retire |
+|----|------|-----------|-------------|-----|------|--------|
+| thompson_family | David & Sarah Thompson | $9.6M | $11.7M | 50 | Balanced | 67 |
+| chen_family | Michael & Lisa Chen | $22.8M | $24.0M | 49 | Growth | 60 |
+| client_3 | Robert Mitchell | $9.6M | $9.6M | 62 | Conservative | 65 |
+| client_4 | Emma & David Williams | $2.8M | $4.0M | 39 | Growth | 67 |
+| client_5 | Raj & Priya Patel | $17.5M | $19.6M | 54 | Aggressive | 60 |
+| client_6 | Anderson Partnership | $18.3M | $22.0M | 59 | Balanced | 65 |
+| client_7 | Sarah Kim | $10.2M | $11.3M | 34 | Aggressive | 50 |
 
 ## Key Features
-### Scenario Engine (Goals tab)
-Connected flow: Budget → Investments → Portfolio → Retirement
-- Save/compare multiple scenarios with delta indicators
-- Adjustable sliders: expenses, extra savings, contributions, return, retirement age, spending
-- Comparison table with confidence scores
-- Per-client data isolation
+### Scenario Engine (Goals tab) — Monte Carlo
+- 500 simulations per scenario, 10th-90th percentile confidence bands
+- Connected flow: Budget → Investments → Portfolio → Retirement
+- Adjustable sliders, comparison table, trajectory chart
 
 ### Views
-- **Personal** (`/dashboard`): 5 tabs, full LHS nav
-- **Client Portal** (`/client-portal`): 6 tabs (with Investments), minimal LHS nav
-- **Adviser Client** (`/dashboard` adviser mode): 8 outer tabs, 6 inner tabs
-- **Client Portal Simplified**: Hero gauge, plain English, improvement actions
+- Personal (`/dashboard`): 5 tabs, full LHS nav
+- Client Portal (`/client-portal`): 6 tabs, minimal nav
+- Adviser Client (`/dashboard` adviser mode): 8 outer + 6 inner tabs
+- Combined client view: View Details → /dashboard (not separate /client-360)
 
-## Completed (as of 15 April 2026)
-- [x] P3: Centralized client data module + eliminated ALL Wheeler references (38+ files)
-- [x] P2: What-If Scenario Engine with Budget→Investments→Portfolio→Retirement flow
-- [x] All 7 client profiles with isolated data across all views
-- [x] lazyRetry wrapper on all lazy imports
-- [x] Tab styling, Budget tab, Goals removal from sidebar, Rebalancing+Radar
-- [x] Client Profile dashboard, Runtime error suppression
+## Completed (as of 16 April 2026)
+- [x] HNW numbers across all profiles ($3M-$25M range)
+- [x] Centralized clientData.js — PersonalDashboard, InvestmentsOverview, ClientProfileTab all import from it
+- [x] BAS Calculator field labels (G1-G20 descriptions)
+- [x] Combined adviser client view (View Details → /dashboard)
+- [x] Monte Carlo scenario engine with trajectory chart + confidence bands
+- [x] All Wheeler references eliminated
 
 ## Backlog
+- [ ] P2: Adviser notification customisation settings
+- [ ] P2: Client invoicing from CRM
+- [ ] P2: Client portal ID upload, TFN input, info update prompts → Xplan
 - [ ] P2: Real email integration for Client Pack auto-delivery
-- [ ] P2: Enhanced scenario engine — trajectory charts, Monte Carlo integration
 - [ ] P3: Replace Mock Xplan integration with real API

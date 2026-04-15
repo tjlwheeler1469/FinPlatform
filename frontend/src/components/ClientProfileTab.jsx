@@ -8,71 +8,38 @@ import {
 
 const fmt = (v) => new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(v || 0);
 
-const PROFILES = {
-  thompson_family: {
-    name: "David & Sarah Thompson",
-    initials: "DT",
-    status: "Married",
-    age: 50,
-    riskProfile: "Balanced",
-    retirementAge: 67,
-    adviser: "Sarah Chen",
-    income: 185000,
-    netWorth: 1608800,
-    grossAssets: 2278000,
-    liabilities: 669200,
-    superBalance: 443000,
-    insuranceCover: "Life + TPD + IP",
-    nextReview: "15 May 2026",
-    allocation: [
-      { type: "Property", value: 1605000, color: "#8B5CF6" },
-      { type: "Super", value: 443000, color: "#10B981" },
-      { type: "Shares", value: 84500, color: "#3B82F6" },
-      { type: "Cash", value: 63000, color: "#F59E0B" },
-      { type: "Managed Funds", value: 32000, color: "#EC4899" },
-      { type: "Other", value: 50500, color: "#6B7280" },
-    ],
+import { CLIENT_DATA, computeClientTotals } from "@/data/clientData";
+
+const COLORS = ["#3B82F6", "#10B981", "#8B5CF6", "#F59E0B", "#EC4899", "#6B7280", "#14B8A6", "#F97316"];
+
+const buildProfile = (clientId) => {
+  const d = CLIENT_DATA[clientId] || CLIENT_DATA.thompson_family;
+  const t = computeClientTotals(clientId);
+  const p = d.profile;
+  // Group assets by type for allocation
+  const typeMap = {};
+  d.assets.forEach(a => { typeMap[a.type] = (typeMap[a.type] || 0) + a.value; });
+  const allocation = Object.entries(typeMap)
+    .sort((a, b) => b[1] - a[1])
+    .map(([type, value], i) => ({ type, value, color: COLORS[i % COLORS.length] }));
+  // Super balance
+  const superBalance = d.assets.filter(a => a.type === 'Super' || a.type === 'SMSF').reduce((s, a) => s + a.value, 0);
+  return {
+    name: p.name, initials: p.first_name[0] + p.last_name[0], status: p.status, age: p.age,
+    riskProfile: p.riskProfile, retirementAge: p.retirementAge, adviser: p.advisor || 'Sarah Chen',
+    income: p.incomeHousehold, netWorth: t.netWorth, grossAssets: t.grossAssets, liabilities: t.totalLiabilities,
+    superBalance, insuranceCover: "Life + TPD + IP", nextReview: "15 May 2026",
+    allocation,
     goals: [
-      { name: "Retirement at 67", target: 2500000, current: 1608800 },
-      { name: "Pay off investment loan", target: 380000, current: 180000 },
-      { name: "Emergency fund $60K", target: 60000, current: 28000 },
+      { name: `Retirement at ${p.retirementAge}`, target: d.retirement.retirement_spending * 25, current: t.netWorth },
+      ...(t.totalLiabilities > 0 ? [{ name: "Debt reduction", target: t.totalLiabilities, current: Math.round(t.totalLiabilities * 0.4) }] : []),
+      { name: "Emergency reserve", target: Math.round(p.expensesAnnual * 0.5), current: d.assets.filter(a => a.type === 'Cash').reduce((s, a) => s + a.value, 0) },
     ],
-  },
-  client_1: null,
-  chen_family: {
-    name: "Michael & Lisa Chen",
-    initials: "MC",
-    status: "Married",
-    age: 49,
-    riskProfile: "Balanced",
-    retirementAge: 60,
-    adviser: "Sarah Chen",
-    income: 450000,
-    netWorth: 5200000,
-    grossAssets: 5200000,
-    liabilities: 0,
-    superBalance: 1200000,
-    insuranceCover: "Life + TPD",
-    nextReview: "22 Jun 2026",
-    allocation: [
-      { type: "Trust Portfolio", value: 2800000, color: "#3B82F6" },
-      { type: "Super", value: 1200000, color: "#10B981" },
-      { type: "Property", value: 1100000, color: "#8B5CF6" },
-      { type: "Cash", value: 100000, color: "#F59E0B" },
-    ],
-    goals: [
-      { name: "Retirement at 60", target: 6000000, current: 5200000 },
-      { name: "Sophie's university", target: 150000, current: 85000 },
-    ],
-  },
-  client_2: null,
+  };
 };
 
-PROFILES.client_1 = PROFILES.thompson_family;
-PROFILES.client_2 = PROFILES.chen_family;
-
 const ClientProfileTab = ({ clientId }) => {
-  const p = PROFILES[clientId] || PROFILES.thompson_family;
+  const p = buildProfile(clientId || 'thompson_family');
   const totalAlloc = p.allocation.reduce((s, a) => s + a.value, 0);
 
   return (
