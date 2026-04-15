@@ -113,7 +113,7 @@ export const CalendarExportButton = ({ event, variant = "outline", size = "sm" }
 };
 
 // Bulk Export Button
-export const CalendarBulkExportButton = ({ events, filename = "wheeler_meetings.ics" }) => {
+export const CalendarBulkExportButton = ({ events, filename = "halcyon_meetings.ics" }) => {
   const handleBulkExport = () => {
     if (events.length === 0) {
       toast.error("No events to export");

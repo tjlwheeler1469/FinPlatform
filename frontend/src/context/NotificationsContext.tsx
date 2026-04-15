@@ -37,7 +37,7 @@ interface NotificationsContextType {
 const INITIAL_NOTIFICATIONS: Notification[] = [
   {
     id: 'notif_1', type: 'task', title: 'Task Due Tomorrow',
-    message: 'Annual Review - Wheeler is due tomorrow',
+    message: 'Annual Review - Thompson is due tomorrow',
     timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
     read: false, priority: 'high', link: '/practice-management'
   },
@@ -75,12 +75,12 @@ interface NotificationsProviderProps {
 
 export const NotificationsProvider = ({ children }: NotificationsProviderProps) => {
   const [notifications, setNotifications] = useState<Notification[]>(() => {
-    const stored = localStorage.getItem('wheeler_notifications');
+    const stored = localStorage.getItem('halcyon_notifications');
     return stored ? JSON.parse(stored) : INITIAL_NOTIFICATIONS;
   });
 
   const [preferences, setPreferences] = useState<NotificationPreferences>(() => {
-    const stored = localStorage.getItem('wheeler_notification_preferences');
+    const stored = localStorage.getItem('halcyon_notification_preferences');
     return stored ? JSON.parse(stored) : {
       taskReminders: true,
       meetingReminders: true,
@@ -93,11 +93,11 @@ export const NotificationsProvider = ({ children }: NotificationsProviderProps) 
   });
 
   useEffect(() => {
-    localStorage.setItem('wheeler_notifications', JSON.stringify(notifications));
+    localStorage.setItem('halcyon_notifications', JSON.stringify(notifications));
   }, [notifications]);
 
   useEffect(() => {
-    localStorage.setItem('wheeler_notification_preferences', JSON.stringify(preferences));
+    localStorage.setItem('halcyon_notification_preferences', JSON.stringify(preferences));
   }, [preferences]);
 
   const unreadCount = notifications.filter(n => !n.read).length;
@@ -146,7 +146,7 @@ export const NotificationsProvider = ({ children }: NotificationsProviderProps) 
       task: { title: 'New Task Assigned', message: 'Review portfolio strategy for Brown Investments' },
       meeting: { title: 'Meeting Reminder', message: 'Client call with Smith & Associates in 30 minutes' },
       market: { title: 'Stock Alert', message: 'BHP has moved 3% today' },
-      compliance: { title: 'Document Required', message: 'Annual review documentation needed for Wheeler Family' },
+      compliance: { title: 'Document Required', message: 'Annual review documentation needed for Thompson Family' },
       invoice: { title: 'Payment Received', message: 'INV-2025-002 has been paid' }
     };
 

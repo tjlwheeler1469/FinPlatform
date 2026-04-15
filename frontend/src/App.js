@@ -700,7 +700,7 @@ const PortfolioProvider = ({ children }) => {
 
   // Load saved data from localStorage on mount
   useEffect(() => {
-    const storageKey = activeClientId ? `clientData_${activeClientId}` : "wheelerFamilyData";
+    const storageKey = activeClientId ? `clientData_${activeClientId}` : "halcyonClientData";
     const savedData = localStorage.getItem(storageKey);
     if (savedData) {
       try {
@@ -790,7 +790,7 @@ const PortfolioProvider = ({ children }) => {
       company,
       lastSaved: new Date().toISOString()
     };
-    const storageKey = activeClientId ? `clientData_${activeClientId}` : "wheelerFamilyData";
+    const storageKey = activeClientId ? `clientData_${activeClientId}` : "halcyonClientData";
     localStorage.setItem(storageKey, JSON.stringify(dataToSave));
     setHasUnsavedChanges(false);
     setLastSaved(dataToSave.lastSaved);

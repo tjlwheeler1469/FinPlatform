@@ -126,7 +126,7 @@ const PortfolioAggregator = () => {
     setLoading(true);
     try {
       const [cdrRes, superRes] = await Promise.all([
-        axios.get(`${API}/feeds/cdr/accounts/wheeler_family`).catch(() => ({ data: null })),
+        axios.get(`${API}/feeds/cdr/accounts/halcyon_family`).catch(() => ({ data: null })),
         axios.get(`${API}/feeds/super/M123456789`).catch(() => ({ data: null }))
       ]);
 

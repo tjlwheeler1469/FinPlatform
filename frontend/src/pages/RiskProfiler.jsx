@@ -246,7 +246,7 @@ const RiskProfiler = () => {
       answers: { ...answers }
     };
     setSavedProfiles([newProfile, ...savedProfiles]);
-    localStorage.setItem('wheeler_risk_profiles', JSON.stringify([newProfile, ...savedProfiles]));
+    localStorage.setItem('halcyon_risk_profiles', JSON.stringify([newProfile, ...savedProfiles]));
     toast.success("Risk profile saved");
   };
 

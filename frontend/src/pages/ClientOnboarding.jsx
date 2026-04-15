@@ -216,7 +216,7 @@ const ClientOnboarding = () => {
 
   const completeOnboarding = () => {
     // Save to localStorage
-    localStorage.setItem("wheeler_onboarding_complete", JSON.stringify({
+    localStorage.setItem("halcyon_onboarding_complete", JSON.stringify({
       data: onboardingData,
       completedAt: new Date().toISOString()
     }));

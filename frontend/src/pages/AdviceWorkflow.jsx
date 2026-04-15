@@ -68,7 +68,7 @@ const INITIAL_ADVICE = [
   {
     id: "adv_001",
     client: "Thompson Family",
-    clientId: "hh_wheeler001",
+    clientId: "hh_thompson001",
     type: "soa",
     title: "Retirement Strategy Review",
     status: "draft",
@@ -123,7 +123,7 @@ const INITIAL_ADVICE = [
   {
     id: "adv_004",
     client: "Thompson Family",
-    clientId: "hh_wheeler001",
+    clientId: "hh_thompson001",
     type: "soa",
     title: "Insurance Review 2024",
     status: "delivered",
@@ -234,7 +234,7 @@ const AdviceWorkflow = () => {
                       <SelectValue placeholder="Select client" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="wheeler">Thompson Family</SelectItem>
+                      <SelectItem value="thompson">Thompson Family</SelectItem>
                       <SelectItem value="chen">Chen Family</SelectItem>
                       <SelectItem value="patel">Patel Family</SelectItem>
                     </SelectContent>

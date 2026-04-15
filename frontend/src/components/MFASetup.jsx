@@ -73,7 +73,7 @@ const MFASetup = ({ userId, userEmail, onMFAEnabled, onMFADisabled }) => {
       } catch (error) {
         console.error("Error loading MFA status:", error);
         // Fall back to localStorage
-        const saved = localStorage.getItem(`wheeler_mfa_${userId}`);
+        const saved = localStorage.getItem(`halcyon_mfa_${userId}`);
         if (saved) {
           setMfaStatus(JSON.parse(saved));
         }
@@ -88,7 +88,7 @@ const MFASetup = ({ userId, userEmail, onMFAEnabled, onMFADisabled }) => {
   // Also keep localStorage as backup
   useEffect(() => {
     if (!isLoading) {
-      localStorage.setItem(`wheeler_mfa_${userId || 'user'}`, JSON.stringify(mfaStatus));
+      localStorage.setItem(`halcyon_mfa_${userId || 'user'}`, JSON.stringify(mfaStatus));
     }
   }, [mfaStatus, userId, isLoading]);
 

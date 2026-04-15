@@ -7,43 +7,42 @@ Build an AFSL-grade wealth management platform with consolidated views, client c
 - **Frontend**: React (CRA) with Shadcn/UI, Recharts, Lucide icons, jsPDF
 - **Backend**: FastAPI + MongoDB
 - **AI**: OpenAI GPT-5.2 (Emergent LLM Key)
+- **Centralized Data**: `/app/frontend/src/data/clientData.js` — single source of truth for all 7 client profiles
 
-## Client Profiles (completely isolated mock data)
-### P1: Thompson Family
-- Net Worth: $1,608,800 | Gross Assets: $2,278,000 | Liabilities: $669,200
-- Income: $185K | Risk: Balanced | Age 50 | Retire at 67
+## Client Profiles (all in clientData.js)
+| ID | Name | Net Worth | Age | Risk | Retire |
+|----|------|-----------|-----|------|--------|
+| thompson_family | David & Sarah Thompson | $1,608,800 | 50 | Balanced | 67 |
+| chen_family | Michael & Lisa Chen | $5,200,000 | 49 | Balanced | 60 |
+| client_3 | Robert Mitchell | $1,450,000 | 62 | Conservative | 65 |
+| client_4 | Emma & David Williams | $615,000 | 39 | TBD | 67 |
+| client_5 | Raj & Priya Patel | $3,100,000 | 54 | Aggressive | 60 |
+| client_6 | Anderson Partnership | $4,200,000 | 59 | Balanced | 65 |
+| client_7 | Sarah Kim | $1,625,000 | 34 | Aggressive | 55 |
 
-### P2: Chen Family Trust
-- Net Worth: $5,200,000 | Gross Assets: $5,200,000 | Liabilities: $0
-- Income: $450K | Risk: Balanced | Age 49 | Retire at 60
+## Key Features
+### Scenario Engine (Goals tab)
+Connected flow: Budget → Investments → Portfolio → Retirement
+- Save/compare multiple scenarios with delta indicators
+- Adjustable sliders: expenses, extra savings, contributions, return, retirement age, spending
+- Comparison table with confidence scores
+- Per-client data isolation
 
-## Tab Structures
-### Personal Dashboard (6 tabs): Overview -> Net Worth -> Wealth Trends -> Investments -> Insights -> Transactions
-### Adviser Client Overview (8 tabs): Overview -> Actions -> Retirement -> Investments -> Budget -> Goals -> Tax Centre -> Profile
-### Investments (10 sub-tabs): Overview -> Bonds -> Cash & TDs -> Crypto -> Managed Funds -> Property -> Shares & ETFs -> SMSF -> Super & Pension -> Unlisted
+### Views
+- **Personal** (`/dashboard`): 5 tabs, full LHS nav
+- **Client Portal** (`/client-portal`): 6 tabs (with Investments), minimal LHS nav
+- **Adviser Client** (`/dashboard` adviser mode): 8 outer tabs, 6 inner tabs
+- **Client Portal Simplified**: Hero gauge, plain English, improvement actions
 
-## Sidebar Structure
-### Personal: DASHBOARD only (My Dashboard, Markets)
-### Adviser: DASHBOARD -> CRM -> EXECUTION -> INTEGRATIONS -> TOOLS
-### Client Context: OVERVIEW -> DOCUMENTS
-
-## Client Portal (at /client-portal)
-Core question: "Am I going to be okay?" — 6 phases: Hero gauge, Plain English, Actions, Timeline, Advisor Guidance, No complexity
-
-## Completed (as of 14 April 2026)
-- [x] Personal dashboard: Investments in tab, LHS nav cleaned (Dashboard only), Assets by Entity at top of Net Worth
-- [x] Client data isolation: PersonalDashboard + InvestmentsOverview switch per selected client (P1/P2)
-- [x] lazyRetry wrapper on all 145 lazy imports (prevents chunk load crashes)
-- [x] Client Portal redesigned: 6-phase emotionally engaging layout
-- [x] Adviser tab styling: subtle 10% opacity bg with gold underline
-- [x] Budget tab between Investments and Goals in adviser client overview
-- [x] Goals removed from adviser client context sidebar
-- [x] Portfolio Rebalancing above Top Holdings + Allocation Radar
-- [x] Client Profile simplified to dashboard
-- [x] Runtime error overlay suppression
+## Completed (as of 15 April 2026)
+- [x] P3: Centralized client data module + eliminated ALL Wheeler references (38+ files)
+- [x] P2: What-If Scenario Engine with Budget→Investments→Portfolio→Retirement flow
+- [x] All 7 client profiles with isolated data across all views
+- [x] lazyRetry wrapper on all lazy imports
+- [x] Tab styling, Budget tab, Goals removal from sidebar, Rebalancing+Radar
+- [x] Client Profile dashboard, Runtime error suppression
 
 ## Backlog
 - [ ] P2: Real email integration for Client Pack auto-delivery
-- [ ] P2: What-If Budget scenario saving/comparison
-- [ ] P3: Centralize all client mock data into shared module
+- [ ] P2: Enhanced scenario engine — trajectory charts, Monte Carlo integration
 - [ ] P3: Replace Mock Xplan integration with real API

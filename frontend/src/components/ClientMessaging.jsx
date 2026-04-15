@@ -166,7 +166,7 @@ const formatFullDate = (dateStr) => {
 
 const ClientMessaging = ({ userRole = 'client', userName = 'David Thompson' }) => {
   const [messages, setMessages] = useState(() => {
-    const stored = localStorage.getItem('wheeler_messages');
+    const stored = localStorage.getItem('halcyon_messages');
     return stored ? JSON.parse(stored) : INITIAL_MESSAGES;
   });
   const [selectedMessage, setSelectedMessage] = useState(null);
@@ -179,7 +179,7 @@ const ClientMessaging = ({ userRole = 'client', userName = 'David Thompson' }) =
 
   // Persist messages
   useEffect(() => {
-    localStorage.setItem('wheeler_messages', JSON.stringify(messages));
+    localStorage.setItem('halcyon_messages', JSON.stringify(messages));
   }, [messages]);
 
   // Filter messages by folder and search

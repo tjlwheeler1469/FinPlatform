@@ -107,16 +107,16 @@ const Collaboration = () => {
 
   // Load from localStorage
   useEffect(() => {
-    const savedTeam = localStorage.getItem("wheeler_collaboration_team");
-    const savedComments = localStorage.getItem("wheeler_collaboration_comments");
+    const savedTeam = localStorage.getItem("halcyon_collaboration_team");
+    const savedComments = localStorage.getItem("halcyon_collaboration_comments");
     if (savedTeam) setTeam(JSON.parse(savedTeam));
     if (savedComments) setComments(JSON.parse(savedComments));
   }, []);
 
   // Save to localStorage
   useEffect(() => {
-    localStorage.setItem("wheeler_collaboration_team", JSON.stringify(team));
-    localStorage.setItem("wheeler_collaboration_comments", JSON.stringify(comments));
+    localStorage.setItem("halcyon_collaboration_team", JSON.stringify(team));
+    localStorage.setItem("halcyon_collaboration_comments", JSON.stringify(comments));
   }, [team, comments]);
 
   // Invite team member

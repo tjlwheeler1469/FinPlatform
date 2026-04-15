@@ -38,14 +38,14 @@ import { WORKFLOW_TEMPLATES, WORKFLOW_MOCK_CLIENTS as MOCK_CLIENTS } from "./wor
 
 const WorkflowAutomation = ({ onTaskCreated, onReminderSet }) => {
   const [activeWorkflows, setActiveWorkflows] = useState(() => {
-    const saved = localStorage.getItem("wheeler_workflows");
+    const saved = localStorage.getItem("halcyon_workflows");
     return saved ? JSON.parse(saved) : [];
   });
   const [showNewWorkflow, setShowNewWorkflow] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [selectedClient, setSelectedClient] = useState("");
   const [automationRules, setAutomationRules] = useState(() => {
-    const saved = localStorage.getItem("wheeler_automation_rules");
+    const saved = localStorage.getItem("halcyon_automation_rules");
     return saved ? JSON.parse(saved) : {
       autoAssignNewClients: true,
       sendMeetingReminders: true,
@@ -60,12 +60,12 @@ const WorkflowAutomation = ({ onTaskCreated, onReminderSet }) => {
 
   // Save workflows to localStorage
   useEffect(() => {
-    localStorage.setItem("wheeler_workflows", JSON.stringify(activeWorkflows));
+    localStorage.setItem("halcyon_workflows", JSON.stringify(activeWorkflows));
   }, [activeWorkflows]);
 
   // Save rules to localStorage
   useEffect(() => {
-    localStorage.setItem("wheeler_automation_rules", JSON.stringify(automationRules));
+    localStorage.setItem("halcyon_automation_rules", JSON.stringify(automationRules));
   }, [automationRules]);
 
   // Start a workflow

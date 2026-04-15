@@ -73,7 +73,7 @@ const DocuSignIntegration = ({ onSignatureComplete }) => {
       } catch (error) {
         console.error("Error loading signature requests:", error);
         // Fall back to localStorage
-        const saved = localStorage.getItem("wheeler_docusign_requests");
+        const saved = localStorage.getItem("halcyon_docusign_requests");
         setSignatureRequests(saved ? JSON.parse(saved) : INITIAL_SIGNATURE_REQUESTS);
         toast.info("Loaded from local cache");
       } finally {
@@ -87,7 +87,7 @@ const DocuSignIntegration = ({ onSignatureComplete }) => {
   // Also keep localStorage as backup
   useEffect(() => {
     if (!isLoading && signatureRequests.length > 0) {
-      localStorage.setItem("wheeler_docusign_requests", JSON.stringify(signatureRequests));
+      localStorage.setItem("halcyon_docusign_requests", JSON.stringify(signatureRequests));
     }
   }, [signatureRequests, isLoading]);
 

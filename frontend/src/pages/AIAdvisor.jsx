@@ -85,7 +85,7 @@ const AIAdvisor = () => {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const res = await axios.get(`${API}/ai/advice-history/hh_wheeler001`);
+        const res = await axios.get(`${API}/ai/advice-history/hh_thompson001`);
         setAdviceHistory(res.data.advice_history || []);
       } catch (error) {
         console.error("Error fetching advice history:", error);
@@ -104,7 +104,7 @@ const AIAdvisor = () => {
     setLoading(true);
     try {
       const res = await axios.post(`${API}/ai/generate-advice`, {
-        household_id: "hh_wheeler001",
+        household_id: "hh_thompson001",
         context: buildContext(),
         question: q,
         advice_type: "general"
@@ -114,7 +114,7 @@ const AIAdvisor = () => {
       toast.success("AI advice generated");
       
       // Refresh history
-      const historyRes = await axios.get(`${API}/ai/advice-history/hh_wheeler001`);
+      const historyRes = await axios.get(`${API}/ai/advice-history/hh_thompson001`);
       setAdviceHistory(historyRes.data.advice_history || []);
     } catch (error) {
       console.error("Error generating advice:", error);

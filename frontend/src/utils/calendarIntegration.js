@@ -125,7 +125,7 @@ export const exportEventToICS = (event) => {
 };
 
 // Export multiple events
-export const exportEventsToICS = (events, filename = 'wheeler_calendar.ics') => {
+export const exportEventsToICS = (events, filename = 'halcyon_calendar.ics') => {
   const icsContent = generateICSCalendar(events);
   downloadICS(icsContent, filename);
 };
@@ -200,14 +200,14 @@ export class CalendarIntegration {
   }
 
   loadConnections() {
-    const stored = localStorage.getItem('wheeler_calendar_connections');
+    const stored = localStorage.getItem('halcyon_calendar_connections');
     if (stored) {
       this.connections = JSON.parse(stored);
     }
   }
 
   saveConnections() {
-    localStorage.setItem('wheeler_calendar_connections', JSON.stringify(this.connections));
+    localStorage.setItem('halcyon_calendar_connections', JSON.stringify(this.connections));
   }
 
   // Check if a service is connected

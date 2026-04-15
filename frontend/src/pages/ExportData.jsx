@@ -293,21 +293,21 @@ const ExportData = () => {
       switch (format) {
         case "csv":
           content = generateCSV();
-          filename = `wheeler_portfolio_${formatDate(new Date()).replace(/\//g, '-')}.csv`;
+          filename = `halcyon_portfolio_${formatDate(new Date()).replace(/\//g, '-')}.csv`;
           break;
         case "xero":
           content = generateXeroCSV();
-          filename = `wheeler_xero_import_${formatDate(new Date()).replace(/\//g, '-')}.csv`;
+          filename = `halcyon_xero_import_${formatDate(new Date()).replace(/\//g, '-')}.csv`;
           break;
         case "myob":
           content = generateMYOBCSV();
-          filename = `wheeler_myob_import_${formatDate(new Date()).replace(/\//g, '-')}.txt`;
+          filename = `halcyon_myob_import_${formatDate(new Date()).replace(/\//g, '-')}.txt`;
           mimeType = "text/plain";
           break;
         case "pdf":
           // Generate simple text report for PDF
           content = generatePDFReport();
-          filename = `wheeler_portfolio_report_${formatDate(new Date()).replace(/\//g, '-')}.txt`;
+          filename = `halcyon_portfolio_report_${formatDate(new Date()).replace(/\//g, '-')}.txt`;
           mimeType = "text/plain";
           break;
         default:

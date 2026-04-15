@@ -118,7 +118,7 @@ const formatTime = (dateStr) => {
 const DocumentManager = ({ clientId = null, compact = false }) => {
   const { sharePortfolio, propertyPortfolio } = usePortfolio();
   const [documents, setDocuments] = useState(() => {
-    const stored = localStorage.getItem('wheeler_documents');
+    const stored = localStorage.getItem('halcyon_documents');
     return stored ? JSON.parse(stored) : INITIAL_DOCUMENTS;
   });
   const [searchQuery, setSearchQuery] = useState('');
@@ -128,7 +128,7 @@ const DocumentManager = ({ clientId = null, compact = false }) => {
 
   // Persist documents
   useEffect(() => {
-    localStorage.setItem('wheeler_documents', JSON.stringify(documents));
+    localStorage.setItem('halcyon_documents', JSON.stringify(documents));
   }, [documents]);
 
   // Filter documents - memoized to avoid recomputation

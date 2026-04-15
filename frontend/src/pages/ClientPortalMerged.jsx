@@ -793,7 +793,7 @@ const ClientDashboard = ({ clientAuth, onLogout }) => {
           {/* Digital Onboarding Tab */}
           <TabsContent value="onboarding" className="space-y-6">
             <DigitalOnboarding 
-              clientId={clientAuth?.id || "client_wheeler"}
+              clientId={clientAuth?.id || "client_thompson"}
               onComplete={(data) => {
                 toast.success("Fact-find completed successfully!");
               }}

@@ -618,7 +618,7 @@ const PracticeManagement = () => {
                     startTime: m.scheduled_at,
                     endTime: new Date(new Date(m.scheduled_at).getTime() + m.duration_minutes * 60000).toISOString()
                   }))}
-                  filename="wheeler_meetings.ics"
+                  filename="halcyon_meetings.ics"
                 />
                 <Dialog open={showNewMeetingDialog} onOpenChange={setShowNewMeetingDialog}>
                   <DialogTrigger asChild>

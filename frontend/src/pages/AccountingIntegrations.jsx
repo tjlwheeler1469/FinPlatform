@@ -124,7 +124,7 @@ const AccountingIntegrations = () => {
 
   // Load saved connections from localStorage
   useEffect(() => {
-    const savedConnections = localStorage.getItem('wheeler_accounting_connections');
+    const savedConnections = localStorage.getItem('halcyon_accounting_connections');
     if (savedConnections) {
       setConnections(JSON.parse(savedConnections));
     }
@@ -132,7 +132,7 @@ const AccountingIntegrations = () => {
 
   // Save connections to localStorage
   useEffect(() => {
-    localStorage.setItem('wheeler_accounting_connections', JSON.stringify(connections));
+    localStorage.setItem('halcyon_accounting_connections', JSON.stringify(connections));
   }, [connections]);
 
   // Simulate OAuth connection flow

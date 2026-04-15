@@ -421,7 +421,7 @@ const Copilot = () => {
     }
 
     // Risk profile check
-    const savedProfile = localStorage.getItem("wheeler_risk_profiles");
+    const savedProfile = localStorage.getItem("halcyon_risk_profiles");
     if (!savedProfile) {
       alerts.push({
         id: "risk-profile",
@@ -582,7 +582,7 @@ const Copilot = () => {
         break;
 
       case "risk":
-        const savedProfile = localStorage.getItem("wheeler_risk_profiles");
+        const savedProfile = localStorage.getItem("halcyon_risk_profiles");
         const profile = savedProfile ? JSON.parse(savedProfile)[0] : null;
         
         if (profile) {

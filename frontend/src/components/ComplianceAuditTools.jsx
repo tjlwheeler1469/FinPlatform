@@ -46,11 +46,11 @@ import { KYC_CHECKLIST, COMPLIANCE_MOCK_CLIENTS as MOCK_CLIENTS, INITIAL_ACTIVIT
 const ComplianceAuditTools = ({ clientId, onComplianceUpdate }) => {
   const [activeTab, setActiveTab] = useState("audit-log");
   const [activityLog, setActivityLog] = useState(() => {
-    const saved = localStorage.getItem("wheeler_activity_log");
+    const saved = localStorage.getItem("halcyon_activity_log");
     return saved ? JSON.parse(saved) : INITIAL_ACTIVITY_LOG;
   });
   const [kycStatus, setKycStatus] = useState(() => {
-    const saved = localStorage.getItem("wheeler_kyc_status");
+    const saved = localStorage.getItem("halcyon_kyc_status");
     return saved ? JSON.parse(saved) : {};
   });
   const [selectedClient, setSelectedClient] = useState(clientId || "client_1");
@@ -65,11 +65,11 @@ const ComplianceAuditTools = ({ clientId, onComplianceUpdate }) => {
 
   // Save to localStorage
   useEffect(() => {
-    localStorage.setItem("wheeler_activity_log", JSON.stringify(activityLog));
+    localStorage.setItem("halcyon_activity_log", JSON.stringify(activityLog));
   }, [activityLog]);
 
   useEffect(() => {
-    localStorage.setItem("wheeler_kyc_status", JSON.stringify(kycStatus));
+    localStorage.setItem("halcyon_kyc_status", JSON.stringify(kycStatus));
   }, [kycStatus]);
 
   // Get client KYC status

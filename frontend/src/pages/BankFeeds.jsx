@@ -123,8 +123,8 @@ const BankFeeds = () => {
   useEffect(() => {
     if (sandboxMode) {
       // Load from localStorage or use mock data
-      const savedAccounts = localStorage.getItem('wheeler_bank_accounts');
-      const savedTxns = localStorage.getItem('wheeler_bank_transactions');
+      const savedAccounts = localStorage.getItem('halcyon_bank_accounts');
+      const savedTxns = localStorage.getItem('halcyon_bank_transactions');
       
       if (savedAccounts) {
         setConnectedAccounts(JSON.parse(savedAccounts));
@@ -136,8 +136,8 @@ const BankFeeds = () => {
   // Save to localStorage when accounts change
   useEffect(() => {
     if (connectedAccounts.length > 0) {
-      localStorage.setItem('wheeler_bank_accounts', JSON.stringify(connectedAccounts));
-      localStorage.setItem('wheeler_bank_transactions', JSON.stringify(transactions));
+      localStorage.setItem('halcyon_bank_accounts', JSON.stringify(connectedAccounts));
+      localStorage.setItem('halcyon_bank_transactions', JSON.stringify(transactions));
     }
   }, [connectedAccounts, transactions]);
 

@@ -295,7 +295,7 @@ const DigitalOnboarding = ({ clientId, onComplete }) => {
       } catch (error) {
         console.error("Error loading fact-find:", error);
         // Fall back to localStorage if API fails
-        const saved = localStorage.getItem(`wheeler_factfind_${clientId}`);
+        const saved = localStorage.getItem(`halcyon_factfind_${clientId}`);
         if (saved) {
           setFactFindData(JSON.parse(saved));
           toast.info("Loaded from local cache");
@@ -311,7 +311,7 @@ const DigitalOnboarding = ({ clientId, onComplete }) => {
   // Also keep localStorage as backup
   useEffect(() => {
     if (!isLoading) {
-      localStorage.setItem(`wheeler_factfind_${clientId || 'new'}`, JSON.stringify(factFindData));
+      localStorage.setItem(`halcyon_factfind_${clientId || 'new'}`, JSON.stringify(factFindData));
     }
   }, [factFindData, clientId, isLoading]);
 

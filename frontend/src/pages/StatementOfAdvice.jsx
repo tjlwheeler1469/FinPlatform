@@ -69,7 +69,7 @@ const StatementOfAdvice = () => {
   const [activeTab, setActiveTab] = useState("create");
   const [activeSection, setActiveSection] = useState("client");
   const [savedSOAs, setSavedSOAs] = useState(() => {
-    const saved = localStorage.getItem("wheeler_soas");
+    const saved = localStorage.getItem("halcyon_soas");
     return saved ? JSON.parse(saved) : [];
   });
 
@@ -363,7 +363,7 @@ This advice is provided by [${soaData.licenseeName || 'Licensee Name'}] (AFSL ${
       
       const updatedSOAs = [newSOA, ...savedSOAs];
       setSavedSOAs(updatedSOAs);
-      localStorage.setItem("wheeler_soas", JSON.stringify(updatedSOAs));
+      localStorage.setItem("halcyon_soas", JSON.stringify(updatedSOAs));
       
       // Download
       const blob = new Blob([soaContent], { type: 'text/plain' });
