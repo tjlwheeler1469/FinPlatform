@@ -90,6 +90,7 @@ const PracticeManagement = lazyRetry(() => import("@/pages/PracticeManagement"))
 const DocumentsCommunications = lazyRetry(() => import("@/pages/DocumentsCommunications"));
 const PortfolioRebalancing = lazyRetry(() => import("@/pages/PortfolioRebalancing"));
 const SecuritySettings = lazyRetry(() => import("@/pages/SecuritySettings"));
+const NotificationSettings = lazyRetry(() => import("@/pages/NotificationSettings"));
 const DataImportExportPage = lazyRetry(() => import("@/pages/DataImportExportPage"));
 const InvestmentComparison = lazyRetry(() => import("@/pages/InvestmentComparison"));
 const DecisionDashboard = lazyRetry(() => import("@/pages/DecisionDashboard"));
@@ -1084,6 +1085,7 @@ const AppRouter = () => {
       <Route path="/documents" element={<DocumentsCommunications />} />
       <Route path="/portfolio-rebalancing" element={<PortfolioRebalancing />} />
       <Route path="/security" element={<SecuritySettings />} />
+      <Route path="/notification-settings" element={<NotificationSettings />} />
       <Route path="/data-import-export" element={<DataImportExportPage />} />
       <Route path="/investment-comparison" element={<Navigate to="/stock-research" replace />} />
       <Route path="/decision-engine" element={<Navigate to="/dashboard" replace />} />

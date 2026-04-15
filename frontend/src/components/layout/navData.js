@@ -101,6 +101,7 @@ export const adviserBaseNav = [
     icon: Settings,
     items: [
       { path: "/notification-center", label: "Notifications", icon: Bell, title: "Notification Center" },
+      { path: "/notification-settings", label: "Notification Settings", icon: Settings, title: "Customise Notifications" },
       { path: "/security", label: "Security", icon: Shield, title: "Security" },
     ]
   }

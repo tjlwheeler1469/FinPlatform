@@ -43,6 +43,8 @@ ROUTE_REGISTRY = [
     ("routes.tax_optimization", "router", "/api", "Tax Optimization"),
     ("routes.rebalancing", "router", "/api", "Rebalancing"),
     ("routes.notifications", "router", "/api", "Notifications"),
+    ("routes.invoices", "router", "", "Invoices"),
+    ("routes.client_onboarding", "router", "", "Client Onboarding"),
     ("routes.document_generation", "router", "/api", "Document Generation"),
     ("routes.data_aggregators", "router", "/api", "Data Aggregators"),
     ("routes.trading", "router", "/api", "Trading"),

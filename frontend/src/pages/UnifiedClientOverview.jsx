@@ -13,6 +13,7 @@ const ScenarioModelling = lazy(() => import("@/pages/ScenarioModelling"));
 const ScenarioEngine = lazy(() => import("@/components/ScenarioEngine"));
 const HouseholdBudget = lazy(() => import("@/pages/HouseholdBudget"));
 const ClientProfileTab = lazy(() => import("@/components/ClientProfileTab"));
+const ClientInvoicing = lazy(() => import("@/components/ClientInvoicing"));
 
 const TabLoader = () => (
   <div className="flex items-center justify-center py-20">
@@ -117,10 +118,15 @@ const UnifiedClientOverview = () => {
                 </Suspense>
               </ErrorBoundary>
             </TabsContent>
-            <TabsContent value="profile" className="mt-0">
+            <TabsContent value="profile" className="mt-0 space-y-6">
               <ErrorBoundary label="Profile">
                 <Suspense fallback={<TabLoader />}>
                   <ClientProfileTab clientId={getClientId()} />
+                </Suspense>
+              </ErrorBoundary>
+              <ErrorBoundary label="Invoicing">
+                <Suspense fallback={<TabLoader />}>
+                  <ClientInvoicing clientId={getClientId()} />
                 </Suspense>
               </ErrorBoundary>
             </TabsContent>

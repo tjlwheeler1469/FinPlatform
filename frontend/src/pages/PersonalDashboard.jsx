@@ -69,6 +69,7 @@ const getConfidenceLabel = (score) => {
 };
 
 import { CLIENT_DATA, getActiveClientId } from '@/data/clientData';
+const ClientOnboarding = lazy(() => import("@/components/ClientOnboarding"));
 
 const mockMarketIndicators = [
   { name: 'ASX 200', value: 7842, change: 0.8 },
@@ -926,6 +927,17 @@ const PersonalDashboard = ({ embedded = false }) => {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Client Portal Onboarding — only on /client-portal */}
+        {location.pathname === '/client-portal' && (
+          <div className="mt-6">
+            <ErrorBoundary label="Onboarding">
+              <Suspense fallback={<div className="flex items-center justify-center py-10"><Loader2 className="h-6 w-6 animate-spin text-[#D4A84C]" /></div>}>
+                <ClientOnboarding clientId="portal_001" />
+              </Suspense>
+            </ErrorBoundary>
+          </div>
+        )}
       </div>
   );
 
