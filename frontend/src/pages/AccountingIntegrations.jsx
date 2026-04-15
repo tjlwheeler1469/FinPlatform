@@ -63,8 +63,8 @@ const ACCOUNTING_APPS = {
 // Mock connected data for demo
 const MOCK_XERO_DATA = {
   organisation: {
-    name: "Wheeler Family Trust",
-    legalName: "Wheeler Family Discretionary Trust",
+    name: "Thompson Family Trust",
+    legalName: "Thompson Family Discretionary Trust",
     abn: "12 345 678 901",
     basReportingFrequency: "QUARTERLY"
   },
@@ -89,7 +89,7 @@ const MOCK_XERO_DATA = {
 
 const MOCK_MYOB_DATA = {
   companyFile: {
-    name: "Wheeler Property Holdings",
+    name: "Thompson Property Holdings",
     abn: "98 765 432 109",
     lastAccessed: new Date(Date.now() - 86400000).toISOString()
   },

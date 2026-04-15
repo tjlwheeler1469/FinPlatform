@@ -100,7 +100,7 @@ const StatementOfAdvice = () => {
     capacityForLoss: "moderate",
     
     // Current Situation
-    totalAssets: portfolio.summary?.totalAssets || 2920000,
+    totalAssets: portfolio.summary?.totalAssets || 2278000,
     totalLiabilities: portfolio.summary?.totalDebt || 942000,
     netWorth: portfolio.summary?.netWorth || 1978000,
     annualIncome: portfolio.summary?.annualIncome || 253400,

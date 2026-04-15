@@ -9,7 +9,7 @@
 import { jsPDF } from 'jspdf';
 import { autoTable } from 'jspdf-autotable';
 
-// Wheeler Financial branding colors
+// Halcyon Wealth branding colors
 const COLORS = {
   primary: [15, 57, 43],      // #0F392B
   gold: [212, 175, 55],       // #D4AF37
@@ -61,9 +61,9 @@ const addHeader = (doc, title, subtitle = null) => {
     doc.text(subtitle, 35, 23);
   }
   
-  // Wheeler Financial branding
+  // Halcyon Wealth branding
   doc.setFontSize(8);
-  doc.text('Wheeler Financial', 170, 12);
+  doc.text('Halcyon Wealth', 170, 12);
   doc.text('AFSL Compliant', 170, 17);
   
   // Reset text color
@@ -84,7 +84,7 @@ const addFooter = (doc, pageNum, totalPages) => {
   doc.setFontSize(8);
   doc.setTextColor(...COLORS.muted);
   doc.text(`Generated on ${formatDate(new Date())}`, 20, pageHeight - 12);
-  doc.text('Wheeler Financial - Australian Investment & Tax Planning', 20, pageHeight - 7);
+  doc.text('Halcyon Wealth - Australian Investment & Tax Planning', 20, pageHeight - 7);
   doc.text(`Page ${pageNum} of ${totalPages}`, 180, pageHeight - 12);
   doc.text('Confidential', 180, pageHeight - 7);
 };
@@ -108,9 +108,9 @@ const addSectionTitle = (doc, title, y) => {
 export const generatePortfolioSummaryPDF = (data) => {
   const doc = new jsPDF();
   const {
-    clientName = 'Wheeler Family',
+    clientName = 'Thompson Family',
     netWorth = 1978000,
-    totalAssets = 2920000,
+    totalAssets = 2278000,
     totalDebt = 942000,
     shares = [],
     properties = [],
@@ -216,7 +216,7 @@ export const generatePortfolioSummaryPDF = (data) => {
 export const generateSOAPDF = (data) => {
   const doc = new jsPDF();
   const {
-    clientName = 'Wheeler Family',
+    clientName = 'Thompson Family',
     adviser = { name: 'David Chen', title: 'Senior Financial Adviser', afsl: '123456' },
     recommendations = [],
     riskProfile = 'Balanced',
@@ -267,7 +267,7 @@ export const generateSOAPDF = (data) => {
   y = addSectionTitle(doc, 'Financial Position', y);
   
   const situation = [
-    ['Total Assets', formatCurrency(currentSituation.totalAssets || 2920000)],
+    ['Total Assets', formatCurrency(currentSituation.totalAssets || 2278000)],
     ['Total Liabilities', formatCurrency(currentSituation.totalDebt || 942000)],
     ['Net Worth', formatCurrency(currentSituation.netWorth || 1978000)],
     ['Annual Income', formatCurrency(currentSituation.income || 250000)],
@@ -373,7 +373,7 @@ export const generateSOAPDF = (data) => {
 export const generateTaxSummaryPDF = (data) => {
   const doc = new jsPDF();
   const {
-    clientName = 'Wheeler Family',
+    clientName = 'Thompson Family',
     financialYear = '2024-25',
     income = {},
     deductions = {},

@@ -62,7 +62,7 @@ const ModeSelector = () => {
               <Sparkles className="h-8 w-8 text-[#1a2744]" />
             </div>
           </div>
-          <h1 className="text-4xl font-bold text-white mb-2">Wheeler Financial</h1>
+          <h1 className="text-4xl font-bold text-white mb-2">Halcyon Wealth</h1>
           <p className="text-white/70">Australian Investment & Tax Planning Platform</p>
         </div>
 

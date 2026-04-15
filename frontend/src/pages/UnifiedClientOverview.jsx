@@ -10,6 +10,7 @@ const RetirementConfidence = lazy(() => import("@/pages/RetirementConfidence"));
 const UnifiedTaxCentre = lazy(() => import("@/pages/UnifiedTaxCentre"));
 const NextBestActions = lazy(() => import("@/pages/NextBestActions"));
 const ScenarioModelling = lazy(() => import("@/pages/ScenarioModelling"));
+const ScenarioEngine = lazy(() => import("@/components/ScenarioEngine"));
 const HouseholdBudget = lazy(() => import("@/pages/HouseholdBudget"));
 const ClientProfileTab = lazy(() => import("@/components/ClientProfileTab"));
 
@@ -105,7 +106,7 @@ const UnifiedClientOverview = () => {
             <TabsContent value="goals" className="mt-0">
               <ErrorBoundary label="Goals">
                 <Suspense fallback={<TabLoader />}>
-                  <ScenarioModelling embedded />
+                  <ScenarioEngine embedded />
                 </Suspense>
               </ErrorBoundary>
             </TabsContent>

@@ -68,7 +68,7 @@ const ScenarioForm = ({ inputs, onInputChange, generating, onGenerate, onClose }
         <Select value={inputs.client_id} onValueChange={(v) => onInputChange({ client_id: v })}>
           <SelectTrigger><SelectValue /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="client_1">James & Sarah Wheeler</SelectItem>
+            <SelectItem value="client_1">David & Sarah Thompson</SelectItem>
             <SelectItem value="client_2">Chen Family Trust</SelectItem>
             <SelectItem value="client_3">Robert Mitchell</SelectItem>
             <SelectItem value="client_5">Patel SMSF</SelectItem>

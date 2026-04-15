@@ -42,10 +42,10 @@ const API_URL = process.env.REACT_APP_BACKEND_URL || "";
 const MOCK_MEETINGS = [
   {
     id: "mtg_001",
-    title: "Annual Review - Wheeler Family",
+    title: "Annual Review - Thompson Family",
     date: "2026-01-15T10:00:00Z",
     duration: 3600, // seconds
-    attendees: ["James Wheeler", "Sarah Wheeler", "Mark Thompson (Advisor)"],
+    attendees: ["David Thompson", "Sarah Thompson", "Mark Thompson (Advisor)"],
     platform: "zoom",
     status: "completed",
     hasTranscript: true,
@@ -67,7 +67,7 @@ const MOCK_MEETINGS = [
     },
     transcript: [
       { speaker: "Mark Thompson", time: "00:00:15", text: "Good morning James and Sarah, thank you for joining today's annual review." },
-      { speaker: "James Wheeler", time: "00:00:25", text: "Morning Mark, looking forward to going through everything." },
+      { speaker: "David Thompson", time: "00:00:25", text: "Morning Mark, looking forward to going through everything." },
       { speaker: "Mark Thompson", time: "00:00:35", text: "Let's start by looking at your portfolio performance over the past year..." }
     ]
   },
@@ -76,7 +76,7 @@ const MOCK_MEETINGS = [
     title: "Tax Planning Discussion",
     date: "2025-12-10T14:00:00Z",
     duration: 1800,
-    attendees: ["James Wheeler", "Mark Thompson (Advisor)"],
+    attendees: ["David Thompson", "Mark Thompson (Advisor)"],
     platform: "google_meet",
     status: "completed",
     hasTranscript: true,
@@ -100,7 +100,7 @@ const MOCK_MEETINGS = [
     title: "Initial Discovery Meeting",
     date: "2025-06-01T09:00:00Z",
     duration: 5400,
-    attendees: ["James Wheeler", "Sarah Wheeler", "Mark Thompson (Advisor)", "Lisa Chen (Paraplanner)"],
+    attendees: ["David Thompson", "Sarah Thompson", "Mark Thompson (Advisor)", "Lisa Chen (Paraplanner)"],
     platform: "teams",
     status: "completed",
     hasTranscript: true,

@@ -10,10 +10,10 @@ export const DOCUMENT_TEMPLATES = [
 export const INITIAL_SIGNATURE_REQUESTS = [
   {
     id: "sig_001", document_id: "soa", document_name: "Statement of Advice (SOA)",
-    client_name: "Wheeler Family", client_email: "james@wheeler.com", status: "completed",
+    client_name: "Thompson Family", client_email: "david@thompson.com", status: "completed",
     sent_at: "2025-03-10T09:00:00Z", completed_at: "2025-03-11T14:30:00Z",
     signatures: [
-      { role: "client", name: "James Wheeler", signed_at: "2025-03-11T10:15:00Z" },
+      { role: "client", name: "David Thompson", signed_at: "2025-03-11T10:15:00Z" },
       { role: "adviser", name: "Financial Adviser", signed_at: "2025-03-11T14:30:00Z" }
     ]
   },
@@ -30,7 +30,7 @@ export const INITIAL_SIGNATURE_REQUESTS = [
 ];
 
 export const MOCK_CLIENTS = [
-  { id: "client_1", name: "Wheeler Family", email: "james@wheeler.com" },
+  { id: "client_1", name: "Thompson Family", email: "david@thompson.com" },
   { id: "client_2", name: "Smith & Associates", email: "sarah@smith.com" },
   { id: "client_3", name: "Johnson Trust", email: "michael@johnson.com" },
   { id: "client_4", name: "Williams Family", email: "emma@williams.com" },

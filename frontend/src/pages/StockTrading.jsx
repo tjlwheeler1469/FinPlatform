@@ -133,7 +133,7 @@ const StockTrading = () => {
   const [buffettSource, setBuffettSource] = useState('idle');
 
   const clients = [
-    { id: "client_1", name: "Wheeler Family" },
+    { id: "client_1", name: "Thompson Family" },
     { id: "client_2", name: "Chen Investment Trust" },
     { id: "client_3", name: "Thompson SMSF" },
     { id: "client_4", name: "Patel Holdings" }

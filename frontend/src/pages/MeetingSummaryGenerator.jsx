@@ -32,10 +32,10 @@ const MeetingSummaryGenerator = () => {
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState(null);
   const [formData, setFormData] = useState({
-    client_name: "Wheeler Family",
+    client_name: "Thompson Family",
     meeting_date: new Date().toISOString().split('T')[0],
     meeting_type: "Annual Review",
-    attendees: "John Wheeler, Sarah Wheeler, Financial Advisor",
+    attendees: "David Thompson, Sarah Thompson, Financial Advisor",
     discussion_points: "Retirement planning, Investment strategy, Tax planning"
   });
 

@@ -267,7 +267,7 @@ const AdvisorCommandCenter = () => {
 
   // Client list for cross-client intelligence
   const clientList = clients?.client_analyses || [
-    { id: "client_1", name: "Wheeler Family", aum: 2920000, risk_profile: "Balanced", status: "needs_attention", type: "Family", age: 45 },
+    { id: "client_1", name: "Thompson Family", aum: 2278000, risk_profile: "Balanced", status: "needs_attention", type: "Family", age: 45 },
     { id: "client_2", name: "Chen Investment Trust", aum: 4200000, risk_profile: "Growth", status: "on_track", type: "Trust", age: 52 },
     { id: "client_3", name: "Thompson SMSF", aum: 890000, risk_profile: "Conservative", status: "at_risk", type: "SMSF", age: 62 },
     { id: "client_4", name: "Patel Holdings", aum: 7500000, risk_profile: "High Growth", status: "needs_attention", type: "Company", age: 48 },
@@ -282,7 +282,7 @@ const AdvisorCommandCenter = () => {
     { id: 1, title: "Meeting with Sarah Chen", due: "Tomorrow 10:00 AM", type: "meeting", priority: "high", client: "Chen Investment Trust" },
     { id: 2, title: "Review estate plan", due: "This week", type: "review", priority: "medium", client: "Thompson SMSF" },
     { id: 3, title: "Client onboarding", due: "Today", type: "onboarding", priority: "high", client: "New Client - David Patel" },
-    { id: 4, title: "Annual review preparation", due: "Next week", type: "compliance", priority: "medium", client: "Wheeler Family" },
+    { id: 4, title: "Annual review preparation", due: "Next week", type: "compliance", priority: "medium", client: "Thompson Family" },
     { id: 5, title: "Rebalancing approval", due: "Today", type: "portfolio", priority: "high", client: "Patel Holdings" }
   ];
 
@@ -797,7 +797,7 @@ const AdvisorCommandCenter = () => {
                       </div>
                       <div className="p-3 border-l-4 border-l-orange-500 bg-orange-50 rounded-r-lg">
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm font-medium">Wheeler Family</span>
+                          <span className="text-sm font-medium">Thompson Family</span>
                           <Badge className="bg-orange-500 text-xs">High</Badge>
                         </div>
                         <p className="text-xs text-muted-foreground">Single stock concentration &gt;15%</p>

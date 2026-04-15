@@ -80,7 +80,7 @@ const generateRevenueData = () => {
 // Generate client revenue breakdown
 const generateClientRevenue = () => [
   { client: "Patel Family", aum: 4200000, fees: 42000, lastPayment: "2024-11-15" },
-  { client: "Wheeler Family", aum: 2920000, fees: 29200, lastPayment: "2024-11-10" },
+  { client: "Thompson Family", aum: 2278000, fees: 29200, lastPayment: "2024-11-10" },
   { client: "Chen Family", aum: 1850000, fees: 18500, lastPayment: "2024-11-12" },
   { client: "Thompson Family", aum: 1650000, fees: 16500, lastPayment: "2024-11-08" },
   { client: "Williams Family", aum: 1420000, fees: 14200, lastPayment: "2024-11-14" }
@@ -370,7 +370,7 @@ const RevenueBilling = () => {
                 </thead>
                 <tbody>
                   {[
-                    { id: "INV-2024-001", client: "Wheeler Family", service: "Annual Review", amount: 2500, date: "2024-11-15", status: "paid" },
+                    { id: "INV-2024-001", client: "Thompson Family", service: "Annual Review", amount: 2500, date: "2024-11-15", status: "paid" },
                     { id: "INV-2024-002", client: "Chen Family", service: "Financial Plan", amount: 3500, date: "2024-11-12", status: "paid" },
                     { id: "INV-2024-003", client: "Patel Family", service: "SMSF Admin", amount: 1800, date: "2024-11-10", status: "pending" },
                     { id: "INV-2024-004", client: "Thompson Family", service: "Investment Review", amount: 1500, date: "2024-11-08", status: "paid" },

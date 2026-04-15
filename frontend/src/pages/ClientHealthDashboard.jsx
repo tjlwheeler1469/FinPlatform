@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 
 const CLIENT_HEALTH = [
   {
-    id: "client_1", name: "Wheeler Family", type: "Household", riskProfile: "Growth",
+    id: "client_1", name: "Thompson Family", type: "Household", riskProfile: "Growth",
     netWorth: 1978000, change: 6.2, lastReview: "2025-11-15", nextReview: "2026-05-15",
     scores: { drift: 82, compliance: 95, engagement: 78, riskAlignment: 88, performance: 74 },
     alerts: [
@@ -116,7 +116,7 @@ const ClientHealthDashboard = ({ embedded = false }) => {
 
   const handleViewClient = (clientId) => {
     const clientMap = {
-      client_1: { id: "client_1", name: "Wheeler Family" },
+      client_1: { id: "client_1", name: "Thompson Family" },
       client_2: { id: "client_2", name: "Chen Family Trust" },
       client_3: { id: "client_3", name: "Robert Mitchell" },
       client_4: { id: "client_4", name: "Williams Family" },

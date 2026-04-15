@@ -42,7 +42,7 @@ const AICopilot = () => {
 
   // Client context - in production this would come from selected client
   const clientContext = {
-    name: "Wheeler Family",
+    name: "Thompson Family",
     age: 45,
     retirement_age: 65,
     annual_income: 180000,

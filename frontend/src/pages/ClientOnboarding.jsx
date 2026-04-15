@@ -221,7 +221,7 @@ const ClientOnboarding = () => {
       completedAt: new Date().toISOString()
     }));
     
-    toast.success("Onboarding complete! Welcome to Wheeler Family Portfolio");
+    toast.success("Onboarding complete! Welcome to Thompson Family Portfolio");
     nextStep();
   };
 

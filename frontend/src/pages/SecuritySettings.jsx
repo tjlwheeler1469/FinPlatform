@@ -151,7 +151,7 @@ const SecuritySettings = () => {
           <TabsContent value="mfa">
             <MFASetup 
               userId="user_wheeler"
-              userEmail="james@wheeler.com"
+              userEmail="david@thompson.com"
               onMFAEnabled={() => toast.success("Two-factor authentication enabled")}
               onMFADisabled={() => toast.info("Two-factor authentication disabled")}
             />

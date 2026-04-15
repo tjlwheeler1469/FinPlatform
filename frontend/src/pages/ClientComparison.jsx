@@ -16,8 +16,8 @@ import {
 
 const CLIENTS = {
   client_1: {
-    name: "Wheeler Family", type: "Household", riskProfile: "Growth", age: 45,
-    netWorth: 1978000, totalAssets: 2920000, totalDebt: 942000,
+    name: "Thompson Family", type: "Household", riskProfile: "Growth", age: 45,
+    netWorth: 1978000, totalAssets: 2278000, totalDebt: 942000,
     allocation: { shares: 28, property: 42, super: 20, cash: 5, bonds: 3, other: 2 },
     income: 253400, expenses: 142000, performance: 6.2,
     metrics: { drift: 82, compliance: 95, engagement: 78, risk: 88, returns: 74 },

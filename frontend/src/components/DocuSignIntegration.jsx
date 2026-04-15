@@ -546,7 +546,7 @@ const DocuSignIntegration = ({ onSignatureComplete }) => {
                   <div className="text-center mb-4">
                     <Badge variant="outline" className="mb-2">MOCK DOCUMENT PREVIEW</Badge>
                     <h3 className="text-xl font-bold">{selectedRequest?.document_name}</h3>
-                    <p className="text-sm text-muted-foreground">Wheeler Financial Advisers</p>
+                    <p className="text-sm text-muted-foreground">Halcyon Wealth Advisers</p>
                   </div>
                   <div className="border-t pt-4 space-y-2 text-sm">
                     <p><strong>Client:</strong> {selectedRequest?.client_name}</p>

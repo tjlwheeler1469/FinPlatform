@@ -73,7 +73,7 @@ const formatCurrency = (value) => {
 
 // Mock data for clients
 const MOCK_CLIENTS = [
-  { id: "client_1", name: "Wheeler Family", email: "james@wheeler.com" },
+  { id: "client_1", name: "Thompson Family", email: "david@thompson.com" },
   { id: "client_2", name: "Smith & Associates", email: "sarah@smith.com" },
   { id: "client_3", name: "Johnson Trust", email: "michael@johnson.com" },
   { id: "client_4", name: "Williams Family", email: "emma@williams.com" },
@@ -82,7 +82,7 @@ const MOCK_CLIENTS = [
 
 // Mock initial data
 const MOCK_TASKS = [
-  { task_id: "task_1", client_id: "client_1", title: "Annual Review - Wheeler", description: "Complete annual review meeting prep", due_date: "2025-01-20", priority: "high", status: "pending", category: "review", assigned_to: "self", created_at: "2025-01-01" },
+  { task_id: "task_1", client_id: "client_1", title: "Annual Review - Thompson", description: "Complete annual review meeting prep", due_date: "2025-01-20", priority: "high", status: "pending", category: "review", assigned_to: "self", created_at: "2025-01-01" },
   { task_id: "task_2", client_id: "client_2", title: "SOA Update - Smith", description: "Prepare updated Statement of Advice", due_date: "2025-01-25", priority: "high", status: "in_progress", category: "compliance", assigned_to: "self", created_at: "2025-01-05" },
   { task_id: "task_3", client_id: "client_3", title: "KYC Verification - Johnson", description: "Update KYC documentation", due_date: "2025-02-01", priority: "medium", status: "pending", category: "compliance", assigned_to: "self", created_at: "2025-01-08" },
   { task_id: "task_4", client_id: null, title: "CPD Training", description: "Complete quarterly CPD requirements", due_date: "2025-01-30", priority: "medium", status: "pending", category: "general", assigned_to: "self", created_at: "2025-01-10" },

@@ -130,11 +130,11 @@ const defaultExpenses = {
 // Demo scenarios data
 const DEMO_SCENARIOS = {
   demo_001: {
-    name: "Wheeler Family - Current",
+    name: "Thompson Family - Current",
     entity_type: "personal",
     people: [
-      { id: "p1", name: "James Wheeler", age: 47, taxable_income: 185000, employer_super: 11, salary_sacrifice: 5000, deductions: { work_related: 2500, self_education: 0, other: 500 } },
-      { id: "p2", name: "Sarah Wheeler", age: 44, taxable_income: 95000, employer_super: 11, salary_sacrifice: 3000, deductions: { work_related: 1800, self_education: 1200, other: 300 } }
+      { id: "p1", name: "David Thompson", age: 47, taxable_income: 185000, employer_super: 11, salary_sacrifice: 5000, deductions: { work_related: 2500, self_education: 0, other: 500 } },
+      { id: "p2", name: "Sarah Thompson", age: 44, taxable_income: 95000, employer_super: 11, salary_sacrifice: 3000, deductions: { work_related: 1800, self_education: 1200, other: 300 } }
     ],
     companies: [],
     investments: {
@@ -161,8 +161,8 @@ const DEMO_SCENARIOS = {
     name: "Retirement Planning 2030",
     entity_type: "personal",
     people: [
-      { id: "p1", name: "James Wheeler", age: 52, taxable_income: 150000, employer_super: 11, salary_sacrifice: 15000, deductions: { work_related: 2000, self_education: 0, other: 500 } },
-      { id: "p2", name: "Sarah Wheeler", age: 49, taxable_income: 80000, employer_super: 11, salary_sacrifice: 10000, deductions: { work_related: 1500, self_education: 0, other: 300 } }
+      { id: "p1", name: "David Thompson", age: 52, taxable_income: 150000, employer_super: 11, salary_sacrifice: 15000, deductions: { work_related: 2000, self_education: 0, other: 500 } },
+      { id: "p2", name: "Sarah Thompson", age: 49, taxable_income: 80000, employer_super: 11, salary_sacrifice: 10000, deductions: { work_related: 1500, self_education: 0, other: 300 } }
     ],
     companies: [],
     investments: {
@@ -188,11 +188,11 @@ const DEMO_SCENARIOS = {
     name: "Company Structure Analysis",
     entity_type: "company",
     people: [
-      { id: "p1", name: "James Wheeler", age: 47, taxable_income: 120000, employer_super: 11, salary_sacrifice: 0, deductions: { work_related: 0, self_education: 0, other: 0 } }
+      { id: "p1", name: "David Thompson", age: 47, taxable_income: 120000, employer_super: 11, salary_sacrifice: 0, deductions: { work_related: 0, self_education: 0, other: 0 } }
     ],
     companies: [
-      { id: "c1", name: "Wheeler Consulting Pty Ltd", abn: "12 345 678 901", taxable_income: 180000, revenue: 450000, expenses: 270000, is_base_rate_entity: true, franking_account_balance: 45000 },
-      { id: "c2", name: "Wheeler Property Holdings", abn: "98 765 432 109", taxable_income: 95000, revenue: 120000, expenses: 25000, is_base_rate_entity: true, franking_account_balance: 22000 }
+      { id: "c1", name: "Thompson Consulting Pty Ltd", abn: "12 345 678 901", taxable_income: 180000, revenue: 450000, expenses: 270000, is_base_rate_entity: true, franking_account_balance: 45000 },
+      { id: "c2", name: "Thompson Property Holdings", abn: "98 765 432 109", taxable_income: 95000, revenue: 120000, expenses: 25000, is_base_rate_entity: true, franking_account_balance: 22000 }
     ],
     investments: {
       cash_savings: 200000,
@@ -219,24 +219,24 @@ const DEMO_SCENARIOS = {
     name: "Family Trust Structure",
     entity_type: "trust",
     people: [
-      { id: "p1", name: "James Wheeler", age: 47, taxable_income: 120000, employer_super: 11, salary_sacrifice: 0, deductions: { work_related: 0, self_education: 0, other: 0 } },
-      { id: "p2", name: "Sarah Wheeler", age: 44, taxable_income: 65000, employer_super: 11, salary_sacrifice: 0, deductions: { work_related: 0, self_education: 0, other: 0 } }
+      { id: "p1", name: "David Thompson", age: 47, taxable_income: 120000, employer_super: 11, salary_sacrifice: 0, deductions: { work_related: 0, self_education: 0, other: 0 } },
+      { id: "p2", name: "Sarah Thompson", age: 44, taxable_income: 65000, employer_super: 11, salary_sacrifice: 0, deductions: { work_related: 0, self_education: 0, other: 0 } }
     ],
     companies: [],
     trusts: [
       { 
         id: "t1", 
-        name: "Wheeler Family Trust", 
+        name: "Thompson Family Trust", 
         abn: "55 123 456 789", 
         trust_type: "discretionary", 
         trustee_type: "corporate",
-        trustee_name: "Wheeler Trustee Pty Ltd",
+        trustee_name: "Thompson Trustee Pty Ltd",
         net_income: 150000,
         beneficiaries: [
-          { id: "b1", name: "James Wheeler", relationship: "family", distribution_percentage: 30, is_presently_entitled: true },
-          { id: "b2", name: "Sarah Wheeler", relationship: "family", distribution_percentage: 30, is_presently_entitled: true },
-          { id: "b3", name: "Emily Wheeler (Adult Child)", relationship: "family", distribution_percentage: 20, is_presently_entitled: true },
-          { id: "b4", name: "Michael Wheeler (Adult Child)", relationship: "family", distribution_percentage: 20, is_presently_entitled: true }
+          { id: "b1", name: "David Thompson", relationship: "family", distribution_percentage: 30, is_presently_entitled: true },
+          { id: "b2", name: "Sarah Thompson", relationship: "family", distribution_percentage: 30, is_presently_entitled: true },
+          { id: "b3", name: "Emily Thompson (Adult Child)", relationship: "family", distribution_percentage: 20, is_presently_entitled: true },
+          { id: "b4", name: "Michael Thompson (Adult Child)", relationship: "family", distribution_percentage: 20, is_presently_entitled: true }
         ]
       }
     ],

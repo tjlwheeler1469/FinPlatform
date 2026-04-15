@@ -43,8 +43,8 @@ import { toast } from "sonner";
 const INITIAL_MESSAGES = [
   {
     id: 'msg_1',
-    from: { name: 'David Chen', role: 'adviser', email: 'david.chen@wheeler.com.au' },
-    to: { name: 'James Wheeler', role: 'client', email: 'james@wheeler.com' },
+    from: { name: 'David Chen', role: 'adviser', email: 'david.chen@halcyonwealth.com.au' },
+    to: { name: 'David Thompson', role: 'client', email: 'david@thompson.com' },
     subject: 'Your Updated Statement of Advice',
     body: `Hi James,
 
@@ -68,8 +68,8 @@ Senior Financial Adviser`,
   },
   {
     id: 'msg_2',
-    from: { name: 'David Chen', role: 'adviser', email: 'david.chen@wheeler.com.au' },
-    to: { name: 'James Wheeler', role: 'client', email: 'james@wheeler.com' },
+    from: { name: 'David Chen', role: 'adviser', email: 'david.chen@halcyonwealth.com.au' },
+    to: { name: 'David Thompson', role: 'client', email: 'david@thompson.com' },
     subject: 'Annual Review Reminder',
     body: `Hi James,
 
@@ -92,8 +92,8 @@ David`,
   },
   {
     id: 'msg_3',
-    from: { name: 'James Wheeler', role: 'client', email: 'james@wheeler.com' },
-    to: { name: 'David Chen', role: 'adviser', email: 'david.chen@wheeler.com.au' },
+    from: { name: 'David Thompson', role: 'client', email: 'david@thompson.com' },
+    to: { name: 'David Chen', role: 'adviser', email: 'david.chen@halcyonwealth.com.au' },
     subject: 'Re: Annual Review Reminder',
     body: `Hi David,
 
@@ -110,8 +110,8 @@ James`,
   },
   {
     id: 'msg_4',
-    from: { name: 'David Chen', role: 'adviser', email: 'david.chen@wheeler.com.au' },
-    to: { name: 'James Wheeler', role: 'client', email: 'james@wheeler.com' },
+    from: { name: 'David Chen', role: 'adviser', email: 'david.chen@halcyonwealth.com.au' },
+    to: { name: 'David Thompson', role: 'client', email: 'david@thompson.com' },
     subject: 'Market Update - December 2024',
     body: `Hi James,
 
@@ -164,7 +164,7 @@ const formatFullDate = (dateStr) => {
   });
 };
 
-const ClientMessaging = ({ userRole = 'client', userName = 'James Wheeler' }) => {
+const ClientMessaging = ({ userRole = 'client', userName = 'David Thompson' }) => {
   const [messages, setMessages] = useState(() => {
     const stored = localStorage.getItem('wheeler_messages');
     return stored ? JSON.parse(stored) : INITIAL_MESSAGES;
@@ -238,8 +238,8 @@ const ClientMessaging = ({ userRole = 'client', userName = 'James Wheeler' }) =>
 
     const msg = {
       id: `msg_${Date.now()}`,
-      from: { name: userName, role: userRole, email: userRole === 'client' ? 'james@wheeler.com' : 'david.chen@wheeler.com.au' },
-      to: { name: userRole === 'client' ? 'David Chen' : 'James Wheeler', role: userRole === 'client' ? 'adviser' : 'client', email: userRole === 'client' ? 'david.chen@wheeler.com.au' : 'james@wheeler.com' },
+      from: { name: userName, role: userRole, email: userRole === 'client' ? 'david@thompson.com' : 'david.chen@halcyonwealth.com.au' },
+      to: { name: userRole === 'client' ? 'David Chen' : 'David Thompson', role: userRole === 'client' ? 'adviser' : 'client', email: userRole === 'client' ? 'david.chen@halcyonwealth.com.au' : 'david@thompson.com' },
       subject: replyTo ? `Re: ${replyTo.subject.replace(/^Re: /, '')}` : newMessage.subject,
       body: newMessage.body,
       timestamp: new Date().toISOString(),
@@ -296,7 +296,7 @@ const ClientMessaging = ({ userRole = 'client', userName = 'James Wheeler' }) =>
                 <div className="space-y-2">
                   <Label>To</Label>
                   <Input 
-                    value={userRole === 'client' ? 'David Chen (Financial Adviser)' : 'James Wheeler (Client)'} 
+                    value={userRole === 'client' ? 'David Chen (Financial Adviser)' : 'David Thompson (Client)'} 
                     disabled 
                   />
                 </div>

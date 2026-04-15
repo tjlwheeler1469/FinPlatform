@@ -25,9 +25,9 @@ const API_URL = process.env.REACT_APP_BACKEND_URL || '';
 const mockClients = [
   {
     id: 'client_1',
-    name: 'Wheeler Family',
+    name: 'Thompson Family',
     type: 'Family',
-    aum: 2850000,
+    aum: 1608800,
     confidence: 84,
     previousConfidence: 86,
     trend: 'declining',

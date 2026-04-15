@@ -132,7 +132,7 @@ const FamilyOverview = () => {
               Family Overview
             </h1>
             <p className="text-muted-foreground mt-1">
-              Holistic view of Wheeler Family finances
+              Holistic view of Thompson Family finances
             </p>
           </div>
           <div className="flex items-center gap-3">

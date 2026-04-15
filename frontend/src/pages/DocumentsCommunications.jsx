@@ -33,7 +33,7 @@ const DocumentsCommunications = () => {
           </TabsContent>
 
           <TabsContent value="messages" className="mt-6">
-            <ClientMessaging userRole="client" userName="James Wheeler" />
+            <ClientMessaging userRole="client" userName="David Thompson" />
           </TabsContent>
         </Tabs>
       </div>

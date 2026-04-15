@@ -93,11 +93,11 @@ const EstatePlanning = () => {
     setLoading(true);
     try {
       const response = await axios.post(`${API}/estate/create-plan`, {
-        primary_name: "James Wheeler",
-        spouse_name: "Sarah Wheeler",
+        primary_name: "David Thompson",
+        spouse_name: "Sarah Thompson",
         beneficiaries: [
-          { name: "Emily Wheeler", relationship: "child", percentage: 40 },
-          { name: "Michael Wheeler", relationship: "child", percentage: 40 },
+          { name: "Emily Thompson", relationship: "child", percentage: 40 },
+          { name: "Michael Thompson", relationship: "child", percentage: 40 },
           { name: "Charity", relationship: "charity", percentage: 20 }
         ],
         assets: {
@@ -107,7 +107,7 @@ const EstatePlanning = () => {
           shares: portfolio.investments.shares_value,
           cash: 100000
         },
-        executor: "Sarah Wheeler (spouse)"
+        executor: "Sarah Thompson (spouse)"
       });
       setEstatePlan(response.data);
       setActiveTab("plan");

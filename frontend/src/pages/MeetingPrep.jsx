@@ -63,7 +63,7 @@ const MeetingPrep = () => {
 
   // Client list with full data
   const clients = [
-    { id: "client_1", name: "Wheeler Family", aum: 2920000, ytd_return: 0.084, retirement_probability: 72, risk_profile: "Balanced", type: "Family", age: 45, meeting_time: "10:00 AM" },
+    { id: "client_1", name: "Thompson Family", aum: 2278000, ytd_return: 0.084, retirement_probability: 72, risk_profile: "Balanced", type: "Family", age: 45, meeting_time: "10:00 AM" },
     { id: "client_2", name: "Chen Investment Trust", aum: 4200000, ytd_return: 0.112, retirement_probability: 85, risk_profile: "Growth", type: "Trust", age: 52, meeting_time: "11:30 AM" },
     { id: "client_3", name: "Thompson SMSF", aum: 890000, ytd_return: 0.065, retirement_probability: 58, risk_profile: "Conservative", type: "SMSF", age: 62, meeting_time: "2:00 PM" },
     { id: "client_4", name: "Patel Holdings", aum: 7500000, ytd_return: 0.142, retirement_probability: 78, risk_profile: "High Growth", type: "Company", age: 48 },

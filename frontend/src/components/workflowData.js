@@ -50,7 +50,7 @@ export const WORKFLOW_TEMPLATES = [
 ];
 
 export const WORKFLOW_MOCK_CLIENTS = [
-  { id: "client_1", name: "Wheeler Family" },
+  { id: "client_1", name: "Thompson Family" },
   { id: "client_2", name: "Smith & Associates" },
   { id: "client_3", name: "Johnson Trust" },
   { id: "client_4", name: "Williams Family" },

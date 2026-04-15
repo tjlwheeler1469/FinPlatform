@@ -729,10 +729,10 @@ const Copilot = () => {
         session_id: sessionId,
         message: input,
         client_context: {
-          name: "Wheeler Family",
+          name: "Thompson Family",
           age: 45,
           income: 185000,
-          net_worth: portfolio.summary?.netWorth || 2850000,
+          net_worth: portfolio.summary?.netWorth || 1608800,
           super_balance: 580000,
           risk_profile: "moderate",
           goals: ["retirement", "wealth building", "education funding"]

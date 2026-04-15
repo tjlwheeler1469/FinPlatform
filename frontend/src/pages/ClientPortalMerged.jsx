@@ -72,9 +72,9 @@ const getGreeting = () => {
 // Mock client data (in production, this would come from API)
 const MOCK_CLIENT_DATA = {
   id: 1,
-  name: "Wheeler Family",
-  primaryContact: "James Wheeler",
-  email: "james.wheeler@email.com",
+  name: "Thompson Family",
+  primaryContact: "David Thompson",
+  email: "david.thompson@email.com",
   adviser: {
     name: "David Chen",
     title: "Senior Financial Adviser",
@@ -84,7 +84,7 @@ const MOCK_CLIENT_DATA = {
   riskProfile: "Balanced",
   netWorth: 1978000,
   netWorthChange: 2.3,
-  totalAssets: 2920000,
+  totalAssets: 2278000,
   totalDebt: 942000,
   lastReview: "2024-11-15",
   nextReview: "2025-02-15",
@@ -184,8 +184,8 @@ const ClientLogin = ({ onLogin }) => {
   const handleDemoLogin = () => {
     const demoData = {
       client_id: "demo_client",
-      email: "demo@wheeler.com.au",
-      name: "James Wheeler",
+      email: "demo@halcyonwealth.com.au",
+      name: "David Thompson",
       token: "demo_token",
       adviser_name: "David Chen"
     };
@@ -215,7 +215,7 @@ const ClientLogin = ({ onLogin }) => {
                 <Input
                   id="name"
                   type="text"
-                  placeholder="James Wheeler"
+                  placeholder="David Thompson"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required={!isLogin}
@@ -296,7 +296,7 @@ const ClientLogin = ({ onLogin }) => {
           </div>
 
           <div className="mt-6 pt-4 border-t text-center text-xs text-muted-foreground">
-            <p>Secure client access powered by Wheeler Financial</p>
+            <p>Secure client access powered by Halcyon Wealth</p>
             <p className="mt-1">AFSL Compliant • Your data is protected</p>
           </div>
         </CardContent>
@@ -804,7 +804,7 @@ const ClientDashboard = ({ clientAuth, onLogout }) => {
         {/* Footer */}
         <div className="text-center text-sm text-muted-foreground py-6 border-t mt-8">
           <p>Need help? Contact your adviser directly or call our support line.</p>
-          <p className="mt-1">© 2025 Wheeler Financial. All rights reserved. | AFSL Compliant</p>
+          <p className="mt-1">© 2025 Halcyon Wealth. All rights reserved. | AFSL Compliant</p>
         </div>
       </main>
     </div>

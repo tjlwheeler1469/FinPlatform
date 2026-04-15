@@ -90,7 +90,7 @@ const MOCK_ACCOUNTS = [
 ];
 
 const MOCK_TRANSACTIONS = [
-  { id: "txn_1", accountId: "acc_1", date: "2024-12-10", description: "Salary - Wheeler Corp", amount: 8500.00, type: "credit", category: "Income" },
+  { id: "txn_1", accountId: "acc_1", date: "2024-12-10", description: "Salary - Thompson Corp", amount: 8500.00, type: "credit", category: "Income" },
   { id: "txn_2", accountId: "acc_1", date: "2024-12-09", description: "Woolworths", amount: -156.78, type: "debit", category: "Groceries" },
   { id: "txn_3", accountId: "acc_1", date: "2024-12-08", description: "Shell Fuel", amount: -89.50, type: "debit", category: "Transport" },
   { id: "txn_4", accountId: "acc_1", date: "2024-12-07", description: "Netflix", amount: -22.99, type: "debit", category: "Entertainment" },

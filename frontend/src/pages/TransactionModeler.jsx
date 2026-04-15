@@ -325,7 +325,7 @@ const TransactionModeler = () => {
   });
 
   const selectedClient = JSON.parse(localStorage.getItem("selected_client") || "{}");
-  const clientName = selectedClient.name || "Wheeler Family";
+  const clientName = selectedClient.name || "Thompson Family";
 
   // Generate projections locally for visualization
   const generateProjections = (initial, rate, years) => {

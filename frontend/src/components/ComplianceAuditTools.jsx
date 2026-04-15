@@ -87,7 +87,7 @@ const ComplianceAuditTools = ({ clientId, onComplianceUpdate }) => {
         [itemId]: {
           completed: checked,
           completed_at: checked ? new Date().toISOString() : null,
-          completed_by: "James Wheeler"
+          completed_by: "David Thompson"
         }
       }
     };
@@ -111,7 +111,7 @@ const ComplianceAuditTools = ({ clientId, onComplianceUpdate }) => {
     const newEntry = {
       id: `log_${Date.now()}`,
       timestamp: new Date().toISOString(),
-      user: "James Wheeler",
+      user: "David Thompson",
       ...entry
     };
     setActivityLog([newEntry, ...activityLog]);
@@ -199,7 +199,7 @@ const ComplianceAuditTools = ({ clientId, onComplianceUpdate }) => {
   const exportAuditLog = () => {
     const exportData = {
       exported_at: new Date().toISOString(),
-      exported_by: "James Wheeler",
+      exported_by: "David Thompson",
       client: selectedClient === "all" ? "All Clients" : getClientName(selectedClient),
       entries: filteredLog
     };

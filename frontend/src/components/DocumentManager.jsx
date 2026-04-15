@@ -148,11 +148,11 @@ const DocumentManager = ({ clientId = null, compact = false }) => {
       const timestamp = new Date().toISOString().split('T')[0];
       
       const reportData = {
-        clientName: 'Wheeler Family',
+        clientName: 'Thompson Family',
         shares: sharePortfolio,
         properties: propertyPortfolio,
         netWorth: 1978000,
-        totalAssets: 2920000,
+        totalAssets: 2278000,
         totalDebt: 942000,
         riskProfile: 'Balanced',
         lastReview: new Date(),

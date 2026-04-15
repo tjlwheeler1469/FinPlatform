@@ -32,7 +32,7 @@ const buildGraphData = (overview) => {
 
   // Clients
   const clients = overview?.clients || [
-    { id: "c1", name: "Wheeler Family", aum: 2920000 },
+    { id: "c1", name: "Thompson Family", aum: 2278000 },
     { id: "c2", name: "Chen Holdings", aum: 5200000 },
     { id: "c3", name: "Mitchell Trust", aum: 1850000 },
     { id: "c4", name: "Parker SMSF", aum: 3100000 },

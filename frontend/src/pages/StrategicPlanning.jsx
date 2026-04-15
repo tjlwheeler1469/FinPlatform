@@ -178,7 +178,7 @@ const StrategicPlanning = () => {
   const [retirementResult, setRetirementResult] = useState(null);
 
   const [estatePlan, setEstatePlan] = useState({
-    total_assets: portfolio?.summary?.totalAssets || 2920000,
+    total_assets: portfolio?.summary?.totalAssets || 2278000,
     total_super: familyMembers.reduce((sum, m) => sum + (m.superBalance || 0), 0),
     property_value: portfolio?.investments?.properties?.reduce((sum, p) => sum + p.value, 0) || 1570000,
     beneficiaries: familyMembers.filter(m => m.relationship !== 'primary').map(m => ({

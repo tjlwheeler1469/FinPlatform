@@ -64,8 +64,8 @@ const USER_ROLES = {
 
 // Mock team members for demo
 const MOCK_TEAM = [
-  { id: 1, name: "John Wheeler", email: "john@wheeler.com.au", role: "admin", avatar: "JW", lastActive: new Date().toISOString(), status: "online" },
-  { id: 2, name: "Sarah Wheeler", email: "sarah@wheeler.com.au", role: "client", avatar: "SW", lastActive: new Date(Date.now() - 3600000).toISOString(), status: "offline" },
+  { id: 1, name: "David Thompson", email: "john@halcyonwealth.com.au", role: "admin", avatar: "JW", lastActive: new Date().toISOString(), status: "online" },
+  { id: 2, name: "Sarah Thompson", email: "sarah@thompson.com.au", role: "client", avatar: "SW", lastActive: new Date(Date.now() - 3600000).toISOString(), status: "offline" },
   { id: 3, name: "David Chen", email: "david@advisers.com.au", role: "adviser", avatar: "DC", lastActive: new Date(Date.now() - 1800000).toISOString(), status: "online" },
   { id: 4, name: "Emma Thompson", email: "emma@accounting.com.au", role: "accountant", avatar: "ET", lastActive: new Date(Date.now() - 7200000).toISOString(), status: "offline" },
 ];
@@ -74,8 +74,8 @@ const MOCK_TEAM = [
 const MOCK_ACTIVITY = [
   { id: 1, user: "David Chen", action: "Updated retirement projections", timestamp: new Date(Date.now() - 300000).toISOString(), type: "edit" },
   { id: 2, user: "Emma Thompson", action: "Generated BAS worksheet", timestamp: new Date(Date.now() - 3600000).toISOString(), type: "export" },
-  { id: 3, user: "John Wheeler", action: "Added investment property", timestamp: new Date(Date.now() - 7200000).toISOString(), type: "create" },
-  { id: 4, user: "Sarah Wheeler", action: "Viewed tax analysis", timestamp: new Date(Date.now() - 10800000).toISOString(), type: "view" },
+  { id: 3, user: "David Thompson", action: "Added investment property", timestamp: new Date(Date.now() - 7200000).toISOString(), type: "create" },
+  { id: 4, user: "Sarah Thompson", action: "Viewed tax analysis", timestamp: new Date(Date.now() - 10800000).toISOString(), type: "view" },
   { id: 5, user: "David Chen", action: "Added note to super strategy", timestamp: new Date(Date.now() - 14400000).toISOString(), type: "comment" },
   { id: 6, user: "System", action: "Auto-sync with Xero completed", timestamp: new Date(Date.now() - 18000000).toISOString(), type: "system" },
 ];
@@ -84,7 +84,7 @@ const MOCK_ACTIVITY = [
 const MOCK_COMMENTS = [
   { id: 1, user: "David Chen", avatar: "DC", section: "Retirement Planning", text: "Consider increasing salary sacrifice to maximize tax benefits before EOFY.", timestamp: new Date(Date.now() - 86400000).toISOString(), resolved: false },
   { id: 2, user: "Emma Thompson", avatar: "ET", section: "Property Portfolio", text: "Depreciation schedule needs updating for Investment Unit.", timestamp: new Date(Date.now() - 172800000).toISOString(), resolved: true },
-  { id: 3, user: "John Wheeler", avatar: "JW", section: "Share Portfolio", text: "Review CBA holding after dividend announcement.", timestamp: new Date(Date.now() - 259200000).toISOString(), resolved: false },
+  { id: 3, user: "David Thompson", avatar: "JW", section: "Share Portfolio", text: "Review CBA holding after dividend announcement.", timestamp: new Date(Date.now() - 259200000).toISOString(), resolved: false },
 ];
 
 const formatTimeAgo = (timestamp) => {

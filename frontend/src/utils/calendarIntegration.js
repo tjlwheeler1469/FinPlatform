@@ -12,7 +12,7 @@ export const generateICSEvent = (event) => {
     location = '',
     startTime,
     endTime,
-    organizer = 'Wheeler Financial',
+    organizer = 'Halcyon Wealth',
     attendees = []
   } = event;
 
@@ -21,14 +21,14 @@ export const generateICSEvent = (event) => {
     return d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
   };
 
-  const uid = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}@wheeler.com.au`;
+  const uid = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}@halcyonwealth.com.au`;
   const now = formatDate(new Date());
   const start = formatDate(startTime);
   const end = formatDate(endTime);
 
   let icsContent = `BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//Wheeler Financial//Calendar Integration//EN
+PRODID:-//Halcyon Wealth//Calendar Integration//EN
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
 BEGIN:VEVENT
@@ -39,7 +39,7 @@ DTEND:${end}
 SUMMARY:${escapeICS(title)}
 DESCRIPTION:${escapeICS(description)}
 LOCATION:${escapeICS(location)}
-ORGANIZER;CN=${organizer}:mailto:calendar@wheeler.com.au
+ORGANIZER;CN=${organizer}:mailto:calendar@halcyonwealth.com.au
 STATUS:CONFIRMED
 TRANSP:OPAQUE`;
 
@@ -56,7 +56,7 @@ END:VCALENDAR`;
 };
 
 // Generate ICS file for multiple events
-export const generateICSCalendar = (events, calendarName = 'Wheeler Financial') => {
+export const generateICSCalendar = (events, calendarName = 'Halcyon Wealth') => {
   const formatDate = (date) => {
     const d = new Date(date);
     return d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
@@ -64,13 +64,13 @@ export const generateICSCalendar = (events, calendarName = 'Wheeler Financial') 
 
   let icsContent = `BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//Wheeler Financial//Calendar Integration//EN
+PRODID:-//Halcyon Wealth//Calendar Integration//EN
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
 X-WR-CALNAME:${calendarName}`;
 
   events.forEach((event, index) => {
-    const uid = `${Date.now()}-${index}-${Math.random().toString(36).substr(2, 9)}@wheeler.com.au`;
+    const uid = `${Date.now()}-${index}-${Math.random().toString(36).substr(2, 9)}@halcyonwealth.com.au`;
     const now = formatDate(new Date());
     const start = formatDate(event.startTime);
     const end = formatDate(event.endTime);

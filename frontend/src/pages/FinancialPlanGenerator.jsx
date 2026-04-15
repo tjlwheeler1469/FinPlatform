@@ -56,7 +56,7 @@ const FinancialPlanGenerator = () => {
   const [plan, setPlan] = useState(null);
   const [activeTab, setActiveTab] = useState("summary");
   const [formData, setFormData] = useState({
-    client_name: "Wheeler Family",
+    client_name: "Thompson Family",
     age: 45,
     retirement_age: 60,
     risk_tolerance: "moderate"

@@ -74,8 +74,8 @@ const formatCurrency = (value) => {
 const MOCK_CLIENTS = [
   {
     id: 1,
-    name: "Wheeler Family",
-    email: "james.wheeler@email.com",
+    name: "Thompson Family",
+    email: "david.thompson@email.com",
     phone: "0412 345 678",
     type: "Family",
     status: "active",
@@ -84,7 +84,7 @@ const MOCK_CLIENTS = [
     nextReview: "2025-02-15",
     netWorth: 1978000,
     netWorthChange: 2.3,
-    totalAssets: 2920000,
+    totalAssets: 2278000,
     totalDebt: 942000,
     monthlyIncome: 21000,
     tasks: [

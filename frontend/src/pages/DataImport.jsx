@@ -82,8 +82,8 @@ const DATA_TEMPLATES = {
     fields: ["name", "relationship", "age", "taxableIncome", "salaryIncome", "superBalance"],
     required: ["name", "relationship"],
     sample: [
-      { name: "John Wheeler", relationship: "primary", age: 52, taxableIncome: 185000, salaryIncome: 160000, superBalance: 420000 },
-      { name: "Sarah Wheeler", relationship: "spouse", age: 48, taxableIncome: 95000, salaryIncome: 95000, superBalance: 280000 }
+      { name: "David Thompson", relationship: "primary", age: 52, taxableIncome: 185000, salaryIncome: 160000, superBalance: 420000 },
+      { name: "Sarah Thompson", relationship: "spouse", age: 48, taxableIncome: 95000, salaryIncome: 95000, superBalance: 280000 }
     ]
   },
   properties: {
