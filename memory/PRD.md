@@ -7,9 +7,10 @@ Build an AFSL-grade wealth management platform for HNW clients with consolidated
 - **Frontend**: React (CRA) with Shadcn/UI, Recharts, Lucide icons, jsPDF
 - **Backend**: FastAPI + MongoDB
 - **AI**: OpenAI GPT-5.2 (Emergent LLM Key)
-- **Centralized Data**: `/app/frontend/src/data/clientData.js` — single source of truth
+- **Storage**: Emergent Object Storage for client document uploads
+- **Centralized Data**: `/app/frontend/src/data/clientData.js`
 
-## HNW Client Profiles (all in clientData.js)
+## HNW Client Profiles
 | ID | Name | Net Worth | Gross Assets | Age | Risk | Retire |
 |----|------|-----------|-------------|-----|------|--------|
 | thompson_family | David & Sarah Thompson | $9.6M | $11.7M | 50 | Balanced | 67 |
@@ -21,28 +22,29 @@ Build an AFSL-grade wealth management platform for HNW clients with consolidated
 | client_7 | Sarah Kim | $10.2M | $11.3M | 34 | Aggressive | 50 |
 
 ## Key Features
-### Scenario Engine (Goals tab) — Monte Carlo
-- 500 simulations per scenario, 10th-90th percentile confidence bands
-- Connected flow: Budget → Investments → Portfolio → Retirement
-- Adjustable sliders, comparison table, trajectory chart
+### Monte Carlo Scenario Engine (Goals tab)
+Connected flow: Budget → Investments → Portfolio → Retirement with 500 MC simulations, confidence bands, trajectory chart
 
-### Views
-- Personal (`/dashboard`): 5 tabs, full LHS nav
-- Client Portal (`/client-portal`): 6 tabs, minimal nav
-- Adviser Client (`/dashboard` adviser mode): 8 outer + 6 inner tabs
-- Combined client view: View Details → /dashboard (not separate /client-360)
+### Adviser Notification Customisation
+Toggle-based: review due, market alerts, compliance, client contact, portfolio rebalance, FDS, document signed, onboarding, insurance, birthdays
+
+### Client Invoicing (Profile tab)
+Create invoices with line items + GST, status tracking (draft→sent→paid), demo invoices
+
+### Client Portal Onboarding (/client-portal)
+Complete Your Profile: ID upload (passport/licence), TFN input (AES-256 encrypted), contact detail updates, Sync to Xplan (MOCKED)
 
 ## Completed (as of 16 April 2026)
-- [x] HNW numbers across all profiles ($3M-$25M range)
-- [x] Centralized clientData.js — PersonalDashboard, InvestmentsOverview, ClientProfileTab all import from it
-- [x] BAS Calculator field labels (G1-G20 descriptions)
-- [x] Combined adviser client view (View Details → /dashboard)
+- [x] Adviser notification customisation (10 toggles, 5 categories, MongoDB persistence)
+- [x] Client invoicing from CRM (create/send/mark paid, GST calculation)
+- [x] Client portal ID upload + TFN + info updates → Xplan (MOCKED)
+- [x] HNW numbers across all 7 profiles ($3M-$25M)
+- [x] Centralized clientData.js — all components import from single source
 - [x] Monte Carlo scenario engine with trajectory chart + confidence bands
+- [x] BAS Calculator field labels, Combined adviser client view
 - [x] All Wheeler references eliminated
 
 ## Backlog
-- [ ] P2: Adviser notification customisation settings
-- [ ] P2: Client invoicing from CRM
-- [ ] P2: Client portal ID upload, TFN input, info update prompts → Xplan
-- [ ] P2: Real email integration for Client Pack auto-delivery
-- [ ] P3: Replace Mock Xplan integration with real API
+- [ ] P2: Real email integration (Resend/SendGrid) for invoice delivery + client pack
+- [ ] P2: Replace Mock Xplan sync with real API
+- [ ] P3: PDF invoice generation (extend existing jsPDF)
