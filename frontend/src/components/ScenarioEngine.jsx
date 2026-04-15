@@ -8,6 +8,10 @@ import {
   ArrowRight, Wallet, TrendingUp, PiggyBank, Gauge, Save, RotateCcw,
   ChevronDown, ChevronUp, Plus, Trash2, Check, ArrowUpRight, ArrowDownRight
 } from "lucide-react";
+import {
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+  ResponsiveContainer, ReferenceLine
+} from "recharts";
 import { CLIENT_DATA, getActiveClientId, computeClientTotals } from "@/data/clientData";
 
 const fmt = (v) => new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD", maximumFractionDigits: 0 }).format(v || 0);
@@ -234,6 +238,22 @@ const ScenarioEngine = ({ embedded = false }) => {
 
   const baseResult = results[0];
 
+  // Build trajectory data for the chart — merge all scenario trajectories by age
+  const trajectoryData = useMemo(() => {
+    const currentAge = clientData.retirement.current_age;
+    const maxYears = Math.max(...results.map((r) => r.trajectory.length));
+    const data = [];
+    for (let i = 0; i < maxYears; i++) {
+      const point = { age: currentAge + i };
+      scenarios.forEach((s, si) => {
+        const t = results[si]?.trajectory[i];
+        point[s.name] = t ? Math.max(0, Math.round(t.balance)) : 0;
+      });
+      data.push(point);
+    }
+    return data;
+  }, [results, scenarios, clientData.retirement.current_age]);
+
   const updateScenario = useCallback((idx, updated) => {
     setScenarios((prev) => prev.map((s, i) => (i === idx ? updated : s)));
   }, []);
@@ -308,6 +328,71 @@ const ScenarioEngine = ({ embedded = false }) => {
           />
         ))}
       </div>
+
+      {/* Projected Balance Trajectory Chart */}
+      <Card data-testid="trajectory-chart">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm">Projected Balance Over Time</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[320px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={trajectoryData} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
+                <defs>
+                  {scenarios.map((s) => (
+                    <linearGradient key={s.id} id={`grad-${s.id}`} x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={s.color} stopOpacity={0.2} />
+                      <stop offset="95%" stopColor={s.color} stopOpacity={0.02} />
+                    </linearGradient>
+                  ))}
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis
+                  dataKey="age"
+                  tick={{ fontSize: 11 }}
+                  tickFormatter={(v) => `${v}`}
+                  label={{ value: "Age", position: "insideBottom", offset: -2, fontSize: 11 }}
+                />
+                <YAxis
+                  tick={{ fontSize: 10 }}
+                  tickFormatter={(v) => `$${(v / 1e6).toFixed(1)}M`}
+                  width={60}
+                />
+                <Tooltip
+                  formatter={(v, name) => [fmt(v), name]}
+                  labelFormatter={(v) => `Age ${v}`}
+                  contentStyle={{ fontSize: 12, borderRadius: 8 }}
+                />
+                <Legend wrapperStyle={{ fontSize: 11 }} />
+                <ReferenceLine
+                  x={clientData.retirement.retirement_age}
+                  stroke="#D4A84C"
+                  strokeDasharray="5 5"
+                  strokeWidth={2}
+                  label={{ value: "Retire", fill: "#D4A84C", fontSize: 10, position: "top" }}
+                />
+                {scenarios.map((s) => (
+                  <Area
+                    key={s.id}
+                    type="monotone"
+                    dataKey={s.name}
+                    stroke={s.color}
+                    strokeWidth={s.locked ? 2.5 : 1.5}
+                    fill={`url(#grad-${s.id})`}
+                    dot={false}
+                    strokeDasharray={s.locked ? undefined : "6 3"}
+                  />
+                ))}
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="flex items-center justify-center gap-4 mt-2 text-[10px] text-muted-foreground">
+            <span className="flex items-center gap-1"><span className="w-4 h-0.5 bg-[#D4A84C] inline-block" style={{ borderTop: "2px dashed #D4A84C" }} /> Retirement</span>
+            <span>Solid = Base plan</span>
+            <span>Dashed = Scenarios</span>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Comparison table */}
       {scenarios.length > 1 && (
