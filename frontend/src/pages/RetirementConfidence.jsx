@@ -8,7 +8,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
@@ -1027,18 +1026,11 @@ const RetirementConfidence = ({ embedded = false }) => {
           </Card>
         )}
 
-        {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="inputs">Inputs</TabsTrigger>
-            <TabsTrigger value="factors" disabled={engineMode !== 'advanced'}>Factors</TabsTrigger>
-            <TabsTrigger value="scenarios">Scenarios</TabsTrigger>
-            <TabsTrigger value="ai">AI Assist</TabsTrigger>
-          </TabsList>
+        {/* All sections combined on one page */}
+        <div className="space-y-6">
 
-          {/* Overview Tab */}
-          <TabsContent value="overview" className="space-y-6">
+          {/* Section 1: Overview + Position Summary */}
+          <div className="space-y-6">
             {/* Phase 1: Position Summary */}
             {result && (
               <PositionSummary result={result} baselineResult={baselineResult} />
@@ -1177,10 +1169,11 @@ const RetirementConfidence = ({ embedded = false }) => {
                 </CardContent>
               </Card>
             </div>
-          </TabsContent>
+          </div>
 
-          {/* Inputs Tab */}
-          <TabsContent value="inputs" className="space-y-6">
+          {/* Section 2: Inputs */}
+          <div className="space-y-6">
+            <h3 className="text-base font-semibold border-b pb-2">Retirement Inputs</h3>
             <div className="grid lg:grid-cols-2 gap-6">
               {/* Personal Details */}
               <Card>
@@ -1321,10 +1314,11 @@ const RetirementConfidence = ({ embedded = false }) => {
                 </Card>
               )}
             </div>
-          </TabsContent>
+          </div>
 
-          {/* Factors Tab (Advanced only) */}
-          <TabsContent value="factors" className="space-y-6">
+          {/* Section 3: Factors */}
+          <div className="space-y-6">
+            <h3 className="text-base font-semibold border-b pb-2">Confidence Factors</h3>
             {engineMode === 'advanced' && (
               <div className="grid lg:grid-cols-2 gap-6">
                 <Card>
@@ -1367,11 +1361,12 @@ const RetirementConfidence = ({ embedded = false }) => {
                 </Card>
               </div>
             )}
-          </TabsContent>
+          </div>
 
-          {/* Scenarios Tab */}
-          <TabsContent value="scenarios" className="space-y-6">
-            <div className="flex justify-end">
+          {/* Section 4: Scenario Comparison */}
+          <div className="space-y-6">
+            <div className="flex items-center justify-between border-b pb-2">
+              <h3 className="text-base font-semibold">Scenario Comparison</h3>
               <Button onClick={compareScenarios}>
                 <BarChart3 className="h-4 w-4 mr-2" />
                 Compare Scenarios
@@ -1400,11 +1395,12 @@ const RetirementConfidence = ({ embedded = false }) => {
                 ))}
               </div>
             )}
-          </TabsContent>
+          </div>
 
-          {/* AI Assist Tab */}
-          <TabsContent value="ai" className="space-y-6">
-            <div className="flex justify-end">
+          {/* Section 5: AI Assist */}
+          <div className="space-y-6">
+            <div className="flex items-center justify-between border-b pb-2">
+              <h3 className="text-base font-semibold">AI Suggestions</h3>
               <Button onClick={getAiSuggestions}>
                 <Brain className="h-4 w-4 mr-2" />
                 Get AI Suggestions
@@ -1472,8 +1468,8 @@ const RetirementConfidence = ({ embedded = false }) => {
                 </Card>
               </div>
             )}
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
       </div>
   );
 

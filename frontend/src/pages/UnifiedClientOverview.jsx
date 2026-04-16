@@ -64,15 +64,22 @@ const UnifiedClientOverview = () => {
               <TabsTrigger value="tax" className={tabTriggerClass} data-testid="client-tab-tax">
                 <Calculator className="h-3.5 w-3.5" /> Tax Centre
               </TabsTrigger>
-              <TabsTrigger value="profile" className={tabTriggerClass} data-testid="client-tab-profile">
-                <UserCircle className="h-3.5 w-3.5" /> Profile
-              </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="overview" className="mt-0">
+            <TabsContent value="overview" className="mt-0 space-y-6">
+              <ErrorBoundary label="Client Profile">
+                <Suspense fallback={<TabLoader />}>
+                  <ClientProfileTab clientId={getClientId()} />
+                </Suspense>
+              </ErrorBoundary>
               <ErrorBoundary label="Overview">
                 <Suspense fallback={<TabLoader />}>
                   <PersonalDashboard embedded />
+                </Suspense>
+              </ErrorBoundary>
+              <ErrorBoundary label="Invoicing">
+                <Suspense fallback={<TabLoader />}>
+                  <ClientInvoicing clientId={getClientId()} />
                 </Suspense>
               </ErrorBoundary>
             </TabsContent>
@@ -115,18 +122,6 @@ const UnifiedClientOverview = () => {
               <ErrorBoundary label="Tax Centre">
                 <Suspense fallback={<TabLoader />}>
                   <UnifiedTaxCentre embedded />
-                </Suspense>
-              </ErrorBoundary>
-            </TabsContent>
-            <TabsContent value="profile" className="mt-0 space-y-6">
-              <ErrorBoundary label="Profile">
-                <Suspense fallback={<TabLoader />}>
-                  <ClientProfileTab clientId={getClientId()} />
-                </Suspense>
-              </ErrorBoundary>
-              <ErrorBoundary label="Invoicing">
-                <Suspense fallback={<TabLoader />}>
-                  <ClientInvoicing clientId={getClientId()} />
                 </Suspense>
               </ErrorBoundary>
             </TabsContent>
