@@ -1,6 +1,7 @@
 // SimpleClientPortal — radically simplified client-facing portal.
 // Honours user spec: Only show Confidence, plain English summary, 2–3 actions, one simple visual.
 import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -39,6 +40,7 @@ const ConfidenceGauge = ({ value, size = 300 }) => {
 };
 
 const SimpleClientPortal = () => {
+  const navigate = useNavigate();
   const clientId = getActiveClientId() || "thompson_family";
   const client = CLIENT_DATA[clientId] || CLIENT_DATA.thompson_family;
 
@@ -76,7 +78,7 @@ const SimpleClientPortal = () => {
       title: "Review your monthly spending",
       subtitle: "Small changes compound — a 5% trim adds years of retirement security.",
       cta: "Open Budget",
-      href: "/household-budget",
+      href: "/budget",
     },
     {
       icon: FileText,
@@ -124,7 +126,7 @@ const SimpleClientPortal = () => {
                   <p className="text-xs text-muted-foreground mt-0.5">{a.subtitle}</p>
                 </div>
                 {a.href ? (
-                  <Button variant="outline" size="sm" onClick={() => { window.location.href = a.href; }} data-testid={`portal-action-${i}-cta`}>
+                  <Button variant="outline" size="sm" onClick={() => navigate(a.href)} data-testid={`portal-action-${i}-cta`}>
                     {a.cta} <ArrowRight className="h-3 w-3 ml-1" />
                   </Button>
                 ) : (

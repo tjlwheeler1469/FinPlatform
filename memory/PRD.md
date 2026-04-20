@@ -14,6 +14,9 @@ Build an AFSL-grade wealth management platform for HNW clients with consolidated
 | ID | Name | Net Worth | Gross Assets | Age | Risk | Retire |
 |----|------|-----------|-------------|-----|------|--------|
 | thompson_family | David & Sarah Thompson | $9.6M | $11.7M | 50 | Balanced | 67 |
+
+## Completed (20 April 2026) — Iteration 5
+- [x] Dashboard header overflow fixed, SimpleRetirement 5-section page — see previous entries
 | chen_family | Michael & Lisa Chen | $22.8M | $24.0M | 49 | Growth | 60 |
 | client_3 | Robert Mitchell | $9.6M | $9.6M | 62 | Conservative | 65 |
 | client_4 | Emma & David Williams | $2.8M | $4.0M | 39 | Growth | 67 |
@@ -56,7 +59,12 @@ Complete Your Profile: ID upload (passport/licence), TFN input (AES-256 encrypte
 - [x] BAS Calculator field labels, Combined adviser client view
 - [x] All Wheeler references eliminated
 
-## Completed (20 April 2026) — Iteration 5
+## Completed (20 April 2026) — Iteration 6
+- [x] **Smart Insights clickable** — each AI/manual insight's action row is now a button that navigates to the relevant page (portfolio→/portfolio-analyzer, retirement→/retirement-confidence, tax→/tax-centre, opportunity/action→/next-best-actions, general→/daily-briefing). Insights can also supply their own `route` override. Verified routes: tax ✅, retirement ✅, action ✅.
+- [x] **SimpleClientPortal** (`/client-portal`) — 5-section calm template: greeting + net worth, huge confidence gauge (SVG semicircle), plain-English navy summary card, exactly 3 action cards (Book Call / Open Budget → `/budget` / Download statement), contact anchor at bottom. All SPA navigation via `useNavigate`.
+- [x] **SimpleGoals** (Goals tab on /dashboard) — 5-section pattern: "3 goals in play" hero, top blocker card, 3 GoalCards (Retirement real, Home reno, Legacy estate) with progress bars, navy "next step" card, primary CTA.
+- [x] **SimpleBudget** (Budget tab on /dashboard) — 5-section pattern: surplus hero + savings-rate badge, income-vs-expenses flow card, top-2 spending categories, gold-accent suggestion card, primary CTA.
+- [x] Testing agent iteration_165: 30/31 pass → 1 route bug fixed (portal Budget CTA now correctly routes to `/budget`), testid regex cleaned up in SimpleGoals.
 - [x] **Dashboard header overflow FIXED** — the sticky Adviser Client Dashboard header no longer overlaps labels/values. Uses `lg:flex-row` (1024px+) with flex-wrap metrics and shortened CTAs (Improve/Scenario/Review Pack).
 - [x] **Retirement page simplified to 5 sections** per spec (`SimpleRetirement.jsx`):
   1. **Hero Status** — huge confidence % + On Track / Close / At Risk label + one-line summary

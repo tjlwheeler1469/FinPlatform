@@ -18,11 +18,12 @@ const fmt = (v) => {
 
 const GoalCard = ({ icon: Icon, title, target, current, targetDate, status, tone, cta, onCta }) => {
   const pct = Math.min(100, Math.round((current / Math.max(1, target)) * 100));
+  const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const ringColor = tone === "emerald" ? "text-emerald-700 bg-emerald-50" :
                     tone === "amber" ? "text-amber-700 bg-amber-50" :
                     "text-rose-700 bg-rose-50";
   return (
-    <Card className="border border-gray-200" data-testid={`goal-${title.replace(/\s/g, '-').toLowerCase()}`}>
+    <Card className="border border-gray-200" data-testid={`goal-${slug}`}>
       <CardContent className="p-5">
         <div className="flex items-start gap-4">
           <div className="h-12 w-12 rounded-full bg-[#1a2744]/5 flex items-center justify-center flex-shrink-0">
@@ -40,7 +41,7 @@ const GoalCard = ({ icon: Icon, title, target, current, targetDate, status, tone
             <Progress value={pct} className="h-1.5" />
             <div className="flex items-center justify-between mt-3">
               <span className="text-[11px] text-muted-foreground">{pct}% funded</span>
-              <Button variant="ghost" size="sm" className="text-xs h-7" onClick={onCta} data-testid={`goal-cta-${title.replace(/\s/g, '-').toLowerCase()}`}>
+              <Button variant="ghost" size="sm" className="text-xs h-7" onClick={onCta} data-testid={`goal-cta-${slug}`}>
                 {cta} <ArrowRight className="h-3 w-3 ml-1" />
               </Button>
             </div>
