@@ -371,18 +371,19 @@ const DecisionEngine = ({ embedded = false }) => {
                         {/* CTA */}
                         <div className="flex justify-end gap-2 mt-4 pt-4 border-t">
                           <Button variant="outline" size="sm"
-                            onClick={() => { toast.info(`Learn more: ${insight.title || 'Insight details'}`); }}
-                            data-testid={`decision-learn-${insight.id}`}
+                            onClick={(e) => { e.stopPropagation(); toast.info(`Learn more: ${rec.title || 'Recommendation details'}`); }}
+                            data-testid={`decision-learn-${rec.id}`}
                           >
                             Learn More
                           </Button>
                           <Button size="sm" className="bg-[#1a2744] hover:bg-[#1a2744]/90"
-                            onClick={() => {
-                              const slug = insight.client_id || insight.client_name;
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const slug = rec.client_id || rec.client_name;
                               if (slug) navigateToClient(navigate, slug);
                               else navigate('/next-best-actions');
                             }}
-                            data-testid={`decision-take-action-${insight.id}`}
+                            data-testid={`decision-take-action-${rec.id}`}
                           >
                             Take Action
                             <ArrowRight className="h-4 w-4 ml-2" />
