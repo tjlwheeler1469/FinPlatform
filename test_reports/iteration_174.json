@@ -1,0 +1,40 @@
+{
+  "summary": "Tested data-consistency fix on /investments page. PRIMARY fix VERIFIED: Shares & ETFs sub-tab now shows Total Value $845,000 (VGH 4000@$105=$420k, BHP 4000@$46.25=$185k, CBA 2000@$120=$240k) — matches Overview asset allocation. Overview regression cards all correct ($11.672M / $2.062M / $9.61M / +5.9% / 15 holdings). HOWEVER, regression broken on Cash & TDs sub-tab and Super & Pension sub-tab — these pages read from a DIFFERENT (old hardcoded) data source and were NOT updated to match the aligned CLIENT_DATA/CLIENT_PORTFOLIO_DATA.client_1 values.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {
+        "flow": "Cash & TDs sub-tab (client_1 / thompson_family)",
+        "issue": "Shows Total Cash $250,000 (Savings $70k = ING $45k + Ubank $25k; TDs $180k = Judo $100k + Macquarie $50k + BOQ $30k). Expected per data alignment: Cash ~$180,000 (Emergency Fund - ING Savings) + TD $350,000 (Westpac 12m) = $530,000. Page uses its own hardcoded dataset that does NOT read from CLIENT_PORTFOLIO_DATA.client_1.investments.cash_savings / term_deposit_amount.",
+        "affected_selectors": ["Cash & TDs tab — Total Cash metric card", "Savings Accounts list", "Term Deposits list"],
+        "priority": "HIGH"
+      },
+      {
+        "flow": "Super & Pension sub-tab (client_1 / thompson_family)",
+        "issue": "Super Projection Calculator shows Primary (David) Super Balance 245000 and Spouse (Sarah) 198000 → Current Combined $443,000. Expected per CLIENT_DATA.thompson_family: David AustralianSuper $1,850,000 + Sarah REST Super $1,420,000 = $3,270,000. Also matches CLIENT_PORTFOLIO_DATA.client_1.smsf_balance = 3270000 but calculator ignores that and uses old defaults (245000/198000 from CLIENT_FAMILY_DATA.client_1.familyMembers.superBalance).",
+        "affected_selectors": ["Super & Pension tab — Current Combined card", "Primary/Spouse Super Balance inputs"],
+        "priority": "HIGH"
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Fix Cash & TDs sub-tab to derive Total Cash and TD breakdown from CLIENT_PORTFOLIO_DATA.client_1.investments.cash_savings ($180k) and term_deposit_amount ($350k), or split the $180k/$350k across the existing savings/TD line items so totals match the Overview donut/cards.",
+    "Fix Super & Pension sub-tab projection calculator to seed initial super balances from CLIENT_DATA.thompson_family super assets ($1.85M David + $1.42M Sarah = $3.27M combined) instead of the stale CLIENT_FAMILY_DATA.client_1 superBalance values (245000/198000). These are now the two remaining mis-aligned data sources.",
+    "After fixing, verify same consistency in adviser mode → /dashboard → UnifiedClientOverview → Investments sub-tab (not retested here since same components)."
+  ],
+  "critical_code_review_comments": [
+    "DRY / single-source-of-truth violation: CLIENT_FAMILY_DATA.client_1.familyMembers[].superBalance (245k/198k) and the hardcoded savings/TD list on the Cash & TDs page duplicate data already present in CLIENT_DATA.thompson_family.assets and CLIENT_PORTFOLIO_DATA.client_1.investments. Bugs like this $845k vs $84.5k inconsistency will keep recurring until all investment views read from ONE seed (recommend CLIENT_DATA.thompson_family as the source of truth and derive CLIENT_PORTFOLIO_DATA + CLIENT_FAMILY_DATA.superBalance from it).",
+    "SharePortfolio uses PortfolioProvider.sharePortfolio (DEFAULT_SHARE_PORTFOLIO) which has now been aligned ×10 quantities — good. But the other sub-tabs (Cash/TDs, Super/Pension, SMSF) each pull from different state slices; consider a single useClientPortfolio() hook returning normalized totals."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "60% (3 of 6 acceptance criteria pass; Overview + Shares & ETFs + Overview regression pass; Cash & TDs + Super & Pension fail; adviser-mode mirror not independently retested)"},
+  "test_credentials": "None required — compliance modal bypassed via localStorage wealth_command_compliance_v5=permanent and app_mode=client",
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Shares $845k alignment is fully working. Two remaining mis-aligned data sources: (1) Cash & TDs page shows $250k total (should be $530k = $180k cash + $350k TD), and (2) Super & Pension calculator defaults to 245k+198k=443k (should be $3.27M from David+Sarah super in CLIENT_DATA). Both pages appear to use their own hardcoded arrays rather than CLIENT_PORTFOLIO_DATA.client_1. After fix, retest both sub-tabs and also adviser-mode UnifiedClientOverview Investments sub-tab for the same 4 numbers.",
+  "rca of the issue": "Only DEFAULT_SHARE_PORTFOLIO and CLIENT_PORTFOLIO_DATA.client_1 top-level totals were updated in portfolioSeedData.js. The Cash & TDs page and Super & Pension calculator read from independent seed data (likely hardcoded arrays inside the sub-tab components, or CLIENT_FAMILY_DATA.client_1.familyMembers.superBalance for super). Fix must propagate aligned totals into those component-level data sources or refactor them to read from CLIENT_PORTFOLIO_DATA.client_1.investments.{cash_savings, term_deposit_amount, smsf_balance} (which are already correct at $180k / $350k / $3.27M)."
+}

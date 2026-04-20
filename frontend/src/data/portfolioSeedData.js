@@ -54,15 +54,16 @@ export const DEFAULT_FAMILY_MEMBERS = CLIENT_FAMILY_DATA.client_1.familyMembers;
 export const DEFAULT_TRUST = CLIENT_FAMILY_DATA.client_1.trust;
 export const DEFAULT_COMPANY = CLIENT_FAMILY_DATA.client_1.company;
 
-// Per-client portfolio data for data flow consistency
+// Per-client portfolio data — ALIGNED with CLIENT_DATA (clientData.js) HNW figures
 export const CLIENT_PORTFOLIO_DATA = {
   client_1: {
-    personal: { name: "Thompson Family", age: 50, taxableIncome: 185000, entityType: "personal" },
-    investments: { cash_savings: 28000, term_deposit_amount: 35000, term_deposit_rate: 4.8, shares_value: 84500, shares_dividend_yield: 4.2, franking_percentage: 85, bonds_value: 0, bonds_yield: 0, etf_value: 42000, etf_yield: 3.5, smsf_balance: 443000, properties: [
-      { property_id: "prop_001", name: "Family Home - Glen Waverley", value: 985000, rental_income: 0, mortgage_amount: 285000, mortgage_rate: 6.19, mortgage_term_years: 25, annual_expenses: 8500, depreciation_building: 0, depreciation_fixtures: 0 },
-      { property_id: "prop_002", name: "Investment Unit - Brunswick", value: 620000, rental_income: 32000, mortgage_amount: 380000, mortgage_rate: 6.49, mortgage_term_years: 28, annual_expenses: 7200, depreciation_building: 5800, depreciation_fixtures: 2800 },
+    personal: { name: "Thompson Family", age: 50, taxableIncome: 485000, entityType: "personal" },
+    investments: { cash_savings: 180000, term_deposit_amount: 350000, term_deposit_rate: 4.65, shares_value: 845000, shares_dividend_yield: 4.2, franking_percentage: 85, bonds_value: 0, bonds_yield: 0, etf_value: 670000, etf_yield: 3.5, smsf_balance: 3270000, properties: [
+      { property_id: "prop_001", name: "Family Home - Glen Waverley", value: 2850000, rental_income: 0, mortgage_amount: 680000, mortgage_rate: 6.19, mortgage_term_years: 25, annual_expenses: 12000, depreciation_building: 0, depreciation_fixtures: 0 },
+      { property_id: "prop_002", name: "Investment Unit - Brunswick", value: 1280000, rental_income: 62000, mortgage_amount: 520000, mortgage_rate: 6.49, mortgage_term_years: 28, annual_expenses: 9400, depreciation_building: 9800, depreciation_fixtures: 4100 },
+      { property_id: "prop_003", name: "Holiday House - Portsea", value: 1950000, rental_income: 0, mortgage_amount: 850000, mortgage_rate: 6.29, mortgage_term_years: 24, annual_expenses: 8500, depreciation_building: 0, depreciation_fixtures: 0 },
     ] },
-    summary: { totalAssets: 2278000, totalDebt: 669200, netWorth: 1608800, annualIncome: 185000, totalTax: 42000, netIncome: 143000 },
+    summary: { totalAssets: 11672000, totalDebt: 2062000, netWorth: 9610000, annualIncome: 485000, totalTax: 142000, netIncome: 343000 },
   },
   client_2: {
     personal: { name: "Chen Family Trust", age: 52, taxableIncome: 280000, entityType: "trust" },
@@ -94,11 +95,12 @@ export const CLIENT_PORTFOLIO_DATA = {
   },
 };
 
-// Default Share Portfolio with ownership types
+// Default Share Portfolio — aligned with CLIENT_DATA.thompson_family asset values
+// VGS (VGH alias) $420k = 4000 @ $105, BHP $185k = 4000 @ $46.25, CBA $240k = 2000 @ $120
 export const DEFAULT_SHARE_PORTFOLIO = [
-  { id: 1, symbol: "VGH", name: "Vanguard High Growth ETF", ownership: "joint", ownerId: null, quantity: 400, purchasePrice: 92.00, currentPrice: 105.00, purchaseDate: "2022-03-15", dividendYield: 3.5, frankingPercentage: 0, sector: "ETF" },
-  { id: 2, symbol: "BHP", name: "BHP Group Shares", ownership: "personal", ownerId: 1, quantity: 400, purchasePrice: 42.00, currentPrice: 46.25, purchaseDate: "2023-06-20", dividendYield: 5.8, frankingPercentage: 100, sector: "Materials" },
-  { id: 3, symbol: "CBA", name: "CBA Shares (DRP)", ownership: "personal", ownerId: 2, quantity: 200, purchasePrice: 105.00, currentPrice: 120.00, purchaseDate: "2022-08-01", dividendYield: 4.2, frankingPercentage: 100, sector: "Financials" },
+  { id: 1, symbol: "VGH", name: "Vanguard High Growth ETF", ownership: "joint", ownerId: null, quantity: 4000, purchasePrice: 92.00, currentPrice: 105.00, purchaseDate: "2022-03-15", dividendYield: 3.5, frankingPercentage: 0, sector: "ETF" },
+  { id: 2, symbol: "BHP", name: "BHP Group Shares", ownership: "personal", ownerId: 1, quantity: 4000, purchasePrice: 42.00, currentPrice: 46.25, purchaseDate: "2023-06-20", dividendYield: 5.8, frankingPercentage: 100, sector: "Materials" },
+  { id: 3, symbol: "CBA", name: "CBA Shares (DRP)", ownership: "personal", ownerId: 2, quantity: 2000, purchasePrice: 105.00, currentPrice: 120.00, purchaseDate: "2022-08-01", dividendYield: 4.2, frankingPercentage: 100, sector: "Financials" },
 ];
 
 // Per-client share portfolios (client_1 uses DEFAULT_SHARE_PORTFOLIO)
