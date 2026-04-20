@@ -10,6 +10,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import RetirementWorkshop from "@/pages/RetirementWorkshop";
 import AdviserClientInputs from "@/components/AdviserClientInputs";
+import SimpleBudget from "@/components/SimpleBudget";
+import SimpleGoals from "@/components/SimpleGoals";
+import SimpleTax from "@/components/SimpleTax";
+import SimpleInvestments from "@/components/SimpleInvestments";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -793,6 +797,10 @@ const Client360View = () => {
             {[
               { value: "overview", label: "Overview" },
               { value: "retirement", label: "Retirement" },
+              { value: "budget", label: "Budget" },
+              { value: "goals", label: "Goals" },
+              { value: "investments-view", label: "Investments" },
+              { value: "tax", label: "Tax" },
               { value: "profile-inputs", label: "Profile & Inputs" },
               { value: "holdings", label: "Holdings" },
               { value: "performance", label: "Performance" },
@@ -955,6 +963,26 @@ const Client360View = () => {
           {/* Retirement Tab — Full Workshop */}
           <TabsContent value="retirement" className="space-y-6" data-testid="tab-content-retirement">
             <RetirementWorkshop embedded clientId={clientId} />
+          </TabsContent>
+
+          {/* Budget Tab — Client's household budget (same as Personal/Client view) */}
+          <TabsContent value="budget" className="space-y-6" data-testid="tab-content-budget">
+            <SimpleBudget embedded clientId={clientId} />
+          </TabsContent>
+
+          {/* Goals Tab — Client's financial goals */}
+          <TabsContent value="goals" className="space-y-6" data-testid="tab-content-goals">
+            <SimpleGoals embedded clientId={clientId} />
+          </TabsContent>
+
+          {/* Investments Tab — client-facing simplified view */}
+          <TabsContent value="investments-view" className="space-y-6" data-testid="tab-content-investments-view">
+            <SimpleInvestments embedded clientId={clientId} />
+          </TabsContent>
+
+          {/* Tax Tab — client's tax summary */}
+          <TabsContent value="tax" className="space-y-6" data-testid="tab-content-tax">
+            <SimpleTax embedded clientId={clientId} />
           </TabsContent>
 
           {/* Profile & Inputs Tab — Adviser manual data entry */}
