@@ -1,20 +1,23 @@
-<analysis>embedded={true}embedded={true}usePortfolio()App.jscrm.pyjsPDFnavData.jsUnifiedClientOverview.jsxUnifiedClientOverview.jsxUnifiedClientOverview.jsxTabsTriggerdata-[state=active]:bg-[#0f1d35]text-whiteErrorBoundaryframe_antindex.jsindex.jsErrorBoundary/app/frontend/src/components/layout/navData.js/app/frontend/src/pages/UnifiedClientOverview.jsxUnifiedClientOverview.jsxPortfolioRebalancing.jsx/app/frontend/src/components/ClientProfileTab.jsxUnifiedClientOverview.jsxjsPDFSyntaxError: Unexpected token '<'frame_antErrorBoundaryindex.js
+<analysis>clientData.jsScenarioEngine.jsxanalyze_file_toollazyRetryApp.jslazyRetrywindow.location.reload(true)clientData.jsAdviserDashboard.jsx/app/frontend/src/components/ClientOnboarding.jsxclient_onboarding.pyScenarioEngine.jsxclientData.jsUnifiedClientOverviewRetirementConfidence.jsxSyntaxError: Unexpected token '<'lazyRetry
 /app/
 ├── backend/
-│   └── routes/
-│       ├── crm.py                      # Handles P1/P2 client data routing
-│       ├── client_portal.py            # Mock data for client portal endpoints
-│       └── confidence_engine.py
+│   ├── routes/
+│   │   ├── client_onboarding.py    # New
+│   │   ├── invoices.py             # New
+│   │   ├── notifications.py        # New
+│   │   └── crm.py
+│   └── route_registry.py           # Centralized route registration
 └── frontend/
     └── src/
+        ├── data/
+        │   └── clientData.js       # Centralized HNW mock data (SINGLE SOURCE OF TRUTH)
         ├── components/
-        │   ├── ClientProfileTab.jsx    # Displays simplified P1/P2 data
-        │   └── layout/navData.js       # Centralized LHS navigation config
+        │   ├── ScenarioEngine.jsx  # Monte Carlo scenario builder
+        │   ├── ClientInvoicing.jsx
+        │   └── ClientOnboarding.jsx
         ├── pages/
-        │   ├── UnifiedClientOverview.jsx # Main tab-based wrapper for clients
-        │   ├── PersonalDashboard.jsx   
-        │   ├── ReportGenerator.jsx     # jsPDF implementation
-        │   └── RetirementConfidence.jsx
-        ├── App.js                      # Context provider with DEFAULT_FAMILY_MEMBERS
-        └── index.js                    # Global error suppression
-embedded={true}UnifiedClientOverview.jsxLayoutusePortfolioApp.jsuser_profiles/app/backend/routes/crm.pyCLIENTSTASKSjsPDFjspdf-autotableReportGenerator.jsx/app/frontend/src/components/layout/navData.js/app/frontend/src/pages/UnifiedClientOverview.jsx/app/frontend/src/components/ClientProfileTab.jsx/app/frontend/src/App.js/app/frontend/src/components/ErrorBoundary.jsx/app/frontend/src/index.js/app/backend/routes/crm.py/app/test_reports/iteration_153.jsonApp.jsDEFAULT/api/crm/clients/api/client-portal/dashboard/{client_id}/api/hybrid-engine/compare-scenariosUnifiedClientOverview.jsxdata-[state=active]:bg-[#0f1d35]/app/test_reports/iteration_148.json/app/test_reports/iteration_153.json/app/memory/PRD.mdnavData.jsUnifiedClientOverview.jsxbg-[#0f1d35]jsPDF/app/test_reports/iteration_153.json/app/memory/test_credentials.mdnavData.jsUnifiedClientOverview.jsx/app/frontend/src/pages/UnifiedClientOverview.jsxTabsTriggerBudgetInvestmentsGoals/app/frontend/src/components/layout/navData.jsGoalsPortfolioRebalancing.jsx/app/frontend/src/components/ClientProfileTab.jsx</analysis>
+        │   ├── UnifiedClientOverview.jsx # Adviser combined client view
+        │   ├── PersonalDashboard.jsx     # Shared dashboard for Personal and Client Portal
+        │   └── RetirementConfidence.jsx  # Single-page scrolling layout
+        └── App.js                        # Contains lazyRetry wrapper for chunks
+clientData.jsCLIENT_DATAlazyRetrylazyApp.jsScenarioEngine.jsxclientData.jsthompson_familychen_familyAreaChart/app/frontend/src/data/clientData.js/app/frontend/src/components/ScenarioEngine.jsx/app/frontend/src/pages/AdviserDashboard.jsx/app/frontend/src/components/ClientOnboarding.jsx/app/frontend/src/App.jslazyRetrywindow.location.reload(true)/api/client-onboarding/tfn/api/invoices/api/adviser-notifications/app/memory/PRD.md/app/test_reports/iteration_159.jsonanalyze_file_tool/app/test_reports/iteration_159.json/app/frontend/src/pages/AdviserDashboard.jsx/app/frontend/src/components/ClientOnboarding.jsxonClicksetTimeout/app/frontend/src/App.js/app/frontend/src/components/ErrorBoundary.jsxwindow.location.reload(true)</analysis>

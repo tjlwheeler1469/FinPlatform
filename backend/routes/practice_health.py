@@ -22,20 +22,21 @@ PRACTICE_DATA = {
     "afsl_number": "123456789",
 }
 
-# Client segments for analysis
+# Client segments for analysis — HNW book scaled values
 CLIENT_SEGMENTS = {
-    "high_value": {"min_aum": 2000000, "count": 3, "total_aum": 14600000, "avg_fee": 0.95},
-    "core": {"min_aum": 500000, "max_aum": 2000000, "count": 4, "total_aum": 5740000, "avg_fee": 1.0},
-    "emerging": {"max_aum": 500000, "count": 1, "total_aum": 580000, "avg_fee": 1.2},
+    "ultra_hnw": {"min_aum": 10000000, "count": 14, "total_aum": 280000000, "avg_fee": 0.75},
+    "high_value": {"min_aum": 2000000, "count": 22, "total_aum": 132000000, "avg_fee": 0.85},
+    "core": {"min_aum": 500000, "max_aum": 2000000, "count": 8, "total_aum": 52000000, "avg_fee": 1.0},
+    "emerging": {"max_aum": 500000, "count": 3, "total_aum": 16000000, "avg_fee": 1.2},
 }
 
-# Historical metrics for trending
+# Historical metrics for trending — HNW practice scale
 HISTORICAL_METRICS = {
-    "2024-Q1": {"aum": 18500000, "clients": 148, "revenue": 420000, "nps": 72},
-    "2024-Q2": {"aum": 19200000, "clients": 152, "revenue": 445000, "nps": 74},
-    "2024-Q3": {"aum": 19800000, "clients": 158, "revenue": 465000, "nps": 76},
-    "2024-Q4": {"aum": 20500000, "clients": 161, "revenue": 485000, "nps": 78},
-    "2025-Q1": {"aum": 21300000, "clients": 164, "revenue": 502000, "nps": 80},
+    "2024-Q1": {"aum": 418000000, "clients": 42, "revenue": 3850000, "nps": 72},
+    "2024-Q2": {"aum": 435000000, "clients": 44, "revenue": 4020000, "nps": 74},
+    "2024-Q3": {"aum": 452000000, "clients": 45, "revenue": 4180000, "nps": 76},
+    "2024-Q4": {"aum": 468000000, "clients": 46, "revenue": 4350000, "nps": 78},
+    "2025-Q1": {"aum": 480000000, "clients": 47, "revenue": 4520000, "nps": 80},
 }
 
 

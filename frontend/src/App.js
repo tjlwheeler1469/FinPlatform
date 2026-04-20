@@ -8,16 +8,43 @@ import { LanguageProvider } from "@/components/LanguageContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
 // Retry wrapper for lazy imports — handles webpack chunk load failures
+const hardReload = () => {
+  try {
+    if ("caches" in window) {
+      caches.keys().then((keys) => keys.forEach((k) => caches.delete(k)));
+    }
+  } catch (e) { /* ignore */ }
+  const url = new URL(window.location.href);
+  url.searchParams.set("_cb", Date.now().toString());
+  window.location.replace(url.toString());
+};
+
 const lazyRetry = (importFn) =>
   lazy(() =>
     importFn().catch(() =>
       new Promise((resolve) => setTimeout(resolve, 1500)).then(() =>
         importFn().catch(() => ({ default: () => (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="flex flex-col items-center justify-center py-20 text-center px-4">
             <p className="font-medium mb-2">This page failed to load.</p>
-            <button className="px-4 py-2 bg-[#1a2744] text-white rounded-md text-sm" onClick={() => window.location.reload()}>
-              Reload
-            </button>
+            <p className="text-xs text-muted-foreground mb-4 max-w-md">
+              A cached file may be stale. Try reloading, or clear your cache with Hard Refresh.
+            </p>
+            <div className="flex gap-2">
+              <button
+                className="px-4 py-2 border rounded-md text-sm"
+                onClick={() => window.location.reload()}
+                data-testid="chunk-fallback-reload"
+              >
+                Reload
+              </button>
+              <button
+                className="px-4 py-2 bg-[#1a2744] text-white rounded-md text-sm"
+                onClick={hardReload}
+                data-testid="chunk-fallback-hard-refresh"
+              >
+                Hard Refresh
+              </button>
+            </div>
           </div>
         )}))
       )

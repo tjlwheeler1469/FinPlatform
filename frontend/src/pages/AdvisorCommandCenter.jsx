@@ -66,6 +66,7 @@ import KnowledgeGraphPanel from "@/components/KnowledgeGraphPanel";
 import ClientPackScheduler from "@/components/ClientPackScheduler";
 import DecisionCenter from "@/pages/DecisionCenter";
 import DailyBriefing from "@/pages/DailyBriefing";
+import { CLIENT_DATA, computeClientTotals } from "@/data/clientData";
 
 const API_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || "";
 
@@ -245,12 +246,21 @@ const AdvisorCommandCenter = () => {
   }
 
   const { commandCenter, monitoring, taxOpportunities, intelligence, practiceHealth, clients, nextActions } = data;
-  
-  // Key Metrics from Practice Health (real data)
-  const totalAUM = practiceHealth?.key_metrics?.total_aum || commandCenter?.metrics?.total_aum || 21300000;
+
+  // HNW portfolio totals derived from centralized clientData.js (up to $25M per client).
+  const HNW_SLUGS = ["thompson_family", "chen_family", "client_3", "client_4", "client_5", "client_6", "client_7"];
+  const hnwTotals = HNW_SLUGS.reduce((acc, slug) => {
+    const t = computeClientTotals(slug);
+    acc.aum += t.grossAssets;
+    acc.netWorth += t.netWorth;
+    return acc;
+  }, { aum: 0, netWorth: 0 });
+
+  // Key Metrics — prefer backend, fallback to HNW-scaled totals
+  const totalAUM = practiceHealth?.key_metrics?.total_aum || commandCenter?.metrics?.total_aum || hnwTotals.aum;
   const totalClients = practiceHealth?.key_metrics?.total_clients || commandCenter?.metrics?.total_clients || 164;
-  const netFlows = 3200000;
-  const revenue = practiceHealth?.key_metrics?.total_revenue || 1800000;
+  const netFlows = Math.round(totalAUM * 0.028); // ~2.8% monthly net inflows
+  const revenue = practiceHealth?.key_metrics?.total_revenue || Math.round(totalAUM * 0.011); // ~1.1% of AUM
   const healthScore = practiceHealth?.health_score?.overall_score || 84;
   const healthGrade = practiceHealth?.health_score?.grade || "B+";
   
@@ -265,17 +275,22 @@ const AdvisorCommandCenter = () => {
   const retirementRisks = 3;
   const idleCashClients = intelligence?.book_wide_insights?.find(i => i.insight?.includes("idle cash"))?.count || 8;
 
-  // Client list for cross-client intelligence
-  const clientList = clients?.client_analyses || [
-    { id: "client_1", name: "Thompson Family", aum: 2278000, risk_profile: "Balanced", status: "needs_attention", type: "Family", age: 45 },
-    { id: "client_2", name: "Chen Investment Trust", aum: 4200000, risk_profile: "Growth", status: "on_track", type: "Trust", age: 52 },
-    { id: "client_3", name: "Thompson SMSF", aum: 890000, risk_profile: "Conservative", status: "at_risk", type: "SMSF", age: 62 },
-    { id: "client_4", name: "Patel Holdings", aum: 7500000, risk_profile: "High Growth", status: "needs_attention", type: "Company", age: 48 },
-    { id: "client_5", name: "Garcia Family", aum: 820000, risk_profile: "Balanced", status: "on_track", type: "Family", age: 38 },
-    { id: "client_6", name: "Anderson SMSF", aum: 1250000, risk_profile: "Conservative", status: "review_due", type: "SMSF", age: 58 },
-    { id: "client_7", name: "Liu Family Trust", aum: 3100000, risk_profile: "Growth", status: "on_track", type: "Trust", age: 42 },
-    { id: "client_8", name: "Morrison Super", aum: 580000, risk_profile: "Balanced", status: "at_risk", type: "SMSF", age: 55 }
-  ];
+  // Client list for cross-client intelligence — built from HNW centralized data
+  const HNW_CLIENT_LIST = HNW_SLUGS.map((slug, idx) => {
+    const c = CLIENT_DATA[slug];
+    const t = computeClientTotals(slug);
+    const statusMap = ["needs_attention", "on_track", "at_risk", "on_track", "needs_attention", "review_due", "on_track"];
+    return {
+      id: slug,
+      name: c?.profile?.name || slug,
+      aum: t.grossAssets,
+      risk_profile: c?.profile?.riskProfile || "Balanced",
+      status: statusMap[idx % statusMap.length],
+      type: idx === 1 || idx === 5 ? "Trust" : idx === 2 ? "SMSF" : idx === 4 ? "Company" : "Family",
+      age: c?.profile?.age || 50,
+    };
+  });
+  const clientList = clients?.client_analyses || HNW_CLIENT_LIST;
 
   // Tasks for workflow panel
   const tasks = commandCenter?.tasks || [

@@ -5,11 +5,19 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import {
-  Upload, Shield, FileCheck, UserCheck, Check, AlertCircle, RefreshCw, Lock, Phone, Mail, MapPin, Briefcase
+  Upload, Shield, FileCheck, UserCheck, Check, AlertCircle, RefreshCw, Lock, Phone, Mail, MapPin, Briefcase, ExternalLink, Building2
 } from "lucide-react";
 import { toast } from "sonner";
 
 const API = process.env.REACT_APP_BACKEND_URL;
+
+const formatSyncTime = (iso) => {
+  if (!iso) return null;
+  try {
+    const d = new Date(iso);
+    return d.toLocaleString("en-AU", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
+  } catch { return null; }
+};
 
 const ClientOnboarding = ({ clientId = "portal_001" }) => {
   const [tfnStatus, setTfnStatus] = useState(null);
@@ -18,7 +26,10 @@ const ClientOnboarding = ({ clientId = "portal_001" }) => {
   const [tfnInput, setTfnInput] = useState("");
   const [infoFields, setInfoFields] = useState({ phone: "", email: "", address: "" });
   const [syncing, setSyncing] = useState(false);
-  const [synced, setSynced] = useState(false);
+  const [lastSyncAt, setLastSyncAt] = useState(null);
+  const [updatingField, setUpdatingField] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState({});
+  const [myGovOpening, setMyGovOpening] = useState(false);
 
   useEffect(() => {
     fetch(`${API}/api/client-onboarding/tfn/${clientId}`).then(r => r.json()).then(setTfnStatus).catch(() => {});
@@ -78,15 +89,19 @@ const ClientOnboarding = ({ clientId = "portal_001" }) => {
 
   const updateInfo = async (field) => {
     if (!infoFields[field]) return;
+    setUpdatingField(field);
     try {
       await fetch(`${API}/api/client-onboarding/info-update`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ client_id: clientId, field, value: infoFields[field] }),
       });
-      toast.success(`${field} updated`);
+      const ts = new Date().toISOString();
+      setLastUpdated(prev => ({ ...prev, [field]: ts }));
+      toast.success(`${field.charAt(0).toUpperCase() + field.slice(1)} saved — will sync to adviser`);
       setInfoFields(prev => ({ ...prev, [field]: "" }));
     } catch { toast.error("Failed to update"); }
+    setUpdatingField(null);
   };
 
   const syncToXplan = async () => {
@@ -97,10 +112,25 @@ const ClientOnboarding = ({ clientId = "portal_001" }) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ client_id: clientId }),
       });
-      setSynced(true);
+      const ts = new Date().toISOString();
+      setLastSyncAt(ts);
       toast.success("All data synced to Xplan");
     } catch { toast.error("Sync failed"); }
     setSyncing(false);
+  };
+
+  const openMyGov = () => {
+    setMyGovOpening(true);
+    toast.info("Redirecting to myGov...", { description: "Opening in a new tab" });
+    setTimeout(() => {
+      window.open("https://my.gov.au", "_blank", "noopener,noreferrer");
+      setMyGovOpening(false);
+    }, 600);
+  };
+
+  const openATO = () => {
+    toast.info("Opening ATO online services...");
+    setTimeout(() => window.open("https://my.gov.au/LoginServices/main/login?execution=e2s1", "_blank", "noopener,noreferrer"), 400);
   };
 
   return (
@@ -201,22 +231,58 @@ const ClientOnboarding = ({ clientId = "portal_001" }) => {
               <Input placeholder={placeholder} value={infoFields[field]} className="flex-1 text-sm"
                 onChange={(e) => setInfoFields(prev => ({ ...prev, [field]: e.target.value }))}
                 data-testid={`info-${field}`} />
-              <Button size="sm" variant="outline" onClick={() => updateInfo(field)} disabled={!infoFields[field]}>Update</Button>
+              <Button size="sm" variant="outline" onClick={() => updateInfo(field)}
+                disabled={!infoFields[field] || updatingField === field}
+                data-testid={`info-${field}-save`}>
+                {updatingField === field ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : "Save"}
+              </Button>
+              {lastUpdated[field] && (
+                <span className="text-[10px] text-emerald-600 whitespace-nowrap" data-testid={`info-${field}-synced`}>
+                  <Check className="h-3 w-3 inline mr-0.5" />synced {formatSyncTime(lastUpdated[field])}
+                </span>
+              )}
             </div>
           ))}
         </CardContent>
       </Card>
 
+      {/* External Services */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Building2 className="h-4 w-4 text-blue-600" /> Government & Tax Services
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <p className="text-xs text-muted-foreground">Link out to your official accounts to update records or provide consent.</p>
+          <div className="grid md:grid-cols-2 gap-2">
+            <Button variant="outline" className="justify-start" onClick={openMyGov} disabled={myGovOpening} data-testid="mygov-btn">
+              {myGovOpening ? <RefreshCw className="h-4 w-4 mr-2 animate-spin" /> : <ExternalLink className="h-4 w-4 mr-2" />}
+              Continue to myGov
+            </Button>
+            <Button variant="outline" className="justify-start" onClick={openATO} data-testid="ato-btn">
+              <ExternalLink className="h-4 w-4 mr-2" />
+              ATO Online Services
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Sync to Xplan */}
       <Card className="border-dashed">
-        <CardContent className="p-4 flex items-center justify-between">
-          <div>
+        <CardContent className="p-4 flex items-center justify-between gap-3 flex-wrap">
+          <div className="flex-1 min-w-[200px]">
             <p className="text-sm font-medium">Transfer to Xplan</p>
             <p className="text-xs text-muted-foreground">Push all uploaded data to your adviser's practice management system</p>
+            {lastSyncAt && (
+              <p className="text-[11px] text-emerald-600 mt-1" data-testid="xplan-last-sync">
+                <Check className="h-3 w-3 inline mr-0.5" /> Last synced {formatSyncTime(lastSyncAt)}
+              </p>
+            )}
           </div>
-          <Button onClick={syncToXplan} disabled={syncing || synced} data-testid="sync-xplan-btn">
-            {synced ? <><Check className="h-4 w-4 mr-1" /> Synced</> :
-             syncing ? <><RefreshCw className="h-4 w-4 mr-1 animate-spin" /> Syncing...</> :
+          <Button onClick={syncToXplan} disabled={syncing} data-testid="sync-xplan-btn">
+            {syncing ? <><RefreshCw className="h-4 w-4 mr-1 animate-spin" /> Syncing...</> :
+             lastSyncAt ? <><RefreshCw className="h-4 w-4 mr-1" /> Re-sync</> :
              <><RefreshCw className="h-4 w-4 mr-1" /> Sync to Xplan</>}
           </Button>
         </CardContent>

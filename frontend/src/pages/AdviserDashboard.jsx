@@ -49,6 +49,7 @@ import {
 import { toast } from "sonner";
 import { ComplianceFooter } from "@/components/ComplianceDisclaimer";
 import ChartContainer from "@/components/ChartContainer";
+import { CLIENT_DATA, computeClientTotals } from "@/data/clientData";
 import {
   BarChart,
   Bar,
@@ -70,121 +71,62 @@ const formatCurrency = (value) => {
   }).format(value);
 };
 
-// Sample multi-client data
-const MOCK_CLIENTS = [
-  {
-    id: 1,
-    name: "Thompson Family",
-    email: "david.thompson@email.com",
-    phone: "0412 345 678",
-    type: "Family",
-    status: "active",
-    riskProfile: "Balanced",
-    lastReview: "2024-11-15",
-    nextReview: "2025-02-15",
-    netWorth: 1978000,
-    netWorthChange: 2.3,
-    totalAssets: 2278000,
-    totalDebt: 942000,
-    monthlyIncome: 21000,
+const formatCompactCurrency = (value) => {
+  if (Math.abs(value) >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
+  if (Math.abs(value) >= 1_000) return `$${(value / 1_000).toFixed(0)}k`;
+  return `$${value}`;
+};
+
+// Build Adviser dashboard rows from the centralized HNW client dataset.
+// This keeps numbers in sync with clientData.js (single source of truth, up to $25M+ per client).
+const CLIENT_META = {
+  thompson_family: { id: 1, type: "Family", status: "active", lastReview: "2024-11-15", nextReview: "2025-02-15", alerts: 2, soaStatus: "current", complianceScore: 95,
     tasks: [
       { id: 1, text: "Review super contributions", priority: "high", due: "2025-01-15" },
       { id: 2, text: "Annual tax planning meeting", priority: "medium", due: "2025-02-01" },
-    ],
-    alerts: 2,
-    soaStatus: "current",
-    complianceScore: 95,
-  },
-  {
-    id: 2,
-    name: "Chen Investment Trust",
-    email: "david.chen@email.com",
-    phone: "0423 456 789",
-    type: "Trust",
-    status: "active",
-    riskProfile: "Growth",
-    lastReview: "2024-10-20",
-    nextReview: "2025-01-20",
-    netWorth: 3450000,
-    netWorthChange: 4.1,
-    totalAssets: 4200000,
-    totalDebt: 750000,
-    monthlyIncome: 35000,
-    tasks: [
-      { id: 1, text: "Trust distribution review", priority: "high", due: "2025-01-10" },
-    ],
-    alerts: 1,
-    soaStatus: "review",
-    complianceScore: 88,
-  },
-  {
-    id: 3,
-    name: "Thompson SMSF",
-    email: "emma.thompson@email.com",
-    phone: "0434 567 890",
-    type: "SMSF",
-    status: "active",
-    riskProfile: "Conservative",
-    lastReview: "2024-12-01",
-    nextReview: "2025-03-01",
-    netWorth: 890000,
-    netWorthChange: -0.5,
-    totalAssets: 890000,
-    totalDebt: 0,
-    monthlyIncome: 0,
-    tasks: [],
-    alerts: 0,
-    soaStatus: "current",
-    complianceScore: 100,
-  },
-  {
-    id: 4,
-    name: "Patel Holdings",
-    email: "raj.patel@email.com",
-    phone: "0445 678 901",
-    type: "Company",
-    status: "review",
-    riskProfile: "High Growth",
-    lastReview: "2024-09-15",
-    nextReview: "2024-12-15",
-    netWorth: 5200000,
-    netWorthChange: 6.8,
-    totalAssets: 7500000,
-    totalDebt: 2300000,
-    monthlyIncome: 85000,
+    ] },
+  chen_family: { id: 2, type: "Trust", status: "active", lastReview: "2024-10-20", nextReview: "2025-01-20", alerts: 1, soaStatus: "review", complianceScore: 88,
+    tasks: [{ id: 1, text: "Trust distribution review", priority: "high", due: "2025-01-10" }] },
+  client_3: { id: 3, type: "SMSF", status: "active", lastReview: "2024-12-01", nextReview: "2025-03-01", alerts: 0, soaStatus: "current", complianceScore: 100, tasks: [] },
+  client_4: { id: 4, type: "Family", status: "active", lastReview: "2024-11-05", nextReview: "2025-02-05", alerts: 0, soaStatus: "current", complianceScore: 92, tasks: [] },
+  client_5: { id: 5, type: "Company", status: "review", lastReview: "2024-09-15", nextReview: "2024-12-15", alerts: 3, soaStatus: "overdue", complianceScore: 72,
     tasks: [
       { id: 1, text: "Div 7A loan review", priority: "high", due: "2025-01-05" },
       { id: 2, text: "Company structure review", priority: "medium", due: "2025-01-20" },
       { id: 3, text: "BAS lodgement", priority: "urgent", due: "2025-01-28" },
-    ],
-    alerts: 3,
-    soaStatus: "overdue",
-    complianceScore: 72,
-  },
-  {
-    id: 5,
-    name: "Garcia Family",
-    email: "maria.garcia@email.com",
-    phone: "0456 789 012",
-    type: "Family",
-    status: "onboarding",
-    riskProfile: null,
-    lastReview: null,
-    nextReview: "2025-01-30",
-    netWorth: 650000,
-    netWorthChange: 0,
-    totalAssets: 820000,
-    totalDebt: 170000,
-    monthlyIncome: 12000,
-    tasks: [
-      { id: 1, text: "Complete onboarding", priority: "urgent", due: "2025-01-10" },
-      { id: 2, text: "Risk assessment", priority: "high", due: "2025-01-15" },
-    ],
-    alerts: 0,
-    soaStatus: "pending",
-    complianceScore: 0,
-  },
-];
+    ] },
+  client_6: { id: 6, type: "Trust", status: "active", lastReview: "2024-10-28", nextReview: "2025-01-28", alerts: 1, soaStatus: "review", complianceScore: 85,
+    tasks: [{ id: 1, text: "Partnership distribution plan", priority: "medium", due: "2025-02-10" }] },
+  client_7: { id: 7, type: "Family", status: "onboarding", lastReview: null, nextReview: "2025-01-30", alerts: 0, soaStatus: "pending", complianceScore: 60,
+    tasks: [{ id: 1, text: "Complete onboarding", priority: "urgent", due: "2025-01-10" }] },
+};
+
+const MOCK_CLIENTS = Object.entries(CLIENT_META).map(([slug, meta]) => {
+  const client = CLIENT_DATA[slug];
+  const { grossAssets, totalLiabilities, netWorth } = computeClientTotals(slug);
+  const monthlyIncome = Math.round((client?.profile?.incomeHousehold || 0) / 12);
+  return {
+    slug,
+    id: meta.id,
+    name: client?.profile?.name || slug,
+    email: client?.profile?.email || "",
+    phone: client?.profile?.phone || "",
+    type: meta.type,
+    status: meta.status,
+    riskProfile: client?.profile?.riskProfile || null,
+    lastReview: meta.lastReview,
+    nextReview: meta.nextReview,
+    netWorth,
+    netWorthChange: +(((client?.assets || []).reduce((a, x) => a + (x.value * (x.change || 0) / 100), 0) / Math.max(1, grossAssets)) * 100).toFixed(1),
+    totalAssets: grossAssets,
+    totalDebt: totalLiabilities,
+    monthlyIncome,
+    tasks: meta.tasks,
+    alerts: meta.alerts,
+    soaStatus: meta.soaStatus,
+    complianceScore: meta.complianceScore,
+  };
+});
 
 const COLORS = ['#1a2744', '#10B981', '#3B82F6', '#D4A84C', '#EF4444'];
 
@@ -215,11 +157,10 @@ const AdviserDashboard = () => {
     { name: "Company", value: clients.filter(c => c.type === "Company").length },
   ];
 
-  // AUM by client
+  // AUM by client — full list, formatted for $10M+ HNW range
   const aumByClient = clients
-    .map(c => ({ name: c.name.split(' ')[0], value: c.totalAssets }))
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 5);
+    .map(c => ({ name: c.name.split(' ').slice(0, 2).join(' '), value: c.totalAssets }))
+    .sort((a, b) => b.value - a.value);
 
   // Filter clients
   const filteredClients = clients.filter(c => {
@@ -267,14 +208,13 @@ const AdviserDashboard = () => {
   };
 
   const viewClientPortal = (clientId) => {
-    localStorage.setItem("active_client_id", clientId.toString());
-    // Find the client data to set the selected client
-    const client = mockClients.find(c => c.id === clientId);
+    const client = clients.find(c => c.id === clientId);
     if (client) {
+      localStorage.setItem("active_client_id", client.slug || clientId.toString());
       localStorage.setItem("selected_client", JSON.stringify({
-        id: client.id,
+        id: client.slug || client.id,
         name: client.name,
-        aum: client.aum
+        aum: client.totalAssets
       }));
     }
     navigate("/client-360");
@@ -341,7 +281,7 @@ const AdviserDashboard = () => {
                 <p className="text-sm text-muted-foreground">Total AUM</p>
                 <DollarSign className="h-4 w-4 text-[#D4A84C]" />
               </div>
-              <p className="text-2xl font-bold">{formatCurrency(totalAUM)}</p>
+              <p className="text-2xl font-bold" title={formatCurrency(totalAUM)}>{formatCompactCurrency(totalAUM)}</p>
               <p className="text-xs text-green-600 flex items-center gap-1 mt-1">
                 <TrendingUp className="h-3 w-3" /> +3.2% this month
               </p>
@@ -417,12 +357,12 @@ const AdviserDashboard = () => {
                   <CardTitle className="text-base">Assets Under Management</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ChartContainer height={200}>
+                  <ChartContainer height={280}>
                     <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-                      <BarChart data={aumByClient} layout="vertical">
+                      <BarChart data={aumByClient} layout="vertical" margin={{ left: 10, right: 30 }}>
                         <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                        <XAxis type="number" tickFormatter={(v) => `$${(v/1000000).toFixed(1)}M`} />
-                        <YAxis type="category" dataKey="name" width={80} />
+                        <XAxis type="number" tickFormatter={(v) => v >= 1000000 ? `$${(v/1000000).toFixed(1)}M` : `$${(v/1000).toFixed(0)}k`} />
+                        <YAxis type="category" dataKey="name" width={110} tick={{ fontSize: 11 }} />
                         <Tooltip formatter={(v) => formatCurrency(v)} />
                         <Bar dataKey="value" fill="#1a2744" radius={[0, 4, 4, 0]} />
                       </BarChart>
@@ -606,7 +546,7 @@ const AdviserDashboard = () => {
                           </td>
                           <td className="p-3">
                             <div>
-                              <p className="font-medium">{formatCurrency(client.netWorth)}</p>
+                              <p className="font-medium" title={formatCurrency(client.netWorth)}>{formatCompactCurrency(client.netWorth)}</p>
                               <p className={`text-xs ${client.netWorthChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                                 {client.netWorthChange >= 0 ? '+' : ''}{client.netWorthChange}%
                               </p>

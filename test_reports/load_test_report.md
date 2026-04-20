@@ -10,7 +10,7 @@
 - **Users**: 1,000 concurrent
 - **Ramp-up**: 50 users/second
 - **Duration**: 60 seconds
-- **Target**: https://adviser-layout-fix.preview.emergentagent.com
+- **Target**: https://scenario-simulator-5.preview.emergentagent.com
 
 ---
 

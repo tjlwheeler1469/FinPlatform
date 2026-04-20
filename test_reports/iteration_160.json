@@ -1,0 +1,29 @@
+{
+  "summary": "Verified HNW-scale adviser dashboard + Client Onboarding interactivity + ErrorBoundary Hard Refresh. Backend /api/practice-health/dashboard returns HNW metrics ($480M AUM, 47 clients, $4.52M revenue). Frontend /advisor-command-center shows $480.0M / 47 / $4.5M KPI tiles with Thompson/Chen/Patel clients. ClientOnboarding (mounted in /client-portal PersonalDashboard) MyGov button opens https://my.gov.au, ATO button opens ATO URL, Sync-to-Xplan shows 'Last synced <ts>', phone Save shows spinner + 'synced <ts>' inline confirmation. ErrorBoundary has data-testid='error-boundary-hard-refresh'; lazyRetry fallback has data-testid='chunk-fallback-hard-refresh'. No app crashes on /dashboard, /advisor-command-center, /adviser-dashboard, /client-portal, /onboarding.",
+  "backend_issues": { "critical": [], "minor": [] },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration160_hnw_practice_health.py",
+    "/app/test_reports/pytest/pytest_iteration160.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "openATO() in ClientOnboarding.jsx:133 points to https://my.gov.au/LoginServices/... (that URL is my.gov.au path, not ato.gov.au). Acceptable since brief states ATO redirect is mocked to my.gov.au externally, but suggest pointing to https://my.gov.au/mygov/ato-online-services/ or https://www.ato.gov.au for clarity.",
+    "App.js is 1300+ lines with large inline data (CLIENT_FAMILY_DATA, CLIENT_PORTFOLIO_DATA, CLIENT_SHARE_DATA, RECOMMENDATIONS). Extract to /src/data/*.js modules for maintainability.",
+    "PortfolioProvider polls localStorage every 500ms for selected_client — this should use a proper context event/subscription rather than a setInterval poll."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration160_hnw_practice_health.py"
+  ],
+  "success_rate": { "backend": "100% (3/3)", "frontend": "100% (all tested flows pass)" },
+  "test_credentials": "Not required (no auth)",
+  "seed_data_creation": "None — used existing backend HNW data in /app/backend/routes/practice_health.py",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend HNW metrics live at /api/practice-health/dashboard (480M/47/4.52M). Frontend Adviser Dashboard lives at /advisor-command-center (the /adviser-dashboard path redirects there). ClientOnboarding component is mounted inside /client-portal (PersonalDashboard.jsx). TFN input (data-testid='tfn-input') is conditionally rendered only when TFN is not yet submitted; on default seed the TFN is already submitted so testid hidden. Set localStorage 'wealth_command_compliance_v5'='permanent' to dismiss disclaimer modal. To test window.open handlers, stub window.open in init script and read window.__openedUrls.",
+  "rca of the issue": "N/A — all requested features verified working. Only findings are minor code-quality/architecture suggestions listed under critical_code_review_comments."
+}
