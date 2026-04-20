@@ -11,7 +11,16 @@ Build an AFSL-grade wealth management platform for HNW clients with consolidated
 - **Centralized Data**: `/app/frontend/src/data/clientData.js`
 
 
-## Completed (20 April 2026) — Iteration 7 (Current)
+## Completed (20 April 2026) — Iteration 8 (Current)
+- [x] **Retirement Workshop embedded in Adviser Client Profile** — Client360View `/client-360` now has a dedicated "Retirement" tab that hosts the full RetirementWorkshop (multi-scenario MC, 4 input tabs per scenario, comparison table, projection chart) scoped to the selected client.
+- [x] **Adviser Manual Client Inputs** — New "Profile & Inputs" tab on Client360View with `AdviserClientInputs` component: 7 sub-tabs (Personal / Income / Expenses / Assets / Liabilities / Goals / Protection). 4 rollup cards (Annual Income, Annual Expenses, Net Worth, Annual Surplus) recompute live. Add/remove rows for income/assets/liabilities/goals. Save persists to `localStorage:adviser_inputs_{clientId}` per-client.
+- [x] **P3: App.js refactored** — Extracted 327 lines of inline seed data (CLIENT_FAMILY_DATA, CLIENT_PORTFOLIO_DATA, CLIENT_SHARE_DATA, DEFAULT_BUDGET, RECOMMENDATIONS etc.) to `/app/frontend/src/data/portfolioSeedData.js`. App.js is now 1,022 lines (down from 1,343).
+- [x] **P3: Replaced PortfolioProvider 500ms polling** — Now uses same-tab `'client-changed'` CustomEvent + cross-tab `'storage'` listener. All 6 call sites that set `selected_client` in localStorage now dispatch the event (Layout, AdviserHub, CRMCommandCenter, Client360View, ClientHealthDashboard, DailyBriefing, lib/navigateToClient).
+- [x] **Polish: Added data-testids** to RetirementWorkshop — 3 headline metrics (metric-confidence, metric-at-retirement, metric-p10) + 4 scenario tabs (tab-budget, tab-investments, tab-goals, tab-assumptions) per scenario.
+- [x] **Bug fix by testing agent**: AdviserClientInputs `<p>` changed to `<div>` to fix Badge-in-paragraph hydration warning.
+- Testing: Frontend testing agent iteration 169 — 13/13 feature groups pass (100%).
+
+
 - [x] **P0: Fixed Retirement Confidence calculations** — Created new `/app/frontend/src/lib/retirementEngine.js` Monte Carlo engine with 29 unit tests (all passing): monotonicity, weak/strong plan confidence, zero-vol determinism, NaN guardrails, percentile ordering, legacy goal support, glide-path in drawdown.
 - [x] **P0: New RetirementWorkshop page** at `/retirement-confidence` — full adviser inputs (Budget/Invest/Goals/Assumptions tabs per scenario), multi-scenario side-by-side (up to 5), live Monte Carlo recompute on any input change, P10/P50/P90 confidence bands chart, comparison table. Loads from active client in CLIENT_DATA.
 - [x] **Fixed Client Portal** — `/client-portal` now renders UnifiedDashboard (rich client view with Net Worth, 6 tabs, Retirement Readiness, Quick Actions, Asset Allocation, Complete Your Profile). Previously blank/too sparse.
