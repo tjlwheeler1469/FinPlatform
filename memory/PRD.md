@@ -11,7 +11,13 @@ Build an AFSL-grade wealth management platform for HNW clients with consolidated
 - **Centralized Data**: `/app/frontend/src/data/clientData.js`
 
 
-## Completed (20 April 2026) — Iteration 8 (Current)
+## Completed (20 April 2026) — Iteration 9 (Current)
+- [x] **Personal/Client tabs replicated onto Adviser's Client Profile** — Client360View (`/client-360`) gained 4 new tabs embedding the same Simple* components used on Personal/Client views: Budget (`SimpleBudget`), Goals (`SimpleGoals`), Investments (`SimpleInvestments`), Tax (`SimpleTax`). Full list is now 14 tabs: Overview · Retirement · Budget · Goals · Investments · Tax · Profile & Inputs · Holdings · Performance · Accounts · Activity · Documents · Timeline · Contact.
+- [x] Embedded components receive `clientId` prop and render the same data as when viewed in Personal/Client mode (via `CLIENT_DATA.client_1 = CLIENT_DATA.thompson_family` alias).
+- Testing: Frontend testing agent iteration 170 — 8/8 pass (100%).
+- Known non-blocking: Header "Total Wealth" comes from `DEMO_CLIENT_DATA` ($1.61M) while embedded Simple components use `CLIENT_DATA` ($11.7M) — two parallel mock sources. See Next Action Items.
+
+## Completed (20 April 2026) — Iteration 8
 - [x] **Retirement Workshop embedded in Adviser Client Profile** — Client360View `/client-360` now has a dedicated "Retirement" tab that hosts the full RetirementWorkshop (multi-scenario MC, 4 input tabs per scenario, comparison table, projection chart) scoped to the selected client.
 - [x] **Adviser Manual Client Inputs** — New "Profile & Inputs" tab on Client360View with `AdviserClientInputs` component: 7 sub-tabs (Personal / Income / Expenses / Assets / Liabilities / Goals / Protection). 4 rollup cards (Annual Income, Annual Expenses, Net Worth, Annual Surplus) recompute live. Add/remove rows for income/assets/liabilities/goals. Save persists to `localStorage:adviser_inputs_{clientId}` per-client.
 - [x] **P3: App.js refactored** — Extracted 327 lines of inline seed data (CLIENT_FAMILY_DATA, CLIENT_PORTFOLIO_DATA, CLIENT_SHARE_DATA, DEFAULT_BUDGET, RECOMMENDATIONS etc.) to `/app/frontend/src/data/portfolioSeedData.js`. App.js is now 1,022 lines (down from 1,343).
