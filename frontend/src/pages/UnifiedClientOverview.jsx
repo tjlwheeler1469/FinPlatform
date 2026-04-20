@@ -1,19 +1,16 @@
 import { useState, lazy, Suspense } from "react";
 import Layout from "@/components/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, LayoutDashboard, TrendingUp, Gauge, Calculator, Zap, UserCircle, Target, PiggyBank, Receipt } from "lucide-react";
+import { Loader2, LayoutDashboard, TrendingUp, Gauge, Calculator, Target, PiggyBank, Receipt } from "lucide-react";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import FloatingActionRail from "@/components/platform/FloatingActionRail";
 
 const PersonalDashboard = lazy(() => import("@/pages/PersonalDashboard"));
-const UnifiedInvestments = lazy(() => import("@/pages/UnifiedInvestments"));
+const SimpleInvestments = lazy(() => import("@/components/SimpleInvestments"));
 const SimpleRetirement = lazy(() => import("@/components/SimpleRetirement"));
 const SimpleGoals = lazy(() => import("@/components/SimpleGoals"));
 const SimpleBudget = lazy(() => import("@/components/SimpleBudget"));
-const UnifiedTaxCentre = lazy(() => import("@/pages/UnifiedTaxCentre"));
-const NextBestActions = lazy(() => import("@/pages/NextBestActions"));
-const ScenarioModelling = lazy(() => import("@/pages/ScenarioModelling"));
-const ScenarioEngine = lazy(() => import("@/components/ScenarioEngine"));
-const HouseholdBudget = lazy(() => import("@/pages/HouseholdBudget"));
+const SimpleTax = lazy(() => import("@/components/SimpleTax"));
 const AdviserClientDashboard = lazy(() => import("@/components/AdviserClientDashboard"));
 const ClientInvoicing = lazy(() => import("@/components/ClientInvoicing"));
 
@@ -41,15 +38,13 @@ const UnifiedClientOverview = () => {
 
   return (
     <Layout>
+      <FloatingActionRail />
       <div className="min-h-screen bg-gray-50" data-testid="unified-client-overview">
         <div className="max-w-[1800px] mx-auto px-4 sm:px-6 pt-4">
           <Tabs value={tab} onValueChange={setTab}>
             <TabsList className="bg-white border mb-4 h-10 w-full justify-start gap-0.5 px-1 overflow-x-auto">
               <TabsTrigger value="overview" className={tabTriggerClass} data-testid="client-tab-overview">
                 <LayoutDashboard className="h-3.5 w-3.5" /> Overview
-              </TabsTrigger>
-              <TabsTrigger value="actions" className={tabTriggerClass} data-testid="client-tab-actions">
-                <Zap className="h-3.5 w-3.5" /> Actions
               </TabsTrigger>
               <TabsTrigger value="retirement" className={tabTriggerClass} data-testid="client-tab-retirement">
                 <Gauge className="h-3.5 w-3.5" /> Retirement
@@ -78,13 +73,6 @@ const UnifiedClientOverview = () => {
                 </Suspense>
               </ErrorBoundary>
             </TabsContent>
-            <TabsContent value="actions" className="mt-0">
-              <ErrorBoundary label="Actions">
-                <Suspense fallback={<TabLoader />}>
-                  <NextBestActions embedded />
-                </Suspense>
-              </ErrorBoundary>
-            </TabsContent>
             <TabsContent value="retirement" className="mt-0">
               <ErrorBoundary label="Retirement">
                 <Suspense fallback={<TabLoader />}>
@@ -95,7 +83,7 @@ const UnifiedClientOverview = () => {
             <TabsContent value="investments" className="mt-0">
               <ErrorBoundary label="Investments">
                 <Suspense fallback={<TabLoader />}>
-                  <UnifiedInvestments embedded />
+                  <SimpleInvestments clientId={getClientId()} embedded />
                 </Suspense>
               </ErrorBoundary>
             </TabsContent>
@@ -116,7 +104,7 @@ const UnifiedClientOverview = () => {
             <TabsContent value="tax" className="mt-0">
               <ErrorBoundary label="Tax Centre">
                 <Suspense fallback={<TabLoader />}>
-                  <UnifiedTaxCentre embedded />
+                  <SimpleTax clientId={getClientId()} embedded />
                 </Suspense>
               </ErrorBoundary>
             </TabsContent>

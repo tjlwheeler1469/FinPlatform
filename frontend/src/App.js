@@ -1083,6 +1083,7 @@ const AppRouter = () => {
       <Route path="/rental-yield-optimizer" element={<RentalYieldOptimizer />} />
       <Route path="/export" element={<ExportData />} />
       <Route path="/tax-analysis-sync" element={<UnifiedTaxCentre />} />
+      <Route path="/tax-centre" element={<UnifiedTaxCentre />} />
       <Route path="/scenario-modeling" element={<Navigate to="/strategic-planning" replace />} />
       <Route path="/family-member/:memberId" element={<FamilyMemberProfile />} />
       <Route path="/lifecycle-planning" element={<Navigate to="/strategic-planning" replace />} />

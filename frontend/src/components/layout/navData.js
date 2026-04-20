@@ -10,99 +10,57 @@ import {
 
 export const personalNavGroups = [
   {
-    name: "Dashboard",
+    name: "You",
     icon: LayoutDashboard,
     items: [
-      { path: "/dashboard", label: "My Dashboard", icon: Eye, title: "Dashboard & Net Worth", badge: "HOME" },
-      { path: "/macro-dashboard", label: "Markets", icon: BarChart3, title: "Live Markets", badge: "LIVE" },
+      { path: "/dashboard", label: "My Dashboard", icon: Eye, title: "Your confidence, plan & next steps", badge: "HOME" },
+      { path: "/retirement-confidence", label: "Retirement", icon: Gauge, title: "Retirement outlook" },
+      { path: "/budget", label: "Budget", icon: PiggyBank, title: "Income, expenses & savings" },
     ]
   },
   {
-    name: "Investments",
+    name: "Portfolio",
     icon: TrendingUp,
     items: [
-      { path: "/investments", label: "All Investments", icon: TrendingUp, title: "Investment Portfolio" },
-      { path: "/portfolio-rebalancing", label: "Rebalancing", icon: BarChart3, title: "Portfolio Rebalancing" },
+      { path: "/investments", label: "Investments", icon: TrendingUp, title: "Holdings & allocation" },
+      { path: "/tax-analysis-sync", label: "Tax Centre", icon: Calculator, title: "Your tax picture" },
     ]
   },
   {
-    name: "Planning",
-    icon: Target,
+    name: "Documents & Account",
+    icon: FileText,
     items: [
-      { path: "/budget", label: "Budget", icon: PiggyBank, title: "Budget Management" },
-      { path: "/scenario-modelling", label: "Goals & Scenarios", icon: Target, title: "Goals, Scenarios & Monte Carlo" },
-      { path: "/retirement-confidence", label: "Retirement", icon: Gauge, title: "Retirement Planning & Confidence" },
-      { path: "/tax-analysis-sync", label: "Tax Centre", icon: Calculator, title: "Unified Tax Centre" },
-    ]
-  },
-  {
-    name: "Research",
-    icon: LineChart,
-    items: [
-      { path: "/stock-research", label: "Research Centre", icon: LineChart, title: "Research & Comparison" },
-    ]
-  },
-  {
-    name: "Settings",
-    icon: Settings,
-    items: [
-      { path: "/bank-feeds", label: "Bank Feeds", icon: Landmark, title: "Bank Feeds" },
-      { path: "/documents", label: "Documents", icon: FileText, title: "Documents" },
-      { path: "/security", label: "Security", icon: Shield, title: "Security" },
-    ]
-  },
-  {
-    name: "Tools",
-    icon: Calculator,
-    items: [
-      { path: "/loan-calculator", label: "Loan Calculator", icon: Landmark, title: "Loan Calculator" },
+      { path: "/documents", label: "Documents", icon: FileText, title: "Statements & secure documents" },
+      { path: "/bank-feeds", label: "Connected Accounts", icon: Landmark, title: "Bank feeds" },
+      { path: "/security", label: "Security", icon: Shield, title: "Security & privacy" },
     ]
   },
 ];
 
 export const adviserBaseNav = [
   {
-    name: "Operating System",
+    name: "Today",
     icon: LayoutDashboard,
     items: [
-      { path: "/advisor-command-center", label: "Dashboard", icon: LayoutDashboard, title: "Adviser Dashboard — firm overview" },
-      { path: "/daily-briefing", label: "Daily Briefing", icon: Bell, title: "Today's priorities, alerts, opportunities" },
-      { path: "/next-best-actions", label: "Opportunities", icon: Sparkles, title: "Ranked opportunities with modelled impact" },
+      { path: "/advisor-command-center", label: "Dashboard", icon: LayoutDashboard, title: "Your operating system — firm overview, alerts, opportunities" },
+      { path: "/daily-briefing", label: "Daily Briefing", icon: Bell, title: "Today's priorities" },
     ]
   },
   {
     name: "Clients",
     icon: Users,
     items: [
-      { path: "/adviser-hub", label: "Client Hub", icon: Users, title: "All clients — select to open a client profile", badge: "HUB" },
+      { path: "/adviser-hub", label: "All Clients", icon: Users, title: "Select a client to enter their profile", badge: "HUB" },
       { path: "/client-setup", label: "New Client", icon: UserPlus, title: "Setup New Client" },
     ]
   },
   {
-    name: "Planning",
-    icon: Target,
-    items: [
-      { path: "/strategic-planning", label: "Scenario Modelling", icon: Target, title: "Scenario engine — Monte Carlo & comparisons" },
-      { path: "/portfolio-analyzer", label: "Portfolio", icon: PieChart, title: "Portfolio analysis & rebalancing" },
-      { path: "/meeting-prep", label: "Meeting Prep", icon: Calendar, title: "Meeting preparation & Review Pack" },
-    ]
-  },
-  {
-    name: "Markets & Data",
-    icon: Activity,
-    items: [
-      { path: "/macro-dashboard", label: "Markets", icon: BarChart3, title: "Live Markets", badge: "LIVE" },
-      { path: "/live-sync", label: "Data Health", icon: Activity, title: "Live Sync & feed status", badge: "LIVE" },
-      { path: "/platform-integrations", label: "Integrations", icon: Cable, title: "Platform & Xplan Integrations" },
-    ]
-  },
-  {
-    name: "Settings",
+    name: "Firm",
     icon: Settings,
     items: [
-      { path: "/notification-settings", label: "Notifications", icon: Bell, title: "Customise Notifications" },
+      { path: "/macro-dashboard", label: "Markets", icon: BarChart3, title: "Live Markets", badge: "LIVE" },
       { path: "/adviser-compliance", label: "Compliance", icon: Shield, title: "Compliance Dashboard" },
-      { path: "/security", label: "Security", icon: Shield, title: "Security" },
+      { path: "/notification-settings", label: "Settings", icon: Settings, title: "Notifications, integrations & security" },
     ]
   }
 ];

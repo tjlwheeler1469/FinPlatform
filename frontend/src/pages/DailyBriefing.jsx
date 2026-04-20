@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
+import FloatingActionRail from '@/components/platform/FloatingActionRail';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -502,7 +503,7 @@ const DailyBriefing = ({ embedded = false }) => {
       </div>
   );
 
-  return embedded ? content : <Layout>{content}</Layout>;
+  return embedded ? content : <Layout><FloatingActionRail />{content}</Layout>;
 };
 
 export default DailyBriefing;

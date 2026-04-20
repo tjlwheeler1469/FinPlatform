@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
+import FloatingActionRail from "@/components/platform/FloatingActionRail";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -142,6 +143,7 @@ const MeetingPrep = () => {
 
   return (
     <Layout>
+      <FloatingActionRail />
       <div className="space-y-6" data-testid="meeting-prep-page">
         {/* Header */}
         <div className="flex items-center justify-between">

@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import ClientModal from "@/components/ClientModal";
+import FloatingActionRail from "@/components/platform/FloatingActionRail";
 import {
   Users,
   Search,
@@ -155,6 +156,7 @@ const AdviserHub = () => {
 
   return (
     <Layout>
+      <FloatingActionRail />
       <div className="space-y-6" data-testid="adviser-hub">
         {/* Header */}
         <div className="flex items-center justify-between">

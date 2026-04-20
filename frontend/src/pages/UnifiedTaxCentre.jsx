@@ -1,5 +1,6 @@
 import { useState, lazy, Suspense } from "react";
 import Layout from "@/components/Layout";
+import FloatingActionRail from "@/components/platform/FloatingActionRail";
 import { Loader2, Calculator, TrendingUp, Calendar, Scissors, DollarSign, Building2, Receipt, Briefcase } from "lucide-react";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { cn } from "@/lib/utils";
@@ -82,7 +83,7 @@ const UnifiedTaxCentre = ({ embedded = false }) => {
     </div>
   );
 
-  return embedded ? content : <Layout>{content}</Layout>;
+  return embedded ? content : <Layout><FloatingActionRail />{content}</Layout>;
 };
 
 export default UnifiedTaxCentre;

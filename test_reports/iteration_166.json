@@ -1,0 +1,36 @@
+{
+  "summary": "Frontend validation of iteration 166 — SimpleTax, SimpleInvestments, 5-section calm template applied to Tax & Investments tabs in UnifiedClientOverview; FloatingActionRail added to 4 additional pages (/daily-briefing, /meeting-prep, /adviser-hub, /tax-centre); adviser & personal sidebars simplified; 'Actions' tab removed from client profile. 3 bugs found (2 fixed in place by testing agent, 1 trivial route fix applied). After fixes, all 7 tabs load correctly, all 5 sections in SimpleTax + SimpleInvestments render with correct testids, all 4 new pages show the rail at 1920px, and all 5 regression rails still work. Thompson computed tax = $152k (matches spec) · effective rate 31.4% · net income $333k.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "AdviserHub.jsx", "issue": "FIXED by testing agent — used <FloatingActionRail /> on line 158 without importing it, causing a runtime ReferenceError that crashed the entire /adviser-hub route (ErrorBoundary caught it, 'Application failed to load'). Added missing import on line 13.", "selector": "[data-testid=\"floating-action-rail\"]", "priority": "HIGH"},
+      {"component": "UnifiedTaxCentre.jsx", "issue": "FIXED by testing agent — imported FloatingActionRail on line 3 but never rendered it. Return statement was `<Layout>{content}</Layout>` — updated to include `<FloatingActionRail />`.", "selector": "[data-testid=\"floating-action-rail\"]", "priority": "HIGH"},
+      {"component": "App.js (routes)", "issue": "FIXED by testing agent — /tax-centre was NOT registered as a route (only /tax-analysis-sync points to UnifiedTaxCentre). The spec explicitly requires FloatingActionRail on /tax-centre, and SimpleTax's 'Open details' CTA navigates to /tax-centre. Added `<Route path=\"/tax-centre\" element={<UnifiedTaxCentre />} />` as an alias.", "selector": "Route /tax-centre", "priority": "HIGH"}
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Review the 3 fixes applied by testing agent (AdviserHub import, UnifiedTaxCentre rail render, App.js /tax-centre route alias) — all are trivial and intended behaviour per spec but main agent should verify alignment with the canonical approach.",
+    "Consider removing the /tax-analysis-sync route OR redirecting it to /tax-centre to keep a single canonical URL (currently both routes point to the same UnifiedTaxCentre component)."
+  ],
+  "critical_code_review_comments": [
+    "SimpleTax uses hard-coded concessionalCap=30000, currentConcessional=12000 — flagged as mocked. For a real demo these should come from client.super[].concessional or similar field, otherwise the 'tax saved' impact is misleading.",
+    "SimpleTax income split '60/40' for couples is an arbitrary assumption — ought to read from client.profile.member1Income/member2Income if available.",
+    "SimpleInvestments groups 'Shares', 'Managed Fund', 'Trust Portfolio' into a single 'Investments' bucket which hides useful detail; acceptable for a 5-section calm view but should be documented.",
+    "Multiple 'Error fetching …' console errors (user profile, retirement, market, sector exposure, analysis) — backend endpoints returning 404. These are pre-existing (not caused by this iteration) but continue to pollute the console and may hide real errors. Recommend either adding the endpoints or silencing the fetch with graceful fallback.",
+    "clientContextNav label in navData.js line 73 still reads 'Overview, Actions, Retirement, Tax & Investments' even though the Actions tab was removed — stale copy."
+  ],
+  "updated_files": [
+    "/app/frontend/src/pages/AdviserHub.jsx (added missing FloatingActionRail import)",
+    "/app/frontend/src/pages/UnifiedTaxCentre.jsx (render <FloatingActionRail /> in Layout)",
+    "/app/frontend/src/App.js (registered /tax-centre route as alias of UnifiedTaxCentre)"
+  ],
+  "success_rate": {"backend": "N/A (skipped)", "frontend": "100% after fixes (3 pre-fix blockers, all trivial)"},
+  "seed_data_creation": "localStorage: app_mode='adviser', selected_client={id:'thompson_family'}, active_client_id='thompson_family', wealth_command_compliance_v5='permanent' — same as iteration 165.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "After iteration 166 fixes: /adviser-hub renders (previously crashed), /tax-centre route now works and shows UnifiedTaxCentre with rail, /tax-analysis-sync still works identically. SimpleTax hero = '$152k · 31.4% effective rate · Net income $333k' on Thompson. SimpleInvestments hero = '$9.61M (if using gross assets) · ↑5.8% YTD · Risk Balanced'. All 7 client tabs load: overview→AdviserClientDashboard, retirement→SimpleRetirement, investments→SimpleInvestments (5 sections), budget→SimpleBudget, goals→SimpleGoals, tax→SimpleTax (5 sections), invoicing→ClientInvoicing. Actions tab is gone. FloatingActionRail visible on: /dashboard, /daily-briefing, /meeting-prep, /adviser-hub, /tax-centre, /tax-analysis-sync, /portfolio-analyzer, /intelligence, /strategic-planning, /next-best-actions, /decision-center. Adviser sidebar simplified: Today (Dashboard, Daily Briefing), Clients (All Clients, New Client), Firm (Markets, Compliance, Settings). Personal sidebar: You, Portfolio, Documents & Account.",
+  "rca of the issue": "(1) AdviserHub: missing import statement — classic copy/paste oversight; ReferenceError inside render function is caught by ErrorBoundary which shows 'Application failed to load'. (2) UnifiedTaxCentre: import declared but component never mounted in JSX return — the import alone doesn't render. (3) /tax-centre: spec stated that path is the target, but App.js only registered /tax-analysis-sync. SimpleTax's 'Open details' CTA hard-codes navigate('/tax-centre'), so clicking it landed on an unmatched route (body<200 chars, 'No routes matched location /tax-centre' warning). Fix = one-line alias in App.js. All three fixes verified live — see /tax-centre screenshot showing UnifiedTaxCentre + rail."
+}
