@@ -36,6 +36,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { ComplianceFooter } from "@/components/ComplianceDisclaimer";
+import FloatingActionRail from "@/components/platform/FloatingActionRail";
 
 const API_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || "";
 
@@ -110,6 +111,7 @@ const IntelligenceEngine = () => {
 
   return (
     <Layout>
+      <FloatingActionRail />
       <div className="space-y-6" data-testid="intelligence-engine-page">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">

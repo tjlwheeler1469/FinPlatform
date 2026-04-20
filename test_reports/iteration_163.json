@@ -1,0 +1,69 @@
+{
+  "summary": "Frontend-only testing of iteration 163: FloatingActionRail on 5 routes, embedded ScenarioEngine on PortfolioAnalyzer, redirect routes, sidebar consolidation. 5/8 test items PASS, 3 FAIL — most critical: /decision-center is captured by a pre-existing Navigate redirect to /advisor-command-center (App.js line 1146) so FloatingActionRail on DecisionCenter.jsx is UNREACHABLE; /book-intelligence chains to /advisor-command-center instead of /daily-briefing (because /daily-briefing is also a Navigate redirect at line 1099); floating-rail collapse toggle state did not update on click.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "App.js routing (line 1146)",
+        "issue": "<Route path=\"/decision-center\" element={<Navigate to=\"/advisor-command-center\" replace />} /> overrides the canonical DecisionCenter page. Visiting /decision-center redirects away, so FloatingActionRail + all other DecisionCenter.jsx content is not reachable at this URL. The review_request explicitly requires the rail to be visible at /decision-center.",
+        "selector": "[data-testid='floating-action-rail']",
+        "priority": "CRITICAL"
+      },
+      {
+        "component": "App.js routing (line 1099)",
+        "issue": "<Route path=\"/daily-briefing\" element={<Navigate to=\"/advisor-command-center\" replace />} /> hijacks /daily-briefing. Because /book-intelligence (line 1192) redirects to /daily-briefing, the browser chain-redirects to /advisor-command-center — NOT the expected /daily-briefing destination. Additionally, the new consolidated sidebar exposes a 'Daily Briefing' nav item pointing to /daily-briefing, which will silently jump the user to the Command Center instead of a real Daily Briefing page.",
+        "selector": "nav a[href='/daily-briefing']",
+        "priority": "CRITICAL"
+      },
+      {
+        "component": "FloatingActionRail.jsx",
+        "issue": "Clicking [data-testid='floating-rail-collapse'] did not update React state — rail transform stayed 'none' and floating-rail-expand did not appear. The click event fires (force=true, no timeout) but setOpen(false) seems not to take effect. Possible culprits: the <aside> has overflow-y-auto & pointer-events may be interacting, or an overlay toast ('AI insights generated successfully' / 'Review Pack downloaded') is intercepting despite force click. Functional impact: user cannot collapse the rail.",
+        "selector": "[data-testid='floating-rail-collapse']",
+        "priority": "HIGH"
+      },
+      {
+        "component": "ClientInvoicing.jsx (still orphan, inherited from iteration 162)",
+        "issue": "invoice-<id>-pdf testid is still not reachable in the live app. ClientInvoicing is not imported/rendered by any page or route. /revenue-billing route renders RevenueBilling, NOT ClientInvoicing. This regression test cannot pass until main agent mounts ClientInvoicing.",
+        "selector": "[data-testid^='invoice-'][data-testid$='-pdf']",
+        "priority": "HIGH"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Adviser sidebar (when client selected)",
+        "issues": ["When selected_client is set, sidebar switches to clientContextNav ('Overview' / 'Documents' only). The adviserBaseNav 5 groups are not visible concurrently — user has to exit client view to see the consolidated nav. Per request this is probably by design, but worth verifying."]
+      }
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "REMOVE or RENAME the App.js line 1146 redirect: <Route path=\"/decision-center\" element={<Navigate to=\"/advisor-command-center\" replace />}>. To satisfy the requirement that FloatingActionRail is visible on /decision-center, mount the actual DecisionCenter component there: <Route path=\"/decision-center\" element={<DecisionCenter />} />.",
+    "REMOVE App.js line 1099 <Route path=\"/daily-briefing\" element={<Navigate to=\"/advisor-command-center\" replace />}> and mount a real Daily Briefing page (or repoint /book-intelligence straight to /advisor-command-center to avoid chained redirects). Without this, the sidebar 'Daily Briefing' entry silently lands on the Command Center.",
+    "Debug FloatingActionRail collapse: verify useState update runs on click (add onClick console.log, check if a parent uses React.memo that blocks updates). Once fixed, re-test collapse→expand cycle.",
+    "Finally wire ClientInvoicing into a route or dashboard tab (carry-over from iteration 162) so invoice-<id>-pdf is reachable."
+  ],
+  "critical_code_review_comments": [
+    "Two canonical routes (/decision-center, /daily-briefing) are still registered as Navigate redirects even though the product direction of iteration 163 is to USE those URLs as real destinations. Those redirects must be deleted to honour the new architecture.",
+    "FloatingActionRail default static recommendations (3) + next actions (2) render twice in the DOM (desktop aside + mobile <details>), so any query_selector_all counts are doubled (6 & 4). Not a bug, but worth knowing for test writers.",
+    "PortfolioAnalyzer embedded ScenarioEngine card (data-testid='portfolio-embedded-scenario') renders cleanly with the full ScenarioEngine inside — good integration.",
+    "Adviser Intelligence Feed on /intelligence returns 404 on /api/portfolio/analysis and /api/portfolio/sector-exposure — backend not scoped for this test but noisy in console."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "not tested", "frontend": "5/8 (62.5%)"},
+  "test_credentials": "none — unauthenticated app; localStorage seeding only",
+  "seed_data_creation": "localStorage: app_mode=adviser, active_client_id=thompson_family, selected_client={id:thompson_family,name:'David & Sarah Thompson',aum:10570000}, wealth_command_compliance_v5=permanent",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Verified PASS: (1) FloatingActionRail visible at 1920px on /intelligence, /portfolio-analyzer, /strategic-planning, /next-best-actions with Generate Review Pack + 3 recs + 2 actions + Meeting Prep section. (2) Clicking rail-generate-review-pack produces 'Review Pack downloaded — Generated for David & Sarah Thompson' sonner toast. (3) /portfolio-analyzer has portfolio-embedded-scenario visible containing full ScenarioEngine. (4) /advisor-intelligence → /advisor-command-center ✓. (5) /dashboard renders AdviserClientDashboard; /advisor-command-center shows $480M AUM. Verified FAIL: /decision-center → hijacked to /advisor-command-center (rail unreachable); /book-intelligence → chain-redirects to /advisor-command-center via /daily-briefing hijack; floating-rail-collapse click does not update state. Sidebar: groups 'Operating System', 'Planning', 'Markets & Data', 'Settings' are not visually present as labels when browsed — only 'Clients' group label + some items (Dashboard, Daily Briefing, Opportunities, New Client, Portfolio). May be due to sidebar being collapsed or group headers being icon-only — next tester should verify with sidebar expanded.",
+  "verified_features": [
+    "[data-testid='floating-action-rail'] visible on /intelligence, /portfolio-analyzer, /strategic-planning, /next-best-actions at 1920x1080",
+    "[data-testid='rail-generate-review-pack'] present on all 4 reachable rail pages and triggers 'Review Pack downloaded' toast",
+    "[data-testid='rail-rec-*'] renders ≥3 items, [data-testid='rail-action-*'] renders ≥2 items with thompson_family context",
+    "Meeting Prep section rendered inside rail",
+    "[data-testid='portfolio-embedded-scenario'] present and visible on /portfolio-analyzer",
+    "/advisor-intelligence → /advisor-command-center redirect works",
+    "/dashboard renders, /advisor-command-center shows $480M AUM"
+  ],
+  "rca of the issue": "App.js contains two orphan Navigate redirects left from a prior consolidation: line 1099 (/daily-briefing → /advisor-command-center) and line 1146 (/decision-center → /advisor-command-center). React Router evaluates these first, so the newer <Route path='/decision-center' element={<DecisionCenter />}> and the intended /daily-briefing target are never reached. Fix: delete those two <Route … Navigate> lines and add proper element mounts. Reproduction: set localStorage adviser+thompson_family, navigate to /decision-center — URL instantly rewrites to /advisor-command-center; same for /book-intelligence which chain-redirects via /daily-briefing."
+}

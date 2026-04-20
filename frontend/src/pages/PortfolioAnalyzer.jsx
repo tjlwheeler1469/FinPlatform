@@ -22,6 +22,9 @@ import {
 } from "lucide-react";
 import { usePortfolio } from "@/App";
 import axios from "axios";
+import FloatingActionRail from "@/components/platform/FloatingActionRail";
+import { lazy, Suspense } from "react";
+const ScenarioEngine = lazy(() => import("@/components/ScenarioEngine"));
 import {
   PieChart,
   Pie,
@@ -127,6 +130,7 @@ const PortfolioAnalyzer = () => {
 
   return (
     <Layout>
+      <FloatingActionRail />
       <div className="space-y-6" data-testid="portfolio-analyzer">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -409,6 +413,22 @@ const PortfolioAnalyzer = () => {
             </CardContent>
           </Card>
         )}
+        {/* Embedded Scenario Engine — "What-if" modelling on this portfolio */}
+        <Card data-testid="portfolio-embedded-scenario">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Activity className="h-4 w-4 text-[#1a2744]" /> What-If Scenario
+              </CardTitle>
+              <CardDescription className="text-xs">Live Monte Carlo on this portfolio</CardDescription>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <Suspense fallback={<div className="py-10 text-center text-xs text-muted-foreground">Loading scenario engine...</div>}>
+              <ScenarioEngine embedded />
+            </Suspense>
+          </CardContent>
+        </Card>
       </div>
     </Layout>
   );

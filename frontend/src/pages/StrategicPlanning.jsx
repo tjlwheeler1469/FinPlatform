@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ChartContainer from "@/components/ChartContainer";
 import { ComplianceFooter, CalculatorDisclaimer } from "@/components/ComplianceDisclaimer";
+import FloatingActionRail from "@/components/platform/FloatingActionRail";
 import { 
   Calculator,
   DollarSign,
@@ -458,6 +459,7 @@ const StrategicPlanning = () => {
 
   return (
     <Layout>
+      <FloatingActionRail />
       <div className="space-y-6" data-testid="strategic-planning-page">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">

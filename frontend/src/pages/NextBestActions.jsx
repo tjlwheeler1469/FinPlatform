@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Layout from "@/components/Layout";
+import FloatingActionRail from "@/components/platform/FloatingActionRail";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -449,7 +450,7 @@ const NextBestActions = ({ embedded = false }) => {
       </div>
   );
 
-  return embedded ? content : <Layout>{content}</Layout>;
+  return embedded ? content : <Layout><FloatingActionRail />{content}</Layout>;
 };
 
 export default NextBestActions;

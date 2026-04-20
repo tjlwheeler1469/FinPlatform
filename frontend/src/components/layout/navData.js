@@ -62,46 +62,46 @@ export const personalNavGroups = [
 
 export const adviserBaseNav = [
   {
-    name: "Dashboard",
+    name: "Operating System",
     icon: LayoutDashboard,
     items: [
-      { path: "/advisor-command-center", label: "Dashboard", icon: LayoutDashboard, title: "Adviser Dashboard" },
-      { path: "/macro-dashboard", label: "Markets", icon: BarChart3, title: "Live Markets", badge: "LIVE" },
+      { path: "/advisor-command-center", label: "Dashboard", icon: LayoutDashboard, title: "Adviser Dashboard — firm overview" },
+      { path: "/daily-briefing", label: "Daily Briefing", icon: Bell, title: "Today's priorities, alerts, opportunities" },
+      { path: "/next-best-actions", label: "Opportunities", icon: Sparkles, title: "Ranked opportunities with modelled impact" },
     ]
   },
   {
-    name: "CRM",
+    name: "Clients",
     icon: Users,
     items: [
-      { path: "/adviser-hub", label: "Client Hub", icon: Zap, title: "Clients & Portfolio", badge: "HUB" },
+      { path: "/adviser-hub", label: "Client Hub", icon: Users, title: "All clients — select to open a client profile", badge: "HUB" },
       { path: "/client-setup", label: "New Client", icon: UserPlus, title: "Setup New Client" },
-      { path: "/data-import-export", label: "Import / Export", icon: Database, title: "Data Import & Export" },
     ]
   },
   {
-    name: "Execution",
-    icon: Zap,
+    name: "Planning",
+    icon: Target,
     items: [
-      { path: "/batch-execution", label: "Batch Execute", icon: Zap, title: "Batch Execution" },
-      { path: "/meeting-prep", label: "Meeting Prep", icon: Sparkles, title: "Meeting Preparation" },
-      { path: "/adviser-compliance", label: "Compliance", icon: Shield, title: "Adviser Compliance Dashboard" },
+      { path: "/strategic-planning", label: "Scenario Modelling", icon: Target, title: "Scenario engine — Monte Carlo & comparisons" },
+      { path: "/portfolio-analyzer", label: "Portfolio", icon: PieChart, title: "Portfolio analysis & rebalancing" },
+      { path: "/meeting-prep", label: "Meeting Prep", icon: Calendar, title: "Meeting preparation & Review Pack" },
     ]
   },
   {
-    name: "Integrations",
-    icon: Link2,
+    name: "Markets & Data",
+    icon: Activity,
     items: [
-      { path: "/live-sync", label: "Live Sync", icon: Activity, title: "Live Sync Dashboard", badge: "LIVE" },
-      { path: "/platform-integrations", label: "Platforms", icon: Cable, title: "Platform Integrations" },
-      { path: "/xplan", label: "Xplan Sync", icon: Cable, title: "Xplan Integration" },
+      { path: "/macro-dashboard", label: "Markets", icon: BarChart3, title: "Live Markets", badge: "LIVE" },
+      { path: "/live-sync", label: "Data Health", icon: Activity, title: "Live Sync & feed status", badge: "LIVE" },
+      { path: "/platform-integrations", label: "Integrations", icon: Cable, title: "Platform & Xplan Integrations" },
     ]
   },
   {
-    name: "Tools",
+    name: "Settings",
     icon: Settings,
     items: [
-      { path: "/notification-center", label: "Notifications", icon: Bell, title: "Notification Center" },
-      { path: "/notification-settings", label: "Notification Settings", icon: Settings, title: "Customise Notifications" },
+      { path: "/notification-settings", label: "Notifications", icon: Bell, title: "Customise Notifications" },
+      { path: "/adviser-compliance", label: "Compliance", icon: Shield, title: "Compliance Dashboard" },
       { path: "/security", label: "Security", icon: Shield, title: "Security" },
     ]
   }

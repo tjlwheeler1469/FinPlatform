@@ -1164,8 +1164,8 @@ const AppRouter = () => {
       {/* Cross-Client Intelligence Engine */}
       <Route path="/intelligence" element={<IntelligenceEngine />} />
       
-      {/* Advisor Intelligence Dashboard - The Daily Operating System */}
-      <Route path="/advisor-intelligence" element={<AdvisorIntelligenceDashboard />} />
+      {/* Advisor Intelligence Dashboard — redirected to main Adviser Dashboard for consolidation */}
+      <Route path="/advisor-intelligence" element={<Navigate to="/advisor-command-center" replace />} />
       
       {/* Ultimate Advisor Command Center - The $10B Platform */}
       <Route path="/advisor-command-center" element={<AdvisorCommandCenter />} />
@@ -1188,8 +1188,8 @@ const AppRouter = () => {
       {/* Workflow Engine */}
       <Route path="/workflows" element={<WorkflowDashboard />} />
       
-      {/* Book Intelligence */}
-      <Route path="/book-intelligence" element={<BookIntelligence />} />
+      {/* Book Intelligence — consolidated into Daily Briefing */}
+      <Route path="/book-intelligence" element={<Navigate to="/daily-briefing" replace />} />
       
       {/* Meeting Automation */}
       <Route path="/meeting-automation" element={<MeetingAutomation />} />

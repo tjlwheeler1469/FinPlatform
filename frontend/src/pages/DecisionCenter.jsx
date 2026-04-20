@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import Layout from "@/components/Layout";
+import FloatingActionRail from "@/components/platform/FloatingActionRail";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -419,7 +420,7 @@ const DecisionCenter = ({ embedded = false }) => {
     </div>
   );
 
-  return embedded ? content : <Layout>{content}</Layout>;
+  return embedded ? content : <Layout><FloatingActionRail />{content}</Layout>;
 };
 
 export default DecisionCenter;
