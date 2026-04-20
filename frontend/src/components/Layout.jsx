@@ -66,13 +66,14 @@ const Layout = ({ children }) => {
     window.dispatchEvent(new CustomEvent('meetingModeChange', { detail: { meetingMode } }));
   }, [meetingMode]);
 
-  // Persist selected client
+  // Persist selected client + broadcast same-tab event for PortfolioProvider
   useEffect(() => {
     if (selectedClient) {
       localStorage.setItem("selected_client", JSON.stringify(selectedClient));
     } else {
       localStorage.removeItem("selected_client");
     }
+    window.dispatchEvent(new CustomEvent('client-changed', { detail: { selectedClient } }));
   }, [selectedClient]);
 
   // Keyboard shortcut (Cmd+K)

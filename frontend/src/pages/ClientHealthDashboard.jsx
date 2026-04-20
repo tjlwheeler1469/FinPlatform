@@ -124,6 +124,7 @@ const ClientHealthDashboard = ({ embedded = false }) => {
     };
     localStorage.setItem("selected_client", JSON.stringify(clientMap[clientId]));
     localStorage.setItem("app_mode", "adviser");
+    window.dispatchEvent(new CustomEvent('client-changed'));
     navigate("/dashboard");
   };
 

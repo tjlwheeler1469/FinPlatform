@@ -134,6 +134,7 @@ const AdviserHub = () => {
     };
     setSelectedClient(clientObj);
     localStorage.setItem("selected_client", JSON.stringify(clientObj));
+    window.dispatchEvent(new CustomEvent('client-changed'));
     navigate("/dashboard");
   };
 

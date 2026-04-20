@@ -204,6 +204,7 @@ const ClientCard = ({ client, priority }) => {
               name: client.name,
               aum: client.aum
             }));
+            window.dispatchEvent(new CustomEvent('client-changed'));
           }}>
             <Button size="sm" variant="outline">
               View <ChevronRight className="h-4 w-4 ml-1" />
@@ -374,6 +375,7 @@ const DailyBriefing = ({ embedded = false }) => {
                             localStorage.setItem('selected_client', JSON.stringify({
                               id: client.id, name: client.name, aum: client.aum
                             }));
+                            window.dispatchEvent(new CustomEvent('client-changed'));
                           }}>
                             <Button size="sm" variant="ghost">
                               <ChevronRight className="h-4 w-4" />

@@ -342,6 +342,7 @@ const CRMCommandCenter = () => {
       name: client.name,
       email: client.email
     }));
+    window.dispatchEvent(new CustomEvent('client-changed'));
     navigate("/dashboard");
   };
 
@@ -349,6 +350,7 @@ const CRMCommandCenter = () => {
     switch (action) {
       case "wealth":
         localStorage.setItem("selected_client", JSON.stringify({ id: client.id, name: client.name }));
+        window.dispatchEvent(new CustomEvent('client-changed'));
         navigate("/client-wealth");
         break;
       case "tasks":

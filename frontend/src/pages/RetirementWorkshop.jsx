@@ -128,14 +128,14 @@ const ScenarioEditor = ({ scenario, onChange, onRemove, isBase, color, result, b
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Confidence Summary */}
-        <div className="grid grid-cols-3 gap-3 text-center p-3 rounded-md" style={{ backgroundColor: `${color}08` }}>
-          <div>
+        <div className="grid grid-cols-3 gap-3 text-center p-3 rounded-md" style={{ backgroundColor: `${color}08` }} data-testid={`scenario-metrics-${scenario.id}`}>
+          <div data-testid={`metric-confidence-${scenario.id}`}>
             <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Confidence</p>
             <p className="text-2xl font-bold" style={{ color: result.confidence >= 80 ? "#10b981" : result.confidence >= 60 ? "#3b82f6" : "#f59e0b" }}>
               {result.confidence}%
             </p>
           </div>
-          <div>
+          <div data-testid={`metric-at-retirement-${scenario.id}`}>
             <p className="text-[10px] text-muted-foreground uppercase tracking-wide">At Retirement</p>
             <p className="text-lg font-bold" style={{ color }}>{fmtShort(result.portfolioAtRetirement)}</p>
             {!isBase && deltaPortfolio !== 0 && (
@@ -144,7 +144,7 @@ const ScenarioEditor = ({ scenario, onChange, onRemove, isBase, color, result, b
               </p>
             )}
           </div>
-          <div>
+          <div data-testid={`metric-p10-${scenario.id}`}>
             <p className="text-[10px] text-muted-foreground uppercase tracking-wide">P10 Balance</p>
             <p className="text-lg font-bold text-rose-600">{fmtShort(result.p10AtLifeEnd)}</p>
           </div>
@@ -152,10 +152,10 @@ const ScenarioEditor = ({ scenario, onChange, onRemove, isBase, color, result, b
 
         <Tabs defaultValue="budget" className="w-full">
           <TabsList className="grid grid-cols-4 w-full h-8">
-            <TabsTrigger value="budget" className="text-[11px]"><Wallet className="h-3 w-3 mr-1" />Budget</TabsTrigger>
-            <TabsTrigger value="investments" className="text-[11px]"><TrendingUp className="h-3 w-3 mr-1" />Invest</TabsTrigger>
-            <TabsTrigger value="goals" className="text-[11px]"><Target className="h-3 w-3 mr-1" />Goals</TabsTrigger>
-            <TabsTrigger value="assumptions" className="text-[11px]"><Sliders className="h-3 w-3 mr-1" />Assum.</TabsTrigger>
+            <TabsTrigger value="budget" className="text-[11px]" data-testid={`tab-budget-${scenario.id}`}><Wallet className="h-3 w-3 mr-1" />Budget</TabsTrigger>
+            <TabsTrigger value="investments" className="text-[11px]" data-testid={`tab-investments-${scenario.id}`}><TrendingUp className="h-3 w-3 mr-1" />Invest</TabsTrigger>
+            <TabsTrigger value="goals" className="text-[11px]" data-testid={`tab-goals-${scenario.id}`}><Target className="h-3 w-3 mr-1" />Goals</TabsTrigger>
+            <TabsTrigger value="assumptions" className="text-[11px]" data-testid={`tab-assumptions-${scenario.id}`}><Sliders className="h-3 w-3 mr-1" />Assum.</TabsTrigger>
           </TabsList>
 
           <TabsContent value="budget" className="space-y-3 pt-3">
@@ -231,8 +231,8 @@ const ScenarioEditor = ({ scenario, onChange, onRemove, isBase, color, result, b
   );
 };
 
-const RetirementWorkshop = () => {
-  const clientId = getActiveClientId();
+const RetirementWorkshop = ({ embedded = false, clientId: propClientId }) => {
+  const clientId = propClientId || getActiveClientId();
   const client = CLIENT_DATA[clientId] || CLIENT_DATA.thompson_family;
   const initialInputs = useMemo(() => buildInitialInputs(client), [client]);
 
@@ -300,9 +300,8 @@ const RetirementWorkshop = () => {
     toast.success("Reset to client's current plan");
   }, [initialInputs]);
 
-  return (
-    <Layout>
-      <div className="p-6 space-y-6" data-testid="retirement-workshop-page">
+  const content = (
+      <div className="space-y-6" data-testid="retirement-workshop-page">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
           <div>
@@ -481,8 +480,9 @@ const RetirementWorkshop = () => {
           </Card>
         )}
       </div>
-    </Layout>
   );
+
+  return embedded ? content : <Layout><div className="p-6">{content}</div></Layout>;
 };
 
 export default RetirementWorkshop;

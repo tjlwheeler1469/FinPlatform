@@ -8,6 +8,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import RetirementWorkshop from "@/pages/RetirementWorkshop";
+import AdviserClientInputs from "@/components/AdviserClientInputs";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -728,6 +730,7 @@ const Client360View = () => {
                     className="border-[#D4A84C]/40 text-[#D4A84C] hover:bg-[#D4A84C]/10 h-8 text-xs"
                     onClick={() => {
                       localStorage.setItem("selected_client", JSON.stringify(client));
+                      window.dispatchEvent(new CustomEvent('client-changed'));
                       navigate(`/transaction-modeler?client=${client.id}`);
                     }}
                     data-testid="transaction-modeler-btn"
@@ -789,6 +792,8 @@ const Client360View = () => {
           <TabsList className="bg-white border h-10 w-full justify-start gap-0 rounded-lg px-1 overflow-x-auto">
             {[
               { value: "overview", label: "Overview" },
+              { value: "retirement", label: "Retirement" },
+              { value: "profile-inputs", label: "Profile & Inputs" },
               { value: "holdings", label: "Holdings" },
               { value: "performance", label: "Performance" },
               { value: "accounts", label: "Accounts" },
@@ -945,6 +950,16 @@ const Client360View = () => {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* Retirement Tab — Full Workshop */}
+          <TabsContent value="retirement" className="space-y-6" data-testid="tab-content-retirement">
+            <RetirementWorkshop embedded clientId={clientId} />
+          </TabsContent>
+
+          {/* Profile & Inputs Tab — Adviser manual data entry */}
+          <TabsContent value="profile-inputs" className="space-y-6" data-testid="tab-content-profile-inputs">
+            <AdviserClientInputs clientId={clientId} client={client} />
           </TabsContent>
 
           {/* Holdings Tab - Detailed Asset Breakdown */}

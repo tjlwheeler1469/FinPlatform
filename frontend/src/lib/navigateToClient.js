@@ -41,6 +41,8 @@ export const navigateToClient = (navigate, clientRef, opts = {}) => {
     })
   );
   if (opts.tab) localStorage.setItem("client_overview_default_tab", opts.tab);
+  // Broadcast so PortfolioProvider (listening) can swap data without polling.
+  window.dispatchEvent(new CustomEvent('client-changed', { detail: { id: slug } }));
   navigate(opts.path || "/dashboard");
 };
 
