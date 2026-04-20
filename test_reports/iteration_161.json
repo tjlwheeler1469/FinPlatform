@@ -1,0 +1,47 @@
+{
+  "summary": "Frontend-only testing of the new Adviser Client Dashboard (Overview tab) for all 7 clients, scenario engine live-update, CTAs/toasts, all sibling tabs (Actions/Retirement/Investments/Budget/Goals/Tax Centre), and regression on /advisor-command-center. 34/34 required data-testids present; dashboard renders error-free for every client; sliders update Monte-Carlo confidence live; all regression routes OK. One minor discrepancy: the route /client-onboarding-portal does not exist (actual route is /onboarding) — this is a misnamed regression check in the review request, not a real regression.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Other tabs (e.g. Retirement/Investments)", "issues": ["Non-blocking recharts warnings: 'The width(-1) and height(-1) of chart should be greater than 0' — pre-existing responsive-container sizing issue on sibling tabs, not introduced by this iteration"]}
+    ]
+  },
+  "test_evidence": {
+    "dashboard_renders_all_7_clients": {
+      "thompson_family": "$9.61M (David & Sarah Thompson)",
+      "chen_family": "$22.80M (Michael & Lisa Chen)",
+      "client_3": "$9.60M (Robert Mitchell)",
+      "client_4": "$2.77M (Emma & David Williams)",
+      "client_5": "$17.45M (Raj & Priya Patel)",
+      "client_6": "$18.30M (Anderson Partnership)",
+      "client_7": "$10.15M (Sarah Kim)"
+    },
+    "testids_present": "34/34 (client-dashboard-header, header-client-name/net-worth/confidence/risk/updated, cta-improve-outcome, cta-run-scenario, cta-generate-review-pack, card-retirement-readiness, confidence-score, btn-improve-outcome, card-alerts, card-opportunities, card-balance-sheet, card-scenario-engine, scenario-confidence, slider-retire-age, slider-spending, slider-contributions, card-priorities, priority-0..3, card-meeting-prep, btn-generate-review-pack, meeting-change-1..3, card-what-changed, change-item-0..3)",
+    "scenario_engine_live_update": "PASS — scenario-confidence went 98% → 69% (spending +50 steps) → 46% (retirement age -8 steps). Monte Carlo sliders correctly recompute confidence via projectRetirement() on every change.",
+    "ctas_and_toasts": "cta-improve-outcome toast ('Opening scenario builder…') PASS; btn-generate-review-pack toast ('Generating Review Pack…') PASS",
+    "sibling_tabs": "Actions OK, Retirement OK, Investments OK, Budget OK, Goals OK, Tax Centre OK (no error boundaries)",
+    "regressions": {
+      "/advisor-command-center": "PASS — loads and shows $480.0M AUM, 47 clients, +$13.4M flows, $4.5M YTD revenue",
+      "/client-onboarding-portal": "Route NOT FOUND — 'No routes matched'. Actual route in App.js is /onboarding (ClientOnboarding) and /client-setup-wizard (contains MyGov/Xplan). Review request likely used wrong path; not a regression from this iteration."
+    }
+  },
+  "test_report_links": [],
+  "action_items": [
+    "(Informational only) Correct review-request regression path: use /onboarding or /client-setup-wizard (the one with MyGov/ATO/Xplan buttons) instead of /client-onboarding-portal. No code change required."
+  ],
+  "critical_code_review_comments": [
+    "AdviserClientDashboard.jsx (569 lines) is close to the 700-line soft limit — consider splitting Row1/Row2/Row3/Row4 subcomponents into their own files for future maintainability.",
+    "'Today\\'s Priorities' and 'What Changed' deltas are hard-coded mock values (clearly called out in review as MOCKED). Confidence drop '-4 pts' shown in Meeting Prep does not reflect real delta.",
+    "TodaysPrioritiesCard static counts (3/2/1/4) do not derive from CLIENT_DATA — if the adviser switches clients, the priorities numbers never change. Acceptable per MOCK notice; flag for next iteration.",
+    "EmbeddedScenarioCard accepts onGenerate prop but never uses it (dead prop).",
+    "WhatChangedCard 'positiveDown' logic: for Spending (positiveDown=true, delta=+6) it correctly marks rose, but 'Equity Exposure' delta=+8 with positiveDown=false marks emerald (green) even though over-allocation was called out as an ALERT — inconsistent sentiment mapping."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (skipped per request)", "frontend": "100% for core dashboard; 1 misnamed regression path (not a real bug)"},
+  "seed_data_creation": "None — all data sourced from /app/frontend/src/data/clientData.js",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "New Adviser Client Dashboard is fully working. Access via localStorage {app_mode:'adviser', selected_client:{...id:'thompson_family'...}, wealth_command_compliance_v5:'permanent'} then navigate to /dashboard. All 34 data-testids wired. Scenario sliders truly live (verified via keyboard ArrowRight/Left on [role=slider] children of slider-retire-age / slider-spending / slider-contributions). Priorities / MeetingPrep / WhatChanged deltas are MOCKED constants — do not assert dynamic values for them. Route /client-onboarding-portal does not exist; use /onboarding or /client-setup-wizard for onboarding regression checks."
+}

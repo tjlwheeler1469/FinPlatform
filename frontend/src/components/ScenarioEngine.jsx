@@ -27,7 +27,7 @@ const randn = () => {
 // Monte Carlo projection engine
 const NUM_SIMS = 500;
 
-const projectRetirement = ({ currentPortfolio, annualContributions, annualSpending, yearsToRetirement, expectedReturn = 0.065, volatility = 0.12, inflationRate = 0.03 }) => {
+export const projectRetirement = ({ currentPortfolio, annualContributions, annualSpending, yearsToRetirement, expectedReturn = 0.065, volatility = 0.12, inflationRate = 0.03 }) => {
   const realReturn = expectedReturn - inflationRate;
   const realVol = volatility;
   const totalYears = yearsToRetirement + 25; // 25 years in retirement

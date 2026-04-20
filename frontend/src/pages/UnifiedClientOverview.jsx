@@ -12,8 +12,7 @@ const NextBestActions = lazy(() => import("@/pages/NextBestActions"));
 const ScenarioModelling = lazy(() => import("@/pages/ScenarioModelling"));
 const ScenarioEngine = lazy(() => import("@/components/ScenarioEngine"));
 const HouseholdBudget = lazy(() => import("@/pages/HouseholdBudget"));
-const ClientProfileTab = lazy(() => import("@/components/ClientProfileTab"));
-const ClientInvoicing = lazy(() => import("@/components/ClientInvoicing"));
+const AdviserClientDashboard = lazy(() => import("@/components/AdviserClientDashboard"));
 
 const TabLoader = () => (
   <div className="flex items-center justify-center py-20">
@@ -66,20 +65,10 @@ const UnifiedClientOverview = () => {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="overview" className="mt-0 space-y-6">
-              <ErrorBoundary label="Client Profile">
+            <TabsContent value="overview" className="mt-0">
+              <ErrorBoundary label="Adviser Client Dashboard">
                 <Suspense fallback={<TabLoader />}>
-                  <ClientProfileTab clientId={getClientId()} />
-                </Suspense>
-              </ErrorBoundary>
-              <ErrorBoundary label="Overview">
-                <Suspense fallback={<TabLoader />}>
-                  <PersonalDashboard embedded />
-                </Suspense>
-              </ErrorBoundary>
-              <ErrorBoundary label="Invoicing">
-                <Suspense fallback={<TabLoader />}>
-                  <ClientInvoicing clientId={getClientId()} />
+                  <AdviserClientDashboard clientId={getClientId()} />
                 </Suspense>
               </ErrorBoundary>
             </TabsContent>
