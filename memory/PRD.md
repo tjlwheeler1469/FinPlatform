@@ -11,7 +11,16 @@ Build an AFSL-grade wealth management platform for HNW clients with consolidated
 - **Centralized Data**: `/app/frontend/src/data/clientData.js`
 
 
-## Completed (20 April 2026) — Iteration 11 (Current)
+## Completed (20 April 2026) — Iteration 12 (Current)
+- [x] **Adviser client view now matches client view exactly** — Swapped `UnifiedClientOverview.jsx` (the page shown at `/dashboard` for adviser with selected client) from lightweight Simple* components to the FULL pages:
+  - Investments tab: SimpleInvestments → **UnifiedInvestments** (10 sub-tabs, stat cards, donut + bar + radar charts, rebalancing, top holdings)
+  - Budget tab: SimpleBudget → **HouseholdBudget** (full cashflow + 12-mo chart + savings)
+  - Tax Centre tab: SimpleTax → **UnifiedTaxCentre** (Tax Analysis, BAS, CGT, Div 7A, Loss Harvesting, Income Splitting, Calendar, Trust Distributions)
+  - Retirement tab: SimpleRetirement → **RetirementWorkshop** (multi-scenario Monte Carlo)
+  - Overview / Goals / Invoicing unchanged.
+- Testing: Frontend testing agent iteration 173 — **8/8 pass (100%)**. Confirmed identical content between adviser client view and standalone client routes.
+
+## Completed (20 April 2026) — Iteration 11
 - [x] **Unified data source across Adviser Client Profile** — Client360View now merges CLIENT_DATA (source of truth) into its DEMO_CLIENT_DATA header via `mergeWithCanonicalClient`. Thompson shows **$9.61M net worth** (was $1.61M), **19 accounts** (was 12), allocation matches canonical (Property 52%, Super 28%, Equities 13%, Cash 5%, Other 2%). Family, email, address, advisor all pulled from canonical profile.
 - [x] Financial Goals recomputed from canonical: Retirement target = `retirement_spending × 25` with super+investments as the current value (capped at 100%); investment loan target from canonical liabilities; emergency fund = 6 months of expenses.
 - [x] Chen (`client_2`) also mapped — net worth $22.80M matches canonical.
