@@ -72,10 +72,10 @@ export const generateReviewPackPDF = ({ clientId, confidence, changes = [], oppo
   doc.text(`Gross Assets: ${fmt(totals.grossAssets)}`, 18, y + 21);
   doc.text(`Liabilities: ${fmt(totals.totalLiabilities)}`, 18, y + 27);
   doc.text(`Age: ${client.profile.age}   Retirement: ${client.profile.retirementAge}   Risk: ${client.profile.riskProfile}`, 18, y + 33);
-  // Confidence badge
-  doc.setFillColor(confidence >= 85 ? 16 : confidence >= 70 ? 245 : 244,
-                   confidence >= 85 ? 185 : confidence >= 70 ? 158 : 63,
-                   confidence >= 85 ? 129 : confidence >= 70 ? 11 : 94);
+  // Confidence badge — use palette lookup (emerald/amber/rose)
+  const confPalette = confidence >= 85 ? [16, 185, 129] :
+                      confidence >= 70 ? [245, 158, 11] : [244, 63, 94];
+  doc.setFillColor(confPalette[0], confPalette[1], confPalette[2]);
   doc.rect(150, y + 6, 42, 22, "F");
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(20);

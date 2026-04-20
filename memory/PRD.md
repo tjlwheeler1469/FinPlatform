@@ -17,6 +17,9 @@ Build an AFSL-grade wealth management platform for HNW clients with consolidated
 | chen_family | Michael & Lisa Chen | $22.8M | $24.0M | 49 | Growth | 60 |
 | client_3 | Robert Mitchell | $9.6M | $9.6M | 62 | Conservative | 65 |
 | client_4 | Emma & David Williams | $2.8M | $4.0M | 39 | Growth | 67 |
+
+## Completed (20 April 2026) — Iteration 2
+- [x] Adviser Client Dashboard redesign (separate previous entry preserved below)
 | client_5 | Raj & Priya Patel | $17.5M | $19.6M | 54 | Aggressive | 60 |
 | client_6 | Anderson Partnership | $18.3M | $22.0M | 59 | Balanced | 65 |
 | client_7 | Sarah Kim | $10.2M | $11.3M | 34 | Aggressive | 50 |
@@ -47,7 +50,18 @@ Complete Your Profile: ID upload (passport/licence), TFN input (AES-256 encrypte
 - [x] BAS Calculator field labels, Combined adviser client view
 - [x] All Wheeler references eliminated
 
-## Completed (20 April 2026) — Iteration 2
+## Completed (20 April 2026) — Iteration 3
+- [x] **Scenario Volatility Slider (σ)** added to the embedded Monte Carlo on the Adviser Client Dashboard — σ 4%–24% with labels Conservative / Balanced / Growth / Aggressive (data-testid `slider-volatility`)
+- [x] **PDF Invoice generation** wired via jsPDF + jspdf-autotable — each invoice has a Download PDF button (branded Halcyon Wealth header, line items, GST breakdown, Bill To)
+- [x] **Generate Review Pack** on dashboard now produces a real multi-page PDF (Household Summary + What Changed + Risks/Alerts + Recommendations) via jsPDF
+- [x] **Adviser Command Center deep-links** — Next Best Actions, Portfolio Alerts fallbacks, and Tasks all navigate to the specific client's `/dashboard` when clicked (via `navigateToClient()` helper)
+- [x] **Client resolution helper** `/lib/navigateToClient.js` maps slugs/names/IDs → `CLIENT_DATA` slug; used across firm-wide adviser views for consistent deep-linking
+- [x] **Invoicing tab** mounted on the Client Overview (previously orphaned component)
+- [x] **Platform design-system primitives** created for future roll-out:
+  - `/components/platform/PageShell.jsx` — standardized page framework (header + hero metrics + CTAs + optional ActionRail slot)
+  - `/components/platform/ActionRail.jsx` — universal right-side panel (Recommendations, Next Best Actions, Meeting Prep, Generate Review Pack CTA)
+  - `/components/platform/WhatChangedPanel.jsx` — reusable delta panel
+- [x] Verified via testing agent iteration_162: 9/9 items passing (PDF toasts, volatility slider, deep-link nav to all 5 clients, no regressions)
 - [x] **Adviser Client Dashboard complete redesign** — premium decision-density layout replacing Overview tab content:
   - Sticky header: client identity + NW + Confidence + Risk + Live timestamp + 3 CTAs (Improve Outcome, Run Scenario, Generate Review Pack)
   - Row 1: 3 hero cards — Retirement Readiness (confidence ring + surplus + top risk), Alerts & Exceptions (traffic-light dots), Opportunities (ranked by $ impact)
