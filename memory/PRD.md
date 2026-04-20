@@ -10,6 +10,9 @@ Build an AFSL-grade wealth management platform for HNW clients with consolidated
 - **Storage**: Emergent Object Storage for client document uploads
 - **Centralized Data**: `/app/frontend/src/data/clientData.js`
 
+
+## Completed (20 April 2026) — Iteration 6
+- [x] Smart Insights clickable, SimpleClientPortal, SimpleGoals, SimpleBudget — see previous entries
 ## HNW Client Profiles
 | ID | Name | Net Worth | Gross Assets | Age | Risk | Retire |
 |----|------|-----------|-------------|-----|------|--------|
@@ -59,7 +62,15 @@ Complete Your Profile: ID upload (passport/licence), TFN input (AES-256 encrypte
 - [x] BAS Calculator field labels, Combined adviser client view
 - [x] All Wheeler references eliminated
 
-## Completed (20 April 2026) — Iteration 6
+## Completed (20 April 2026) — Iteration 7
+- [x] **SimpleTax** (Tax Centre tab) — 5-section calm: hero ($X estimated tax, Y% effective rate) · gross/tax/home flow bar · gold top opportunity · 3 upcoming deadlines · Plan my tax + Open details CTAs
+- [x] **SimpleInvestments** (Investments tab) — 5-section calm: hero (portfolio value + YTD badge + risk) · asset allocation bars · gold top-action (rebalance/diversify/stay-course) · top 3 holdings · Rebalance + Run scenario CTAs
+- [x] **FloatingActionRail** applied to 4 more pages: /daily-briefing, /meeting-prep, /adviser-hub, /tax-centre
+- [x] **Adviser sidebar simplified to 3 groups × ≤3 items (7 items total, was 14)**: Today (Dashboard, Daily Briefing), Clients (All Clients, New Client), Firm (Markets, Compliance, Settings). Planning group removed — scenarios live inside the client profile (SimpleRetirement sliders + embedded ScenarioEngine).
+- [x] **Personal/Client sidebar simplified to 3 groups**: You, Portfolio, Documents & Account
+- [x] **"Actions" tab removed** from client profile (duplicated ActionRail + Overview alerts) — client tabs now: Overview, Retirement, Investments, Budget, Goals, Tax Centre, Invoicing
+- [x] `/tax-centre` route registered as alias of UnifiedTaxCentre
+- [x] Verified via testing agent iteration_166 — 100% pass after 3 trivial fixes (all applied in-place)
 - [x] **Smart Insights clickable** — each AI/manual insight's action row is now a button that navigates to the relevant page (portfolio→/portfolio-analyzer, retirement→/retirement-confidence, tax→/tax-centre, opportunity/action→/next-best-actions, general→/daily-briefing). Insights can also supply their own `route` override. Verified routes: tax ✅, retirement ✅, action ✅.
 - [x] **SimpleClientPortal** (`/client-portal`) — 5-section calm template: greeting + net worth, huge confidence gauge (SVG semicircle), plain-English navy summary card, exactly 3 action cards (Book Call / Open Budget → `/budget` / Download statement), contact anchor at bottom. All SPA navigation via `useNavigate`.
 - [x] **SimpleGoals** (Goals tab on /dashboard) — 5-section pattern: "3 goals in play" hero, top blocker card, 3 GoalCards (Retirement real, Home reno, Legacy estate) with progress bars, navy "next step" card, primary CTA.

@@ -70,7 +70,7 @@ export const clientContextNav = [
     name: "Overview",
     icon: Eye,
     items: [
-      { path: "/dashboard", label: "Client Overview", icon: Wallet, title: "Overview, Actions, Retirement, Tax & Investments", badge: "360" },
+      { path: "/dashboard", label: "Client Overview", icon: Wallet, title: "Overview, Retirement, Investments, Budget, Goals, Tax & Invoicing", badge: "360" },
     ]
   },
   {
