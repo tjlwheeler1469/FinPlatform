@@ -693,11 +693,16 @@ const mergeWithCanonicalClient = (demo, clientId) => {
     // Realign headline goals to the canonical wealth — keeps UX consistent
     goals: (() => {
       const retirementTarget = (canonical.retirement?.retirement_spending || 180000) * 25; // rule of 25
+      // Use super + liquid investments as the retirement-assigned current (not total net worth)
+      const retirementCurrent = canonical.assets
+        .filter((a) => ["Super", "Shares", "Managed Fund", "Bonds", "Alternatives", "SMSF", "Trust Portfolio"].includes(a.type))
+        .reduce((s, a) => s + (a.value || 0), 0);
       const loanTarget = canonical.liabilities?.find((l) => /investment/i.test(l.name))?.value || 0;
       const loanCurrent = loanTarget ? Math.round(loanTarget * 0.35) : 0;
+      const progressPct = (cur, tgt) => tgt > 0 ? Math.min(100, Math.round((cur / tgt) * 100)) : 0;
       return [
-        { id: 1, name: `Retirement at ${canonical.retirement?.retirement_age || 67}`, target: retirementTarget, current: Math.round(netWorth * 0.75), progress: Math.round((netWorth * 0.75 / retirementTarget) * 100), targetDate: `${new Date().getFullYear() + (canonical.retirement?.retirement_age - canonical.retirement?.current_age || 17)}-06-30`, icon: Target },
-        ...(loanTarget ? [{ id: 2, name: "Pay off investment loan", target: loanTarget, current: loanCurrent, progress: Math.round((loanCurrent / loanTarget) * 100), targetDate: "2035-01-01", icon: Home }] : []),
+        { id: 1, name: `Retirement at ${canonical.retirement?.retirement_age || 67}`, target: retirementTarget, current: retirementCurrent, progress: progressPct(retirementCurrent, retirementTarget), targetDate: `${new Date().getFullYear() + (canonical.retirement?.retirement_age - canonical.retirement?.current_age || 17)}-06-30`, icon: Target },
+        ...(loanTarget ? [{ id: 2, name: "Pay off investment loan", target: loanTarget, current: loanCurrent, progress: progressPct(loanCurrent, loanTarget), targetDate: "2035-01-01", icon: Home }] : []),
         { id: 3, name: "Emergency fund 6 months", target: Math.round((canonical.profile?.expensesAnnual || 120000) / 2), current: Math.round((canonical.profile?.expensesAnnual || 120000) / 3), progress: 67, targetDate: "2027-12-31", icon: DollarSign },
       ];
     })(),
