@@ -1,0 +1,31 @@
+{
+  "summary": "Verified Client360View data-source merge (mergeWithCanonicalClient). All 11 test criteria PASS: Thompson header shows $9.61M (not $1.61M), 19 accounts, allocation Equities 13%/Property 52%/Super 28%/Cash 5%/Other 2% matching canonical CLIENT_DATA, family shows David & Sarah Thompson, goals show Retirement at 67 ($4.50M target) and Pay off investment loan ($520k). Chen client_2 regression shows $22.80M via chen_family mapping. All 14 tabs render without errors (transactions/communications are the underlying values for Activity/Timeline labels). Standalone routes /retirement-confidence, /budget, /investments, /tax-analysis-sync all return 200.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Client360View > Overview > Financial Goals", "issues": ["Retirement at 67 progress bar shows 160% ($7.21M current vs $4.50M target) because code uses current = netWorth * 0.75 but target = retirement_spending * 25 ($180k * 25 = $4.5M). When net worth exceeds retirement target (common for HNW clients), progress exceeds 100%. Consider capping display at 100% or using a different 'current' metric (e.g. super balance only)."]}
+    ]
+  },
+  "test_report_links": ["/app/test_reports/iteration_172.json"],
+  "action_items": [
+    "[OPTIONAL] Cap goal progress bar at 100% or rethink 'current' computation so Thompson's Retirement goal doesn't render as 160%. Currently cosmetic only — all numbers are internally consistent."
+  ],
+  "critical_code_review_comments": [
+    "Client360View.jsx is 1838 lines — well past the 700-line guideline. DEMO_CLIENT_DATA (lines ~60-600) should be extracted to a data module; tab content blocks could be split into per-tab components for maintainability.",
+    "mergeWithCanonicalClient (lines 614-706) is computed on every render inside getClientData. Consider useMemo in the component to avoid recomputation on unrelated state changes.",
+    "Goal 'Retirement at 67' uses current = netWorth * 0.75 which yields progress >100% for HNW clients. Use Math.min(100, …) on display or derive current from super+investments only."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a (frontend-only)", "frontend": "100%"},
+  "test_credentials": "n/a — adviser mode via localStorage (wealth_command_compliance_v5='permanent', app_mode='adviser', selected_client={id:'client_1'|'client_2'})",
+  "seed_data_creation": "None — used existing CLIENT_DATA.thompson_family and CLIENT_DATA.chen_family in frontend/src/data/clientData.js",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iteration 172 verified the Client360View unified data merge. Thompson shows $9.61M (19 accounts, correct allocation, correct family, correct HNW goals). Chen shows $22.80M. All 14 tabs render. Note: Activity tab testid is tab-transactions, Timeline tab testid is tab-communications (labels differ from values). Standalone routes OK. Only finding: Financial Goals 'Retirement at 67' displays 160% progress on Thompson because current = netWorth * 0.75 exceeds target $4.5M — cosmetic issue.",
+  "rca of the issue": "Not a bug — fix from iteration 171 is working correctly. mergeWithCanonicalClient in Client360View.jsx (lines 614-706) successfully merges CLIENT_DATA.thompson_family / chen_family into DEMO_CLIENT_DATA, producing consistent totals across header, accounts, allocation, family and goals that match the embedded Budget/Investments/Tax/Retirement unified pages."
+}

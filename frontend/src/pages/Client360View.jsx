@@ -14,6 +14,7 @@ import HouseholdBudget from "@/pages/HouseholdBudget";
 import UnifiedInvestments from "@/pages/UnifiedInvestments";
 import UnifiedTaxCentre from "@/pages/UnifiedTaxCentre";
 import SimpleGoals from "@/components/SimpleGoals";
+import { CLIENT_DATA } from "@/data/clientData";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -599,9 +600,115 @@ const DEMO_CLIENT_DATA = {
 DEMO_CLIENT_DATA["thompson_family"] = DEMO_CLIENT_DATA["client_1"];
 DEMO_CLIENT_DATA["chen_family"] = DEMO_CLIENT_DATA["client_2"];
 
+// Merge CLIENT_DATA (HNW source-of-truth) into the DEMO structure so the
+// header, totals and accounts match the embedded Budget/Investments/Tax pages.
+const CLIENT_ID_MAP = {
+  client_1: "thompson_family",
+  client_2: "chen_family",
+  thompson_family: "thompson_family",
+  chen_family: "chen_family",
+};
+
+const ASSET_ICONS = { Super: PiggyBank, Property: Home, Shares: TrendingUp, "Managed Fund": TrendingUp, Cash: DollarSign, Crypto: TrendingUp, Other: Building2 };
+
+const mergeWithCanonicalClient = (demo, clientId) => {
+  const canonicalKey = CLIENT_ID_MAP[clientId];
+  const canonical = canonicalKey ? CLIENT_DATA[canonicalKey] : null;
+  if (!canonical) return demo;
+
+  const totalAssets = canonical.assets.reduce((s, a) => s + (a.value || 0), 0);
+  const totalLiab = canonical.liabilities.reduce((s, l) => s + (l.value || 0), 0);
+  const netWorth = totalAssets - totalLiab;
+  // Weighted % change on assets
+  const weightedChange = totalAssets
+    ? canonical.assets.reduce((s, a) => s + (a.value || 0) * (a.change || 0), 0) / totalAssets
+    : 0;
+  const dollarChange = Math.round((netWorth * weightedChange) / 100);
+
+  // Build allocation by type
+  const byType = canonical.assets.reduce((acc, a) => {
+    const bucket = a.type === "Super" ? "super"
+      : a.type === "Property" ? "property"
+      : a.type === "Shares" || a.type === "Managed Fund" ? "equities"
+      : a.type === "Cash" ? "cash"
+      : "other";
+    acc[bucket] = (acc[bucket] || 0) + (a.value || 0);
+    return acc;
+  }, {});
+  const allocPct = (v) => totalAssets ? Math.round((v / totalAssets) * 100) : 0;
+  const assetAllocation = {
+    equities: allocPct(byType.equities || 0),
+    property: allocPct(byType.property || 0),
+    super: allocPct(byType.super || 0),
+    cash: allocPct(byType.cash || 0),
+    other: allocPct(byType.other || 0),
+  };
+
+  // Build account rows (assets as positive, liabilities as negative)
+  const accounts = [
+    ...canonical.assets.map((a, i) => ({
+      id: i + 1,
+      name: a.name,
+      type: a.type,
+      institution: a.entity,
+      balance: a.value,
+      change: Math.round((a.value || 0) * (a.change || 0) / 100),
+      changePercent: a.change,
+      icon: ASSET_ICONS[a.type] || TrendingUp,
+    })),
+    ...canonical.liabilities.map((l, i) => ({
+      id: 1000 + i,
+      name: l.name,
+      type: "Liability",
+      institution: l.name.includes("-") ? l.name.split("-")[1].trim() : "Bank",
+      balance: -l.value,
+      change: 0,
+      changePercent: l.rate || 0,
+      icon: Building2,
+    })),
+  ];
+
+  return {
+    ...demo,
+    name: canonical.profile?.name || demo.name,
+    email: canonical.profile?.email || demo.email,
+    phone: canonical.profile?.phone || demo.phone,
+    address: canonical.profile?.address || demo.address,
+    age: canonical.profile?.age || demo.age,
+    occupation: canonical.profile?.occupation || demo.occupation,
+    employer: canonical.profile?.employer || demo.employer,
+    advisor: canonical.profile?.advisor || demo.advisor,
+    riskProfile: canonical.profile?.riskProfile || demo.riskProfile,
+    wealth: {
+      total: netWorth,
+      change: dollarChange,
+      changePercent: +weightedChange.toFixed(1),
+      assetAllocation,
+    },
+    accounts,
+    family: [
+      { name: canonical.profile?.name?.split(" & ")[0] || "Primary", relationship: "Primary", dob: demo.dateOfBirth, age: canonical.profile?.age },
+      ...(canonical.profile?.partner_first_name ? [{ name: `${canonical.profile.partner_first_name} ${canonical.profile.last_name}`, relationship: "Spouse", dob: "", age: canonical.profile?.age }] : []),
+    ],
+    // Realign headline goals to the canonical wealth — keeps UX consistent
+    goals: (() => {
+      const retirementTarget = (canonical.retirement?.retirement_spending || 180000) * 25; // rule of 25
+      const loanTarget = canonical.liabilities?.find((l) => /investment/i.test(l.name))?.value || 0;
+      const loanCurrent = loanTarget ? Math.round(loanTarget * 0.35) : 0;
+      return [
+        { id: 1, name: `Retirement at ${canonical.retirement?.retirement_age || 67}`, target: retirementTarget, current: Math.round(netWorth * 0.75), progress: Math.round((netWorth * 0.75 / retirementTarget) * 100), targetDate: `${new Date().getFullYear() + (canonical.retirement?.retirement_age - canonical.retirement?.current_age || 17)}-06-30`, icon: Target },
+        ...(loanTarget ? [{ id: 2, name: "Pay off investment loan", target: loanTarget, current: loanCurrent, progress: Math.round((loanCurrent / loanTarget) * 100), targetDate: "2035-01-01", icon: Home }] : []),
+        { id: 3, name: "Emergency fund 6 months", target: Math.round((canonical.profile?.expensesAnnual || 120000) / 2), current: Math.round((canonical.profile?.expensesAnnual || 120000) / 3), progress: 67, targetDate: "2027-12-31", icon: DollarSign },
+      ];
+    })(),
+    _canonical: canonical, // expose for downstream tabs
+  };
+};
+
 // Default to client_1 if no client selected
 const getClientData = (clientId) => {
-  return DEMO_CLIENT_DATA[clientId] || DEMO_CLIENT_DATA["client_1"];
+  const base = DEMO_CLIENT_DATA[clientId] || DEMO_CLIENT_DATA["client_1"];
+  return mergeWithCanonicalClient(base, clientId);
 };
 
 const Client360View = () => {
