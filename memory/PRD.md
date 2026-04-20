@@ -11,7 +11,13 @@ Build an AFSL-grade wealth management platform for HNW clients with consolidated
 - **Centralized Data**: `/app/frontend/src/data/clientData.js`
 
 
-## Completed (20 April 2026) — Iteration 13 (Current)
+## Completed (20 April 2026) — Iteration 14 (Current)
+- [x] **Edit/Delete buttons wired on UnlistedInvestments** — previously the pencil/trash icons did nothing. Now: Edit opens a pre-filled Dialog (name/type/entity/prices/notes) with Save Changes toast; Delete confirms then removes + toasts. Add button unchanged.
+- [x] **Markets moved into Today section** — TodaysPrioritiesCard in AdviserClientDashboard now has a "Markets" strip at the bottom of the card with ASX 200 / AUD/USD / RBA Rate tiles + Live badge. (Adviser dashboard shown at /dashboard when adviser has a selected client.)
+- [x] **RetirementWorkshop — scenario cap 5 → 10** — advisers can now model up to 10 scenarios simultaneously. Budget/Investments inputs already align to CLIENT_DATA: monthly income $40,417, expenses $17,500, surplus $22,917 all match /budget page.
+- Testing: Frontend testing agent iteration 176 — **6/6 pass (100%)**.
+
+## Completed (20 April 2026) — Iteration 13
 - [x] **Data consistency fix across Investments sub-tabs** — User-reported bug: Overview donut showed Shares $845k but Shares & ETFs sub-tab showed $84,500. Root cause: 3 parallel mock data sources (CLIENT_DATA in clientData.js, CLIENT_PORTFOLIO_DATA + DEFAULT_SHARE_PORTFOLIO in portfolioSeedData.js, hardcoded DEMO_ACCOUNTS/DEMO_TERM_DEPOSITS in CashDeposits.jsx, local useState in SuperannuationGuarantee.jsx). All aligned to CLIENT_DATA.thompson_family:
   - **Shares & ETFs** — VGH 4000@$105, BHP 4000@$46.25, CBA 2000@$120 = $845,000
   - **Cash & TDs** — ING Emergency Fund $180,000 + Westpac 12m TD $350,000 = $530,000
