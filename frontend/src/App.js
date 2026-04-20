@@ -150,6 +150,7 @@ const AICopilot = lazyRetry(() => import("@/pages/AICopilot"));
 const DecisionCenter = lazyRetry(() => import("@/pages/DecisionCenter"));
 const ClientIntelligenceFeed = lazyRetry(() => import("@/pages/ClientIntelligenceFeed"));
 const ClientPortal = lazyRetry(() => import("@/pages/ClientPortal"));
+const SimpleClientPortal = lazyRetry(() => import("@/pages/SimpleClientPortal"));
 
 // Super App Features - Meeting Prep, Research, Compliance, Wealth
 const MeetingPrep = lazyRetry(() => import("@/pages/MeetingPrep"));
@@ -1147,7 +1148,7 @@ const AppRouter = () => {
       <Route path="/client-insights" element={<Navigate to="/ai-copilot-advanced" replace />} />
       <Route path="/intelligence-feed" element={<Navigate to="/ai-copilot-advanced" replace />} />
       <Route path="/ai-insights" element={<Navigate to="/ai-copilot-advanced" replace />} />
-      <Route path="/client-portal" element={<PersonalDashboard />} />
+      <Route path="/client-portal" element={<SimpleClientPortal />} />
       
       {/* Super App Features */}
       <Route path="/meeting-prep" element={<MeetingPrep />} />

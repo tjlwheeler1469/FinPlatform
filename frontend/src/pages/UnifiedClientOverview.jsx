@@ -7,6 +7,8 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 const PersonalDashboard = lazy(() => import("@/pages/PersonalDashboard"));
 const UnifiedInvestments = lazy(() => import("@/pages/UnifiedInvestments"));
 const SimpleRetirement = lazy(() => import("@/components/SimpleRetirement"));
+const SimpleGoals = lazy(() => import("@/components/SimpleGoals"));
+const SimpleBudget = lazy(() => import("@/components/SimpleBudget"));
 const UnifiedTaxCentre = lazy(() => import("@/pages/UnifiedTaxCentre"));
 const NextBestActions = lazy(() => import("@/pages/NextBestActions"));
 const ScenarioModelling = lazy(() => import("@/pages/ScenarioModelling"));
@@ -100,14 +102,14 @@ const UnifiedClientOverview = () => {
             <TabsContent value="budget" className="mt-0">
               <ErrorBoundary label="Budget">
                 <Suspense fallback={<TabLoader />}>
-                  <HouseholdBudget embedded />
+                  <SimpleBudget clientId={getClientId()} embedded />
                 </Suspense>
               </ErrorBoundary>
             </TabsContent>
             <TabsContent value="goals" className="mt-0">
               <ErrorBoundary label="Goals">
                 <Suspense fallback={<TabLoader />}>
-                  <ScenarioEngine embedded />
+                  <SimpleGoals clientId={getClientId()} embedded />
                 </Suspense>
               </ErrorBoundary>
             </TabsContent>

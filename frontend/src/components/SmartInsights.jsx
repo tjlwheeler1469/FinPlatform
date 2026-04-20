@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -52,10 +53,23 @@ const formatCurrency = (value) => {
   }).format(value || 0);
 };
 
+// Map insight category → destination route. Each insight can also supply its own `route` to override.
+const CATEGORY_ROUTE = {
+  portfolio: '/portfolio-analyzer',
+  retirement: '/retirement-confidence',
+  tax: '/tax-centre',
+  risk: '/portfolio-analyzer',
+  opportunity: '/next-best-actions',
+  action: '/next-best-actions',
+  general: '/daily-briefing',
+};
+
 // Single Insight Card
 const InsightCard = ({ insight, onEdit, onDelete, isAdvisor }) => {
+  const navigate = useNavigate();
   const colors = priorityColors[insight.priority] || priorityColors.medium;
   const IconComponent = categoryIcons[insight.category] || Lightbulb;
+  const target = insight.route || CATEGORY_ROUTE[insight.category] || '/daily-briefing';
   
   return (
     <div className={`p-4 rounded-lg border ${colors.bg} ${colors.border} transition-all hover:shadow-md`}>
@@ -94,10 +108,16 @@ const InsightCard = ({ insight, onEdit, onDelete, isAdvisor }) => {
           )}
           
           {insight.action && (
-            <div className="flex items-center gap-2 text-sm bg-white/50 p-2 rounded border">
-              <ArrowRight className="h-4 w-4 text-primary" />
-              <span>{insight.action}</span>
-            </div>
+            <button
+              type="button"
+              onClick={() => navigate(target)}
+              className="w-full flex items-center gap-2 text-sm bg-white/50 p-2 rounded border hover:bg-white hover:border-[#1a2744] transition-colors text-left group"
+              data-testid={`insight-action-${insight.id}`}
+            >
+              <ArrowRight className="h-4 w-4 text-primary transition-transform group-hover:translate-x-0.5" />
+              <span className="flex-1">{insight.action}</span>
+              <span className="text-[10px] text-muted-foreground group-hover:text-[#1a2744] uppercase tracking-wide">Open →</span>
+            </button>
           )}
         </div>
         

@@ -1,0 +1,30 @@
+{
+  "summary": "Frontend validation of (1) SmartInsights action-button navigation, (2) SimpleClientPortal, (3) SimpleGoals, (4) SimpleBudget plus regression on SimpleRetirement + FloatingActionRail. 30/31 checks pass. Only bug: portal-action-1 navigates to /household-budget which is NOT registered in App.js (actual route is /budget), so the Open Budget CTA lands on an empty/unmatched-route page. All other testids, structure, counts, toasts and navigations verified.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "SimpleClientPortal", "issue": "portal-action-1 (Open Budget) href is '/household-budget' but App.js registers the HouseholdBudget page at '/budget'. Clicking the CTA changes URL but renders nothing (react-router warning: 'No routes matched location /household-budget'). Change href to '/budget' OR add a route alias in App.js.", "selector": "[data-testid=\"portal-action-1-cta\"]", "priority": "HIGH"}
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Fix SimpleClientPortal.jsx line 79: change href from '/household-budget' to '/budget' (or add <Route path='/household-budget' element={<HouseholdBudget/>} /> in App.js).",
+    "Optional: SmartInsights 'general' category maps to /daily-briefing but no generated AI insight currently uses 'general' — consider adding a sensible default or removing the mapping."
+  ],
+  "critical_code_review_comments": [
+    "SimpleClientPortal uses window.location.href for internal navigation (full reload) instead of useNavigate — minor UX regression vs SPA navigation elsewhere. Recommend switching to useNavigate(a.href).",
+    "SimpleGoals GoalCard testid uses title.toLowerCase() which for 'Legacy & estate' produces 'goal-legacy-&-estate' (non-standard character). Works but brittle; replace /[^a-z0-9]+/g with '-' for cleaner testids.",
+    "SimpleBudget derives expense categories from hard-coded percentages (32%/14%/10%...). Acceptable for MVP per spec, but should be flagged as MOCKED in any client-facing demo.",
+    "SmartInsights InsightCard: navigate(target) fires on button click but there's no analytics/log — future work if telemetry desired.",
+    "UnifiedClientOverview.jsx uses lazy-loading + Suspense correctly; no issues."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (skipped)", "frontend": "97% (30/31 checks — 1 bug)"},
+  "seed_data_creation": "Used thompson_family from CLIENT_DATA + localStorage: app_mode, selected_client, active_client_id, wealth_command_compliance_v5",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "SimpleClientPortal test: localStorage app_mode='client' + selected_client={id:'thompson_family'} then go to /client-portal. SmartInsights lives on the 'Insights' tab of PersonalDashboard (client mode → /dashboard → click 'Insights' tab). Thompson has 7 AI insights generated (confidence 84%): ai_catchup (tax), ai_concentration (risk), ai_super_consolidate (opportunity), ai_intl_diversification (opportunity), ai_insurance (risk), ai_debt (action), ai_on_track (retirement). Verified routes: tax→/tax-centre ✅, retirement→/retirement-confidence ✅, action→/next-best-actions ✅. SimpleGoals/Budget testids verified on adviser /dashboard (goals & budget tabs). Budget hero shows '$275k/yr surplus · Strong · 57% savings rate' matching spec. Goals hero shows '3 goals in play · 2 on track · 1 to review'. FloatingActionRail confirmed visible on all 5 regression routes.",
+  "rca of the issue": "portal-action-1 bug RCA: SimpleClientPortal.jsx line 79 hard-codes href:'/household-budget'. App.js registers HouseholdBudget at '/budget' (line 1050). Mitigation: change href to '/budget' OR add alias route. Reproduction: localStorage app_mode='client' → visit /client-portal → click 'Open Budget' → URL becomes /household-budget and page renders blank (react-router logs 'No routes matched location /household-budget')."
+}
