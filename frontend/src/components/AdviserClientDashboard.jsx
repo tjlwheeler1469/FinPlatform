@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import { CLIENT_DATA, computeClientTotals } from "@/data/clientData";
 import { projectRetirement } from "@/components/ScenarioEngine";
+import { generateReviewPackPDF } from "@/lib/pdfGenerator";
+import ActionRail from "@/components/platform/ActionRail";
 
 const fmt = (v) => {
   const abs = Math.abs(v);
@@ -216,6 +218,7 @@ const EmbeddedScenarioCard = ({ client, baseConfidence }) => {
   const [retireAge, setRetireAge] = useState(client.retirement.retirement_age);
   const [annualSpend, setAnnualSpend] = useState(client.retirement.retirement_spending);
   const [annualContrib, setAnnualContrib] = useState(client.retirement.annual_contributions);
+  const [volatility, setVolatility] = useState(12); // σ% — 6%=conservative, 12%=balanced, 20%=aggressive
 
   const scenario = useMemo(() => {
     const yearsToRet = Math.max(1, retireAge - client.profile.age);
@@ -224,10 +227,12 @@ const EmbeddedScenarioCard = ({ client, baseConfidence }) => {
       annualContributions: annualContrib,
       annualSpending: annualSpend,
       yearsToRetirement: yearsToRet,
-      expectedReturn: 0.065, volatility: 0.12, inflationRate: 0.03,
+      expectedReturn: 0.065,
+      volatility: volatility / 100,
+      inflationRate: 0.03,
     });
     return { ...result, yearsToRet };
-  }, [liquidAssets, retireAge, annualSpend, annualContrib, client.profile.age]);
+  }, [liquidAssets, retireAge, annualSpend, annualContrib, volatility, client.profile.age]);
 
   const delta = scenario.confidence - baseConfidence;
 
@@ -279,6 +284,15 @@ const EmbeddedScenarioCard = ({ client, baseConfidence }) => {
               <span className="text-xs font-semibold text-[#1a2744]">{fmt(annualContrib)}/yr</span>
             </div>
             <Slider min={0} max={300000} step={5000} value={[annualContrib]} onValueChange={(v) => setAnnualContrib(v[0])} />
+          </div>
+          <div data-testid="slider-volatility">
+            <div className="flex justify-between mb-1.5">
+              <label className="text-[11px] font-medium text-gray-700">Portfolio Volatility (σ)</label>
+              <span className="text-xs font-semibold text-[#1a2744]">
+                {volatility}% · {volatility <= 8 ? "Conservative" : volatility <= 14 ? "Balanced" : volatility <= 18 ? "Growth" : "Aggressive"}
+              </span>
+            </div>
+            <Slider min={4} max={24} step={1} value={[volatility]} onValueChange={(v) => setVolatility(v[0])} />
           </div>
         </div>
 
@@ -474,7 +488,20 @@ const AdviserClientDashboard = ({ clientId = "thompson_family" }) => {
   ];
 
   const handleImprove = () => toast.success("Opening scenario builder to improve outcome", { description: "Adjust the sliders in Row 2 to see confidence updates live" });
-  const handleGeneratePack = () => toast.success("Generating Review Pack...", { description: "PDF will be ready in a few seconds" });
+  const handleGeneratePack = () => {
+    try {
+      generateReviewPackPDF({
+        clientId,
+        confidence: baseScenario.confidence,
+        changes,
+        opportunities,
+        alerts,
+      });
+      toast.success("Review Pack PDF downloaded", { description: `Generated for ${client.profile.name}` });
+    } catch (e) {
+      toast.error("PDF generation failed");
+    }
+  };
   const handleRunScenario = () => toast.info("Scenario engine is embedded below — adjust the sliders live");
   const handleOppAction = (o) => toast.success(`Action: ${o.title}`, { description: `Estimated impact: ${fmt(o.impact)}` });
 

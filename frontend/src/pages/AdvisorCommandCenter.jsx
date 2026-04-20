@@ -67,6 +67,8 @@ import ClientPackScheduler from "@/components/ClientPackScheduler";
 import DecisionCenter from "@/pages/DecisionCenter";
 import DailyBriefing from "@/pages/DailyBriefing";
 import { CLIENT_DATA, computeClientTotals } from "@/data/clientData";
+import { navigateToClient, resolveClientSlug } from "@/lib/navigateToClient";
+import { generateReviewPackPDF } from "@/lib/pdfGenerator";
 
 const API_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || "";
 
@@ -496,7 +498,19 @@ const AdvisorCommandCenter = () => {
                     </Badge>
                   </div>
                   <h4 className="font-semibold text-sm mb-1">{action.title}</h4>
-                  <p className="text-xs text-muted-foreground mb-2">{action.client_name}</p>
+                  {/* Client pill — clickable, navigates to that client's dashboard */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const slug = resolveClientSlug(action.client_id || action.client_name);
+                      if (slug) navigateToClient(navigate, slug);
+                      else toast.info(`No client context for "${action.client_name}"`);
+                    }}
+                    className="text-xs text-[#1a2744] font-medium underline-offset-2 hover:underline mb-2 block text-left"
+                    data-testid={`next-action-${i}-client`}
+                  >
+                    👤 {action.client_name}
+                  </button>
                   <p className="text-xs text-gray-600 line-clamp-2">{action.description}</p>
                   {action.impact_value && (
                     <div className="mt-2 pt-2 border-t">
@@ -509,7 +523,21 @@ const AdvisorCommandCenter = () => {
                     <span className="text-[10px] text-muted-foreground">
                       {action.estimated_time}
                     </span>
-                    <Button size="sm" variant="ghost" className="h-6 px-2 text-xs">
+                    <Button
+                      size="sm"
+                      variant="default"
+                      className="h-6 px-2 text-xs bg-[#1a2744] hover:bg-[#1a2744]/90"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const slug = resolveClientSlug(action.client_id || action.client_name);
+                        if (slug) {
+                          navigateToClient(navigate, slug, { tab: action.category?.toLowerCase() });
+                        } else {
+                          toast.info(`Executing: ${action.title}`);
+                        }
+                      }}
+                      data-testid={`next-action-${i}-execute`}
+                    >
                       <Play className="h-3 w-3 mr-1" />
                       Execute
                     </Button>
@@ -791,7 +819,12 @@ const AdvisorCommandCenter = () => {
                     <div 
                       key={`item-${i}`}
                       className="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                      onClick={() => navigate(`/client-wealth?client=${alert.client_id}`)}
+                      onClick={() => {
+                        const slug = resolveClientSlug(alert.client_id || alert.client_name);
+                        if (slug) navigateToClient(navigate, slug);
+                        else navigate('/client-crm');
+                      }}
+                      data-testid={`portfolio-alert-${i}`}
                     >
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-sm font-medium">{alert.client_name}</span>
@@ -803,35 +836,55 @@ const AdvisorCommandCenter = () => {
                     </div>
                   )) || (
                     <>
-                      <div className="p-3 border-l-4 border-l-red-500 bg-red-50 rounded-r-lg">
+                      <div
+                        className="p-3 border-l-4 border-l-red-500 bg-red-50 rounded-r-lg cursor-pointer hover:bg-red-100"
+                        onClick={() => navigateToClient(navigate, "client_5")}
+                        data-testid="portfolio-alert-fallback-0"
+                      >
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-sm font-medium">Patel Holdings</span>
                           <Badge variant="destructive" className="text-xs">Critical</Badge>
                         </div>
                         <p className="text-xs text-muted-foreground">Portfolio drift 8.2% - rebalancing required</p>
                       </div>
-                      <div className="p-3 border-l-4 border-l-orange-500 bg-orange-50 rounded-r-lg">
+                      <div
+                        className="p-3 border-l-4 border-l-orange-500 bg-orange-50 rounded-r-lg cursor-pointer hover:bg-orange-100"
+                        onClick={() => navigateToClient(navigate, "thompson_family")}
+                        data-testid="portfolio-alert-fallback-1"
+                      >
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-sm font-medium">Thompson Family</span>
                           <Badge className="bg-orange-500 text-xs">High</Badge>
                         </div>
                         <p className="text-xs text-muted-foreground">Single stock concentration &gt;15%</p>
                       </div>
-                      <div className="p-3 border-l-4 border-l-yellow-500 bg-yellow-50 rounded-r-lg">
+                      <div
+                        className="p-3 border-l-4 border-l-yellow-500 bg-yellow-50 rounded-r-lg cursor-pointer hover:bg-yellow-100"
+                        onClick={() => navigateToClient(navigate, "chen_family")}
+                        data-testid="portfolio-alert-fallback-2"
+                      >
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-sm font-medium">Chen Investment Trust</span>
                           <Badge className="bg-yellow-500 text-black text-xs">Medium</Badge>
                         </div>
                         <p className="text-xs text-muted-foreground">Underperforming benchmark by 3.2%</p>
                       </div>
-                      <div className="p-3 border-l-4 border-l-blue-500 bg-blue-50 rounded-r-lg">
+                      <div
+                        className="p-3 border-l-4 border-l-blue-500 bg-blue-50 rounded-r-lg cursor-pointer hover:bg-blue-100"
+                        onClick={() => navigateToClient(navigate, "client_3")}
+                        data-testid="portfolio-alert-fallback-3"
+                      >
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-sm font-medium">Thompson SMSF</span>
                           <Badge className="bg-blue-500 text-xs">Info</Badge>
                         </div>
                         <p className="text-xs text-muted-foreground">Cash allocation above target</p>
                       </div>
-                      <div className="p-3 border-l-4 border-l-orange-500 bg-orange-50 rounded-r-lg">
+                      <div
+                        className="p-3 border-l-4 border-l-orange-500 bg-orange-50 rounded-r-lg cursor-pointer hover:bg-orange-100"
+                        onClick={() => navigateToClient(navigate, "client_6")}
+                        data-testid="portfolio-alert-fallback-4"
+                      >
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-sm font-medium">Liu Family Trust</span>
                           <Badge className="bg-orange-500 text-xs">High</Badge>
@@ -869,6 +922,12 @@ const AdvisorCommandCenter = () => {
                     <div 
                       key={task.id}
                       className="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                      onClick={() => {
+                        const slug = resolveClientSlug(task.client_id || task.client);
+                        if (slug) navigateToClient(navigate, slug);
+                        else toast.info(`Opening task: ${task.title}`);
+                      }}
+                      data-testid={`task-item-${task.id}`}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">

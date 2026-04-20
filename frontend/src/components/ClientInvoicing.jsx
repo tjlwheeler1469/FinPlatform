@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { getActiveClientId, CLIENT_DATA } from "@/data/clientData";
+import { generateInvoicePDF } from "@/lib/pdfGenerator";
 
 const API = process.env.REACT_APP_BACKEND_URL;
 const fmt = (v) => new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD", minimumFractionDigits: 2 }).format(v || 0);
@@ -132,6 +133,31 @@ const ClientInvoicing = ({ clientId: propClientId }) => {
               <div className="flex items-center gap-3">
                 <p className="text-sm font-bold">{fmt(inv.total)}</p>
                 <Badge className={STATUS_COLORS[inv.status] || "bg-gray-400"}>{inv.status}</Badge>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-xs"
+                  onClick={() => {
+                    try {
+                      generateInvoicePDF({
+                        ...inv,
+                        invoice_number: inv.invoice_id,
+                        client_name: client.profile.name,
+                        client_email: client.profile.email,
+                        issue_date: inv.created_at ? new Date(inv.created_at).toLocaleDateString("en-AU") : new Date().toLocaleDateString("en-AU"),
+                        due_date: inv.due_date || "On receipt",
+                        line_items: inv.line_items,
+                        subtotal: inv.subtotal,
+                        gst: inv.gst,
+                        total: inv.total,
+                      });
+                      toast.success("Invoice PDF downloaded");
+                    } catch { toast.error("PDF generation failed"); }
+                  }}
+                  data-testid={`invoice-${inv.invoice_id}-pdf`}
+                >
+                  <Download className="h-3 w-3 mr-1" /> PDF
+                </Button>
                 {inv.status === "draft" && (
                   <Button variant="outline" size="sm" className="text-xs" onClick={() => updateStatus(inv.invoice_id, "sent")}>
                     <Send className="h-3 w-3 mr-1" /> Send

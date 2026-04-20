@@ -1,0 +1,45 @@
+{
+  "summary": "Frontend-only testing for iteration 162: Volatility slider, Review Pack PDF, Invoice PDF, AdvisorCommandCenter deep-link navigation, design-system primitives lint, and regression checks. 8 of 9 request items PASS; 1 GAP — ClientInvoicing is not mounted anywhere in the app, so the invoice-<id>-pdf testid is unreachable to end users (component is dead code).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "ClientInvoicing.jsx",
+        "issue": "Component exists with the invoice-<id>-pdf Download button, toast, and generateInvoicePDF wired correctly, BUT the component is never imported/rendered anywhere in the app (grep across /app/frontend/src shows it is only referenced by itself). No route or parent renders it, so the PDF Download button is not reachable through the UI. Either mount ClientInvoicing inside the Adviser Client Dashboard (e.g., as a new Invoices sub-tab in UnifiedClientOverview) or add a route.",
+        "selector": "[data-testid=invoice-<id>-pdf]",
+        "priority": "HIGH"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Mount ClientInvoicing component somewhere reachable (adviser dashboard sub-tab or dedicated /invoicing route) so the Download PDF button is actually usable. Currently it is dead code — lint-clean but orphaned."
+  ],
+  "critical_code_review_comments": [
+    "ClientInvoicing.jsx is implemented correctly (testids, toast, jsPDF call) but is not imported anywhere — effectively dead code. Either wire it into UnifiedClientOverview or remove until needed.",
+    "Volatility slider on AdviserClientDashboard confidence update observed in live test (toast showed 83.5% for Thompson after drag) — works. Earlier 99% reading was likely pre-drag state of the DOM read.",
+    "generateReviewPackPDF badge fill color math uses odd ternary collisions (lines 76-78 of pdfGenerator.js): the way R/G/B are each computed with independent nested ternaries will produce incorrect intermediate colours for boundary confidence values. Cosmetic only — does not affect functionality, but worth a follow-up refactor to use a palette lookup.",
+    "AdvisorCommandCenter.jsx: Execute button for next-action-N navigates only if resolveClientSlug() succeeds; falls back to toast.info. Works as designed.",
+    "Platform primitives (PageShell, ActionRail, WhatChangedPanel) are lint-clean and ready but not yet adopted — as expected for this iteration."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "not tested", "frontend": "89% (8/9 items; 1 gap = ClientInvoicing orphan)"},
+  "seed_data_creation": "localStorage only: app_mode=adviser, active_client_id, selected_client, wealth_command_compliance_v5=permanent",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Volatility slider, Review Pack PDF toast, AdvisorCommandCenter next-action-N client+execute (0..3), portfolio-alert-fallback-0..4, and task-item click all verified working and navigating to /dashboard with correct localStorage.selected_client set (Patel=client_5, Thompson Family=thompson_family, Chen=chen_family, Thompson SMSF=client_3, Liu=client_6, next-action-0 resolves to Chen=client_2). All 6 UnifiedClientOverview tabs (Actions/Retirement/Investments/Budget/Goals/Tax Centre) render for Thompson without errors. All 5 regression clients render slider+confidence+CTA. The only remaining issue is that ClientInvoicing is never mounted — main agent must import it into a dashboard tab or route before invoice PDF test is user-reachable.",
+  "verified_features": [
+    "[data-testid=slider-volatility] present on AdviserClientDashboard for all 5 tested clients",
+    "[data-testid=cta-generate-review-pack] and [data-testid=btn-generate-review-pack] both trigger jsPDF save and show 'Review Pack PDF downloaded' toast",
+    "[data-testid=next-action-0..3-client] and [data-testid=next-action-0..3-execute] all present and navigate to /dashboard with correct selected_client in localStorage",
+    "[data-testid=portfolio-alert-fallback-0..4] all present and correctly deep-link to Patel, Thompson, Chen, Thompson SMSF, Liu respectively",
+    "[data-testid=task-item-<id>] clickable — 5 tasks rendered, click navigates to /dashboard",
+    "Design-system primitives PageShell/ActionRail/WhatChangedPanel: ESLint clean (verified via mcp_lint_javascript)",
+    "navigateToClient.js + pdfGenerator.js: ESLint clean",
+    "Regression: /dashboard renders for client_5, chen_family, client_3, client_6, thompson_family with all prior testids intact",
+    "Regression: /advisor-command-center loads without errors"
+  ],
+  "rca of the issue": "ClientInvoicing orphan: file exists at /app/frontend/src/components/ClientInvoicing.jsx with a default export but no other file in /app/frontend/src imports it. Reproduction: `grep -rln 'ClientInvoicing' /app/frontend/src/` returns only the file itself. Mitigation: add an import + render call in UnifiedClientOverview.jsx (e.g., as a new 'Invoicing' tab when in adviser mode) or create a route /client-invoicing that renders <ClientInvoicing clientId={selectedClient.id} />. Both the Download PDF button and the generateInvoicePDF pipeline itself work — this is purely a wiring gap."
+}
