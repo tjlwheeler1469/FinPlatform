@@ -10,10 +10,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import RetirementWorkshop from "@/pages/RetirementWorkshop";
 import AdviserClientInputs from "@/components/AdviserClientInputs";
-import SimpleBudget from "@/components/SimpleBudget";
+import HouseholdBudget from "@/pages/HouseholdBudget";
+import UnifiedInvestments from "@/pages/UnifiedInvestments";
+import UnifiedTaxCentre from "@/pages/UnifiedTaxCentre";
 import SimpleGoals from "@/components/SimpleGoals";
-import SimpleTax from "@/components/SimpleTax";
-import SimpleInvestments from "@/components/SimpleInvestments";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -965,9 +965,9 @@ const Client360View = () => {
             <RetirementWorkshop embedded clientId={clientId} />
           </TabsContent>
 
-          {/* Budget Tab — Client's household budget (same as Personal/Client view) */}
+          {/* Budget Tab — full HouseholdBudget page (same as /budget) */}
           <TabsContent value="budget" className="space-y-6" data-testid="tab-content-budget">
-            <SimpleBudget embedded clientId={clientId} />
+            <HouseholdBudget embedded />
           </TabsContent>
 
           {/* Goals Tab — Client's financial goals */}
@@ -975,14 +975,14 @@ const Client360View = () => {
             <SimpleGoals embedded clientId={clientId} />
           </TabsContent>
 
-          {/* Investments Tab — client-facing simplified view */}
+          {/* Investments Tab — full UnifiedInvestments page (same as /investments) */}
           <TabsContent value="investments-view" className="space-y-6" data-testid="tab-content-investments-view">
-            <SimpleInvestments embedded clientId={clientId} />
+            <UnifiedInvestments embedded />
           </TabsContent>
 
-          {/* Tax Tab — client's tax summary */}
+          {/* Tax Tab — full UnifiedTaxCentre page (same as /tax-analysis-sync) */}
           <TabsContent value="tax" className="space-y-6" data-testid="tab-content-tax">
-            <SimpleTax embedded clientId={clientId} />
+            <UnifiedTaxCentre embedded />
           </TabsContent>
 
           {/* Profile & Inputs Tab — Adviser manual data entry */}
