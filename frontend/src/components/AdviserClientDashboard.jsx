@@ -207,7 +207,7 @@ const BalanceSheetCard = ({ client, totals }) => {
   );
 };
 
-const EmbeddedScenarioCard = ({ client, totals, baseConfidence, onGenerate }) => {
+const EmbeddedScenarioCard = ({ client, baseConfidence }) => {
   const liquidAssets = useMemo(() =>
     client.assets.filter(a => ["Super", "Shares", "Managed Fund", "Cash", "Trust Portfolio"].includes(a.type))
       .reduce((s, a) => s + a.value, 0),
@@ -389,7 +389,8 @@ const WhatChangedCard = ({ changes }) => (
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {changes.map((c, i) => {
           const ArrowIcon = c.delta >= 0 ? ArrowUpRight : ArrowDownRight;
-          const sentiment = c.positiveDown ? (c.delta <= 0 ? "emerald" : "rose") : (c.delta >= 0 ? "emerald" : "rose");
+          // isNegative flag: true means this metric-direction is bad (e.g. spending up, confidence down)
+          const sentiment = c.isNegative ? "rose" : "emerald";
           const toneText = sentiment === "emerald" ? "text-emerald-700" : "text-rose-700";
           return (
             <div key={i} className="border rounded-md p-3" data-testid={`change-item-${i}`}>
@@ -464,12 +465,12 @@ const AdviserClientDashboard = ({ clientId = "thompson_family" }) => {
     { icon: Briefcase, title: "Fee review opportunity", detail: "Consolidate super to reduce 0.35% admin fee", impact: 12500 },
   ].sort((a, b) => b.impact - a.impact), [client]);
 
-  // What Changed (vs last review)
+  // What Changed (vs last review) — 'isNegative' flags deltas that represent worsening outcomes
   const changes = [
-    { label: "Confidence", current: `${baseScenario.confidence}%`, delta: -4, suffix: "%", previous: `${baseScenario.confidence + 4}%`, positiveDown: false },
-    { label: "Spending", current: fmt(client.profile.expensesAnnual), delta: 6, suffix: "%", previous: fmt(client.profile.expensesAnnual * 0.94), positiveDown: true },
-    { label: "Equity Exposure", current: "42%", delta: 8, suffix: "pts", previous: "34%", positiveDown: false },
-    { label: "Net Worth", current: fmt(totals.netWorth), delta: 3.2, suffix: "%", previous: fmt(totals.netWorth * 0.969), positiveDown: false },
+    { label: "Confidence", current: `${baseScenario.confidence}%`, delta: -4, suffix: "%", previous: `${baseScenario.confidence + 4}%`, isNegative: true },
+    { label: "Spending", current: fmt(client.profile.expensesAnnual), delta: 6, suffix: "%", previous: fmt(client.profile.expensesAnnual * 0.94), isNegative: true },
+    { label: "Equity Exposure", current: "42%", delta: 8, suffix: "pts", previous: "34%", isNegative: true },
+    { label: "Net Worth", current: fmt(totals.netWorth), delta: 3.2, suffix: "%", previous: fmt(totals.netWorth * 0.969), isNegative: false },
   ];
 
   const handleImprove = () => toast.success("Opening scenario builder to improve outcome", { description: "Adjust the sliders in Row 2 to see confidence updates live" });
@@ -549,7 +550,7 @@ const AdviserClientDashboard = ({ clientId = "thompson_family" }) => {
           <BalanceSheetCard client={client} totals={totals} />
         </div>
         <div className="lg:col-span-2">
-          <EmbeddedScenarioCard client={client} totals={totals} baseConfidence={baseScenario.confidence} />
+          <EmbeddedScenarioCard client={client} baseConfidence={baseScenario.confidence} />
         </div>
       </div>
 

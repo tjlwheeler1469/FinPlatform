@@ -37,6 +37,9 @@ Complete Your Profile: ID upload (passport/licence), TFN input (AES-256 encrypte
 ## Completed (as of 16 April 2026)
 - [x] Adviser notification customisation (10 toggles, 5 categories, MongoDB persistence)
 - [x] Client invoicing from CRM (create/send/mark paid, GST calculation)
+
+## Completed (20 April 2026) — Iteration 1 (prior batch)
+- [x] Adviser Dashboard scaled to HNW book (~$480M AUM, 47 clients, $4.52M revenue via practice_health.py)
 - [x] Client portal ID upload + TFN + info updates → Xplan (MOCKED)
 - [x] HNW numbers across all 7 profiles ($3M-$25M)
 - [x] Centralized clientData.js — all components import from single source
@@ -44,8 +47,16 @@ Complete Your Profile: ID upload (passport/licence), TFN input (AES-256 encrypte
 - [x] BAS Calculator field labels, Combined adviser client view
 - [x] All Wheeler references eliminated
 
-## Completed (20 April 2026)
-- [x] Adviser Dashboard scaled to HNW book (~$480M AUM, 47 clients, $4.52M revenue via practice_health.py)
+## Completed (20 April 2026) — Iteration 2
+- [x] **Adviser Client Dashboard complete redesign** — premium decision-density layout replacing Overview tab content:
+  - Sticky header: client identity + NW + Confidence + Risk + Live timestamp + 3 CTAs (Improve Outcome, Run Scenario, Generate Review Pack)
+  - Row 1: 3 hero cards — Retirement Readiness (confidence ring + surplus + top risk), Alerts & Exceptions (traffic-light dots), Opportunities (ranked by $ impact)
+  - Row 2: 60/40 split — Household Financial Map (grouped by asset type) + Embedded Live Scenario Engine with 3 Monte Carlo sliders (retire age, spending, contributions) that live-update confidence
+  - Row 3: Today's Priorities + Meeting Prep (with Generate Review Pack)
+  - Row 4: What Changed Since Last Review delta tiles
+- [x] Other tabs (Actions/Retirement/Investments/Budget/Goals/Tax Centre) preserved intact
+- [x] `projectRetirement` exported from ScenarioEngine for reuse
+- [x] Verified across all 7 HNW clients ($2.77M–$22.80M NW) — tested iteration_161 (100% pass)
 - [x] AdvisorCommandCenter + AdviserDashboard now derive numbers from clientData.js (single source)
 - [x] ErrorBoundary "Hard Refresh" button — clears caches/service workers, bypasses cache on reload
 - [x] lazyRetry fallback shows "Reload" + "Hard Refresh" CTAs for chunk-loading errors
