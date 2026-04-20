@@ -6,8 +6,8 @@
 export const CLIENT_FAMILY_DATA = {
   client_1: {
     familyMembers: [
-      { id: 1, name: "David Thompson", relationship: "primary", age: 50, taxableIncome: 120000, salaryIncome: 120000, dividendIncome: 3500, rentalIncome: 16000, otherIncome: 0, deductions: 5200, superBalance: 245000, isTrustBeneficiary: false, trustDistribution: 0 },
-      { id: 2, name: "Sarah Thompson", relationship: "spouse", age: 48, taxableIncome: 65000, salaryIncome: 65000, dividendIncome: 2000, rentalIncome: 16000, otherIncome: 0, deductions: 2800, superBalance: 198000, isTrustBeneficiary: false, trustDistribution: 0 },
+      { id: 1, name: "David Thompson", relationship: "primary", age: 50, taxableIncome: 320000, salaryIncome: 320000, dividendIncome: 18500, rentalIncome: 31000, otherIncome: 0, deductions: 15000, superBalance: 1850000, isTrustBeneficiary: false, trustDistribution: 0 },
+      { id: 2, name: "Sarah Thompson", relationship: "spouse", age: 48, taxableIncome: 165000, salaryIncome: 165000, dividendIncome: 9800, rentalIncome: 31000, otherIncome: 0, deductions: 8000, superBalance: 1420000, isTrustBeneficiary: false, trustDistribution: 0 },
     ],
     trust: { name: "Thompson Family Trust", type: "discretionary", netIncome: 0, financialYear: "2024-25", companyDividendsReceived: 0 },
     company: { name: "Thompson Investments Pty Ltd", abn: "12 345 678 901", acn: "123 456 789", isBaseRateEntity: true, taxRate: 0.25, frankingAccountBalance: 0, retainedEarnings: 0, financialYear: "2024-25" },

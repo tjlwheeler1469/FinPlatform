@@ -23,15 +23,15 @@ const SG_RATE = 12.0; // Current SG rate %
 const CONCESSIONAL_CAP = 30000; // 2025-26 concessional cap
 
 const SuperannuationGuarantee = ({ embedded = false }) => {
-  // Personal inputs matching Thompson family
+  // Personal inputs matching Thompson family (aligned with CLIENT_DATA)
   const [currentAge, setCurrentAge] = useState(50);
   const [retirementAge, setRetirementAge] = useState(67);
-  const [superBalance, setSuperBalance] = useState(245000); // David's AustralianSuper
-  const [spouseBalance, setSpouseBalance] = useState(198000); // Sarah's REST Super
-  const [salary, setSalary] = useState(120000);
-  const [spouseSalary, setSpouseSalary] = useState(65000);
-  const [voluntaryContrib, setVoluntaryContrib] = useState(5000);
-  const [spouseVoluntary, setSpouseVoluntary] = useState(2000);
+  const [superBalance, setSuperBalance] = useState(1850000); // David's AustralianSuper
+  const [spouseBalance, setSpouseBalance] = useState(1420000); // Sarah's REST Super
+  const [salary, setSalary] = useState(320000);
+  const [spouseSalary, setSpouseSalary] = useState(165000);
+  const [voluntaryContrib, setVoluntaryContrib] = useState(27500);
+  const [spouseVoluntary, setSpouseVoluntary] = useState(15000);
   const [investmentReturn, setInvestmentReturn] = useState(7.0);
   const [inflation, setInflation] = useState(3.0);
   const [salaryGrowth, setSalaryGrowth] = useState(2.5);

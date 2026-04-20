@@ -22,30 +22,18 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-// Demo cash and term deposit data
+// Cash & TDs aligned with CLIENT_DATA.thompson_family: ING Emergency Fund $180k, Westpac 12m TD $350k
 const DEMO_ACCOUNTS = [
   {
     id: 1,
-    name: "High Interest Savings",
+    name: "Emergency Fund",
     bank: "ING",
     type: "savings",
-    balance: 45000,
+    balance: 180000,
     interestRate: 5.50,
     bonusRate: 0.55,
     effectiveRate: 5.50,
-    interestEarned: 1850,
-    lastInterestPaid: "2025-11-30"
-  },
-  {
-    id: 2,
-    name: "Emergency Fund",
-    bank: "Ubank",
-    type: "savings",
-    balance: 25000,
-    interestRate: 5.10,
-    bonusRate: 0,
-    effectiveRate: 5.10,
-    interestEarned: 980,
+    interestEarned: 7830,
     lastInterestPaid: "2025-11-30"
   }
 ];
@@ -54,37 +42,13 @@ const DEMO_TERM_DEPOSITS = [
   {
     id: 1,
     name: "12 Month TD",
-    bank: "Judo Bank",
-    principal: 100000,
-    interestRate: 5.15,
+    bank: "Westpac",
+    principal: 350000,
+    interestRate: 4.65,
     term: 12,
     startDate: "2025-01-15",
     maturityDate: "2026-01-15",
-    interestAtMaturity: 5150,
-    status: "active"
-  },
-  {
-    id: 2,
-    name: "6 Month TD",
-    bank: "Macquarie",
-    principal: 50000,
-    interestRate: 4.95,
-    term: 6,
-    startDate: "2025-09-01",
-    maturityDate: "2026-03-01",
-    interestAtMaturity: 1237.50,
-    status: "active"
-  },
-  {
-    id: 3,
-    name: "9 Month TD",
-    bank: "BOQ",
-    principal: 30000,
-    interestRate: 5.05,
-    term: 9,
-    startDate: "2025-06-15",
-    maturityDate: "2026-03-15",
-    interestAtMaturity: 1136.25,
+    interestAtMaturity: 16275,
     status: "active"
   }
 ];
