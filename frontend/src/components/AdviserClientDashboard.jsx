@@ -512,52 +512,50 @@ const AdviserClientDashboard = ({ clientId = "thompson_family" }) => {
       {/* GLOBAL HEADER — sticky, premium */}
       <Card className="border-2 border-[#1a2744]/20 sticky top-2 z-20 shadow-sm" data-testid="client-dashboard-header">
         <CardContent className="p-4">
-          <div className="flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-8">
+          <div className="flex flex-col xl:flex-row xl:items-center gap-4 xl:gap-6">
             {/* Client identity */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#1a2744] to-[#2a3a5c] flex items-center justify-center text-white text-sm font-semibold">
-                  {client.profile.first_name?.[0]}{client.profile.last_name?.[0]}
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-[#1a2744] leading-tight" data-testid="header-client-name">{client.profile.name}</p>
-                  <p className="text-[11px] text-muted-foreground">{client.profile.status} · Age {client.profile.age} · {client.profile.riskProfile}</p>
-                </div>
+            <div className="flex items-center gap-3 min-w-0 xl:min-w-[220px]">
+              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#1a2744] to-[#2a3a5c] flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
+                {client.profile.first_name?.[0]}{client.profile.last_name?.[0]}
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-[#1a2744] leading-tight truncate" data-testid="header-client-name" title={client.profile.name}>{client.profile.name}</p>
+                <p className="text-[11px] text-muted-foreground truncate">{client.profile.status} · Age {client.profile.age} · {client.profile.riskProfile}</p>
               </div>
             </div>
 
-            {/* Metrics inline */}
-            <div className="grid grid-cols-4 gap-4 flex-1">
-              <div>
-                <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Net Worth</p>
-                <p className="text-base font-bold text-[#1a2744]" data-testid="header-net-worth">{fmt(totals.netWorth)}</p>
+            {/* Metrics inline — flex-wrap instead of rigid grid */}
+            <div className="flex flex-wrap gap-5 sm:gap-7 flex-1 items-center">
+              <div className="flex-shrink-0 min-w-[88px]">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wide leading-tight">Net Worth</p>
+                <p className="text-base font-bold text-[#1a2744] leading-tight" data-testid="header-net-worth">{fmt(totals.netWorth)}</p>
               </div>
-              <div>
-                <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Confidence</p>
-                <p className="text-base font-bold text-emerald-700" data-testid="header-confidence">{baseScenario.confidence}%</p>
+              <div className="flex-shrink-0 min-w-[88px]">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wide leading-tight">Confidence</p>
+                <p className="text-base font-bold text-emerald-700 leading-tight" data-testid="header-confidence">{baseScenario.confidence}%</p>
               </div>
-              <div>
-                <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Risk</p>
-                <p className="text-base font-bold text-gray-800" data-testid="header-risk">{client.profile.riskProfile}</p>
+              <div className="flex-shrink-0 min-w-[88px]">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wide leading-tight">Risk</p>
+                <p className="text-base font-bold text-gray-800 leading-tight" data-testid="header-risk">{client.profile.riskProfile}</p>
               </div>
-              <div>
-                <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Updated</p>
-                <p className="text-xs font-semibold text-gray-700 flex items-center gap-1" data-testid="header-updated">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live · {lastUpdatedText}
+              <div className="flex-shrink-0 min-w-[110px]">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wide leading-tight">Updated</p>
+                <p className="text-xs font-semibold text-gray-700 flex items-center gap-1 leading-tight whitespace-nowrap" data-testid="header-updated">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" /> Live · {lastUpdatedText}
                 </p>
               </div>
             </div>
 
             {/* CTAs */}
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex gap-2 flex-wrap xl:flex-nowrap flex-shrink-0">
               <Button size="sm" variant="outline" onClick={handleImprove} data-testid="cta-improve-outcome">
-                <Sparkles className="h-3.5 w-3.5 mr-1" /> Improve Outcome
+                <Sparkles className="h-3.5 w-3.5 mr-1" /> Improve
               </Button>
               <Button size="sm" variant="outline" onClick={handleRunScenario} data-testid="cta-run-scenario">
-                <Activity className="h-3.5 w-3.5 mr-1" /> Run Scenario
+                <Activity className="h-3.5 w-3.5 mr-1" /> Scenario
               </Button>
               <Button size="sm" className="bg-[#1a2744] hover:bg-[#1a2744]/90" onClick={handleGeneratePack} data-testid="cta-generate-review-pack">
-                <FileText className="h-3.5 w-3.5 mr-1" /> Generate Review Pack
+                <FileText className="h-3.5 w-3.5 mr-1" /> Review Pack
               </Button>
             </div>
           </div>
