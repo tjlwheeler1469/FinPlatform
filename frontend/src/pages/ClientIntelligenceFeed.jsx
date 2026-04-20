@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Layout from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -78,16 +79,19 @@ const ClientIntelligenceFeed = () => {
 
   if (isLoading) {
     return (
-      <div className="p-6 flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground" />
-          <p className="text-muted-foreground">Loading AI insights...</p>
+      <Layout>
+        <div className="p-6 flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground" />
+            <p className="text-muted-foreground">Loading AI insights...</p>
+          </div>
         </div>
-      </div>
+      </Layout>
     );
   }
 
   return (
+    <Layout>
     <div className="p-6 space-y-6" data-testid="intelligence-feed-page">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -310,6 +314,7 @@ const ClientIntelligenceFeed = () => {
         </Card>
       </div>
     </div>
+    </Layout>
   );
 };
 

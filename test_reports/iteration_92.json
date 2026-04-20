@@ -52,7 +52,7 @@
     "frontend": "100% (CRM, Macro Dashboard, Scenario Modelling all working)"
   },
   "test_credentials": {
-    "preview_url": "https://scenario-simulator-5.preview.emergentagent.com"
+    "preview_url": "https://decision-density-ui.preview.emergentagent.com"
   },
   "seed_data_creation": "None - using existing demo data",
   "retest_needed": false,

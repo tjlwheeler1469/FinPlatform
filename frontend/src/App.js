@@ -1117,7 +1117,7 @@ const AppRouter = () => {
       <Route path="/notification-settings" element={<NotificationSettings />} />
       <Route path="/data-import-export" element={<DataImportExportPage />} />
       <Route path="/investment-comparison" element={<Navigate to="/stock-research" replace />} />
-      <Route path="/decision-engine" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/decision-engine" element={<DecisionEngine />} />
       <Route path="/decision-dashboard" element={<DecisionDashboard />} />
       <Route path="/life-timeline" element={<LifeTimelinePlanner />} />
       <Route path="/timeline" element={<LifeTimeline />} />
@@ -1146,8 +1146,8 @@ const AppRouter = () => {
       {/* AI routes - consolidate to primary */}
       <Route path="/ai-copilot" element={<Navigate to="/ai-copilot-advanced" replace />} />
       <Route path="/decision-center" element={<DecisionCenter />} />
-      <Route path="/client-insights" element={<Navigate to="/ai-copilot-advanced" replace />} />
-      <Route path="/intelligence-feed" element={<Navigate to="/ai-copilot-advanced" replace />} />
+      <Route path="/client-insights" element={<ClientIntelligenceFeed />} />
+      <Route path="/intelligence-feed" element={<ClientIntelligenceFeed />} />
       <Route path="/ai-insights" element={<Navigate to="/ai-copilot-advanced" replace />} />
       <Route path="/client-portal" element={<SimpleClientPortal />} />
       
@@ -1190,8 +1190,8 @@ const AppRouter = () => {
       {/* Workflow Engine */}
       <Route path="/workflows" element={<WorkflowDashboard />} />
       
-      {/* Book Intelligence — consolidated into Daily Briefing */}
-      <Route path="/book-intelligence" element={<Navigate to="/daily-briefing" replace />} />
+      {/* Book Intelligence — now reachable for Take Action deep links */}
+      <Route path="/book-intelligence" element={<BookIntelligence />} />
       
       {/* Meeting Automation */}
       <Route path="/meeting-automation" element={<MeetingAutomation />} />
