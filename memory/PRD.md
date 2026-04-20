@@ -11,6 +11,16 @@ Build an AFSL-grade wealth management platform for HNW clients with consolidated
 - **Centralized Data**: `/app/frontend/src/data/clientData.js`
 
 
+## Completed (20 April 2026) — Iteration 7 (Current)
+- [x] **P0: Fixed Retirement Confidence calculations** — Created new `/app/frontend/src/lib/retirementEngine.js` Monte Carlo engine with 29 unit tests (all passing): monotonicity, weak/strong plan confidence, zero-vol determinism, NaN guardrails, percentile ordering, legacy goal support, glide-path in drawdown.
+- [x] **P0: New RetirementWorkshop page** at `/retirement-confidence` — full adviser inputs (Budget/Invest/Goals/Assumptions tabs per scenario), multi-scenario side-by-side (up to 5), live Monte Carlo recompute on any input change, P10/P50/P90 confidence bands chart, comparison table. Loads from active client in CLIENT_DATA.
+- [x] **Fixed Client Portal** — `/client-portal` now renders UnifiedDashboard (rich client view with Net Worth, 6 tabs, Retirement Readiness, Quick Actions, Asset Allocation, Complete Your Profile). Previously blank/too sparse.
+- [x] **P1: Orphaned routes wired** — `/decision-engine`, `/book-intelligence`, `/client-insights`, `/intelligence-feed` now reachable (were Navigate-redirected). All Take Action buttons verified navigating to `/next-best-actions`.
+- [x] **Bug fix**: DecisionEngine recommendations expansion (map used undefined `insight` variable inside `rec` loop — 5 refs renamed, `e.stopPropagation()` added to CTAs).
+- [x] Legacy RetirementConfidence preserved at `/retirement-confidence-legacy` + alias `/retirement-workshop`.
+- Testing: Frontend testing agent iteration 168 — 12/12 feature groups pass (100%).
+
+
 ## Completed (20 April 2026) — Iteration 6
 - [x] Smart Insights clickable, SimpleClientPortal, SimpleGoals, SimpleBudget — see previous entries
 ## HNW Client Profiles
