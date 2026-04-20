@@ -11,7 +11,18 @@ Build an AFSL-grade wealth management platform for HNW clients with consolidated
 - **Centralized Data**: `/app/frontend/src/data/clientData.js`
 
 
-## Completed (20 April 2026) — Iteration 9 (Current)
+## Completed (20 April 2026) — Iteration 10 (Current)
+- [x] **Full unified pages now embedded in adviser Client360View** (replacing the lighter Simple* components):
+  - **Retirement tab** ← `/retirement-confidence` → RetirementWorkshop (already in place)
+  - **Budget tab** ← `/budget` → HouseholdBudget (full budget tool with expense categories, cashflow, charts)
+  - **Investments tab** ← `/investments` → UnifiedInvestments (9 sub-tabs: Shares/Bonds/Property/Crypto/Cash/Super/SMSF/Managed/Unlisted)
+  - **Tax tab** ← `/tax-analysis-sync` → UnifiedTaxCentre (full tax centre)
+  - **Goals tab** ← SimpleGoals (user did not request a full-page replacement)
+- All use `embedded` prop so they fit inside Radix TabsContent without duplicate Layout wrappers.
+- Testing: Frontend testing agent iteration 171 — 7/7 pass (100%).
+- Non-blocking carry-overs: (i) $1.61M header vs $11.67M embedded content (DEMO_CLIENT_DATA vs CLIENT_DATA split); (ii) pre-existing Recharts width(-1) warnings.
+
+## Completed (20 April 2026) — Iteration 9
 - [x] **Personal/Client tabs replicated onto Adviser's Client Profile** — Client360View (`/client-360`) gained 4 new tabs embedding the same Simple* components used on Personal/Client views: Budget (`SimpleBudget`), Goals (`SimpleGoals`), Investments (`SimpleInvestments`), Tax (`SimpleTax`). Full list is now 14 tabs: Overview · Retirement · Budget · Goals · Investments · Tax · Profile & Inputs · Holdings · Performance · Accounts · Activity · Documents · Timeline · Contact.
 - [x] Embedded components receive `clientId` prop and render the same data as when viewed in Personal/Client mode (via `CLIENT_DATA.client_1 = CLIENT_DATA.thompson_family` alias).
 - Testing: Frontend testing agent iteration 170 — 8/8 pass (100%).
