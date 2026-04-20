@@ -1,0 +1,43 @@
+{
+  "summary": "Iteration 167 frontend validation. Banner self-correction, sidebar normalization, ClientCRM navigation, AdviserDashboard viewClientPortal, and new AdviserScenarioWorkshop (4 sliders + chart + table) all PASS end-to-end. However the 3 Take Action wirings the main agent added in BookIntelligence / ClientIntelligenceFeed / DecisionEngine are UNREACHABLE — those components are imported but never mounted by any route in App.js. The paths mentioned in the review request (/book-intelligence, /intelligence, /decision-center) currently resolve to different components (redirect to /daily-briefing, IntelligenceEngine, DecisionCenter respectively), so the newly-added bookintel-take-action-*, intel-take-action-*, intel-schedule-*, decision-take-action-*, decision-learn-* testids never render in the live app and cannot be validated. All other regression checks (SimpleClientPortal on /client-portal, FloatingActionRail on 6 pages) pass.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {
+        "flow": "BookIntelligence Take Action",
+        "issue": "/book-intelligence is declared as <Navigate to='/daily-briefing' replace /> in App.js line 1194, so the BookIntelligence page with data-testid='bookintel-take-action-*' is unreachable. Take Action wiring added in BookIntelligence.jsx line ~246 cannot be used.",
+        "affected_selectors": ["[data-testid^=\"bookintel-take-action-\"]"]
+      },
+      {
+        "flow": "ClientIntelligenceFeed Take Action / Schedule",
+        "issue": "/intelligence route (App.js line 1167) is bound to IntelligenceEngine, not ClientIntelligenceFeed. The data-testid='intel-take-action-*' and 'intel-schedule-*' buttons live only in ClientIntelligenceFeed.jsx (no route references it anywhere). Buttons are not clickable because the component is never mounted.",
+        "affected_selectors": ["[data-testid^=\"intel-take-action-\"]", "[data-testid^=\"intel-schedule-\"]"]
+      },
+      {
+        "flow": "DecisionEngine Take Action / Learn More",
+        "issue": "/decision-center (App.js line 1148) is bound to DecisionCenter (scenario controls page), not DecisionEngine. The data-testid='decision-take-action-*' and 'decision-learn-*' buttons in DecisionEngine.jsx are unreachable.",
+        "affected_selectors": ["[data-testid^=\"decision-take-action-\"]", "[data-testid^=\"decision-learn-\"]"]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Decide routing strategy for the 3 new Take Action wirings. Options: (a) rebind /book-intelligence → BookIntelligence, /intelligence → ClientIntelligenceFeed, /decision-center → DecisionEngine; (b) keep current routes and move the Take Action wiring into IntelligenceEngine / DecisionCenter / DailyBriefing instead; (c) add new alias routes like /book-intelligence-feed, /client-intelligence, /decision-engine. Once the components are actually rendered, re-test the 5 testid groups above.",
+    "(Nice-to-have) AdviserScenarioWorkshop baseline for Williams client_4 shows 97% confidence, spec expected ~92%. Thompson baseline = 100% (spec expected 99% ceiling — close). Not blocking but worth a quick param check if precise numbers matter for the narrative."
+  ],
+  "critical_code_review_comments": [
+    "App.js imports DecisionEngine (line 124), ClientIntelligenceFeed (line 151), BookIntelligence (line 197) but never references them in a <Route> — tree-shaken-bundles aside, this is dead code and should either be routed or removed. Currently no URL surfaces the Take Action buttons the main agent added in those files.",
+    "AdviserScenarioWorkshop.jsx uses 300 Monte Carlo sims client-side on every slider tick (onValueChange). On low-end devices this may feel laggy. Consider debouncing the setState or reducing SIMS to 150.",
+    "AdviserScenarioWorkshop confidence can hit 100% (no cap). The narrative mentions a '99% ceiling' — no ceiling is enforced in code; Thompson naturally simulates at 100%. If a cap is required, enforce it in simulateProjection.",
+    "navigateToClient helper is clean and correct — single source of truth for slug resolution + localStorage write + navigate. Good pattern."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (skipped)", "frontend": "~70% — 5 of 8 feature groups fully pass; 3 Take Action routes unreachable"},
+  "seed_data_creation": "localStorage: app_mode='adviser', wealth_command_compliance_v5='permanent'. Also tested with STALE selected_client={id:'client_4',name:'Thompson Family',aum:1200000} to validate banner self-correction.",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Banner self-correction + sidebar normalization VERIFIED: stale localStorage with id=client_4+name='Thompson Family'+aum=1200000 is overridden to 'Emma & David Williams' / '$4.0M' from CLIENT_DATA on both the top banner and the DesktopSidebar. ClientCRM first card click → /dashboard VERIFIED. AdviserScenarioWorkshop on /dashboard Retirement tab fully works: 4 sliders (budget/retire-age/contributions/volatility), live chart (ComposedChart with P10/P50/P90), comparison table with Current Plan vs Your Scenario rows, ws-summary badge showing confidence delta (e.g. '-31% vs current' when lowering retirement age). Thompson initial = 100%, Williams initial = 97%. FloatingActionRail confirmed on /daily-briefing, /meeting-prep, /adviser-hub, /tax-centre, /next-best-actions, /decision-center. UNRESOLVED: routes /book-intelligence, /intelligence, /decision-center do NOT render the components containing the new Take Action testids. Main agent must decide whether to rewire routes or move Take Action wiring elsewhere.",
+  "rca of the issue": "App.js currently has: line 1148 '/decision-center' → <DecisionCenter /> (NOT DecisionEngine); line 1167 '/intelligence' → <IntelligenceEngine /> (NOT ClientIntelligenceFeed); line 1194 '/book-intelligence' → <Navigate to='/daily-briefing' replace />. The three components DecisionEngine, ClientIntelligenceFeed, BookIntelligence are imported with lazyRetry but have zero <Route> references in App.js (grep confirmed). The review request assumed these URLs render the newly-wired components, but the actual route bindings have drifted. Reproduction: open /book-intelligence in browser → lands on /daily-briefing. Open /intelligence → shows 'Intelligence Engine' page with 5 tabs, no 'intel-take-action-*' testids exist in the DOM. Open /decision-center → shows 'Decision Center' scenario controls page, no 'decision-take-action-*' testids exist. Mitigation: either wire Routes for the three components, or move the Take Action handlers into the currently-routed IntelligenceEngine / DecisionCenter / DailyBriefing pages so the wiring is reachable."
+}

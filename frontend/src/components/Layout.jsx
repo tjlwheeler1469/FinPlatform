@@ -10,6 +10,7 @@ import { usePortfolio } from "@/App";
 import DesktopSidebar from "@/components/layout/DesktopSidebar";
 import MobileMenu from "@/components/layout/MobileMenu";
 import { personalNavGroups, adviserBaseNav, clientContextNav, clientPortalNav, allNavItems } from "@/components/layout/navData";
+import { CLIENT_DATA, computeClientTotals } from "@/data/clientData";
 
 const Layout = ({ children }) => {
   const location = useLocation();
@@ -21,7 +22,22 @@ const Layout = ({ children }) => {
   const [meetingMode, setMeetingMode] = useState(() => localStorage.getItem("meeting_mode") === "true");
   const [selectedClient, setSelectedClient] = useState(() => {
     const saved = localStorage.getItem("selected_client");
-    return saved ? JSON.parse(saved) : null;
+    if (!saved) return null;
+    try {
+      const parsed = JSON.parse(saved);
+      // Normalize against CLIENT_DATA so stale name/aum always self-correct
+      const slug = parsed?.id || parsed?.client_id;
+      if (slug && CLIENT_DATA[slug]) {
+        const canonical = CLIENT_DATA[slug];
+        return {
+          ...parsed,
+          id: slug,
+          name: canonical.profile.name,
+          aum: computeClientTotals(slug).grossAssets,
+        };
+      }
+      return parsed;
+    } catch { return null; }
   });
   const [expandedGroups, setExpandedGroups] = useState({});
   const [touchStart, setTouchStart] = useState(null);
@@ -149,18 +165,26 @@ const Layout = ({ children }) => {
 
       {/* Main Content */}
       <main id="main-content" className={cn("flex-1 min-h-screen transition-all duration-300 overflow-y-auto", "pt-14 pb-20 lg:pt-0 lg:pb-0", sidebarCollapsed ? "lg:ml-16" : "lg:ml-64")}>
-        {appMode === "adviser" && selectedClient && (
+        {appMode === "adviser" && selectedClient && (() => {
+          // Single source of truth: if the selected client slug maps to CLIENT_DATA,
+          // derive name & AUM from there so the banner can never drift from page content.
+          const slug = selectedClient.id || selectedClient.client_id;
+          const canonical = slug && CLIENT_DATA[slug] ? CLIENT_DATA[slug] : null;
+          const name = canonical?.profile?.name || selectedClient.name || "Client";
+          const aum = canonical ? computeClientTotals(slug).grossAssets : selectedClient.aum;
+          return (
           <div className="bg-[#D4A84C] text-black px-4 py-2 flex items-center justify-between" data-testid="client-context-banner">
             <div className="flex items-center gap-3">
               <Users className="h-5 w-5" />
-              <span className="font-semibold">Viewing: {selectedClient.name}</span>
-              {selectedClient.aum && <Badge className="bg-black/10 text-black border-0">AUM: ${(selectedClient.aum / 1000000).toFixed(1)}M</Badge>}
+              <span className="font-semibold">Viewing: {name}</span>
+              {aum ? <Badge className="bg-black/10 text-black border-0">AUM: ${(aum / 1000000).toFixed(1)}M</Badge> : null}
             </div>
             <Button variant="ghost" size="sm" onClick={handleClearClient} className="hover:bg-black/10 text-black" data-testid="exit-client-view-btn">
               <X className="h-4 w-4 mr-1" />Exit Client View
             </Button>
           </div>
-        )}
+          );
+        })()}
         {meetingMode && (
           <div className="bg-amber-500 text-black px-4 py-2 flex items-center justify-between" data-testid="meeting-mode-banner">
             <div className="flex items-center gap-3">

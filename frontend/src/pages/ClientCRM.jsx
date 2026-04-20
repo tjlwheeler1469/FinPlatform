@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
+import { navigateToClient } from "@/lib/navigateToClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -77,17 +78,10 @@ const ClientCRM = () => {
   const [activeTab, setActiveTab] = useState('clients');
   const [selectedClient, setSelectedClient] = useState(null);
 
-  // Handle selecting a client - save to localStorage for Layout to pick up
+  // Handle selecting a client — use the platform helper to ensure single source of truth + navigate to LHS Dashboard
   const handleSelectClient = (client) => {
     setSelectedClient(client);
-    // Save to localStorage so Layout can show client-specific navigation
-    localStorage.setItem("selected_client", JSON.stringify({
-      id: client.client_id,
-      name: client.name,
-      email: client.email
-    }));
-    // Navigate to the client's 360 view
-    navigate("/client-360");
+    navigateToClient(navigate, client.client_id || client.id || client.name);
   };
 
   useEffect(() => {

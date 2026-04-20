@@ -50,6 +50,7 @@ import { toast } from "sonner";
 import { ComplianceFooter } from "@/components/ComplianceDisclaimer";
 import ChartContainer from "@/components/ChartContainer";
 import { CLIENT_DATA, computeClientTotals } from "@/data/clientData";
+import { navigateToClient } from "@/lib/navigateToClient";
 import {
   BarChart,
   Bar,
@@ -209,15 +210,7 @@ const AdviserDashboard = () => {
 
   const viewClientPortal = (clientId) => {
     const client = clients.find(c => c.id === clientId);
-    if (client) {
-      localStorage.setItem("active_client_id", client.slug || clientId.toString());
-      localStorage.setItem("selected_client", JSON.stringify({
-        id: client.slug || client.id,
-        name: client.name,
-        aum: client.totalAssets
-      }));
-    }
-    navigate("/client-360");
+    navigateToClient(navigate, client?.slug || clientId);
   };
 
   const viewClientCompliance = (clientId) => {

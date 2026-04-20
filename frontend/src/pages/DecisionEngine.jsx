@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
+import { navigateToClient } from "@/lib/navigateToClient";
+import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -368,10 +370,20 @@ const DecisionEngine = ({ embedded = false }) => {
 
                         {/* CTA */}
                         <div className="flex justify-end gap-2 mt-4 pt-4 border-t">
-                          <Button variant="outline" size="sm">
+                          <Button variant="outline" size="sm"
+                            onClick={() => { toast.info(`Learn more: ${insight.title || 'Insight details'}`); }}
+                            data-testid={`decision-learn-${insight.id}`}
+                          >
                             Learn More
                           </Button>
-                          <Button size="sm" className="bg-[#1a2744] hover:bg-[#1a2744]/90">
+                          <Button size="sm" className="bg-[#1a2744] hover:bg-[#1a2744]/90"
+                            onClick={() => {
+                              const slug = insight.client_id || insight.client_name;
+                              if (slug) navigateToClient(navigate, slug);
+                              else navigate('/next-best-actions');
+                            }}
+                            data-testid={`decision-take-action-${insight.id}`}
+                          >
                             Take Action
                             <ArrowRight className="h-4 w-4 ml-2" />
                           </Button>

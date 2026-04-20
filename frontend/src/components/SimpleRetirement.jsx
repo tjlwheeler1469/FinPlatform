@@ -11,6 +11,7 @@ import {
 import { CLIENT_DATA, getActiveClientId } from "@/data/clientData";
 import { projectRetirement } from "@/components/ScenarioEngine";
 import { generateReviewPackPDF } from "@/lib/pdfGenerator";
+import AdviserScenarioWorkshop from "@/components/AdviserScenarioWorkshop";
 
 const fmt = (v) => {
   const abs = Math.abs(v || 0);
@@ -238,6 +239,12 @@ const SimpleRetirement = ({ clientId: propClientId, embedded = false }) => {
             <Activity className="h-4 w-4 mr-2" />
             Generate Review Pack
           </Button>
+        </div>
+
+        {/* SECTION 6 — ADVISER SCENARIO WORKSHOP (live forecasting) */}
+        <div className="pt-4" data-testid="retirement-workshop-wrap">
+          <p className="text-[11px] text-muted-foreground uppercase tracking-wide font-semibold mb-3">Adviser scenario workshop</p>
+          <AdviserScenarioWorkshop clientId={clientId} />
         </div>
       </div>
     </div>

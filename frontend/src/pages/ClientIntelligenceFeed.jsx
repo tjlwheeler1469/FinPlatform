@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { navigateToClient } from "@/lib/navigateToClient";
 import { 
   Sparkles, 
   AlertTriangle, 
@@ -52,6 +54,7 @@ const getPriorityBadgeColor = (priority) => {
 };
 
 const ClientIntelligenceFeed = () => {
+  const navigate = useNavigate();
   const [insights, setInsights] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedInsight, setSelectedInsight] = useState(null);
@@ -274,10 +277,22 @@ const ClientIntelligenceFeed = () => {
                       </div>
 
                       <div className="flex gap-2">
-                        <Button className="flex-1 bg-[#1a2744] hover:bg-[#1a2744]/90">
+                        <Button
+                          className="flex-1 bg-[#1a2744] hover:bg-[#1a2744]/90"
+                          onClick={() => {
+                            const firstClient = insight.clients?.[0];
+                            const slug = firstClient?.client_id || firstClient?.id || firstClient?.name;
+                            if (slug) navigateToClient(navigate, slug);
+                            else navigate('/next-best-actions');
+                          }}
+                          data-testid={`intel-take-action-${insight.id}`}
+                        >
                           Take Action
                         </Button>
-                        <Button variant="outline" className="flex-1">
+                        <Button variant="outline" className="flex-1"
+                          onClick={() => { toast.success('Follow-up scheduled'); }}
+                          data-testid={`intel-schedule-${insight.id}`}
+                        >
                           Schedule Follow-up
                         </Button>
                       </div>

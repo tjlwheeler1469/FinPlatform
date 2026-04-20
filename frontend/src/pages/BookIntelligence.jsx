@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -6,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import Layout from "@/components/Layout";
+import { navigateToClient } from "@/lib/navigateToClient";
 import {
   Brain,
   TrendingUp,
@@ -27,6 +29,7 @@ import {
 const API_URL = import.meta.env.VITE_API_URL || process.env.REACT_APP_BACKEND_URL;
 
 const BookIntelligence = () => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [overview, setOverview] = useState(null);
   const [insights, setInsights] = useState([]);
@@ -233,7 +236,15 @@ const BookIntelligence = () => {
                         )}
                       </div>
                     </div>
-                    <Button size="sm">
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        const slug = insight.client_id || insight.affected_client_id || insight.client_name;
+                        if (slug) navigateToClient(navigate, slug);
+                        else navigate('/next-best-actions');
+                      }}
+                      data-testid={`bookintel-take-action-${insight.id || insight.title?.replace(/\s/g,'-').toLowerCase()}`}
+                    >
                       Take Action
                       <ArrowRight className="h-4 w-4 ml-1" />
                     </Button>
