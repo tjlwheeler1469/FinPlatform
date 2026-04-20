@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { toast } from "sonner";
 import {
-  Sparkles, Activity, TrendingUp, AlertTriangle, CheckCircle2, ArrowRight, Zap,
+  Sparkles, Activity, TrendingUp, AlertTriangle, ArrowRight, Zap,
 } from "lucide-react";
 import { CLIENT_DATA, getActiveClientId } from "@/data/clientData";
 import { projectRetirement } from "@/components/ScenarioEngine";

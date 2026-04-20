@@ -31,6 +31,9 @@ Connected flow: Budget → Investments → Portfolio → Retirement with 500 MC 
 ## Completed (20 April 2026) — Iteration 3
 - [x] Scenario volatility slider (σ), jsPDF invoices, jsPDF Review Pack, Adviser Command Center client deep-links, platform primitives (PageShell/ActionRail/WhatChangedPanel) — see previous entries
 
+## Completed (20 April 2026) — Iteration 4
+- [x] FloatingActionRail on 5 pages, embedded ScenarioEngine on Portfolio Analyzer, sidebar consolidated to 10-page architecture — see previous entries
+
 ### Adviser Notification Customisation
 Toggle-based: review due, market alerts, compliance, client contact, portfolio rebalance, FDS, document signed, onboarding, insurance, birthdays
 
@@ -53,7 +56,16 @@ Complete Your Profile: ID upload (passport/licence), TFN input (AES-256 encrypte
 - [x] BAS Calculator field labels, Combined adviser client view
 - [x] All Wheeler references eliminated
 
-## Completed (20 April 2026) — Iteration 4
+## Completed (20 April 2026) — Iteration 5
+- [x] **Dashboard header overflow FIXED** — the sticky Adviser Client Dashboard header no longer overlaps labels/values. Uses `lg:flex-row` (1024px+) with flex-wrap metrics and shortened CTAs (Improve/Scenario/Review Pack).
+- [x] **Retirement page simplified to 5 sections** per spec (`SimpleRetirement.jsx`):
+  1. **Hero Status** — huge confidence % + On Track / Close / At Risk label + one-line summary
+  2. **Main Risk** — single dominant risk only, derived from client data (sequencing / drawdown / volatility)
+  3. **Biggest Improvement** — exactly 2 improvement cards with +% confidence boost
+  4. **One Visual** — single ConfidenceGauge SVG semicircle (no Monte Carlo histograms, no dense tables)
+  5. **Primary CTA** — Improve My Plan (reveals inline age slider) + Generate Review Pack
+- [x] Replaced legacy `RetirementConfidence` (1479 lines) with `SimpleRetirement` (~210 lines) on the Client Overview retirement tab; legacy `/retirement-confidence` route preserved for backwards compat
+- [x] Verified via testing agent iteration_164 — 100% pass across Thompson (99%), Williams/client_4 (94%), all 14 testids render, SVG gauge + inline slider working
 - [x] **FloatingActionRail** created and applied to 5 highest-traffic pages: `/intelligence`, `/portfolio-analyzer`, `/strategic-planning`, `/next-best-actions`, `/decision-center`
   - Every rail has Generate Review Pack CTA (jsPDF), Recommendations (top-3 by impact), Next Best Actions, Meeting Prep
   - Collapsible via X → re-expands via gold pill tab

@@ -512,9 +512,9 @@ const AdviserClientDashboard = ({ clientId = "thompson_family" }) => {
       {/* GLOBAL HEADER — sticky, premium */}
       <Card className="border-2 border-[#1a2744]/20 sticky top-2 z-20 shadow-sm" data-testid="client-dashboard-header">
         <CardContent className="p-4">
-          <div className="flex flex-col xl:flex-row xl:items-center gap-4 xl:gap-6">
+          <div className="flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-6">
             {/* Client identity */}
-            <div className="flex items-center gap-3 min-w-0 xl:min-w-[220px]">
+            <div className="flex items-center gap-3 min-w-0 lg:min-w-[220px]">
               <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#1a2744] to-[#2a3a5c] flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
                 {client.profile.first_name?.[0]}{client.profile.last_name?.[0]}
               </div>
@@ -547,7 +547,7 @@ const AdviserClientDashboard = ({ clientId = "thompson_family" }) => {
             </div>
 
             {/* CTAs */}
-            <div className="flex gap-2 flex-wrap xl:flex-nowrap flex-shrink-0">
+            <div className="flex gap-2 flex-wrap lg:flex-nowrap flex-shrink-0">
               <Button size="sm" variant="outline" onClick={handleImprove} data-testid="cta-improve-outcome">
                 <Sparkles className="h-3.5 w-3.5 mr-1" /> Improve
               </Button>
