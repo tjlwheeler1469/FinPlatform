@@ -11,7 +11,16 @@ Build an AFSL-grade wealth management platform for HNW clients with consolidated
 - **Centralized Data**: `/app/frontend/src/data/clientData.js`
 
 
-## Completed (20 April 2026) — Iteration 12 (Current)
+## Completed (20 April 2026) — Iteration 13 (Current)
+- [x] **Data consistency fix across Investments sub-tabs** — User-reported bug: Overview donut showed Shares $845k but Shares & ETFs sub-tab showed $84,500. Root cause: 3 parallel mock data sources (CLIENT_DATA in clientData.js, CLIENT_PORTFOLIO_DATA + DEFAULT_SHARE_PORTFOLIO in portfolioSeedData.js, hardcoded DEMO_ACCOUNTS/DEMO_TERM_DEPOSITS in CashDeposits.jsx, local useState in SuperannuationGuarantee.jsx). All aligned to CLIENT_DATA.thompson_family:
+  - **Shares & ETFs** — VGH 4000@$105, BHP 4000@$46.25, CBA 2000@$120 = $845,000
+  - **Cash & TDs** — ING Emergency Fund $180,000 + Westpac 12m TD $350,000 = $530,000
+  - **Super & Pension** — David AustralianSuper $1,850,000 + Sarah REST $1,420,000 = $3,270,000
+  - **CLIENT_PORTFOLIO_DATA.client_1** — totalAssets $11,672,000, totalDebt $2,062,000, netWorth $9,610,000, annualIncome $485,000
+  - **CLIENT_FAMILY_DATA.client_1** — David $320k income/$1.85M super, Sarah $165k/$1.42M super
+- Testing: Frontend testing agent iteration 175 — **7/7 pass (100%)**. Shares, Cash, Super, Tax income, and adviser-mode mirror all consistent.
+
+## Completed (20 April 2026) — Iteration 12
 - [x] **Adviser client view now matches client view exactly** — Swapped `UnifiedClientOverview.jsx` (the page shown at `/dashboard` for adviser with selected client) from lightweight Simple* components to the FULL pages:
   - Investments tab: SimpleInvestments → **UnifiedInvestments** (10 sub-tabs, stat cards, donut + bar + radar charts, rebalancing, top holdings)
   - Budget tab: SimpleBudget → **HouseholdBudget** (full cashflow + 12-mo chart + savings)
