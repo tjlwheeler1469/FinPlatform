@@ -6,11 +6,11 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import FloatingActionRail from "@/components/platform/FloatingActionRail";
 
 const PersonalDashboard = lazy(() => import("@/pages/PersonalDashboard"));
-const SimpleInvestments = lazy(() => import("@/components/SimpleInvestments"));
-const SimpleRetirement = lazy(() => import("@/components/SimpleRetirement"));
+const UnifiedInvestments = lazy(() => import("@/pages/UnifiedInvestments"));
+const RetirementWorkshop = lazy(() => import("@/pages/RetirementWorkshop"));
 const SimpleGoals = lazy(() => import("@/components/SimpleGoals"));
-const SimpleBudget = lazy(() => import("@/components/SimpleBudget"));
-const SimpleTax = lazy(() => import("@/components/SimpleTax"));
+const HouseholdBudget = lazy(() => import("@/pages/HouseholdBudget"));
+const UnifiedTaxCentre = lazy(() => import("@/pages/UnifiedTaxCentre"));
 const AdviserClientDashboard = lazy(() => import("@/components/AdviserClientDashboard"));
 const ClientInvoicing = lazy(() => import("@/components/ClientInvoicing"));
 
@@ -76,21 +76,21 @@ const UnifiedClientOverview = () => {
             <TabsContent value="retirement" className="mt-0">
               <ErrorBoundary label="Retirement">
                 <Suspense fallback={<TabLoader />}>
-                  <SimpleRetirement clientId={getClientId()} embedded />
+                  <RetirementWorkshop clientId={getClientId()} embedded />
                 </Suspense>
               </ErrorBoundary>
             </TabsContent>
             <TabsContent value="investments" className="mt-0">
               <ErrorBoundary label="Investments">
                 <Suspense fallback={<TabLoader />}>
-                  <SimpleInvestments clientId={getClientId()} embedded />
+                  <UnifiedInvestments embedded />
                 </Suspense>
               </ErrorBoundary>
             </TabsContent>
             <TabsContent value="budget" className="mt-0">
               <ErrorBoundary label="Budget">
                 <Suspense fallback={<TabLoader />}>
-                  <SimpleBudget clientId={getClientId()} embedded />
+                  <HouseholdBudget embedded />
                 </Suspense>
               </ErrorBoundary>
             </TabsContent>
@@ -104,7 +104,7 @@ const UnifiedClientOverview = () => {
             <TabsContent value="tax" className="mt-0">
               <ErrorBoundary label="Tax Centre">
                 <Suspense fallback={<TabLoader />}>
-                  <SimpleTax clientId={getClientId()} embedded />
+                  <UnifiedTaxCentre embedded />
                 </Suspense>
               </ErrorBoundary>
             </TabsContent>

@@ -1,0 +1,25 @@
+{
+  "summary": "Verified iteration 173 swap: UnifiedClientOverview (adviser /dashboard view for selected_client) now embeds the SAME FULL pages the client sees. All 8 criteria from the review request PASS. Adviser → /dashboard with selected_client=thompson_family renders unified-client-overview with 7 sub-tabs. Investments tab is full UnifiedInvestments ($11.67M assets, $2.06M liab, $9.61M NW, +5.9% return, Asset Allocation donut, Holdings by Entity bar, Portfolio Rebalancing, Allocation Radar, Top Holdings + 10 sub-tabs Overview/Bonds/Cash & TDs/Crypto/Managed Funds/Property/Shares & ETFs/SMSF/Super & Pension/Unlisted all visible in screenshot). Budget tab is full HouseholdBudget ($26,437 income, $8,726 expenses, $17,011 surplus, donut + 12-mo cashflow + cumulative savings). Tax Centre is full UnifiedTaxCentre (Tax Analysis, BAS Calculator, Capital Gains, Division 7A, Tax Loss Harvesting, Income Splitting, Tax Calendar, Trust Distributions sub-tabs with David $120k / Sarah $65k breakdown, combined $185k/$40.8k/$144k). Retirement is full RetirementWorkshop (multi-scenario Monte Carlo: Current Plan 99% + Aggressive Savings 100%, Projected Portfolio Balance P10/P50/P90 chart, Scenario Comparison). Overview still AdviserClientDashboard. Goals and Invoicing unchanged. Regression: client mode → unified-dashboard (not UnifiedClientOverview). Standalone /retirement-confidence, /budget, /investments, /tax-analysis-sync all return 200 with Layout. NOTE: substring checks for 'Cash & TDs', 'Shares & ETFs', 'Super & Pension' showed False but are clearly visible in screenshots — HTML encoding (& → &amp;) masked the match; not a bug.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "UnifiedClientOverview (embedded mode)", "issues": ["Multiple Recharts 'width(-1) height(-1)' warnings on tab switch — ResponsiveContainer parent briefly has 0 width during Radix TabsContent mount. Charts render correctly after mount but consider setting min-width/min-height on chart containers to suppress console noise."]}
+    ]
+  },
+  "test_report_links": ["/app/test_reports/iteration_173.json"],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "UnifiedClientOverview.jsx cleanly swaps to full pages via embedded prop — good pattern. Confirm every embedded page (HouseholdBudget, UnifiedInvestments, UnifiedTaxCentre, RetirementWorkshop) actually skips Layout when embedded=true (verified visually — no double nav/header shown inside tabs).",
+    "Minor: Recharts noise from ResponsiveContainer on tab mount. Non-blocking but worth setting minWidth=0/minHeight=0 on chart wrappers or deferring render until tab is active."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a (frontend-only)", "frontend": "100%"},
+  "test_credentials": "n/a — adviser mode via localStorage (wealth_command_compliance_v5='permanent', app_mode='adviser', selected_client={id:'thompson_family', name:'David & Sarah Thompson'})",
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iteration 173 verified adviser /dashboard UnifiedClientOverview now embeds the full rich pages (UnifiedInvestments, HouseholdBudget, UnifiedTaxCentre, RetirementWorkshop) — matching the CLIENT standalone /investments, /budget, /tax-analysis-sync, /retirement-confidence views. 7 sub-tabs: overview/retirement/investments/budget/goals/tax/invoicing. Regression: client mode still renders unified-dashboard. Standalone routes unchanged. For text-based assertions on embedded pages, prefer locators or innerText over raw HTML substring because Radix uses HTML-encoded entities (e.g. & → &amp;).",
+  "rca of the issue": "n/a — not a bug investigation. Feature swap works as intended. The embedded prop pattern on each full page allows them to render without their own Layout wrapper inside the Radix TabsContent, preserving the adviser's client-view header/sidebar."
+}
