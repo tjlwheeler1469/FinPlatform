@@ -344,6 +344,32 @@ const TodaysPrioritiesCard = () => {
             );
           })}
         </div>
+
+        {/* Markets strip — moved here from Firm section */}
+        <div className="mt-4 pt-3 border-t" data-testid="markets-strip">
+          <div className="flex items-center gap-2 mb-2">
+            <TrendingUp className="h-3.5 w-3.5 text-[#1a2744]" />
+            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Markets</p>
+            <Badge variant="outline" className="text-[9px] ml-auto">Live</Badge>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            <div className="p-2 rounded bg-gray-50 text-center" data-testid="market-asx">
+              <p className="text-[10px] text-muted-foreground">ASX 200</p>
+              <p className="text-sm font-bold text-[#1a2744]">7,856</p>
+              <p className="text-[10px] text-emerald-600 flex items-center justify-center gap-0.5"><ArrowUpRight className="h-2.5 w-2.5" />0.42%</p>
+            </div>
+            <div className="p-2 rounded bg-gray-50 text-center" data-testid="market-aud">
+              <p className="text-[10px] text-muted-foreground">AUD/USD</p>
+              <p className="text-sm font-bold text-[#1a2744]">0.6545</p>
+              <p className="text-[10px] text-rose-600 flex items-center justify-center gap-0.5"><ArrowDownRight className="h-2.5 w-2.5" />0.15%</p>
+            </div>
+            <div className="p-2 rounded bg-gray-50 text-center" data-testid="market-rba">
+              <p className="text-[10px] text-muted-foreground">RBA Rate</p>
+              <p className="text-sm font-bold text-[#1a2744]">4.35%</p>
+              <p className="text-[10px] text-muted-foreground">unchanged</p>
+            </div>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );

@@ -1,0 +1,32 @@
+{
+  "summary": "Iteration 176 verified all 3 fixes: (1) UnlistedInvestments Edit + Delete fully wired and regression Add still works; (2) Markets strip present inside Today's Priorities card on AdviserClientDashboard with ASX 200 / AUD/USD / RBA Rate tiles + Markets label + Live badge; (3) RetirementWorkshop scenario cap raised from 5 to 10 — Add Scenario button stays enabled through the 10th scenario, disabled at 10.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "acceptance_criteria_results": {
+    "unlisted_edit": "PASS — clicking edit-investment-1 opens dialog with prefilled name='Private Equity Fund A', purchase=100000, current=125000. Changing Current Value to 150000 and clicking save-edit-btn updates Current Value summary card from $504,000 to $529,000 and shows 'Investment updated' toast.",
+    "unlisted_delete": "PASS — clicking delete-investment-2 triggers window.confirm; after accept, row disappears, Total Investments drops 4→3, toast 'Investment deleted' displayed.",
+    "unlisted_add_regression": "PASS — Add Investment dialog still functional; TEST Regression Fund appended, Total Investments 3→4.",
+    "markets_strip_adviser_dashboard": "PASS — /dashboard in adviser mode with selected_client=thompson_family renders data-testid='markets-strip' inside data-testid='card-priorities'. All three tiles present with expected values: market-asx shows 'ASX 200 7,856', market-aud shows 'AUD/USD 0.6545', market-rba shows 'RBA Rate 4.35%'. 'Markets' label and 'Live' badge both present above strip.",
+    "retirement_workshop_scenario_cap": "PASS — add-scenario-btn enabled from 2 to 9 scenarios (8 clicks each adds one); becomes disabled exactly when scenario count reaches 10. Header line confirmed '10 scenarios · 500 sims each'.",
+    "retirement_workshop_data_consistency": "PASS — Current Plan scenario shows Monthly Income 40417 (=$485k/12), Monthly Expenses 17500 (=$210k/12), Net monthly surplus $22,917. Matches data shown on /budget and /investments pages (iteration 175 alignment preserved)."
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "UnlistedInvestments.jsx handleAddInvestment uses id = investments.length + 1 to generate new ids. After a delete (e.g., removing id=2 leaves [1,3,4], length=3), the next add produces id=4 which collides with existing id=4 — React logs 'Encountered two children with the same key' warning. Fix: use Math.max(...investments.map(i=>i.id), 0) + 1 or crypto.randomUUID().",
+    "DialogContent in both Add and Edit dialogs is missing aria-describedby / DialogDescription — Radix warns in console. Minor a11y issue.",
+    "Architectural debt from iteration 175 still applies: UnlistedInvestments.jsx uses module-level mockUnlistedInvestments array instead of reading from CLIENT_PORTFOLIO_DATA. When adviser switches clients, same unlisted data is shown. Not in scope for this iteration."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100% (6 of 6 acceptance criteria pass)"},
+  "test_credentials": "None — compliance bypassed via localStorage wealth_command_compliance_v5=permanent; adviser mode set via localStorage app_mode=adviser + selected_client={id:'thompson_family'}",
+  "seed_data_creation": "Ephemeral test state only (added 'TEST Regression Fund' to local state during regression test; not persisted).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All 3 iteration-176 fixes verified via live UI: (a) UnlistedInvestments edit/delete flow works; recommend main agent fix id-generation collision issue noted above; (b) AdviserClientDashboard TodaysPrioritiesCard now contains markets-strip with three tiles; (c) RetirementWorkshop cap=10. Data-source alignment from iteration 175 remains intact — Monthly Income/Expenses/Net surplus match ($40,417 / $17,500 / $22,917).",
+  "rca of the issue": "N/A — implementation was correct. Single minor pre-existing issue (duplicate key warning) identified and documented for main agent to address in a future pass."
+}

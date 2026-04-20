@@ -73,6 +73,7 @@ const formatCurrency = (value) => {
 const UnlistedInvestments = ({ embedded = false }) => {
   const [investments, setInvestments] = useState(mockUnlistedInvestments);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [editingInvestment, setEditingInvestment] = useState(null);
   const [newInvestment, setNewInvestment] = useState({
     name: '',
     type: 'Private Equity',
@@ -105,6 +106,32 @@ const UnlistedInvestments = ({ embedded = false }) => {
     setShowAddDialog(false);
     setNewInvestment({ name: '', type: 'Private Equity', entity: 'Personal', purchasePrice: '', currentValue: '', notes: '' });
     toast.success('Investment added successfully');
+  };
+
+  const handleSaveEdit = () => {
+    if (!editingInvestment?.name || !editingInvestment?.purchasePrice) {
+      toast.error('Please fill in required fields');
+      return;
+    }
+    setInvestments(investments.map((inv) =>
+      inv.id === editingInvestment.id
+        ? {
+            ...editingInvestment,
+            purchasePrice: parseFloat(editingInvestment.purchasePrice) || 0,
+            currentValue: parseFloat(editingInvestment.currentValue) || 0,
+            lastValuation: new Date().toISOString().split('T')[0],
+          }
+        : inv
+    ));
+    setEditingInvestment(null);
+    toast.success('Investment updated');
+  };
+
+  const handleDelete = (id) => {
+    const inv = investments.find((i) => i.id === id);
+    if (!window.confirm(`Delete "${inv?.name}"?`)) return;
+    setInvestments(investments.filter((i) => i.id !== id));
+    toast.success('Investment deleted');
   };
 
   const content = (
@@ -299,10 +326,21 @@ const UnlistedInvestments = ({ embedded = false }) => {
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="sm">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setEditingInvestment({ ...investment })}
+                          data-testid={`edit-investment-${investment.id}`}
+                        >
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-red-600 hover:text-red-700"
+                          onClick={() => handleDelete(investment.id)}
+                          data-testid={`delete-investment-${investment.id}`}
+                        >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
@@ -313,6 +351,69 @@ const UnlistedInvestments = ({ embedded = false }) => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Edit Dialog */}
+        <Dialog open={!!editingInvestment} onOpenChange={(v) => !v && setEditingInvestment(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Investment</DialogTitle>
+            </DialogHeader>
+            {editingInvestment && (
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label>Investment Name *</Label>
+                  <Input value={editingInvestment.name} onChange={(e) => setEditingInvestment({ ...editingInvestment, name: e.target.value })} data-testid="edit-name-input" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Type</Label>
+                    <Select value={editingInvestment.type} onValueChange={(v) => setEditingInvestment({ ...editingInvestment, type: v })}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Private Equity">Private Equity</SelectItem>
+                        <SelectItem value="Venture Capital">Venture Capital</SelectItem>
+                        <SelectItem value="Property Syndicate">Property Syndicate</SelectItem>
+                        <SelectItem value="Infrastructure">Infrastructure</SelectItem>
+                        <SelectItem value="Hedge Fund">Hedge Fund</SelectItem>
+                        <SelectItem value="Other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Entity</Label>
+                    <Select value={editingInvestment.entity} onValueChange={(v) => setEditingInvestment({ ...editingInvestment, entity: v })}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Personal">Personal</SelectItem>
+                        <SelectItem value="Super">Super</SelectItem>
+                        <SelectItem value="Trust">Trust</SelectItem>
+                        <SelectItem value="Company">Company</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Purchase Price *</Label>
+                    <Input type="number" value={editingInvestment.purchasePrice} onChange={(e) => setEditingInvestment({ ...editingInvestment, purchasePrice: e.target.value })} data-testid="edit-purchase-input" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Current Value</Label>
+                    <Input type="number" value={editingInvestment.currentValue} onChange={(e) => setEditingInvestment({ ...editingInvestment, currentValue: e.target.value })} data-testid="edit-current-input" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Notes</Label>
+                  <Input value={editingInvestment.notes || ''} onChange={(e) => setEditingInvestment({ ...editingInvestment, notes: e.target.value })} />
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" className="flex-1" onClick={() => setEditingInvestment(null)}>Cancel</Button>
+                  <Button className="flex-1" onClick={handleSaveEdit} data-testid="save-edit-btn">Save Changes</Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </>
   );

@@ -317,7 +317,7 @@ const RetirementWorkshop = ({ embedded = false, clientId: propClientId }) => {
             <Button variant="outline" size="sm" onClick={resetAll} data-testid="reset-btn">
               <RotateCcw className="h-3.5 w-3.5 mr-1.5" /> Reset
             </Button>
-            <Button variant="outline" size="sm" onClick={addScenario} disabled={scenarios.length >= 5} data-testid="add-scenario-btn">
+            <Button variant="outline" size="sm" onClick={addScenario} disabled={scenarios.length >= 10} data-testid="add-scenario-btn">
               <Plus className="h-3.5 w-3.5 mr-1.5" /> Add Scenario
             </Button>
           </div>
