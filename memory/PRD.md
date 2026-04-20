@@ -44,7 +44,20 @@ Complete Your Profile: ID upload (passport/licence), TFN input (AES-256 encrypte
 - [x] BAS Calculator field labels, Combined adviser client view
 - [x] All Wheeler references eliminated
 
+## Completed (20 April 2026)
+- [x] Adviser Dashboard scaled to HNW book (~$480M AUM, 47 clients, $4.52M revenue via practice_health.py)
+- [x] AdvisorCommandCenter + AdviserDashboard now derive numbers from clientData.js (single source)
+- [x] ErrorBoundary "Hard Refresh" button — clears caches/service workers, bypasses cache on reload
+- [x] lazyRetry fallback shows "Reload" + "Hard Refresh" CTAs for chunk-loading errors
+- [x] ClientOnboarding: per-field "Save" spinner + inline "synced <timestamp>" confirmation
+- [x] ClientOnboarding: "Continue to myGov" button opens https://my.gov.au in new tab
+- [x] ClientOnboarding: "ATO Online Services" button opens https://www.ato.gov.au in new tab
+- [x] ClientOnboarding: "Sync to Xplan" now shows "Last synced <timestamp>" after sync (re-syncable)
+
 ## Backlog
 - [ ] P2: Real email integration (Resend/SendGrid) for invoice delivery + client pack
+- [ ] P2: Scenario volatility slider for Monte Carlo engine
 - [ ] P2: Replace Mock Xplan sync with real API
 - [ ] P3: PDF invoice generation (extend existing jsPDF)
+- [ ] P3: Refactor App.js (1300+ lines) — extract inline CLIENT_FAMILY_DATA etc. into /src/data/*.js
+- [ ] P3: PortfolioProvider polling (setInterval 500ms) → replace with context event subscription

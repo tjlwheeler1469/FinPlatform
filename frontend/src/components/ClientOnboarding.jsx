@@ -130,7 +130,7 @@ const ClientOnboarding = ({ clientId = "portal_001" }) => {
 
   const openATO = () => {
     toast.info("Opening ATO online services...");
-    setTimeout(() => window.open("https://my.gov.au/LoginServices/main/login?execution=e2s1", "_blank", "noopener,noreferrer"), 400);
+    setTimeout(() => window.open("https://www.ato.gov.au/individuals-and-families/", "_blank", "noopener,noreferrer"), 400);
   };
 
   return (
