@@ -1096,7 +1096,7 @@ const AppRouter = () => {
       <Route path="/statement-of-advice" element={<StatementOfAdvice />} />
       <Route path="/onboarding" element={<ClientOnboarding />} />
       <Route path="/copilot" element={<Navigate to="/ai-copilot-advanced" replace />} />
-      <Route path="/daily-briefing" element={<Navigate to="/advisor-command-center" replace />} />
+      <Route path="/daily-briefing" element={<DailyBriefing />} />
       {/* Unified Dashboard (Net Worth + Dashboard) */}
       <Route path="/dashboard" element={<DashboardRouter />} />
       <Route path="/personal-dashboard" element={<Navigate to="/dashboard" replace />} />
@@ -1143,7 +1143,7 @@ const AppRouter = () => {
       
       {/* AI routes - consolidate to primary */}
       <Route path="/ai-copilot" element={<Navigate to="/ai-copilot-advanced" replace />} />
-      <Route path="/decision-center" element={<Navigate to="/advisor-command-center" replace />} />
+      <Route path="/decision-center" element={<DecisionCenter />} />
       <Route path="/client-insights" element={<Navigate to="/ai-copilot-advanced" replace />} />
       <Route path="/intelligence-feed" element={<Navigate to="/ai-copilot-advanced" replace />} />
       <Route path="/ai-insights" element={<Navigate to="/ai-copilot-advanced" replace />} />

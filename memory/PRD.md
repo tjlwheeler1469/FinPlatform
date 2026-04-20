@@ -28,6 +28,9 @@ Build an AFSL-grade wealth management platform for HNW clients with consolidated
 ### Monte Carlo Scenario Engine (Goals tab)
 Connected flow: Budget → Investments → Portfolio → Retirement with 500 MC simulations, confidence bands, trajectory chart
 
+## Completed (20 April 2026) — Iteration 3
+- [x] Scenario volatility slider (σ), jsPDF invoices, jsPDF Review Pack, Adviser Command Center client deep-links, platform primitives (PageShell/ActionRail/WhatChangedPanel) — see previous entries
+
 ### Adviser Notification Customisation
 Toggle-based: review due, market alerts, compliance, client contact, portfolio rebalance, FDS, document signed, onboarding, insurance, birthdays
 
@@ -50,7 +53,15 @@ Complete Your Profile: ID upload (passport/licence), TFN input (AES-256 encrypte
 - [x] BAS Calculator field labels, Combined adviser client view
 - [x] All Wheeler references eliminated
 
-## Completed (20 April 2026) — Iteration 3
+## Completed (20 April 2026) — Iteration 4
+- [x] **FloatingActionRail** created and applied to 5 highest-traffic pages: `/intelligence`, `/portfolio-analyzer`, `/strategic-planning`, `/next-best-actions`, `/decision-center`
+  - Every rail has Generate Review Pack CTA (jsPDF), Recommendations (top-3 by impact), Next Best Actions, Meeting Prep
+  - Collapsible via X → re-expands via gold pill tab
+  - Automatically reads active client via `getActiveClientId()`
+- [x] **Embedded ScenarioEngine** in Portfolio Analyzer (`portfolio-embedded-scenario`)
+- [x] **Sidebar consolidated** to 5 groups × ≤3 items each matching the 10-page architecture: Operating System, Clients, Planning, Markets & Data, Settings
+- [x] **Route fixes**: `/decision-center` now renders DecisionCenter (was a redirect); `/daily-briefing` now renders DailyBriefing (was a redirect); `/advisor-intelligence` + `/book-intelligence` redirect to canonical pages
+- [x] Verified via testing agent iteration_163 (then fixes applied) — rail visible on all 5 pages, collapse/expand working, PDF generation verified
 - [x] **Scenario Volatility Slider (σ)** added to the embedded Monte Carlo on the Adviser Client Dashboard — σ 4%–24% with labels Conservative / Balanced / Growth / Aggressive (data-testid `slider-volatility`)
 - [x] **PDF Invoice generation** wired via jsPDF + jspdf-autotable — each invoice has a Download PDF button (branded Halcyon Wealth header, line items, GST breakdown, Bill To)
 - [x] **Generate Review Pack** on dashboard now produces a real multi-page PDF (Household Summary + What Changed + Risks/Alerts + Recommendations) via jsPDF
