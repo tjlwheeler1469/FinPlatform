@@ -1,0 +1,281 @@
+// Simplified Client Portal — high-level, read-only view.
+// 5 sections only: Snapshot, Investments (view), Retirement, Documents, Messages.
+// Any "edits" go to an adviser-pending queue (localStorage), not live data.
+import { useMemo, useState } from "react";
+import Layout from "@/components/Layout";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
+import {
+  PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid,
+} from "recharts";
+import {
+  LayoutDashboard, TrendingUp, Gauge, FileText, MessageSquare,
+  ShieldCheck, Lock, Send, CheckCircle2,
+} from "lucide-react";
+import { CLIENT_DATA, getActiveClientId } from "@/data/clientData";
+import { projectRetirement } from "@/lib/retirementEngine";
+
+const fmt = (v) => new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD", maximumFractionDigits: 0 }).format(v || 0);
+const fmtShort = (v) => {
+  const abs = Math.abs(v || 0);
+  if (abs >= 1_000_000) return `$${(v / 1_000_000).toFixed(2)}M`;
+  if (abs >= 1_000) return `$${(v / 1_000).toFixed(0)}k`;
+  return `$${Math.round(v || 0)}`;
+};
+
+const ALLOC_COLORS = ["#1a2744", "#D4A84C", "#10b981", "#8b5cf6", "#06b6d4", "#f43f5e"];
+
+const SnapshotTab = ({ client }) => {
+  const totalAssets = client.assets.reduce((s, a) => s + a.value, 0);
+  const totalLiab = client.liabilities.reduce((s, l) => s + l.value, 0);
+  const netWorth = totalAssets - totalLiab;
+
+  const allocation = useMemo(() => {
+    const byType = client.assets.reduce((acc, a) => {
+      const b = a.type === "Super" || a.type === "SMSF" ? "Super" : a.type === "Property" ? "Property" : a.type === "Shares" || a.type === "Managed Fund" || a.type === "Bonds" || a.type === "Alternatives" ? "Investments" : a.type === "Cash" ? "Cash" : "Other";
+      acc[b] = (acc[b] || 0) + a.value;
+      return acc;
+    }, {});
+    return Object.entries(byType).map(([name, value]) => ({ name, value }));
+  }, [client]);
+
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardContent className="p-5">
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">Net Worth</p>
+          <p className="text-3xl font-bold text-[#1a2744]" data-testid="client-net-worth">{fmt(netWorth)}</p>
+          <div className="grid grid-cols-2 gap-4 mt-4">
+            <div><p className="text-[11px] text-muted-foreground">Total Assets</p><p className="text-lg font-semibold">{fmtShort(totalAssets)}</p></div>
+            <div><p className="text-[11px] text-muted-foreground">Total Debt</p><p className="text-lg font-semibold">{fmtShort(totalLiab)}</p></div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="pb-2"><CardTitle className="text-sm">How your wealth is allocated</CardTitle></CardHeader>
+        <CardContent>
+          <div className="h-[240px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie data={allocation} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={50} outerRadius={90} paddingAngle={2}>
+                  {allocation.map((_, i) => <Cell key={i} fill={ALLOC_COLORS[i % ALLOC_COLORS.length]} />)}
+                </Pie>
+                <Tooltip formatter={(v) => fmt(v)} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="flex flex-wrap justify-center gap-3 mt-2">
+            {allocation.map((a, i) => (
+              <div key={a.name} className="flex items-center gap-1.5 text-xs">
+                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: ALLOC_COLORS[i % ALLOC_COLORS.length] }} />
+                <span>{a.name} {fmtShort(a.value)}</span>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="bg-[#1a2744]/5 border-[#1a2744]/20">
+        <CardContent className="p-4 flex items-center gap-3">
+          <ShieldCheck className="h-5 w-5 text-[#1a2744]" />
+          <div className="flex-1">
+            <p className="text-sm font-medium">Your adviser is actively managing this portfolio.</p>
+            <p className="text-xs text-muted-foreground">Any changes you request go to your adviser for review — they won't affect live numbers until approved.</p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+const InvestmentsTab = ({ client }) => {
+  const grouped = useMemo(() => client.assets.reduce((acc, a) => {
+    (acc[a.type] = acc[a.type] || []).push(a);
+    return acc;
+  }, {}), [client]);
+
+  return (
+    <div className="space-y-3">
+      {Object.entries(grouped).map(([type, list]) => (
+        <Card key={type}>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm flex items-center justify-between">
+              <span>{type}</span>
+              <span className="text-xs text-muted-foreground">{fmt(list.reduce((s, x) => s + x.value, 0))}</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-1">
+            {list.map((a, i) => (
+              <div key={i} className="flex items-center justify-between py-1.5 border-b last:border-0 text-sm">
+                <div>
+                  <p className="font-medium">{a.name}</p>
+                  <p className="text-[11px] text-muted-foreground">{a.entity}</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-semibold">{fmt(a.value)}</p>
+                  {a.change !== undefined && (
+                    <p className={`text-[11px] ${a.change >= 0 ? "text-emerald-600" : "text-rose-600"}`}>{a.change >= 0 ? "+" : ""}{a.change.toFixed(1)}%</p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      ))}
+      <p className="text-[11px] text-center text-muted-foreground py-2 flex items-center justify-center gap-1.5"><Lock className="h-3 w-3" />View only — contact your adviser to adjust holdings</p>
+    </div>
+  );
+};
+
+const RetirementTab = ({ client }) => {
+  const liquidAssets = client.assets.filter((a) => ["Super", "Shares", "Managed Fund", "Cash", "SMSF", "Bonds", "Alternatives"].includes(a.type)).reduce((s, a) => s + a.value, 0);
+  const result = projectRetirement({
+    currentPortfolio: liquidAssets,
+    annualContributions: client.retirement.annual_contributions,
+    annualSpending: client.retirement.retirement_spending,
+    yearsToRetirement: Math.max(0, client.retirement.retirement_age - client.retirement.current_age),
+    yearsInRetirement: Math.max(1, client.retirement.life_expectancy - client.retirement.retirement_age),
+    numSims: 300,
+  });
+
+  const chartData = result.trajectory.map((t, i) => ({ age: client.retirement.current_age + i, p10: t.p10, p50: t.p50, p90: t.p90 }));
+  const tone = result.confidence >= 80 ? "text-emerald-600" : result.confidence >= 60 ? "text-blue-600" : "text-amber-600";
+
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardContent className="p-5 text-center">
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">Retirement Confidence</p>
+          <p className={`text-6xl font-bold ${tone} my-2`} data-testid="client-retirement-confidence">{result.confidence}%</p>
+          <p className="text-sm">You can retire at age <strong>{client.retirement.retirement_age}</strong> spending <strong>{fmt(client.retirement.retirement_spending)}</strong>/yr.</p>
+          <p className="text-[11px] text-muted-foreground mt-2">Based on {result.numSims} Monte Carlo simulations · {client.retirement.retirement_age - client.retirement.current_age} years to go</p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="pb-2"><CardTitle className="text-sm">Projected balance (P10 · P50 · P90)</CardTitle></CardHeader>
+        <CardContent>
+          <div className="h-[260px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis dataKey="age" tick={{ fontSize: 11 }} />
+                <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `$${(v / 1e6).toFixed(1)}M`} width={55} />
+                <Tooltip formatter={(v) => fmt(v)} labelFormatter={(v) => `Age ${v}`} />
+                <Line type="monotone" dataKey="p10" stroke="#f43f5e" strokeWidth={1.5} dot={false} strokeDasharray="4 3" name="P10 (pessimistic)" />
+                <Line type="monotone" dataKey="p50" stroke="#1a2744" strokeWidth={2.5} dot={false} name="P50 (median)" />
+                <Line type="monotone" dataKey="p90" stroke="#10b981" strokeWidth={1.5} dot={false} strokeDasharray="4 3" name="P90 (optimistic)" />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+const DocumentsTab = () => {
+  const docs = [
+    { name: "Statement of Advice (SOA)", date: "Mar 2025", status: "signed" },
+    { name: "Financial Services Guide (FSG) v5", date: "Jan 2025", status: "current" },
+    { name: "Fee Disclosure Statement", date: "Apr 2025", status: "awaiting" },
+    { name: "Annual Review Pack 2024", date: "Nov 2024", status: "signed" },
+  ];
+  return (
+    <div className="space-y-2">
+      {docs.map((d, i) => (
+        <Card key={i}>
+          <CardContent className="p-3 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <FileText className="h-5 w-5 text-[#1a2744]" />
+              <div>
+                <p className="text-sm font-medium">{d.name}</p>
+                <p className="text-[11px] text-muted-foreground">{d.date}</p>
+              </div>
+            </div>
+            <Badge variant={d.status === "signed" ? "default" : d.status === "awaiting" ? "outline" : "secondary"} className={d.status === "signed" ? "bg-emerald-500" : ""}>
+              {d.status === "signed" && <CheckCircle2 className="h-3 w-3 mr-1" />}
+              {d.status}
+            </Badge>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+};
+
+const MessagesTab = ({ clientId }) => {
+  const [msg, setMsg] = useState("");
+  const [thread, setThread] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(`client_msgs_${clientId}`) || "[]"); } catch { return []; }
+  });
+
+  const send = () => {
+    if (!msg.trim()) return;
+    const entry = { from: "client", body: msg, ts: new Date().toISOString() };
+    const updated = [...thread, entry];
+    setThread(updated);
+    localStorage.setItem(`client_msgs_${clientId}`, JSON.stringify(updated));
+    setMsg("");
+    toast.success("Message sent to your adviser");
+  };
+
+  return (
+    <Card>
+      <CardHeader className="pb-2"><CardTitle className="text-sm">Message your adviser</CardTitle></CardHeader>
+      <CardContent className="space-y-3">
+        <div className="space-y-2 max-h-64 overflow-y-auto">
+          {thread.length === 0 && <p className="text-xs text-muted-foreground text-center py-4">No messages yet</p>}
+          {thread.map((m, i) => (
+            <div key={i} className={`p-2.5 rounded-lg text-sm ${m.from === "client" ? "bg-[#1a2744]/10 ml-8" : "bg-gray-100 mr-8"}`}>
+              <p>{m.body}</p>
+              <p className="text-[10px] text-muted-foreground mt-1">{new Date(m.ts).toLocaleString()}</p>
+            </div>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <Textarea value={msg} onChange={(e) => setMsg(e.target.value)} placeholder="Ask your adviser anything…" rows={2} data-testid="client-msg-input" />
+          <Button onClick={send} className="bg-[#1a2744]" data-testid="client-msg-send"><Send className="h-4 w-4" /></Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+const SimpleClientView = () => {
+  const clientId = getActiveClientId();
+  const client = CLIENT_DATA[clientId] || CLIENT_DATA.thompson_family;
+
+  return (
+    <Layout>
+      <div className="max-w-3xl mx-auto p-4" data-testid="simple-client-view">
+        <div className="mb-4">
+          <h1 className="text-2xl font-bold text-[#1a2744]">Hello, {client.profile.name.split(" & ")[0]}</h1>
+          <p className="text-xs text-muted-foreground">A calm, simple view of your wealth · managed by {client.profile.advisor || "your adviser"}</p>
+        </div>
+        <Tabs defaultValue="snapshot">
+          <TabsList className="bg-white border w-full justify-start h-10">
+            <TabsTrigger value="snapshot" className="gap-1.5" data-testid="client-tab-snapshot"><LayoutDashboard className="h-3.5 w-3.5" />Snapshot</TabsTrigger>
+            <TabsTrigger value="investments" className="gap-1.5" data-testid="client-tab-invest"><TrendingUp className="h-3.5 w-3.5" />Investments</TabsTrigger>
+            <TabsTrigger value="retirement" className="gap-1.5" data-testid="client-tab-retire"><Gauge className="h-3.5 w-3.5" />Retirement</TabsTrigger>
+            <TabsTrigger value="docs" className="gap-1.5" data-testid="client-tab-docs"><FileText className="h-3.5 w-3.5" />Documents</TabsTrigger>
+            <TabsTrigger value="msgs" className="gap-1.5" data-testid="client-tab-msgs"><MessageSquare className="h-3.5 w-3.5" />Messages</TabsTrigger>
+          </TabsList>
+          <TabsContent value="snapshot" className="pt-4"><SnapshotTab client={client} /></TabsContent>
+          <TabsContent value="investments" className="pt-4"><InvestmentsTab client={client} /></TabsContent>
+          <TabsContent value="retirement" className="pt-4"><RetirementTab client={client} /></TabsContent>
+          <TabsContent value="docs" className="pt-4"><DocumentsTab /></TabsContent>
+          <TabsContent value="msgs" className="pt-4"><MessagesTab clientId={clientId} /></TabsContent>
+        </Tabs>
+      </div>
+    </Layout>
+  );
+};
+
+export default SimpleClientView;
