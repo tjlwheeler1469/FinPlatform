@@ -230,3 +230,7 @@ export const NetWorthTrend = lazyRetry(() => import("@/pages/NetWorthTrend"));
 
 // Auth / Shell
 export const Login = lazyRetry(() => import("@/pages/Login"));
+
+// Client-facing secure areas
+export const MyVault = lazyRetry(() => import("@/pages/MyVault"));
+export const MySettings = lazyRetry(() => import("@/pages/MySettings"));

@@ -60,6 +60,8 @@ import {
   KnowledgeGraphDashboard, Collaboration, InsuranceGapAnalysis, NetWorthTrend,
   // Auth
   Login,
+  // Client-facing secure areas
+  MyVault, MySettings,
 } from "@/routes/lazyPages";
 
 // Smart router: shows different dashboard based on client context
@@ -248,6 +250,8 @@ const AppRouter = () => (
     <Route path="/connected-accounts" element={<ConnectedAccounts />} />
 
     {/* Firm & Admin */}
+    <Route path="/my-vault" element={<MyVault />} />
+    <Route path="/my-settings" element={<MySettings />} />
     <Route path="/practice-management" element={<PracticeManagement />} />
     <Route path="/revenue-billing" element={<RevenueBilling />} />
     <Route path="/reports" element={<ReportGenerator />} />

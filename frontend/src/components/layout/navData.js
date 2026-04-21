@@ -5,7 +5,7 @@ import {
   Target, Activity, Bot, Upload, Database, Link2, Shield,
   UserPlus, Sparkles, Bell, Zap, CreditCard,
   Settings, MessageSquare, Brain, ListTodo, Video,
-  Bitcoin, Coins, Cable, Gauge, Calendar
+  Bitcoin, Coins, Cable, Gauge, Calendar, FolderLock
 } from "lucide-react";
 
 export const personalNavGroups = [
@@ -20,8 +20,10 @@ export const personalNavGroups = [
     name: "Documents & Account",
     icon: FileText,
     items: [
+      { path: "/my-vault", label: "Vault", icon: FolderLock, title: "Secure storage for meeting notes, SOA, ROA, FSG & signed documents", badge: "SECURE" },
       { path: "/documents", label: "Documents", icon: FileText, title: "Statements & secure documents" },
       { path: "/bank-feeds", label: "Connected Accounts", icon: Landmark, title: "Bank feeds" },
+      { path: "/my-settings", label: "Settings", icon: Settings, title: "Profile, ID verification, TFN, MyGov & ATO linkage" },
       { path: "/security", label: "Security", icon: Shield, title: "Security & privacy" },
     ]
   },

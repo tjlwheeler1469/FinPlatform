@@ -170,7 +170,7 @@ const AdviserHub = () => {
   return (
     <Layout>
       <FloatingActionRail />
-      <div className="space-y-6 xl:pr-[350px]" data-testid="adviser-hub">
+      <div className="space-y-6" data-testid="adviser-hub">
         {/* Header */}
         <div className="flex items-start justify-between gap-4 pb-1 border-b border-gray-100">
           <div>
@@ -236,51 +236,55 @@ const AdviserHub = () => {
 
         {/* Tabs for different views */}
         <Tabs defaultValue="clients" className="space-y-4">
-          <div className="flex items-center justify-between">
-            <TabsList className="bg-white border h-11 p-1 gap-0.5">
-              <TabsTrigger value="clients" className="gap-1.5 text-xs sm:text-sm px-3 rounded-md data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:shadow-sm">
+          <div className="overflow-x-auto">
+            <TabsList className="bg-white border h-11 p-1 gap-0.5 w-full justify-start">
+              <TabsTrigger value="clients" className="gap-1.5 text-xs sm:text-sm px-3 rounded-md data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:shadow-sm flex-shrink-0">
                 <Users className="h-4 w-4" />
                 All Clients
               </TabsTrigger>
-              <TabsTrigger value="portfolio" className="gap-1.5 text-xs sm:text-sm px-3 rounded-md data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:shadow-sm">
+              <TabsTrigger value="portfolio" className="gap-1.5 text-xs sm:text-sm px-3 rounded-md data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:shadow-sm flex-shrink-0">
                 <PieChart className="h-4 w-4" />
                 Portfolio
               </TabsTrigger>
-              <TabsTrigger value="activity" className="gap-1.5 text-xs sm:text-sm px-3 rounded-md data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:shadow-sm">
+              <TabsTrigger value="activity" className="gap-1.5 text-xs sm:text-sm px-3 rounded-md data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:shadow-sm flex-shrink-0">
                 <Activity className="h-4 w-4" />
                 Activity
               </TabsTrigger>
-              <div className="w-px bg-gray-200 mx-1 h-6 self-center" />
-              <TabsTrigger value="segments" className="gap-1.5 text-xs sm:text-sm px-3 rounded-md data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:shadow-sm" data-testid="hub-tab-segments">
+              <div className="w-px bg-gray-200 mx-1 h-6 self-center flex-shrink-0" />
+              <TabsTrigger value="segments" className="gap-1.5 text-xs sm:text-sm px-3 rounded-md data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:shadow-sm flex-shrink-0" data-testid="hub-tab-segments">
                 <Sparkles className="h-4 w-4" />
                 Segments
               </TabsTrigger>
-              <TabsTrigger value="newsletter" className="gap-1.5 text-xs sm:text-sm px-3 rounded-md data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:shadow-sm" data-testid="hub-tab-newsletter">
+              <TabsTrigger value="newsletter" className="gap-1.5 text-xs sm:text-sm px-3 rounded-md data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:shadow-sm flex-shrink-0" data-testid="hub-tab-newsletter">
                 <MailIcon className="h-4 w-4" />
                 Comms
               </TabsTrigger>
-              <TabsTrigger value="compliance" className="gap-1.5 text-xs sm:text-sm px-3 rounded-md data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:shadow-sm" data-testid="hub-tab-compliance">
+              <TabsTrigger value="compliance" className="gap-1.5 text-xs sm:text-sm px-3 rounded-md data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:shadow-sm flex-shrink-0" data-testid="hub-tab-compliance">
                 <ShieldCheck className="h-4 w-4" />
                 SOA / ROA
               </TabsTrigger>
-              <TabsTrigger value="docusign" className="gap-1.5 text-xs sm:text-sm px-3 rounded-md data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:shadow-sm" data-testid="hub-tab-docusign">
+              <TabsTrigger value="docusign" className="gap-1.5 text-xs sm:text-sm px-3 rounded-md data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:shadow-sm flex-shrink-0" data-testid="hub-tab-docusign">
                 <FileSignature className="h-4 w-4" />
                 E-Sign
               </TabsTrigger>
             </TabsList>
+          </div>
 
-            <div className="flex items-center gap-2">
-              <div className="relative">
+          {/* All Clients Tab */}
+          <TabsContent value="clients" className="space-y-4">
+            {/* Search + status filters — moved below tabs, above client grid */}
+            <div className="flex flex-wrap items-center gap-3 bg-white border border-gray-200 rounded-lg p-3">
+              <div className="relative flex-1 min-w-[260px]">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search clients..."
+                  placeholder="Search clients by name or email..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-9 w-64"
+                  className="pl-9 w-full h-9"
                   data-testid="search-input"
                 />
               </div>
-              <div className="flex gap-1 bg-muted rounded-lg p-1">
+              <div className="flex gap-1 bg-muted rounded-lg p-1 flex-shrink-0">
                 {["all", "active", "prospect", "review"].map((status) => (
                   <Button
                     key={status}
@@ -288,16 +292,16 @@ const AdviserHub = () => {
                     size="sm"
                     onClick={() => setStatusFilter(status)}
                     className={statusFilter === status ? "bg-[#1a2744]" : ""}
+                    data-testid={`filter-${status}`}
                   >
                     {status === "all" ? "All" : status.charAt(0).toUpperCase() + status.slice(1)}
                   </Button>
                 ))}
               </div>
+              <span className="text-xs text-muted-foreground ml-auto">
+                Showing <strong className="text-[#1a2744]">{filteredClients.length}</strong> of {clients.length}
+              </span>
             </div>
-          </div>
-
-          {/* All Clients Tab */}
-          <TabsContent value="clients" className="space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
               {filteredClients.map((client) => {
                 const tw = client.total_wealth || 0;

@@ -1,0 +1,28 @@
+{
+  "summary": "Iteration 186 frontend verification — ALL 7 review items PASS at 1920x1080. (1) ADVISER HUB LAYOUT: tab row sits on top (tabs_bottom=309.5px) with 7 tabs (All Clients, Portfolio, Activity, Segments, Comms, SOA/ROA, E-Sign) inside an overflow-x-auto wrapper. The search input + 4 status filter buttons (All/Active/Prospect/Review) are in a white border-card BELOW the tabs (search_top=340.5px > tabs_bottom). xl:pr-[350px] removed — content fills full width. (2) FILTER FUNCTIONALITY: data-testid='search-input' + filter-all/filter-active/filter-prospect/filter-review present and functional. Clicking 'prospect' narrows grid from 8→1 and counter updates 'Showing 1 of 8'. Search 'thompson' returns 2 cards. (3) CLIENT DASHBOARD: 8 tabs render at /dashboard in client mode (no regression). (4) CLIENT VAULT (/my-vault): renders with eyebrow + 'My Vault' title, 4-tile stat ribbon (Signed=0, Meetings=4, Document Types, AES-256), 3 tabs all present (vault-tab-signed/meetings/timeline). Meeting Notes tab shows exactly 4 mock cards (vault-meeting-mn_1..mn_4) each with title/date/summary/attendees/Notes Download button. (5) CLIENT SETTINGS (/my-settings): 4 tabs present (settings-tab-profile/identity/government/notifications). Profile tab shows all 6 editable rows (profile-name/partner/email/phone/address/occupation) each with Update button. ID & TFN tab shows VOI 'Frankie Financial' verified status, masked TFN '123•••••876' with lock icon, btn-voi-update + btn-tfn-update present. MyGov/ATO tab shows 3 cards (MyGov linked, ATO authorised, Bank feeds) with btn-mygov-open/btn-ato-open/btn-bank-open. Notifications tab shows 5 toggle switches with correct defaults: documentsForSignature=on, emailCampaigns=on, portfolioAlerts=on, marketUpdates=off, smsReminders=off. (6) CLIENT SIDEBAR: /my-vault and /my-settings hrefs present under Documents & Account group. (7) ADVISER REGRESSION: adviser sidebar contains /adviser-hub + /client-setup; /my-vault and /my-settings NOT exposed in adviser mode (correctly personal-nav only).",
+  "backend_issues": { "critical": [], "minor": [] },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Client Dashboard chart containers", "issues": ["Recharts emits 'width(-1) height(-1)' warnings on initial dashboard mount in client mode — non-blocking but indicates a ResponsiveContainer parent without explicit min-height during first paint. Add minHeight on the chart wrapper to silence and avoid layout shift."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "MyVault.jsx: signedFiles useMemo depends on `tick` but ESLint may flag listVault as missing-dep — currently fine because comms-ledger-changed event triggers tick. Just add an eslint-disable-next-line or list refresh explicitly.",
+    "MyVault.jsx line 161: 'Notes' download button is a static toast.success('Notes downloaded (mock)') with no actual blob output, unlike the signed-doc download. Either generate a similar mock-text blob for parity, or label the button 'Request notes' to reflect MOCKED status.",
+    "MySettings.jsx: TFN value field is hard-coded inside a useState initializer ('123•••••876') instead of being derived via MASK_TFN(p.tfn). The MASK_TFN helper at line 21 is defined but never used — dead code. Wire it up so TFN flows from CLIENT_DATA when a real TFN is later added.",
+    "MySettings.jsx: 'Update' buttons on profile rows always toast success — they don't open a real form/modal. This is acceptable as a 'request update from adviser' flow but consider adding a small Dialog with a free-text reason field so adviser receives context.",
+    "navData.js: clientContextNav still exposes a separate 'Vault' entry pointing to /document-vault (adviser-side vault). Risk of confusion if adviser switches contexts — fine for now but document the two distinct vault routes (/document-vault adviser, /my-vault client).",
+    "AdviserHub.jsx (566 lines) is approaching the 700-line guideline. The 4 lazy CRM tabs are already split, but the inline Card render for client tier/status logic (lines 306-394) could be extracted into a ClientCard component for testability.",
+    "AdviserHub.jsx line 61: API_URL falls back to '' which silently breaks fetch in environments missing REACT_APP_BACKEND_URL. Per env rules (omit defaults so missing config fails fast), drop the '|| \"\"' fallback."
+  ],
+  "updated_files": [],
+  "success_rate": { "backend": "N/A (skipped per request)", "frontend": "100%" },
+  "seed_data_creation": "None. Used localStorage flags only — wealth_command_compliance_v5=permanent, app_mode toggled adviser/client.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Iteration 186 fully passes. Adviser Hub layout (search-below-tabs) verified by absolute pixel positions; Vault and Settings pages live at /my-vault and /my-settings, only surfaced in client mode personal nav. TFN value is currently hard-coded in MySettings useState, not derived via the existing MASK_TFN helper — flag for future refactor when real TFN backend lands. Vault meeting notes are MOCKED constant (MOCK_MEETING_NOTES). All third-party verifications (VOI/MyGov/ATO/Bank/DocuSign) are mock toasts."
+}
