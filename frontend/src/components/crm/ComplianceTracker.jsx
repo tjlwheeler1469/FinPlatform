@@ -110,11 +110,11 @@ const ComplianceTracker = () => {
     <div className="space-y-4" data-testid="compliance-tracker">
       {/* Stat strip */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <Card><CardContent className="p-3"><p className="text-[11px] text-muted-foreground">Firm Compliance</p><p className="text-2xl font-bold text-[#1a2744]">{stats.compliance}%</p></CardContent></Card>
-        <Card><CardContent className="p-3"><p className="text-[11px] text-muted-foreground">Signed</p><p className="text-2xl font-bold text-emerald-600">{stats.signed}</p></CardContent></Card>
+        <Card><CardContent className="p-3"><p className="text-[11px] text-muted-foreground">Firm Compliance</p><p className="text-2xl font-bold text-[#1a2744]" data-testid="stat-compliance">{stats.compliance}%</p></CardContent></Card>
+        <Card><CardContent className="p-3"><p className="text-[11px] text-muted-foreground">Signed</p><p className="text-2xl font-bold text-emerald-600" data-testid="stat-signed">{stats.signed}</p></CardContent></Card>
         <Card className="border-rose-200"><CardContent className="p-3"><p className="text-[11px] text-muted-foreground">Overdue</p><p className="text-2xl font-bold text-rose-600" data-testid="stat-overdue">{stats.overdue}</p></CardContent></Card>
-        <Card className="border-amber-200"><CardContent className="p-3"><p className="text-[11px] text-muted-foreground">Due &lt; 30d</p><p className="text-2xl font-bold text-amber-600">{stats.dueSoon}</p></CardContent></Card>
-        <Card><CardContent className="p-3"><p className="text-[11px] text-muted-foreground">Awaiting Sign</p><p className="text-2xl font-bold text-blue-600">{stats.awaiting}</p></CardContent></Card>
+        <Card className="border-amber-200"><CardContent className="p-3"><p className="text-[11px] text-muted-foreground">Due &lt; 30d</p><p className="text-2xl font-bold text-amber-600" data-testid="stat-due-soon">{stats.dueSoon}</p></CardContent></Card>
+        <Card><CardContent className="p-3"><p className="text-[11px] text-muted-foreground">Awaiting Sign</p><p className="text-2xl font-bold text-blue-600" data-testid="stat-awaiting">{stats.awaiting}</p></CardContent></Card>
       </div>
 
       {/* Filters */}

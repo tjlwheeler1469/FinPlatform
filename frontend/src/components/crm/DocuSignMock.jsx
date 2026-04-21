@@ -95,10 +95,10 @@ const DocuSignMock = () => {
     <div className="space-y-4" data-testid="docusign-mock">
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Card><CardContent className="p-3"><p className="text-[11px] text-muted-foreground">Total Envelopes</p><p className="text-2xl font-bold">{stats.total}</p></CardContent></Card>
+        <Card><CardContent className="p-3"><p className="text-[11px] text-muted-foreground">Total Envelopes</p><p className="text-2xl font-bold" data-testid="stat-total">{stats.total}</p></CardContent></Card>
         <Card><CardContent className="p-3"><p className="text-[11px] text-muted-foreground">Pending Signature</p><p className="text-2xl font-bold text-blue-600" data-testid="stat-pending">{stats.pending}</p></CardContent></Card>
-        <Card><CardContent className="p-3"><p className="text-[11px] text-muted-foreground">Signed</p><p className="text-2xl font-bold text-emerald-600">{stats.signed}</p></CardContent></Card>
-        <Card><CardContent className="p-3"><p className="text-[11px] text-muted-foreground">Declined</p><p className="text-2xl font-bold text-rose-600">{stats.declined}</p></CardContent></Card>
+        <Card><CardContent className="p-3"><p className="text-[11px] text-muted-foreground">Signed</p><p className="text-2xl font-bold text-emerald-600" data-testid="stat-signed">{stats.signed}</p></CardContent></Card>
+        <Card><CardContent className="p-3"><p className="text-[11px] text-muted-foreground">Declined</p><p className="text-2xl font-bold text-rose-600" data-testid="stat-declined">{stats.declined}</p></CardContent></Card>
       </div>
 
       {/* New envelope */}

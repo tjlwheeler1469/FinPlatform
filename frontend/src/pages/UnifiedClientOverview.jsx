@@ -42,7 +42,7 @@ const UnifiedClientOverview = () => {
     <Layout>
       <FloatingActionRail />
       <div className="min-h-screen bg-gray-50" data-testid="unified-client-overview">
-        <div className="max-w-[1800px] mx-auto px-4 sm:px-6 pt-4">
+        <div className="max-w-[1800px] mx-auto px-4 sm:px-6 xl:pr-[350px] pt-4">
           <Tabs value={tab} onValueChange={setTab}>
             <TabsList className="bg-white border mb-4 h-10 w-full justify-start gap-0.5 px-1 overflow-x-auto">
               <TabsTrigger value="overview" className={tabTriggerClass} data-testid="client-tab-overview">
