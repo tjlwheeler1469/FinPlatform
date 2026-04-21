@@ -955,6 +955,8 @@ const AppRouter = () => {
       <Route path="/retirement-workshop" element={<RetirementWorkshop />} />
       
       <Route path="/crm-command-center" element={<Navigate to="/adviser-hub" replace />} />
+      <Route path="/crm" element={<Navigate to="/adviser-hub" replace />} />
+      <Route path="/profile" element={<Navigate to="/dashboard" replace />} />
       
       {/* Client 360 View */}
       <Route path="/client-360" element={<Client360View />} />

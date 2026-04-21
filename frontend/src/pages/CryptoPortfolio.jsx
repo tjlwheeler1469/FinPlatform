@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { 
@@ -130,6 +131,37 @@ const CryptoPortfolio = ({ embedded = false }) => {
     fetchLivePrices();
   };
 
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const emptyCrypto = { symbol: "", name: "", units: "", purchasePrice: "", currentPrice: "" };
+  const [newCrypto, setNewCrypto] = useState(emptyCrypto);
+
+  const addCrypto = () => {
+    if (!newCrypto.symbol || !newCrypto.units) { toast.error("Symbol and units required"); return; }
+    const units = parseFloat(newCrypto.units) || 0;
+    const price = parseFloat(newCrypto.currentPrice || newCrypto.purchasePrice) || 0;
+    setHoldings([...holdings, {
+      id: Math.max(0, ...holdings.map((h) => h.id || 0)) + 1,
+      symbol: newCrypto.symbol.toUpperCase(),
+      name: newCrypto.name || newCrypto.symbol,
+      units,
+      amount: units,
+      purchasePrice: parseFloat(newCrypto.purchasePrice) || 0,
+      purchaseDate: new Date().toISOString().split("T")[0],
+      currentPrice: price,
+      price,
+      value_aud: units * price,
+    }]);
+    setShowAddDialog(false);
+    setNewCrypto(emptyCrypto);
+    toast.success(`${newCrypto.symbol.toUpperCase()} added to portfolio`);
+  };
+
+  const deleteCrypto = (id) => {
+    if (!window.confirm("Remove this crypto?")) return;
+    setHoldings(holdings.filter((h) => h.id !== id));
+    toast.success("Removed");
+  };
+
   const content = (
     <>
       <div className="space-y-6" data-testid="crypto-portfolio-page">
@@ -144,7 +176,7 @@ const CryptoPortfolio = ({ embedded = false }) => {
               <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
-            <Button className="bg-[#D4A84C] hover:bg-[#C49A3C] text-black">
+            <Button className="bg-[#D4A84C] hover:bg-[#C49A3C] text-black" onClick={() => setShowAddDialog(true)} data-testid="add-crypto-btn">
               <Plus className="h-4 w-4 mr-2" />
               Add Crypto
             </Button>
@@ -389,7 +421,54 @@ const CryptoPortfolio = ({ embedded = false }) => {
     </>
   );
 
-  return embedded ? content : <Layout>{content}</Layout>;
+  return embedded ? (
+    <>
+      {content}
+      {showAddDialog && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowAddDialog(false)}>
+          <div className="bg-white rounded-lg p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+            <h2 className="text-lg font-semibold mb-4">Add Cryptocurrency</h2>
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div><Label>Symbol *</Label><Input value={newCrypto.symbol} onChange={(e) => setNewCrypto({ ...newCrypto, symbol: e.target.value })} data-testid="crypto-symbol" placeholder="BTC" /></div>
+                <div><Label>Name</Label><Input value={newCrypto.name} onChange={(e) => setNewCrypto({ ...newCrypto, name: e.target.value })} placeholder="Bitcoin" /></div>
+              </div>
+              <div><Label>Units *</Label><Input type="number" step="any" value={newCrypto.units} onChange={(e) => setNewCrypto({ ...newCrypto, units: e.target.value })} data-testid="crypto-units" /></div>
+              <div className="grid grid-cols-2 gap-3">
+                <div><Label>Purchase Price</Label><Input type="number" step="any" value={newCrypto.purchasePrice} onChange={(e) => setNewCrypto({ ...newCrypto, purchasePrice: e.target.value })} /></div>
+                <div><Label>Current Price</Label><Input type="number" step="any" value={newCrypto.currentPrice} onChange={(e) => setNewCrypto({ ...newCrypto, currentPrice: e.target.value })} /></div>
+              </div>
+            </div>
+            <div className="flex gap-2 mt-4">
+              <Button variant="outline" className="flex-1" onClick={() => setShowAddDialog(false)}>Cancel</Button>
+              <Button className="flex-1 bg-[#1a2744]" onClick={addCrypto} data-testid="confirm-add-crypto">Add</Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  ) : <Layout>{content}{showAddDialog && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowAddDialog(false)}>
+          <div className="bg-white rounded-lg p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+            <h2 className="text-lg font-semibold mb-4">Add Cryptocurrency</h2>
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div><Label>Symbol *</Label><Input value={newCrypto.symbol} onChange={(e) => setNewCrypto({ ...newCrypto, symbol: e.target.value })} data-testid="crypto-symbol" placeholder="BTC" /></div>
+                <div><Label>Name</Label><Input value={newCrypto.name} onChange={(e) => setNewCrypto({ ...newCrypto, name: e.target.value })} placeholder="Bitcoin" /></div>
+              </div>
+              <div><Label>Units *</Label><Input type="number" step="any" value={newCrypto.units} onChange={(e) => setNewCrypto({ ...newCrypto, units: e.target.value })} data-testid="crypto-units" /></div>
+              <div className="grid grid-cols-2 gap-3">
+                <div><Label>Purchase Price</Label><Input type="number" step="any" value={newCrypto.purchasePrice} onChange={(e) => setNewCrypto({ ...newCrypto, purchasePrice: e.target.value })} /></div>
+                <div><Label>Current Price</Label><Input type="number" step="any" value={newCrypto.currentPrice} onChange={(e) => setNewCrypto({ ...newCrypto, currentPrice: e.target.value })} /></div>
+              </div>
+            </div>
+            <div className="flex gap-2 mt-4">
+              <Button variant="outline" className="flex-1" onClick={() => setShowAddDialog(false)}>Cancel</Button>
+              <Button className="flex-1 bg-[#1a2744]" onClick={addCrypto} data-testid="confirm-add-crypto">Add</Button>
+            </div>
+          </div>
+        </div>
+      )}</Layout>;
 };
 
 export default CryptoPortfolio;

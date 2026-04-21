@@ -1,0 +1,60 @@
+{
+  "summary": "Iteration 178 re-audit of the 6 CTA wiring fixes + 2 route redirects from iteration 177 action items. 10 of 11 flows PASS. Bonds Buy/Edit/Delete, Cash New TD + New Savings + per-row Delete, Crypto Add, Property Add/Remove (toast + confirm), and /crm + /profile redirects all work correctly. One regression introduced: ManagedFunds 'Invest in Fund' dialog saves the fund and shows the toast, but the re-render crashes with TypeError because the new fund object lacks `units` and `unitPrice` fields (line 355 reads `fund.units.toLocaleString()`), triggering ErrorBoundary. 18/18 sidebar pages still render content (no blanks, no ErrorBoundary visible). Cross-page Net Worth / Total Assets mismatch from iteration 177 (Strategic Planning $8.675M/$10.725M vs Investments $9.610M/$11.672M) remains unaddressed.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "/api/documents", "issue": "Still returns 503 (carry-over from iteration 177)"},
+      {"endpoint": "/api/insights", "issue": "Returns 503"},
+      {"endpoint": "/notifications resource", "issue": "404 on page load (carry-over)"}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "ManagedFunds", "issue": "Invest in Fund dialog adds the fund and toast fires, but the Portfolio list crashes immediately after: `TypeError: Cannot read properties of undefined (reading 'toLocaleString')` at ManagedFunds.jsx:355 `{fund.units.toLocaleString()} units @ ${fund.unitPrice}`. The newFund object built in investInFund() (lines 132-147) omits units and unitPrice, so the freshly added row crashes the page (ErrorBoundary catches with 'Managed Funds' message).", "selector": "[data-testid='confirm-invest']", "priority": "HIGH"}
+    ],
+    "integration_issues": [
+      {"flow": "Cross-page totals consistency (carry-over iter177)", "issue": "Strategic Planning still shows Net Worth $8,675,000 / Total Assets $10,725,000 while Investments Overview shows $9,610,000 / $11,672,000 for same Thompson family client.", "affected_selectors": ["/strategic-planning header tiles", "/investments Overview tiles"]},
+      {"flow": "Emergent sandbox postMessage (environmental, not app code)", "issue": "DataCloneError spam from emergent-main.js continues on /dashboard, /client-360, /retirement-confidence. Non-blocking but pollutes console.", "affected_selectors": ["emergent-main.js sendToParent"]}
+    ],
+    "design_issues": []
+  },
+  "acceptance_criteria_results": {
+    "bonds_buy_dialog": "PASS - data-testid='buy-bond-btn' opens dialog, Bond Name + Face Value inputs accept TEST values, 'confirm-buy-bond' adds row + fires 'Bond added to portfolio' toast.",
+    "bonds_edit_dialog": "PASS - 5 edit-bond-{id} buttons render, dialog opens, save-bond-edit saves.",
+    "bonds_delete": "PASS - delete-bond-{id} with window.confirm, count 5 -> 4 after delete.",
+    "cash_new_td_dialog": "PASS - new-deposit-btn opens dialog, confirm-add-td adds row.",
+    "cash_new_savings_dialog": "PASS - new-savings-btn opens dialog, confirm-add-savings adds row.",
+    "cash_delete_td": "PASS - count 2 -> 1 after delete-td-{id} click.",
+    "cash_delete_savings": "PASS - count 2 -> 1 after delete-savings-{id} click.",
+    "crypto_add_dialog": "PASS - add-crypto-btn opens dialog, confirm-add-crypto adds row (replaces previous broken 'Refresh' toast behaviour).",
+    "managed_funds_invest_dialog": "FAIL - dialog + save wiring work, but new fund render crashes with TypeError on fund.units. Toast does show before the crash.",
+    "property_add_property": "PASS - count 1 -> 2 after add-property-btn click, toast visible.",
+    "property_remove": "PASS - remove-property-{index} triggers window.confirm, property removed, 'Property removed' toast shown.",
+    "crm_redirect": "PASS - /crm -> /adviser-hub (body length 1992, not blank).",
+    "profile_redirect": "PASS - /profile -> /dashboard (body length 2587, not blank).",
+    "sidebar_pages_render": "PASS - all 18 tested pages (/dashboard, /retirement-confidence, /budget, /investments, /tax-analysis-sync, /goals, /command-center, /adviser-hub, /document-vault, /client-portal, /client-360, /decision-engine, /book-intelligence, /intelligence-feed, /notifications, /reports, /practice-management, /strategic-planning) return non-zero body content with no 'Something went wrong' ErrorBoundary fallback.",
+    "retirement_confidence_stress_scenarios": "NOT EXECUTED - time-boxed; engine + Current Plan scenario already validated in iter177/176 (Monthly Income $40,417, Expenses $17,500, Annual Contribs $120,000, 99% confidence). Main agent can self-verify 3 stress scenarios.",
+    "investments_cross_tab_consistency": "NOT RE-TESTED - iter177 already confirmed Shares $845k, Cash $530k, Super $3.27M, Total Assets $11.672M, Net Worth $9.610M."
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Fix ManagedFunds crash: in investInFund() (ManagedFunds.jsx L132-147), include units + unitPrice in the spread, e.g. units: 0, unitPrice: 0 (or derive unitPrice from purchaseValue/units if entered). Alternatively, guard line 355 with `{(fund.units ?? 0).toLocaleString()} units @ $${fund.unitPrice ?? '-'}`.",
+    "(Carry-over iter177) Reconcile Net Worth / Total Assets between Strategic Planning ($8.675M / $10.725M) and Investments Overview ($9.610M / $11.672M) - single source of truth needed.",
+    "(Carry-over iter177) Backend 503s: /api/documents and /api/insights; 404s on /notifications resource - fix or mock.",
+    "(Minor, cosmetic) Recharts warnings 'The width(-1) and height(-1) of chart should be greater than 0' on pages with collapsed chart containers - add minWidth/minHeight 0 to ResponsiveContainer parents."
+  ],
+  "critical_code_review_comments": [
+    "ManagedFunds investInFund() only spreads user-entered fields; the render relies on units/unitPrice which are never set on new funds. Either (a) extend emptyFund with units:0 unitPrice:0 plus UI inputs, or (b) null-guard the render. Same bug pattern could exist in other newly-wired dialogs (Bonds, Cash, Crypto) - recommend a smoke test that adds a row and re-reads each list render.",
+    "Dialogs across the 6 fixed pages use native div overlays (fixed inset-0 bg-black/50 z-50) rather than the shadcn Dialog component. This is a deliberate choice to avoid Radix TabsContent portal issues, but now duplicates Escape/backdrop logic across 6+ files. Consider extracting a shared <SimpleModal> component.",
+    "Add/Edit/Delete handlers across these pages do not persist to backend or localStorage - all state is in-memory and resets on refresh. If the product intent is client-side persistence, wire to localStorage; if server-side, add API calls.",
+    "id generation: BondsTrading uses Math.max(...ids)+1 (correct), but verify all 6 newly-wired pages use the same safe pattern (earlier iter176 UnlistedInvestments bug was length+1 collision)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (frontend-only test)", "frontend": "91% (10/11 wired flows PASS + 2/2 redirects PASS + 18/18 pages render; 1 new regression in ManagedFunds crash post-add)"},
+  "test_credentials": "None - compliance bypassed via localStorage wealth_command_compliance_v5=permanent; adviser mode + selected_client={id:'thompson_family'} seeded via localStorage.",
+  "seed_data_creation": "Ephemeral in-memory rows added during test (TEST Bond Alpha, TEST TD, TEST Savings, TESTC crypto, TEST Vanguard Global fund, one extra Property); not persisted.",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iteration 178 verified the 6 CTA wiring fixes requested in iter177 action items. All work EXCEPT ManagedFunds which now has a render-time TypeError when a new fund is added (units/unitPrice missing). Bonds/Cash/Crypto/Property all functional end-to-end. /crm and /profile redirects confirmed working. Do not re-test page-level blankness (18/18 render). Carry-over issues (Net Worth mismatch between Strategic Planning vs Investments, /api/documents 503, /notifications 404, emergent-main postMessage errors) are unchanged from iter177 and have not been addressed.",
+  "rca of the issue": "ManagedFunds.jsx line 355 unconditionally calls `fund.units.toLocaleString()` and interpolates `fund.unitPrice`. The newly-added funds coming from investInFund() (L132-147) spread only the user-entered fields from newFund (name, manager, category, risk, mer, purchaseValue, currentValue, rating) plus generated id/purchaseDate/apir - no units or unitPrice. When React re-renders the Portfolio tab list, the freshly added object hits `undefined.toLocaleString()` and the ErrorBoundary catches with 'Managed Funds ...'. Reproduction: /investments -> Managed Funds tab -> Invest in Fund -> fill Name='X' + Purchase Value=1000 -> Add Investment. Toast 'Investment added to portfolio' briefly shows, then the tab crashes. Fix: either add units:0, unitPrice:0 defaults in the setFunds call at L135-143, or null-coalesce the render at L355."
+}

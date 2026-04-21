@@ -14,6 +14,7 @@ import {
   Calendar,
   Clock,
   Plus,
+  Trash2,
   Building2,
   TrendingUp,
   ArrowUpRight,
@@ -64,6 +65,53 @@ const BEST_RATES = [
 const CashDeposits = ({ embedded = false }) => {
   const [accounts, setAccounts] = useState(DEMO_ACCOUNTS);
   const [termDeposits, setTermDeposits] = useState(DEMO_TERM_DEPOSITS);
+  const [showTDDialog, setShowTDDialog] = useState(false);
+  const [showSavingsDialog, setShowSavingsDialog] = useState(false);
+  const emptyTD = { name: "", bank: "", principal: "", interestRate: "", term: 12, startDate: new Date().toISOString().split("T")[0] };
+  const emptySavings = { name: "", bank: "", balance: "", interestRate: "" };
+  const [newTD, setNewTD] = useState(emptyTD);
+  const [newSavings, setNewSavings] = useState(emptySavings);
+
+  const addTD = () => {
+    if (!newTD.name || !newTD.principal) { toast.error("Name and principal required"); return; }
+    const principal = parseFloat(newTD.principal);
+    const rate = parseFloat(newTD.interestRate) || 0;
+    const term = parseInt(newTD.term) || 12;
+    const start = new Date(newTD.startDate);
+    const maturity = new Date(start); maturity.setMonth(maturity.getMonth() + term);
+    setTermDeposits([...termDeposits, {
+      id: Math.max(0, ...termDeposits.map((t) => t.id)) + 1,
+      ...newTD,
+      principal, interestRate: rate, term,
+      maturityDate: maturity.toISOString().split("T")[0],
+      interestAtMaturity: Math.round(principal * rate / 100 * (term / 12)),
+      status: "active",
+    }]);
+    setShowTDDialog(false);
+    setNewTD(emptyTD);
+    toast.success("Term deposit added");
+  };
+
+  const addSavings = () => {
+    if (!newSavings.name || !newSavings.balance) { toast.error("Name and balance required"); return; }
+    setAccounts([...accounts, {
+      id: Math.max(0, ...accounts.map((a) => a.id)) + 1,
+      ...newSavings,
+      type: "savings",
+      balance: parseFloat(newSavings.balance),
+      interestRate: parseFloat(newSavings.interestRate) || 0,
+      bonusRate: 0,
+      effectiveRate: parseFloat(newSavings.interestRate) || 0,
+      interestEarned: 0,
+      lastInterestPaid: new Date().toISOString().split("T")[0],
+    }]);
+    setShowSavingsDialog(false);
+    setNewSavings(emptySavings);
+    toast.success("Savings account added");
+  };
+
+  const deleteTD = (id) => { if (window.confirm("Remove this TD?")) { setTermDeposits(termDeposits.filter((t) => t.id !== id)); toast.success("Removed"); } };
+  const deleteSavings = (id) => { if (window.confirm("Remove this account?")) { setAccounts(accounts.filter((a) => a.id !== id)); toast.success("Removed"); } };
   const [activeTab, setActiveTab] = useState("overview");
 
   const totalSavings = accounts.reduce((sum, a) => sum + a.balance, 0);
@@ -110,10 +158,15 @@ const CashDeposits = ({ embedded = false }) => {
               High-interest savings accounts and term deposits
             </p>
           </div>
-          <Button className="bg-[#1a2744] hover:bg-[#1a2744]/90" data-testid="new-deposit-btn">
-            <Plus className="h-4 w-4 mr-2" />
-            New Term Deposit
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" data-testid="new-savings-btn" onClick={() => setShowSavingsDialog(true)}>
+              <Plus className="h-4 w-4 mr-2" /> Savings Account
+            </Button>
+            <Button className="bg-[#1a2744] hover:bg-[#1a2744]/90" data-testid="new-deposit-btn" onClick={() => setShowTDDialog(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              New Term Deposit
+            </Button>
+          </div>
         </div>
 
         {/* Summary Cards */}
@@ -200,9 +253,12 @@ const CashDeposits = ({ embedded = false }) => {
                             <p className="font-medium">{account.name}</p>
                             <p className="text-sm text-muted-foreground">{account.bank}</p>
                           </div>
-                          <div className="text-right">
-                            <p className="font-bold">{formatCurrency(account.balance)}</p>
-                            <p className="text-sm text-emerald-600">{account.effectiveRate}% p.a.</p>
+                          <div className="text-right flex flex-col items-end gap-1">
+                            <div>
+                              <p className="font-bold">{formatCurrency(account.balance)}</p>
+                              <p className="text-sm text-emerald-600">{account.effectiveRate}% p.a.</p>
+                            </div>
+                            <Button variant="ghost" size="icon" className="h-6 w-6 text-red-600" onClick={() => deleteSavings(account.id)} data-testid={`delete-savings-${account.id}`}><Trash2 className="h-3 w-3" /></Button>
                           </div>
                         </div>
                       </div>
@@ -225,9 +281,12 @@ const CashDeposits = ({ embedded = false }) => {
                             <p className="font-medium">{td.name}</p>
                             <p className="text-sm text-muted-foreground">{td.bank}</p>
                           </div>
-                          <div className="text-right">
-                            <p className="font-bold">{formatCurrency(td.principal)}</p>
-                            <p className="text-sm text-emerald-600">{td.interestRate}% p.a.</p>
+                          <div className="text-right flex flex-col items-end gap-1">
+                            <div>
+                              <p className="font-bold">{formatCurrency(td.principal)}</p>
+                              <p className="text-sm text-emerald-600">{td.interestRate}% p.a.</p>
+                            </div>
+                            <Button variant="ghost" size="icon" className="h-6 w-6 text-red-600" onClick={() => deleteTD(td.id)} data-testid={`delete-td-${td.id}`}><Trash2 className="h-3 w-3" /></Button>
                           </div>
                         </div>
                         <div className="space-y-1">
@@ -374,6 +433,52 @@ const CashDeposits = ({ embedded = false }) => {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Savings Account Dialog */}
+        {showSavingsDialog && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowSavingsDialog(false)}>
+            <div className="bg-white rounded-lg p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+              <h2 className="text-lg font-semibold mb-4">Add Savings Account</h2>
+              <div className="space-y-3">
+                <div><Label>Account Name *</Label><Input value={newSavings.name} onChange={(e) => setNewSavings({ ...newSavings, name: e.target.value })} data-testid="savings-name" /></div>
+                <div><Label>Bank</Label><Input value={newSavings.bank} onChange={(e) => setNewSavings({ ...newSavings, bank: e.target.value })} /></div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><Label>Balance *</Label><Input type="number" value={newSavings.balance} onChange={(e) => setNewSavings({ ...newSavings, balance: e.target.value })} data-testid="savings-balance" /></div>
+                  <div><Label>Interest %</Label><Input type="number" step="0.01" value={newSavings.interestRate} onChange={(e) => setNewSavings({ ...newSavings, interestRate: e.target.value })} /></div>
+                </div>
+              </div>
+              <div className="flex gap-2 mt-4">
+                <Button variant="outline" className="flex-1" onClick={() => setShowSavingsDialog(false)}>Cancel</Button>
+                <Button className="flex-1 bg-[#1a2744]" onClick={addSavings} data-testid="confirm-add-savings">Add</Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TD Dialog */}
+        {showTDDialog && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowTDDialog(false)}>
+            <div className="bg-white rounded-lg p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+              <h2 className="text-lg font-semibold mb-4">New Term Deposit</h2>
+              <div className="space-y-3">
+                <div><Label>Name *</Label><Input value={newTD.name} onChange={(e) => setNewTD({ ...newTD, name: e.target.value })} data-testid="td-name" placeholder="e.g. 12 Month TD" /></div>
+                <div><Label>Bank</Label><Input value={newTD.bank} onChange={(e) => setNewTD({ ...newTD, bank: e.target.value })} /></div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><Label>Principal *</Label><Input type="number" value={newTD.principal} onChange={(e) => setNewTD({ ...newTD, principal: e.target.value })} data-testid="td-principal" /></div>
+                  <div><Label>Interest %</Label><Input type="number" step="0.01" value={newTD.interestRate} onChange={(e) => setNewTD({ ...newTD, interestRate: e.target.value })} /></div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><Label>Term (months)</Label><Input type="number" value={newTD.term} onChange={(e) => setNewTD({ ...newTD, term: e.target.value })} /></div>
+                  <div><Label>Start Date</Label><Input type="date" value={newTD.startDate} onChange={(e) => setNewTD({ ...newTD, startDate: e.target.value })} /></div>
+                </div>
+              </div>
+              <div className="flex gap-2 mt-4">
+                <Button variant="outline" className="flex-1" onClick={() => setShowTDDialog(false)}>Cancel</Button>
+                <Button className="flex-1 bg-[#1a2744]" onClick={addTD} data-testid="confirm-add-td">Add TD</Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
   );
 

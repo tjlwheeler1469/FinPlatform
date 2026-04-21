@@ -16,6 +16,8 @@ import {
   Percent,
   Clock,
   Plus,
+  Pencil,
+  Trash2,
   ArrowUpRight,
   ArrowDownRight,
   Info
@@ -88,10 +90,43 @@ const MARKET_RATES = {
 const BondsTrading = ({ embedded = false }) => {
   const [bonds, setBonds] = useState(DEMO_BONDS);
   const [activeTab, setActiveTab] = useState("portfolio");
+  const [showBuyDialog, setShowBuyDialog] = useState(false);
+  const [editingBond, setEditingBond] = useState(null);
+  const emptyBond = { name: "", issuer: "", type: "Government", couponRate: "", yieldToMaturity: "", maturityDate: "", faceValue: "", currentValue: "", rating: "AAA" };
+  const [newBond, setNewBond] = useState(emptyBond);
+
+  const handleBuyBond = () => {
+    if (!newBond.name || !newBond.faceValue) { toast.error("Bond name and face value required"); return; }
+    setBonds([...bonds, {
+      id: Math.max(0, ...bonds.map((b) => b.id)) + 1,
+      ...newBond,
+      faceValue: parseFloat(newBond.faceValue) || 0,
+      currentValue: parseFloat(newBond.currentValue || newBond.faceValue) || 0,
+      couponRate: parseFloat(newBond.couponRate) || 0,
+      yieldToMaturity: parseFloat(newBond.yieldToMaturity) || 0,
+      purchaseDate: new Date().toISOString().split("T")[0],
+    }]);
+    setShowBuyDialog(false);
+    setNewBond(emptyBond);
+    toast.success("Bond added to portfolio");
+  };
+
+  const handleSaveBondEdit = () => {
+    if (!editingBond?.name) { toast.error("Name required"); return; }
+    setBonds(bonds.map((b) => (b.id === editingBond.id ? { ...editingBond, faceValue: parseFloat(editingBond.faceValue) || 0, currentValue: parseFloat(editingBond.currentValue) || 0, couponRate: parseFloat(editingBond.couponRate) || 0, yieldToMaturity: parseFloat(editingBond.yieldToMaturity) || 0 } : b)));
+    setEditingBond(null);
+    toast.success("Bond updated");
+  };
+
+  const handleDeleteBond = (id) => {
+    if (!window.confirm("Remove this bond?")) return;
+    setBonds(bonds.filter((b) => b.id !== id));
+    toast.success("Bond removed");
+  };
 
   const totalFaceValue = bonds.reduce((sum, b) => sum + b.faceValue, 0);
   const totalCurrentValue = bonds.reduce((sum, b) => sum + b.currentValue, 0);
-  const averageYield = bonds.reduce((sum, b) => sum + b.yieldToMaturity, 0) / bonds.length;
+  const averageYield = bonds.length > 0 ? bonds.reduce((sum, b) => sum + b.yieldToMaturity, 0) / bonds.length : 0;
   const totalPnL = totalCurrentValue - totalFaceValue;
 
   const getRatingColor = (rating) => {
@@ -123,7 +158,7 @@ const BondsTrading = ({ embedded = false }) => {
               Government, semi-government, and corporate bonds portfolio
             </p>
           </div>
-          <Button className="bg-[#1a2744] hover:bg-[#1a2744]/90" data-testid="buy-bond-btn">
+          <Button className="bg-[#1a2744] hover:bg-[#1a2744]/90" data-testid="buy-bond-btn" onClick={() => setShowBuyDialog(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Buy Bond
           </Button>
@@ -267,6 +302,14 @@ const BondsTrading = ({ embedded = false }) => {
                       <p className="text-xs text-muted-foreground mt-1">
                         Face: {formatCurrency(bond.faceValue)}
                       </p>
+                      <div className="flex justify-end gap-1 mt-2">
+                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); setEditingBond({ ...bond }); }} data-testid={`edit-bond-${bond.id}`}>
+                          <Pencil className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-red-600" onClick={(e) => { e.stopPropagation(); handleDeleteBond(bond.id); }} data-testid={`delete-bond-${bond.id}`}>
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -274,6 +317,65 @@ const BondsTrading = ({ embedded = false }) => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Buy Bond Dialog */}
+        {showBuyDialog && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowBuyDialog(false)}>
+            <div className="bg-white rounded-lg p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+              <h2 className="text-lg font-semibold mb-4">Buy Bond</h2>
+              <div className="space-y-3">
+                <div><Label>Bond Name *</Label><Input value={newBond.name} onChange={(e) => setNewBond({ ...newBond, name: e.target.value })} data-testid="buy-bond-name" placeholder="e.g. Australian Government Bond" /></div>
+                <div><Label>Issuer</Label><Input value={newBond.issuer} onChange={(e) => setNewBond({ ...newBond, issuer: e.target.value })} /></div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><Label>Type</Label>
+                    <select value={newBond.type} onChange={(e) => setNewBond({ ...newBond, type: e.target.value })} className="w-full h-9 border rounded px-2 text-sm">
+                      <option>Government</option><option>Semi-Government</option><option>Corporate</option><option>Floating Rate</option>
+                    </select>
+                  </div>
+                  <div><Label>Rating</Label>
+                    <select value={newBond.rating} onChange={(e) => setNewBond({ ...newBond, rating: e.target.value })} className="w-full h-9 border rounded px-2 text-sm">
+                      <option>AAA</option><option>AA+</option><option>AA</option><option>AA-</option><option>A+</option><option>A</option><option>A-</option><option>BBB</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><Label>Face Value *</Label><Input type="number" value={newBond.faceValue} onChange={(e) => setNewBond({ ...newBond, faceValue: e.target.value })} data-testid="buy-bond-face" /></div>
+                  <div><Label>Current Value</Label><Input type="number" value={newBond.currentValue} onChange={(e) => setNewBond({ ...newBond, currentValue: e.target.value })} /></div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><Label>Coupon %</Label><Input type="number" step="0.01" value={newBond.couponRate} onChange={(e) => setNewBond({ ...newBond, couponRate: e.target.value })} /></div>
+                  <div><Label>YTM %</Label><Input type="number" step="0.01" value={newBond.yieldToMaturity} onChange={(e) => setNewBond({ ...newBond, yieldToMaturity: e.target.value })} /></div>
+                </div>
+                <div><Label>Maturity Date</Label><Input type="date" value={newBond.maturityDate} onChange={(e) => setNewBond({ ...newBond, maturityDate: e.target.value })} /></div>
+              </div>
+              <div className="flex gap-2 mt-4">
+                <Button variant="outline" className="flex-1" onClick={() => setShowBuyDialog(false)}>Cancel</Button>
+                <Button className="flex-1 bg-[#1a2744]" onClick={handleBuyBond} data-testid="confirm-buy-bond">Add Bond</Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Bond Dialog */}
+        {editingBond && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setEditingBond(null)}>
+            <div className="bg-white rounded-lg p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+              <h2 className="text-lg font-semibold mb-4">Edit Bond</h2>
+              <div className="space-y-3">
+                <div><Label>Bond Name *</Label><Input value={editingBond.name} onChange={(e) => setEditingBond({ ...editingBond, name: e.target.value })} /></div>
+                <div><Label>Issuer</Label><Input value={editingBond.issuer} onChange={(e) => setEditingBond({ ...editingBond, issuer: e.target.value })} /></div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><Label>Face Value</Label><Input type="number" value={editingBond.faceValue} onChange={(e) => setEditingBond({ ...editingBond, faceValue: e.target.value })} /></div>
+                  <div><Label>Current Value</Label><Input type="number" value={editingBond.currentValue} onChange={(e) => setEditingBond({ ...editingBond, currentValue: e.target.value })} /></div>
+                </div>
+              </div>
+              <div className="flex gap-2 mt-4">
+                <Button variant="outline" className="flex-1" onClick={() => setEditingBond(null)}>Cancel</Button>
+                <Button className="flex-1 bg-[#1a2744]" onClick={handleSaveBondEdit} data-testid="save-bond-edit">Save</Button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Info Card */}
         <Card className="bg-blue-50 border-blue-200">

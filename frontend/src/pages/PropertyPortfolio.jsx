@@ -63,11 +63,14 @@ const PropertyPortfolio = ({ embedded = false }) => {
       ...properties,
       { ...defaultProperty, name: `Property ${properties.length + 1}` }
     ]);
+    toast.success("New property added to portfolio");
   };
 
   const removeProperty = (index) => {
     if (properties.length > 1) {
+      if (!window.confirm(`Remove ${properties[index].name}?`)) return;
       setProperties(properties.filter((_, i) => i !== index));
+      toast.success("Property removed");
     }
   };
 

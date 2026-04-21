@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { 
@@ -124,12 +125,38 @@ const FUND_CATEGORIES = [
 const ManagedFunds = ({ embedded = false }) => {
   const [funds, setFunds] = useState(DEMO_FUNDS);
   const [activeTab, setActiveTab] = useState("portfolio");
+  const [showInvestDialog, setShowInvestDialog] = useState(false);
+  const emptyFund = { name: "", manager: "", category: "Australian Equities", risk: "Medium", mer: "", purchaseValue: "", currentValue: "", rating: 4 };
+  const [newFund, setNewFund] = useState(emptyFund);
+
+  const investInFund = () => {
+    if (!newFund.name || !newFund.purchaseValue) { toast.error("Name and investment amount required"); return; }
+    const purchaseValue = parseFloat(newFund.purchaseValue) || 0;
+    setFunds([...funds, {
+      id: Math.max(0, ...funds.map((f) => f.id)) + 1,
+      ...newFund,
+      purchaseValue,
+      currentValue: parseFloat(newFund.currentValue) || purchaseValue,
+      mer: parseFloat(newFund.mer) || 0,
+      purchaseDate: new Date().toISOString().split("T")[0],
+      apir: `NEW${String(funds.length + 1).padStart(4, "0")}AU`,
+    }]);
+    setShowInvestDialog(false);
+    setNewFund(emptyFund);
+    toast.success("Investment added to portfolio");
+  };
+
+  const removeFund = (id) => {
+    if (!window.confirm("Redeem/remove this fund?")) return;
+    setFunds(funds.filter((f) => f.id !== id));
+    toast.success("Fund removed");
+  };
 
   const totalCurrentValue = funds.reduce((sum, f) => sum + f.currentValue, 0);
   const totalPurchaseValue = funds.reduce((sum, f) => sum + f.purchaseValue, 0);
   const totalReturn = totalCurrentValue - totalPurchaseValue;
-  const returnPercent = ((totalCurrentValue / totalPurchaseValue) - 1) * 100;
-  const avgMER = funds.reduce((sum, f) => sum + f.mer, 0) / funds.length;
+  const returnPercent = totalPurchaseValue > 0 ? ((totalCurrentValue / totalPurchaseValue) - 1) * 100 : 0;
+  const avgMER = funds.length > 0 ? funds.reduce((sum, f) => sum + f.mer, 0) / funds.length : 0;
 
   const formatCurrency = (value) => {
     return new Intl.NumberFormat('en-AU', {
@@ -181,7 +208,7 @@ const ManagedFunds = ({ embedded = false }) => {
               Active and index managed investment funds
             </p>
           </div>
-          <Button className="bg-[#1a2744] hover:bg-[#1a2744]/90" data-testid="invest-btn">
+          <Button className="bg-[#1a2744] hover:bg-[#1a2744]/90" data-testid="invest-btn" onClick={() => setShowInvestDialog(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Invest in Fund
           </Button>
@@ -428,7 +455,40 @@ const ManagedFunds = ({ embedded = false }) => {
     </>
   );
 
-  return embedded ? content : <Layout>{content}</Layout>;
+  const investDialog = showInvestDialog && (
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowInvestDialog(false)}>
+      <div className="bg-white rounded-lg p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        <h2 className="text-lg font-semibold mb-4">Invest in Fund</h2>
+        <div className="space-y-3">
+          <div><Label>Fund Name *</Label><Input value={newFund.name} onChange={(e) => setNewFund({ ...newFund, name: e.target.value })} data-testid="fund-name" /></div>
+          <div><Label>Fund Manager</Label><Input value={newFund.manager} onChange={(e) => setNewFund({ ...newFund, manager: e.target.value })} /></div>
+          <div className="grid grid-cols-2 gap-3">
+            <div><Label>Category</Label>
+              <select value={newFund.category} onChange={(e) => setNewFund({ ...newFund, category: e.target.value })} className="w-full h-9 border rounded px-2 text-sm">
+                <option>Australian Equities</option><option>International Equities</option><option>Fixed Income</option><option>Multi-Asset</option><option>Property</option><option>Infrastructure</option>
+              </select>
+            </div>
+            <div><Label>Risk</Label>
+              <select value={newFund.risk} onChange={(e) => setNewFund({ ...newFund, risk: e.target.value })} className="w-full h-9 border rounded px-2 text-sm">
+                <option>Low</option><option>Medium</option><option>High</option>
+              </select>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div><Label>Purchase Value *</Label><Input type="number" value={newFund.purchaseValue} onChange={(e) => setNewFund({ ...newFund, purchaseValue: e.target.value })} data-testid="fund-purchase" /></div>
+            <div><Label>Current Value</Label><Input type="number" value={newFund.currentValue} onChange={(e) => setNewFund({ ...newFund, currentValue: e.target.value })} /></div>
+          </div>
+          <div><Label>MER %</Label><Input type="number" step="0.01" value={newFund.mer} onChange={(e) => setNewFund({ ...newFund, mer: e.target.value })} /></div>
+        </div>
+        <div className="flex gap-2 mt-4">
+          <Button variant="outline" className="flex-1" onClick={() => setShowInvestDialog(false)}>Cancel</Button>
+          <Button className="flex-1 bg-[#1a2744]" onClick={investInFund} data-testid="confirm-invest">Add Investment</Button>
+        </div>
+      </div>
+    </div>
+  );
+
+  return embedded ? <>{content}{investDialog}</> : <Layout>{content}{investDialog}</Layout>;
 };
 
 export default ManagedFunds;
