@@ -11,7 +11,22 @@ Build an AFSL-grade wealth management platform for HNW clients with consolidated
 - **Centralized Data**: `/app/frontend/src/data/clientData.js`
 
 
-## Completed (20 April 2026) — Iteration 14 (Current)
+## Completed (20 April 2026) — Iteration 15 (Current)
+- [x] **Full audit of investment sub-page Add/Edit/Delete buttons** — previously 6 primary CTAs were non-wired. All now functional with modal dialogs + toasts + confirm-on-delete:
+  - **BondsTrading** — Buy Bond dialog + per-row Edit/Delete (pencil/trash icons).
+  - **CashDeposits** — New Term Deposit + Savings Account dialogs + per-row Delete.
+  - **CryptoPortfolio** — Add Crypto dialog + per-row Delete.
+  - **ManagedFunds** — Invest in Fund dialog + Remove. Fixed crash by adding units/unitPrice/return fields.
+  - **PropertyPortfolio** — Add/Remove now show toast + confirm.
+  - **UnlistedInvestments** (earlier) — Edit/Delete dialogs.
+  - **SMSFOptimizer** skipped — read-only calculator, no edit UI.
+- [x] **Strategic Planning totals unified** — Net Worth $9,610,000 / Total Assets $11,672,000 now match Investments Overview (was $8,675k/$10,725k). `currentNetWorth` now prefers `portfolio.summary` values.
+- [x] **Routed /crm and /profile** to eliminate blank pages (redirect to /adviser-hub and /dashboard).
+- Testing: iteration 178 (10/11 wired flows) + iteration 179 (2/2 fixes, 100%).
+- Calculations verified: /budget / /investments / /retirement-confidence all consistent with CLIENT_DATA.thompson_family ($9.61M NW, $485k income, $17,500 monthly spend, $845k shares, $3.27M super, $530k cash).
+- Pre-existing cosmetic: Recharts width(-1) warnings on hidden TabsContent first-render; emergent sandbox postMessage DataCloneError noise (environmental).
+
+## Completed (20 April 2026) — Iteration 14
 - [x] **Edit/Delete buttons wired on UnlistedInvestments** — previously the pencil/trash icons did nothing. Now: Edit opens a pre-filled Dialog (name/type/entity/prices/notes) with Save Changes toast; Delete confirms then removes + toasts. Add button unchanged.
 - [x] **Markets moved into Today section** — TodaysPrioritiesCard in AdviserClientDashboard now has a "Markets" strip at the bottom of the card with ASX 200 / AUD/USD / RBA Rate tiles + Live badge. (Adviser dashboard shown at /dashboard when adviser has a selected client.)
 - [x] **RetirementWorkshop — scenario cap 5 → 10** — advisers can now model up to 10 scenarios simultaneously. Budget/Investments inputs already align to CLIENT_DATA: monthly income $40,417, expenses $17,500, surplus $22,917 all match /budget page.
