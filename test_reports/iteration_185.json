@@ -1,0 +1,26 @@
+{
+  "summary": "Iteration 185 frontend UI verification — ALL 3 client-view changes PASS. (1) Client /dashboard in client mode renders exactly 8 tabs in required order with all 8 data-testids present. (2) Retirement & Super tab shows Monte Carlo confidence + P10/P50/P90 chart + 3-tile Super & Pension card ($3.27M total, $120k contrib, age 67), FY25 $30k concessional cap bar at 100%, list of David-AustralianSuper $1.85M + Sarah-REST $1.42M, adviser footer. (3) Budget tab: 3-tile cash flow ($40k/$18k/$23k) + 56.7% savings-rate bar + Annual Summary ($485k/$210k/$275k/56.7%) + lock footer. (4) Tax Centre: 4-tile ($485k/$30k/$180k/$275k) + 5-band marginal table + 37.1% effective rate. (5) Zero inputs/textareas/sliders/Add buttons across Snapshot, Retirement, Investments, Budget, Tax, Documents (verified via DOM query). (6) Sandbox kept: 8 sliders + reset + playground banner. (7) Messages composer allowed. (8) Sidebar cleaned — only 'YOU>My Dashboard' + 'Documents & Account' groups; no anchors to /retirement-confidence, /budget, /investments, /tax-analysis. (9) Data matches CLIENT_DATA.thompson_family. Adviser regression (app_mode=adviser + selected_client=thompson_family) still renders 8 profile tabs (Overview, Retirement & Super, Investments, Budget, Goals, Tax Centre, Comms & Vault, Invoicing). Client Hub redesign from iter 184 intact (8 household cards, tier badges, Open profile CTA).",
+  "backend_issues": { "critical": [], "minor": [] },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Client Dashboard TabsList", "issues": ["At 1920px viewport, 8 tabs wrap to two rows (flex-wrap enabled). Visually acceptable but second row (Documents, Messages) sits slightly offset. Consider a horizontal scroll on narrow widths instead of wrapping for a cleaner look."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "SimpleClientView.jsx (466 lines) still imports '@/components/ui/input' (Input) at line 9 even though no <Input> is now rendered in the file — dead import, remove.",
+    "SimpleClientView.jsx defines 4 new tab components (RetirementTab extended, BudgetTab, TaxTab) inline in one file — approaching single-file bloat. Consider splitting BudgetTab/TaxTab/RetirementTab into /components/client/*Tab.jsx for maintainability before the file grows past 700 lines.",
+    "Tax bands in TaxTab are hard-coded inline (lines 283-289). Same 2025 AU tax bracket constants likely exist elsewhere — extract to /lib/taxBands.js for DRY/testability.",
+    "BudgetTab falls back to (client.profile?.incomeHousehold) || (b.monthlyIncome * 12). If profile.incomeHousehold is 0 (not undefined), this incorrectly uses monthlyIncome*12 — use nullish coalescing (??) instead of ||.",
+    "navData.js — /dashboard route label 'My Dashboard' has title 'Retirement, investments, budget, tax & sandbox — all in one' which is accurate, good alignment. But 'allNavItems' export (line 93) still spreads clientContextNav — harmless but unused in client mode."
+  ],
+  "updated_files": [],
+  "success_rate": { "backend": "N/A (skipped per request)", "frontend": "100%" },
+  "seed_data_creation": "None. Used localStorage: wealth_command_compliance_v5=permanent, app_mode=client, no selected_client.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Iteration 185 client-view consolidation is fully working. The 8-tab client dashboard lives at /dashboard when app_mode=client and no selected_client. Radix TabsContent only mounts the active panel by default, so text-existence assertions must switch tab first. Note: CSS text-transform:uppercase means innerText returns uppercased strings for tile labels — use case-insensitive regex or visual verification. Adviser flow unchanged at /dashboard with app_mode=adviser + selected_client. Sandbox remains the only interactive tab in client mode."
+}

@@ -13,17 +13,7 @@ export const personalNavGroups = [
     name: "You",
     icon: LayoutDashboard,
     items: [
-      { path: "/dashboard", label: "My Dashboard", icon: Eye, title: "Your confidence, plan & next steps", badge: "HOME" },
-      { path: "/retirement-confidence", label: "Retirement & Super", icon: Gauge, title: "Retirement plan, Super/Pension & SMSF" },
-      { path: "/budget", label: "Budget", icon: PiggyBank, title: "Income, expenses & savings" },
-    ]
-  },
-  {
-    name: "Portfolio",
-    icon: TrendingUp,
-    items: [
-      { path: "/investments", label: "Investments", icon: TrendingUp, title: "Holdings & allocation" },
-      { path: "/tax-analysis-sync", label: "Tax Centre", icon: Calculator, title: "Your tax picture" },
+      { path: "/dashboard", label: "My Dashboard", icon: Eye, title: "Retirement, investments, budget, tax & sandbox — all in one", badge: "HOME" },
     ]
   },
   {

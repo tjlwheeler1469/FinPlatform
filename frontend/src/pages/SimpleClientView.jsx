@@ -16,7 +16,7 @@ import {
 } from "recharts";
 import {
   LayoutDashboard, TrendingUp, Gauge, FileText, MessageSquare,
-  ShieldCheck, Lock, Send, CheckCircle2, FlaskConical,
+  ShieldCheck, Lock, Send, CheckCircle2, FlaskConical, PiggyBank, Calculator, Landmark,
 } from "lucide-react";
 import { CLIENT_DATA, getActiveClientId } from "@/data/clientData";
 import { projectRetirement } from "@/lib/retirementEngine";
@@ -136,6 +136,8 @@ const InvestmentsTab = ({ client }) => {
 
 const RetirementTab = ({ client }) => {
   const liquidAssets = client.assets.filter((a) => ["Super", "Shares", "Managed Fund", "Cash", "SMSF", "Bonds", "Alternatives"].includes(a.type)).reduce((s, a) => s + a.value, 0);
+  const superAssets = client.assets.filter((a) => ["Super", "SMSF"].includes(a.type));
+  const totalSuper = superAssets.reduce((s, a) => s + a.value, 0);
   const result = projectRetirement({
     currentPortfolio: liquidAssets,
     annualContributions: client.retirement.annual_contributions,
@@ -147,6 +149,11 @@ const RetirementTab = ({ client }) => {
 
   const chartData = result.trajectory.map((t, i) => ({ age: client.retirement.current_age + i, p10: t.p10, p50: t.p50, p90: t.p90 }));
   const tone = result.confidence >= 80 ? "text-emerald-600" : result.confidence >= 60 ? "text-blue-600" : "text-amber-600";
+
+  // Concessional cap usage (FY25 $30k)
+  const concessionalCap = 30000;
+  const concessionalUsed = Math.min(client.retirement.annual_contributions, concessionalCap);
+  const capUsedPct = Math.round((concessionalUsed / concessionalCap) * 100);
 
   return (
     <div className="space-y-4">
@@ -175,6 +182,166 @@ const RetirementTab = ({ client }) => {
               </LineChart>
             </ResponsiveContainer>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Super & Pension summary */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm flex items-center gap-2"><Landmark className="h-4 w-4 text-[#D4A84C]" /> Super &amp; Pension</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="grid grid-cols-3 gap-3 text-center">
+            <div className="p-3 bg-gray-50 rounded">
+              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Total Super Balance</p>
+              <p className="text-xl font-bold text-[#1a2744]">{fmtShort(totalSuper)}</p>
+            </div>
+            <div className="p-3 bg-gray-50 rounded">
+              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Annual Contributions</p>
+              <p className="text-xl font-bold text-[#1a2744]">{fmt(client.retirement.annual_contributions)}</p>
+            </div>
+            <div className="p-3 bg-gray-50 rounded">
+              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Retirement Age</p>
+              <p className="text-xl font-bold text-[#1a2744]">{client.retirement.retirement_age}</p>
+            </div>
+          </div>
+
+          <div>
+            <div className="flex justify-between text-xs mb-1"><span>Concessional cap usage (FY25 ${(concessionalCap/1000).toFixed(0)}k)</span><span className="font-semibold">{capUsedPct}%</span></div>
+            <div className="h-2 bg-gray-100 rounded-full overflow-hidden"><div className="h-full bg-[#D4A84C]" style={{ width: `${Math.min(100, capUsedPct)}%` }} /></div>
+          </div>
+
+          {superAssets.length > 0 && (
+            <div className="space-y-1 pt-2 border-t">
+              {superAssets.map((s, i) => (
+                <div key={i} className="flex justify-between text-sm py-1">
+                  <span className="text-muted-foreground">{s.name}</span>
+                  <span className="font-semibold">{fmt(s.value)}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          <p className="text-[10px] text-center text-muted-foreground flex items-center justify-center gap-1 pt-1"><Lock className="h-3 w-3" /> View only — speak to your adviser to adjust contributions</p>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+const BudgetTab = ({ client }) => {
+  const b = client.budget || { monthlyIncome: 0, monthlyExpenses: 0, savingsRate: 0 };
+  const monthlySavings = b.monthlyIncome - b.monthlyExpenses;
+  const annualIncome = (client.profile?.incomeHousehold) || (b.monthlyIncome * 12);
+  const annualExpenses = (client.profile?.expensesAnnual) || (b.monthlyExpenses * 12);
+
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardContent className="p-5">
+          <p className="text-xs uppercase tracking-wide text-muted-foreground mb-3">Household Cash Flow</p>
+          <div className="grid grid-cols-3 gap-3 text-center">
+            <div className="p-3 bg-emerald-50 rounded">
+              <p className="text-[10px] uppercase tracking-wide text-emerald-700">Monthly In</p>
+              <p className="text-xl font-bold text-emerald-700">{fmtShort(b.monthlyIncome)}</p>
+            </div>
+            <div className="p-3 bg-rose-50 rounded">
+              <p className="text-[10px] uppercase tracking-wide text-rose-700">Monthly Out</p>
+              <p className="text-xl font-bold text-rose-700">{fmtShort(b.monthlyExpenses)}</p>
+            </div>
+            <div className="p-3 bg-[#1a2744]/5 rounded">
+              <p className="text-[10px] uppercase tracking-wide text-[#1a2744]">Monthly Saved</p>
+              <p className="text-xl font-bold text-[#1a2744]">{fmtShort(monthlySavings)}</p>
+            </div>
+          </div>
+          <div className="mt-4">
+            <div className="flex justify-between text-xs mb-1"><span>Savings rate</span><span className="font-semibold text-[#D4A84C]">{b.savingsRate}%</span></div>
+            <div className="h-2 bg-gray-100 rounded-full overflow-hidden"><div className="h-full bg-gradient-to-r from-emerald-500 to-[#D4A84C]" style={{ width: `${Math.min(100, b.savingsRate)}%` }} /></div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="pb-2"><CardTitle className="text-sm">Annual Summary</CardTitle></CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            <div className="flex justify-between py-2 border-b"><span className="text-sm text-muted-foreground">Household income (annual)</span><span className="font-semibold">{fmt(annualIncome)}</span></div>
+            <div className="flex justify-between py-2 border-b"><span className="text-sm text-muted-foreground">Household expenses (annual)</span><span className="font-semibold">{fmt(annualExpenses)}</span></div>
+            <div className="flex justify-between py-2 border-b"><span className="text-sm text-muted-foreground">Annual savings</span><span className="font-semibold text-emerald-600">{fmt(annualIncome - annualExpenses)}</span></div>
+            <div className="flex justify-between py-2"><span className="text-sm font-semibold text-[#1a2744]">Effective savings rate</span><span className="font-bold text-[#D4A84C]">{b.savingsRate}%</span></div>
+          </div>
+          <p className="text-[10px] text-center text-muted-foreground flex items-center justify-center gap-1 pt-3"><Lock className="h-3 w-3" /> View only — all cash flow data is managed by your adviser</p>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+const TaxTab = ({ client }) => {
+  const income = client.profile?.incomeHousehold || (client.budget?.monthlyIncome * 12) || 0;
+  const superConcessional = Math.min(client.retirement?.annual_contributions || 0, 30000);
+  // 2025 AU tax bands (combined household rough estimate — for illustration only)
+  const bands = [
+    { from: 0, to: 18200, rate: 0 },
+    { from: 18200, to: 45000, rate: 0.16 },
+    { from: 45000, to: 135000, rate: 0.30 },
+    { from: 135000, to: 190000, rate: 0.37 },
+    { from: 190000, to: Infinity, rate: 0.45 },
+  ];
+  const taxable = Math.max(0, income - superConcessional);
+  let tax = 0;
+  for (const b of bands) {
+    if (taxable > b.from) tax += (Math.min(taxable, b.to) - b.from) * b.rate;
+  }
+  const medicare = taxable * 0.02;
+  const totalTax = tax + medicare;
+  const netIncome = income - totalTax - superConcessional;
+  const effectiveRate = income > 0 ? (totalTax / income) * 100 : 0;
+
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardContent className="p-5">
+          <p className="text-xs uppercase tracking-wide text-muted-foreground mb-3">Estimated Annual Tax Position</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+            <div className="p-3 bg-gray-50 rounded">
+              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Gross Income</p>
+              <p className="text-lg font-bold text-[#1a2744]">{fmtShort(income)}</p>
+            </div>
+            <div className="p-3 bg-[#D4A84C]/10 rounded">
+              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Super Salary-Sac</p>
+              <p className="text-lg font-bold text-[#D4A84C]">{fmtShort(superConcessional)}</p>
+            </div>
+            <div className="p-3 bg-rose-50 rounded">
+              <p className="text-[10px] uppercase tracking-wide text-rose-700">Est. Tax + Medicare</p>
+              <p className="text-lg font-bold text-rose-700">{fmtShort(totalTax)}</p>
+            </div>
+            <div className="p-3 bg-emerald-50 rounded">
+              <p className="text-[10px] uppercase tracking-wide text-emerald-700">Net (After Tax)</p>
+              <p className="text-lg font-bold text-emerald-700">{fmtShort(netIncome)}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="pb-2"><CardTitle className="text-sm">Marginal Tax Bands Applied</CardTitle></CardHeader>
+        <CardContent>
+          <div className="space-y-1.5">
+            {bands.filter((b) => taxable > b.from).map((b, i) => {
+              const applied = Math.min(taxable, b.to) - b.from;
+              return (
+                <div key={i} className="flex justify-between text-sm py-1.5 border-b last:border-0">
+                  <span className="text-muted-foreground">{fmt(b.from)}{b.to !== Infinity ? ` – ${fmt(b.to)}` : "+"} · {(b.rate * 100).toFixed(0)}%</span>
+                  <span className="font-semibold">{fmt(applied * b.rate)}</span>
+                </div>
+              );
+            })}
+          </div>
+          <div className="flex justify-between pt-3 mt-2 border-t">
+            <span className="font-semibold text-[#1a2744]">Effective tax rate</span>
+            <span className="font-bold text-[#D4A84C]">{effectiveRate.toFixed(1)}%</span>
+          </div>
+          <p className="text-[10px] text-center text-muted-foreground flex items-center justify-center gap-1 pt-3"><Lock className="h-3 w-3" /> Illustrative only — your adviser's tax models include your full entity structure &amp; deductions</p>
         </CardContent>
       </Card>
     </div>
@@ -261,17 +428,21 @@ const SimpleClientView = () => {
           <p className="text-xs text-muted-foreground">A calm, simple view of your wealth · managed by {client.profile.advisor || "your adviser"}</p>
         </div>
         <Tabs defaultValue="snapshot">
-          <TabsList className="bg-white border w-full justify-start h-10">
+          <TabsList className="bg-white border w-full justify-start h-10 flex-wrap">
             <TabsTrigger value="snapshot" className="gap-1.5" data-testid="client-tab-snapshot"><LayoutDashboard className="h-3.5 w-3.5" />Snapshot</TabsTrigger>
+            <TabsTrigger value="retirement" className="gap-1.5" data-testid="client-tab-retire"><Gauge className="h-3.5 w-3.5" />Retirement &amp; Super</TabsTrigger>
             <TabsTrigger value="investments" className="gap-1.5" data-testid="client-tab-invest"><TrendingUp className="h-3.5 w-3.5" />Investments</TabsTrigger>
-            <TabsTrigger value="retirement" className="gap-1.5" data-testid="client-tab-retire"><Gauge className="h-3.5 w-3.5" />Retirement</TabsTrigger>
+            <TabsTrigger value="budget" className="gap-1.5" data-testid="client-tab-budget"><PiggyBank className="h-3.5 w-3.5" />Budget</TabsTrigger>
+            <TabsTrigger value="tax" className="gap-1.5" data-testid="client-tab-tax"><Calculator className="h-3.5 w-3.5" />Tax Centre</TabsTrigger>
             <TabsTrigger value="sandbox" className="gap-1.5" data-testid="client-tab-sandbox"><FlaskConical className="h-3.5 w-3.5" />Sandbox</TabsTrigger>
             <TabsTrigger value="docs" className="gap-1.5" data-testid="client-tab-docs"><FileText className="h-3.5 w-3.5" />Documents</TabsTrigger>
             <TabsTrigger value="msgs" className="gap-1.5" data-testid="client-tab-msgs"><MessageSquare className="h-3.5 w-3.5" />Messages</TabsTrigger>
           </TabsList>
           <TabsContent value="snapshot" className="pt-4"><SnapshotTab client={client} /></TabsContent>
-          <TabsContent value="investments" className="pt-4"><InvestmentsTab client={client} /></TabsContent>
           <TabsContent value="retirement" className="pt-4"><RetirementTab client={client} /></TabsContent>
+          <TabsContent value="investments" className="pt-4"><InvestmentsTab client={client} /></TabsContent>
+          <TabsContent value="budget" className="pt-4"><BudgetTab client={client} /></TabsContent>
+          <TabsContent value="tax" className="pt-4"><TaxTab client={client} /></TabsContent>
           <TabsContent value="sandbox" className="pt-4">
             <ClientSandbox
               seed={{
