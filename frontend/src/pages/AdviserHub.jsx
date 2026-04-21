@@ -172,20 +172,21 @@ const AdviserHub = () => {
       <FloatingActionRail />
       <div className="space-y-6 xl:pr-[350px]" data-testid="adviser-hub">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-start justify-between gap-4 pb-1 border-b border-gray-100">
           <div>
-            <h1 className="text-2xl font-bold flex items-center gap-3">
-              <Users className="h-7 w-7 text-[#D4A84C]" />
-              Client Hub
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              All clients, portfolios, and practice overview in one place
+            <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.15em] text-muted-foreground font-semibold">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#D4A84C]" />
+              Practice
+            </div>
+            <h1 className="text-3xl font-bold text-[#1a2744] mt-1">Client Hub</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              {clients.length} households · all client communications, compliance and e-signatures start here
             </p>
           </div>
-          <div className="flex gap-3">
-            <Button 
+          <div className="flex gap-2">
+            <Button
               onClick={() => setShowClientModal(true)}
-              className="bg-[#1a2744] hover:bg-[#1a2744]/90"
+              className="bg-[#1a2744] hover:bg-[#1a2744]/90 shadow-sm"
               data-testid="add-client-btn"
             >
               <Plus className="h-4 w-4 mr-2" />
@@ -194,61 +195,41 @@ const AdviserHub = () => {
           </div>
         </div>
 
-        {/* Summary Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <Card className="bg-gradient-to-br from-[#1a2744] to-[#2a3754] text-white">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-white/70">Total AUM</p>
-                  <p className="text-2xl font-bold">{formatCurrency(totalAUM)}</p>
-                </div>
-                <DollarSign className="h-8 w-8 text-[#D4A84C]" />
-              </div>
+        {/* Summary Stats — compact ribbon */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <Card className="bg-gradient-to-br from-[#1a2744] to-[#2a3754] text-white border-0 shadow-sm">
+            <CardContent className="p-4">
+              <p className="text-[10px] uppercase tracking-wide text-white/60 font-medium">Total AUM</p>
+              <p className="text-2xl font-bold mt-0.5">{formatCurrency(totalAUM)}</p>
+              <p className="text-[10px] text-white/50 mt-1">Across {clients.length} households</p>
             </CardContent>
           </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Active Clients</p>
-                  <p className="text-2xl font-bold">{clients.filter(c => c.status === "active").length}</p>
-                </div>
-                <Users className="h-8 w-8 text-emerald-500" />
-              </div>
+          <Card className="border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-4">
+              <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-medium">Active Clients</p>
+              <p className="text-2xl font-bold mt-0.5 text-[#1a2744]">{clients.filter((c) => c.status === "active").length}</p>
+              <p className="text-[10px] text-emerald-600 mt-1">●︎ Engaged &amp; current</p>
             </CardContent>
           </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Prospects</p>
-                  <p className="text-2xl font-bold">{clients.filter(c => c.status === "prospect").length}</p>
-                </div>
-                <Target className="h-8 w-8 text-blue-500" />
-              </div>
+          <Card className="border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-4">
+              <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-medium">Prospects</p>
+              <p className="text-2xl font-bold mt-0.5 text-[#1a2744]">{clients.filter((c) => c.status === "prospect").length}</p>
+              <p className="text-[10px] text-blue-600 mt-1">◐ In pipeline</p>
             </CardContent>
           </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Reviews Due</p>
-                  <p className="text-2xl font-bold">{clients.filter(c => c.status === "review").length}</p>
-                </div>
-                <AlertTriangle className="h-8 w-8 text-amber-500" />
-              </div>
+          <Card className="border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-4">
+              <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-medium">Reviews Due</p>
+              <p className="text-2xl font-bold mt-0.5 text-amber-600">{clients.filter((c) => c.status === "review").length}</p>
+              <p className="text-[10px] text-amber-600 mt-1">⚑ Action needed</p>
             </CardContent>
           </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Total Accounts</p>
-                  <p className="text-2xl font-bold">{totalAccounts}</p>
-                </div>
-                <Layers className="h-8 w-8 text-purple-500" />
-              </div>
+          <Card className="border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-4">
+              <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-medium">Total Accounts</p>
+              <p className="text-2xl font-bold mt-0.5 text-[#1a2744]">{totalAccounts}</p>
+              <p className="text-[10px] text-muted-foreground mt-1">Linked custodians</p>
             </CardContent>
           </Card>
         </div>
@@ -256,34 +237,35 @@ const AdviserHub = () => {
         {/* Tabs for different views */}
         <Tabs defaultValue="clients" className="space-y-4">
           <div className="flex items-center justify-between">
-            <TabsList>
-              <TabsTrigger value="clients" className="flex items-center gap-2">
+            <TabsList className="bg-white border h-11 p-1 gap-0.5">
+              <TabsTrigger value="clients" className="gap-1.5 text-xs sm:text-sm px-3 rounded-md data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:shadow-sm">
                 <Users className="h-4 w-4" />
                 All Clients
               </TabsTrigger>
-              <TabsTrigger value="portfolio" className="flex items-center gap-2">
+              <TabsTrigger value="portfolio" className="gap-1.5 text-xs sm:text-sm px-3 rounded-md data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:shadow-sm">
                 <PieChart className="h-4 w-4" />
-                Portfolio Overview
+                Portfolio
               </TabsTrigger>
-              <TabsTrigger value="activity" className="flex items-center gap-2">
+              <TabsTrigger value="activity" className="gap-1.5 text-xs sm:text-sm px-3 rounded-md data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:shadow-sm">
                 <Activity className="h-4 w-4" />
-                Recent Activity
+                Activity
               </TabsTrigger>
-              <TabsTrigger value="segments" className="flex items-center gap-2" data-testid="hub-tab-segments">
-                <Sparkles className="h-4 w-4 text-[#D4A84C]" />
-                Segmentations
+              <div className="w-px bg-gray-200 mx-1 h-6 self-center" />
+              <TabsTrigger value="segments" className="gap-1.5 text-xs sm:text-sm px-3 rounded-md data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:shadow-sm" data-testid="hub-tab-segments">
+                <Sparkles className="h-4 w-4" />
+                Segments
               </TabsTrigger>
-              <TabsTrigger value="newsletter" className="flex items-center gap-2" data-testid="hub-tab-newsletter">
+              <TabsTrigger value="newsletter" className="gap-1.5 text-xs sm:text-sm px-3 rounded-md data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:shadow-sm" data-testid="hub-tab-newsletter">
                 <MailIcon className="h-4 w-4" />
                 Comms
               </TabsTrigger>
-              <TabsTrigger value="compliance" className="flex items-center gap-2" data-testid="hub-tab-compliance">
+              <TabsTrigger value="compliance" className="gap-1.5 text-xs sm:text-sm px-3 rounded-md data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:shadow-sm" data-testid="hub-tab-compliance">
                 <ShieldCheck className="h-4 w-4" />
                 SOA / ROA
               </TabsTrigger>
-              <TabsTrigger value="docusign" className="flex items-center gap-2" data-testid="hub-tab-docusign">
+              <TabsTrigger value="docusign" className="gap-1.5 text-xs sm:text-sm px-3 rounded-md data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:shadow-sm" data-testid="hub-tab-docusign">
                 <FileSignature className="h-4 w-4" />
-                E-Signatures
+                E-Sign
               </TabsTrigger>
             </TabsList>
 

@@ -9,13 +9,14 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ClientSandbox from "@/components/ClientSandbox";
 import { toast } from "sonner";
 import {
   PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid,
 } from "recharts";
 import {
   LayoutDashboard, TrendingUp, Gauge, FileText, MessageSquare,
-  ShieldCheck, Lock, Send, CheckCircle2,
+  ShieldCheck, Lock, Send, CheckCircle2, FlaskConical,
 } from "lucide-react";
 import { CLIENT_DATA, getActiveClientId } from "@/data/clientData";
 import { projectRetirement } from "@/lib/retirementEngine";
@@ -264,12 +265,25 @@ const SimpleClientView = () => {
             <TabsTrigger value="snapshot" className="gap-1.5" data-testid="client-tab-snapshot"><LayoutDashboard className="h-3.5 w-3.5" />Snapshot</TabsTrigger>
             <TabsTrigger value="investments" className="gap-1.5" data-testid="client-tab-invest"><TrendingUp className="h-3.5 w-3.5" />Investments</TabsTrigger>
             <TabsTrigger value="retirement" className="gap-1.5" data-testid="client-tab-retire"><Gauge className="h-3.5 w-3.5" />Retirement</TabsTrigger>
+            <TabsTrigger value="sandbox" className="gap-1.5" data-testid="client-tab-sandbox"><FlaskConical className="h-3.5 w-3.5" />Sandbox</TabsTrigger>
             <TabsTrigger value="docs" className="gap-1.5" data-testid="client-tab-docs"><FileText className="h-3.5 w-3.5" />Documents</TabsTrigger>
             <TabsTrigger value="msgs" className="gap-1.5" data-testid="client-tab-msgs"><MessageSquare className="h-3.5 w-3.5" />Messages</TabsTrigger>
           </TabsList>
           <TabsContent value="snapshot" className="pt-4"><SnapshotTab client={client} /></TabsContent>
           <TabsContent value="investments" className="pt-4"><InvestmentsTab client={client} /></TabsContent>
           <TabsContent value="retirement" className="pt-4"><RetirementTab client={client} /></TabsContent>
+          <TabsContent value="sandbox" className="pt-4">
+            <ClientSandbox
+              seed={{
+                startingBalance: client.assets.filter((a) => ["Super", "Shares", "Managed Fund", "Cash", "SMSF", "Bonds", "Alternatives"].includes(a.type)).reduce((s, a) => s + a.value, 0),
+                annualContrib: client.retirement.annual_contributions,
+                annualSpending: client.retirement.retirement_spending,
+                currentAge: client.retirement.current_age,
+                retireAge: client.retirement.retirement_age,
+                lifeExpectancy: client.retirement.life_expectancy,
+              }}
+            />
+          </TabsContent>
           <TabsContent value="docs" className="pt-4"><DocumentsTab /></TabsContent>
           <TabsContent value="msgs" className="pt-4"><MessagesTab clientId={clientId} /></TabsContent>
         </Tabs>
