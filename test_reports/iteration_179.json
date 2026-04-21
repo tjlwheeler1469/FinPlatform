@@ -1,0 +1,34 @@
+{
+  "summary": "Focused retest of the 2 fixes from iteration 178: (1) ManagedFunds 'Invest in Fund' crash and (2) Strategic Planning net worth mismatch. Both PASS. ManagedFunds now adds a new row safely (TEST Growth Fund => 40,000 units @ $1.25, toast 'Investment added to portfolio' fires, NO TypeError, count 5 -> 6, ErrorBoundary not triggered). Strategic Planning header now reads Net Worth $9,610,000 and Total Assets $11,672,000 — identical to Investments Overview. One remaining minor cosmetic bug flagged below (return field name mismatch in new fund object).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "ManagedFunds", "issue": "New fund object sets ytdReturn/oneYearReturn/threeYearReturn/fiveYearReturn (L147-150) but the Portfolio row renders fund.return1y / return3y / return5y — so freshly added funds display empty '%' for 1Y/3Y/5Y. No crash (undefined coerces to ''), purely cosmetic. Align field names: either store as return1y/return3y/return5y OR read from oneYearReturn/threeYearReturn/fiveYearReturn in the JSX.", "selector": "[data-testid^='fund-']", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "acceptance_criteria_results": {
+    "managed_funds_invest_dialog_no_crash": "PASS - invest-btn opens dialog, fund-name + fund-purchase accept input, confirm-invest adds row. Toast 'Investment added to portfolio' shown. No ErrorBoundary. Fund count 5 -> 6. Last row shows '40,000 units @ $1.25' and purchase value $50,000.",
+    "strategic_planning_totals_match_investments": "PASS - /strategic-planning header: Net Worth $9,610,000, Total Assets $11,672,000, Total Debt $2,062,000, Annual Income $582,510, Annual Tax $162,224. Values now match /investments Overview (Thompson Family client) via portfolio.summary.{totalAssets,totalDebt,netWorth} pass-through.",
+    "regression_prior_iter178_flows": "NOT RE-EXECUTED (time-boxed to the 2 requested fixes). Iter178 already confirmed Bonds/Cash/Crypto/Property Add+Delete + /crm + /profile redirects all PASS. Code for those pages unchanged in this iteration per review_request."
+  },
+  "test_report_links": [],
+  "action_items": [
+    "(LOW) ManagedFunds: align return field names between investInFund() newFund object (ytdReturn/oneYearReturn/threeYearReturn/fiveYearReturn) and Portfolio tab render (fund.return1y/return3y/return5y) so freshly added funds show 0% instead of empty '%'.",
+    "(Carry-over) Recharts 'width(-1) and height(-1)' warnings still logged on /investments (multiple chart containers with 0 width at mount). Non-blocking.",
+    "(Carry-over) emergent-main.js DataCloneError postMessage spam — environmental, not app code."
+  ],
+  "critical_code_review_comments": [
+    "ManagedFunds fix is good (units/unitPrice defaults included), but the naming inconsistency noted above means the fresh row's 1Y/3Y/5Y columns look 'empty' rather than '0%' or '+0%'. Pattern worth a quick pass across other newly-wired add-item flows (Bonds, Cash, Crypto, Property) to confirm no other field-name drift between state shape and JSX readers.",
+    "StrategicPlanning currentNetWorth useMemo now correctly prefers portfolio.summary totals when present (?? nullish coalescing) and falls back to calculated values — good single-source-of-truth pattern. Consider applying the same pattern to other pages that compute Net Worth independently (e.g., Dashboard, Retirement Confidence) if they also diverge."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (frontend-only)", "frontend": "100% (2/2 targeted fixes PASS)"},
+  "test_credentials": "None — compliance bypass via localStorage wealth_command_compliance_v5=permanent; adviser_mode=true; selected_client={id:'thompson_family'}.",
+  "seed_data_creation": "Ephemeral in-memory: one 'TEST Growth Fund' row added to ManagedFunds during test; not persisted.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iteration 179 verified the 2 iter178 carry-over fixes (ManagedFunds crash + Strategic Planning totals mismatch). Both PASS. One remaining LOW-priority cosmetic bug: new ManagedFunds fund rows show empty '1Y: %' '3Y: %' '5Y: %' because the new fund object uses oneYearReturn/threeYearReturn/fiveYearReturn while JSX reads return1y/return3y/return5y. No functional regressions. Carry-over non-blocking issues unchanged: /api/documents 503, /notifications 404, Recharts width(-1) warnings, emergent-main.js DataCloneError spam.",
+  "rca of the issue": "Fix #1 (ManagedFunds): investInFund() now explicitly sets units (derived from purchaseValue/unitPrice=1.25) and unitPrice=1.25 on the new fund object (ManagedFunds.jsx L135-146). Render at L367 no longer hits undefined.toLocaleString(). Verified live: 40,000 units @ $1.25 displayed. Fix #2 (Strategic Planning): currentNetWorth useMemo (StrategicPlanning.jsx L219-239) now uses portfolio.summary.totalAssets ?? (sum of parts), totalDebt ?? propertyDebt, netWorth ?? (assets-debt). Since portfolio.summary provides canonical totals for the selected client, the header tiles now align with Investments Overview. Verified live: $9,610,000 / $11,672,000 / $2,062,000."
+}

@@ -132,6 +132,8 @@ const ManagedFunds = ({ embedded = false }) => {
   const investInFund = () => {
     if (!newFund.name || !newFund.purchaseValue) { toast.error("Name and investment amount required"); return; }
     const purchaseValue = parseFloat(newFund.purchaseValue) || 0;
+    const unitPrice = 1.25; // default unit price for demo
+    const units = Math.round(purchaseValue / unitPrice);
     setFunds([...funds, {
       id: Math.max(0, ...funds.map((f) => f.id)) + 1,
       ...newFund,
@@ -140,6 +142,16 @@ const ManagedFunds = ({ embedded = false }) => {
       mer: parseFloat(newFund.mer) || 0,
       purchaseDate: new Date().toISOString().split("T")[0],
       apir: `NEW${String(funds.length + 1).padStart(4, "0")}AU`,
+      units,
+      unitPrice,
+      ytdReturn: 0,
+      oneYearReturn: 0,
+      threeYearReturn: 0,
+      fiveYearReturn: 0,
+      distribution: 0,
+      nextDistribution: "",
+      rating: parseInt(newFund.rating) || 4,
+      description: newFund.name,
     }]);
     setShowInvestDialog(false);
     setNewFund(emptyFund);

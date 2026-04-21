@@ -215,25 +215,26 @@ const StrategicPlanning = () => {
 
   const activeScenario = scenarios.find(s => s.id === activeScenarioId) || scenarios[0];
 
-  // Current net worth calculation
+  // Current net worth calculation — prefer canonical summary totals when available
   const currentNetWorth = useMemo(() => {
     const propertyValue = portfolio.investments?.properties?.reduce((sum, p) => sum + p.value, 0) || 0;
     const propertyDebt = portfolio.investments?.properties?.reduce((sum, p) => sum + (p.mortgage_amount || 0), 0) || 0;
     const shareValue = sharePortfolio.reduce((sum, s) => sum + s.quantity * s.currentPrice, 0);
     const cash = portfolio.investments?.cash_savings || 0;
     const termDeposit = portfolio.investments?.term_deposit_amount || 0;
-    const superBalance = familyMembers.reduce((sum, m) => sum + (m.superBalance || 0), 0);
-    
+    const etfValue = portfolio.investments?.etf_value || 0;
+    const bondsValue = portfolio.investments?.bonds_value || 0;
+    const smsfBalance = portfolio.investments?.smsf_balance || 0;
+    const superBalance = smsfBalance || familyMembers.reduce((sum, m) => sum + (m.superBalance || 0), 0);
+
+    // Use canonical summary when supplied (client unified view); else sum parts.
+    const totalAssets = portfolio.summary?.totalAssets ?? (propertyValue + shareValue + cash + termDeposit + etfValue + bondsValue + superBalance);
+    const totalDebt = portfolio.summary?.totalDebt ?? propertyDebt;
+    const netWorth = portfolio.summary?.netWorth ?? (totalAssets - totalDebt);
+
     return {
-      propertyValue,
-      propertyDebt,
-      shareValue,
-      cash,
-      termDeposit,
-      superBalance,
-      totalAssets: propertyValue + shareValue + cash + termDeposit + superBalance,
-      totalDebt: propertyDebt,
-      netWorth: propertyValue + shareValue + cash + termDeposit + superBalance - propertyDebt
+      propertyValue, propertyDebt, shareValue, cash, termDeposit, etfValue, bondsValue, superBalance,
+      totalAssets, totalDebt, netWorth,
     };
   }, [portfolio, sharePortfolio, familyMembers]);
 
