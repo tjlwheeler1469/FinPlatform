@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ShieldCheck, AlertTriangle, CheckCircle2, Clock, Mail, FileText, Filter, BellRing } from "lucide-react";
 import { toast } from "sonner";
 import { CLIENT_DATA } from "@/data/clientData";
+import { logEvent, addToVault } from "@/lib/commsLedger";
 
 const DOC_TYPES = [
   { id: "FSG", name: "Financial Services Guide", cadenceDays: 365, legal: "Corporations Act s941A" },
@@ -85,12 +86,31 @@ const ComplianceTracker = () => {
     return { total, signed, overdue, awaiting, dueSoon, compliance: total ? Math.round(((signed) / total) * 100) : 0 };
   }, [enriched]);
 
-  const resend = (r) => toast.success(`Reminder emailed to ${r.clientName} · MOCK (connect Resend/SendGrid to deliver)`);
+  const resend = (r) => {
+    logEvent(r.clientId, { type: "reminder_sent", docType: r.docType, docName: r.docName, title: `Reminder: ${r.docName}`, meta: { channel: "email" } });
+    toast.success(`Reminder emailed to ${r.clientName} · MOCK (connect Resend/SendGrid to deliver)`);
+  };
 
   const markSigned = (r) => {
     const next = records.map((x) => x.id === r.id ? { ...x, signed: new Date().toISOString(), status: "signed" } : x);
     setRecords(next); saveRecords(next);
-    toast.success("Marked signed");
+    const vaultEntry = addToVault(r.clientId, {
+      name: `${r.docName} · Signed ${new Date().toLocaleDateString("en-AU")}.pdf`,
+      docType: r.docType,
+      docName: r.docName,
+      signedBy: r.clientName,
+      source: "compliance-manual",
+      meta: { recordId: r.id },
+    });
+    logEvent(r.clientId, {
+      type: "doc_signed",
+      docType: r.docType,
+      docName: r.docName,
+      title: `${r.docName} signed (manual)`,
+      by: r.clientName,
+      meta: { recordId: r.id, vaultFileId: vaultEntry?.id },
+    });
+    toast.success("Marked signed · saved to vault");
   };
 
   const bulkRemindOverdue = () => {

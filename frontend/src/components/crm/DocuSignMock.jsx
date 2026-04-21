@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FileSignature, Send, CheckCircle2, XCircle, Eye, Clock, Trash2, Download, BellRing, User } from "lucide-react";
 import { toast } from "sonner";
 import { CLIENT_DATA } from "@/data/clientData";
+import { logEvent, addToVault } from "@/lib/commsLedger";
 
 const DOCUMENT_TEMPLATES = [
   { id: "soa", name: "Statement of Advice", size: "3.2 MB" },
@@ -63,6 +64,15 @@ const DocuSignMock = () => {
     const next = [env, ...envelopes];
     setEnvelopes(next); saveEnvelopes(next);
     setCreating(false);
+    // Log to per-client ledger (powers Comms Timeline + Compliance Checkboxes)
+    logEvent(client.id, {
+      type: "doc_sent",
+      docType: doc.id.toUpperCase(),
+      docName: doc.name,
+      title: `${doc.name} sent for e-signature`,
+      body: draft.message,
+      meta: { envelopeId: env.id, provider: draft.provider, channel: "esign" },
+    });
     toast.success(`Envelope sent to ${client.email} · MOCK (DocuSign API key not configured)`);
   };
 
@@ -78,7 +88,44 @@ const DocuSignMock = () => {
       return u;
     });
     setEnvelopes(next); saveEnvelopes(next);
-    toast.success(`Status updated → ${newStatus}`);
+    // Log status changes to per-client ledger
+    const evtType = newStatus === "signed" ? "doc_signed" : newStatus === "viewed" ? "doc_viewed" : newStatus === "declined" ? "doc_declined" : null;
+    if (evtType) {
+      let vaultFileId = null;
+      if (newStatus === "signed") {
+        const vaultEntry = addToVault(env.clientId, {
+          name: `${env.docName} · Signed ${new Date().toLocaleDateString("en-AU")}.pdf`,
+          docType: env.docName.includes("Statement of Advice") ? "SOA" :
+                   env.docName.includes("Record of Advice") ? "ROA" :
+                   env.docName.includes("Fee Disclosure") ? "FDS" :
+                   env.docName.includes("Opt-In") ? "OpIn" :
+                   env.docName.includes("Engagement") ? "Engagement" :
+                   env.docName.includes("Power of Attorney") ? "POA" :
+                   env.docName.includes("Trust Deed") ? "SMSFTrust" : "Other",
+          docName: env.docName,
+          size: env.docSize,
+          signedBy: env.clientName,
+          source: "e-signature",
+          meta: { envelopeId: env.id, clientEmail: env.clientEmail, provider: env.provider },
+        });
+        vaultFileId = vaultEntry?.id;
+      }
+      logEvent(env.clientId, {
+        type: evtType,
+        docType: env.docName.includes("Statement of Advice") ? "SOA" :
+                 env.docName.includes("Record of Advice") ? "ROA" :
+                 env.docName.includes("Fee Disclosure") ? "FDS" :
+                 env.docName.includes("Opt-In") ? "OpIn" :
+                 env.docName.includes("Engagement") ? "Engagement" :
+                 env.docName.includes("Power of Attorney") ? "POA" :
+                 env.docName.includes("Trust Deed") ? "SMSFTrust" : "Other",
+        docName: env.docName,
+        title: `${env.docName} ${newStatus}`,
+        by: env.clientName,
+        meta: { envelopeId: env.id, vaultFileId },
+      });
+    }
+    toast.success(`Status updated → ${newStatus}${newStatus === "signed" ? " · saved to vault" : ""}`);
   };
 
   const remind = (env) => toast.success(`Reminder sent to ${env.clientEmail} · MOCK`);

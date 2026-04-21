@@ -1,7 +1,7 @@
 import { useState, lazy, Suspense } from "react";
 import Layout from "@/components/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, LayoutDashboard, TrendingUp, Gauge, Calculator, Target, PiggyBank, Receipt } from "lucide-react";
+import { Loader2, LayoutDashboard, TrendingUp, Gauge, Calculator, Target, PiggyBank, Receipt, ShieldCheck } from "lucide-react";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import FloatingActionRail from "@/components/platform/FloatingActionRail";
 
@@ -13,6 +13,7 @@ const HouseholdBudget = lazy(() => import("@/pages/HouseholdBudget"));
 const UnifiedTaxCentre = lazy(() => import("@/pages/UnifiedTaxCentre"));
 const AdviserClientDashboard = lazy(() => import("@/components/AdviserClientDashboard"));
 const ClientInvoicing = lazy(() => import("@/components/ClientInvoicing"));
+const ClientCommsTimeline = lazy(() => import("@/components/crm/ClientCommsTimeline"));
 
 const TabLoader = () => (
   <div className="flex items-center justify-center py-20">
@@ -61,6 +62,9 @@ const UnifiedClientOverview = () => {
               <TabsTrigger value="tax" className={tabTriggerClass} data-testid="client-tab-tax">
                 <Calculator className="h-3.5 w-3.5" /> Tax Centre
               </TabsTrigger>
+              <TabsTrigger value="comms" className={tabTriggerClass} data-testid="client-tab-comms">
+                <ShieldCheck className="h-3.5 w-3.5" /> Comms &amp; Vault
+              </TabsTrigger>
               <TabsTrigger value="invoicing" className={tabTriggerClass} data-testid="client-tab-invoicing">
                 <Receipt className="h-3.5 w-3.5" /> Invoicing
               </TabsTrigger>
@@ -105,6 +109,13 @@ const UnifiedClientOverview = () => {
               <ErrorBoundary label="Tax Centre">
                 <Suspense fallback={<TabLoader />}>
                   <UnifiedTaxCentre embedded />
+                </Suspense>
+              </ErrorBoundary>
+            </TabsContent>
+            <TabsContent value="comms" className="mt-0">
+              <ErrorBoundary label="Comms & Vault">
+                <Suspense fallback={<TabLoader />}>
+                  <ClientCommsTimeline clientId={getClientId()} embedded />
                 </Suspense>
               </ErrorBoundary>
             </TabsContent>

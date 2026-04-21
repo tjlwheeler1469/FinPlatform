@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Mail, Send, Sparkles, Eye, Save, Trash2, Plus, Users, TrendingUp, CheckCircle2, Clock } from "lucide-react";
 import { toast } from "sonner";
+import { logEvent } from "@/lib/commsLedger";
 
 const TEMPLATES = [
   { id: "market_update", name: "Monthly Market Update", subject: "Market wrap — {{month}}", body: "Dear {{first_name}},\n\nThis month's market highlights:\n• ASX 200 moved {{asx_change}}\n• RBA held rates at {{rba_rate}}\n• Your portfolio is tracking at {{ytd_return}} YTD\n\nKey actions for you:\n1. Review asset allocation\n2. Check rebalancing opportunities\n3. Tax-loss harvesting window\n\nBook a review at your convenience.\n\nRegards,\n{{adviser_name}}" },
@@ -63,7 +64,15 @@ const NewsletterBuilder = () => {
       : [sent, ...campaigns];
     setCampaigns(next); saveCampaigns(next);
     setActive(sent);
-    toast.success(`Campaign queued to ${sent.recipientCount} recipient${sent.recipientCount !== 1 ? "s" : ""} · MOCK — no real emails sent. Hook up Resend/SendGrid to go live.`);
+    // Log per-recipient to comms ledger
+    const ids = target?.clientIds || [];
+    ids.forEach((cid) => logEvent(cid, {
+      type: "campaign_sent",
+      title: `Campaign: ${sent.name}`,
+      body: sent.subject,
+      meta: { campaignId: sent.id, provider: sent.provider, segmentName: sent.segmentName },
+    }));
+    toast.success(`Campaign queued to ${sent.recipientCount} recipient${sent.recipientCount !== 1 ? "s" : ""} · logged to comms timeline · MOCK — no real emails sent. Hook up Resend/SendGrid to go live.`);
   };
 
   const removeCampaign = (id) => { const next = campaigns.filter((c) => c.id !== id); setCampaigns(next); saveCampaigns(next); if (active?.id === id) setActive(null); toast.success("Deleted"); };
