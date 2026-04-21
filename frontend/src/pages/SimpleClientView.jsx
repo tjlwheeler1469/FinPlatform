@@ -428,15 +428,15 @@ const SimpleClientView = () => {
           <p className="text-xs text-muted-foreground">A calm, simple view of your wealth · managed by {client.profile.advisor || "your adviser"}</p>
         </div>
         <Tabs defaultValue="snapshot">
-          <TabsList className="bg-white border w-full justify-start h-10 flex-wrap">
-            <TabsTrigger value="snapshot" className="gap-1.5" data-testid="client-tab-snapshot"><LayoutDashboard className="h-3.5 w-3.5" />Snapshot</TabsTrigger>
-            <TabsTrigger value="retirement" className="gap-1.5" data-testid="client-tab-retire"><Gauge className="h-3.5 w-3.5" />Retirement &amp; Super</TabsTrigger>
-            <TabsTrigger value="investments" className="gap-1.5" data-testid="client-tab-invest"><TrendingUp className="h-3.5 w-3.5" />Investments</TabsTrigger>
-            <TabsTrigger value="budget" className="gap-1.5" data-testid="client-tab-budget"><PiggyBank className="h-3.5 w-3.5" />Budget</TabsTrigger>
-            <TabsTrigger value="tax" className="gap-1.5" data-testid="client-tab-tax"><Calculator className="h-3.5 w-3.5" />Tax Centre</TabsTrigger>
-            <TabsTrigger value="sandbox" className="gap-1.5" data-testid="client-tab-sandbox"><FlaskConical className="h-3.5 w-3.5" />Sandbox</TabsTrigger>
-            <TabsTrigger value="docs" className="gap-1.5" data-testid="client-tab-docs"><FileText className="h-3.5 w-3.5" />Documents</TabsTrigger>
-            <TabsTrigger value="msgs" className="gap-1.5" data-testid="client-tab-msgs"><MessageSquare className="h-3.5 w-3.5" />Messages</TabsTrigger>
+          <TabsList className="bg-white border w-full justify-start h-10 overflow-x-auto">
+            <TabsTrigger value="snapshot" className="gap-1.5 flex-shrink-0" data-testid="client-tab-snapshot"><LayoutDashboard className="h-3.5 w-3.5" />Snapshot</TabsTrigger>
+            <TabsTrigger value="retirement" className="gap-1.5 flex-shrink-0" data-testid="client-tab-retire"><Gauge className="h-3.5 w-3.5" />Retirement &amp; Super</TabsTrigger>
+            <TabsTrigger value="investments" className="gap-1.5 flex-shrink-0" data-testid="client-tab-invest"><TrendingUp className="h-3.5 w-3.5" />Investments</TabsTrigger>
+            <TabsTrigger value="budget" className="gap-1.5 flex-shrink-0" data-testid="client-tab-budget"><PiggyBank className="h-3.5 w-3.5" />Budget</TabsTrigger>
+            <TabsTrigger value="tax" className="gap-1.5 flex-shrink-0" data-testid="client-tab-tax"><Calculator className="h-3.5 w-3.5" />Tax Centre</TabsTrigger>
+            <TabsTrigger value="sandbox" className="gap-1.5 flex-shrink-0" data-testid="client-tab-sandbox"><FlaskConical className="h-3.5 w-3.5" />Sandbox</TabsTrigger>
+            <TabsTrigger value="docs" className="gap-1.5 flex-shrink-0" data-testid="client-tab-docs"><FileText className="h-3.5 w-3.5" />Documents</TabsTrigger>
+            <TabsTrigger value="msgs" className="gap-1.5 flex-shrink-0" data-testid="client-tab-msgs"><MessageSquare className="h-3.5 w-3.5" />Messages</TabsTrigger>
           </TabsList>
           <TabsContent value="snapshot" className="pt-4"><SnapshotTab client={client} /></TabsContent>
           <TabsContent value="retirement" className="pt-4"><RetirementTab client={client} /></TabsContent>

@@ -1,24 +1,21 @@
-## Completed (21 April 2026) — Iteration 184 (UI polish: Client Hub, Dashboard merge, inline retirement)
+## Completed (21 April 2026) — Iteration 185 (Client View consolidation)
 
-### Task 1 — Client Hub card redesign
-- Status-coloured left accent bar: emerald=active, amber=review, blue=prospect, slate=other
-- Tier pill in top-right corner (Platinum ≥$20M, Gold ≥$10M, Silver ≥$5M, Bronze <$5M)
-- Gradient avatar matching tier palette + ring
-- 3-column metric grid (Wealth / Accounts / Risk) with uppercase micro-labels
-- Compact account-value chips + "+N" overflow
-- Footer: "Next review:" label + date + "Open profile →" CTA with chevron translation on hover
-- Hover lift (−0.5 translate-y) + navy border + shadow-md
+### All 3 user asks delivered
+1. **Retirement → dashboard tab** — Client dashboard "Retirement & Super" tab now embeds Monte Carlo confidence + P10/P50/P90 projection chart + a new Super & Pension breakdown card (3-tile: Total Super Balance · Annual Contributions · Retirement Age) + concessional cap usage bar (FY25 $30k) + list of individual super accounts. Sidebar entry removed.
+2. **Investments → dashboard tab** — Investments tab already embedded in SimpleClientView; sidebar entry removed from `personalNavGroups`. (Mobile bottom nav retained for phone viewports.)
+3. **Budget + Tax Centre → dashboard tabs** — new `BudgetTab` (3-tile monthly flow + annual summary + savings-rate bar, 100% read-only) and new `TaxTab` (4-tile estimated annual tax position + marginal bands applied table using 2025 AU tax bands, 100% read-only). Both sidebar entries removed.
 
-### Task 2 — Dashboard + Daily Briefing merged
-- `AdvisorCommandCenter` is now a single `<div data-testid="dashboard-briefing">` — removed the redundant inner `<Tabs>` wrapper (which previously held Dashboard & Briefing + Decision Centre)
-- Sidebar: removed the "Daily Briefing" link from the Today group (`navData.js`); the route `/daily-briefing` still resolves but is no longer surfaced in nav
-- High-level content preserved: MarketsStrip, 6 KPI cards, Next Best Actions, Advisor Intelligence Feed
+### Client dashboard now has 8 tabs (single entry point)
+Snapshot · Retirement & Super · Investments · Budget · Tax Centre · Sandbox · Documents · Messages
 
-### Task 3 — Inline retirement analysis
-- PersonalDashboard "View Full Analysis" button no longer navigates to `/retirement-confidence`
-- Replaced with stateful toggle (`showRetireDetails`) that expands an inline details panel (`data-testid="retirement-details-panel"`)
-- Panel shows 4 stat tiles (Years to Retire, Target Age, Confidence, Status) + narrative text based on confidence band + sidebar hint
-- URL stays on /dashboard throughout
+### Read-only enforcement
+- Zero `<input>`, `<textarea>`, `[role="slider"]` across Snapshot, Retirement & Super, Investments, Budget, Tax Centre, Documents (verified by testing agent).
+- **Sandbox remains the ONLY input surface** — 8 sliders, fully isolated from adviser data.
+- Messages tab keeps the composer (client → adviser is intended).
+
+### Sidebar for client mode (trimmed)
+- You: My Dashboard (HOME)
+- Documents & Account: Documents, Connected Accounts, Security
 
 ### Testing
-- Iteration 184: **100% PASS** (3/3). 0 UI bugs, 0 action items. One micro-nit addressed post-test.
+- Iteration 185: **100% PASS** (3/3). 0 action items. One cosmetic tab-wrap fix applied (overflow-x-auto + flex-shrink-0) to keep 8 tabs on a single horizontal row.
