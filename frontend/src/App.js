@@ -151,6 +151,8 @@ const DecisionCenter = lazyRetry(() => import("@/pages/DecisionCenter"));
 const ClientIntelligenceFeed = lazyRetry(() => import("@/pages/ClientIntelligenceFeed"));
 const ClientPortal = lazyRetry(() => import("@/pages/ClientPortal"));
 const SimpleClientPortal = lazyRetry(() => import("@/pages/SimpleClientPortal"));
+const SimpleClientView = lazyRetry(() => import("@/pages/SimpleClientView"));
+const RockstarCRM = lazyRetry(() => import("@/pages/RockstarCRM"));
 
 // Super App Features - Meeting Prep, Research, Compliance, Wealth
 const MeetingPrep = lazyRetry(() => import("@/pages/MeetingPrep"));
@@ -955,7 +957,8 @@ const AppRouter = () => {
       <Route path="/retirement-workshop" element={<RetirementWorkshop />} />
       
       <Route path="/crm-command-center" element={<Navigate to="/adviser-hub" replace />} />
-      <Route path="/crm" element={<Navigate to="/adviser-hub" replace />} />
+      <Route path="/crm" element={<Navigate to="/rockstar-crm" replace />} />
+      <Route path="/rockstar-crm" element={<RockstarCRM />} />
       <Route path="/profile" element={<Navigate to="/dashboard" replace />} />
       
       {/* Client 360 View */}
@@ -990,6 +993,10 @@ const DashboardRouter = () => {
   const mode = localStorage.getItem("app_mode");
   if (stored && mode === "adviser") {
     return <UnifiedClientOverview />;
+  }
+  // End-client mode: strictly read-only, high-level view
+  if (mode === "client") {
+    return <SimpleClientView />;
   }
   return <UnifiedDashboard />;
 };

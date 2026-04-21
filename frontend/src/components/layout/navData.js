@@ -51,6 +51,7 @@ export const adviserBaseNav = [
     icon: Users,
     items: [
       { path: "/adviser-hub", label: "All Clients", icon: Users, title: "Select a client to enter their profile", badge: "HUB" },
+      { path: "/rockstar-crm", label: "CRM", icon: Sparkles, title: "Segmentations, newsletters, compliance, e-signatures", badge: "PRO" },
       { path: "/client-setup", label: "New Client", icon: UserPlus, title: "Setup New Client" },
     ]
   },
