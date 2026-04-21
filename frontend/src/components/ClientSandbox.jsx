@@ -153,7 +153,8 @@ const ClientSandbox = ({ seed = {} }) => {
         <Card>
           <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><TrendingUp className="h-4 w-4" /> Projected balance over time</CardTitle></CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={260}>
+            <div style={{ width: "100%", height: 260, minHeight: 260 }}>
+            <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData}>
                 <defs>
                   <linearGradient id="rangeGrad" x1="0" y1="0" x2="0" y2="1">
@@ -171,6 +172,7 @@ const ClientSandbox = ({ seed = {} }) => {
                 <ReferenceLine x={i.retireAge} stroke="#ef4444" strokeDasharray="3 3" label={{ value: `Retire`, fill: "#ef4444", fontSize: 10, position: "top" }} />
               </AreaChart>
             </ResponsiveContainer>
+            </div>
             <div className="flex items-center justify-center gap-4 text-[10px] text-muted-foreground mt-2">
               <span className="flex items-center gap-1.5"><span className="w-3 h-0.5 bg-[#1a2744]" />Median outcome</span>
               <span className="flex items-center gap-1.5"><span className="w-3 h-0.5 bg-[#D4A84C]" />Best case (P90)</span>
