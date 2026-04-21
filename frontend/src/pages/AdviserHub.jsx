@@ -376,7 +376,8 @@ const AdviserHub = () => {
                       <div className="mt-4 flex items-center justify-between">
                         <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
                           <Calendar className="h-3 w-3" />
-                          {client.next_review || "No review scheduled"}
+                          <span>Next review:</span>
+                          <span className="text-[#1a2744] font-medium">{client.next_review || "Not scheduled"}</span>
                         </div>
                         <div className="flex items-center gap-1 text-xs font-medium text-[#1a2744] group-hover:text-[#D4A84C] transition-colors">
                           Open profile
