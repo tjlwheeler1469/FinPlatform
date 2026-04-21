@@ -299,71 +299,94 @@ const AdviserHub = () => {
           {/* All Clients Tab */}
           <TabsContent value="clients" className="space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-              {filteredClients.map((client) => (
-                <Card 
-                  key={client.client_id} 
-                  className="cursor-pointer hover:border-[#D4A84C] transition-all group"
-                  onClick={() => selectClient(client)}
-                  data-testid={`client-card-${client.client_id}`}
-                >
-                  <CardContent className="pt-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-12 w-12 bg-[#1a2744]">
-                          <AvatarFallback className="text-white bg-[#1a2744]">
-                            {client.name?.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <h3 className="font-semibold">{client.name}</h3>
-                          <p className="text-sm text-muted-foreground">{client.email}</p>
+              {filteredClients.map((client) => {
+                const tw = client.total_wealth || 0;
+                const tier = tw >= 20_000_000 ? { label: "Platinum", accent: "from-slate-600 to-slate-800", ring: "ring-slate-300", chip: "bg-slate-100 text-slate-700 border-slate-200" } :
+                             tw >= 10_000_000 ? { label: "Gold", accent: "from-[#D4A84C] to-[#b8892f]", ring: "ring-amber-200", chip: "bg-amber-50 text-amber-700 border-amber-200" } :
+                             tw >= 5_000_000 ? { label: "Silver", accent: "from-slate-400 to-slate-500", ring: "ring-slate-200", chip: "bg-slate-50 text-slate-600 border-slate-200" } :
+                             { label: "Bronze", accent: "from-amber-700 to-amber-900", ring: "ring-amber-200", chip: "bg-amber-50 text-amber-800 border-amber-200" };
+                const statusAccent =
+                  client.status === "active" ? { bar: "bg-emerald-500", dot: "bg-emerald-500" } :
+                  client.status === "review" ? { bar: "bg-amber-500", dot: "bg-amber-500" } :
+                  client.status === "prospect" ? { bar: "bg-blue-500", dot: "bg-blue-500" } :
+                  { bar: "bg-slate-300", dot: "bg-slate-300" };
+                return (
+                  <Card
+                    key={client.client_id}
+                    className="relative overflow-hidden cursor-pointer border border-gray-200 hover:border-[#1a2744] hover:-translate-y-0.5 hover:shadow-md transition-all group"
+                    onClick={() => selectClient(client)}
+                    data-testid={`client-card-${client.client_id}`}
+                  >
+                    {/* Status-coloured left accent bar */}
+                    <div className={`absolute left-0 top-0 bottom-0 w-1 ${statusAccent.bar}`} />
+
+                    <CardContent className="p-5">
+                      {/* Tier chip — top right corner */}
+                      <div className="absolute top-3 right-3">
+                        <Badge variant="outline" className={`text-[9px] uppercase tracking-wide ${tier.chip}`}>{tier.label}</Badge>
+                      </div>
+
+                      {/* Header */}
+                      <div className="flex items-center gap-3 mb-4 pr-16">
+                        <div className={`h-11 w-11 rounded-full bg-gradient-to-br ${tier.accent} flex items-center justify-center text-white font-semibold text-sm shadow-sm ring-2 ${tier.ring} flex-shrink-0`}>
+                          {client.name?.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase()}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <h3 className="font-semibold text-[#1a2744] truncate">{client.name}</h3>
+                          <p className="text-[11px] text-muted-foreground truncate">{client.email}</p>
+                          <span className="text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5">
+                            <span className={`w-1.5 h-1.5 rounded-full ${statusAccent.dot}`} />{client.status}
+                          </span>
                         </div>
                       </div>
-                      <Badge variant="outline" className={statusColors[client.status]}>
-                        {client.status}
-                      </Badge>
-                    </div>
 
-                    <div className="mt-4 flex items-center justify-between">
-                      <div>
-                        <p className="text-sm text-muted-foreground">Total Wealth</p>
-                        <p className="text-xl font-bold">{formatCurrency(client.total_wealth)}</p>
+                      {/* Key metrics */}
+                      <div className="grid grid-cols-3 gap-2 py-3 border-y border-gray-100">
+                        <div>
+                          <p className="text-[9px] uppercase tracking-wide text-muted-foreground font-medium">Wealth</p>
+                          <p className="text-lg font-bold text-[#1a2744]">{formatCurrency(client.total_wealth)}</p>
+                        </div>
+                        <div>
+                          <p className="text-[9px] uppercase tracking-wide text-muted-foreground font-medium">Accounts</p>
+                          <p className="text-lg font-bold text-[#1a2744]">{client.accounts?.length || 0}</p>
+                        </div>
+                        <div>
+                          <p className="text-[9px] uppercase tracking-wide text-muted-foreground font-medium">Risk</p>
+                          <p className="text-sm font-semibold text-[#1a2744] leading-tight mt-1">{client.risk_profile || "—"}</p>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <p className="text-sm text-muted-foreground">Accounts</p>
-                        <p className="text-lg font-semibold">{client.accounts?.length || 0}</p>
+
+                      {/* Account breakdown chips */}
+                      <div className="mt-3 flex flex-wrap gap-1.5 min-h-[24px]">
+                        {client.accounts?.slice(0, 3).map((account, idx) => {
+                          const Icon = getAccountIcon(account.type);
+                          return (
+                            <div key={`item-${idx}`} className="flex items-center gap-1 text-[10px] bg-gray-50 text-gray-700 rounded px-1.5 py-0.5 border border-gray-100">
+                              <Icon className="h-2.5 w-2.5" />
+                              <span className="font-medium">{formatCurrency(account.balance)}</span>
+                            </div>
+                          );
+                        })}
+                        {(client.accounts?.length || 0) > 3 && (
+                          <span className="text-[10px] text-muted-foreground px-1.5 py-0.5">+{client.accounts.length - 3}</span>
+                        )}
                       </div>
-                    </div>
 
-                    {/* Account breakdown */}
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {client.accounts?.slice(0, 3).map((account, idx) => {
-                        const Icon = getAccountIcon(account.type);
-                        return (
-                          <div key={`item-${idx}`} className="flex items-center gap-1 text-xs bg-muted rounded px-2 py-1">
-                            <Icon className="h-3 w-3" />
-                            <span>{formatCurrency(account.balance)}</span>
-                          </div>
-                        );
-                      })}
-                      {(client.accounts?.length || 0) > 3 && (
-                        <span className="text-xs text-muted-foreground">+{client.accounts.length - 3} more</span>
-                      )}
-                    </div>
-
-                    <div className="mt-4 pt-3 border-t flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground flex items-center gap-1">
-                        <Calendar className="h-3 w-3" />
-                        {client.risk_profile || "Balanced"}
-                      </span>
-                      <Button variant="ghost" size="sm" className="group-hover:text-[#D4A84C]">
-                        View Details
-                        <ChevronRight className="h-4 w-4 ml-1" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                      {/* Footer CTA */}
+                      <div className="mt-4 flex items-center justify-between">
+                        <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                          <Calendar className="h-3 w-3" />
+                          {client.next_review || "No review scheduled"}
+                        </div>
+                        <div className="flex items-center gap-1 text-xs font-medium text-[#1a2744] group-hover:text-[#D4A84C] transition-colors">
+                          Open profile
+                          <ChevronRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
 
             {filteredClients.length === 0 && (

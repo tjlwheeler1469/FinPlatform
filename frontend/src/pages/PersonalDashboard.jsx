@@ -99,6 +99,7 @@ const PersonalDashboard = ({ embedded = false }) => {
   const [marketDataSource, setMarketDataSource] = useState('fallback');
   const [userProfile, setUserProfile] = useState(clientData.profile);
   const [showProfileEdit, setShowProfileEdit] = useState(false);
+  const [showRetireDetails, setShowRetireDetails] = useState(false);
 
   // Fetch live market data
   useEffect(() => {
@@ -539,11 +540,48 @@ const PersonalDashboard = ({ embedded = false }) => {
                       {yearsToRetirement} years to retirement (age {userProfile.retirementAge})
                     </p>
                   </div>
-                  <Link to="/retirement-confidence">
-                    <Button variant="outline" className="w-full mt-4">
-                      View Full Analysis <ChevronRight className="h-4 w-4 ml-1" />
-                    </Button>
-                  </Link>
+                  <Button
+                    variant="outline"
+                    className="w-full mt-4"
+                    onClick={() => setShowRetireDetails((v) => !v)}
+                    data-testid="retirement-full-analysis"
+                  >
+                    {showRetireDetails ? "Hide Full Analysis" : "View Full Analysis"}
+                    <ChevronRight className={`h-4 w-4 ml-1 transition-transform ${showRetireDetails ? "rotate-90" : ""}`} />
+                  </Button>
+                  {showRetireDetails && (
+                    <div className="mt-4 pt-4 border-t space-y-3" data-testid="retirement-details-panel">
+                      <div className="grid grid-cols-2 gap-3 text-center">
+                        <div className="p-2 bg-gray-50 rounded">
+                          <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Years to Retire</p>
+                          <p className="text-lg font-bold text-[#1a2744]">{yearsToRetirement}</p>
+                        </div>
+                        <div className="p-2 bg-gray-50 rounded">
+                          <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Target Age</p>
+                          <p className="text-lg font-bold text-[#1a2744]">{userProfile.retirementAge}</p>
+                        </div>
+                        <div className="p-2 bg-gray-50 rounded">
+                          <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Confidence</p>
+                          <p className={`text-lg font-bold`} style={{ color: getConfidenceColor(confidence) }}>{confidence.toFixed(0)}%</p>
+                        </div>
+                        <div className="p-2 bg-gray-50 rounded">
+                          <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Status</p>
+                          <p className="text-sm font-bold">{getConfidenceLabel(confidence)}</p>
+                        </div>
+                      </div>
+                      <div className="text-xs text-muted-foreground leading-relaxed px-1">
+                        Your plan projects a <strong>{getConfidenceLabel(confidence).toLowerCase()}</strong> path to retirement at age <strong>{userProfile.retirementAge}</strong>.
+                        {confidence >= 80
+                          ? " You are on track — stay the course."
+                          : confidence >= 60
+                          ? " Small adjustments to savings or timing could strengthen this."
+                          : " Consider increasing contributions or delaying retirement to improve confidence."}
+                      </div>
+                      <p className="text-[10px] text-muted-foreground italic text-center">
+                        For the full scenario playground, visit <strong>Retirement &amp; Super</strong> in the sidebar.
+                      </p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 

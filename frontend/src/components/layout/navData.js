@@ -42,8 +42,7 @@ export const adviserBaseNav = [
     name: "Today",
     icon: LayoutDashboard,
     items: [
-      { path: "/advisor-command-center", label: "Dashboard", icon: LayoutDashboard, title: "Your operating system — firm overview, alerts, opportunities" },
-      { path: "/daily-briefing", label: "Daily Briefing", icon: Bell, title: "Today's priorities" },
+      { path: "/advisor-command-center", label: "Dashboard", icon: LayoutDashboard, title: "Firm overview, priorities & daily briefing — all in one" },
     ]
   },
   {

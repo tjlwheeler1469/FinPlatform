@@ -366,15 +366,8 @@ const AdvisorCommandCenter = () => {
           </div>
         </div>
 
-        {/* ===== Dashboard & Briefing (Decision Centre removed per user request) ===== */}
-        <Tabs value={topTab} onValueChange={setTopTab}>
-          <TabsList className="bg-white border h-10">
-            <TabsTrigger value="dashboard" className="gap-1.5 data-[state=active]:bg-[#1a2744] data-[state=active]:text-white" data-testid="tab-dashboard">
-              <LayoutDashboard className="h-3.5 w-3.5" /> Dashboard &amp; Briefing
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="dashboard" className="mt-4 space-y-4">
+        {/* ===== Dashboard & Briefing (single, high-level view) ===== */}
+        <div className="space-y-4" data-testid="dashboard-briefing">
         <MarketsStrip title="Markets · Live" />
         <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
           <Card className="bg-gradient-to-br from-[#1a2744] to-[#2a3754] text-white">
@@ -958,8 +951,7 @@ const AdvisorCommandCenter = () => {
 
         <ComplianceFooter />
 
-          </TabsContent>
-        </Tabs>
+          </div>
       </div>
     </Layout>
   );
