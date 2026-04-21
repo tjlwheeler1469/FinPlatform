@@ -1,20 +1,18 @@
 import { useState, lazy, Suspense } from "react";
 import Layout from "@/components/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, LayoutDashboard, TrendingUp, Gauge, Calculator, Target, PiggyBank, Receipt, Building2, Landmark } from "lucide-react";
+import { Loader2, LayoutDashboard, TrendingUp, Gauge, Calculator, Target, PiggyBank, Receipt } from "lucide-react";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import FloatingActionRail from "@/components/platform/FloatingActionRail";
 
 const PersonalDashboard = lazy(() => import("@/pages/PersonalDashboard"));
 const UnifiedInvestments = lazy(() => import("@/pages/UnifiedInvestments"));
-const RetirementWorkshop = lazy(() => import("@/pages/RetirementWorkshop"));
+const RetirementHub = lazy(() => import("@/pages/RetirementHub"));
 const SimpleGoals = lazy(() => import("@/components/SimpleGoals"));
 const HouseholdBudget = lazy(() => import("@/pages/HouseholdBudget"));
 const UnifiedTaxCentre = lazy(() => import("@/pages/UnifiedTaxCentre"));
 const AdviserClientDashboard = lazy(() => import("@/components/AdviserClientDashboard"));
 const ClientInvoicing = lazy(() => import("@/components/ClientInvoicing"));
-const SuperOptimiser = lazy(() => import("@/components/SuperOptimiser"));
-const SMSFOptimizer = lazy(() => import("@/pages/SMSFOptimizer"));
 
 const TabLoader = () => (
   <div className="flex items-center justify-center py-20">
@@ -49,7 +47,7 @@ const UnifiedClientOverview = () => {
                 <LayoutDashboard className="h-3.5 w-3.5" /> Overview
               </TabsTrigger>
               <TabsTrigger value="retirement" className={tabTriggerClass} data-testid="client-tab-retirement">
-                <Gauge className="h-3.5 w-3.5" /> Retirement
+                <Gauge className="h-3.5 w-3.5" /> Retirement &amp; Super
               </TabsTrigger>
               <TabsTrigger value="investments" className={tabTriggerClass} data-testid="client-tab-investments">
                 <TrendingUp className="h-3.5 w-3.5" /> Investments
@@ -62,12 +60,6 @@ const UnifiedClientOverview = () => {
               </TabsTrigger>
               <TabsTrigger value="tax" className={tabTriggerClass} data-testid="client-tab-tax">
                 <Calculator className="h-3.5 w-3.5" /> Tax Centre
-              </TabsTrigger>
-              <TabsTrigger value="super" className={tabTriggerClass} data-testid="client-tab-super">
-                <Landmark className="h-3.5 w-3.5" /> Super &amp; Pension
-              </TabsTrigger>
-              <TabsTrigger value="smsf" className={tabTriggerClass} data-testid="client-tab-smsf">
-                <Building2 className="h-3.5 w-3.5" /> SMSF
               </TabsTrigger>
               <TabsTrigger value="invoicing" className={tabTriggerClass} data-testid="client-tab-invoicing">
                 <Receipt className="h-3.5 w-3.5" /> Invoicing
@@ -82,9 +74,9 @@ const UnifiedClientOverview = () => {
               </ErrorBoundary>
             </TabsContent>
             <TabsContent value="retirement" className="mt-0">
-              <ErrorBoundary label="Retirement">
+              <ErrorBoundary label="Retirement & Super">
                 <Suspense fallback={<TabLoader />}>
-                  <RetirementWorkshop clientId={getClientId()} embedded />
+                  <RetirementHub clientId={getClientId()} embedded />
                 </Suspense>
               </ErrorBoundary>
             </TabsContent>
@@ -113,20 +105,6 @@ const UnifiedClientOverview = () => {
               <ErrorBoundary label="Tax Centre">
                 <Suspense fallback={<TabLoader />}>
                   <UnifiedTaxCentre embedded />
-                </Suspense>
-              </ErrorBoundary>
-            </TabsContent>
-            <TabsContent value="super" className="mt-0">
-              <ErrorBoundary label="Super & Pension">
-                <Suspense fallback={<TabLoader />}>
-                  <div className="p-4"><SuperOptimiser clientId={getClientId()} embedded /></div>
-                </Suspense>
-              </ErrorBoundary>
-            </TabsContent>
-            <TabsContent value="smsf" className="mt-0">
-              <ErrorBoundary label="SMSF">
-                <Suspense fallback={<TabLoader />}>
-                  <SMSFOptimizer embedded />
                 </Suspense>
               </ErrorBoundary>
             </TabsContent>

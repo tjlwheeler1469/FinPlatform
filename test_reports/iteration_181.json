@@ -1,0 +1,34 @@
+{
+  "summary": "Iteration 181 frontend UI consolidation verified end-to-end. All 7 spec items pass: (1) Personal /retirement-confidence renders RetirementHub with context strip showing NW $9.61M / Super $3.27M / Target $4.5M / Age 67 and 3 sub-tabs (Plan, Super & Pension, SMSF) all load without runtime errors. (2) Adviser /dashboard with thompson_family shows UnifiedClientOverview with exactly 7 tabs (Overview, Retirement & Super, Investments, Budget, Goals, Tax Centre, Invoicing); old super/smsf tabs removed; Retirement & Super opens embedded RetirementHub with 3 sub-tabs. (3) SuperOptimiser defaults flow from CLIENT_DATA (superBalance $3.27M confirmed in DOM; defaults={salary:485000,superBalance:3270000,age:50} confirmed in React tree). (4) SMSFOptimizer sub-tab loads without crash. (5) /adviser-hub has 7 role=tab elements; all 4 CRM sub-tabs (segments/newsletter/compliance/docusign) click through cleanly. (6) Sidebar clean: CRM removed, Markets removed (verified on adviser /adviser-hub context showing clientContextNav). (7) /advisor-command-center MarketsStrip present with all 6 market tiles (ASX 200, S&P 500, AUD/USD, RBA Cash, 10Y Bond, Gold). (8) /rockstar-crm correctly 302s to /adviser-hub. (9) Rapid nav across all 4 routes: zero ChunkLoadError or dynamic import failures.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "SuperOptimiser (FY year select, line 285)", "issue": "React hydration warning: <span> cannot be a child of <option>. Visual-editor instrumentation injects a <span style={display:contents}> inside FY2024/FY2025 <option> elements, producing repeating console errors whenever the Super & Pension sub-tab mounts. Functional behaviour unaffected but pollutes console and may break in strict SSR.", "selector": "select > option (FY year)", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "RetirementHub Plan sub-tab", "issues": ["Recharts emits width(-1)/height(-1) warnings on first paint of the Monte Carlo projection chart — harmless but worth adding minWidth/minHeight on ResponsiveContainer."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "(LOW) Remove/normalise the span-inside-option hydration warning in SuperOptimiser.jsx around line 285 (FY year dropdown). If it's a visual-editor-only artefact, confirm prod build is clean; otherwise use native text node (no wrapping elements) inside <option>.",
+    "(LOW) Add minWidth/minHeight to ResponsiveContainer in RetirementWorkshop charts to silence recharts width(-1) warnings on first mount."
+  ],
+  "critical_code_review_comments": [
+    "RetirementHub.jsx: clean single-source-of-truth pattern; superDefaults memoised from CLIENT_DATA — correct.",
+    "UnifiedClientOverview.jsx: tab consolidation from 9 → 7 is clean; old super/smsf tab ids fully removed.",
+    "MarketsStrip.jsx: hardcoded market values are MOCKED per spec; clear to reviewer. Good data-testid coverage.",
+    "navData.js: rockstar-crm link removed; Markets link removed; Client Hub rename applied — matches spec.",
+    "App.js: /rockstar-crm → /adviser-hub redirect and /retirement-confidence → RetirementHub routing both wired correctly.",
+    "AdviserHub.jsx exceeds 500 lines with 7 tabs of mixed concerns — worth splitting CRM tab panels into separate modules when it grows further."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (skipped per request)", "frontend": "100%"},
+  "test_credentials": "None. localStorage only: wealth_command_compliance_v5=permanent; adviser mode sets app_mode=adviser + selected_client={id:'thompson_family'}.",
+  "seed_data_creation": "None. All data sourced from CLIENT_DATA.thompson_family.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Iteration 181 confirms the 3-tab consolidation (Retirement+Super+SMSF → single RetirementHub with sub-tabs), CRM into Client Hub, and Markets onto Today>Dashboard all work end-to-end. Data consistency verified: $9.61M NW / $3.27M super / $4.5M target (25×$180k) propagate from CLIENT_DATA into both RetirementHub context strip and SuperOptimiser defaults. Only cosmetic console noise remains (span-in-option hydration warning + recharts width/height warnings) — neither blocks users.",
+  "rca of the issue": "N/A — no blocking issues found."
+}

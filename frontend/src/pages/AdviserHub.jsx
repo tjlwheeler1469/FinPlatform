@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +11,13 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import ClientModal from "@/components/ClientModal";
 import FloatingActionRail from "@/components/platform/FloatingActionRail";
+import ErrorBoundary from "@/components/ErrorBoundary";
+
+// Lazy-load CRM tools so they only hydrate when tab is active
+const ClientSegmentations = lazy(() => import("@/components/crm/ClientSegmentations"));
+const NewsletterBuilder = lazy(() => import("@/components/crm/NewsletterBuilder"));
+const ComplianceTracker = lazy(() => import("@/components/crm/ComplianceTracker"));
+const DocuSignMock = lazy(() => import("@/components/crm/DocuSignMock"));
 import {
   Users,
   Search,
@@ -42,7 +49,12 @@ import {
   Filter,
   SlidersHorizontal,
   PieChart,
-  Layers
+  Layers,
+  Loader2,
+  Mail as MailIcon,
+  ShieldCheck,
+  FileSignature,
+  Sparkles
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -256,6 +268,22 @@ const AdviserHub = () => {
               <TabsTrigger value="activity" className="flex items-center gap-2">
                 <Activity className="h-4 w-4" />
                 Recent Activity
+              </TabsTrigger>
+              <TabsTrigger value="segments" className="flex items-center gap-2" data-testid="hub-tab-segments">
+                <Sparkles className="h-4 w-4 text-[#D4A84C]" />
+                Segmentations
+              </TabsTrigger>
+              <TabsTrigger value="newsletter" className="flex items-center gap-2" data-testid="hub-tab-newsletter">
+                <MailIcon className="h-4 w-4" />
+                Comms
+              </TabsTrigger>
+              <TabsTrigger value="compliance" className="flex items-center gap-2" data-testid="hub-tab-compliance">
+                <ShieldCheck className="h-4 w-4" />
+                SOA / ROA
+              </TabsTrigger>
+              <TabsTrigger value="docusign" className="flex items-center gap-2" data-testid="hub-tab-docusign">
+                <FileSignature className="h-4 w-4" />
+                E-Signatures
               </TabsTrigger>
             </TabsList>
 
@@ -471,6 +499,42 @@ const AdviserHub = () => {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* CRM — Segmentations */}
+          <TabsContent value="segments" className="space-y-4">
+            <ErrorBoundary label="Segmentations">
+              <Suspense fallback={<div className="flex items-center justify-center py-16"><Loader2 className="h-6 w-6 animate-spin text-[#D4A84C]" /></div>}>
+                <ClientSegmentations />
+              </Suspense>
+            </ErrorBoundary>
+          </TabsContent>
+
+          {/* CRM — Newsletters & Comms */}
+          <TabsContent value="newsletter" className="space-y-4">
+            <ErrorBoundary label="Newsletter">
+              <Suspense fallback={<div className="flex items-center justify-center py-16"><Loader2 className="h-6 w-6 animate-spin text-[#D4A84C]" /></div>}>
+                <NewsletterBuilder />
+              </Suspense>
+            </ErrorBoundary>
+          </TabsContent>
+
+          {/* CRM — SOA / ROA Compliance */}
+          <TabsContent value="compliance" className="space-y-4">
+            <ErrorBoundary label="Compliance">
+              <Suspense fallback={<div className="flex items-center justify-center py-16"><Loader2 className="h-6 w-6 animate-spin text-[#D4A84C]" /></div>}>
+                <ComplianceTracker />
+              </Suspense>
+            </ErrorBoundary>
+          </TabsContent>
+
+          {/* CRM — E-Signatures */}
+          <TabsContent value="docusign" className="space-y-4">
+            <ErrorBoundary label="E-Signatures">
+              <Suspense fallback={<div className="flex items-center justify-center py-16"><Loader2 className="h-6 w-6 animate-spin text-[#D4A84C]" /></div>}>
+                <DocuSignMock />
+              </Suspense>
+            </ErrorBoundary>
           </TabsContent>
         </Tabs>
       </div>

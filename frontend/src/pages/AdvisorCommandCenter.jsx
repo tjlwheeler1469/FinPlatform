@@ -66,6 +66,7 @@ import KnowledgeGraphPanel from "@/components/KnowledgeGraphPanel";
 import ClientPackScheduler from "@/components/ClientPackScheduler";
 import DecisionCenter from "@/pages/DecisionCenter";
 import DailyBriefing from "@/pages/DailyBriefing";
+import MarketsStrip from "@/components/MarketsStrip";
 import { CLIENT_DATA, computeClientTotals } from "@/data/clientData";
 import { navigateToClient, resolveClientSlug } from "@/lib/navigateToClient";
 import { generateReviewPackPDF } from "@/lib/pdfGenerator";
@@ -377,6 +378,7 @@ const AdvisorCommandCenter = () => {
           </TabsList>
 
           <TabsContent value="dashboard" className="mt-4 space-y-4">
+        <MarketsStrip title="Markets · Live" />
         <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
           <Card className="bg-gradient-to-br from-[#1a2744] to-[#2a3754] text-white">
             <CardContent className="pt-4 pb-4">

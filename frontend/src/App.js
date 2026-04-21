@@ -304,6 +304,7 @@ const RetirementConfidence = lazyRetry(() => import("@/pages/RetirementConfidenc
 
 // New Retirement Workshop — multi-scenario Monte Carlo with full adviser inputs
 const RetirementWorkshop = lazyRetry(() => import("@/pages/RetirementWorkshop"));
+const RetirementHub = lazyRetry(() => import("@/pages/RetirementHub"));
 
 // Contexts
 import { NotificationsProvider } from "@/context/NotificationsContext";
@@ -952,13 +953,13 @@ const AppRouter = () => {
       <Route path="/hybrid-engine" element={<HybridEngineView />} />
       
       {/* Combined Retirement Confidence (Quick + Advanced) */}
-      <Route path="/retirement-confidence" element={<RetirementWorkshop />} />
+      <Route path="/retirement-confidence" element={<RetirementHub />} />
       <Route path="/retirement-confidence-legacy" element={<RetirementConfidence />} />
       <Route path="/retirement-workshop" element={<RetirementWorkshop />} />
       
       <Route path="/crm-command-center" element={<Navigate to="/adviser-hub" replace />} />
-      <Route path="/crm" element={<Navigate to="/rockstar-crm" replace />} />
-      <Route path="/rockstar-crm" element={<RockstarCRM />} />
+      <Route path="/crm" element={<Navigate to="/adviser-hub" replace />} />
+      <Route path="/rockstar-crm" element={<Navigate to="/adviser-hub" replace />} />
       <Route path="/profile" element={<Navigate to="/dashboard" replace />} />
       
       {/* Client 360 View */}

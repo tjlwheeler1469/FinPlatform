@@ -14,7 +14,7 @@ export const personalNavGroups = [
     icon: LayoutDashboard,
     items: [
       { path: "/dashboard", label: "My Dashboard", icon: Eye, title: "Your confidence, plan & next steps", badge: "HOME" },
-      { path: "/retirement-confidence", label: "Retirement", icon: Gauge, title: "Retirement outlook" },
+      { path: "/retirement-confidence", label: "Retirement & Super", icon: Gauge, title: "Retirement plan, Super/Pension & SMSF" },
       { path: "/budget", label: "Budget", icon: PiggyBank, title: "Income, expenses & savings" },
     ]
   },
@@ -50,8 +50,7 @@ export const adviserBaseNav = [
     name: "Clients",
     icon: Users,
     items: [
-      { path: "/adviser-hub", label: "All Clients", icon: Users, title: "Select a client to enter their profile", badge: "HUB" },
-      { path: "/rockstar-crm", label: "CRM", icon: Sparkles, title: "Segmentations, newsletters, compliance, e-signatures", badge: "PRO" },
+      { path: "/adviser-hub", label: "Client Hub", icon: Users, title: "All clients, comms, compliance, e-signatures", badge: "HUB" },
       { path: "/client-setup", label: "New Client", icon: UserPlus, title: "Setup New Client" },
     ]
   },
@@ -59,7 +58,6 @@ export const adviserBaseNav = [
     name: "Firm",
     icon: Settings,
     items: [
-      { path: "/macro-dashboard", label: "Markets", icon: BarChart3, title: "Live Markets", badge: "LIVE" },
       { path: "/adviser-compliance", label: "Compliance", icon: Shield, title: "Compliance Dashboard" },
       { path: "/notification-settings", label: "Settings", icon: Settings, title: "Notifications, integrations & security" },
     ]
