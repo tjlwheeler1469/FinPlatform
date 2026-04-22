@@ -157,6 +157,7 @@ ROUTE_REGISTRY = [
     ("routes.buffett_engine", "router", "/api", "Buffett Engine"),
     ("routes.client_personal_info", "router", "/api", "Client Personal Info"),
     ("routes.retirement_projection", "router", "/api", "Retirement Projection"),
+    ("routes.email_service", "router", "/api", "Email (Resend)"),
 ]
 
 

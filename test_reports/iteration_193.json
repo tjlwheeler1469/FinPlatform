@@ -1,0 +1,54 @@
+{
+  "summary": "Iter 193 cleanup + refactor sweep verified. Backend: 4/4 pytest tests passed for /api/email-resend/{status,send} (mocked mode). Frontend: SimpleClientView 8-tab split renders cleanly with no ErrorBoundary and correct net worth ($9,610,000); retirement side-by-side layout confirmed at 1920x900; DocumentVault client-mode request-copy + hidden delete code is correct by inspection. CRITICAL: Xplan page crashes with a TDZ ReferenceError ('Cannot access fetchConnectionStatus before initialization') before the new MOCKED badge can render — ErrorBoundary catches and shows 'Application failed to load'. This blocks acceptance for the Xplan MOCKED badge feature.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "XplanIntegration", "issue": "TDZ: useEffect at line 78-81 references fetchConnectionStatus (declared at line 83) and fetchSyncHistory (line 108) in its deps array, throwing ReferenceError at render time. Entire page crashes to ErrorBoundary — the new xplan-mocked-badge never mounts.", "selector": "[data-testid=xplan-mocked-badge]", "priority": "CRITICAL"}
+    ],
+    "integration_issues": [
+      {"flow": "DocumentVault doc fetch (adviser and client)", "issue": "GET /api/documents returns 307 redirect to http:// (non-HTTPS) causing browser to block as mixed-content. UI shows 'Failed to load documents'. Pre-existing, also noted in iter 192. Prevents functional verification of vault-request-copy-* buttons (code is correct by inspection).", "affected_selectors": ["[data-testid^=vault-request-copy-]", "[data-testid=vault-delete-btn]"]}
+    ],
+    "design_issues": [
+      {"screen": "SimpleClientView Snapshot & Retirement tabs", "issues": ["Recharts width(-1)/height(-1) warnings still firing on initial mount despite debounce={50}. Cosmetic only, not blocking."]}
+    ]
+  },
+  "detailed_results": {
+    "smoke_client_portal_8_tabs": {"pass": true, "net_worth": "$9,610,000", "error_boundary_total_across_tabs": 0, "tabs_with_content": ["snapshot:51140","retire:116010","invest:42329","budget:8242","goals:23962","tax:12368","docs:14503","msgs:2929"]},
+    "retirement_side_by_side_1920": {"pass": true, "current_bbox": {"x":304,"y":370.5,"w":776}, "sandbox_bbox": {"x":1096,"y":370.5,"w":776}, "same_row": true},
+    "xplan_mocked_badge_adviser": {"pass": false, "reason": "Page crashes with ReferenceError before render", "error_boundary_shown": true, "badge_code_present_in_source": true, "line": 235},
+    "document_vault_client_cta": {"pass": "partial", "code_inspection_ok": true, "ui_verification_blocked_by": "pre-existing /api/documents 307 mixed-content redirect"},
+    "email_resend_status_endpoint": {"pass": true, "response": {"sdk_installed": true, "api_key_configured": false, "mode": "mocked"}},
+    "email_resend_send_endpoint_mocked": {"pass": true, "response": {"status": "mocked", "mocked": true}},
+    "email_resend_validation": {"pass": true, "invalid_email_returns_422": true, "missing_subject_returns_422": true}
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_email_resend.py",
+    "/app/test_reports/pytest/pytest_iteration193.xml"
+  ],
+  "action_items": [
+    "CRITICAL — Fix XplanIntegration.jsx TDZ: either move the useEffect (current lines 78-81) to AFTER the fetchConnectionStatus (line 83) and fetchSyncHistory (line 108) useCallback declarations, or inline the function bodies and drop them from the dep array. Without this fix the MOCKED badge never renders even though the JSX at line 235 is correct.",
+    "Investigate the /api/documents 307 HTTP→HTTPS redirect (pre-existing). Likely a trailing-slash router config issue on FastAPI — enable follow_redirects on the axios call is NOT the fix; the backend should return 200 on both /api/documents and /api/documents/ without dropping to http://. Same symptom noted in iter 192.",
+    "Consider suppressing the recharts width(-1) first-render warning via either setting fixed widths on the ResponsiveContainer parent or upgrading recharts — debounce={50} did not silence it."
+  ],
+  "critical_code_review_comments": [
+    "XplanIntegration.jsx lines 78-81: classic TDZ — useEffect listing useCallback references before they are initialized. Must be declared below the callbacks (or callbacks hoisted above useEffect).",
+    "SimpleClientView.jsx refactor is clean (56 LOC composition only). Per-tab files under clientView/* each compile and render independently — good split, easy to test.",
+    "email_service.py is well-structured: lazy import of resend, clean mocked fallback, pydantic EmailStr validation. Proper use of asyncio.to_thread for sync SDK. No changes needed.",
+    "DocumentVault.jsx lines 409-430: clean role-gated conditional render. Fine as-is.",
+    "Recharts debounce prop applied consistently across SimpleClientView charts but warnings persist — likely fires on the very first paint before dimensions are measured. Non-blocking."
+  ],
+  "updated_files": ["/app/backend/tests/test_email_resend.py"],
+  "success_rate": {"backend": "100% (4/4 email-resend tests)", "frontend": "4/6 acceptance items verified (Xplan badge blocked, Document vault client CTA visually blocked by pre-existing 307)"},
+  "test_credentials": "None required. localStorage: wealth_command_compliance_v5='permanent', app_mode='client'|'adviser'",
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Xplan page is fully broken by a TDZ bug in /app/frontend/src/pages/XplanIntegration.jsx (useEffect at line 78 references fetchConnectionStatus/fetchSyncHistory before their useCallback declarations at lines 83 and 108). Once fixed, just re-verify [data-testid=xplan-mocked-badge] is visible in adviser mode. DocumentVault client-CTA was code-reviewed (lines 409-430) but cannot be UI-confirmed until the /api/documents 307 mixed-content redirect is addressed — if the main agent fixes that, re-run the client-mode check. Backend email-resend endpoints are green — no need to retest unless env changes. All 8 client-portal tabs render cleanly under the new SimpleClientView split.",
+  "rca_of_the_issue": {
+    "xplan_crash": {
+      "root_cause": "In XplanIntegration.jsx, the `useEffect(() => { fetchConnectionStatus(); fetchSyncHistory(); }, [fetchConnectionStatus, fetchSyncHistory])` at line 78-81 is declared BEFORE the `const fetchConnectionStatus = useCallback(...)` at line 83 and `const fetchSyncHistory = useCallback(...)` at line 108. During the first render React reads the dependency array, triggering the Temporal Dead Zone error on the still-uninitialized `const` bindings.",
+      "reproduction": "1) Set localStorage app_mode='adviser'; 2) Navigate to /xplan-integration; 3) ErrorBoundary shows 'Application failed to load'. Console: 'ReferenceError: Cannot access fetchConnectionStatus before initialization'.",
+      "mitigation": "Move the useEffect block to AFTER both useCallback declarations (common pattern is to place all fetchers/utility callbacks first, then mount effects). Alternatively, inline the fetch calls inside the effect and drop the deps: `useEffect(() => { (async () => { ... })(); }, []);`."
+    }
+  }
+}

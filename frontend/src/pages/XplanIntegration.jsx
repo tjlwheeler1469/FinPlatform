@@ -232,9 +232,12 @@ const XplanIntegration = () => {
             <h1 className="text-2xl font-bold flex items-center gap-3">
               <Link2 className="h-7 w-7 text-[#D4A84C]" />
               Xplan Integration
+              <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-300 text-xs font-semibold" data-testid="xplan-mocked-badge">
+                MOCKED · Demo data only
+              </Badge>
             </h1>
             <p className="text-muted-foreground mt-1">
-              Connect to IRESS Xplan - Your System of Record
+              Connect to IRESS Xplan — Your System of Record. <span className="text-amber-700 font-medium">This integration is currently mocked. Live API is planned; no real Xplan tenant is connected.</span>
             </p>
           </div>
           <div className="flex items-center gap-3">

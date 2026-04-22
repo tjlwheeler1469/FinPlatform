@@ -28,6 +28,7 @@ import {
   File,
   Clock,
   Filter,
+  Mail,
   Sparkles,
   AlertTriangle,
   CheckCircle,
@@ -405,6 +406,23 @@ const DocumentVault = () => {
                               <Button variant="ghost" size="sm" title="Download">
                                 <Download className="h-4 w-4" />
                               </Button>
+                              {localStorage.getItem("app_mode") === "client" && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  title="Request a copy / message my adviser"
+                                  onClick={() => {
+                                    sessionStorage.setItem("client_msg_prefill", JSON.stringify({
+                                      subject: `Request: copy of "${doc.name}"`,
+                                      message: `Hi, could you send me a copy of "${doc.name}" (${doc.type || doc.category || "document"})? Thanks.`,
+                                    }));
+                                    window.location.href = "/client-portal?tab=msgs";
+                                  }}
+                                  data-testid={`vault-request-copy-${doc.id}`}
+                                >
+                                  <Mail className="h-4 w-4 text-[#1a2744]" />
+                                </Button>
+                              )}
                               {localStorage.getItem("app_mode") !== "client" && (
                                 <Button variant="ghost" size="sm" onClick={() => handleDelete(doc.id)} title="Delete" data-testid="vault-delete-btn">
                                   <Trash2 className="h-4 w-4 text-red-500" />
