@@ -150,8 +150,8 @@ const ClientHome = () => {
         <Card className="border-muted">
           <CardContent className="p-4 flex items-center gap-3">
             <Sparkles className="h-4 w-4 text-[#D4A84C] flex-shrink-0" />
-            <p className="text-xs text-muted-foreground">
-              Want the full picture? Visit <a href="/client-portal" className="font-semibold text-[#1a2744] hover:underline">your dashboard</a> for all your investments, budget, tax, and goals.
+            <p className="text-xs text-muted-foreground flex-1">
+              Want the full readiness view on your phone? <a href="/client-readiness" className="font-semibold text-[#1a2744] hover:underline" data-testid="home-open-mobile-portal">Open mobile portal</a> · for investments & goals use your <a href="/client-portal" className="font-semibold text-[#1a2744] hover:underline">dashboard</a>.
             </p>
           </CardContent>
         </Card>

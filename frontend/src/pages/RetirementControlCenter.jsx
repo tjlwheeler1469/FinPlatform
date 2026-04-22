@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { buildBook, buildIntelligenceFeed, rankPriorityClients } from "@/engine/bookAggregator";
 import IntelligenceFeed from "@/components/intelligence/IntelligenceFeed";
+import ActionsShippedReport from "@/components/intelligence/ActionsShippedReport";
 
 const fmt = (v) => {
   const abs = Math.abs(v || 0);
@@ -161,6 +162,9 @@ const RetirementControlCenter = () => {
             </table>
           </CardContent>
         </Card>
+
+        {/* ── Actions Shipped Report ── */}
+        <ActionsShippedReport />
       </div>
     </Layout>
   );

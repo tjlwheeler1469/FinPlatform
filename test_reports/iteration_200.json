@@ -1,0 +1,29 @@
+{
+  "summary": "Verified (1) Actions Shipped weekly report endpoint + UI widget and (2) Mobile-first read-only Client Readiness Portal. Backend: 5/5 pytest passed (days=7 returns 7 daily entries, days=30 returns 30, actor filter works, totals & delta_wow schemas correct). Frontend: portal renders all 6 sections (hero/outcomes/factors/actions/risks/activity) at 390x844 with no horizontal scroll, zero sliders/toggles/apply/generate buttons (confirmed read-only), factor weights render correctly at 30/25/20/15/10 % (3000%-bug fix confirmed), portal-book-chat CTA + portal-back both navigate correctly. ActionsShippedReport on /retirement-control-center shows 4 primary KPIs with WoW deltas (Sims 0, Strategies 1 +100%, Drafts 3 +100%, Notified 3 +100%), 3 secondary KPIs (Clients touched 1 / $778k / 25 readiness computes), sparkline toggles 7↔30 bars, refresh works. ClientHome at /client-home exposes home-open-mobile-portal link → /client-readiness (confirmed href + click navigates). Regression: RetirementControlCenter, ClientDecisionHub, IntelligenceFeed, FutureImpactEngine, ComplianceTrail all load with no webpack overlay & no console errors.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_actions_shipped.py",
+    "/app/test_reports/pytest/iter200.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "adviser_reports.py: ts_query() mutates nested dict (q['timestamp']['$lt'] = end) which could confuse callers if reused, but each call creates a fresh dict so current usage is safe.",
+    "ClientReadinessPortal fetches /api/compliance-audit/adviser-actions without loading state — silent empty fallback is acceptable for read-only UX but consider a skeleton for perceived polish.",
+    "ActionsShippedReport default is 7 days; when API is unavailable the widget shows KPIs with 0 + empty sparkline (no error state). Currently acceptable, minor UX polish only."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_actions_shipped.py"
+  ],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "No auth. localStorage wealth_command_compliance_v5=permanent; app_mode=client (portal) or adviser (report).",
+  "seed_data_creation": "Used existing Mongo collections from prior test runs (3 drafts approved, $778k impact, 3 notifications, 25 readiness computes).",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "main_agent_can_self_test": false,
+  "context_for_next_testing_agent": "ClientHome lives at /client-home (NOT /client-portal). The mobile portal /client-readiness reads selected_client from localStorage (falls back to thompson_family). Actions Shipped widget is mounted inside /retirement-control-center — scroll down to view. Backend endpoint /api/reports/actions-shipped takes days & optional actor query params."
+}
