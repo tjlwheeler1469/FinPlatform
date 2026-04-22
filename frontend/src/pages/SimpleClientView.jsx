@@ -3,7 +3,7 @@
 import Layout from "@/components/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  LayoutDashboard, TrendingUp, Gauge, FileText, MessageSquare,
+  LayoutDashboard, TrendingUp, Gauge,
   PiggyBank, Calculator, Target,
 } from "lucide-react";
 import { CLIENT_DATA, getActiveClientId } from "@/data/clientData";
@@ -14,8 +14,6 @@ import InvestmentsTab from "./clientView/InvestmentsTab";
 import RetirementTab from "./clientView/RetirementTab";
 import BudgetTab from "./clientView/BudgetTab";
 import TaxTab from "./clientView/TaxTab";
-import DocumentsTab from "./clientView/DocumentsTab";
-import MessagesTab from "./clientView/MessagesTab";
 
 const SimpleClientView = () => {
   const clientId = getActiveClientId();
@@ -36,8 +34,6 @@ const SimpleClientView = () => {
             <TabsTrigger value="budget" className="gap-1.5 flex-shrink-0" data-testid="client-tab-budget"><PiggyBank className="h-3.5 w-3.5" />Budget</TabsTrigger>
             <TabsTrigger value="goals" className="gap-1.5 flex-shrink-0" data-testid="client-tab-goals"><Target className="h-3.5 w-3.5" />Goals &amp; Scenarios</TabsTrigger>
             <TabsTrigger value="tax" className="gap-1.5 flex-shrink-0" data-testid="client-tab-tax"><Calculator className="h-3.5 w-3.5" />Tax Centre</TabsTrigger>
-            <TabsTrigger value="docs" className="gap-1.5 flex-shrink-0" data-testid="client-tab-docs"><FileText className="h-3.5 w-3.5" />Documents</TabsTrigger>
-            <TabsTrigger value="msgs" className="gap-1.5 flex-shrink-0" data-testid="client-tab-msgs"><MessageSquare className="h-3.5 w-3.5" />Messages</TabsTrigger>
           </TabsList>
           <TabsContent value="snapshot" className="pt-4"><SnapshotTab client={client} /></TabsContent>
           <TabsContent value="retirement" className="pt-4"><RetirementTab client={client} /></TabsContent>
@@ -45,8 +41,6 @@ const SimpleClientView = () => {
           <TabsContent value="budget" className="pt-4"><BudgetTab client={client} /></TabsContent>
           <TabsContent value="goals" className="pt-4"><SimpleGoals embedded clientId={clientId} /></TabsContent>
           <TabsContent value="tax" className="pt-4"><TaxTab client={client} /></TabsContent>
-          <TabsContent value="docs" className="pt-4"><DocumentsTab /></TabsContent>
-          <TabsContent value="msgs" className="pt-4"><MessagesTab clientId={clientId} /></TabsContent>
         </Tabs>
       </div>
     </Layout>

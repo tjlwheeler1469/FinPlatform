@@ -170,6 +170,7 @@ export const ClientInvoicingPage = lazyRetry(() => import("@/pages/ClientInvoici
 export const ClientCommsChecklistPage = lazyRetry(() => import("@/pages/ClientCommsChecklistPage"));
 export const RetirementControlCenter = lazyRetry(() => import("@/pages/RetirementControlCenter"));
 export const ClientHome = lazyRetry(() => import("@/pages/ClientHome"));
+export const ClientMessages = lazyRetry(() => import("@/pages/ClientMessages"));
 export const ClientReadinessPortal = lazyRetry(() => import("@/pages/ClientReadinessPortal"));
 export const ClientOnboarding = lazyRetry(() => import("@/pages/ClientOnboarding"));
 export const ClientSetupWizard = lazyRetry(() => import("@/pages/ClientSetupWizard"));
