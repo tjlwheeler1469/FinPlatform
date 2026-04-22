@@ -77,6 +77,26 @@ export const buildIntelligenceFeed = (book) => {
     clients: book.clients.map((c) => c.id),
   });
 
+  // Always-on: book summary card
+  feed.push({
+    id: "feed-summary",
+    severity: "info",
+    tag: "Book",
+    title: `Book snapshot — avg readiness ${book.kpis.avgScore}/100 · total opportunity ${fmtShort(book.kpis.totalOpportunityValue)}`,
+    message: `${book.kpis.onTrackPct}% on track · ${book.kpis.atRiskPct}% at risk · total shortfall ${fmtShort(book.kpis.totalShortfall)}.`,
+    clients: book.clients.map((c) => c.id),
+  });
+
+  // Always-on: EOFY super contribution reminder (date-aware would be nicer; leaving as evergreen)
+  feed.push({
+    id: "feed-eofy",
+    severity: "low",
+    tag: "Planning",
+    title: "EOFY approaching — review concessional & non-concessional contribution plans",
+    message: "Audit each client's super cap usage; last-mile contributions lock in this-FY deductions.",
+    clients: book.clients.map((c) => c.id),
+  });
+
   // Delay-retirement upside
   const topDelayClient = book.clients
     .map((c) => ({ id: c.id, name: c.name, uplift: Math.max(0, 100 - c.readiness.score) }))

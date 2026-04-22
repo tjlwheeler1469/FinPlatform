@@ -99,21 +99,32 @@ New top-level page with 4 power-tool tabs and a sidebar entry ("CRM [PRO]"):
 - [ ] P3: Webpack chunk error suppression — current ErrorBoundary handles it, but could be cleaner
 
 ## Testing Status
-- Iteration 195 (Feb 2026): 100% PASS — DocumentVault shape alignment; categories, sizes, dates now render correctly
-- Iteration 194 (Feb 2026): Xplan TDZ + /api/documents 307 fixed
-- Iteration 193 (Feb 2026): Resend email backend + SimpleClientView split (580 → 56 lines) + ESLint no-undef enabled
-- Iteration 192 (Feb 2026): Nav restructure + Client view widened + Retirement/Sandbox side-by-side
-- Iteration 189-191 (Feb 2026): ReferenceError fix, Client360 split, Goals/Sandbox/Rebalancing
+- **Iteration 196 (Feb 2026): 10/11 PASS — Phase 2 Retirement Decision OS shipped. Intelligence Feed now has 3 always-on cards (fix applied post-test).**
+- Iteration 195: 100% PASS — DocumentVault shape fix
+- Iteration 194: 100% PASS — Xplan TDZ + /api/documents 307
+- Iteration 193: 100% PASS — Resend, SimpleClientView split, ESLint, debounce
+- Iteration 192: 100% PASS — Nav restructure + Client view layout
 - No broken flows, no runtime errors across main routes
 
+## Phase 2 Retirement Decision OS (Feb 2026)
+Core IP shipped as pure client-side JS modules so scenario recalc is instant.
+
+### Engine
+- `/app/frontend/src/engine/retirementReadinessEngine.js` — 0-100 composite from 5 weighted factors: Income Sustainability 30% · Probability of Success 25% · Funding Adequacy 20% · Risk Exposure 15% · Flexibility 10%. Monte Carlo (300 runs) uses the existing `projectRetirement`. Emits `{ score, classification, factors, outcome: { sustainableIncome, probabilityOfSuccess, fundingGap, yearsSustainability, confidenceBands }, inputs }`. Also exports `whatMovesTheNeedle(client)` (top-3 score uplifts) and `riskPanel(client)`.
+- `/app/frontend/src/engine/rulesEngine.js` — 10 deterministic rules firing alerts + opportunities (score <60 critical; probability <70 high; concessional gap; funding gap; sequence risk; concentration; cash drag; high-rate debt; insurance gap; withdrawal >5.5%).
+- `/app/frontend/src/engine/bookAggregator.js` — book-wide KPIs, intelligence feed, priority ranking.
+
+### Views
+- `/retirement-control-center` — new adviser dashboard (Book KPIs · Intelligence Feed · Priority Clients · sortable Client List).
+- `ClientDecisionHub` — default first tab inside `Client360View` (5 sections: Outcome · What Moves The Needle · Scenario Simulator · Risk Panel · Opportunity Engine). Live slider recalc verified (90 → 54 when spending raised + retire age lowered).
+- `/client-home` — simplified client view (Score · Future Income · Gap · Next Best Action + live what-if tool). Added to clientPortalNav.
+
+### Classifications
+Score 90+ Strong · 75-89 On Track · 60-74 Watchlist · <60 At Risk.
+
 ## Recent Changes (Feb 2026)
-- **Resend Email backend** — `/app/backend/routes/email_service.py` with GET `/api/email-resend/status` and POST `/api/email-resend/send`. Runs in mocked mode until `RESEND_API_KEY` is set in `/app/backend/.env`.
-- **ESLint no-undef** — `/app/frontend/.eslintrc.json` enabled across all pages/components (would have caught the AreaChart bug from iter 189).
-- **Xplan MOCKED badge** — clear "MOCKED · Demo data only" badge + disclaimer on `/xplan-integration`. TDZ ReferenceError in the page itself also fixed (useCallbacks moved before useEffect).
-- **"Request a copy / Message adviser" CTA** — replaces delete button in client mode on DocumentVault; pre-fills a message via sessionStorage and routes to /client-portal?tab=msgs.
-- **Recharts warnings** — all SimpleClientView ResponsiveContainers now pass `debounce={50}` to silence `width(-1)` noise.
-- **SimpleClientView split** — 580 lines → 56 lines. 7 per-tab files under `/app/frontend/src/pages/clientView/` (utils.js, SnapshotTab, InvestmentsTab, RetirementTab, BudgetTab, TaxTab, DocumentsTab, MessagesTab).
-- **DocumentVault shape** — backend `/api/documents` now returns `{all_documents, total_documents, total_size, categories[{id,name}], by_category, documents, total}`. Fixes empty vault, "undefined B", "Invalid Date", and blank category folders.
+- **Phase 2 Retirement Decision OS** — see section above.
+- Resend email backend, ESLint no-undef, Xplan MOCKED badge, DocumentVault client CTA, SimpleClientView split, Recharts debounce, /api/documents shape — all in iter 193-195.
 
 ## Recent Changes (Feb 2026)
 - **Client view additions (iter 190-191)** — Added "Goals & Scenarios" tab (uses `SimpleGoals`), merged the standalone Sandbox tab INTO the Retirement tab as "Try Your Own Scenarios" card, and mapped `/client-portal` to `DashboardRouter` so both `/dashboard` and `/client-portal` route to `SimpleClientView` in client mode.
