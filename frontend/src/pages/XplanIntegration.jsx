@@ -73,18 +73,21 @@ const XplanIntegration = () => {
   // Synced data
   const [clients, setClients] = useState([]);
   const [syncHistory, setSyncHistory] = useState([]);
-  
-  // Fetch connection status on mount
-  useEffect(() => {
-    fetchConnectionStatus();
-    fetchSyncHistory();
-  }, [fetchConnectionStatus, fetchSyncHistory]);
-  
+
+  const fetchClients = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/xplan/clients`);
+      setClients(response.data.clients || []);
+    } catch (error) {
+      console.error("Error fetching clients:", error);
+    }
+  };
+
   const fetchConnectionStatus = useCallback(async () => {
     try {
       const response = await axios.get(`${API_URL}/api/xplan/status`);
       setConnectionStatus(response.data);
-      
+
       if (response.data.connected) {
         fetchClients();
       }
@@ -95,16 +98,7 @@ const XplanIntegration = () => {
       setLoading(false);
     }
   }, []);
-  
-  const fetchClients = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/api/xplan/clients`);
-      setClients(response.data.clients || []);
-    } catch (error) {
-      console.error("Error fetching clients:", error);
-    }
-  };
-  
+
   const fetchSyncHistory = useCallback(async () => {
     try {
       const response = await axios.get(`${API_URL}/api/xplan/sync-history`);
@@ -113,6 +107,12 @@ const XplanIntegration = () => {
       console.error("Error fetching sync history:", error);
     }
   }, []);
+
+  // Fetch connection status on mount — must be declared AFTER the useCallbacks above.
+  useEffect(() => {
+    fetchConnectionStatus();
+    fetchSyncHistory();
+  }, [fetchConnectionStatus, fetchSyncHistory]);
   
   const testConnection = async () => {
     setTestingConnection(true);

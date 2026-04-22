@@ -80,6 +80,7 @@ init_sample_documents()
 
 
 @router.get("/")
+@router.get("")
 async def list_documents(
     client_id: Optional[str] = None,
     category: Optional[str] = None,

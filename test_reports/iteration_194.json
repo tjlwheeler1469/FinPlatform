@@ -1,0 +1,98 @@
+{
+  "summary": "Iter 194 focused retest of 4 items. Items 1 & 2 PASS (Xplan page renders with MOCKED badge visible, no ErrorBoundary; /api/documents and /api/documents/ both return 200 with total=3). Items 3 & 4 FAIL in the UI: DocumentVault renders 'Documents (0) / No documents found' in BOTH client and adviser modes, so neither vault-request-copy-* nor vault-delete-btn selectors ever render. Root cause is a pre-existing response-shape mismatch between the backend ({documents, total}) and the frontend (which reads documents.all_documents / documents.total_documents / documents.total_size / documents.categories). The 307 fix is correct but insufficient on its own.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {
+        "flow": "DocumentVault document list rendering (client + adviser mode)",
+        "issue": "Backend GET /api/documents returns {documents: [...], total: 3} but DocumentVault.jsx reads documents.all_documents / total_documents / total_size / categories (lines 196, 242, 253, 264, 114). Mismatch causes UI to always show '0 Total Documents' and 'No documents found'. No [data-testid^=vault-request-copy-] or [data-testid=vault-delete-btn] rows ever render because there are no document rows to render. No 'Failed to load documents' toast because the axios call succeeds with a 200 — the bug is purely shape-related.",
+        "affected_selectors": [
+          "[data-testid^=vault-request-copy-]",
+          "[data-testid=vault-delete-btn]",
+          "[data-testid=search-documents-input] (search still mounts)"
+        ]
+      }
+    ],
+    "design_issues": []
+  },
+  "detailed_results": {
+    "xplan_mocked_badge_adviser": {
+      "pass": true,
+      "url": "/xplan-integration",
+      "app_mode": "adviser",
+      "error_boundary_shown": false,
+      "badge_visible": true,
+      "badge_text": "MOCKED · Demo data only",
+      "note": "Two console errors for /api/xplan/sync-history 404 — non-blocking, the page still renders (these are pre-existing and unrelated to this iteration's fixes)."
+    },
+    "api_documents_no_slash": {
+      "pass": true,
+      "status": 200,
+      "redirect": false,
+      "body_shape": "{documents: [...], total: 3}"
+    },
+    "api_documents_with_slash": {
+      "pass": true,
+      "status": 200,
+      "redirect": false,
+      "body_shape": "{documents: [...], total: 3}"
+    },
+    "document_vault_client_mode": {
+      "pass": false,
+      "url": "/document-vault",
+      "app_mode": "client",
+      "rows_rendered": 0,
+      "request_copy_count": 0,
+      "delete_btn_count": 0,
+      "failed_to_load_toast": false,
+      "reason": "Backend returns {documents, total} but DocumentVault.jsx expects {all_documents, total_documents, total_size, categories}. UI shows 'Documents (0) / No documents found'."
+    },
+    "document_vault_adviser_mode": {
+      "pass": false,
+      "url": "/document-vault",
+      "app_mode": "adviser",
+      "rows_rendered": 0,
+      "request_copy_count": 0,
+      "delete_btn_count": 0,
+      "failed_to_load_toast": false,
+      "reason": "Same shape mismatch as client mode."
+    }
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration194_documents_and_xplan.py",
+    "/app/test_reports/pytest/pytest_iteration194.xml"
+  ],
+  "action_items": [
+    "CRITICAL — Fix the /api/documents response-shape mismatch. Two options: (A) Backend: change /app/backend/routes/documents.py list_documents() to return {all_documents: documents, total_documents: len(documents), total_size: sum(d.get('file_size',0) for d in documents), categories: sorted({d.get('category') for d in documents if d.get('category')})} — this matches what the existing frontend code reads. (B) Frontend: update /app/frontend/src/pages/DocumentVault.jsx lines 102, 114, 196, 242, 253, 264 to use the new {documents, total} shape. Option A is the safer minimal change because it preserves existing frontend logic; option B is the better long-term fix but touches ~6 call-sites.",
+    "Optional: silence/remove the /api/xplan/sync-history 404 noise on the Xplan page (either implement the endpoint or stop calling it when connectionStatus.connected=false)."
+  ],
+  "critical_code_review_comments": [
+    "XplanIntegration.jsx TDZ fix is correct — useCallbacks (lines 86 and 102) are now declared BEFORE the useEffect that references them (line 112). Good.",
+    "documents.py @router.get('/') + @router.get('') dual-registration at lines 82-83 is the correct FastAPI pattern to avoid redirect_slashes 307s. Backend fix verified via no-redirect curl.",
+    "BUT — the api-response contract between documents.py and DocumentVault.jsx was never aligned. The endpoint currently returns {documents, total} while the UI reads documents.all_documents / total_documents / total_size / categories. This blocks the entire DocumentVault feature (both modes) regardless of the 307 fix. Fix one side or the other.",
+    "DocumentVault.jsx lines 409-430 role-gated CTA code is still correct by inspection — it just can't be reached because the document list is empty."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration194_documents_and_xplan.py"
+  ],
+  "success_rate": {
+    "backend": "100% (3/3 pytest: no-slash-200, slash-200, shape-matches-spec)",
+    "frontend": "50% (2/4 acceptance items: Xplan badge PASS, DocumentVault client PASS-by-code but FAIL-in-UI, DocumentVault adviser FAIL-in-UI)"
+  },
+  "test_credentials": "None. localStorage only: wealth_command_compliance_v5='permanent', app_mode='client'|'adviser'",
+  "seed_data_creation": "None (backend has 3 sample documents auto-seeded on startup via init_sample_documents()).",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Xplan TDZ is fixed — the MOCKED badge renders correctly in adviser mode. /api/documents 307 is fixed — both URLs return 200. The remaining blocker is a pre-existing API-contract mismatch: backend returns {documents, total} but DocumentVault.jsx reads documents.all_documents / total_documents / total_size / categories. Once the main agent aligns either side, re-run this playwright: set localStorage app_mode='client', visit /document-vault, expect >=3 rows each with a [data-testid^=vault-request-copy-] button and NO [data-testid=vault-delete-btn]; then switch app_mode='adviser' and expect >=3 rows each with [data-testid=vault-delete-btn] and NO vault-request-copy-* buttons.",
+  "rca_of_the_issue": {
+    "document_vault_empty": {
+      "root_cause": "Response-shape mismatch. Backend /api/documents returns {documents:[...], total:N} (see documents.py lines 100-103). Frontend DocumentVault.jsx stores the raw response in state and then reads documents.all_documents (line 196), documents.total_documents (line 242), documents.total_size (line 253), documents.categories (line 264), and documents.all_documents again at line 114 for insights. None of these keys exist on the new response, so every accessor evaluates to undefined, .filter is guarded by ?., and the UI correctly reports 'Documents (0)' / 'No documents found'. The axios call itself succeeds (200) so no error toast fires.",
+      "reproduction": "1) localStorage.setItem('app_mode','client') (or 'adviser'); 2) GET /document-vault; 3) UI shows 0 Total Documents, 0 B Storage, 0 Categories, 'No documents found' — despite backend returning 3 documents at /api/documents.",
+      "mitigation": "Easiest: update list_documents() in /app/backend/routes/documents.py to return {all_documents: documents, total_documents: len(documents), total_size: sum(d.get('file_size',0) for d in documents), categories: sorted({d.get('category') for d in documents if d.get('category')})}. Cleaner long-term: change frontend DocumentVault.jsx to consume {documents, total} and derive totals client-side."
+    }
+  }
+}
