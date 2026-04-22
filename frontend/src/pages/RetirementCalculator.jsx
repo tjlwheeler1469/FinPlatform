@@ -281,7 +281,7 @@ export default function RetirementCalculator() {
                 id="client-mode"
               />
               <Label htmlFor="client-mode" className="text-sm">
-                {isClientMode ? 'Client Mode' : 'Personal Mode'}
+                {isClientMode ? 'Client Mode' : 'Individual Mode'}
               </Label>
             </div>
             <Button variant="outline" onClick={loadSampleCalculation} disabled={calculating}>

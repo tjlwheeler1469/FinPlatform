@@ -2,7 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import {
   TrendingUp, Search, Save, ChevronLeft, ChevronRight, ChevronDown,
-  Users, X, UserCircle, Briefcase, Eye, Lock, Presentation, Unlock, Globe, Mic
+  Users, X, Briefcase, Eye, Lock, Presentation, Unlock, Globe, Mic
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -94,7 +94,6 @@ const DesktopSidebar = ({
         <Select value={appMode} onValueChange={switchMode}>
           <SelectTrigger className="w-full bg-white/10 border-white/20 text-white"><SelectValue /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="personal"><div className="flex items-center gap-2"><UserCircle className="h-4 w-4" />Personal Mode</div></SelectItem>
             <SelectItem value="adviser"><div className="flex items-center gap-2"><Briefcase className="h-4 w-4" />Adviser Mode</div></SelectItem>
             <SelectItem value="client"><div className="flex items-center gap-2"><Eye className="h-4 w-4" />Client View</div></SelectItem>
           </SelectContent>

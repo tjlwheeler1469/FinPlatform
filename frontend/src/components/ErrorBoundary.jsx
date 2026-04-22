@@ -32,6 +32,7 @@ class ErrorBoundary extends Component {
     const isChunkError = error?.message?.includes("Unexpected token") ||
       error?.message?.includes("Loading chunk") ||
       error?.message?.includes("Loading CSS chunk") ||
+      error?.message?.includes("Failed to fetch dynamically imported module") ||
       error?.name === "ChunkLoadError";
     return { hasError: true, error, isChunkError };
   }
@@ -42,10 +43,18 @@ class ErrorBoundary extends Component {
       this.setState({ hasError: false, error: null });
       return;
     }
-    // Auto-retry chunk errors up to twice; on the third, surface the hard-refresh UI
-    if (this.state.isChunkError && this.state.retryCount < 2) {
-      this.setState((prev) => ({ retryCount: prev.retryCount + 1, hasError: false, error: null }));
-      return;
+    // Auto-retry chunk errors up to twice; on the third attempt, auto hard-refresh
+    if (this.state.isChunkError) {
+      if (this.state.retryCount < 2) {
+        this.setState((prev) => ({ retryCount: prev.retryCount + 1, hasError: false, error: null }));
+        return;
+      }
+      // Sustained chunk failure — cached bundle is stale. Hard-refresh once automatically.
+      const alreadyBusted = new URL(window.location.href).searchParams.has("_cb");
+      if (!alreadyBusted) {
+        hardRefresh();
+        return;
+      }
     }
     console.error("[ErrorBoundary]", this.props.label || "Unknown", error);
   }

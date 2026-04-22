@@ -358,7 +358,7 @@ export default function DecumulationCalculator() {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <Switch checked={isClientMode} onCheckedChange={setIsClientMode} />
-              <Label>{isClientMode ? 'Client Mode' : 'Personal Mode'}</Label>
+              <Label>{isClientMode ? 'Client Mode' : 'Individual Mode'}</Label>
             </div>
             <Button variant="outline" onClick={loadSample} disabled={calculating}>
               <RefreshCw className={`h-4 w-4 mr-2 ${calculating ? 'animate-spin' : ''}`} />

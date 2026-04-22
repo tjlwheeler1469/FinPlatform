@@ -18,7 +18,12 @@ const Layout = ({ children }) => {
   const { hasUnsavedChanges, saveAllData } = usePortfolio();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [appMode, setAppMode] = useState(() => localStorage.getItem("app_mode") || "personal");
+  const [appMode, setAppMode] = useState(() => {
+    const stored = localStorage.getItem("app_mode");
+    // Personal Mode was removed — coerce any legacy "personal" value to "adviser"
+    if (!stored || stored === "personal") return "adviser";
+    return stored;
+  });
   const [meetingMode, setMeetingMode] = useState(() => localStorage.getItem("meeting_mode") === "true");
   const [selectedClient, setSelectedClient] = useState(() => {
     const saved = localStorage.getItem("selected_client");
@@ -126,7 +131,6 @@ const Layout = ({ children }) => {
     localStorage.setItem("app_mode", newMode);
     if (newMode === "adviser") navigate("/advisor-command-center");
     else if (newMode === "client") navigate("/client-portal");
-    else navigate("/personal-dashboard");
   };
 
   const handleClearClient = () => { setSelectedClient(null); navigate("/client-crm"); };

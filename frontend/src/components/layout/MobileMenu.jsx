@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import {
-  TrendingUp, Menu, X, UserCircle, Briefcase, Eye,
+  TrendingUp, Menu, X, Briefcase, Eye,
   LayoutDashboard, Wallet, Target, FileText, Calculator
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -48,7 +48,6 @@ const MobileMenu = ({
             <Select value={appMode} onValueChange={(val) => { switchMode(val); setMobileMenuOpen(false); }}>
               <SelectTrigger className="w-full bg-white/10 border-white/20 text-white"><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="personal"><div className="flex items-center gap-2"><UserCircle className="h-4 w-4" />Personal Mode</div></SelectItem>
                 <SelectItem value="adviser"><div className="flex items-center gap-2"><Briefcase className="h-4 w-4" />Adviser Mode</div></SelectItem>
                 <SelectItem value="client"><div className="flex items-center gap-2"><Eye className="h-4 w-4" />Client View</div></SelectItem>
               </SelectContent>

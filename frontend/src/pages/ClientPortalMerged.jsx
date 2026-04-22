@@ -338,7 +338,7 @@ const ClientDashboard = ({ clientAuth, onLogout }) => {
   };
 
   const exitPortal = () => {
-    localStorage.setItem("app_mode", "personal");
+    localStorage.setItem("app_mode", "adviser");
     navigate("/");
   };
 
