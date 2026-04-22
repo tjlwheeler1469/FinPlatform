@@ -405,9 +405,11 @@ const DocumentVault = () => {
                               <Button variant="ghost" size="sm" title="Download">
                                 <Download className="h-4 w-4" />
                               </Button>
-                              <Button variant="ghost" size="sm" onClick={() => handleDelete(doc.id)} title="Delete">
-                                <Trash2 className="h-4 w-4 text-red-500" />
-                              </Button>
+                              {localStorage.getItem("app_mode") !== "client" && (
+                                <Button variant="ghost" size="sm" onClick={() => handleDelete(doc.id)} title="Delete" data-testid="vault-delete-btn">
+                                  <Trash2 className="h-4 w-4 text-red-500" />
+                                </Button>
+                              )}
                             </div>
                           </div>
                         );

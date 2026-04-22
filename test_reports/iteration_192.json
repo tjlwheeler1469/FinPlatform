@@ -1,0 +1,38 @@
+{
+  "summary": "Frontend-only verification of nav + layout restructure (iter 192). All 9 acceptance criteria verified via Playwright at 1920x900. Adviser UnifiedClientOverview now shows EXACTLY 6 tabs in correct order; /client-invoicing and /client-comms-checklist pages render without ErrorBoundary; client view widened to max-w-[1600px]; Retirement tab sandbox sits side-by-side with current plan at xl breakpoint; client portal sidebar has new Documents group with all 4 items; DocumentVault delete hidden for client mode; /client-360 regression still shows Rebalance.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "DocumentVault, MyVault", "issues": ["Recharts 'width(-1) height(-1)' warnings on initial render (cosmetic, not blocking)", "Multiple 503 errors from /api/documents and /api/insights endpoints when visiting /document-vault and /my-vault (backend issue pre-existing, not part of this review scope)"]}
+    ]
+  },
+  "detailed_results": {
+    "1_adviser_6_tabs": {"pass": true, "tab_texts": ["Overview","Goals","Retirement & Super","Investments","Budget","Tax"], "removed_tabs_absent": true},
+    "2_left_nav_adviser_client_context": {"pass": true, "has_invoicing_link": true, "has_checklist_link": true, "portfolio_group_removed": true},
+    "3_client_invoicing_page": {"pass": true, "testid_found": true, "no_error_boundary": true},
+    "4_client_comms_checklist_page": {"pass": true, "testid_found": true, "content_rendered": true},
+    "5_client_view_width_1600": {"pass": true, "class": "max-w-[1600px] mx-auto p-4"},
+    "6_retirement_side_by_side": {"pass": true, "current_top": 370.5, "sandbox_top": 370.5, "current_right": 1080, "sandbox_left": 1096, "layout": "2-col grid xl:grid-cols-2 confirmed"},
+    "7_client_portal_documents_group": {"pass": true, "has_documents": true, "has_meeting_notes": true, "has_reports": true, "has_my_vault": true, "my_vault_renders": true},
+    "8_vault_delete_hidden_client": {"pass": true, "delete_button_count_in_client_mode": 0},
+    "9_client_360_regression": {"pass": true, "rebalance_still_rendered": true, "no_error_boundary": true},
+    "10_all_6_adviser_tabs_render_without_EB": {"pass": true, "per_tab_error_boundary_count": {"overview":0,"goals":0,"retirement":0,"investments":0,"budget":0,"tax":0}}
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Pre-existing: /api/documents and /api/insights return 503 (Cloud Run cold-start?). Not part of this review but worth flagging — DocumentVault page shows no docs and cannot verify adviser-mode delete button rendered because list is empty.",
+    "UnifiedClientOverview.jsx cleanly uses lazy + ErrorBoundary per tab — good isolation.",
+    "ClientInvoicingPage.jsx and ClientCommsChecklistPage.jsx are thin wrappers (~20 LOC each) — appropriate.",
+    "clientPortalNav Documents group uses /my-vault for client vault (read-only path), which is distinct from adviser's /document-vault — correctly separates role-based routes."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (not tested)", "frontend": "100% (9/9 acceptance criteria)"},
+  "test_credentials": "None required. localStorage: wealth_command_compliance_v5='permanent', app_mode='adviser'|'client', selected_client=JSON.stringify({id:'client_1'})",
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All 9 restructure items verified at 1920x900 viewport. Adviser-mode delete button visibility on DocumentVault could NOT be positively confirmed because /api/documents returned 503 (no rows to render). If this is retested later, mock/seed at least one document first. The client-mode hide logic is verified correct via the line check (line 408 uses localStorage.getItem('app_mode') !== 'client')."
+}

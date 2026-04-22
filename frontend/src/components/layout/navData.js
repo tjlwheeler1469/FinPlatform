@@ -5,7 +5,7 @@ import {
   Target, Activity, Bot, Upload, Database, Link2, Shield,
   UserPlus, Sparkles, Bell, Zap, CreditCard,
   Settings, MessageSquare, Brain, ListTodo, Video,
-  Bitcoin, Coins, Cable, Gauge, Calendar, FolderLock, Scale
+  Bitcoin, Coins, Cable, Gauge, Calendar, FolderLock, Receipt
 } from "lucide-react";
 
 export const personalNavGroups = [
@@ -60,20 +60,15 @@ export const clientContextNav = [
     name: "Overview",
     icon: Eye,
     items: [
-      { path: "/dashboard", label: "Client Overview", icon: Wallet, title: "Overview, Retirement, Investments, Budget, Goals, Tax & Invoicing", badge: "360" },
-    ]
-  },
-  {
-    name: "Portfolio",
-    icon: Scale,
-    items: [
-      { path: "/portfolio-rebalancing", label: "Portfolio Rebalancing", icon: Scale, title: "Drift analysis & trade recommendations" },
+      { path: "/dashboard", label: "Client Overview", icon: Wallet, title: "Overview, Goals, Retirement, Investments, Budget & Tax", badge: "360" },
+      { path: "/client-invoicing", label: "Invoicing", icon: Receipt, title: "Invoices, fees & billing for this client" },
     ]
   },
   {
     name: "Documents",
     icon: FileText,
     items: [
+      { path: "/client-comms-checklist", label: "Checklist", icon: ListTodo, title: "Required Communications Checklist & Timeline" },
       { path: "/meeting-notes", label: "Meeting Notes", icon: Video, title: "Meeting Notes" },
       { path: "/reports", label: "Reports", icon: FileText, title: "Reports" },
       { path: "/document-vault", label: "Vault", icon: FolderOpen, title: "Document Vault" },
@@ -87,6 +82,16 @@ export const clientPortalNav = [
     icon: LayoutDashboard,
     items: [
       { path: "/client-portal", label: "My Dashboard", icon: Eye, title: "Client Dashboard", badge: "HOME" },
+    ]
+  },
+  {
+    name: "Documents",
+    icon: FileText,
+    items: [
+      { path: "/documents", label: "Documents", icon: FileText, title: "View your documents (read-only)" },
+      { path: "/meeting-notes", label: "Meeting Notes", icon: Video, title: "Adviser meeting notes" },
+      { path: "/reports", label: "Reports", icon: FileText, title: "Statements & adviser reports" },
+      { path: "/my-vault", label: "Vault", icon: FolderLock, title: "Secure documents (read-only)" },
     ]
   },
 ];

@@ -39,7 +39,7 @@ import {
   SimpleClientView, ClientPortal, ClientPortalMerged, ClientWealth, ClientCompliance,
   ClientCRM, ClientHealthDashboard, ClientComparison, Client360View, ClientOnboarding,
   ClientSetupWizard, ClientFinancialDashboard, FamilyOverview, FamilyMemberProfile,
-  FamilyWealthDashboard,
+  FamilyWealthDashboard, ClientInvoicingPage, ClientCommsChecklistPage,
   // CRM Compliance Estate Docs
   CRMCommandCenter, ComplianceCenter, AdviserComplianceDashboard,
   UnifiedComplianceCentre, EnterpriseComplianceDashboard, DocumentsCommunications,
@@ -207,6 +207,8 @@ const AppRouter = () => (
     <Route path="/client-wealth" element={<ClientWealth />} />
     <Route path="/client-compliance" element={<ClientCompliance />} />
     <Route path="/client-portal" element={<DashboardRouter />} />
+    <Route path="/client-invoicing" element={<ClientInvoicingPage />} />
+    <Route path="/client-comms-checklist" element={<ClientCommsChecklistPage />} />
     <Route path="/client-portal-old" element={<ClientPortalMerged />} />
     <Route path="/onboarding" element={<ClientOnboarding />} />
     <Route path="/financial-dashboard" element={<Navigate to="/dashboard" replace />} />

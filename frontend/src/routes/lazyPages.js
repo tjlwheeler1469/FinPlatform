@@ -166,6 +166,8 @@ export const ClientCRM = lazyRetry(() => import("@/pages/ClientCRM"));
 export const ClientHealthDashboard = lazyRetry(() => import("@/pages/ClientHealthDashboard"));
 export const ClientComparison = lazyRetry(() => import("@/pages/ClientComparison"));
 export const Client360View = lazyRetry(() => import("@/pages/Client360View"));
+export const ClientInvoicingPage = lazyRetry(() => import("@/pages/ClientInvoicingPage"));
+export const ClientCommsChecklistPage = lazyRetry(() => import("@/pages/ClientCommsChecklistPage"));
 export const ClientOnboarding = lazyRetry(() => import("@/pages/ClientOnboarding"));
 export const ClientSetupWizard = lazyRetry(() => import("@/pages/ClientSetupWizard"));
 export const ClientFinancialDashboard = lazyRetry(() => import("@/pages/ClientFinancialDashboard"));
