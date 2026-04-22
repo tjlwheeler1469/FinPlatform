@@ -18,6 +18,7 @@ import { whatMovesTheNeedle, riskPanel } from "@/engine/retirementReadinessEngin
 import { evaluateRules } from "@/engine/rulesEngine";
 import ReadinessDial from "@/components/readiness/ReadinessDial";
 import NumberRoll from "@/components/ui/NumberRoll";
+import { XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceDot, CartesianGrid, Area, AreaChart } from "recharts";
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
@@ -69,6 +70,43 @@ const ClientReadinessPortal = () => {
 
   const scoreDelta = projectedReadiness.score - readiness.score;
   const incomeDelta = projectedReadiness.outcome.sustainableIncome - readiness.outcome.sustainableIncome;
+
+  // Pre-compute the trajectory — score + income at evenly-spaced year offsets (0..maxOffset).
+  // 6 sample points is plenty for a mobile sparkline; Recharts smooths between them.
+  const trajectory = useMemo(() => {
+    if (maxOffset <= 0) return [];
+    const stepCount = Math.min(6, maxOffset);
+    const step = Math.max(1, Math.round(maxOffset / stepCount));
+    const offsets = [];
+    for (let y = 0; y <= maxOffset; y += step) offsets.push(y);
+    if (offsets[offsets.length - 1] !== maxOffset) offsets.push(maxOffset);
+    return offsets.map((y) => {
+      if (y === 0) return { year: 0, age: currentAge, score: readiness.score, income: readiness.outcome.sustainableIncome };
+      const projClient = {
+        ...client,
+        retirement: { ...client.retirement, current_age: Math.min(currentAge + y, retireAge) },
+        assets: (client.assets || []).map((a) => ({ ...a, value: (a.value || 0) * Math.pow(1.05, y) })),
+      };
+      const r = computeReadinessCached(`${clientId}:fwd${y}`, projClient, { numSims: 150 });
+      return { year: y, age: currentAge + y, score: r.score, income: r.outcome.sustainableIncome };
+    });
+  }, [clientId, client, readiness, maxOffset, currentAge, retireAge]);
+
+  // Active trajectory point for the reference-dot marker (linearly interpolated).
+  const activePoint = useMemo(() => {
+    if (!trajectory.length) return null;
+    // Find surrounding samples and interpolate score + income for the current slider offset.
+    const left = [...trajectory].reverse().find((p) => p.year <= yearOffset) || trajectory[0];
+    const right = trajectory.find((p) => p.year >= yearOffset) || trajectory[trajectory.length - 1];
+    if (left === right) return { year: yearOffset, age: currentAge + yearOffset, score: left.score, income: left.income };
+    const t = (yearOffset - left.year) / Math.max(1, right.year - left.year);
+    return {
+      year: yearOffset,
+      age: currentAge + yearOffset,
+      score: left.score + t * (right.score - left.score),
+      income: left.income + t * (right.income - left.income),
+    };
+  }, [trajectory, yearOffset, currentAge]);
 
   // Recent adviser activity for this client (compliance trail — read-only view)
   const [trail, setTrail] = useState([]);
@@ -194,6 +232,51 @@ const ClientReadinessPortal = () => {
                 <p className="text-[11px] text-muted-foreground italic border-t pt-2">
                   ▸ Based on current plan growing at ~5% real return. Actual outcomes vary — this is for context only.
                 </p>
+              )}
+
+              {/* Trajectory sparkline — visualises the score curve */}
+              {trajectory.length > 1 && (
+                <div className="pt-2 border-t" data-testid="portal-future-trajectory">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Your trajectory · score over time</span>
+                    <span className="text-[10px] text-muted-foreground">Age {currentAge} → {currentAge + maxOffset}</span>
+                  </div>
+                  <div className="h-28">
+                    <ResponsiveContainer width="100%" height="100%" debounce={50}>
+                      <AreaChart data={trajectory} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
+                        <defs>
+                          <linearGradient id="scoreGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%"  stopColor="#D4A84C" stopOpacity={0.4} />
+                            <stop offset="100%" stopColor="#D4A84C" stopOpacity={0.04} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid vertical={false} stroke="#e2e8f0" strokeDasharray="2 2" />
+                        <XAxis dataKey="age" tick={{ fontSize: 9, fill: "#64748b" }} axisLine={false} tickLine={false} />
+                        <YAxis domain={[0, 100]} tick={{ fontSize: 9, fill: "#64748b" }} width={26} axisLine={false} tickLine={false} ticks={[0, 50, 100]} />
+                        <Tooltip
+                          formatter={(v, name) => name === "score" ? [`${Math.round(v)}/100`, "Readiness"] : [v, name]}
+                          labelFormatter={(v) => `Age ${v}`}
+                          contentStyle={{ fontSize: 11, borderRadius: 6 }}
+                        />
+                        <Area type="monotone" dataKey="score" stroke="#D4A84C" strokeWidth={2} fill="url(#scoreGrad)" />
+                        {activePoint && (
+                          <ReferenceDot
+                            x={activePoint.age}
+                            y={activePoint.score}
+                            r={5}
+                            fill="#1a2744"
+                            stroke="white"
+                            strokeWidth={2}
+                            ifOverflow="extendDomain"
+                          />
+                        )}
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <p className="text-[10px] text-center text-muted-foreground mt-1">
+                    Drag the slider to see the dot travel along your score curve.
+                  </p>
+                </div>
               )}
             </CardContent>
           </Card>

@@ -574,11 +574,12 @@ const AdviserComplianceDashboard = () => {
                     <Button
                       variant="outline"
                       className="w-full"
-                      onClick={() => {
+                      onClick={async () => {
                         try {
                           const gen = REPORT_GENERATORS[report.title];
                           if (gen) {
-                            gen();
+                            toast.info(`Generating ${report.title}…`, { description: "Hydrating from live compliance log." });
+                            await gen();
                             toast.success(`${report.title} generated`, { description: "PDF saved to downloads." });
                           } else {
                             toast.info(`${report.title} — generator not wired yet`);

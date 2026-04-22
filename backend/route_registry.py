@@ -17,6 +17,7 @@ ROUTE_REGISTRY = [
     ("routes.market_snapshot", "router", "/api", "Market Snapshot"),
     ("routes.adviser_reports", "router", "/api", "Adviser Reports"),
     ("routes.scheduled_digests", "router", "/api", "Scheduled Digests"),
+    ("routes.compliance_reports", "router", "/api", "Compliance Reports"),
     ("routes.tax", "router", "/api", "Tax"),
     ("routes.analysis", "router", "/api", "Analysis"),
     ("routes.crm", "router", "/api", "CRM"),

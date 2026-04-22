@@ -10,7 +10,7 @@
 - **Users**: 1,000 concurrent
 - **Ramp-up**: 50 users/second
 - **Duration**: 60 seconds
-- **Target**: https://retirement-readiness-2.preview.emergentagent.com
+- **Target**: https://retire-dash-1.preview.emergentagent.com
 
 ---
 

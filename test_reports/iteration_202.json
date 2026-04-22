@@ -1,0 +1,46 @@
+{
+  "summary": "Regression sweep for the new compliance_reports aggregator + ClientReadinessPortal trajectory chart + AdviserComplianceDashboard live-data hydration. Backend: 11/11 pytest passed — GET /api/compliance-reports/data returns 200 with full shape (data_source='mongodb-live', fallback_recommended=false, counts={readiness_events:76, drafts_approved:3, drafts_rejected:1, execution_tickets:3, notifications:3}). Adjacent endpoints (/api/compliance-audit, /api/advice/drafts, /api/market/snapshot, /api/market-feed/snapshot) all return <500 — no import-time breakage from the new route module. Frontend: trajectory chart renders inside data-testid='portal-future-trajectory' with SVG + reference dot; slider keyboard navigation moves aria-valuenow correctly (0→5 verified). All 6 compliance PDF generator cards (Monthly Compliance Summary, Adviser Performance Report, Issue Resolution Tracker, Risk Assessment Report, Audit Trail Report, ASIC Alignment Report) render in the Reports tab with 'Live from MongoDB' badge confirming live aggregator wiring. CRITICAL: a pre-existing webpack/ESLint compile overlay (undefined 'acknowledged' in ComplianceDisclaimer.jsx + missing type imports in AuthContext.tsx) covers every page on first load — must be dismissed/removed before clicks register. Not introduced by current task (touches files outside the diff) but should be fixed because it visually blocks the new trajectory chart and the compliance dashboard.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "ComplianceDisclaimer.jsx (line 143) + AuthContext.tsx",
+        "issue": "Webpack 'Compiled with problems' ESLint overlay covers every page: ComplianceDisclaimer.jsx references undefined 'acknowledged' inside handleAccept; AuthContext.tsx references undefined User/LoginResult/RegisterResult/AuthContextType/etc. Underlying React tree DOES render (Playwright DOM queries succeed), but real users will see a red error overlay over the new trajectory chart and the compliance dashboard until the overlay is dismissed.",
+        "selector": "iframe#webpack-dev-server-client-overlay",
+        "priority": "HIGH"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration202_compliance_reports.py",
+    "/app/test_reports/pytest/iter202.xml"
+  ],
+  "action_items": [
+    "Add `const [acknowledged, setAcknowledged] = useState(false);` (and a checkbox handler) inside ComplianceModal in /app/frontend/src/components/ComplianceDisclaimer.jsx OR replace `if (acknowledged)` with `if (true)` if the gating is no longer wanted. Currently breaks dev compile.",
+    "Fix /app/frontend/src/context/AuthContext.tsx — many no-undef errors (User, LoginResult, RegisterResult, AuthContextType, isLoading, isAuthenticated, login, logout, register, success, requiresMFA, error, key, token, password, email, role, id). Likely missing `import type { ... } from './types'` or interface declarations were stripped.",
+    "(Optional) Add data-testid attributes to each Generate Report button (e.g. data-testid='compliance-report-monthly-pdf') so future regression scripts can click each PDF generator deterministically — currently they share the generic 'Generate Report' label."
+  ],
+  "critical_code_review_comments": [
+    "compliance_reports.py: aggregator does N+1 queries (one count_documents per actor for 'approved_by') inside the adviser loop. With 20 advisers that is 20 extra round-trips on every request. Consider a single $facet pipeline or pre-aggregate approved counts grouped by approved_by.",
+    "compliance_reports.py: ISS- code uses last 4 chars of draft_id/ticket_id which collide easily; consider full ID or a hash.",
+    "compliance_reports.py: `_fmt_date` swallows all parse errors; OK for display but log a warning so seed-data drift is visible.",
+    "ClientReadinessPortal.jsx: the trajectory ResponsiveContainer occasionally logs `width(-1) and height(-1)` recharts warnings on first render because the panel is rendered inside an animation-collapsed parent. Consider initial fixed width/height or `aspect` to silence the warning.",
+    "AdviserComplianceDashboard reports tab: 6 'Generate Report' buttons share identical accessible name; add unique aria-label or data-testid for each to satisfy accessibility + test selectors."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration202_compliance_reports.py"
+  ],
+  "success_rate": {"backend": "100%", "frontend": "85%"},
+  "test_credentials": "No auth. localStorage flags: wealth_command_compliance_v5='permanent', app_mode='client' for /client-readiness, app_mode='adviser' for /adviser-compliance.",
+  "seed_data_creation": "None — read-only sweep. MongoDB seed already had 76 readiness_events, 3 approved drafts, 1 rejected draft, 3 execution_tickets, 3 notifications.",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend GET /api/compliance-reports/data is 100% green and reports mongodb-live data. The new trajectory chart renders correctly under data-testid='portal-future-trajectory'. To interact with adviser dashboard PDF tab, navigate to /adviser-compliance and click the 'Reports' tab — there are 6 cards with 'Generate Report' buttons (no individual data-testid yet). The webpack overlay (iframe#webpack-dev-server-client-overlay) MUST be removed in Playwright before clicking buttons: `await page.evaluate(\"document.getElementById('webpack-dev-server-client-overlay')?.remove()\")`. The compile overlay is caused by undefined identifiers in ComplianceDisclaimer.jsx line 143 + AuthContext.tsx — outside the current task's diff but blocks the user UX visually.",
+  "rca of the issue": "ComplianceDisclaimer.jsx ComplianceModal removes/refactored `useState` for the acknowledged checkbox but left the consumer `if (acknowledged)` in handleAccept. AuthContext.tsx is a TypeScript file consumed by an otherwise JS project; types were referenced as values without import, triggering ESLint no-undef. Both errors are static (ESLint), so they surface as a webpack-dev-server compile overlay even though runtime paths never execute the broken branch (because wealth_command_compliance_v5='permanent' short-circuits open=false). Fix: add `const [acknowledged, setAcknowledged] = useState(false);` + checkbox in the modal body, and add `import type { User, LoginResult, RegisterResult, AuthContextType } from './types'` (or inline interfaces) in AuthContext.tsx."
+}

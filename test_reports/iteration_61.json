@@ -34,7 +34,7 @@
   "test_credentials": {
     "email": "advisor@wealthcommand.io",
     "password": "secure_password_123",
-    "api_base_url": "https://retirement-readiness-2.preview.emergentagent.com"
+    "api_base_url": "https://retire-dash-1.preview.emergentagent.com"
   },
   "seed_data_creation": "Used existing demo data for testing. Created TEST_ prefixed orders for execution layer testing.",
   "retest_needed": false,
