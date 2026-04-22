@@ -96,10 +96,17 @@ async def list_documents(
     if search:
         search_lower = search.lower()
         documents = [d for d in documents if search_lower in d["name"].lower() or search_lower in d.get("description", "").lower()]
-    
+
+    # Return in the shape expected by DocumentVault.jsx
+    categories = sorted({d["category"] for d in documents if d.get("category")})
     return {
+        "all_documents": documents,
+        "total_documents": len(documents),
+        "total_size": sum(d.get("file_size", 0) for d in documents),
+        "categories": categories,
+        # Legacy keys kept for any older consumer
         "documents": documents,
-        "total": len(documents)
+        "total": len(documents),
     }
 
 

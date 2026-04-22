@@ -1,0 +1,73 @@
+{
+  "summary": "Iter 195 focused retest of the 3 items from the review request. ALL 3 PASS. Backend /api/documents now returns both the new shape (all_documents, total_documents=3, total_size=4802000, categories=['compliance','financial_plan','soa']) AND legacy (documents, total=3) at 200. DocumentVault in client mode (localStorage app_mode='client', wealth_command_compliance_v5='permanent') renders 3 document rows each with a [data-testid^=vault-request-copy-] button and ZERO [data-testid=vault-delete-btn]. DocumentVault in adviser mode renders 3 document rows each with [data-testid=vault-delete-btn] and ZERO [data-testid^=vault-request-copy-] buttons. Shape-mismatch bug from iter 194 is fully resolved.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "DocumentVault row metadata", "issue": "Each row shows 'undefined B' for file size and 'Invalid Date' for created_at. Backend returns file_size (e.g. 2456000) and created_at (ISO), but the row component appears to read different keys (likely 'size' / a different date field). Cosmetic, not in the 3 acceptance items but worth fixing.", "selector": "Documents (3) list rows", "priority": "MEDIUM"},
+      {"component": "DocumentVault Categories left panel", "issue": "Three sibling category folders render with no label (only '0' count), meaning the map is emitting blank rows. Likely related to the same 'Each child in a list should have a unique key prop' React warning logged from DocumentVault.", "selector": "Categories card", "priority": "LOW"}
+    ],
+    "integration_issues": [
+      {"flow": "DocumentVault AI Insights tab fetch", "issue": "GET /api/documents/insights returns 405 Method Not Allowed (logged twice per page load: 'Error fetching insights: AxiosError'). Non-blocking for the 3 acceptance items but should be wired up or silenced.", "affected_selectors": ["[data-testid=ai-insights-tab]"]}
+    ],
+    "design_issues": []
+  },
+  "detailed_results": {
+    "backend_api_documents": {
+      "pass": true,
+      "url": "/api/documents",
+      "status": 200,
+      "keys": ["all_documents", "categories", "documents", "total", "total_documents", "total_size"],
+      "total_documents": 3,
+      "total": 3,
+      "total_size": 4802000,
+      "categories": ["compliance", "financial_plan", "soa"],
+      "all_documents_len": 3,
+      "documents_len": 3
+    },
+    "document_vault_client_mode": {
+      "pass": true,
+      "url": "/document-vault",
+      "localStorage": {"wealth_command_compliance_v5": "permanent", "app_mode": "client"},
+      "rows_rendered": 3,
+      "doc_names_visible": ["Financial Plan 2024", "Statement of Advice - Super Strategy", "Risk Profile Assessment"],
+      "vault_request_copy_count": 3,
+      "vault_delete_btn_count": 0,
+      "no_documents_text": false
+    },
+    "document_vault_adviser_mode": {
+      "pass": true,
+      "url": "/document-vault",
+      "localStorage": {"wealth_command_compliance_v5": "permanent", "app_mode": "adviser"},
+      "rows_rendered": 3,
+      "doc_names_visible": ["Financial Plan 2024", "Statement of Advice - Super Strategy", "Risk Profile Assessment"],
+      "vault_request_copy_count": 0,
+      "vault_delete_btn_count": 3,
+      "no_documents_text": false
+    }
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Optional polish: fix 'undefined B' / 'Invalid Date' in DocumentVault rows by mapping doc.file_size and doc.created_at (the keys the backend actually returns).",
+    "Optional polish: fix the empty Categories list (3 blank folders with no label) and the 'Each child in a list should have a unique key prop' React warning from DocumentVault.",
+    "Optional: implement or stop calling GET /api/documents/insights (currently 405 on every page load, non-blocking)."
+  ],
+  "critical_code_review_comments": [
+    "documents.py list_documents() now returns both shapes (all_documents + legacy documents). This is the correct minimal fix and preserves backward compatibility with any older consumer.",
+    "Role gating in DocumentVault.jsx works as specified: client mode exposes vault-request-copy-* and suppresses vault-delete-btn; adviser mode is the inverse.",
+    "Remaining rough edges (undefined B / Invalid Date / empty category folders / 405 insights) are pre-existing and outside the scope of this iter 195 review."
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "100% (1/1 acceptance item)",
+    "frontend": "100% (2/2 acceptance items: client mode + adviser mode)"
+  },
+  "test_credentials": "None. localStorage only: wealth_command_compliance_v5='permanent', app_mode='client'|'adviser'.",
+  "seed_data_creation": "None (backend auto-seeds 3 sample documents via init_sample_documents()).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iter 194 shape-mismatch bug is fully fixed in iter 195. GET /api/documents returns both shapes. DocumentVault renders correctly in both modes with correct role-gated action buttons. Pre-existing cosmetic issues remain in DocumentVault (undefined B file sizes, Invalid Date, empty Categories list, 405 on /api/documents/insights) but are out of scope for this iteration.",
+  "rca_of_the_issue": "N/A — the 3 acceptance items all pass on retest. Shape mismatch resolved by documents.py lines 100-110 returning the superset of both the new frontend-expected keys and the legacy keys."
+}
