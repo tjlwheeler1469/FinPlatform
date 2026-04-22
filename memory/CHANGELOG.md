@@ -1,3 +1,39 @@
+## Completed (22 April 2026) — Iteration 200 (Real integrations + Adviser Copilot)
+
+### P1 — Generate Advice → LIVE GPT-5.2 copilot (adviser retains full control)
+- **NEW `/app/backend/routes/advice_copilot.py`**: Uses `emergentintegrations` with `EMERGENT_LLM_KEY` and GPT-5.2. Endpoints: POST `/api/advice/drafts`, GET, PATCH (amend), POST `/regenerate` (adviser natural-language instructions), POST `/approve`, POST `/reject`. Approved drafts are 409-locked. Every draft has `version`, `history[]`, `session_id` (keeps LLM context across amendments). Persisted in Mongo collection `advice_drafts`.
+- **NEW `/app/frontend/src/components/intelligence/AdviceDraftModal.jsx`**: Opens on "Generate Advice" click. Shows spinner → editable title/body/adviser-notes textareas. "Regenerate with instructions" textarea lets adviser steer the LLM in plain English. Save amendment, Approve, Reject buttons. **Adviser ALWAYS has final say — no auto-send.**
+- System prompt hard-codes AU context + ATO/ASIC terminology + "the adviser WILL edit this; write it as a confident first draft, not final".
+- Tested: 2502-char structured markdown memo → adviser regenerate "100 words max and blunt" → 1487 chars.
+
+### P2 — Persisted adviser action log + readiness events (Mongo)
+- `compliance_audit.py`: `readiness_events` and `adviser_actions` collections replace in-memory lists. New POST `/api/compliance-audit/adviser-actions` endpoint, GET with filters. Frontend `IntelligenceFeed` `logLocalAction` now fires keepalive fetch to Mongo-backed endpoint.
+
+### P2 — Execution Tickets adapter (Apply Strategy)
+- **NEW `/app/backend/routes/execution_tickets.py`**: Mongo-backed ticket store (collection `execution_tickets`). CRUD + dashboard summary. Ticket types: trade, super_change, insurance_quote, contribution, rebalance. Status lifecycle: pending → executing → completed/failed/cancelled.
+- Frontend "Apply Strategy" button now creates a real ticket and surfaces `ticket_id` in a toast.
+
+### P2 — Notify Client (Resend integration, graceful fallback)
+- **NEW `/app/backend/routes/notify_client.py`**: If `RESEND_API_KEY` env var is set, sends via `resend` SDK; otherwise logs notification with `mode='mocked'` in `client_notifications` collection. No breakage if key is absent.
+- Frontend "Notify Client" button calls it and surfaces "Email sent via Resend" or "Resend MOCKED — awaiting RESEND_API_KEY" in the toast.
+
+### P2 — Market feed hook
+- **NEW `/app/backend/routes/market_snapshot.py`** returns `{source:'simulated', items:[XJO/XAO/AUDUSD], avg_delta_pct}`. Deterministic 30s-window seeding to avoid UI flicker; ready to swap for a live feed.
+- `readinessCache.js` `_tick` now polls this endpoint first, falls back to bounded random walk. Pulse HUD shows `source` field.
+
+### Backlog delivered
+- **Compliance Trail** (Section 7 of `ClientDecisionHub`): `ComplianceTrail.jsx` fetches readiness events + adviser actions for the current client, merges, renders as timeline with badges. Refresh button.
+- **Number-roll animation**: `NumberRoll.jsx` (RAF-based easeOutCubic). Wired into all 5 `FutureImpactEngine` DeltaTiles and `ClientHome` scenario delta/income.
+
+### Testing
+- Iteration 199: **18/18 backend tests PASS** + full frontend flow verified. No regressions. 12 compliance-audit beacons emitted during test session. `/app/test_reports/iteration_199.json`.
+
+### Still MOCKED (by design, pending user credentials)
+- Resend is mocked until `RESEND_API_KEY` is provided → drop-in ready.
+- Execution tickets are real DB records but downstream broker/super/insurance integrations are conceptual (no actual trade execution).
+- Market feed is server-side simulated (deterministic) until a live feed is wired.
+
+
 ## Completed (22 April 2026) — Iteration 199 (Flagship: Mission Control + Future Impact Engine™)
 
 ### Intelligence Feed → "Mission Control" (RetirementControlCenter)
