@@ -1,3 +1,28 @@
+## Calculation Stress Test (22 April 2026) — Iteration 203
+
+**Scope:** All calculators across Adviser Mode → Client Overview tabs (Overview, Goals, Retirement & Super, Investments, Budget, Tax) plus standalone calculator pages.
+
+**Results:** **115/115 green** (29/29 retirementEngine regression + 86/86 new calculation assertions) + 7/7 UI calculator pages render clean (no NaN/Infinity leakage).
+
+### New test infra
+- `/app/frontend/src/lib/calculations.test.mjs` — 86 assertions covering: tax bracket duplicate consistency, ATO 2024-25 Stage-3 thresholds, CGT (individual 50%, SMSF 1/3, company 0%), loan amortisation, SG 12% FY25-26, SMSF caps ($30k/$120k/$250k), scenario ordering, Monte Carlo invariants (P10≤P50≤P90), budget frequency conversion, goal progress clamp, readiness classify buckets, rulesEngine R3.
+- `/app/frontend/test-loader.mjs` — resolves Vite `@/` alias for Node-based test runs.
+
+### Verified correct
+- Tax: StrategicPlanning.jsx & TrustDistributionAnalysis.jsx both match ATO 2024-25 ($45k→$5,188; $100k→$22,788; $135k→$33,988; $190k→$55,438; $250k→$83,638).
+- Loan: $500k @ 6.5% over 30y → $3,160.34/mo, $637,722 total interest (exact).
+- CGT: individual 24mo ($100k gain × 50% × 37% = $18,500); SMSF ($10,000); company ($30,000).
+- SG FY25-26 at 12%: $100k → $12k; $500k → capped at $30k max contribution base.
+- Scenarios: retire now → +5y → +10y produce strictly ordered terminal balances ($800k → $1.09M → $1.48M) and success probabilities (0% → 9% → 36%).
+
+### Optional refactor items (no bugs)
+- Extract duplicate `TAX_BRACKETS`/`calculateTax` (StrategicPlanning + TrustDistributionAnalysis) into `/app/frontend/src/lib/auTax.js` before next FY bracket change.
+- Standardise CGT entity-type vocabulary between CGT.jsx (`{individual,trust,super,smsf,company}`) and RetirementPlanner.jsx (`{personal,joint,trust,company,smsf}`).
+- Plumb seedable RNG into `projectRetirement` so `computeReadiness` is fully deterministic (currently ±2-5 score points Monte Carlo noise).
+- Add `minHeight` to ResponsiveContainer wrappers to silence recharts `width(-1)/height(-1)` cosmetic warnings.
+- Split RetirementPlanner.jsx (1818 lines) into sub-components.
+
+
 ## Completed (22 April 2026) — Iteration 202 (Trajectory chart + MongoDB hydration + webpack overlay fix)
 
 ### Client Readiness Portal — Trajectory line chart
