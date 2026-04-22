@@ -13,7 +13,6 @@ import AdviserClientInputs from "@/components/AdviserClientInputs";
 import HouseholdBudget from "@/pages/HouseholdBudget";
 import UnifiedInvestments from "@/pages/UnifiedInvestments";
 import UnifiedTaxCentre from "@/pages/UnifiedTaxCentre";
-import SimpleGoals from "@/components/SimpleGoals";
 import AdviserGoals from "@/components/AdviserGoals";
 import { CLIENT_DATA } from "@/data/clientData";
 import { Input } from "@/components/ui/input";

@@ -99,6 +99,14 @@ New top-level page with 4 power-tool tabs and a sidebar entry ("CRM [PRO]"):
 - [ ] P3: Webpack chunk error suppression — current ErrorBoundary handles it, but could be cleaner
 
 ## Testing Status
+- Iteration 187 (Feb 2026): 100% PASS (10/10) — AdviserGoals wired into adviser views; Recommendations pinned to TOP of CGT, Tax Analysis, Tax Loss Harvesting, Strategic Planning
 - Iteration 180: 100% PASS on all 10 acceptance criteria
 - Pre-existing cosmetic: emergent-main.js DataCloneError noise (environmental, not app code)
 - No broken flows, no runtime errors across main routes
+
+## Recent Changes (Feb 2026)
+- `/app/frontend/src/components/AdviserGoals.jsx` — goal CRUD with budget feasibility banner; adjusts-budget CTA when goals exceed monthly surplus
+- `/app/frontend/src/components/RecommendationsBanner.jsx` — NEW reusable "top-of-page" recommendations card used across CGT, Tax Analysis, Strategic Planning; Tax Loss Harvesting keeps its native Recommendations card but moved to TOP of results
+- Replaced SimpleGoals with AdviserGoals in `UnifiedClientOverview`, `Client360View`, `UnifiedGoalsPlanning`
+- SimpleGoals retained only for client read-only view (SimpleClientView)
+
