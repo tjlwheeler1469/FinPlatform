@@ -206,7 +206,7 @@ const AppRouter = () => (
     <Route path="/client-comparison" element={<ClientComparison />} />
     <Route path="/client-wealth" element={<ClientWealth />} />
     <Route path="/client-compliance" element={<ClientCompliance />} />
-    <Route path="/client-portal" element={<UnifiedDashboard />} />
+    <Route path="/client-portal" element={<DashboardRouter />} />
     <Route path="/client-portal-old" element={<ClientPortalMerged />} />
     <Route path="/onboarding" element={<ClientOnboarding />} />
     <Route path="/financial-dashboard" element={<Navigate to="/dashboard" replace />} />

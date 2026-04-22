@@ -1,0 +1,50 @@
+{
+  "summary": "Retest of iter 190 fixes — both fixes verified working. (1) Client360View Rebalance tab now renders PortfolioRebalancing content correctly. (2) /client-portal now correctly maps to DashboardRouter and renders SimpleClientView with all 8 tabs. Regression on /dashboard also confirmed.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_results_detail": {
+    "fix_1_client360_rebalance_tab": {
+      "route": "/client-360?id=client_1 (app_mode=adviser, selected_client set)",
+      "tab_clickable": true,
+      "tab_content_visible": true,
+      "content_length": 936,
+      "drift_or_rebalance_text_present": true,
+      "snippet": "Rebalancing Recommended... drifted 50.8%... Total Portfolio $3,645,000... Total Drift 50.8%... Trades Suggested 5... Analysis / Target Allocation / Rebalancing Trades / Settings",
+      "error_boundary": false,
+      "status": "PASS"
+    },
+    "fix_2_client_portal_simpleclientview": {
+      "route": "/client-portal (app_mode=client, no selected_client)",
+      "simple_client_view_present": true,
+      "all_8_tabs_present": true,
+      "tabs_verified": ["client-tab-snapshot","client-tab-retire","client-tab-invest","client-tab-budget","client-tab-goals","client-tab-tax","client-tab-docs","client-tab-msgs"],
+      "error_boundary": false,
+      "status": "PASS"
+    },
+    "regression_dashboard_route": {
+      "route": "/dashboard (app_mode=client)",
+      "simple_client_view_present": true,
+      "snapshot_tab": true,
+      "goals_tab": true,
+      "error_boundary": false,
+      "status": "PASS"
+    }
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Recharts ResponsiveContainer width(-1)/height(-1) warnings appear repeatedly on Client360View and SimpleClientView when charts mount in hidden TabsContent (Radix Tabs unmount inactive panels by default; even so the parent container computes negative size at first render). Non-blocking but pollutes console. Consider lazy-mounting charts when tab becomes active or wrap in a div with explicit min-height."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a (frontend-only)", "frontend": "100% (3/3 retest items pass)"},
+  "test_credentials": "No auth required. localStorage: wealth_command_compliance_v5='permanent', app_mode='client'|'adviser', selected_client=JSON for adviser flows.",
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Both iter 190 bugs are fixed. Client360View.jsx now has the <TabsContent value='rebalance'> block (line 103-105) wrapping PortfolioRebalancing embedded — verified rendering with $3.645M portfolio, 50.8% drift, 5 trades. AppRouter.jsx /client-portal now points to DashboardRouter (line 209) — verified SimpleClientView renders with all 8 tabs in client mode. /dashboard regression confirmed identical. Only minor non-blocking Recharts ResponsiveContainer width warnings in console.",
+  "rca of the issue": "Both bugs from iter 190 confirmed fixed by the two surgical changes E1 made. No regressions detected."
+}

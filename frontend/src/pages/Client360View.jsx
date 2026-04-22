@@ -100,6 +100,10 @@ const Client360View = () => {
             <UnifiedInvestments embedded />
           </TabsContent>
 
+          <TabsContent value="rebalance" className="space-y-6" data-testid="tab-content-rebalance">
+            <PortfolioRebalancing embedded />
+          </TabsContent>
+
           <TabsContent value="tax" className="space-y-6" data-testid="tab-content-tax">
             <UnifiedTaxCentre embedded />
           </TabsContent>
