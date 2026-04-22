@@ -1,0 +1,41 @@
+{
+  "summary": "Verified Yahoo Finance market snapshot, APScheduler-backed daily Signal + weekly Actions Shipped digests (mocked emails to digest_log), multi-page PDF export, and the new 'Show me in N years' slider on the mobile Client Readiness Portal. Backend: 11/11 pytest passed. Frontend: slider, projection tiles, delta badges, reset button and PDF export all confirmed working end-to-end. No webpack overlays, no console errors.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "/api/digests/status", "issue": "Scheduler timezone is set to Australia/Sydney but next_run_time is returned with '+00:00' offset (e.g. 2026-04-23T08:00:00+00:00). If APScheduler is interpreting the cron in UTC instead of Sydney, jobs will fire at 18:00 Sydney instead of 08:00 Sydney. Recommend explicitly passing timezone='Australia/Sydney' to each CronTrigger() (currently relying on scheduler-level tz) and verifying next_run_time prints with +10:00/+11:00 offset. Otherwise, daily 'Signal' email goes out at 6pm Sydney rather than 8am as designed."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {"flow": "Market Pulse HUD", "issue": "HUD shows '+0.00%' on initial load because it displays pulse.pctFromBaseline (session-relative drift) rather than the snapshot's avg_delta_pct. With the 30s server-side cache, the underlying value never changes within a session so the HUD stays at 0.00%. This appears to be intentional (session drift indicator), but the original spec said 'reflect non-zero delta once the snapshot endpoint returns live Yahoo data'. Underlying /api/market-feed/snapshot correctly returns ASX 200 = 8843.6, -1.225%. If the intent is to show today's % move vs prior close, swap the HUD to display avg_delta_pct (or last item's delta_pct) directly.", "affected_selectors": ["[data-testid='market-pulse-hud']"]}
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration201_market_digests.py",
+    "/app/test_reports/pytest/iter201.xml"
+  ],
+  "action_items": [
+    "(Minor) Pass timezone='Australia/Sydney' explicitly to both CronTrigger() instances in scheduled_digests.py so the 08:00 firing is anchored to AEST (currently next_run reports +00:00 offset).",
+    "(Optional) Decide whether market-pulse-hud should display session-baseline drift (current behaviour, mostly 0.00%) or today's regularMarketChangePercent from Yahoo (~-1.225%). If the latter, bind to pulse.lastSnapshot.avg_delta_pct."
+  ],
+  "critical_code_review_comments": [
+    "scheduled_digests.py: CronTrigger does not pass timezone — relies on AsyncIOScheduler tz. Returned next_run_time isoformat is +00:00 which suggests the trigger may not actually be Sydney-anchored. Worth a one-line explicit fix: CronTrigger(hour=8, minute=0, timezone='Australia/Sydney').",
+    "scheduled_digests.py: send/signal and send/actions schedule the job with asyncio.create_task() but do not await — log entry is added asynchronously, so callers needing the log row immediately get a brief (1-2s) race. Acceptable for fire-and-forget UX; the test harness mitigates with a 2s sleep.",
+    "market_snapshot.py: 30s cache is shared module-level dict — fine for single-process; if backend ever scales horizontally each replica will have its own cache (acceptable for read-only quote data).",
+    "ClientDecisionHub.jsx: Market Pulse HUD displays pctFromBaseline rather than the live Yahoo avg_delta_pct. May not match user expectation; consider exposing both 'today' and 'session drift' sub-labels.",
+    "ClientReadinessPortal slider works correctly via keyboard (Radix Slider exposes role='slider' on the inner thumb). The data-testid is on the wrapper span — fine for visibility checks but cannot be filled() directly. Tests must drive it via thumb focus + ArrowRight."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration201_market_digests.py"
+  ],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "No auth. localStorage: wealth_command_compliance_v5='permanent', app_mode='client' for /client-readiness or 'adviser' for /client-360.",
+  "seed_data_creation": "Two digest_log entries appended (one signal_daily mocked, one actions_weekly mocked) via POST /api/digests/send/* during test run. No client data mutated.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Market HUD is at /client-360 (Client360View), NOT /client-decision-hub. PDF export button is at the bottom of the Decision Graph card; PDF is ~9.4MB and 4 pages. Slider on /client-readiness uses Radix Slider — fill() doesn't work on the wrapper; use page.locator('[data-testid=portal-future-slider-input] [role=slider]').focus() then keyboard.press('ArrowRight') N times. Slider max for Thompson is 15 (retire 67 - age 50 = 17 capped at 15). Each ArrowRight moves +1yr."
+}

@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Slider } from "@/components/ui/slider";
 import {
   Target, TrendingUp, Shield, Sparkles, Clock, MessageSquare,
   ChevronRight, CheckCircle2, DollarSign, Activity, Calendar, ArrowLeft,
@@ -43,6 +44,31 @@ const ClientReadinessPortal = () => {
   const rules = useMemo(() => evaluateRules(client, readiness), [client, readiness]);
   const risks = useMemo(() => riskPanel(client), [client]);
   const topActions = useMemo(() => whatMovesTheNeedle(client), [client]);
+
+  // ── "Show me in N years" read-only projection ──
+  const currentAge = client.retirement?.current_age || 50;
+  const retireAge = client.retirement?.retirement_age || 67;
+  const maxOffset = Math.min(15, retireAge - currentAge);
+  const [yearOffset, setYearOffset] = useState(0);
+
+  // Compute the projected scenario: age forward by `offset` years, preserve inputs.
+  // We simulate by aging the client (shrinking years-to-retirement, shrinking contribution window).
+  const projectedReadiness = useMemo(() => {
+    if (yearOffset === 0) return readiness;
+    const projClient = {
+      ...client,
+      retirement: {
+        ...client.retirement,
+        current_age: Math.min(currentAge + yearOffset, retireAge),
+      },
+      // Rough asset growth: compound at expected real return 5%
+      assets: (client.assets || []).map((a) => ({ ...a, value: (a.value || 0) * Math.pow(1.05, yearOffset) })),
+    };
+    return computeReadinessCached(`${clientId}:fwd${yearOffset}`, projClient, { numSims: 150 });
+  }, [clientId, client, readiness, yearOffset, currentAge, retireAge]);
+
+  const scoreDelta = projectedReadiness.score - readiness.score;
+  const incomeDelta = projectedReadiness.outcome.sustainableIncome - readiness.outcome.sustainableIncome;
 
   // Recent adviser activity for this client (compliance trail — read-only view)
   const [trail, setTrail] = useState([]);
@@ -94,6 +120,84 @@ const ClientReadinessPortal = () => {
             </p>
           </div>
         </Card>
+
+        {/* ── "Show me in N years" interactive preview ── */}
+        {maxOffset > 0 && (
+          <Card data-testid="portal-future-slider" className="border-[#D4A84C]/40">
+            <CardContent className="p-4 space-y-3">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-[#D4A84C]" />
+                    <p className="text-sm font-semibold text-[#1a2744]">Show me in {yearOffset === 0 ? "N" : yearOffset} year{yearOffset === 1 ? "" : "s"}</p>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">Drag the slider to see where you're headed. Nothing changes for your plan.</p>
+                </div>
+                {yearOffset > 0 && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-[11px] h-7"
+                    onClick={() => setYearOffset(0)}
+                    data-testid="portal-future-reset"
+                  >
+                    Today
+                  </Button>
+                )}
+              </div>
+
+              <div className="px-1 pt-2">
+                <Slider
+                  value={[yearOffset]}
+                  min={0}
+                  max={maxOffset}
+                  step={1}
+                  onValueChange={(v) => setYearOffset(v[0])}
+                  data-testid="portal-future-slider-input"
+                />
+                <div className="flex justify-between mt-1.5 text-[10px] text-muted-foreground">
+                  <span>Today · age {currentAge}</span>
+                  <span className="font-semibold text-[#D4A84C]">+{yearOffset}yr · age {currentAge + yearOffset}</span>
+                  <span>Retire · age {retireAge}</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 pt-2">
+                <div className="p-2.5 rounded-lg border bg-slate-50/40" data-testid="portal-future-score">
+                  <p className="text-[9px] uppercase tracking-wider text-muted-foreground">Projected score</p>
+                  <div className="flex items-baseline gap-1.5 mt-0.5">
+                    <NumberRoll value={projectedReadiness.score} className="text-xl font-bold tabular-nums text-[#1a2744]" />
+                    <span className="text-[10px] text-muted-foreground">/100</span>
+                  </div>
+                  {yearOffset > 0 && (
+                    <span className={`text-[10px] font-semibold tabular-nums ${scoreDelta >= 0 ? "text-emerald-700" : "text-rose-700"}`}>
+                      {scoreDelta >= 0 ? "+" : ""}{scoreDelta} pts
+                    </span>
+                  )}
+                </div>
+                <div className="p-2.5 rounded-lg border bg-slate-50/40" data-testid="portal-future-income">
+                  <p className="text-[9px] uppercase tracking-wider text-muted-foreground">Projected income /yr</p>
+                  <NumberRoll
+                    value={projectedReadiness.outcome.sustainableIncome}
+                    format={fmtMoney}
+                    className="text-xl font-bold tabular-nums text-emerald-700"
+                  />
+                  {yearOffset > 0 && (
+                    <span className={`text-[10px] font-semibold tabular-nums ${incomeDelta >= 0 ? "text-emerald-700" : "text-rose-700"}`}>
+                      {incomeDelta >= 0 ? "+" : ""}{fmtMoney(incomeDelta)}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {yearOffset > 0 && (
+                <p className="text-[11px] text-muted-foreground italic border-t pt-2">
+                  ▸ Based on current plan growing at ~5% real return. Actual outcomes vary — this is for context only.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* ── Outcome tiles — stacked, 2-col on md+ ── */}
         <div className="grid grid-cols-2 gap-3" data-testid="portal-outcomes">

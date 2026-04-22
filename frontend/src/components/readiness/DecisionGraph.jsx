@@ -1,9 +1,10 @@
 // Financial Decision Graph — visualises action → outcome edges from the readiness engine.
 // SVG-based, zero extra deps. Reads from whatMovesTheNeedle() + evaluateRules() output.
-// Exports: PNG snapshot + PDF report for client SOA attachments.
+// Exports: PNG snapshot + multi-page PDF report (graph + factors + opportunities + scenario trail).
 import { useMemo, useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,20 @@ import { Network, TrendingUp, TrendingDown, FileText, Image as ImageIcon } from 
 
 const WIDTH = 900;
 const HEIGHT = 420;
+
+// ── formatting helpers for PDF ──
+const fmtMoneyShort = (v) => {
+  const abs = Math.abs(v || 0);
+  if (abs >= 1_000_000) return `$${(v / 1_000_000).toFixed(2)}M`;
+  if (abs >= 1_000) return `$${(v / 1_000).toFixed(0)}k`;
+  return `$${Math.round(v || 0)}`;
+};
+const barText = (s) => {
+  if (s >= 90) return "Strong";
+  if (s >= 75) return "On Track";
+  if (s >= 60) return "Watchlist";
+  return "At Risk";
+};
 
 const DecisionGraph = ({ client, readiness, rules, topActions }) => {
   const graphRef = useRef(null);
@@ -41,33 +56,121 @@ const DecisionGraph = ({ client, readiness, rules, topActions }) => {
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
       const margin = 32;
+      const name = (client.profile?.name || "client").replace(/\s+/g, "_");
+      const dateStr = new Date().toLocaleString("en-AU");
 
-      // Header
+      // ── Page 1 — Graph ───────────────────────────────────────────────
       pdf.setFontSize(16);
       pdf.setTextColor(26, 39, 68);
       pdf.text("Financial Decision Graph", margin, margin + 4);
       pdf.setFontSize(10);
       pdf.setTextColor(100, 116, 139);
       pdf.text(`${client.profile?.name || "Client"} · Readiness ${readiness.score}/100 · ${readiness.classification?.label || ""}`, margin, margin + 22);
-      pdf.text(`Generated ${new Date().toLocaleString("en-AU")} — for adviser/client SOA attachment`, margin, margin + 36);
-
-      // Graph image, scaled to width
+      pdf.text(`Generated ${dateStr} — for adviser/client SOA attachment`, margin, margin + 36);
       const imgW = pageWidth - margin * 2;
-      const imgH = (canvas.height / canvas.width) * imgW;
-      pdf.addImage(imgData, "PNG", margin, margin + 52, imgW, Math.min(imgH, pageHeight - margin * 2 - 60));
-
-      // Footer notes
-      const footerY = Math.min(margin + 52 + imgH + 20, pageHeight - margin);
+      const imgH = Math.min((canvas.height / canvas.width) * imgW, pageHeight - margin * 2 - 70);
+      pdf.addImage(imgData, "PNG", margin, margin + 52, imgW, imgH);
       pdf.setFontSize(8);
       pdf.setTextColor(71, 85, 105);
-      pdf.text(`${rules.alerts.length} alerts · ${rules.opportunities.length} opportunities surfaced from the Rules Engine.`, margin, footerY);
+      pdf.text(`${rules.alerts.length} alerts · ${rules.opportunities.length} opportunities surfaced from the Rules Engine.`, margin, pageHeight - margin + 6);
 
-      const name = (client.profile?.name || "client").replace(/\s+/g, "_");
+      // ── Page 2 — Readiness factor breakdown ──────────────────────────
+      pdf.addPage("a4", "landscape");
+      pdf.setFontSize(14); pdf.setTextColor(26, 39, 68);
+      pdf.text("Appendix A — Readiness Factor Breakdown", margin, margin + 4);
+      pdf.setFontSize(9); pdf.setTextColor(100, 116, 139);
+      pdf.text(`5 weighted factors · composite score ${readiness.score}/100`, margin, margin + 22);
+      const factorRows = (readiness.factors || []).map((f) => [
+        f.label, `${Math.round(f.weight)}%`, f.score.toString(), barText(f.score),
+      ]);
+      autoTable(pdf, {
+        startY: margin + 32,
+        head: [["Factor", "Weight", "Score", "Band"]],
+        body: factorRows,
+        theme: "grid",
+        headStyles: { fillColor: [26, 39, 68], textColor: 255, fontSize: 9 },
+        bodyStyles: { fontSize: 9 },
+        columnStyles: { 3: { cellWidth: "wrap" } },
+      });
+
+      // Outcome table on same page
+      const outcomeBodyRows = [
+        ["Sustainable income / yr", fmtMoneyShort(readiness.outcome.sustainableIncome)],
+        ["Lifetime income (approx)", fmtMoneyShort(readiness.outcome.sustainableIncome * (readiness.outcome.yearsSustainability || 0))],
+        ["Probability of success", `${readiness.outcome.probabilityOfSuccess}%`],
+        ["Years sustainable", `${readiness.outcome.yearsSustainability} yrs`],
+        ["Funding gap", fmtMoneyShort(readiness.outcome.fundingGap || 0)],
+      ];
+      autoTable(pdf, {
+        startY: (pdf.lastAutoTable?.finalY || margin + 80) + 14,
+        head: [["Outcome", "Value"]],
+        body: outcomeBodyRows,
+        theme: "grid",
+        headStyles: { fillColor: [212, 168, 76], textColor: 26, fontSize: 9 },
+        bodyStyles: { fontSize: 9 },
+      });
+
+      // ── Page 3 — Opportunities & alerts ──────────────────────────────
+      pdf.addPage("a4", "landscape");
+      pdf.setFontSize(14); pdf.setTextColor(26, 39, 68);
+      pdf.text("Appendix B — Rules Engine Output", margin, margin + 4);
+      pdf.setFontSize(9); pdf.setTextColor(100, 116, 139);
+      pdf.text(`${rules.alerts.length} alerts · ${rules.opportunities.length} opportunities`, margin, margin + 22);
+
+      if (rules.opportunities.length) {
+        autoTable(pdf, {
+          startY: margin + 32,
+          head: [["Opportunity", "Severity", "Value ($)", "Message"]],
+          body: rules.opportunities.map((o) => [o.title, o.severity, o.value ? fmtMoneyShort(o.value) : "—", o.message]),
+          theme: "striped",
+          headStyles: { fillColor: [16, 185, 129], textColor: 255, fontSize: 9 },
+          bodyStyles: { fontSize: 8, cellWidth: "wrap" },
+          columnStyles: { 0: { cellWidth: 160 }, 1: { cellWidth: 60 }, 2: { cellWidth: 70 }, 3: { cellWidth: "auto" } },
+        });
+      }
+      if (rules.alerts.length) {
+        autoTable(pdf, {
+          startY: (pdf.lastAutoTable?.finalY || margin + 80) + 14,
+          head: [["Alert", "Severity", "Message"]],
+          body: rules.alerts.map((a) => [a.title, a.severity, a.message]),
+          theme: "striped",
+          headStyles: { fillColor: [225, 29, 72], textColor: 255, fontSize: 9 },
+          bodyStyles: { fontSize: 8, cellWidth: "wrap" },
+          columnStyles: { 0: { cellWidth: 180 }, 1: { cellWidth: 60 }, 2: { cellWidth: "auto" } },
+        });
+      }
+
+      // ── Page 4 — Scenario trail (top actions) ────────────────────────
+      pdf.addPage("a4", "landscape");
+      pdf.setFontSize(14); pdf.setTextColor(26, 39, 68);
+      pdf.text("Appendix C — Scenario Trail · What Moves The Needle", margin, margin + 4);
+      pdf.setFontSize(9); pdf.setTextColor(100, 116, 139);
+      pdf.text("Top ranked actions by projected readiness-score uplift (vs baseline).", margin, margin + 22);
+      autoTable(pdf, {
+        startY: margin + 32,
+        head: [["Rank", "Action", "Projected score", "Uplift (pts)"]],
+        body: (topActions || []).map((a, i) => [`#${i + 1}`, a.label, a.score, (a.uplift >= 0 ? "+" : "") + a.uplift]),
+        theme: "grid",
+        headStyles: { fillColor: [212, 168, 76], textColor: 26, fontSize: 9 },
+        bodyStyles: { fontSize: 9 },
+        columnStyles: { 0: { cellWidth: 50 }, 1: { cellWidth: 380 }, 2: { cellWidth: 90 }, 3: { cellWidth: 80 } },
+      });
+
+      // Footer on every page
+      const pageCount = pdf.internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        pdf.setPage(i);
+        pdf.setFontSize(7); pdf.setTextColor(148, 163, 184);
+        pdf.text(`Wealth Command · ${client.profile?.name || "Client"} · ${dateStr}`, margin, pageHeight - 12);
+        pdf.text(`Page ${i} / ${pageCount}`, pageWidth - margin - 40, pageHeight - 12);
+      }
+
       pdf.save(`decision_graph_${name}_${new Date().toISOString().slice(0, 10)}.pdf`);
     } finally {
       setExporting(false);
     }
   };
+
   const nodes = useMemo(() => {
     // Outcome pillar (right)
     const outcomes = [

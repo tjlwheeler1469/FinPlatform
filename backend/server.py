@@ -177,8 +177,24 @@ async def health_check() -> dict:
 
 # ==================== LIFECYCLE ====================
 
+@app.on_event("startup")
+async def start_digest_scheduler() -> None:
+    """Start scheduled digests (08:00 daily Signal + Mon 08:00 Actions Shipped)."""
+    try:
+        from routes.scheduled_digests import start_scheduler
+        start_scheduler()
+        logger.info("Digest scheduler started")
+    except Exception as e:
+        logger.exception(f"Failed to start digest scheduler: {e}")
+
+
 @app.on_event("shutdown")
 async def shutdown_db_client() -> None:
     """Clean up database connection on shutdown."""
+    try:
+        from routes.scheduled_digests import stop_scheduler
+        stop_scheduler()
+    except Exception:
+        pass
     client.close()
     logger.info("Database connection closed")
