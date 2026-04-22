@@ -111,7 +111,7 @@ const IntelligenceEngine = () => {
 
   return (
     <Layout>
-      <FloatingActionRail />
+      {/* FloatingActionRail hidden — user request */}
       <div className="space-y-6" data-testid="intelligence-engine-page">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">

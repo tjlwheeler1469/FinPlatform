@@ -1,140 +1,139 @@
-<analysis>**original_problem_statement**: 
-The user requested an ongoing granular reorganization of the platform's UI (Adviser, Client, and Personal views) to simplify the user experience and consolidate views. Most recently, the user requested to correct mismatched account names/headers, route the LHS navigation directly to the dashboard upon client selection, ensure all Take Action buttons have correct destinations, and improve the adviser input screens for budget/scenario modelling with interactive sliders and Monte Carlo forecasting charts.
+<analysis>Here is the handover summary based on the recent LLM conversation:
 
-**PRODUCT REQUIREMENTS**:
-- Provide seamless client context switching with completely isolated mock data.
-- Redesign the platform using a 5-section calm template (Status, Risk, Improvement, Visual, Action) to reduce cognitive load.
-- Embed a persistent  on all primary pages for recommendations and next best actions.
-- Build an interactive  with sliders for retirement age, budget, contributions, and risk.
-- Ensure the header/banner always displays the correct active client data synced with the internal data store ().
+**original_problem_statement**: 
+The user requested several UI and functional changes:
+1. Increase the width of all pages to match the  layout (e.g., using ).
+2. Client view - Add more visualizations to the Snapshot tab.
+3. Adviser view - Hide the Review Pack pop-out globally as it reduces the page width.
+4. Adviser view - Allow goals to be added or removed. Make sure calculations are possible—if a goal lacks funding, prompt the adviser to adjust the budget.
+5. Adviser view - Add a Trust tab to Tax Analysis.
+6. Fix the Failed to calculate CGT error.
+7. Move recommendations to the top of the page (e.g., tax loss harvesting).
+8. Remove Personal Mode entirely, leaving only Adviser and Client modes.
 
 **User's preferred language**: English (INSTRUCT next agent to respond in English only)
 
 **what currently exists?** 
-A mature React + FastAPI + MongoDB wealth management platform. It uses a centralized  for single-source-of-truth mock data handling HNW clients. The UI has undergone a massive simplification pass: duplicate pages were removed, the sidebar was consolidated into 3 core groups, and a  handles global CTAs (e.g., Generate Review Pack). The Retirement tab now features an  containing 4 interactive sliders, real-time confidence scores, and a P10/P50/P90 Monte Carlo projection chart.
+A mature React + FastAPI + MongoDB wealth management platform. The agent successfully executed major UI restructurings, refactored  routes, redesigned the Client Hub, and built a read-only  with a Sandbox. In the latest session, the agent addressed most of the new requests: increased page widths globally, removed the  (Review Pack), removed Personal Mode from , fixed CGT data mappings, added a Trust tab to Tax Analysis, and added Area/Bar charts to the Client Snapshot. The agent was in the middle of building the  component to handle goal feasibility checks.
 
 **Last working item**: 
-    - Last item agent was working: Fixing mismatched client names in the header banner, updating client selection links in the CRM to route to the unified dashboard (), wiring deep links for Take Action buttons, and building the slider-based scenario workshop.
-    - Status: USER VERIFICATION PENDING
-    - Agent Testing Done: Y
-    - Which testing method agent to use? Frontend testing agent (iteration_167)
+    - Last item agent was working: Building the  component for Goal CRUD and budget feasibility checks.
+    - Status: IN PROGRESS
+    - Agent Testing Done: N
+    - Which testing method agent to use? frontend testing agent (after wiring the component)
     - User Testing Done: N
 
 **All Pending/In progress Issue list**:  
-  Issue 1: Unreachable Intelligence/Decision Components (P1)
-     - Attempted fixes: The agent added  and  to Take Action buttons in , , and .
-     - Next debug checklist: The testing agent reported that these components are currently not wired to any active  routes. Wire these components into the active routing tree (e.g., under  or ) so the buttons can actually be accessed and clicked by users.
-     - Why fix this issue and what will be achieved with the fix? Ensures AI insights and decision engine alerts have functional deep links, resolving the user's request to Make all action buttons clickable.
+  Issue 1: Wire and Complete Adviser Goals (P0)
+     - Attempted fixes: The component  was created.
+     - Next debug checklist: Ensure the component properly checks goal feasibility against the client's income/expenses. Wire  into the adviser workflows (e.g., replacing instances of  in  or relevant planner pages).
+     - Why fix this issue and what will be achieved with the fix? Fulfills the user's explicit request for interactive goal planning with budget validation prompts.
      - Status: IN PROGRESS
      - Is recurring issue? N
      - Should Test frontend/backend/both after fix? Frontend
      - Blocked on other issue: N/A
 
-  Issue 2: Persistent Webpack Chunk / Reload Errors (P2)
-     - Attempted fixes: Previous agents added  and an  with a Hard Refresh button to bust cache.
-     - Next debug checklist: Monitor for user complaints. If the issue recurs, investigate further caching headers or ServiceWorker conflicts.
-     - Why fix this issue and what will be achieved with the fix? Prevents the app from crashing during navigation.
-     - Status: USER VERIFICATION PENDING
-     - Is recurring issue? Y
+  Issue 2: Move Recommendations to Top of Pages (P1)
+     - Attempted fixes: None yet.
+     - Next debug checklist: Identify pages that contain Recommendations or Strategies sections (e.g., CGT, Tax Analysis, Strategic Planning) and reposition these cards/sections to the top of the layout for immediate visibility.
+     - Why fix this issue and what will be achieved with the fix? Completes the user's layout reorganization request (e.g., highlighting tax loss harvesting early).
+     - Status: NOT STARTED
+     - Is recurring issue? N
      - Should Test frontend/backend/both after fix? Frontend
+     - Blocked on other issue: N/A
 
 **In progress Task List**:
-  Task 1: AI Component Route Integration (P1)
-     - Where to resume:  and .
-     - What will be achieved with this? Exposing the orphaned AI components so their newly wired CTAs are accessible.
+  Task 1: Testing and Verification
+     - Where to resume: Once Goals and Recommendations are finalized, trigger the  to run a comprehensive suite over the new widths, hidden rails, and added tabs.
+     - What will be achieved with this? Ensures no regressions were introduced during the UI cleanup.
      - Status: NOT STARTED
      - Should Test frontend/backend/both after fix? Frontend
-     - Blocked on something: N/A
 
 **Upcoming and Future Tasks**
     Upcoming Tasks:
-    - P2: Real email integration (Resend/SendGrid) for invoice delivery + client pack auto-delivery.
+    - P2: Real email integration (Resend/SendGrid) for invoice delivery + client pack auto-delivery (carried over).
     - P3: Replace Mock Xplan integration with real API connectivity.
     
     Future Tasks:
-    - P3: Refactor  (over 1300 lines) by extracting inline data and splitting route registries.
-    - P3: Replace  500ms setInterval polling with a context event subscription.
+    - P3: Further refactor  route registries if required.
 
 **Completed work in this session**
-- Redesigned Adviser Client Dashboard for maximum decision density (DONE).
-- Propagated the 5-section calm template across Retirement, Budget, Goals, Tax, and Investments tabs (DONE).
-- Embedded  across all primary pages (DONE).
-- Consolidated the Adviser Sidebar into 3 minimal groups and redirected deprecated routes (DONE).
-- Fixed the header/banner to dynamically self-correct the client name and AUM from  (DONE).
-- Created  with 4 sliders, live confidence updates, and Monte Carlo charts (DONE).
-- Updated Client CRM and Adviser Dashboard links to route directly to  (DONE).
+- Replaced  with  to increase page width globally (DONE).
+- Hid the Review Pack () from all Adviser views (DONE).
+- Removed Personal Mode from  (DONE).
+- Fixed the Failed to calculate CGT error by mapping backend response fields correctly in  (DONE).
+- Added a Trust tab to Tax Analysis by creating  (DONE).
+- Added an AreaChart (Historical Net Worth) and BarChart (Asset Allocation vs Target) to the  Snapshot tab (DONE).
 
 **Earlier issues found/mentioned but not fixed**
-None explicitly mentioned by the user that were ignored, but the missing route mappings for the intelligence components were flagged by the testing agent.
+None explicitly.
 
 **Known issue recurrence from previous fork**
   - Issue recurrence in previous fork: Webpack Chunk Loading Error ().
   - Recurrence count: 10+ 
-  - Status: USER VERIFICATION PENDING (ErrorBoundary and lazyRetry in place).
+  - Status: USER VERIFICATION PENDING (Currently suppressed with ErrorBoundary).
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **5-Section Calm Template**: A UX principle rigorously applied across the app (Status, Top Risk, Improvement, One Visual, Primary Action) to reduce clutter.
-- **FloatingActionRail**: A globally embedded fixed-position React component providing consistent access to Recommendations, Next Best Actions, and Generate Review Pack CTAs.
-- **AdviserScenarioWorkshop**: Utilizes Recharts with  and custom slider inputs to run live Monte Carlo confidence projections.
+- **Single Source of Truth**: All UI tabs strictly pull from  and . 
+- **Event-Driven Updates**: Context and events used instead of polling.
+- **Strict Client Read-Only**: Client mode enforces read-only views, funneling interactivity purely into the isolated Sandbox tab.
 
 **key DB schema**
-  - Mapped entirely to  in . 
+  - All critical data is mocked inside  ().
 
 **changes in tech stack**
-  - Added  and  for automated Review Pack and Invoice generation.
+  - None
 
 **All files of reference** 
--  (New scenario logic)
--  (Updated header banner data binding)
--  (Routing logic updated)
+-  (Newly created, pending integration)
+-  (Newly created)
+- 
+- 
 - 
 - 
 
 **Areas that need refactoring**: 
--  is overly bloated (>1300 lines) and holds orphaned/deprecated routes that need cleanup.
+- N/A
 
 **key api endpoints**
 - 
-- 
 
 **Critical Info for New Agent** 
-- The user is extremely focused on **UX simplicity** (decision density, 5-section calm template). Do not add complex tables or multi-chart layouts without explicitly fitting them into the new minimalist design system. 
-- You must always rely on  as the source of truth for mock data, rather than localized state or localStorage fragments.
-- When working on the Take Action buttons, look closely at . The testing agent reported that the newly wired buttons in , , etc., are currently unmounted in the active application tree.
+- **CRITICAL**: The user is highly sensitive to data mismatches. Ensure the newly created  respects  perfectly and calculates feasibility actively using the client's specific  parameters (Income vs Expenses).
+- Keep the  severely restricted/read-only to prevent calculation disruption.
 
 **documents and test reports created in this job** 
   - 
   - 
 
 **Last 10 User Messages and any pending HUMAN messages** 
-1. *User*: Fix mismatched account names in headers, link LHS client selection directly to the dashboard, wire action buttons, and improve retirement scenario input sliders.
-2. *Assistant*: Fixed  header to sync with , updated CRM links to , created  with 4 sliders and live charts. Tested & completed.
+1. *User*: Combine the retirement, Super, Pension and SMSF tabs... Move CRM to Client Hub... Move Markets from under Firm to Today > Dashboard.
+2. *User*: P3: Further split App.js into route registries. Add a per-client Comms Timeline...
+3. *User*: Fix the design as it's ugly. Remove decision centre. Client view - remove ability to add assets and allow sandbox.
+4. *User*: Adviser - Improve design of Client Hub... Combine Adviser Dashboard with Daily Briefing... Client View - inline retirement analysis.
+5. *User*: On dashboard, replace Retirement tab with Retirement & Super tab... Move Budget and Tax Centre... Remove inputs except sandbox.
+6. *User*: Adviser - Move Search bar below tabs. Increase width. Client View - Add Vault and Settings to LHS.
+7. *User*: Increase the width of all pages... Client view - Add more visualizations... Adviser view - hide the Review Pack pop-out... Adviser view - Allow goals to be added or removed with feasibility checks... Add trust to Tax Analysis... Failed to calculate CGT fix... Move recommendations to the top... Remove Personal Mode... (AGENT WAS WORKING ON THIS LAST PROMPT)
 
 **Project Health Check:**
-- Broken: Disconnected routes for AI/Decision components (, etc.) preventing access to newly wired action buttons.
-- Mocked: Xplan sync, MyGov API handoff, Resend/SendGrid email dispatch.
+- Broken:  is created but isolated/unwired. Recommendations are not yet moved to the top.
+- Mocked: Most data relies on .
 
 **3rd Party Integrations** 
 - OpenAI GPT-5.2 — uses Emergent LLM Key
-- jsPDF — local dependency
+- DocuSign (Mocked)
 
 **Testing status**
-  - Testing agent used after significant changes: YES (iteration 167)
+  - Testing agent used after significant changes: YES (Iteration 186)
   - Troubleshoot agent used after agent stuck in loop: NO
-  - Test files created: 
-  - Known regressions: Testing agent flagged that several intelligence components are no longer reachable via the main routing tree.
+  - Test files created: None recently
+  - Known regressions: None
 
 **Credentials to test flow:**
-No authentication required - endpoints are open and mock data is injected.
+No authentication required — tests use localStorage only: ,  or .
 
 **What agent forgot to execute**
-The agent wired the Take Action buttons inside , , and  but forgot to ensure those components are actively mounted/routed in , making the fix untestable for the user.
-
-**Debugging checklist for current issue**
-    Issue: Take Action buttons unreachable due to orphaned components.
-    Frontend files to check: 
-    -  (Check where  or  used to sit, and re-integrate them into the active tabs or routes).
-    -  or  (Consider embedding the orphaned components here so the user can interact with them).</analysis>
+The agent did not yet implement moving the Recommendations to the top of the relevant pages (Task 7 from the user's latest prompt), and the newly created  has not been wired into the UI.</analysis>

@@ -460,7 +460,7 @@ const StrategicPlanning = () => {
 
   return (
     <Layout>
-      <FloatingActionRail />
+      {/* FloatingActionRail hidden — user request */}
       <div className="space-y-6" data-testid="strategic-planning-page">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">

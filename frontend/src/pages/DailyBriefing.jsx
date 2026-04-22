@@ -505,7 +505,7 @@ const DailyBriefing = ({ embedded = false }) => {
       </div>
   );
 
-  return embedded ? content : <Layout><FloatingActionRail />{content}</Layout>;
+  return embedded ? content : <Layout>{/* FloatingActionRail hidden — user request */}{content}</Layout>;
 };
 
 export default DailyBriefing;

@@ -69,8 +69,8 @@ const DashboardRouter = () => {
   const stored = localStorage.getItem("selected_client");
   const mode = localStorage.getItem("app_mode");
   if (stored && mode === "adviser") return <UnifiedClientOverview />;
-  if (mode === "client") return <SimpleClientView />;
-  return <UnifiedDashboard />;
+  // Default: anything non-adviser is the simple client view (Personal Mode retired)
+  return <SimpleClientView />;
 };
 
 const AppRouter = () => (

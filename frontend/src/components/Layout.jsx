@@ -199,7 +199,7 @@ const Layout = ({ children }) => {
           </div>
         )}
         <div className="p-4 md:p-6 lg:p-8">
-          <div className="max-w-7xl mx-auto">{children}</div>
+          <div className="max-w-[1600px] mx-auto">{children}</div>
         </div>
       </main>
 

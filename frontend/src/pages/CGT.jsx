@@ -267,18 +267,46 @@ const CGT = ({ embedded = false }) => {
     toast.success("Parcel deleted");
   };
 
-  // Calculator
-  const calculateCGT = async () => {
+  // Calculator — CLIENT-SIDE Australian CGT logic (no backend dependency)
+  const calculateCGT = () => {
     setCalcLoading(true);
     try {
-      const response = await axios.post(`${API}/analyze/cgt`, null, {
-        params: { purchase_price: purchasePrice, sale_price: salePrice, holding_period_months: holdingPeriod, marginal_tax_rate: marginalRate / 100, entity_type: entityType, improvement_costs: improvementCosts, selling_costs: sellingCosts }
+      const pp = Number(purchasePrice) || 0;
+      const sp = Number(salePrice) || 0;
+      const ic = Number(improvementCosts) || 0;
+      const sc = Number(sellingCosts) || 0;
+      const costBase = pp + ic + sc;
+      const grossGain = sp - costBase;
+      const heldOver12m = Number(holdingPeriod) >= 12;
+
+      // AU CGT discount: individuals/trusts 50%, super 33.33%, companies 0%
+      let discountPct = 0;
+      if (grossGain > 0 && heldOver12m) {
+        if (entityType === "individual" || entityType === "trust") discountPct = 0.5;
+        else if (entityType === "super" || entityType === "smsf") discountPct = 1 / 3;
+        else discountPct = 0; // company
+      }
+      const assessableGain = grossGain > 0 ? grossGain * (1 - discountPct) : grossGain; // full loss for losses
+      const rate = Number(marginalRate) / 100 || 0;
+      const taxPayable = assessableGain > 0 ? assessableGain * rate : 0;
+      const netProceeds = sp - sc - taxPayable;
+
+      setCalcResult({
+        capital_gain: grossGain,
+        cost_base: costBase,
+        discount_percentage: Math.round(discountPct * 100),
+        discount_amount: grossGain > 0 ? grossGain * discountPct : 0,
+        taxable_gain: assessableGain,
+        estimated_tax: taxPayable,
+        net_proceeds: netProceeds,
+        effective_rate: grossGain > 0 ? (taxPayable / grossGain) * 100 : 0,
+        held_over_12m: heldOver12m,
+        entity_type: entityType,
       });
-      setCalcResult(response.data);
-      toast.success("CGT calculated");
+      toast.success(grossGain >= 0 ? "CGT calculated" : "Capital loss calculated");
     } catch (error) {
       console.error("Error calculating CGT:", error);
-      toast.error("Failed to calculate CGT");
+      toast.error("Failed to calculate CGT — please check your inputs");
     } finally {
       setCalcLoading(false);
     }

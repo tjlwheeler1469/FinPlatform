@@ -29,9 +29,8 @@ const ModeSelector = () => {
       if (savedMode && savedMode === rememberedMode) {
         // Auto-redirect to remembered mode
         const paths = {
-          personal: "/daily-briefing",
-          adviser: "/adviser-dashboard",
-          client: "/client-portal"
+          adviser: "/adviser-hub",
+          client: "/dashboard"
         };
         if (paths[rememberedMode]) {
           navigate(paths[rememberedMode]);
@@ -68,40 +67,8 @@ const ModeSelector = () => {
 
         {/* Mode Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Personal Use */}
-          <Card className="hover:shadow-xl transition-shadow cursor-pointer group" onClick={() => selectMode("personal", "/daily-briefing")} data-testid="personal-mode-card">
-            <CardHeader className="pb-4">
-              <div className="w-16 h-16 rounded-2xl bg-[#1a2744]/10 flex items-center justify-center mb-4 group-hover:bg-[#1a2744]/20 transition-colors">
-                <User className="h-8 w-8 text-[#1a2744]" />
-              </div>
-              <CardTitle className="text-2xl">Personal Use</CardTitle>
-              <CardDescription className="text-base">
-                Manage your own investments, tax planning, and financial goals
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3 mb-6">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Home className="h-4 w-4 text-[#10B981]" />
-                  Full portfolio management
-                </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Settings className="h-4 w-4 text-[#10B981]" />
-                  All calculators & tools
-                </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Shield className="h-4 w-4 text-[#10B981]" />
-                  Tax analysis & CGT tracking
-                </div>
-              </div>
-              <Button className="w-full bg-[#1a2744] group-hover:bg-[#1a2744]/90" data-testid="enter-personal-btn">
-                Enter Personal Mode <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
-            </CardContent>
-          </Card>
-
           {/* Adviser Use */}
-          <Card className="hover:shadow-xl transition-shadow cursor-pointer group" onClick={() => selectMode("adviser", "/adviser-dashboard")} data-testid="adviser-mode-card">
+          <Card className="hover:shadow-xl transition-shadow cursor-pointer group" onClick={() => selectMode("adviser", "/adviser-hub")} data-testid="adviser-mode-card">
             <CardHeader className="pb-4">
               <div className="w-16 h-16 rounded-2xl bg-[#D4A84C]/10 flex items-center justify-center mb-4 group-hover:bg-[#D4A84C]/20 transition-colors">
                 <Briefcase className="h-8 w-8 text-[#D4A84C]" />

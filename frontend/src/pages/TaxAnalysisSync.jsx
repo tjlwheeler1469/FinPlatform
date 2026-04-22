@@ -25,8 +25,10 @@ import {
   Plus,
   Save,
   RefreshCw,
-  Eye
+  Eye,
+  Landmark
 } from "lucide-react";
+import TrustTaxPanel from "@/components/tax/TrustTaxPanel";
 import { usePortfolio } from "@/App";
 import { toast } from "sonner";
 import {
@@ -305,7 +307,7 @@ const TaxAnalysisSync = ({ embedded = false }) => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full max-w-md grid-cols-3">
+          <TabsList className="grid w-full max-w-2xl grid-cols-4">
             <TabsTrigger value="family" data-testid="family-tab">
               <Users className="h-4 w-4 mr-2" />
               Family
@@ -313,6 +315,10 @@ const TaxAnalysisSync = ({ embedded = false }) => {
             <TabsTrigger value="company" data-testid="company-tab">
               <Building2 className="h-4 w-4 mr-2" />
               Company
+            </TabsTrigger>
+            <TabsTrigger value="trust" data-testid="trust-tab">
+              <Landmark className="h-4 w-4 mr-2" />
+              Trust
             </TabsTrigger>
             <TabsTrigger value="comparison" data-testid="comparison-tab">
               <TrendingUp className="h-4 w-4 mr-2" />
@@ -604,6 +610,11 @@ const TaxAnalysisSync = ({ embedded = false }) => {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Trust Tab — AU Discretionary Trust quick calculator */}
+          <TabsContent value="trust" className="space-y-6">
+            <TrustTaxPanel />
           </TabsContent>
 
           {/* Comparison Tab */}

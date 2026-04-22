@@ -15,11 +15,11 @@ const TrustDistributionAnalysis = lazy(() => import("@/pages/TrustDistributionAn
 const Division7ACalculator = lazy(() => import("@/pages/Division7ACalculator"));
 
 const TAX_TABS = [
+  { value: "harvesting", label: "Recommendations", icon: Scissors },
   { value: "analysis", label: "Tax Analysis", icon: Calculator },
   { value: "bas", label: "BAS Calculator", icon: Receipt },
   { value: "cgt", label: "Capital Gains", icon: TrendingUp },
   { value: "div7a", label: "Division 7A", icon: Briefcase },
-  { value: "harvesting", label: "Tax Loss Harvesting", icon: Scissors },
   { value: "income-split", label: "Income Splitting", icon: DollarSign },
   { value: "calendar", label: "Tax Calendar", icon: Calendar },
   { value: "trusts", label: "Trust Distributions", icon: Building2 },
@@ -83,7 +83,7 @@ const UnifiedTaxCentre = ({ embedded = false }) => {
     </div>
   );
 
-  return embedded ? content : <Layout><FloatingActionRail />{content}</Layout>;
+  return embedded ? content : <Layout>{/* FloatingActionRail hidden — user request */}{content}</Layout>;
 };
 
 export default UnifiedTaxCentre;

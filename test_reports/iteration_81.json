@@ -40,7 +40,7 @@
     "frontend": "100% (all integrations verified)"
   },
   "test_credentials": {
-    "preview_url": "https://advisor-crm-pro-1.preview.emergentagent.com",
+    "preview_url": "https://goal-feasibility-hub.preview.emergentagent.com",
     "compliance_bypass": "localStorage.setItem('wealth_command_compliance_v5', 'permanent')"
   },
   "seed_data_creation": "None - APIs use in-memory storage (MESSAGES_STORE, GENERATED_PLANS, MEETINGS_STORE)",

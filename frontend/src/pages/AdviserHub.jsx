@@ -169,7 +169,6 @@ const AdviserHub = () => {
 
   return (
     <Layout>
-      <FloatingActionRail />
       <div className="space-y-6" data-testid="adviser-hub">
         {/* Header */}
         <div className="flex items-start justify-between gap-4 pb-1 border-b border-gray-100">

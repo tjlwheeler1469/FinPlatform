@@ -143,7 +143,7 @@ const MeetingPrep = () => {
 
   return (
     <Layout>
-      <FloatingActionRail />
+      {/* FloatingActionRail hidden — user request */}
       <div className="space-y-6" data-testid="meeting-prep-page">
         {/* Header */}
         <div className="flex items-center justify-between">
