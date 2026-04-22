@@ -1,3 +1,29 @@
+## Completed (22 April 2026) — Iteration 199 (Flagship: Mission Control + Future Impact Engine™)
+
+### Intelligence Feed → "Mission Control" (RetirementControlCenter)
+- **Rewrote `buildIntelligenceFeed`** in `bookAggregator.js`: every item now has `impactScore` (0–100), `scoreDelta`, `financialImpact ($)`, `urgency` (NOW/SOON/MONITOR), `confidence %`, 4 one-click actions, category, actionHint.
+- **Impact Score formula**: 35% readiness uplift (capped 25pts) + 30% log-scaled $ impact + 15% urgency bump + 10% confidence + 10% rescue-bump for at-risk clients.
+- **5 categories with auto-grouping**: High-Impact Opportunities · Risks & Threats · Time-Sensitive Actions · Portfolio Adjustments · Client Engagement.
+- **Ranked, capped at 15** — no low-signal noise. Generic reminders + passive notifications killed.
+- **New component `IntelligenceFeed.jsx`**: mission-control card with header stats (NOW count, total $ impact, avg impact), filterable category chips, ranked items with Impact Score badge, urgency pill (pulsing red for NOW), metrics row (Δ/$/confidence bar), action hint, 4 action buttons.
+- **One-click actions**: `Simulate` → routes to client hub with tab=decision (MOCKED). `Apply Strategy`/`Generate Advice`/`Notify Client` → sonner toasts + append to `localStorage.adviser_action_log` (MOCKED pending execution/LLM/Resend wiring).
+
+### Future Impact Engine™ (replaces Section 3 of ClientDecisionHub)
+- **New component `FutureImpactEngine.jsx`**: 3-column layout with live delta strip, Levers column (5 sliders), Shock Simulator column, Confidence Bands + "What Matters Most" column.
+- **Instant Before→After delta strip** (5 tiles): Readiness Score, Lifetime Income ($), Success Probability %, Years Sustainable, Risk Exposure — each tile shows baseline → scenario with signed delta and trend icon.
+- **Shock Simulator toggles** with animated switches:
+  - Market crash −30% (growth assets × 0.70, defensive × 0.90)
+  - Inflation spike +3% (CPI +3, real returns −2)
+  - Early retirement −5yr (retire 5 years sooner)
+  - Any active shock shows rose-tinted warning banner.
+- **Confidence Bands strip**: P10/P50/P90 as proportional horizontal bars with $ labels.
+- **"What Matters Most" reveal button**: hides top-3 actions behind a click for the "wow" moment. Lists ranked uplift.
+- **Presets**: Baseline · Aggressive · Cautious · Part-time (also available on the engine).
+
+### Testing
+- Iteration 198: **12/12 frontend acceptance items PASS**, 0 regressions, 0 console errors. `/app/test_reports/iteration_198.json`.
+
+
 ## Completed (22 April 2026) — Iteration 198 (Backlog: Market Feed + Export + Presets)
 
 ### Real-time recalc on live market data feed

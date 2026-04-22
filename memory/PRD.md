@@ -10,24 +10,28 @@ Build an AFSL-grade wealth management platform for HNW clients with consolidated
 - **Centralized Data**: `/app/frontend/src/data/clientData.js` (single source of truth: $9.61M Thompson, $22.8M Chen, etc.)
 
 
-## Phase 2 — Retirement Decision OS — STATUS: STABLE (22 April 2026, Iter 197)
+## Phase 2 — Retirement Decision OS — STATUS: FLAGSHIP-READY (22 April 2026, Iter 199)
 
-### ✅ Completed (latest)
-- **Retirement Readiness Engine** (`/app/frontend/src/engine/retirementReadinessEngine.js`): 0–100 composite from 5 weighted factors (Income Sustainability 30%, Probability 25%, Funding 20%, Risk 15%, Flexibility 10%).
-- **Readiness Cache** (`readinessCache.js`): 5-min TTL keyed by (clientId, inputs, opts). Prunes at 200 entries. Emits compliance beacons. Market-feed event bus (45s ticker).
-- **Rules Engine** (`rulesEngine.js`): 17 rules (R1–R17) covering alerts (readiness, probability, withdrawal, concentration) + opportunities (concessional, non-concessional, SMSF, spouse equalisation, reversionary pension, TTR, downsizer, carry-forward).
-- **Retirement Control Center** (`/retirement-control-center`): book KPIs, intelligence feed, priority clients, all-clients table.
-- **Client Decision Hub** (inside `/client-360`): 6 sections — Outcome, What Moves The Needle, Scenario Simulator, Risk Panel, Opportunity Engine, Financial Decision Graph.
-- **Financial Decision Graph** (`DecisionGraph.jsx`): SVG action → factor → outcome visualisation.
-- **Client Home** (`/client-home`): simplified score + future income + gap + next best action + what-if sliders.
-- **Compliance audit** (`/api/compliance-audit/readiness-events`): POST/GET/summary. In-memory store.
-- **Email Resend** (`/api/email-resend/send`): MOCKED — pending user-provided `RESEND_API_KEY`.
+### ✅ Flagship features
+- **Intelligence Feed · Mission Control**: ranked (Impact Score 0–100), categorised (5 groups), urgency-tagged (NOW/SOON/MONITOR), one-click action items (Simulate/Apply/Generate/Notify). Top 15 only.
+- **Future Impact Engine™**: sliders + shock toggles (crash/inflation/early-retire) → instant Before→After delta strip for Score/Lifetime Income/Probability/Years/Risk. Confidence bands. "What Matters Most" reveal.
+
+### ✅ Core infrastructure
+- **Retirement Readiness Engine** (`retirementReadinessEngine.js`): 0–100 composite from 5 weighted factors.
+- **Readiness Cache** (`readinessCache.js`): 5-min TTL, LRU prune, compliance beacon, event bus, simulated market feed with bounded random walk.
+- **Rules Engine** (`rulesEngine.js`): 17 rules (R1–R17) — alerts + opportunities (concessional, non-concessional, SMSF, spouse equalisation, reversionary, TTR, downsizer, carry-forward).
+- **Financial Decision Graph** (`DecisionGraph.jsx`): SVG action→factor→outcome viz with PNG/PDF export for SOA attachments.
+
+### ✅ Compliance
+- `/api/compliance-audit/readiness-events` POST/GET/summary. Frontend beacon debounced per client.
 
 ### ⏳ P2 / Backlog
-- Deeper event-driven recalc (hook to real market feed, inflation publish).
-- `RESEND_API_KEY` drop-in to flip email from mocked → live.
-- Persist compliance audit log to MongoDB (currently in-memory).
-- P3: Execution Rails, Advice Marketplace, Open API platform, White-label infra.
+- Wire real execution adapter for "Apply Strategy" (currently MOCKED → toast + localStorage)
+- Wire real LLM for "Generate Advice" (currently MOCKED → uses Emergent LLM key when added)
+- `RESEND_API_KEY` drop-in for "Notify Client" → flip from mock to live
+- Persist compliance audit to MongoDB (currently in-memory)
+- Hook `startMarketFeed` to real websocket/REST market feed
+- P3: Execution Rails, Advice Marketplace, Open API, White-label infra
 
 
 ## Completed (21 April 2026) — Iteration 180 (Phase 1 of 6-feature batch)
