@@ -139,18 +139,11 @@ export const ComplianceModal = ({ onAccept }) => {
   // Don't render anything if not open
   if (!open) return null;
 
-  const handleAccept = () => {
-    if (acknowledged) {
-      setAcknowledgement(true); // Always persist on explicit accept
-      setOpen(false);
-      onAccept?.();
-    }
-  };
-
   const handleQuickDismiss = () => {
     // Persist dismissal across sessions — the compliance footer remains visible on all pages
     setAcknowledgement(true);
     setOpen(false);
+    onAccept?.();
   };
 
   return (

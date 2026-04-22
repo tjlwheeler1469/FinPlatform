@@ -1,3 +1,21 @@
+## Completed (22 April 2026) — Iteration 202 (Trajectory chart + MongoDB hydration + webpack overlay fix)
+
+### Client Readiness Portal — Trajectory line chart
+- `ClientReadinessPortal.jsx`: new AreaChart inside the "Show me in N years" slider panel, `data-testid="portal-future-trajectory"`. Pre-computes score + income at evenly-spaced year offsets (useMemo) and tracks current slider position with an animated reference dot.
+
+### Adviser Compliance Dashboard — live MongoDB hydration
+- **NEW `/app/backend/routes/compliance_reports.py`** — aggregator at `GET /api/compliance-reports/data` reading from `readiness_events`, `adviser_actions`, `advice_drafts`, `execution_tickets`, `client_notifications`. Returns monthly_summary, adviser_rows, issues, client_risk_rows, risk_buckets, audit_rows, asic_rows + counts; includes `fallback_recommended` flag.
+- `mockComplianceReports.js` now fetches live data first and only falls back to synthetic on error. Reports show "Live from MongoDB" badge when backend hydrated.
+
+### Webpack compile overlay fix (pre-existing blockers cleared)
+- `.eslintrc.json`: added `overrides` block disabling `no-undef` for `*.ts`/`*.tsx` (type annotations were firing false positives; TypeScript itself validates identifiers).
+- `ComplianceDisclaimer.jsx`: removed dead `handleAccept` (unreachable — button uses `handleQuickDismiss`), which referenced undefined `acknowledged`. Moved `onAccept?.()` callback into `handleQuickDismiss`.
+
+### Verified
+- Backend: 11/11 pytest in `test_iteration202_compliance_reports.py` passed — GET /api/compliance-reports/data returns 200, data_source=`mongodb-live`, counts match live collections (76 readiness_events, 3 approved drafts, 1 rejected, 3 tickets, 3 notifications). Adjacent endpoints (/api/advice/drafts, /api/market/snapshot, /api/compliance-audit) still 200.
+- Frontend: trajectory chart renders under `portal-future-trajectory`, reference dot tracks slider. 6 compliance PDF buttons render in Reports tab. Webpack compile overlay no longer present. `testing_agent_v3_fork` run via iteration_202.
+
+
 ## Completed (22 April 2026) — Iteration 203 (UX polish + Compliance mock reports)
 
 ### Login routing

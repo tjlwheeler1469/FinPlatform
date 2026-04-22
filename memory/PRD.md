@@ -10,7 +10,7 @@ Build an AFSL-grade wealth management platform for HNW clients with consolidated
 - **Centralized Data**: `/app/frontend/src/data/clientData.js` (single source of truth: $9.61M Thompson, $22.8M Chen, etc.)
 
 
-## Phase 2 — Retirement Decision OS — STATUS: PRODUCTION-READY (22 April 2026, Iter 200)
+## Phase 2 — Retirement Decision OS — STATUS: PRODUCTION-READY (22 April 2026, Iter 202)
 
 ### ✅ Flagship features (live)
 - **Intelligence Feed · Mission Control** with ranked items, 5 categories, 4 one-click actions wired to backend.
@@ -20,19 +20,23 @@ Build an AFSL-grade wealth management platform for HNW clients with consolidated
 - **Client Notifications** — Resend integration (graceful mocked fallback without `RESEND_API_KEY`).
 - **Compliance Trail** — regulator-ready audit log of every readiness compute + adviser action, per-client timeline.
 - **Financial Decision Graph** with PNG/PDF export.
+- **Client Readiness Portal** — mobile-friendly read-only view with trajectory line chart inside "Show me in N years" slider.
+- **Adviser Compliance Reports** — 6 PDF generators hydrated from live Mongo via `GET /api/compliance-reports/data` (fallback-to-synthetic on error).
 
 ### ✅ Core infrastructure
-- **Readiness Engine** + 5-min TTL cache + market-feed polling (`/api/market-feed/snapshot`) + event bus.
+- **Readiness Engine** + 5-min TTL cache + market-feed polling (Yahoo Finance via `/api/market-feed/snapshot`) + event bus.
 - **Rules Engine**: 17 rules (R1–R17).
-- **Compliance events + adviser actions**: Mongo-persisted (`readiness_events`, `adviser_actions` collections).
+- **Compliance events + adviser actions**: Mongo-persisted (`readiness_events`, `adviser_actions`, `advice_drafts`, `execution_tickets`, `client_notifications`).
+- **APScheduler**: daily/weekly signal digest cron jobs inside FastAPI.
 
 ### ⏳ Backlog (deferred, user-dependent)
-- Provide `RESEND_API_KEY` → flip Notify Client from mocked to live.
-- Wire real execution broker/super platform/insurance integrations behind the ticket model.
-- Replace `market_snapshot.py` simulated generator with a real market data provider.
-- Multi-page PDF export (full opportunity list, risk panel, scenario trail appendix).
-- Client-facing read-only Future Impact Engine variant for `ClientHome`.
-- P3: Advice Marketplace, Open API, White-label infra.
+- **P2**: Provide `RESEND_API_KEY` → flip Notify Client from mocked to live email digests.
+- **P3**: Wire real execution broker/super platform/insurance integrations behind the ticket model.
+- **P3**: Advice Marketplace, Open API platform, White-label infra.
+- **P3**: Multi-page PDF export (full opportunity list, risk panel, scenario trail appendix).
+- **P3**: Expand `NumberRoll` animated deltas to more tiles.
+- **Refactor**: abstract `AdviserComplianceDashboard.jsx` reporting into factory pattern as more reports are added.
+- **Refactor (opt)**: collapse N+1 queries in `compliance_reports.py` adviser loop into a single `$facet` pipeline.
 
 
 ## Completed (21 April 2026) — Iteration 180 (Phase 1 of 6-feature batch)
