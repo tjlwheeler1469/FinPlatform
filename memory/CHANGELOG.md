@@ -1,3 +1,27 @@
+## Completed (22 April 2026) — Iteration 198 (Backlog: Market Feed + Export + Presets)
+
+### Real-time recalc on live market data feed
+- `readinessCache.js`: enhanced `startMarketFeed` with bounded random walk (±0.6%/tick, clamped ±4%), exposes `getMarketPulse()`, `onMarketPulse(cb)`, `pulseNow()`.
+- `ClientDecisionHub` header now shows a clickable "MARKET ±x.xx%" HUD (data-testid="market-pulse-hud"). Click forces an immediate pulse tick.
+- Meaningful moves (>0.25%) trigger cache invalidation + book-wide recalc subscriber broadcast.
+
+### Export Decision Graph as PNG/PDF (SOA attachments)
+- `DecisionGraph.jsx`: added `graphRef` + two export handlers using existing `html2canvas` + `jsPDF` (no new deps).
+- PNG button (data-testid="graph-export-png"): 2x-scale white-backed snapshot, downloads `decision_graph_<Name>_<YYYY-MM-DD>.png`.
+- PDF button (data-testid="graph-export-pdf"): landscape A4 with header (client name, score, classification), graph image, and footer line (alerts/opportunities counts). Downloads matching `.pdf`.
+
+### Scenario presets (one-click what-ifs)
+- `ClientDecisionHub` Scenario Simulator section now has 4 preset buttons:
+  - **Baseline** → reset to client's current inputs.
+  - **Aggressive** → retire 2yr earlier, $30k contrib (cap), +10% spend, 8.0% return.
+  - **Cautious** → retire 2yr later, ≥$15k contrib, -10% spend, 4.5% return, 3.0% inflation.
+  - **Part-time Work** → retire 3yr later, 50% contrib, -5% spend, 6.0% return.
+- All presets recompute live via the cached readiness engine; verified Aggressive drops Thompson score 90→86.
+
+### Testing
+- Self-tested: PNG + PDF both downloaded successfully with correct filenames. All data-testids verified present. Scenario simulator score updates live. Market HUD renders and is clickable.
+
+
 ## Completed (22 April 2026) — Iteration 197 (Stabilisation + P1 Backlog)
 
 ### P0 — Stress test "Too many errors" RESOLVED

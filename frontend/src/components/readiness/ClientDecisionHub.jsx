@@ -3,13 +3,14 @@
 import { useMemo, useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
-import { Gauge, Target, Sliders, Shield, Sparkles, TrendingUp, TrendingDown, AlertTriangle, Lightbulb } from "lucide-react";
+import { Gauge, Target, Sliders, Shield, Sparkles, TrendingUp, TrendingDown, AlertTriangle, Lightbulb, Activity } from "lucide-react";
 import ReadinessDial from "@/components/readiness/ReadinessDial";
 import DecisionGraph from "@/components/readiness/DecisionGraph";
 import { whatMovesTheNeedle, riskPanel } from "@/engine/retirementReadinessEngine";
-import { computeReadinessCached, onRecalc, startMarketFeed } from "@/engine/readinessCache";
+import { computeReadinessCached, onRecalc, startMarketFeed, getMarketPulse, onMarketPulse, pulseNow } from "@/engine/readinessCache";
 import { evaluateRules } from "@/engine/rulesEngine";
 
 const fmt = (v) => {
@@ -34,6 +35,39 @@ const ClientDecisionHub = ({ client }) => {
   const [spending, setSpending] = useState(client.retirement?.retirement_spending || 150000);
   const [expectedReturn, setExpectedReturn] = useState(6.5);
   const [inflation, setInflation] = useState(2.5);
+  const [pulse, setPulse] = useState(() => getMarketPulse());
+
+  // ── Scenario presets ──
+  const applyPreset = (preset) => {
+    const baseAge = client.retirement?.retirement_age || 67;
+    const baseContrib = client.retirement?.annual_contributions || 0;
+    const baseSpend = client.retirement?.retirement_spending || 150000;
+    if (preset === "baseline") {
+      setRetireAge(baseAge);
+      setContrib(baseContrib);
+      setSpending(baseSpend);
+      setExpectedReturn(6.5);
+      setInflation(2.5);
+    } else if (preset === "aggressive") {
+      setRetireAge(Math.max(55, baseAge - 2));
+      setContrib(30000);
+      setSpending(Math.round(baseSpend * 1.1));
+      setExpectedReturn(8.0);
+      setInflation(2.5);
+    } else if (preset === "cautious") {
+      setRetireAge(baseAge + 2);
+      setContrib(Math.max(baseContrib, 15000));
+      setSpending(Math.round(baseSpend * 0.9));
+      setExpectedReturn(4.5);
+      setInflation(3.0);
+    } else if (preset === "part_time") {
+      setRetireAge(baseAge + 3);
+      setContrib(Math.max(0, Math.round(baseContrib * 0.5)));
+      setSpending(Math.round(baseSpend * 0.95));
+      setExpectedReturn(6.0);
+      setInflation(2.5);
+    }
+  };
 
   const clientId = client.profile?.user_id || client.profile?.name || "unknown";
   // Force recompute counter bumped by market-feed / user-edit event bus
@@ -43,7 +77,8 @@ const ClientDecisionHub = ({ client }) => {
     startMarketFeed();
     const off = onRecalc(clientId, () => setRecalcTick((t) => t + 1));
     const offWild = onRecalc("*", () => setRecalcTick((t) => t + 1));
-    return () => { off(); offWild(); };
+    const offPulse = onMarketPulse((p) => setPulse(p));
+    return () => { off(); offWild(); offPulse(); };
   }, [clientId]);
 
   const baseReadiness = useMemo(() => computeReadinessCached(clientId, client, { numSims: 250 }), [clientId, client, recalcTick]);
@@ -75,8 +110,26 @@ const ClientDecisionHub = ({ client }) => {
         <CardContent className="p-5 flex flex-col md:flex-row items-center gap-6">
           <ReadinessDial score={baseReadiness.score} size={180} testId="hub-score-dial" />
           <div className="flex-1 space-y-2">
-            <p className="text-xs uppercase tracking-wider text-white/60">Retirement Readiness Score</p>
-            <h2 className="text-2xl font-bold">{client.profile?.name}</h2>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs uppercase tracking-wider text-white/60">Retirement Readiness Score</p>
+                <h2 className="text-2xl font-bold">{client.profile?.name}</h2>
+              </div>
+              <div
+                className="flex items-center gap-1.5 rounded-full bg-white/5 border border-white/10 px-2.5 py-1 cursor-pointer hover:bg-white/10 transition-colors"
+                onClick={() => pulseNow()}
+                title="Click to force a market pulse"
+                data-testid="market-pulse-hud"
+              >
+                <Activity className={`h-3.5 w-3.5 ${pulse.lastDelta >= 0 ? "text-emerald-300" : "text-rose-300"}`} />
+                <div className="text-[10px] leading-tight">
+                  <div className="text-white/60 uppercase tracking-wider">Market</div>
+                  <div className={`font-bold tabular-nums ${pulse.lastDelta >= 0 ? "text-emerald-300" : "text-rose-300"}`}>
+                    {(pulse.pctFromBaseline >= 0 ? "+" : "")}{pulse.pctFromBaseline.toFixed(2)}%
+                  </div>
+                </div>
+              </div>
+            </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2 border-t border-white/10">
               {baseReadiness.factors.map((f) => (
                 <div key={f.id} data-testid={`factor-${f.id}`}>
@@ -160,8 +213,19 @@ const ClientDecisionHub = ({ client }) => {
       {/* ── Section 3 — Scenario Simulator ── */}
       <Card data-testid="section-simulator">
         <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-base"><Sliders className="h-4 w-4 text-[#D4A84C]" /> 3 · Scenario Simulator</CardTitle>
-          <CardDescription>Adjust inputs · score recalculates live</CardDescription>
+          <div className="flex items-start justify-between gap-3 flex-wrap">
+            <div>
+              <CardTitle className="flex items-center gap-2 text-base"><Sliders className="h-4 w-4 text-[#D4A84C]" /> 3 · Scenario Simulator</CardTitle>
+              <CardDescription>Adjust inputs · score recalculates live</CardDescription>
+            </div>
+            <div className="flex flex-wrap items-center gap-1.5" data-testid="scenario-presets">
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground mr-1">Presets:</span>
+              <Button type="button" size="sm" variant="outline" className="h-7 text-[11px]" onClick={() => applyPreset("baseline")} data-testid="preset-baseline">Baseline</Button>
+              <Button type="button" size="sm" variant="outline" className="h-7 text-[11px] border-emerald-300 text-emerald-700 hover:bg-emerald-50" onClick={() => applyPreset("aggressive")} data-testid="preset-aggressive">Aggressive</Button>
+              <Button type="button" size="sm" variant="outline" className="h-7 text-[11px] border-sky-300 text-sky-700 hover:bg-sky-50" onClick={() => applyPreset("cautious")} data-testid="preset-cautious">Cautious</Button>
+              <Button type="button" size="sm" variant="outline" className="h-7 text-[11px] border-amber-300 text-amber-700 hover:bg-amber-50" onClick={() => applyPreset("part_time")} data-testid="preset-part-time">Part-time Work</Button>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">

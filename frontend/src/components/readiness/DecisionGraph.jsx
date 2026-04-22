@@ -1,14 +1,73 @@
 // Financial Decision Graph — visualises action → outcome edges from the readiness engine.
 // SVG-based, zero extra deps. Reads from whatMovesTheNeedle() + evaluateRules() output.
-import { useMemo } from "react";
+// Exports: PNG snapshot + PDF report for client SOA attachments.
+import { useMemo, useRef, useState } from "react";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Network, TrendingUp, TrendingDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Network, TrendingUp, TrendingDown, FileText, Image as ImageIcon } from "lucide-react";
 
 const WIDTH = 900;
 const HEIGHT = 420;
 
 const DecisionGraph = ({ client, readiness, rules, topActions }) => {
+  const graphRef = useRef(null);
+  const [exporting, setExporting] = useState(false);
+
+  const handleExportPng = async () => {
+    if (!graphRef.current) return;
+    setExporting(true);
+    try {
+      const canvas = await html2canvas(graphRef.current, { backgroundColor: "#ffffff", scale: 2 });
+      const link = document.createElement("a");
+      const name = (client.profile?.name || "client").replace(/\s+/g, "_");
+      link.download = `decision_graph_${name}_${new Date().toISOString().slice(0, 10)}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleExportPdf = async () => {
+    if (!graphRef.current) return;
+    setExporting(true);
+    try {
+      const canvas = await html2canvas(graphRef.current, { backgroundColor: "#ffffff", scale: 2 });
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 32;
+
+      // Header
+      pdf.setFontSize(16);
+      pdf.setTextColor(26, 39, 68);
+      pdf.text("Financial Decision Graph", margin, margin + 4);
+      pdf.setFontSize(10);
+      pdf.setTextColor(100, 116, 139);
+      pdf.text(`${client.profile?.name || "Client"} · Readiness ${readiness.score}/100 · ${readiness.classification?.label || ""}`, margin, margin + 22);
+      pdf.text(`Generated ${new Date().toLocaleString("en-AU")} — for adviser/client SOA attachment`, margin, margin + 36);
+
+      // Graph image, scaled to width
+      const imgW = pageWidth - margin * 2;
+      const imgH = (canvas.height / canvas.width) * imgW;
+      pdf.addImage(imgData, "PNG", margin, margin + 52, imgW, Math.min(imgH, pageHeight - margin * 2 - 60));
+
+      // Footer notes
+      const footerY = Math.min(margin + 52 + imgH + 20, pageHeight - margin);
+      pdf.setFontSize(8);
+      pdf.setTextColor(71, 85, 105);
+      pdf.text(`${rules.alerts.length} alerts · ${rules.opportunities.length} opportunities surfaced from the Rules Engine.`, margin, footerY);
+
+      const name = (client.profile?.name || "client").replace(/\s+/g, "_");
+      pdf.save(`decision_graph_${name}_${new Date().toISOString().slice(0, 10)}.pdf`);
+    } finally {
+      setExporting(false);
+    }
+  };
   const nodes = useMemo(() => {
     // Outcome pillar (right)
     const outcomes = [
@@ -82,14 +141,43 @@ const DecisionGraph = ({ client, readiness, rules, topActions }) => {
   return (
     <Card data-testid="decision-graph">
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <Network className="h-4 w-4 text-[#D4A84C]" /> Financial Decision Graph
-        </CardTitle>
-        <CardDescription>
-          How each action flows through the 5 readiness factors into {client.profile?.name?.split(" ")[0] || "your"} retirement outcomes. Thicker edges = higher impact.
-        </CardDescription>
+        <div className="flex items-start justify-between gap-3 flex-wrap">
+          <div>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Network className="h-4 w-4 text-[#D4A84C]" /> Financial Decision Graph
+            </CardTitle>
+            <CardDescription>
+              How each action flows through the 5 readiness factors into {client.profile?.name?.split(" ")[0] || "your"} retirement outcomes. Thicker edges = higher impact.
+            </CardDescription>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="h-7 text-[11px] gap-1"
+              onClick={handleExportPng}
+              disabled={exporting}
+              data-testid="graph-export-png"
+            >
+              <ImageIcon className="h-3 w-3" /> PNG
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="h-7 text-[11px] gap-1"
+              onClick={handleExportPdf}
+              disabled={exporting}
+              data-testid="graph-export-pdf"
+            >
+              <FileText className="h-3 w-3" /> PDF
+            </Button>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
+        <div ref={graphRef} className="bg-white p-2 rounded">
         <div className="overflow-x-auto">
           <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full h-[420px]" data-testid="decision-graph-svg">
             {/* Column labels */}
@@ -201,6 +289,7 @@ const DecisionGraph = ({ client, readiness, rules, topActions }) => {
             ))}
           </div>
         )}
+        </div>
       </CardContent>
     </Card>
   );

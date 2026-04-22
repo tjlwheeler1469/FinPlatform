@@ -105,15 +105,49 @@ export const publishRecalc = (clientId, reason = "user-edit") => {
 };
 
 // Simulated real-time market feed — polls every 45s and emits a book-wide recalc signal.
-// In production this would hook to a websocket.
+// Maintains a market-multiplier (1.0 ± random walk) that downstream readiness consumers
+// can use to preview portfolio movement. In production this would hook to a websocket.
 let _marketTimer = null;
-export const startMarketFeed = () => {
-  if (_marketTimer) return;
-  _marketTimer = setInterval(() => {
+let _marketMultiplier = 1.0;
+let _marketLastTickAt = Date.now();
+let _marketLastDelta = 0;
+const _pulseListeners = new Set();
+
+const _tick = () => {
+  // Small bounded random walk — ±0.6% per tick, clamped to ±4%
+  const delta = (Math.random() - 0.5) * 0.012;
+  _marketMultiplier = Math.max(0.96, Math.min(1.04, _marketMultiplier * (1 + delta)));
+  _marketLastDelta = delta;
+  _marketLastTickAt = Date.now();
+  // Only meaningful moves trigger recalc (> 0.25%)
+  if (Math.abs(delta) > 0.0025) {
     publishRecalc("*", "market-feed");
-  }, 45000);
+  }
+  _pulseListeners.forEach((cb) => {
+    try { cb({ multiplier: _marketMultiplier, delta, at: _marketLastTickAt }); } catch (e) { /* ignore */ }
+  });
+};
+
+export const startMarketFeed = (intervalMs = 45000) => {
+  if (_marketTimer) return;
+  _marketTimer = setInterval(_tick, intervalMs);
 };
 export const stopMarketFeed = () => {
   if (_marketTimer) clearInterval(_marketTimer);
   _marketTimer = null;
 };
+
+export const getMarketPulse = () => ({
+  multiplier: _marketMultiplier,
+  lastDelta: _marketLastDelta,
+  lastTickAt: _marketLastTickAt,
+  pctFromBaseline: (_marketMultiplier - 1) * 100,
+});
+
+export const onMarketPulse = (cb) => {
+  _pulseListeners.add(cb);
+  return () => _pulseListeners.delete(cb);
+};
+
+// Force an immediate tick (useful for manual "pulse now" button).
+export const pulseNow = () => _tick();
