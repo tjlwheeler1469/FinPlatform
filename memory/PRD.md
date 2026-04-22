@@ -99,9 +99,10 @@ New top-level page with 4 power-tool tabs and a sidebar entry ("CRM [PRO]"):
 - [ ] P3: Webpack chunk error suppression — current ErrorBoundary handles it, but could be cleaner
 
 ## Testing Status
-- Iteration 187 (Feb 2026): 100% PASS (10/10) — AdviserGoals wired into adviser views; Recommendations pinned to TOP of CGT, Tax Analysis, Tax Loss Harvesting, Strategic Planning
-- Iteration 180: 100% PASS on all 10 acceptance criteria
-- Pre-existing cosmetic: emergent-main.js DataCloneError noise (environmental, not app code)
+- Iteration 189 (Feb 2026): 100% PASS — Fixed critical `ReferenceError: AreaChart is not defined` in `SimpleClientView.jsx` that bubbled to the top-level ErrorBoundary and rendered the entire /client-portal as "Application failed to load". Personal Mode fully removed from sidebar.
+- Iteration 188 (Feb 2026): 100% PASS — Client360View refactor (1843 → 255 lines)
+- Iteration 187 (Feb 2026): 100% PASS — AdviserGoals wired + Recommendations pinned to top of 4 pages
+- Pre-existing cosmetic: Recharts `width(-1)` warnings on inactive tabs (harmless)
 - No broken flows, no runtime errors across main routes
 
 ## Recent Changes (Feb 2026)

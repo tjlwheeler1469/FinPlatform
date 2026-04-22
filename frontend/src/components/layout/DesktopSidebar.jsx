@@ -92,7 +92,7 @@ const DesktopSidebar = ({
       {/* Mode Switcher */}
       <div className="px-3 py-2 border-b border-white/10">
         <Select value={appMode} onValueChange={switchMode}>
-          <SelectTrigger className="w-full bg-white/10 border-white/20 text-white"><SelectValue /></SelectTrigger>
+          <SelectTrigger className="w-full bg-white/10 border-white/20 text-white" data-testid="mode-selector-trigger"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="adviser"><div className="flex items-center gap-2"><Briefcase className="h-4 w-4" />Adviser Mode</div></SelectItem>
             <SelectItem value="client"><div className="flex items-center gap-2"><Eye className="h-4 w-4" />Client View</div></SelectItem>
