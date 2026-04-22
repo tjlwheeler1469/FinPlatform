@@ -376,11 +376,11 @@ const DocumentVault = () => {
                             <div className="flex-1 min-w-0">
                               <p className="font-medium text-sm truncate">{doc.name}</p>
                               <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
-                                <span>{formatFileSize(doc.size)}</span>
+                                <span>{formatFileSize(doc.file_size ?? doc.size ?? 0)}</span>
                                 <span>•</span>
-                                <span>{new Date(doc.uploaded_at).toLocaleDateString()}</span>
+                                <span>{doc.created_at || doc.uploaded_at ? new Date(doc.created_at || doc.uploaded_at).toLocaleDateString() : "—"}</span>
                                 <span>•</span>
-                                <span>{doc.uploaded_by}</span>
+                                <span>{doc.uploaded_by || "System"}</span>
                               </div>
                             </div>
                             <div className="flex items-center gap-1">

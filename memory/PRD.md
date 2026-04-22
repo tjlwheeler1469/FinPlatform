@@ -99,11 +99,21 @@ New top-level page with 4 power-tool tabs and a sidebar entry ("CRM [PRO]"):
 - [ ] P3: Webpack chunk error suppression — current ErrorBoundary handles it, but could be cleaner
 
 ## Testing Status
-- Iteration 192 (Feb 2026): 100% PASS (9/9) — Nav restructure + layout fixes (Adviser 6-tab reorder, Checklist/Invoicing to left nav, Client view widened, Retirement+Sandbox side-by-side)
-- Iteration 189-191 (Feb 2026): 100% PASS — ReferenceError fix, Client360 split, Client view goals/sandbox/rebalancing
-- Pre-existing cosmetic: Recharts `width(-1)` warnings on inactive tabs (harmless)
-- Pre-existing: /api/documents and /api/insights 503 on cold start (backend)
+- Iteration 195 (Feb 2026): 100% PASS — DocumentVault shape alignment; categories, sizes, dates now render correctly
+- Iteration 194 (Feb 2026): Xplan TDZ + /api/documents 307 fixed
+- Iteration 193 (Feb 2026): Resend email backend + SimpleClientView split (580 → 56 lines) + ESLint no-undef enabled
+- Iteration 192 (Feb 2026): Nav restructure + Client view widened + Retirement/Sandbox side-by-side
+- Iteration 189-191 (Feb 2026): ReferenceError fix, Client360 split, Goals/Sandbox/Rebalancing
 - No broken flows, no runtime errors across main routes
+
+## Recent Changes (Feb 2026)
+- **Resend Email backend** — `/app/backend/routes/email_service.py` with GET `/api/email-resend/status` and POST `/api/email-resend/send`. Runs in mocked mode until `RESEND_API_KEY` is set in `/app/backend/.env`.
+- **ESLint no-undef** — `/app/frontend/.eslintrc.json` enabled across all pages/components (would have caught the AreaChart bug from iter 189).
+- **Xplan MOCKED badge** — clear "MOCKED · Demo data only" badge + disclaimer on `/xplan-integration`. TDZ ReferenceError in the page itself also fixed (useCallbacks moved before useEffect).
+- **"Request a copy / Message adviser" CTA** — replaces delete button in client mode on DocumentVault; pre-fills a message via sessionStorage and routes to /client-portal?tab=msgs.
+- **Recharts warnings** — all SimpleClientView ResponsiveContainers now pass `debounce={50}` to silence `width(-1)` noise.
+- **SimpleClientView split** — 580 lines → 56 lines. 7 per-tab files under `/app/frontend/src/pages/clientView/` (utils.js, SnapshotTab, InvestmentsTab, RetirementTab, BudgetTab, TaxTab, DocumentsTab, MessagesTab).
+- **DocumentVault shape** — backend `/api/documents` now returns `{all_documents, total_documents, total_size, categories[{id,name}], by_category, documents, total}`. Fixes empty vault, "undefined B", "Invalid Date", and blank category folders.
 
 ## Recent Changes (Feb 2026)
 - **Client view additions (iter 190-191)** — Added "Goals & Scenarios" tab (uses `SimpleGoals`), merged the standalone Sandbox tab INTO the Retirement tab as "Try Your Own Scenarios" card, and mapped `/client-portal` to `DashboardRouter` so both `/dashboard` and `/client-portal` route to `SimpleClientView` in client mode.
