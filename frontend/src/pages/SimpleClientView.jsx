@@ -13,6 +13,7 @@ import ClientSandbox from "@/components/ClientSandbox";
 import { toast } from "sonner";
 import {
   PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid,
+  AreaChart, Area, BarChart, Bar, Legend,
 } from "recharts";
 import {
   LayoutDashboard, TrendingUp, Gauge, FileText, MessageSquare,

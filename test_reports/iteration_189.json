@@ -1,0 +1,28 @@
+{
+  "summary": "Targeted regression test for iter 189 fix (recharts ReferenceError in SimpleClientView.jsx, Personal Mode removal from sidebar). All 4 focus areas PASS. /client-portal renders without ErrorBoundary and shows 9 .recharts-surface elements (Pie + Area + multiple Bar charts), confirming AreaChart/BarChart/Area/Bar/Legend imports are now resolved. /client-360 in adviser mode renders with [data-testid=client-360-view] visible. Sidebar mode dropdown shows ONLY 'Adviser Mode' and 'Client View' — Personal Mode confirmed removed. /cgt, /tax-analysis-sync, /strategic-planning, /tax-loss-harvesting all render without error boundary fallback.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "/client-portal Snapshot tab", "issues": ["Recharts console warnings: 'The width(-1) and height(-1) of chart should be greater than 0' — appears 4 times. Likely caused by ResponsiveContainer rendering before parent (e.g., hidden tab) has measurable layout. Cosmetic, charts still render correctly after layout settles."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "(Optional minor) Add data-testid='mode-selector-trigger' to the sidebar mode <SelectTrigger> in DesktopSidebar.jsx and MobileMenu.jsx — currently it is only addressable via role=combobox + visible text. The review_request expected this testid.",
+    "(Optional minor) Investigate recharts 'width(-1) height(-1)' warnings on /client-portal — likely a ResponsiveContainer mounting in a Tab that wasn't visible at measure time. Charts render OK but the noisy console may hide real warnings."
+  ],
+  "critical_code_review_comments": [
+    "SimpleClientView.jsx (562 lines) is approaching the 700-line guideline; consider splitting the per-tab components (SnapshotTab, InvestmentsTab, RetirementTab, etc.) into separate files for maintainability.",
+    "The recharts ReferenceError that caused the iter 189 outage would have been caught by a basic `eslint --no-undef` check or a smoke render test. Recommend adding ESLint no-undef enforcement and at least one render-smoke test per top-level page."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a", "frontend": "100%"},
+  "test_credentials": "None — no auth. localStorage keys: wealth_command_compliance_v5='permanent', app_mode='adviser'|'client'.",
+  "seed_data_creation": "None.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "iter 189 regression confirmed fixed: (a) recharts imports complete in SimpleClientView, no ErrorBoundary on /client-portal, 9 chart surfaces render. (b) Personal Mode removed from sidebar dropdown — only Adviser Mode + Client View show. (c) /client-360, /cgt, /tax-analysis-sync, /strategic-planning, /tax-loss-harvesting all render OK. The mode dropdown is reachable via role=combobox + 'Adviser Mode' text — no data-testid='mode-selector-trigger' currently exists despite review_request mentioning it; flagged as minor.",
+  "rca of the issue": "Confirmed RCA from main agent is correct. SnapshotTab in SimpleClientView.jsx referenced AreaChart/Area/BarChart/Bar/Legend but the recharts import only included PieChart/Pie/Cell/ResponsiveContainer/LineChart/Line/XAxis/YAxis/Tooltip/CartesianGrid. ReferenceError thrown on first SnapshotTab render bubbled to ErrorBoundary, masking the entire client-portal route. Fix at lines 14-17 (added AreaChart, Area, BarChart, Bar, Legend) is verified working. Mitigation: enable ESLint no-undef and add render-smoke test for each route to catch identical regressions in CI."
+}
