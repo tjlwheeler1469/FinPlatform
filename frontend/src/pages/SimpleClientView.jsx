@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ClientSandbox from "@/components/ClientSandbox";
+import SimpleGoals from "@/components/SimpleGoals";
 import { toast } from "sonner";
 import {
   PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid,
@@ -17,7 +18,7 @@ import {
 } from "recharts";
 import {
   LayoutDashboard, TrendingUp, Gauge, FileText, MessageSquare,
-  ShieldCheck, Lock, Send, CheckCircle2, FlaskConical, PiggyBank, Calculator, Landmark,
+  ShieldCheck, Lock, Send, CheckCircle2, FlaskConical, PiggyBank, Calculator, Landmark, Target,
 } from "lucide-react";
 import { CLIENT_DATA, getActiveClientId } from "@/data/clientData";
 import { projectRetirement } from "@/lib/retirementEngine";
@@ -319,6 +320,28 @@ const RetirementTab = ({ client }) => {
           <p className="text-[10px] text-center text-muted-foreground flex items-center justify-center gap-1 pt-1"><Lock className="h-3 w-3" /> View only — speak to your adviser to adjust contributions</p>
         </CardContent>
       </Card>
+
+      {/* Scenarios & Sandbox — try "what if" plans right here */}
+      <Card className="border-[#D4A84C]/40 bg-gradient-to-br from-amber-50/40 to-white" data-testid="client-retirement-sandbox">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <FlaskConical className="h-4 w-4 text-[#D4A84C]" /> Try Your Own Scenarios
+          </CardTitle>
+          <p className="text-xs text-muted-foreground">Experiment with contributions, retirement age, and spending — calculations run live without affecting your live plan.</p>
+        </CardHeader>
+        <CardContent>
+          <ClientSandbox
+            seed={{
+              startingBalance: liquidAssets,
+              annualContrib: client.retirement.annual_contributions,
+              annualSpending: client.retirement.retirement_spending,
+              currentAge: client.retirement.current_age,
+              retireAge: client.retirement.retirement_age,
+              lifeExpectancy: client.retirement.life_expectancy,
+            }}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 };
@@ -528,8 +551,8 @@ const SimpleClientView = () => {
             <TabsTrigger value="retirement" className="gap-1.5 flex-shrink-0" data-testid="client-tab-retire"><Gauge className="h-3.5 w-3.5" />Retirement &amp; Super</TabsTrigger>
             <TabsTrigger value="investments" className="gap-1.5 flex-shrink-0" data-testid="client-tab-invest"><TrendingUp className="h-3.5 w-3.5" />Investments</TabsTrigger>
             <TabsTrigger value="budget" className="gap-1.5 flex-shrink-0" data-testid="client-tab-budget"><PiggyBank className="h-3.5 w-3.5" />Budget</TabsTrigger>
+            <TabsTrigger value="goals" className="gap-1.5 flex-shrink-0" data-testid="client-tab-goals"><Target className="h-3.5 w-3.5" />Goals &amp; Scenarios</TabsTrigger>
             <TabsTrigger value="tax" className="gap-1.5 flex-shrink-0" data-testid="client-tab-tax"><Calculator className="h-3.5 w-3.5" />Tax Centre</TabsTrigger>
-            <TabsTrigger value="sandbox" className="gap-1.5 flex-shrink-0" data-testid="client-tab-sandbox"><FlaskConical className="h-3.5 w-3.5" />Sandbox</TabsTrigger>
             <TabsTrigger value="docs" className="gap-1.5 flex-shrink-0" data-testid="client-tab-docs"><FileText className="h-3.5 w-3.5" />Documents</TabsTrigger>
             <TabsTrigger value="msgs" className="gap-1.5 flex-shrink-0" data-testid="client-tab-msgs"><MessageSquare className="h-3.5 w-3.5" />Messages</TabsTrigger>
           </TabsList>
@@ -537,19 +560,8 @@ const SimpleClientView = () => {
           <TabsContent value="retirement" className="pt-4"><RetirementTab client={client} /></TabsContent>
           <TabsContent value="investments" className="pt-4"><InvestmentsTab client={client} /></TabsContent>
           <TabsContent value="budget" className="pt-4"><BudgetTab client={client} /></TabsContent>
+          <TabsContent value="goals" className="pt-4"><SimpleGoals embedded clientId={clientId} /></TabsContent>
           <TabsContent value="tax" className="pt-4"><TaxTab client={client} /></TabsContent>
-          <TabsContent value="sandbox" className="pt-4">
-            <ClientSandbox
-              seed={{
-                startingBalance: client.assets.filter((a) => ["Super", "Shares", "Managed Fund", "Cash", "SMSF", "Bonds", "Alternatives"].includes(a.type)).reduce((s, a) => s + a.value, 0),
-                annualContrib: client.retirement.annual_contributions,
-                annualSpending: client.retirement.retirement_spending,
-                currentAge: client.retirement.current_age,
-                retireAge: client.retirement.retirement_age,
-                lifeExpectancy: client.retirement.life_expectancy,
-              }}
-            />
-          </TabsContent>
           <TabsContent value="docs" className="pt-4"><DocumentsTab /></TabsContent>
           <TabsContent value="msgs" className="pt-4"><MessagesTab clientId={clientId} /></TabsContent>
         </Tabs>

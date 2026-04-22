@@ -1,0 +1,75 @@
+{
+  "summary": "Frontend-only test of new additions: Client view tabs (Goals & Scenarios, Sandbox merged into Retirement) and Adviser Portfolio Rebalancing integration. 5/6 features pass; 1 critical bug in Client360View Rebalance tab (TabsContent block missing).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Client360View (/client-360) Rebalance tab",
+        "issue": "Clicking [data-testid=tab-rebalance] renders an EMPTY tab body. PortfolioRebalancing is imported (line 20) and the tab is registered in TAB_DEFS (line 35), BUT no <TabsContent value=\\\"rebalance\\\"> block exists in the JSX (between lines 99-105). The TabsTrigger is generated dynamically so the tab is clickable, but no panel content is mounted. Active role=tabpanel returns null on click.",
+        "selector": "[data-testid=tab-rebalance]",
+        "priority": "HIGH"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "Client view route /client-portal",
+        "issue": "Review request says SimpleClientView (with new Goals tab + embedded sandbox) should render at /client-portal, but /client-portal is wired to UnifiedDashboard (PersonalDashboard) via AppRouter.jsx line 209. SimpleClientView is actually served at /dashboard via DashboardRouter when no selected_client is set. All NEW SimpleClientView features verified working at /dashboard — but if the requirement is that the client-facing URL is /client-portal, the route mapping is wrong.",
+        "affected_selectors": ["/client-portal vs /dashboard"]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_results_detail": {
+    "client_view_simpleclientview_at_/dashboard": {
+      "all_8_tabs_present": true,
+      "tabs": ["client-tab-snapshot","client-tab-retire","client-tab-invest","client-tab-budget","client-tab-goals","client-tab-tax","client-tab-docs","client-tab-msgs"],
+      "standalone_sandbox_tab_removed": true,
+      "retirement_tab_embeds_sandbox": true,
+      "client-retirement-sandbox_card_visible": true,
+      "try_your_own_scenarios_heading_present": true,
+      "goals_tab_renders_simplegoals": "PASS — '3 goals in play' with progress bars rendered, no error boundary",
+      "error_boundary": false
+    },
+    "adviser_unifiedclientoverview": {
+      "verified_route": "/dashboard with app_mode=adviser & selected_client (DashboardRouter -> UnifiedClientOverview); /unified-client-overview is NOT a registered route",
+      "client-tab-rebalance_present": true,
+      "tab_label": "Rebalancing",
+      "portfoliorebalancing_renders": true,
+      "drift_text_present": true,
+      "error_boundary": false
+    },
+    "adviser_client360view_/client-360": {
+      "tab-rebalance_trigger_present": true,
+      "tab_position_between_investments_and_tax": true,
+      "portfoliorebalancing_renders_on_click": false,
+      "issue": "TabsContent block missing — empty panel rendered. Active tabpanel = null after click."
+    },
+    "adviser_sidebar_portfolio_group": {
+      "portfolio_rebalancing_link_present": true,
+      "link_text": "Portfolio Rebalancing",
+      "href": "/portfolio-rebalancing"
+    },
+    "/portfolio-rebalancing_route": {
+      "loads": true,
+      "error_boundary": false,
+      "rebalanc_text_present": true
+    }
+  },
+  "test_report_links": [],
+  "action_items": [
+    "FIX (Client360View.jsx ~line 101): add `<TabsContent value=\\\"rebalance\\\" className=\\\"space-y-6\\\" data-testid=\\\"tab-content-rebalance\\\"><PortfolioRebalancing embedded /></TabsContent>` between the Investments and Tax TabsContent blocks. Currently the Rebalance tab renders an empty panel because the TabsContent block was forgotten (only the import + TAB_DEFS entry were added).",
+    "CLARIFY routing: review request expects SimpleClientView at /client-portal, but AppRouter.jsx routes /client-portal -> UnifiedDashboard (PersonalDashboard). SimpleClientView is reachable only at /dashboard. Either change the route, or update the requirement to /dashboard."
+  ],
+  "critical_code_review_comments": [
+    "Client360View.jsx imports PortfolioRebalancing but never uses it in JSX — dead import + missing TabsContent. ESLint should have flagged unused import, suggesting lint rules are lax for this file.",
+    "DashboardRouter logic (AppRouter.jsx L68-74) is the actual entry point for SimpleClientView; the /client-portal route bypasses this router entirely. This split routing is fragile and confusing — consider consolidating or documenting clearly."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a (frontend-only)", "frontend": "83% (5/6 features working; 1 broken tab + 1 routing mismatch)"},
+  "test_credentials": "No auth required. localStorage: wealth_command_compliance_v5='permanent', app_mode='client'|'adviser', selected_client=JSON for adviser flows.",
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "After E1 adds the missing <TabsContent value='rebalance'> in Client360View.jsx, re-test /client-360?clientId=client_1 and click [data-testid=tab-rebalance] to confirm PortfolioRebalancing renders (look for 'Total Drift', 'Drift Analysis' text). All other new features (SimpleClientView at /dashboard, UnifiedClientOverview Rebalancing tab, sidebar link, /portfolio-rebalancing page) confirmed working. Note: SimpleClientView is served at /dashboard not /client-portal — confirm with E1 if route mapping change is desired.",
+  "rca of the issue": "Client360View Rebalance bug RCA: Developer added (1) `import PortfolioRebalancing from '@/pages/PortfolioRebalancing'` (line 20), and (2) `{ value: 'rebalance', label: 'Rebalance' }` in TAB_DEFS (line 35). The TabsTrigger is generated by the TAB_DEFS map loop so the tab button appears. However, the developer FORGOT to add a corresponding `<TabsContent value='rebalance'>...</TabsContent>` block alongside the other 14 TabsContent blocks (lines 85-250). Without a matching TabsContent, Radix Tabs renders nothing for the active panel. Reproduction: navigate /client-360?clientId=client_1, click the 'Rebalance' tab — the page area below tabs is blank. Mitigation: insert the missing TabsContent block."
+}

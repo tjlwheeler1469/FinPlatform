@@ -5,7 +5,7 @@ import {
   Target, Activity, Bot, Upload, Database, Link2, Shield,
   UserPlus, Sparkles, Bell, Zap, CreditCard,
   Settings, MessageSquare, Brain, ListTodo, Video,
-  Bitcoin, Coins, Cable, Gauge, Calendar, FolderLock
+  Bitcoin, Coins, Cable, Gauge, Calendar, FolderLock, Scale
 } from "lucide-react";
 
 export const personalNavGroups = [
@@ -61,6 +61,13 @@ export const clientContextNav = [
     icon: Eye,
     items: [
       { path: "/dashboard", label: "Client Overview", icon: Wallet, title: "Overview, Retirement, Investments, Budget, Goals, Tax & Invoicing", badge: "360" },
+    ]
+  },
+  {
+    name: "Portfolio",
+    icon: Scale,
+    items: [
+      { path: "/portfolio-rebalancing", label: "Portfolio Rebalancing", icon: Scale, title: "Drift analysis & trade recommendations" },
     ]
   },
   {

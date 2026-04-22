@@ -1,7 +1,7 @@
 import { useState, lazy, Suspense } from "react";
 import Layout from "@/components/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, LayoutDashboard, TrendingUp, Gauge, Calculator, Target, PiggyBank, Receipt, ShieldCheck } from "lucide-react";
+import { Loader2, LayoutDashboard, TrendingUp, Gauge, Calculator, Target, PiggyBank, Receipt, ShieldCheck, Scale } from "lucide-react";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import FloatingActionRail from "@/components/platform/FloatingActionRail";
 
@@ -14,6 +14,7 @@ const UnifiedTaxCentre = lazy(() => import("@/pages/UnifiedTaxCentre"));
 const AdviserClientDashboard = lazy(() => import("@/components/AdviserClientDashboard"));
 const ClientInvoicing = lazy(() => import("@/components/ClientInvoicing"));
 const ClientCommsTimeline = lazy(() => import("@/components/crm/ClientCommsTimeline"));
+const PortfolioRebalancing = lazy(() => import("@/pages/PortfolioRebalancing"));
 
 const TabLoader = () => (
   <div className="flex items-center justify-center py-20">
@@ -52,6 +53,9 @@ const UnifiedClientOverview = () => {
               <TabsTrigger value="investments" className={tabTriggerClass} data-testid="client-tab-investments">
                 <TrendingUp className="h-3.5 w-3.5" /> Investments
               </TabsTrigger>
+              <TabsTrigger value="rebalance" className={tabTriggerClass} data-testid="client-tab-rebalance">
+                <Scale className="h-3.5 w-3.5" /> Rebalancing
+              </TabsTrigger>
               <TabsTrigger value="budget" className={tabTriggerClass} data-testid="client-tab-budget">
                 <PiggyBank className="h-3.5 w-3.5" /> Budget
               </TabsTrigger>
@@ -87,6 +91,13 @@ const UnifiedClientOverview = () => {
               <ErrorBoundary label="Investments">
                 <Suspense fallback={<TabLoader />}>
                   <UnifiedInvestments embedded />
+                </Suspense>
+              </ErrorBoundary>
+            </TabsContent>
+            <TabsContent value="rebalance" className="mt-0">
+              <ErrorBoundary label="Portfolio Rebalancing">
+                <Suspense fallback={<TabLoader />}>
+                  <PortfolioRebalancing embedded />
                 </Suspense>
               </ErrorBoundary>
             </TabsContent>

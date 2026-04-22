@@ -17,6 +17,7 @@ import UnifiedInvestments from "@/pages/UnifiedInvestments";
 import UnifiedTaxCentre from "@/pages/UnifiedTaxCentre";
 import AdviserGoals from "@/components/AdviserGoals";
 import MeetingMode from "@/components/MeetingMode";
+import PortfolioRebalancing from "@/pages/PortfolioRebalancing";
 
 import ClientHeader from "./client360/ClientHeader";
 import OverviewTab from "./client360/OverviewTab";
@@ -31,6 +32,7 @@ const TAB_DEFS = [
   { value: "budget", label: "Budget" },
   { value: "goals", label: "Goals" },
   { value: "investments-view", label: "Investments" },
+  { value: "rebalance", label: "Rebalance" },
   { value: "tax", label: "Tax" },
   { value: "profile-inputs", label: "Profile & Inputs" },
   { value: "holdings", label: "Holdings" },
