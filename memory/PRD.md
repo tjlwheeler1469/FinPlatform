@@ -105,6 +105,7 @@ New top-level page with 4 power-tool tabs and a sidebar entry ("CRM [PRO]"):
 - No broken flows, no runtime errors across main routes
 
 ## Recent Changes (Feb 2026)
+- **Refactor** — `Client360View.jsx` split from 1843 lines → 255 lines. Heavy sections moved to `pages/client360/` (`data.js`, `utils.js`, `ClientHeader`, `OverviewTab`, `HoldingsTab`, `PerformanceSection`, `ContactAdvisorSection`). Zero behavior change, 100% test pass (iter 188).
 - `/app/frontend/src/components/AdviserGoals.jsx` — goal CRUD with budget feasibility banner; adjusts-budget CTA when goals exceed monthly surplus
 - `/app/frontend/src/components/RecommendationsBanner.jsx` — NEW reusable "top-of-page" recommendations card used across CGT, Tax Analysis, Strategic Planning; Tax Loss Harvesting keeps its native Recommendations card but moved to TOP of results
 - Replaced SimpleGoals with AdviserGoals in `UnifiedClientOverview`, `Client360View`, `UnifiedGoalsPlanning`
