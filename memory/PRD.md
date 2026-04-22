@@ -99,10 +99,10 @@ New top-level page with 4 power-tool tabs and a sidebar entry ("CRM [PRO]"):
 - [ ] P3: Webpack chunk error suppression — current ErrorBoundary handles it, but could be cleaner
 
 ## Testing Status
-- Iteration 189 (Feb 2026): 100% PASS — Fixed critical `ReferenceError: AreaChart is not defined` in `SimpleClientView.jsx` that bubbled to the top-level ErrorBoundary and rendered the entire /client-portal as "Application failed to load". Personal Mode fully removed from sidebar.
-- Iteration 188 (Feb 2026): 100% PASS — Client360View refactor (1843 → 255 lines)
-- Iteration 187 (Feb 2026): 100% PASS — AdviserGoals wired + Recommendations pinned to top of 4 pages
+- Iteration 192 (Feb 2026): 100% PASS (9/9) — Nav restructure + layout fixes (Adviser 6-tab reorder, Checklist/Invoicing to left nav, Client view widened, Retirement+Sandbox side-by-side)
+- Iteration 189-191 (Feb 2026): 100% PASS — ReferenceError fix, Client360 split, Client view goals/sandbox/rebalancing
 - Pre-existing cosmetic: Recharts `width(-1)` warnings on inactive tabs (harmless)
+- Pre-existing: /api/documents and /api/insights 503 on cold start (backend)
 - No broken flows, no runtime errors across main routes
 
 ## Recent Changes (Feb 2026)
