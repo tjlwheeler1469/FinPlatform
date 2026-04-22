@@ -7,6 +7,7 @@ import { Gauge, Target, Shield, Sparkles, TrendingUp, TrendingDown, AlertTriangl
 import ReadinessDial from "@/components/readiness/ReadinessDial";
 import DecisionGraph from "@/components/readiness/DecisionGraph";
 import FutureImpactEngine from "@/components/readiness/FutureImpactEngine";
+import ComplianceTrail from "@/components/readiness/ComplianceTrail";
 import { whatMovesTheNeedle, riskPanel } from "@/engine/retirementReadinessEngine";
 import { computeReadinessCached, onRecalc, startMarketFeed, getMarketPulse, onMarketPulse, pulseNow } from "@/engine/readinessCache";
 import { evaluateRules } from "@/engine/rulesEngine";
@@ -229,6 +230,9 @@ const ClientDecisionHub = ({ client }) => {
 
       {/* ── Section 6 — Financial Decision Graph ── */}
       <DecisionGraph client={client} readiness={baseReadiness} rules={rules} topActions={topActions} />
+
+      {/* ── Section 7 — Compliance Trail (regulator-ready audit log) ── */}
+      <ComplianceTrail clientId={clientId} />
     </div>
   );
 };

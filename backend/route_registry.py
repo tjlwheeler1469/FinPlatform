@@ -11,6 +11,10 @@ ROUTE_REGISTRY = [
     # Core routes
     ("routes.auth", "router", "/api", "Auth"),
     ("routes.dashboard", "router", "/api", "Dashboard"),
+    ("routes.advice_copilot", "router", "/api", "Advice Copilot"),
+    ("routes.execution_tickets", "router", "/api", "Execution Tickets"),
+    ("routes.notify_client", "router", "/api", "Client Notifications"),
+    ("routes.market_snapshot", "router", "/api", "Market Snapshot"),
     ("routes.tax", "router", "/api", "Tax"),
     ("routes.analysis", "router", "/api", "Analysis"),
     ("routes.crm", "router", "/api", "CRM"),

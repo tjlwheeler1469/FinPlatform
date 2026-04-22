@@ -105,17 +105,30 @@ export const publishRecalc = (clientId, reason = "user-edit") => {
 };
 
 // Simulated real-time market feed — polls every 45s and emits a book-wide recalc signal.
-// Maintains a market-multiplier (1.0 ± random walk) that downstream readiness consumers
-// can use to preview portfolio movement. In production this would hook to a websocket.
+// When REACT_APP_BACKEND_URL is present, also polls /api/market-feed/snapshot so the
+// multiplier reflects a server-side feed (currently simulated, ready to swap for live data).
 let _marketTimer = null;
 let _marketMultiplier = 1.0;
 let _marketLastTickAt = Date.now();
 let _marketLastDelta = 0;
+let _marketSource = "simulated";
 const _pulseListeners = new Set();
 
-const _tick = () => {
-  // Small bounded random walk — ±0.6% per tick, clamped to ±4%
-  const delta = (Math.random() - 0.5) * 0.012;
+const _pullRemoteDelta = async () => {
+  try {
+    const base = typeof process !== "undefined" && process.env ? process.env.REACT_APP_BACKEND_URL : null;
+    if (!base) return null;
+    const r = await fetch(`${base}/api/market-feed/snapshot`);
+    if (!r.ok) return null;
+    const data = await r.json();
+    _marketSource = data.source || "simulated";
+    return typeof data.avg_delta_pct === "number" ? data.avg_delta_pct / 100 : null;
+  } catch (e) { return null; }
+};
+
+const _tick = async () => {
+  const remote = await _pullRemoteDelta();
+  const delta = remote !== null ? remote : (Math.random() - 0.5) * 0.012;
   _marketMultiplier = Math.max(0.96, Math.min(1.04, _marketMultiplier * (1 + delta)));
   _marketLastDelta = delta;
   _marketLastTickAt = Date.now();
@@ -124,7 +137,7 @@ const _tick = () => {
     publishRecalc("*", "market-feed");
   }
   _pulseListeners.forEach((cb) => {
-    try { cb({ multiplier: _marketMultiplier, delta, at: _marketLastTickAt }); } catch (e) { /* ignore */ }
+    try { cb({ multiplier: _marketMultiplier, delta, at: _marketLastTickAt, source: _marketSource }); } catch (e) { /* ignore */ }
   });
 };
 
@@ -142,6 +155,7 @@ export const getMarketPulse = () => ({
   lastDelta: _marketLastDelta,
   lastTickAt: _marketLastTickAt,
   pctFromBaseline: (_marketMultiplier - 1) * 100,
+  source: _marketSource,
 });
 
 export const onMarketPulse = (cb) => {

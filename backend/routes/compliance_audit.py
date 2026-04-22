@@ -10,8 +10,13 @@ from enum import Enum
 import uuid
 import logging
 
+from db import db
+
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/compliance-audit", tags=["Compliance & Audit"])
+
+READINESS_EVENTS_COLLECTION = "readiness_events"
+ADVISER_ACTIONS_COLLECTION = "adviser_actions"
 
 
 class AuditAction(str, Enum):
@@ -964,8 +969,10 @@ async def log_readiness_event(payload: Dict = Body(...)) -> dict:
     if not client_id:
         raise HTTPException(status_code=400, detail="client_id required")
 
+    event_id = f"rre_{uuid.uuid4().hex[:10]}"
     event = {
-        "event_id": f"rre_{uuid.uuid4().hex[:10]}",
+        "_id": event_id,
+        "event_id": event_id,
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "client_id": client_id,
         "client_name": payload.get("client_name", ""),
@@ -976,13 +983,8 @@ async def log_readiness_event(payload: Dict = Body(...)) -> dict:
         "num_sims": payload.get("num_sims"),
         "actor": payload.get("actor", "system"),
     }
-    READINESS_EVENTS.append(event)
-
-    # Cap in-memory store
-    if len(READINESS_EVENTS) > 5000:
-        del READINESS_EVENTS[:1000]
-
-    # Also stamp into the main audit log (so the dashboard view shows it)
+    await db[READINESS_EVENTS_COLLECTION].insert_one(event)
+    # Mirror into transient in-memory log for dashboard queries that still use it
     AUDIT_LOG.append({
         "log_id": f"log_{uuid.uuid4().hex[:8]}",
         "timestamp": event["timestamp"],
@@ -994,8 +996,7 @@ async def log_readiness_event(payload: Dict = Body(...)) -> dict:
         "details": {"score": event["score"], "classification": event["classification"], "num_sims": event["num_sims"]},
         "success": True,
     })
-
-    return {"success": True, "event_id": event["event_id"]}
+    return {"success": True, "event_id": event_id}
 
 
 @router.get("/readiness-events")
@@ -1003,27 +1004,29 @@ async def list_readiness_events(
     client_id: Optional[str] = None,
     limit: int = 100,
 ) -> dict:
-    """List readiness audit events, optionally filtered by client."""
-    events = READINESS_EVENTS
+    """List readiness audit events (Mongo-backed), optionally filtered by client."""
+    q = {}
     if client_id:
-        events = [e for e in events if e.get("client_id") == client_id]
-    events = sorted(events, key=lambda x: x.get("timestamp", ""), reverse=True)[:limit]
+        q["client_id"] = client_id
+    cursor = db[READINESS_EVENTS_COLLECTION].find(q, {"_id": 0}).sort("timestamp", -1).limit(limit)
+    events = await cursor.to_list(length=limit)
+    total_all = await db[READINESS_EVENTS_COLLECTION].count_documents({})
     return {
         "events": events,
         "total": len(events),
-        "total_all": len(READINESS_EVENTS),
+        "total_all": total_all,
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
 
 
 @router.get("/readiness-events/summary")
 async def readiness_events_summary() -> dict:
-    """Aggregate summary of readiness events (for compliance dashboard)."""
+    """Aggregate summary of readiness events (Mongo-backed)."""
     by_client: Dict[str, int] = {}
     by_day: Dict[str, int] = {}
     score_buckets = {"strong": 0, "on_track": 0, "watchlist": 0, "at_risk": 0}
 
-    for e in READINESS_EVENTS:
+    async for e in db[READINESS_EVENTS_COLLECTION].find({}, {"_id": 0, "client_id": 1, "timestamp": 1, "score": 1}):
         cid = e.get("client_id", "unknown")
         by_client[cid] = by_client.get(cid, 0) + 1
         day = (e.get("timestamp", "")[:10]) or "unknown"
@@ -1038,11 +1041,50 @@ async def readiness_events_summary() -> dict:
         else:
             score_buckets["at_risk"] += 1
 
+    total_events = await db[READINESS_EVENTS_COLLECTION].count_documents({})
     return {
-        "total_events": len(READINESS_EVENTS),
+        "total_events": total_events,
         "unique_clients": len(by_client),
         "by_client": by_client,
         "by_day": by_day,
         "score_buckets": score_buckets,
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
+
+
+# ==================== ADVISER ACTION LOG (persisted) ====================
+
+@router.post("/adviser-actions")
+async def log_adviser_action(payload: Dict = Body(...)) -> dict:
+    """Record an adviser action (replaces localStorage.adviser_action_log)."""
+    action_id = f"act_{uuid.uuid4().hex[:10]}"
+    doc = {
+        "_id": action_id,
+        "action_id": action_id,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "actor": payload.get("actor", "adviser"),
+        "action": payload.get("action"),  # simulate | apply | generate | notify | amend | approve | reject
+        "item_id": payload.get("item_id"),
+        "client_id": payload.get("client_id"),
+        "headline": payload.get("headline"),
+        "metadata": payload.get("metadata", {}),
+    }
+    await db[ADVISER_ACTIONS_COLLECTION].insert_one(doc)
+    return {"success": True, "action_id": action_id}
+
+
+@router.get("/adviser-actions")
+async def list_adviser_actions(
+    client_id: Optional[str] = None,
+    action: Optional[str] = None,
+    limit: int = 100,
+) -> dict:
+    q = {}
+    if client_id:
+        q["client_id"] = client_id
+    if action:
+        q["action"] = action
+    cursor = db[ADVISER_ACTIONS_COLLECTION].find(q, {"_id": 0}).sort("timestamp", -1).limit(limit)
+    actions = await cursor.to_list(length=limit)
+    total = await db[ADVISER_ACTIONS_COLLECTION].count_documents(q)
+    return {"actions": actions, "total": total}

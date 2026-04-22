@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { computeReadinessCached } from "@/engine/readinessCache";
 import { whatMovesTheNeedle } from "@/engine/retirementReadinessEngine";
+import NumberRoll from "@/components/ui/NumberRoll";
 
 const fmtMoney = (v) => {
   const abs = Math.abs(v || 0);
@@ -43,13 +44,28 @@ const DeltaTile = ({ label, base, scenario, isMoney = false, isPct = false, test
       <div className="flex items-baseline gap-2 mt-0.5">
         <span className="text-xs text-slate-500 tabular-nums">{fmt(base)}</span>
         <ArrowRight className="h-3 w-3 text-slate-400" />
-        <span className="text-lg font-bold text-[#1a2744] tabular-nums">{fmt(scenario)}</span>
+        <NumberRoll
+          value={scenario}
+          duration={500}
+          format={fmt}
+          className="text-lg font-bold text-[#1a2744] tabular-nums"
+          testId={`${testId}-value`}
+        />
       </div>
       <div className={`flex items-center gap-1 mt-1 text-xs font-bold ${color}`}>
         <Icon className="h-3 w-3" />
-        <span className="tabular-nums">
-          {isMoney ? fmtSigned(delta, true) : isPct ? `${fmtSigned(Math.round(delta))} pts` : fmtSigned(Math.round(delta)) + (label.includes("Years") ? " yrs" : " pts")}
-        </span>
+        <NumberRoll
+          value={delta}
+          duration={500}
+          format={(v) => {
+            if (Math.abs(v) < 0.01) return "±0";
+            const signed = v > 0 ? "+" : "";
+            if (isMoney) return signed + fmtMoney(v);
+            if (isPct) return `${signed}${Math.round(v)} pts`;
+            return `${signed}${Math.round(v)}` + (label.includes("Years") ? " yrs" : " pts");
+          }}
+          className="tabular-nums"
+        />
       </div>
     </div>
   );

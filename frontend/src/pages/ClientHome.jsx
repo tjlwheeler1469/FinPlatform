@@ -11,6 +11,7 @@ import { CLIENT_DATA, getActiveClientId } from "@/data/clientData";
 import { whatMovesTheNeedle } from "@/engine/retirementReadinessEngine";
 import { computeReadinessCached } from "@/engine/readinessCache";
 import ReadinessDial from "@/components/readiness/ReadinessDial";
+import NumberRoll from "@/components/ui/NumberRoll";
 
 const fmt = (v) => {
   const abs = Math.abs(v || 0);
@@ -131,9 +132,15 @@ const ClientHome = () => {
                 <ReadinessDial score={scenario.score} size={140} testId="home-scenario-dial" />
                 <div className={`mt-2 flex items-center gap-1 font-bold text-sm ${delta >= 0 ? "text-emerald-600" : "text-rose-600"}`}>
                   {delta >= 0 ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
-                  {delta >= 0 ? "+" : ""}{delta} pts vs today
+                  <NumberRoll
+                    value={delta}
+                    format={(v) => (v >= 0 ? "+" : "") + Math.round(v) + " pts vs today"}
+                    testId="home-delta-roll"
+                  />
                 </div>
-                <p className="text-[11px] text-muted-foreground mt-2">New income: <span className="font-semibold text-emerald-700">{fmt(scenario.outcome.sustainableIncome)}</span>/yr</p>
+                <p className="text-[11px] text-muted-foreground mt-2">
+                  New income: <NumberRoll value={scenario.outcome.sustainableIncome} format={fmt} className="font-semibold text-emerald-700" testId="home-income-roll" />/yr
+                </p>
               </div>
             </div>
           </CardContent>

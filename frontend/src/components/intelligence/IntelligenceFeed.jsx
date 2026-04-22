@@ -12,6 +12,9 @@ import {
   ChevronRight, Send, CheckCircle2, FileText, Play,
 } from "lucide-react";
 import { groupFeedByCategory, CATEGORY_META } from "@/engine/bookAggregator";
+import AdviceDraftModal from "@/components/intelligence/AdviceDraftModal";
+
+const API = process.env.REACT_APP_BACKEND_URL;
 
 const ICONS = {
   sparkles: Sparkles,
@@ -35,23 +38,33 @@ const fmtMoney = (v) => {
   return "—";
 };
 
-const logLocalAction = (actionId, item) => {
+const logLocalAction = (actionId, item, extra = {}) => {
+  // Fire-and-forget persistence to Mongo-backed audit log; local fallback for resilience.
   try {
     const log = JSON.parse(localStorage.getItem("adviser_action_log") || "[]");
-    log.unshift({
-      at: new Date().toISOString(),
-      action: actionId,
-      itemId: item.id,
-      clientId: item.clientId,
-      headline: item.headline,
-    });
+    log.unshift({ at: new Date().toISOString(), action: actionId, itemId: item.id, clientId: item.clientId, headline: item.headline, ...extra });
     localStorage.setItem("adviser_action_log", JSON.stringify(log.slice(0, 200)));
   } catch (e) { /* ignore */ }
+  if (!API) return;
+  fetch(`${API}/api/compliance-audit/adviser-actions`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      actor: "adviser",
+      action: actionId,
+      item_id: item.id,
+      client_id: item.clientId,
+      headline: item.headline,
+      metadata: { category: item.category, urgency: item.urgency, impactScore: item.impactScore, ...extra },
+    }),
+    keepalive: true,
+  }).catch(() => {});
 };
 
 const IntelligenceFeed = ({ feed }) => {
   const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState("all");
+  const [adviceItem, setAdviceItem] = useState(null);
 
   const grouped = useMemo(() => groupFeedByCategory(feed), [feed]);
 
@@ -67,7 +80,7 @@ const IntelligenceFeed = ({ feed }) => {
     return { now, totalValue, avgImpact };
   }, [feed]);
 
-  const handleAction = (actionId, item) => {
+  const handleAction = async (actionId, item) => {
     logLocalAction(actionId, item);
     if (actionId === "simulate") {
       if (item.clientId) {
@@ -77,11 +90,55 @@ const IntelligenceFeed = ({ feed }) => {
         toast.info("Open a client to simulate.");
       }
     } else if (actionId === "apply") {
-      toast.success(`Strategy queued: ${item.headline}`, { description: "Recorded in adviser action log. (Execution adapter MOCKED.)" });
+      // Persist an execution ticket — adviser retains full control via ticket status.
+      if (!API) { toast.error("Backend unavailable"); return; }
+      try {
+        const res = await fetch(`${API}/api/execution/tickets`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            client_id: item.clientId || "unknown",
+            client_name: item.clientName || "",
+            ticket_type: item.category === "portfolio" ? "rebalance" : "contribution",
+            headline: item.headline,
+            message: item.message,
+            urgency: item.urgency,
+            requested_by: "adviser",
+            source_item_id: item.id,
+            payload: { impactScore: item.impactScore, scoreDelta: item.scoreDelta, financialImpact: item.financialImpact },
+          }),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        toast.success("Execution ticket created", { description: `${data.ticket.ticket_id} · status: pending. Adviser retains control.` });
+      } catch (e) {
+        toast.error("Apply failed", { description: String(e).slice(0, 200) });
+      }
     } else if (actionId === "generate") {
-      toast.success("Advice draft started", { description: `Generating SOA for '${item.headline}'. (MOCKED — will use LLM copilot when wired.)` });
+      // Open the AI advice modal. Adviser fully controls edit/approve/reject.
+      setAdviceItem(item);
     } else if (actionId === "notify") {
-      toast.success(`Client notified: ${item.clientName || "All clients"}`, { description: "Email + portal message queued. (Resend MOCKED pending API key.)" });
+      if (!API) { toast.error("Backend unavailable"); return; }
+      try {
+        const res = await fetch(`${API}/api/notify/client`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            client_id: item.clientId || "unknown",
+            client_name: item.clientName || "",
+            subject: `Strategy update: ${item.headline}`,
+            body: `${item.headline}\n\n${item.message || ""}\n\n— Your adviser`,
+            source_item_id: item.id,
+            actor: "adviser",
+          }),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const modeLabel = data.mode === "live" ? "Email sent via Resend" : "Notification logged (Resend MOCKED — awaiting RESEND_API_KEY)";
+        toast.success(`Client notified: ${item.clientName || "—"}`, { description: modeLabel });
+      } catch (e) {
+        toast.error("Notify failed", { description: String(e).slice(0, 200) });
+      }
     }
   };
 
@@ -243,6 +300,12 @@ const IntelligenceFeed = ({ feed }) => {
           </div>
         </ScrollArea>
       </CardContent>
+      <AdviceDraftModal
+        open={!!adviceItem}
+        onOpenChange={(o) => { if (!o) setAdviceItem(null); }}
+        feedItem={adviceItem}
+        onApproved={(draft) => logLocalAction("generate_approved", adviceItem || { id: "", headline: draft.title }, { draft_id: draft.draft_id })}
+      />
     </Card>
   );
 };

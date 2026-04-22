@@ -1,0 +1,39 @@
+{
+  "summary": "Tested iteration 199: Advice Copilot LLM (GPT-5.2), execution tickets, Resend-mock notify, market snapshot, compliance trail with Mongo persistence. 18/18 backend tests passed. Frontend Generate Advice → AdviceDraftModal → edit/save/regenerate/approve flow fully functional. LLM produced 2502-char compliant draft, regenerated to 1487 chars on instruction. Apply Strategy + Notify Client buttons fire backend calls and show toasts. Compliance Trail, Market Pulse HUD, trail-list visible on Client Decision Hub. 12 compliance-audit beacons emitted during one session.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {
+        "flow": "Market feed polling",
+        "issue": "On /client-360 mount, no GET /api/market-feed/snapshot calls were observed within ~10s of mount during the test window (HUD displays default +0.00%). Endpoint itself works (200 OK with simulated XJO/XAO/AUDUSD payload). Likely startMarketFeed in /app/frontend/src/engine/readinessCache.js is not firing on ClientDecisionHub mount, OR the first poll is delayed beyond the test wait. Recommend verifying the polling timer trigger and initial fetch.",
+        "affected_selectors": ["[data-testid=\"market-pulse-hud\"]"]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration199_advice_copilot.py",
+    "/app/test_reports/pytest/iter199.xml"
+  ],
+  "action_items": [
+    "Investigate why /api/market-feed/snapshot is not being called on ClientDecisionHub mount within the first 10s — check startMarketFeed wiring in readinessCache.js and confirm initial-fetch on mount (not only interval). Backend endpoint is healthy."
+  ],
+  "critical_code_review_comments": [
+    "compliance_audit.py is ~1090 lines and mixes legacy in-memory KYC/AML/Approvals seeded data with new Mongo-backed readiness_events + adviser_actions collections — recommend splitting into compliance_audit_legacy.py (in-memory) and compliance_audit_persistent.py to reduce coupling and ease future migration of the legacy parts to Mongo.",
+    "advice_copilot.py: regenerate endpoint preserves session_id which is good for context continuity, but no max-version cap — over many regenerations, history list could grow unbounded. Consider adding a soft cap or summarisation.",
+    "notify_client.py: when RESEND fails (mode='error'), still returns success=True. Suggest returning success=False with error in payload so frontend can surface it distinctly from 'mocked'.",
+    "execution_tickets.py: status field accepts arbitrary strings via PATCH. Consider Pydantic Enum validation matching the documented lifecycle (pending/executing/completed/failed/cancelled)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100% (18/18)", "frontend": "~95% (only market-feed polling not verified)"},
+  "test_credentials": "No auth required. localStorage: wealth_command_compliance_v5='permanent', app_mode='adviser'. EMERGENT_LLM_KEY in backend/.env (live LLM verified).",
+  "seed_data_creation": "Created via tests: 2 advice_drafts (chen approved, thompson rejected), 1 execution_tickets (chen rebalance executing), 1 client_notifications (chen mocked), 1+ readiness_events (chen), 2+ adviser_actions (chen generate, plus UI-emitted ones).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All advice copilot LLM endpoints verified end-to-end including 409 lock semantics on amend/regenerate after approval. UI modal flow works including loader, edit body, save amend, regenerate with instruction (amend prompt clears), approve closes modal. Apply Strategy & Notify Client fire correctly with mocked-mode toast. Only outstanding question is whether market-feed polling fires on CDH mount; backend snapshot endpoint itself returns valid simulated payload with XJO/XAO/AUDUSD and avg_delta_pct.",
+  "rca of the issue": "Market-feed snapshot endpoint OK at backend level; no client request observed during 10s window after CDH mount. Possible causes: (a) startMarketFeed only sets up an interval >10s without an immediate fetch, (b) hook not invoked on CDH path, (c) cached value in readinessCache prevents re-fetch. Recommend logging inside startMarketFeed and confirming the first call timing."
+}
