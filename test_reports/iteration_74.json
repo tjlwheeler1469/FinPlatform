@@ -33,7 +33,7 @@
     "frontend": "100% (all features working)"
   },
   "test_credentials": {
-    "api_base_url": "https://goal-feasibility-hub.preview.emergentagent.com"
+    "api_base_url": "https://retirement-readiness-2.preview.emergentagent.com"
   },
   "seed_data_creation": "Test clients created with TEST_ prefix for cleanup identification",
   "retest_needed": false,

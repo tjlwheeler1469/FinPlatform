@@ -158,6 +158,7 @@ ROUTE_REGISTRY = [
     ("routes.client_personal_info", "router", "/api", "Client Personal Info"),
     ("routes.retirement_projection", "router", "/api", "Retirement Projection"),
     ("routes.email_service", "router", "/api", "Email (Resend)"),
+    ("routes.compliance_audit", "router", "/api", "Compliance Audit"),
 ]
 
 

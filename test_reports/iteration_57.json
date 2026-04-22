@@ -36,7 +36,7 @@
     "frontend": "100% (Stock Trading page verified, all features working)"
   },
   "test_credentials": {
-    "api_base_url": "https://goal-feasibility-hub.preview.emergentagent.com"
+    "api_base_url": "https://retirement-readiness-2.preview.emergentagent.com"
   },
   "seed_data_creation": "None - uses mock data for demo mode services",
   "retest_needed": false,

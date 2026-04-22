@@ -34,7 +34,7 @@
     "frontend": "100% (All 4 new pages load correctly)"
   },
   "test_credentials": {
-    "api_base_url": "https://goal-feasibility-hub.preview.emergentagent.com"
+    "api_base_url": "https://retirement-readiness-2.preview.emergentagent.com"
   },
   "seed_data_creation": "No seed data needed - all APIs use in-memory demo data",
   "retest_needed": false,

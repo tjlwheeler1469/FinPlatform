@@ -10,7 +10,7 @@
 - **Users**: 1,000 concurrent
 - **Ramp-up**: 50 users/second
 - **Duration**: 60 seconds
-- **Target**: https://goal-feasibility-hub.preview.emergentagent.com
+- **Target**: https://retirement-readiness-2.preview.emergentagent.com
 
 ---
 
