@@ -1,0 +1,41 @@
+{
+  "summary": "Iter 197 — Phase 2 Retirement Decision OS (cached engine + DecisionGraph + Compliance audit beacon + expanded rules R11-R17). Full backend + frontend validation. 8/8 backend pytest pass. All 9 acceptance items PASS on the frontend. The 'Too many errors' freeze complaint is RESOLVED — rapid navigation across 6 readiness routes produces 0 page errors, 0 console errors/warnings, no webpack dev overlay. RCC loads in 1.20s (under 1.5s target). DecisionGraph SVG renders with 18 <path> edges. Opportunity Engine surfaces 7 cards for thompson_family including SMSF (R12) and Life+TPD (R9). Compliance beacon fires correctly: 16 POSTs observed during the run and GET /readiness-events?client_id=thompson_family returns 8 persisted events. Cached readiness engine + 5-min TTL is working as designed.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "detailed_results": {
+    "backend_pytest": {"passed": 8, "failed": 0, "file": "/app/backend/tests/test_iteration197_compliance_readiness.py"},
+    "rcc_load_time_seconds": 1.20,
+    "rcc_testids": {"book-overview-kpis": true, "intelligence-feed": true, "priority-clients": true, "client-list": true},
+    "decision_hub_sections": {"section-outcome": true, "section-needle": true, "section-simulator": true, "section-risks": true, "section-opportunities": true, "decision-graph": true},
+    "decision_graph_svg": {"present": true, "path_edges": 18},
+    "opportunity_cards_thompson": 7,
+    "opportunity_rule_hits": {"R12_SMSF": true, "R9_Life_TPD": true},
+    "scenario_simulator": {"slider_movable_no_exception": true},
+    "rapid_nav_stress": {"routes_visited": ["/retirement-control-center", "/client-360?id=thompson_family", "/client-home", "/client-360?id=chen_family", "/retirement-control-center", "/client-360?id=thompson_family"], "page_errors": 0, "console_warn_or_error": 0},
+    "compliance_beacon": {"post_count_observed": 16, "get_endpoint_thompson_total": 8, "sample_event_id": "rre_c2b98741f7"},
+    "client_row_click_navigation": "/client-360?id=thompson_family",
+    "webpack_dev_overlay_present": false
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration197_compliance_readiness.py",
+    "/app/test_reports/pytest/pytest_iteration197.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "compliance_audit.py /readiness-events POST validates client_id and returns event_id; GET supports client_id filter + limit; summary computes score_buckets/by_client/by_day correctly. In-memory store capped at 5000 with prune to 4000 on overflow — acceptable per PRD.",
+    "readinessCache.js 5-min TTL keyed by (clientId, hashInputs, hashOpts) and the audit beacon is debounced 30s per client — preventing the prior 'Too many errors' from per-render Monte Carlo. Verified: 16 POSTs across 6+ navigations is well-behaved.",
+    "DecisionGraph SVG renders 18 path edges from actions→factors→outcomes — visually present and structurally testable via [data-testid=decision-graph-svg] path. Good.",
+    "RetirementControlCenter cold-load via networkidle 1.20s — comfortably under 1.5s target. No backend dependency on render.",
+    "Frontend correctly uses process.env.REACT_APP_BACKEND_URL for the beacon (no hardcoded URLs). Beacon is fire-and-forget with keepalive — non-blocking.",
+    "MOCKED: /api/email-resend remains mocked (no RESEND_API_KEY) and compliance-audit storage is in-memory — both acknowledged in PRD.",
+    "Minor: KPI avg-score testid lookup returned n/a in one rapid-nav window because the script had already navigated away to /client-360 — not a product bug; iter196 confirmed kpi-avg-score=93 on RCC."
+  ],
+  "updated_files": ["/app/backend/tests/test_iteration197_compliance_readiness.py"],
+  "success_rate": {"backend": "100% (8/8)", "frontend": "100% (9/9 acceptance items)"},
+  "test_credentials": "localStorage only — wealth_command_compliance_v5='permanent', app_mode='adviser'.",
+  "seed_data_creation": "TEST_iter197_* readiness events POSTed to in-memory compliance audit (auto-pruned, no cleanup needed).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Phase 2 batch (P0+P1) is fully shipped and verified. The cache layer (readinessCache.js) eliminated the 'Too many errors' freeze. DecisionGraph + expanded rules engine + compliance beacon are all working end-to-end. Backend route is /api/compliance-audit/readiness-events (POST/GET/summary). Two valid client IDs: thompson_family, chen_family.",
+  "rca_of_the_issue": "Prior 'Too many errors' was caused by 200-300 sim Monte Carlo firing on every render across multiple readiness consumers. Mitigated by (a) computeReadinessCached 5-min TTL keyed on inputs hash, (b) reduced probe sim counts (200→120/100, bookAggregator 150), (c) audit beacon debounced 30s per client. Confirmed: 0 errors across 6 rapid navs."
+}

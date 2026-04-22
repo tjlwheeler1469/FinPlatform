@@ -1,7 +1,7 @@
 // Aggregates readiness + rules across the full client book for the Retirement Control Center.
 import { CLIENT_DATA } from "@/data/clientData";
-import { computeReadiness } from "./retirementReadinessEngine";
 import { evaluateRules } from "./rulesEngine";
+import { computeReadinessCached } from "./readinessCache";
 
 // All real clients (de-duplicated — aliases like client_1 point to the same object).
 const CLIENT_KEYS = ["thompson_family", "chen_family"];
@@ -10,7 +10,7 @@ export const buildBook = () => {
   const clients = CLIENT_KEYS.map((id) => {
     const c = CLIENT_DATA[id];
     if (!c) return null;
-    const readiness = computeReadiness(c, { numSims: 200 });
+    const readiness = computeReadinessCached(id, c, { numSims: 150 });
     const { alerts, opportunities } = evaluateRules(c, readiness);
     const topOpportunity = opportunities[0] || null;
     return { id, name: c.profile?.name || id, advisor: c.profile?.advisor, readiness, alerts, opportunities, topOpportunity, raw: c };

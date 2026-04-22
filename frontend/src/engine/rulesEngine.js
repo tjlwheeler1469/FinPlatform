@@ -144,6 +144,113 @@ export const evaluateRules = (client, readiness) => {
     });
   }
 
+  // ── Expanded Opportunity Engine ─────────────────────────────────────────
+  const liquid = readiness.inputs.liquidWealth || 0;
+  const superBalance = (client.assets || []).filter((a) => a.type === "Super" || a.type === "SMSF").reduce((s, a) => s + (a.value || 0), 0);
+  const smsfBalance = (client.assets || []).filter((a) => a.type === "SMSF").reduce((s, a) => s + (a.value || 0), 0);
+  const age = client.retirement?.current_age || 50;
+
+  // R11 — Non-concessional contribution capacity
+  // Cap: $120k/yr post-tax, or $360k bring-forward. Flags clients with investable cash > $100k outside super.
+  const cashOutsideSuper = (client.assets || [])
+    .filter((a) => a.type === "Cash" || a.type === "Shares" || a.type === "Managed Fund")
+    .reduce((s, a) => s + (a.value || 0), 0);
+  const nonConcessionalCap = 120000;
+  if (cashOutsideSuper > 100000 && superBalance < 1_900_000 && age < 75) {
+    const headroom = Math.min(cashOutsideSuper * 0.5, 360000);  // cap at bring-forward
+    opportunities.push({
+      id: "R11",
+      severity: "medium",
+      type: "opportunity",
+      title: "Non-concessional contribution capacity",
+      message: `$${Math.round(headroom).toLocaleString()} can be moved into super tax-free (post-tax). Shelters earnings in the 15% super environment vs marginal rates.`,
+      value: Math.round(headroom * 0.20),  // ~20% annual tax arbitrage benefit
+    });
+  }
+
+  // R12 — SMSF suitability (>$500k super + multi-asset appetite)
+  if (superBalance > 500_000 && smsfBalance === 0 && age < 70) {
+    const smsfSaveBps = 40; // ~40bps fee saving vs retail super above $500k
+    opportunities.push({
+      id: "R12",
+      severity: "low",
+      type: "opportunity",
+      title: "SMSF may be viable",
+      message: `Super balance $${Math.round(superBalance).toLocaleString()} is past the ~$500k efficiency threshold — SMSF unlocks direct assets, property, and potential ${smsfSaveBps}bps fee saving.`,
+      value: Math.round(superBalance * (smsfSaveBps / 10000)),
+    });
+  }
+
+  // R13 — Spouse equalisation (partner super balance disparity)
+  const partnerSuper = client.partner?.assets?.super || client.spouse?.super_balance || 0;
+  const selfSuper = superBalance;
+  if (partnerSuper > 0 && selfSuper > 0) {
+    const ratio = Math.min(partnerSuper, selfSuper) / Math.max(partnerSuper, selfSuper);
+    if (ratio < 0.5 && Math.max(partnerSuper, selfSuper) > 400_000) {
+      const equalisable = Math.round((Math.max(partnerSuper, selfSuper) - Math.min(partnerSuper, selfSuper)) / 2);
+      opportunities.push({
+        id: "R13",
+        severity: "medium",
+        type: "opportunity",
+        title: "Spouse equalisation — transfer balance cap efficiency",
+        message: `Combined super $${Math.round(selfSuper + partnerSuper).toLocaleString()} but skewed ${Math.round(ratio * 100)}/${Math.round((1 - ratio) * 100)}. Equalising $${equalisable.toLocaleString()} via contribution splitting preserves two $1.9M transfer balance caps.`,
+        value: Math.round(equalisable * 0.075),  // proxy tax saving
+      });
+    }
+  }
+
+  // R14 — Reversionary pension — binding nomination in place?
+  if (age >= 55 && (client.profile?.marital_status === "married" || client.partner || client.spouse)) {
+    const hasReversionaryNom = client.estate?.reversionary_pension === true
+      || client.super?.reversionary_nomination === true;
+    if (!hasReversionaryNom) {
+      opportunities.push({
+        id: "R14",
+        severity: "medium",
+        type: "opportunity",
+        title: "Reversionary pension nomination missing",
+        message: "Nominate your spouse as reversionary pensioner to auto-transfer your pension tax-efficiently on death and preserve the tax-free pension phase.",
+      });
+    }
+  }
+
+  // R15 — Transition to Retirement (TTR) strategy — age 60–64 & working
+  if (age >= 60 && age < 65 && (client.retirement?.retirement_age || 67) > 62 && superBalance > 200_000) {
+    const ttrSave = Math.round(Math.min(25000, superBalance * 0.04) * 0.175); // rough tax arbitrage
+    opportunities.push({
+      id: "R15",
+      severity: "medium",
+      type: "opportunity",
+      title: "Transition to Retirement (TTR) pension",
+      message: "Age 60+ and still working — a TTR pension can replace salary-sacrificed income with tax-free pension payments while capturing 15%→0% super fund tax.",
+      value: ttrSave,
+    });
+  }
+
+  // R16 — Downsizer contribution (age 55+, property > $500k eligible if downsized)
+  const propertyValue = (client.assets || []).filter((a) => a.type === "Property" || a.type === "Real Estate").reduce((s, a) => s + (a.value || 0), 0);
+  if (age >= 55 && propertyValue > 800_000) {
+    opportunities.push({
+      id: "R16",
+      severity: "low",
+      type: "opportunity",
+      title: "Downsizer contribution eligibility",
+      message: "Age 55+ with principal residence held >10 years — up to $300k per individual ($600k couple) can be added to super from sale proceeds (ignores caps & work test).",
+      value: 300000 * 0.15,
+    });
+  }
+
+  // R17 — Carry-forward concessional (unused caps from prior 5 yrs, super < $500k)
+  if (superBalance < 500_000 && contrib < CONCESSIONAL_CAP && age < 75) {
+    opportunities.push({
+      id: "R17",
+      severity: "low",
+      type: "opportunity",
+      title: "Carry-forward concessional contributions",
+      message: `Super balance under $500k — can sweep up to 5 years of unused concessional caps (up to ~$125k lump) to shelter a high-income year or CGT event.`,
+    });
+  }
+
   alerts.sort((a, b) => SEVERITY_ORDER[a.severity] - SEVERITY_ORDER[b.severity]);
   opportunities.sort((a, b) => SEVERITY_ORDER[a.severity] - SEVERITY_ORDER[b.severity]);
 

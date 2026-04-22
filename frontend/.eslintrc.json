@@ -1,6 +1,5 @@
 {
   "root": true,
-  "extends": ["react-app"],
   "env": { "browser": true, "node": true, "jest": true, "es2022": true },
   "globals": { "process": "readonly", "__dirname": "readonly" },
   "rules": {

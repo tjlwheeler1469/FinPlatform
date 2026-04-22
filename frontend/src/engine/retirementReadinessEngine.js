@@ -176,7 +176,7 @@ export const computeReadiness = (client, opts = {}) => {
 
 // Top 3 actions ranked by score uplift.
 export const whatMovesTheNeedle = (client) => {
-  const baseline = computeReadiness(client, { numSims: 200 }).score;
+  const baseline = computeReadiness(client, { numSims: 120 }).score;
   const candidates = [
     {
       id: "contrib_up",
@@ -212,7 +212,8 @@ export const whatMovesTheNeedle = (client) => {
 
   const results = candidates.map((c) => {
     if (c.proxyUplift) return { ...c, score: baseline + c.proxyUplift, uplift: c.proxyUplift };
-    const s = probeWithOverrides(client, c.apply(client));
+    const merged = { ...client, retirement: { ...client.retirement, ...c.apply(client) } };
+    const s = computeReadiness(merged, { numSims: 100 }).score;
     return { id: c.id, label: c.label, score: s, uplift: s - baseline };
   });
 

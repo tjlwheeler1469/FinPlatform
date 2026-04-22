@@ -1,13 +1,15 @@
 // Client Decision Hub — the retirement-first adviser view of a single client.
-// 5 sections: Outcome · What Moves The Needle · Scenario Simulator · Risk Panel · Opportunity Engine.
-import { useMemo, useState } from "react";
+// 6 sections: Outcome · What Moves The Needle · Scenario Simulator · Risk Panel · Opportunity Engine · Decision Graph.
+import { useMemo, useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Gauge, Target, Sliders, Shield, Sparkles, TrendingUp, TrendingDown, AlertTriangle, Lightbulb } from "lucide-react";
 import ReadinessDial from "@/components/readiness/ReadinessDial";
-import { computeReadiness, whatMovesTheNeedle, riskPanel } from "@/engine/retirementReadinessEngine";
+import DecisionGraph from "@/components/readiness/DecisionGraph";
+import { whatMovesTheNeedle, riskPanel } from "@/engine/retirementReadinessEngine";
+import { computeReadinessCached, onRecalc, startMarketFeed } from "@/engine/readinessCache";
 import { evaluateRules } from "@/engine/rulesEngine";
 
 const fmt = (v) => {
@@ -33,7 +35,18 @@ const ClientDecisionHub = ({ client }) => {
   const [expectedReturn, setExpectedReturn] = useState(6.5);
   const [inflation, setInflation] = useState(2.5);
 
-  const baseReadiness = useMemo(() => computeReadiness(client, { numSims: 300 }), [client]);
+  const clientId = client.profile?.user_id || client.profile?.name || "unknown";
+  // Force recompute counter bumped by market-feed / user-edit event bus
+  const [recalcTick, setRecalcTick] = useState(0);
+
+  useEffect(() => {
+    startMarketFeed();
+    const off = onRecalc(clientId, () => setRecalcTick((t) => t + 1));
+    const offWild = onRecalc("*", () => setRecalcTick((t) => t + 1));
+    return () => { off(); offWild(); };
+  }, [clientId]);
+
+  const baseReadiness = useMemo(() => computeReadinessCached(clientId, client, { numSims: 250 }), [clientId, client, recalcTick]);
   const rules = useMemo(() => evaluateRules(client, baseReadiness), [client, baseReadiness]);
   const risks = useMemo(() => riskPanel(client), [client]);
   const topActions = useMemo(() => whatMovesTheNeedle(client), [client]);
@@ -49,8 +62,8 @@ const ClientDecisionHub = ({ client }) => {
   }), [client, retireAge, contrib, spending]);
 
   const scenarioReadiness = useMemo(
-    () => computeReadiness(scenarioClient, { numSims: 200, expectedReturn: expectedReturn / 100, inflationRate: inflation / 100 }),
-    [scenarioClient, expectedReturn, inflation]
+    () => computeReadinessCached(`${clientId}:scenario`, scenarioClient, { numSims: 150, expectedReturn: expectedReturn / 100, inflationRate: inflation / 100 }),
+    [clientId, scenarioClient, expectedReturn, inflation]
   );
 
   const scoreDelta = scenarioReadiness.score - baseReadiness.score;
@@ -261,6 +274,9 @@ const ClientDecisionHub = ({ client }) => {
           )}
         </CardContent>
       </Card>
+
+      {/* ── Section 6 — Financial Decision Graph ── */}
+      <DecisionGraph client={client} readiness={baseReadiness} rules={rules} topActions={topActions} />
     </div>
   );
 };

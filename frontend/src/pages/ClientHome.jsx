@@ -8,7 +8,8 @@ import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown, Sparkles, Target, Sliders } from "lucide-react";
 import { CLIENT_DATA, getActiveClientId } from "@/data/clientData";
-import { computeReadiness, whatMovesTheNeedle } from "@/engine/retirementReadinessEngine";
+import { whatMovesTheNeedle } from "@/engine/retirementReadinessEngine";
+import { computeReadinessCached } from "@/engine/readinessCache";
 import ReadinessDial from "@/components/readiness/ReadinessDial";
 
 const fmt = (v) => {
@@ -26,13 +27,13 @@ const ClientHome = () => {
   const [retireAge, setRetireAge] = useState(client.retirement?.retirement_age || 67);
   const [contrib, setContrib] = useState(client.retirement?.annual_contributions || 0);
 
-  const baseline = useMemo(() => computeReadiness(client, { numSims: 200 }), [client]);
+  const baseline = useMemo(() => computeReadinessCached(clientId, client, { numSims: 150 }), [clientId, client]);
   const nextBest = useMemo(() => whatMovesTheNeedle(client)[0], [client]);
 
-  const scenario = useMemo(() => computeReadiness({
+  const scenario = useMemo(() => computeReadinessCached(`${clientId}:scenario`, {
     ...client,
     retirement: { ...client.retirement, retirement_age: retireAge, annual_contributions: contrib },
-  }, { numSims: 150 }), [client, retireAge, contrib]);
+  }, { numSims: 100 }), [clientId, client, retireAge, contrib]);
   const delta = scenario.score - baseline.score;
 
   return (

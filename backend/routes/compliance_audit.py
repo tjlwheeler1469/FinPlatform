@@ -91,6 +91,7 @@ KYC_RECORDS: Dict[str, Dict] = {}
 AML_RECORDS: Dict[str, Dict] = {}
 DOCUMENTS: Dict[str, Dict] = {}
 APPROVALS: Dict[str, Dict] = {}
+READINESS_EVENTS: List[Dict] = []  # compliance trail of every readiness compute
 
 
 # Pre-populate with demo data
@@ -934,4 +935,114 @@ async def get_compliance_dashboard() -> dict:
         },
         "alerts": alerts,
         "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+
+
+# ==================== READINESS COMPLIANCE EVENTS ====================
+# Every time the readiness engine computes a score for a client, the frontend
+# fires a beacon here. These events form the compliance-by-design audit trail:
+# regulators can see exactly what inputs drove a given recommendation.
+
+from fastapi import Body
+
+
+@router.post("/readiness-events")
+async def log_readiness_event(payload: Dict = Body(...)) -> dict:
+    """Log a retirement-readiness compute event for compliance audit.
+
+    Payload (all optional except client_id):
+      - client_id (str, required)
+      - client_name (str)
+      - score (int/float)
+      - classification (str)
+      - factors (list[{id, score}])
+      - inputs (dict)
+      - num_sims (int)
+      - actor (str)  # 'adviser' | 'client'
+    """
+    client_id = payload.get("client_id")
+    if not client_id:
+        raise HTTPException(status_code=400, detail="client_id required")
+
+    event = {
+        "event_id": f"rre_{uuid.uuid4().hex[:10]}",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "client_id": client_id,
+        "client_name": payload.get("client_name", ""),
+        "score": payload.get("score"),
+        "classification": payload.get("classification"),
+        "factors": payload.get("factors", []),
+        "inputs": payload.get("inputs", {}),
+        "num_sims": payload.get("num_sims"),
+        "actor": payload.get("actor", "system"),
+    }
+    READINESS_EVENTS.append(event)
+
+    # Cap in-memory store
+    if len(READINESS_EVENTS) > 5000:
+        del READINESS_EVENTS[:1000]
+
+    # Also stamp into the main audit log (so the dashboard view shows it)
+    AUDIT_LOG.append({
+        "log_id": f"log_{uuid.uuid4().hex[:8]}",
+        "timestamp": event["timestamp"],
+        "user_id": event["actor"],
+        "user_name": event["actor"],
+        "action": AuditAction.COMPLIANCE_CHECK,
+        "resource_type": "readiness",
+        "resource_id": client_id,
+        "details": {"score": event["score"], "classification": event["classification"], "num_sims": event["num_sims"]},
+        "success": True,
+    })
+
+    return {"success": True, "event_id": event["event_id"]}
+
+
+@router.get("/readiness-events")
+async def list_readiness_events(
+    client_id: Optional[str] = None,
+    limit: int = 100,
+) -> dict:
+    """List readiness audit events, optionally filtered by client."""
+    events = READINESS_EVENTS
+    if client_id:
+        events = [e for e in events if e.get("client_id") == client_id]
+    events = sorted(events, key=lambda x: x.get("timestamp", ""), reverse=True)[:limit]
+    return {
+        "events": events,
+        "total": len(events),
+        "total_all": len(READINESS_EVENTS),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+@router.get("/readiness-events/summary")
+async def readiness_events_summary() -> dict:
+    """Aggregate summary of readiness events (for compliance dashboard)."""
+    by_client: Dict[str, int] = {}
+    by_day: Dict[str, int] = {}
+    score_buckets = {"strong": 0, "on_track": 0, "watchlist": 0, "at_risk": 0}
+
+    for e in READINESS_EVENTS:
+        cid = e.get("client_id", "unknown")
+        by_client[cid] = by_client.get(cid, 0) + 1
+        day = (e.get("timestamp", "")[:10]) or "unknown"
+        by_day[day] = by_day.get(day, 0) + 1
+        score = e.get("score") or 0
+        if score >= 90:
+            score_buckets["strong"] += 1
+        elif score >= 75:
+            score_buckets["on_track"] += 1
+        elif score >= 60:
+            score_buckets["watchlist"] += 1
+        else:
+            score_buckets["at_risk"] += 1
+
+    return {
+        "total_events": len(READINESS_EVENTS),
+        "unique_clients": len(by_client),
+        "by_client": by_client,
+        "by_day": by_day,
+        "score_buckets": score_buckets,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
     }
