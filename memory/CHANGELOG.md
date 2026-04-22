@@ -1,3 +1,21 @@
+## Completed (22 April 2026) — Iteration 201 (Mobile portal + Weekly KPIs)
+
+### Mobile-first Client Readiness Portal (read-only)
+- **NEW `/app/frontend/src/pages/ClientReadinessPortal.jsx`** at route `/client-readiness`.
+- Sticky mobile top bar · navy hero with big Dial + years-to-retirement · 2×2 outcome tiles (Income/Success/Surplus or Gap/Years Sustainable) · 5-factor progress bars with weight badges (now render correctly as 30/25/20/15/10%) · top-3 what-lifts-your-score with "Discuss with your adviser" CTA · read-only Key Risks · Recent adviser activity via `/api/compliance-audit/adviser-actions` · footer last-computed timestamp.
+- **Strictly READ-ONLY**: zero sliders, zero shock toggles, zero Apply/Generate buttons.
+- `ClientHome` now links to it (`data-testid="home-open-mobile-portal"`).
+
+### Weekly "Actions Shipped" Report
+- **NEW `/app/backend/routes/adviser_reports.py`** → `GET /api/reports/actions-shipped?days=7&actor=...` aggregates Mongo collections (`adviser_actions`, `advice_drafts`, `execution_tickets`, `client_notifications`, `readiness_events`).
+- Returns totals, WoW deltas, daily sparkline for flexible window.
+- **NEW `/app/frontend/src/components/intelligence/ActionsShippedReport.jsx`** on `RetirementControlCenter`:
+  4 primary KPIs with WoW % (Simulations / Strategies applied / Drafts approved / Clients notified) + 3 secondary (Clients touched / $ impact approved / Readiness computes) + daily activity sparkline + 7/30-day toggle + refresh.
+
+### Testing
+- Iteration 200: **5/5 backend PASS + full FE verified**. Weight bug fixed (was 3000% → 30%). `/app/test_reports/iteration_200.json`.
+
+
 ## Completed (22 April 2026) — Iteration 200 (Real integrations + Adviser Copilot)
 
 ### P1 — Generate Advice → LIVE GPT-5.2 copilot (adviser retains full control)
