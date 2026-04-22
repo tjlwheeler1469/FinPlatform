@@ -1,3 +1,34 @@
+## Completed (22 April 2026) — Iteration 202 (Live market + Scheduled digests + Multi-page PDF + 5-year slider)
+
+### Market feed → Yahoo Finance (live)
+- `market_snapshot.py` rewritten: Yahoo v7 quote endpoint (primary), v8 chart endpoint (fallback), simulated fallback (last resort), 30s in-memory cache.
+- Confirmed live: ASX 200 8843.6 (−1.225%), All Ords 9074.4, AUD/USD 0.716, source='yahoo'.
+- Frontend `readinessCache.startMarketFeed` already polls this — now displays real deltas.
+
+### Scheduled digests (APScheduler)
+- `APScheduler==3.11.0` added, `AsyncIOScheduler` started on FastAPI `startup`.
+- **Daily "Signal" at 08:00 AEST**: top pending drafts + lowest-scoring clients in last 24h.
+- **Weekly "Actions Shipped" Mon 08:00 AEST**: reuses `/api/reports/actions-shipped`.
+- **NEW `/app/backend/routes/scheduled_digests.py`** — endpoints: `/api/digests/status`, `/preview/signal`, `/preview/actions`, `POST /send/signal`, `POST /send/actions`, `GET /log`.
+- Emails go via Resend if `RESEND_API_KEY` set, otherwise persisted to `digest_log` collection with mode='mocked'.
+- HTML templates inline (responsive, branded, no Resend template dependency).
+
+### Multi-page PDF export (DecisionGraph)
+- 4-page landscape A4: Page 1 graph · Page 2 Appendix A (factor breakdown + outcomes table) · Page 3 Appendix B (opportunities + alerts tables) · Page 4 Appendix C (scenario trail).
+- Uses `jspdf-autotable` for tables. Footer with page numbers on every page.
+
+### "Show me in N years" slider (mobile client portal)
+- Read-only interactive projection in `ClientReadinessPortal`: ages forward by 0–15 years, compounds assets at 5% real return, recomputes via cached engine.
+- NumberRoll-animated score + income tiles with delta badges. "Today" reset button. Context note footer.
+- Pure motivation feature — no adviser tools, no commitment, no editable inputs.
+
+### Testing
+- Iteration 201: **11/11 backend PASS + full FE verified**. `/app/test_reports/iteration_201.json`.
+
+### Still MOCKED
+- Email digests persist to `digest_log` with mode='mocked' until `RESEND_API_KEY` is provided. **Drop-in ready — flipping the env var auto-activates live sends on next job run.**
+
+
 ## Completed (22 April 2026) — Iteration 201 (Mobile portal + Weekly KPIs)
 
 ### Mobile-first Client Readiness Portal (read-only)
