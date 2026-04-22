@@ -9,6 +9,27 @@ Build an AFSL-grade wealth management platform for HNW clients with consolidated
 - **AI**: OpenAI GPT-5.2 (Emergent LLM Key)
 - **Centralized Data**: `/app/frontend/src/data/clientData.js` (single source of truth: $9.61M Thompson, $22.8M Chen, etc.)
 
+
+## Phase 2 — Retirement Decision OS — STATUS: STABLE (22 April 2026, Iter 197)
+
+### ✅ Completed (latest)
+- **Retirement Readiness Engine** (`/app/frontend/src/engine/retirementReadinessEngine.js`): 0–100 composite from 5 weighted factors (Income Sustainability 30%, Probability 25%, Funding 20%, Risk 15%, Flexibility 10%).
+- **Readiness Cache** (`readinessCache.js`): 5-min TTL keyed by (clientId, inputs, opts). Prunes at 200 entries. Emits compliance beacons. Market-feed event bus (45s ticker).
+- **Rules Engine** (`rulesEngine.js`): 17 rules (R1–R17) covering alerts (readiness, probability, withdrawal, concentration) + opportunities (concessional, non-concessional, SMSF, spouse equalisation, reversionary pension, TTR, downsizer, carry-forward).
+- **Retirement Control Center** (`/retirement-control-center`): book KPIs, intelligence feed, priority clients, all-clients table.
+- **Client Decision Hub** (inside `/client-360`): 6 sections — Outcome, What Moves The Needle, Scenario Simulator, Risk Panel, Opportunity Engine, Financial Decision Graph.
+- **Financial Decision Graph** (`DecisionGraph.jsx`): SVG action → factor → outcome visualisation.
+- **Client Home** (`/client-home`): simplified score + future income + gap + next best action + what-if sliders.
+- **Compliance audit** (`/api/compliance-audit/readiness-events`): POST/GET/summary. In-memory store.
+- **Email Resend** (`/api/email-resend/send`): MOCKED — pending user-provided `RESEND_API_KEY`.
+
+### ⏳ P2 / Backlog
+- Deeper event-driven recalc (hook to real market feed, inflation publish).
+- `RESEND_API_KEY` drop-in to flip email from mocked → live.
+- Persist compliance audit log to MongoDB (currently in-memory).
+- P3: Execution Rails, Advice Marketplace, Open API platform, White-label infra.
+
+
 ## Completed (21 April 2026) — Iteration 180 (Phase 1 of 6-feature batch)
 
 ### P0 — Adviser SMSF + Super & Pension tabs (VERIFIED)
