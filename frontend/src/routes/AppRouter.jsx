@@ -70,7 +70,10 @@ import {
 const DashboardRouter = () => {
   const stored = localStorage.getItem("selected_client");
   const mode = localStorage.getItem("app_mode");
-  if (stored && mode === "adviser") return <UnifiedClientOverview />;
+  if (mode === "adviser") {
+    // Adviser home = Retirement Control Center unless a specific client is selected
+    return stored ? <UnifiedClientOverview /> : <Navigate to="/retirement-control-center" replace />;
+  }
   // Default: anything non-adviser is the simple client view (Personal Mode retired)
   return <SimpleClientView />;
 };

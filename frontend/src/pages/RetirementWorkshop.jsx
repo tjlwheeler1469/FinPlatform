@@ -323,8 +323,8 @@ const RetirementWorkshop = ({ embedded = false, clientId: propClientId }) => {
           </div>
         </div>
 
-        {/* Scenario Editors (stacked) */}
-        <div className="space-y-4">
+        {/* Scenario Editors (side-by-side, horizontal-scrollable on narrow) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" data-testid="scenario-grid">
           {scenarios.map((s, idx) => (
             <ScenarioEditor
               key={s.id}

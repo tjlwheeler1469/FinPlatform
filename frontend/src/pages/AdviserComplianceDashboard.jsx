@@ -22,6 +22,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend
 } from 'recharts';
 import { toast } from 'sonner';
+import { REPORT_GENERATORS } from '@/lib/mockComplianceReports';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || "";
 
@@ -565,12 +566,29 @@ const AdviserComplianceDashboard = () => {
                 { title: 'Risk Assessment Report', description: 'Client risk profile alignment', icon: AlertTriangle },
                 { title: 'Audit Trail Report', description: 'Document changes and reviews', icon: FileCheck },
               ].map((report, idx) => (
-                <Card key={`item-${idx}`} className="hover:shadow-md transition-shadow cursor-pointer">
+                <Card key={`item-${idx}`} className="hover:shadow-md transition-shadow" data-testid={`compliance-report-card-${idx}`}>
                   <CardContent className="p-6">
                     <report.icon className="h-10 w-10 text-blue-600 mb-4" />
                     <h3 className="font-semibold mb-2">{report.title}</h3>
                     <p className="text-sm text-muted-foreground mb-4">{report.description}</p>
-                    <Button variant="outline" className="w-full">
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => {
+                        try {
+                          const gen = REPORT_GENERATORS[report.title];
+                          if (gen) {
+                            gen();
+                            toast.success(`${report.title} generated`, { description: "PDF saved to downloads." });
+                          } else {
+                            toast.info(`${report.title} — generator not wired yet`);
+                          }
+                        } catch (e) {
+                          toast.error("Report generation failed", { description: String(e).slice(0, 150) });
+                        }
+                      }}
+                      data-testid={`compliance-report-btn-${idx}`}
+                    >
                       <Download className="h-4 w-4 mr-2" />
                       Generate Report
                     </Button>

@@ -1,3 +1,35 @@
+## Completed (22 April 2026) — Iteration 203 (UX polish + Compliance mock reports)
+
+### Login routing
+- `DashboardRouter`: adviser mode with no selected client now redirects `/dashboard` → `/retirement-control-center`. Advisers land on their control centre on login.
+
+### Adviser Command Centre — "Markets · Live" removed
+- `AdvisorCommandCenter.jsx` — `MarketsStrip title="Markets · Live"` block deleted from the dashboard-briefing area.
+
+### Review-pack PDF Recommendations table fix
+- `lib/pdfGenerator.js`: Recommendations & Opportunities autoTable now strips non-ASCII characters (arrows, smart quotes, em-dashes) which were corrupting Helvetica rendering. Explicit column widths (55/95/32mm), `overflow: linebreak`, `valign: top`, 3mm cell padding — no more wide letter-spacing artefacts.
+
+### Retirement Workshop & SMSF Optimizer layout
+- `RetirementWorkshop.jsx`: scenarios grid changed from `space-y-4` stacked → `grid-cols-1 md:grid-cols-2 xl:grid-cols-3` side-by-side so the comparison chart + table below are immediately visible without scrolling past long scenario cards.
+- `SMSFOptimizer.jsx`: 3 info cards (Concessional / Non-Concessional / Division 293) MOVED above the calculator + output grid per user feedback.
+
+### Client (SimpleClientView) — Retirement & Super tab reorder
+- `RetirementTab.jsx`: layout changed from 2-column (current plan + scenarios side-by-side) to stacked layout: Current Plan chart → Super & Pension card → **Try Your Own Scenarios in full-width landscape** below. Sandbox is now 1568px wide on desktop.
+
+### Compliance Dashboard — mock reports wired
+- **NEW `/app/frontend/src/lib/mockComplianceReports.js`**: 6 generators producing real branded PDFs — Monthly Compliance Summary, Adviser Performance Report, Issue Resolution Tracker, ASIC Alignment Report, Risk Assessment Report, Audit Trail Report.
+- Each PDF has navy+gold header, footer with page numbers, autoTable tables, synthetic-but-plausible data. Named with date-stamped filenames.
+- `AdviserComplianceDashboard.jsx`: Generate Report buttons wired to registry, toast confirmation on save.
+
+### Verified via smoke tests
+- `/dashboard` → `/retirement-control-center` for advisers ✓
+- Markets · Live count=0 on adviser command centre ✓
+- Scenario grid testid present, scenarios side-by-side ✓
+- SMSF info cards render above inputs ✓
+- 6 compliance report buttons render; `MonthlyComplianceSummary_2026-04-22.pdf` downloaded ✓
+- SimpleClientView retirement tab: current(y=370) above sandbox(y=1006, width=1568) ✓
+
+
 ## Completed (22 April 2026) — Iteration 202 (Live market + Scheduled digests + Multi-page PDF + 5-year slider)
 
 ### Market feed → Yahoo Finance (live)

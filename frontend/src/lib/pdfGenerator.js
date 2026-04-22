@@ -132,12 +132,24 @@ export const generateReviewPackPDF = ({ clientId, confidence, changes = [], oppo
     doc.setFont("helvetica", "bold");
     doc.text("Recommendations & Opportunities", 14, y);
     y += 4;
+    // Strip non-ASCII (arrows, smart quotes) that helvetica can't render
+    const clean = (s) => String(s || "")
+      .replace(/→|➜|➞|➔/g, "->")
+      .replace(/—|–/g, "-")
+      .replace(/['']/g, "'")
+      .replace(/[""]/g, '"')
+      .replace(/[^\x20-\x7E]/g, ""); // strip anything outside printable ASCII
     autoTable(doc, {
       startY: y,
       head: [["Recommendation", "Rationale", "Estimated Impact"]],
-      body: opportunities.map((o) => [o.title, o.detail, fmt(o.impact)]),
+      body: opportunities.map((o) => [clean(o.title), clean(o.detail), fmt(o.impact)]),
       headStyles: { fillColor: [212, 168, 76], textColor: [26, 39, 68], fontSize: 9 },
-      bodyStyles: { fontSize: 9 },
+      bodyStyles: { fontSize: 9, cellPadding: 3, overflow: "linebreak", valign: "top" },
+      columnStyles: {
+        0: { cellWidth: 55 },
+        1: { cellWidth: 95 },
+        2: { cellWidth: 32, halign: "right" },
+      },
       margin: { left: 14, right: 14 },
       theme: "striped",
     });
