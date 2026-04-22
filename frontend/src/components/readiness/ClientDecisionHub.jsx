@@ -1,14 +1,12 @@
 // Client Decision Hub — the retirement-first adviser view of a single client.
-// 6 sections: Outcome · What Moves The Needle · Scenario Simulator · Risk Panel · Opportunity Engine · Decision Graph.
+// 6 sections: Outcome · What Moves The Needle · Future Impact Engine · Risk Panel · Opportunity Engine · Decision Graph.
 import { useMemo, useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
-import { Label } from "@/components/ui/label";
-import { Gauge, Target, Sliders, Shield, Sparkles, TrendingUp, TrendingDown, AlertTriangle, Lightbulb, Activity } from "lucide-react";
+import { Gauge, Target, Shield, Sparkles, TrendingUp, TrendingDown, AlertTriangle, Lightbulb, Activity } from "lucide-react";
 import ReadinessDial from "@/components/readiness/ReadinessDial";
 import DecisionGraph from "@/components/readiness/DecisionGraph";
+import FutureImpactEngine from "@/components/readiness/FutureImpactEngine";
 import { whatMovesTheNeedle, riskPanel } from "@/engine/retirementReadinessEngine";
 import { computeReadinessCached, onRecalc, startMarketFeed, getMarketPulse, onMarketPulse, pulseNow } from "@/engine/readinessCache";
 import { evaluateRules } from "@/engine/rulesEngine";
@@ -29,45 +27,7 @@ const severityStyles = {
 };
 
 const ClientDecisionHub = ({ client }) => {
-  // Scenario simulator overrides
-  const [retireAge, setRetireAge] = useState(client.retirement?.retirement_age || 67);
-  const [contrib, setContrib] = useState(client.retirement?.annual_contributions || 0);
-  const [spending, setSpending] = useState(client.retirement?.retirement_spending || 150000);
-  const [expectedReturn, setExpectedReturn] = useState(6.5);
-  const [inflation, setInflation] = useState(2.5);
   const [pulse, setPulse] = useState(() => getMarketPulse());
-
-  // ── Scenario presets ──
-  const applyPreset = (preset) => {
-    const baseAge = client.retirement?.retirement_age || 67;
-    const baseContrib = client.retirement?.annual_contributions || 0;
-    const baseSpend = client.retirement?.retirement_spending || 150000;
-    if (preset === "baseline") {
-      setRetireAge(baseAge);
-      setContrib(baseContrib);
-      setSpending(baseSpend);
-      setExpectedReturn(6.5);
-      setInflation(2.5);
-    } else if (preset === "aggressive") {
-      setRetireAge(Math.max(55, baseAge - 2));
-      setContrib(30000);
-      setSpending(Math.round(baseSpend * 1.1));
-      setExpectedReturn(8.0);
-      setInflation(2.5);
-    } else if (preset === "cautious") {
-      setRetireAge(baseAge + 2);
-      setContrib(Math.max(baseContrib, 15000));
-      setSpending(Math.round(baseSpend * 0.9));
-      setExpectedReturn(4.5);
-      setInflation(3.0);
-    } else if (preset === "part_time") {
-      setRetireAge(baseAge + 3);
-      setContrib(Math.max(0, Math.round(baseContrib * 0.5)));
-      setSpending(Math.round(baseSpend * 0.95));
-      setExpectedReturn(6.0);
-      setInflation(2.5);
-    }
-  };
 
   const clientId = client.profile?.user_id || client.profile?.name || "unknown";
   // Force recompute counter bumped by market-feed / user-edit event bus
@@ -85,23 +45,6 @@ const ClientDecisionHub = ({ client }) => {
   const rules = useMemo(() => evaluateRules(client, baseReadiness), [client, baseReadiness]);
   const risks = useMemo(() => riskPanel(client), [client]);
   const topActions = useMemo(() => whatMovesTheNeedle(client), [client]);
-
-  const scenarioClient = useMemo(() => ({
-    ...client,
-    retirement: {
-      ...client.retirement,
-      retirement_age: retireAge,
-      annual_contributions: contrib,
-      retirement_spending: spending,
-    },
-  }), [client, retireAge, contrib, spending]);
-
-  const scenarioReadiness = useMemo(
-    () => computeReadinessCached(`${clientId}:scenario`, scenarioClient, { numSims: 150, expectedReturn: expectedReturn / 100, inflationRate: inflation / 100 }),
-    [clientId, scenarioClient, expectedReturn, inflation]
-  );
-
-  const scoreDelta = scenarioReadiness.score - baseReadiness.score;
 
   return (
     <div className="space-y-5" data-testid="client-decision-hub">
@@ -210,63 +153,8 @@ const ClientDecisionHub = ({ client }) => {
         </CardContent>
       </Card>
 
-      {/* ── Section 3 — Scenario Simulator ── */}
-      <Card data-testid="section-simulator">
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between gap-3 flex-wrap">
-            <div>
-              <CardTitle className="flex items-center gap-2 text-base"><Sliders className="h-4 w-4 text-[#D4A84C]" /> 3 · Scenario Simulator</CardTitle>
-              <CardDescription>Adjust inputs · score recalculates live</CardDescription>
-            </div>
-            <div className="flex flex-wrap items-center gap-1.5" data-testid="scenario-presets">
-              <span className="text-[10px] uppercase tracking-wider text-muted-foreground mr-1">Presets:</span>
-              <Button type="button" size="sm" variant="outline" className="h-7 text-[11px]" onClick={() => applyPreset("baseline")} data-testid="preset-baseline">Baseline</Button>
-              <Button type="button" size="sm" variant="outline" className="h-7 text-[11px] border-emerald-300 text-emerald-700 hover:bg-emerald-50" onClick={() => applyPreset("aggressive")} data-testid="preset-aggressive">Aggressive</Button>
-              <Button type="button" size="sm" variant="outline" className="h-7 text-[11px] border-sky-300 text-sky-700 hover:bg-sky-50" onClick={() => applyPreset("cautious")} data-testid="preset-cautious">Cautious</Button>
-              <Button type="button" size="sm" variant="outline" className="h-7 text-[11px] border-amber-300 text-amber-700 hover:bg-amber-50" onClick={() => applyPreset("part_time")} data-testid="preset-part-time">Part-time Work</Button>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div className="space-y-4">
-              <div>
-                <div className="flex justify-between mb-1.5"><Label>Retirement age</Label><span className="font-semibold tabular-nums">{retireAge}</span></div>
-                <Slider value={[retireAge]} min={55} max={75} step={1} onValueChange={(v) => setRetireAge(v[0])} data-testid="sim-retire-age" />
-              </div>
-              <div>
-                <div className="flex justify-between mb-1.5"><Label>Annual contributions</Label><span className="font-semibold tabular-nums">{fmt(contrib)}</span></div>
-                <Slider value={[contrib]} min={0} max={60000} step={1000} onValueChange={(v) => setContrib(v[0])} data-testid="sim-contrib" />
-              </div>
-              <div>
-                <div className="flex justify-between mb-1.5"><Label>Retirement spending</Label><span className="font-semibold tabular-nums">{fmt(spending)}</span></div>
-                <Slider value={[spending]} min={50000} max={400000} step={5000} onValueChange={(v) => setSpending(v[0])} data-testid="sim-spending" />
-              </div>
-              <div>
-                <div className="flex justify-between mb-1.5"><Label>Expected real return</Label><span className="font-semibold tabular-nums">{expectedReturn.toFixed(1)}%</span></div>
-                <Slider value={[expectedReturn * 10]} min={20} max={100} step={5} onValueChange={(v) => setExpectedReturn(v[0] / 10)} data-testid="sim-return" />
-              </div>
-              <div>
-                <div className="flex justify-between mb-1.5"><Label>Inflation</Label><span className="font-semibold tabular-nums">{inflation.toFixed(1)}%</span></div>
-                <Slider value={[inflation * 10]} min={10} max={60} step={1} onValueChange={(v) => setInflation(v[0] / 10)} data-testid="sim-inflation" />
-              </div>
-            </div>
-            <div className="flex flex-col items-center justify-center p-4 bg-muted/40 rounded-lg">
-              <p className="text-xs uppercase tracking-wider text-muted-foreground">Scenario readiness</p>
-              <ReadinessDial score={scenarioReadiness.score} size={170} testId="sim-score-dial" />
-              <div className={`mt-3 flex items-center gap-1.5 font-bold text-sm ${scoreDelta >= 0 ? "text-emerald-600" : "text-rose-600"}`} data-testid="sim-delta">
-                {scoreDelta >= 0 ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
-                {scoreDelta >= 0 ? "+" : ""}{scoreDelta} pts vs baseline ({baseReadiness.score})
-              </div>
-              <div className="grid grid-cols-3 gap-2 w-full mt-4 text-center text-[11px]">
-                <div><p className="text-muted-foreground">Success</p><p className="font-bold">{scenarioReadiness.outcome.probabilityOfSuccess}%</p></div>
-                <div><p className="text-muted-foreground">Income</p><p className="font-bold">{fmt(scenarioReadiness.outcome.sustainableIncome)}</p></div>
-                <div><p className="text-muted-foreground">Gap</p><p className="font-bold">{fmt(scenarioReadiness.outcome.fundingGap)}</p></div>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* ── Section 3 — Future Impact Engine™ (replaces Scenario Simulator) ── */}
+      <FutureImpactEngine client={client} baseReadiness={baseReadiness} />
 
       {/* ── Section 4 — Risk Panel ── */}
       <Card data-testid="section-risks">

@@ -1,0 +1,76 @@
+{
+  "summary": "Iter 198 — Frontend-only validation of two flagship redesigns: (1) IntelligenceFeed (Mission Control) on /retirement-control-center and (2) Future Impact Engine on /client-360?id=thompson_family. ALL 12 acceptance items PASS. 0 console errors, 0 page errors, no webpack overlay. Old Section 3 Scenario Simulator (section-simulator / sim-retire-age) confirmed REMOVED. All Decision Hub sections (outcome, needle, risks, opportunities, decision-graph) + market-pulse-hud still render. RCC KPIs/priority-clients/client-list intact. One-click adviser actions wired correctly: Apply/Generate/Notify show toasts and append entries to localStorage.adviser_action_log; Simulate routes to /client-360?id=<clientId>&tab=decision.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "FutureImpactEngine baseline state", "issues": ["Baseline (no sliders moved, no shocks) shows delta-score +1 pts instead of 0 due to Monte Carlo noise (FIE uses numSims=150 vs. base computation defaults). Cosmetic only — does not affect direction-of-impact when sliders/shocks are applied. Optional: snap |delta|<2 to 0 for visual cleanliness."]}
+    ]
+  },
+  "detailed_results": {
+    "intelligence_feed": {
+      "renders": true,
+      "header_shows_now_count_total_impact_avg": true,
+      "stats_observed": {"now_count": 2, "total_impact": "$705K", "avg_impact": 42},
+      "chips_present": {"chip-all": true, "chip-opportunity": true, "chip-risk": true, "chip-time_sensitive": false, "chip-portfolio": true, "chip-engagement": false, "note": "time_sensitive and engagement correctly hidden when count=0 per design"},
+      "chip_filter_works": "chip-opportunity narrowed feed from 7→5 items",
+      "items_count": 7,
+      "items_capped_at_15": true,
+      "ranked_desc_by_impact_score": true,
+      "impact_scores_observed": [58, 57, 43, 42, 42, 32, 18],
+      "first_item_action_buttons": {"simulate": true, "apply": true, "generate": true, "notify": true},
+      "apply_action_logs_to_localstorage": true,
+      "adviser_action_log_entries_after_3_actions": 3,
+      "simulate_navigates_to_client_360": "https://retirement-readiness-2.preview.emergentagent.com/client-360?id=chen_family&tab=decision"
+    },
+    "future_impact_engine": {
+      "renders": true,
+      "delta_strip_present": true,
+      "tiles_present": {"delta-score": true, "delta-lifetime": true, "delta-probability": true, "delta-years": true, "delta-risk": true},
+      "sliders_present": {"fie-slider-age": true, "fie-slider-contrib": true, "fie-slider-spending": true, "fie-slider-return": true, "fie-slider-inflation": true},
+      "presets_present": {"fie-preset-baseline": true, "fie-preset-aggressive": true, "fie-preset-cautious": true, "fie-preset-parttime": true},
+      "confidence_bands_present": true,
+      "shock_market_crash": "Readiness 89→84 (-5 pts) within 2.5s; 'Shock mode active' warning shown",
+      "shock_inflation": "Readiness 89→85 (-4 pts)",
+      "shock_early_retire": "Readiness 89→82 (-7 pts)",
+      "slider_age_movement": "Live recompute confirmed (89→90)",
+      "preset_aggressive_recomputes": "89→87",
+      "wmm_reveal_works": true,
+      "wmm_top3_actions": ["Rebalance to target growth allocation +4 pts", "Reduce retirement spending by 10% +1 pts", "Delay retirement by 2 years +0 pts"]
+    },
+    "regression": {
+      "old_section-simulator_removed": true,
+      "old_sim-retire-age_removed": true,
+      "section-outcome": true,
+      "section-needle": true,
+      "section-risks": true,
+      "section-opportunities": true,
+      "decision-graph": true,
+      "market-pulse-hud": true,
+      "rcc_book-overview-kpis": true,
+      "rcc_priority-clients": true,
+      "rcc_client-list": true,
+      "console_errors_total": 0,
+      "page_errors_total": 0,
+      "webpack_dev_overlay": false
+    }
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "IntelligenceFeed.jsx — clean composition. groupFeedByCategory + CATEGORY_META driven UI; chip hides at count=0 (good UX). Action logger uses try/catch around localStorage and caps log to 200 entries (good). data-testid coverage is complete and predictable: feed-item-<id>, feed-action-<id>-<actionId>, chip-<category>.",
+    "FutureImpactEngine.jsx — uses computeReadinessCached (carry-over from iter 197 cache layer) which keeps slider-driven recomputes responsive. Good separation: scenarioClient memoized on (client, retireAge, contrib, spending, shocks); scenarioOpts memoized on (return, inflation, shocks). Confidence bands read scenario.outcome.confidenceBands.{p10,p50,p90} — clean.",
+    "Minor cosmetic: at exact baseline (no shocks, no slider movement), delta-score shows +1 pts on thompson_family due to MC noise (150 sims vs higher base sim count). Consider snapping |delta|<2 to ±0 in DeltaTile, or sharing the same numSims between base and scenario for the 'baseline=0' guarantee.",
+    "ClientDecisionHub.jsx — Section 3 successfully replaced by FutureImpactEngine; no orphan refs to section-simulator/sim-retire-age remain. Sections 1,2,4,5,6 + decision-graph + market-pulse-hud preserved.",
+    "MOCKED actions are correctly labelled in toast descriptions ('Execution adapter MOCKED', 'Resend MOCKED pending API key', 'will use LLM copilot when wired') — transparent to reviewer/user."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a (frontend-only request)", "frontend": "100% (12/12 acceptance items)"},
+  "test_credentials": "localStorage only — wealth_command_compliance_v5='permanent', app_mode='adviser'.",
+  "seed_data_creation": "Test added entries to localStorage.adviser_action_log (3 entries: apply, notify, generate on chen_family-need-lift_allocation). Cosmetic only.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iter 198 = pure frontend redesign verification. IntelligenceFeed (Mission Control) and FutureImpactEngine are working end-to-end with 0 console errors. Mocked one-click actions are wired as Apply/Generate/Notify (toast + adviser_action_log). Simulate is real-routes to client decision hub. Two valid clients: thompson_family, chen_family.",
+  "rca_of_the_issue": "n/a — no bugs found. Optional improvement: snap baseline delta noise <2 pts to 0 in DeltaTile or align numSims to remove cosmetic +1 baseline drift."
+}

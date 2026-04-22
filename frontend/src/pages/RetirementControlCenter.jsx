@@ -7,24 +7,17 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-  Target, TrendingUp, TrendingDown, AlertTriangle, Zap, Sparkles, ChevronRight,
-  Users, DollarSign, Activity, Gauge,
+  Target, TrendingDown, AlertTriangle, Sparkles, ChevronRight,
+  Users, Activity, Gauge,
 } from "lucide-react";
 import { buildBook, buildIntelligenceFeed, rankPriorityClients } from "@/engine/bookAggregator";
+import IntelligenceFeed from "@/components/intelligence/IntelligenceFeed";
 
 const fmt = (v) => {
   const abs = Math.abs(v || 0);
   if (abs >= 1_000_000) return `$${(v / 1_000_000).toFixed(2)}M`;
   if (abs >= 1_000) return `$${(v / 1_000).toFixed(0)}k`;
   return `$${Math.round(v || 0)}`;
-};
-
-const severityStyles = {
-  critical: "bg-rose-100 text-rose-700 border-rose-200",
-  high: "bg-orange-100 text-orange-700 border-orange-200",
-  medium: "bg-amber-100 text-amber-700 border-amber-200",
-  low: "bg-sky-100 text-sky-700 border-sky-200",
-  info: "bg-slate-100 text-slate-700 border-slate-200",
 };
 
 const KpiCard = ({ icon: Icon, label, value, sub, tone = "navy", testId }) => {
@@ -84,41 +77,8 @@ const RetirementControlCenter = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          {/* ── Intelligence Feed (middle, spans 2 cols) ── */}
-          <Card className="lg:col-span-2" data-testid="intelligence-feed">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Zap className="h-4 w-4 text-[#D4A84C]" /> Intelligence Feed
-              </CardTitle>
-              <CardDescription>Actionable insights surfaced across the book. Click to review affected clients.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {feed.map((f) => (
-                  <div
-                    key={f.id}
-                    className="p-3 rounded-lg border hover:border-[#1a2744]/40 cursor-pointer transition-colors"
-                    onClick={() => f.clients?.[0] && openClient(f.clients[0])}
-                    data-testid={`feed-item-${f.id}`}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <Badge variant="outline" className={`text-[9px] ${severityStyles[f.severity]}`}>{f.severity}</Badge>
-                          <Badge variant="outline" className="text-[9px]">{f.tag}</Badge>
-                          <span className="text-xs text-muted-foreground">· {f.clients?.length || 0} clients</span>
-                        </div>
-                        <p className="text-sm font-semibold text-[#1a2744]">{f.title}</p>
-                        <p className="text-xs text-muted-foreground mt-1">{f.message}</p>
-                      </div>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-1" />
-                    </div>
-                  </div>
-                ))}
-                {feed.length === 0 && <p className="text-xs text-center text-muted-foreground py-8">Nothing urgent. Your book is humming.</p>}
-              </div>
-            </CardContent>
-          </Card>
+          {/* ── Intelligence Feed — Mission Control ── */}
+          <IntelligenceFeed feed={feed} />
 
           {/* ── Priority Clients ── */}
           <Card data-testid="priority-clients">
