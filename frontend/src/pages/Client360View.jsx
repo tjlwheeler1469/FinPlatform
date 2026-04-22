@@ -14,6 +14,7 @@ import HouseholdBudget from "@/pages/HouseholdBudget";
 import UnifiedInvestments from "@/pages/UnifiedInvestments";
 import UnifiedTaxCentre from "@/pages/UnifiedTaxCentre";
 import SimpleGoals from "@/components/SimpleGoals";
+import AdviserGoals from "@/components/AdviserGoals";
 import { CLIENT_DATA } from "@/data/clientData";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -1084,7 +1085,7 @@ const Client360View = () => {
 
           {/* Goals Tab — Client's financial goals */}
           <TabsContent value="goals" className="space-y-6" data-testid="tab-content-goals">
-            <SimpleGoals embedded clientId={clientId} />
+            <AdviserGoals embedded clientId={clientId} />
           </TabsContent>
 
           {/* Investments Tab — full UnifiedInvestments page (same as /investments) */}

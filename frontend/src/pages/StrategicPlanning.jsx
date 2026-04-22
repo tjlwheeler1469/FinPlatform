@@ -14,6 +14,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import ChartContainer from "@/components/ChartContainer";
 import { ComplianceFooter, CalculatorDisclaimer } from "@/components/ComplianceDisclaimer";
 import FloatingActionRail from "@/components/platform/FloatingActionRail";
+import RecommendationsBanner from "@/components/RecommendationsBanner";
 import { 
   Calculator,
   DollarSign,
@@ -249,6 +250,48 @@ const StrategicPlanning = () => {
     
     return { salaryIncome, dividendIncome, rentalIncome, totalIncome, totalTax };
   }, [familyMembers, sharePortfolio, portfolio]);
+
+  // Strategic planning recommendations (pinned at top)
+  const strategicRecommendations = useMemo(() => {
+    const recs = [];
+    const debtRatio = currentNetWorth.totalAssets > 0 ? currentNetWorth.totalDebt / currentNetWorth.totalAssets : 0;
+    if (debtRatio > 0.5) {
+      recs.push({
+        severity: "high",
+        title: "High debt-to-asset ratio",
+        message: `Debt is ${(debtRatio * 100).toFixed(0)}% of assets — consider accelerated paydown to reduce rate-risk.`,
+        href: "/debt-paydown",
+        tag: "Risk",
+      });
+    }
+    const taxRate = currentIncome.totalIncome > 0 ? currentIncome.totalTax / currentIncome.totalIncome : 0;
+    if (taxRate > 0.28) {
+      recs.push({
+        severity: "medium",
+        title: "Effective tax rate above 28%",
+        message: "Review salary sacrifice, income splitting and tax-loss harvesting to reclaim marginal-rate headroom.",
+        href: "/tax-loss-harvesting",
+        tag: "Tax",
+      });
+    }
+    const currentAge = primaryMember?.age || 45;
+    if (currentAge < 60 && (currentNetWorth.superBalance || 0) < (currentIncome.salaryIncome || 0) * 3) {
+      recs.push({
+        severity: "medium",
+        title: "Super balance below target",
+        message: "Super is under 3× annual salary — additional concessional contributions could compound meaningfully before 60.",
+        tag: "Retirement",
+      });
+    }
+    recs.push({
+      severity: "low",
+      title: "Run a Monte Carlo on base case",
+      message: "Stress-test today's plan against 1,000 market scenarios to quantify sequence-of-returns risk.",
+      href: "/monte-carlo",
+      tag: "Modelling",
+    });
+    return recs;
+  }, [currentNetWorth, currentIncome, primaryMember]);
 
   // Generate projection for a scenario
   const generateProjection = (scenario) => {
@@ -515,6 +558,14 @@ const StrategicPlanning = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Strategic recommendations — pinned at top */}
+        <RecommendationsBanner
+          title="Strategic Recommendations"
+          description="Top-priority moves surfaced from the current household position"
+          items={strategicRecommendations}
+          testId="strategic-recommendations"
+        />
 
         {/* Main Tabs */}
         <Tabs value={mainTab} onValueChange={setMainTab}>

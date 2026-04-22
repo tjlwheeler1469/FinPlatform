@@ -8,7 +8,7 @@ import FloatingActionRail from "@/components/platform/FloatingActionRail";
 const PersonalDashboard = lazy(() => import("@/pages/PersonalDashboard"));
 const UnifiedInvestments = lazy(() => import("@/pages/UnifiedInvestments"));
 const RetirementHub = lazy(() => import("@/pages/RetirementHub"));
-const SimpleGoals = lazy(() => import("@/components/SimpleGoals"));
+const AdviserGoals = lazy(() => import("@/components/AdviserGoals"));
 const HouseholdBudget = lazy(() => import("@/pages/HouseholdBudget"));
 const UnifiedTaxCentre = lazy(() => import("@/pages/UnifiedTaxCentre"));
 const AdviserClientDashboard = lazy(() => import("@/components/AdviserClientDashboard"));
@@ -100,7 +100,7 @@ const UnifiedClientOverview = () => {
             <TabsContent value="goals" className="mt-0">
               <ErrorBoundary label="Goals">
                 <Suspense fallback={<TabLoader />}>
-                  <SimpleGoals clientId={getClientId()} embedded />
+                  <AdviserGoals clientId={getClientId()} embedded />
                 </Suspense>
               </ErrorBoundary>
             </TabsContent>

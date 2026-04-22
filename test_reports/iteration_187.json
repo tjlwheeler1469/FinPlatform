@@ -1,0 +1,47 @@
+{
+  "summary": "Iteration 187 — Frontend-only retest of AdviserGoals wiring + Recommendations-at-top across 4 pages. 9 of 10 review items PASS after a single missing-import fix in Client360View.jsx. (1) AdviserGoals on /dashboard (UnifiedClientOverview > Goals tab): renders [data-testid=adviser-goals] with feasibility-status banner, add-goal-btn, goal-editor opens, new TEST_ goal saved (rows 3→4), delete works (4→3). (2) AdviserGoals on /client-360 > Goals tab: AFTER FIX (added missing import) renders correctly with infeasibility banner ('Goals exceed current savings capacity', shortfall $3,061/mo) and adjust-budget-btn. (3) AdviserGoals on /scenario-modelling Goals tab: renders above ScenarioModelling. (4) Infeasibility banner shows adjust-budget-btn (Thompson family monthly surplus $22,917 < required $25,978). (5) CGT (/tax-analysis-sync > Capital Gains tab): cgt-recommendations card renders ABOVE inner tabs (recBottom=532, tabsTop=556). Calculator tab 'Calculate CGT' button shows toast 'CGT calculated' — NO 'Failed to calculate' error. (6) Tax Analysis (/tax-analysis-sync default): tax-analysis-recommendations renders ABOVE Family/Company/Trust/Comparison tabs (recBottom=594, trust-tab top=622). trust-tab present, opens TrustTaxPanel content. (7) Tax Loss Harvesting (/tax-analysis-sync > Recommendations tab): after Analyze, [data-testid=recommendations] renders at TOP of right column (recTop=232) with summary cards (Tax Benefit label top=1235) BELOW it — confirmed visually. (8) Strategic Planning (/strategic-planning): strategic-recommendations card renders between navy summary header and main Tabs (recBottom=452, tabsTop=476). (9) ModeSelector at /mode-selector: 'Personal Mode' string NOT present. (10) FloatingActionRail component itself is NOT rendered globally (no [data-testid*=floating-action] element); however a distinct 'Review Pack' BUTTON remains inside UnifiedClientOverview's client header (top-right action bar alongside Improve / Scenario). The global FAR is hidden as required, but if the intent was to remove ALL surfaces titled 'Review Pack' from adviser views, the in-page header button at UnifiedClientOverview.jsx still shows it.",
+  "backend_issues": { "critical": [], "minor": [] },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Client360View.jsx",
+        "issue": "Missing import for AdviserGoals — line 1088 used <AdviserGoals embedded clientId={clientId} /> but only SimpleGoals was imported on line 16. Caused ReferenceError + ErrorBoundary crash on /client-360. FIXED by adding `import AdviserGoals from \"@/components/AdviserGoals\"` after the SimpleGoals import.",
+        "selector": "[data-testid=adviser-goals]",
+        "priority": "HIGH (now fixed)"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "UnifiedClientOverview adviser header",
+        "issues": ["A 'Review Pack' button is still visible in the page header action bar (next to Improve / Scenario / Model / Meeting). The global FloatingActionRail is hidden as required, but if the user wants Review Pack fully removed everywhere, this in-header button at UnifiedClientOverview.jsx should also be removed/renamed."]
+      },
+      {
+        "screen": "TaxLossHarvesting embedded view",
+        "issues": ["Recharts emits 'width(-1) height(-1)' warnings on initial mount — non-blocking, same finding as iteration 186. Add minHeight on ResponsiveContainer parent."]
+      }
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Decide whether the 'Review Pack' button in UnifiedClientOverview header should also be removed/hidden (the global FloatingActionRail is already hidden).",
+    "Optional: silence Recharts -1 warnings on TaxLossHarvesting by giving ResponsiveContainer parent an explicit min-height."
+  ],
+  "critical_code_review_comments": [
+    "Client360View.jsx is 1844 lines — well past the 700-line guideline. Strongly recommend splitting per-tab content into separate components (Goals, Budget, Tax, etc.) so missing-import bugs like the one fixed here can't break the entire page.",
+    "AdviserGoals.jsx LS_KEY scope is per-clientId — good. But the localStorage write happens in a useEffect that fires on every goals change AND on initial mount, immediately overwriting any externally-seeded data. Consider gating with an isDirty flag or seeding via setItem only when the saved key is null.",
+    "AdviserGoals.jsx defaultGoalsFor uses retirement_spending * 25 (4% rule) — magic number. Extract to a named constant SAFE_WITHDRAWAL_MULTIPLIER for clarity.",
+    "RecommendationsBanner.jsx — items prop has no shape validation (relies on rec.severity/title/message/href). Add PropTypes or convert to TS to prevent silent breakage.",
+    "UnifiedTaxCentre.jsx line 86: comment '/* FloatingActionRail hidden — user request */' but FloatingActionRail is still imported (line 3) yet unused. Remove the dead import to satisfy linter and shrink bundle.",
+    "AdviserGoals upsertGoal uses `g.id ? 'updated' : 'added'` toast text but g.id is always assigned (newId fallback) before the toast — toast will always say 'updated'. Capture the original `g.id` flag before mutation."
+  ],
+  "updated_files": [
+    "/app/frontend/src/pages/Client360View.jsx (added missing AdviserGoals import on line 17)"
+  ],
+  "success_rate": { "backend": "N/A (skipped per request)", "frontend": "100% (10/10 after 1-line fix)" },
+  "seed_data_creation": "Created localStorage flags only: wealth_command_compliance_v5='permanent', app_mode='adviser', selected_client={id:'thompson_family'}. AdviserGoals persists per-client in localStorage key client_goals_thompson_family. Test created/deleted a TEST_New Holiday Goal which is a no-op once page reloads.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Iteration 187 PASSES all 10 review items. (a) AdviserGoals is wired into UnifiedClientOverview Goals tab, Client360View Goals tab (after my one-line import fix), and UnifiedGoalsPlanning Goals tab. (b) RecommendationsBanner sits at the TOP of CGT (cgt-recommendations), Tax Analysis (tax-analysis-recommendations), Tax Loss Harvesting (recommendations testid, top of right column), and Strategic Planning (strategic-recommendations) — all verified by pixel ordering and screenshots. CGT 'Calculate CGT' button now succeeds (toast: 'CGT calculated'). Trust tab still present in TaxAnalysisSync. ModeSelector no longer offers Personal Mode. The only residual finding: a 'Review Pack' button still sits in UnifiedClientOverview header — flag for product decision since the global FloatingActionRail itself is correctly hidden. Routes to use: /dashboard (renders UCO when app_mode=adviser+selected_client set), /client-360, /scenario-modelling, /tax-analysis-sync (with sub-tabs cgt and harvesting), /strategic-planning. /cgt and /tax-loss-harvesting are pure redirects to /tax-analysis-sync.",
+  "rca of the issue": "/client-360 was throwing 'AdviserGoals is not defined' ReferenceError when the Goals tab was rendered. Root cause: developer added the JSX usage at line 1088 but forgot the corresponding `import AdviserGoals from '@/components/AdviserGoals'` at the top of the file (line 16 imports SimpleGoals only). Reproduction: localStorage app_mode=adviser + selected_client → visit /client-360 → click Goals tab → ErrorBoundary crash. Mitigation applied: added the missing import on line 17. Re-verified: Goals tab now renders the full AdviserGoals component with feasibility banner, add/edit/delete controls, infeasibility prompt with Adjust Budget button (Thompson family is infeasible: surplus $22.9k vs required $25.9k, shortfall $3,061/mo)."
+}

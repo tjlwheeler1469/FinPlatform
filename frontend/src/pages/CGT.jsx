@@ -48,6 +48,7 @@ import {
 } from "recharts";
 import axios from "axios";
 import { toast } from "sonner";
+import RecommendationsBanner from "@/components/RecommendationsBanner";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -200,13 +201,46 @@ const CGT = ({ embedded = false }) => {
   const totalLosses = processedEvents.filter(e => !e.is_gain).reduce((sum, e) => sum + Math.abs(e.gross_gain), 0);
   const netPosition = totalGains - totalLosses;
 
-  // Multi-year summary data
+  // Multi-year summary data (needed before recommendations)
   const yearSummary = FINANCIAL_YEARS.filter(y => y.value !== "all").map(fy => {
     const yearEvents = cgtEvents.filter(e => getFinancialYear(e.sale_date) === fy.value).map(calculateEventCGT);
     const gains = yearEvents.filter(e => e.is_gain).reduce((sum, e) => sum + e.discounted_gain, 0);
     const losses = yearEvents.filter(e => !e.is_gain).reduce((sum, e) => sum + Math.abs(e.gross_gain), 0);
     return { year: fy.label.replace("FY ", ""), gains, losses, net: gains - losses, events: yearEvents.length };
   });
+
+  // Strategic recommendations (surfaced at top)
+  const recommendations = (() => {
+    const recs = [];
+    if (netPosition > 0) {
+      recs.push({
+        severity: "high",
+        title: "Offset gains with Tax Loss Harvesting",
+        message: `Net taxable position of ${formatCurrency(netPosition)} — harvesting unrealised losses could reduce your CGT bill this FY.`,
+        href: "/tax-loss-harvesting",
+        tag: "Strategy",
+      });
+    }
+    const shortTerm = processedEvents.filter((e) => e.is_gain && !e.is_discount_eligible);
+    if (shortTerm.length > 0) {
+      recs.push({
+        severity: "medium",
+        title: "Hold >12 months for 50% CGT discount",
+        message: `${shortTerm.length} recent gain(s) missed the 12-month threshold — reviewing holding periods before disposal can halve the tax.`,
+        tag: "Discount",
+      });
+    }
+    const carryForward = yearSummary.reduce((sum, y) => sum - y.net, 0);
+    if (carryForward > 0) {
+      recs.push({
+        severity: "low",
+        title: "Carry-forward losses available",
+        message: `${formatCurrency(carryForward)} in prior-year losses can offset future gains — log them against current-year events first.`,
+        tag: "Planning",
+      });
+    }
+    return recs;
+  })();
 
   // Add parcel
   const handleAddParcel = () => {
@@ -365,6 +399,14 @@ const CGT = ({ embedded = false }) => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Strategic recommendations — pinned at top */}
+        <RecommendationsBanner
+          title="Tax Planning Recommendations"
+          description="Actions to minimise this year's CGT exposure"
+          items={recommendations}
+          testId="cgt-recommendations"
+        />
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full max-w-lg grid-cols-4">

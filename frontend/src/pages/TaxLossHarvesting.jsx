@@ -357,6 +357,27 @@ const TaxLossHarvesting = ({ embedded = false }) => {
           <div className="lg:col-span-2 space-y-6">
             {result ? (
               <>
+                {/* Recommendations (moved to top for immediate visibility) */}
+                <Card data-testid="recommendations" className="border-[#D4A84C]/50 bg-[#D4A84C]/5">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Lightbulb className="h-5 w-5 text-[#D4A84C]" />
+                      Recommendations
+                    </CardTitle>
+                    <CardDescription>Top-of-page actions — review before executing harvest trades</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {(result.recommendations || []).map((rec, index) => (
+                        <div key={`rec-top-${index}`} className="flex items-start gap-3 p-3 rounded-lg bg-white">
+                          <CheckCircle className="h-5 w-5 text-[#10B981] flex-shrink-0 mt-0.5" />
+                          <p className="text-sm">{typeof rec === 'string' ? rec : rec.message}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
                 {/* Summary Cards */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <Card className="bg-[#1a2744] text-white">
@@ -523,26 +544,6 @@ const TaxLossHarvesting = ({ embedded = false }) => {
                           tax purposes. Wait at least 30 days before repurchasing.
                         </p>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Recommendations */}
-                <Card data-testid="recommendations">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Lightbulb className="h-5 w-5 text-[#D4A84C]" />
-                      Recommendations
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      {(result.recommendations || []).map((rec, index) => (
-                        <div key={`item-${index}`} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                          <CheckCircle className="h-5 w-5 text-[#10B981] flex-shrink-0 mt-0.5" />
-                          <p className="text-sm">{typeof rec === 'string' ? rec : rec.message}</p>
-                        </div>
-                      ))}
                     </div>
                   </CardContent>
                 </Card>

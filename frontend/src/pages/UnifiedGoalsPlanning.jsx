@@ -6,6 +6,7 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 
 const ScenarioModelling = lazy(() => import("@/pages/ScenarioModelling"));
 const MonteCarloSimulation = lazy(() => import("@/pages/MonteCarloSimulation"));
+const AdviserGoals = lazy(() => import("@/components/AdviserGoals"));
 
 const TabLoader = () => (
   <div className="flex items-center justify-center py-20">
@@ -30,7 +31,8 @@ const UnifiedGoalsPlanning = () => {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="goals" className="mt-0">
+            <TabsContent value="goals" className="mt-0 space-y-6">
+              <ErrorBoundary label="Household Goals"><Suspense fallback={<TabLoader />}><AdviserGoals embedded /></Suspense></ErrorBoundary>
               <ErrorBoundary label="Goals & Scenarios"><Suspense fallback={<TabLoader />}><ScenarioModelling embedded /></Suspense></ErrorBoundary>
             </TabsContent>
             <TabsContent value="monte-carlo" className="mt-0">

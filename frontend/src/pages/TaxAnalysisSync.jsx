@@ -29,6 +29,7 @@ import {
   Landmark
 } from "lucide-react";
 import TrustTaxPanel from "@/components/tax/TrustTaxPanel";
+import RecommendationsBanner from "@/components/RecommendationsBanner";
 import { usePortfolio } from "@/App";
 import { toast } from "sonner";
 import {
@@ -212,6 +213,38 @@ const TaxAnalysisSync = ({ embedded = false }) => {
       color: COLORS[i % COLORS.length]
     }));
 
+  // Strategic tax recommendations
+  const taxRecommendations = useMemo(() => {
+    const recs = [];
+    const highEarners = familyTaxData.filter((m) => (m.taxableIncome || 0) >= 135000);
+    const lowEarners = familyTaxData.filter((m) => (m.taxableIncome || 0) > 0 && (m.taxableIncome || 0) < 45000);
+    if (highEarners.length > 0 && lowEarners.length > 0) {
+      recs.push({
+        severity: "high",
+        title: "Consider income splitting across the family",
+        message: `${highEarners.length} member(s) at 37%+ marginal rate while ${lowEarners.length} sit below $45k. Redirecting investment income can materially cut the family tax bill.`,
+        href: "/income-splitting",
+        tag: "Strategy",
+      });
+    }
+    if (highEarners.length > 0) {
+      recs.push({
+        severity: "medium",
+        title: "Trust distributions may outperform personal income",
+        message: "High-income earners can stream distributions to lower-taxed beneficiaries through a family trust — review in the Trust tab.",
+        tag: "Planning",
+      });
+    }
+    recs.push({
+      severity: "low",
+      title: "Tax Loss Harvesting before 30 June",
+      message: "Offset capital gains realised this FY by selectively crystallising unrealised losses before year-end.",
+      href: "/tax-loss-harvesting",
+      tag: "Year-end",
+    });
+    return recs;
+  }, [familyTaxData]);
+
   // Handle adding new family member
   const handleAddMember = () => {
     if (!newMemberName.trim()) {
@@ -305,6 +338,14 @@ const TaxAnalysisSync = ({ embedded = false }) => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Strategic recommendations — pinned at top */}
+        <RecommendationsBanner
+          title="Tax Planning Recommendations"
+          description="Priority moves to minimise family + entity tax"
+          items={taxRecommendations}
+          testId="tax-analysis-recommendations"
+        />
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full max-w-2xl grid-cols-4">
