@@ -1,39 +1,14 @@
 {
   "root": true,
-  "parserOptions": {
-    "ecmaVersion": 2022,
-    "sourceType": "module",
-    "ecmaFeatures": { "jsx": true }
-  },
-  "env": {
-    "browser": true,
-    "node": true,
-    "es2022": true,
-    "jest": true
-  },
-  "globals": {
-    "process": "readonly",
-    "__dirname": "readonly"
-  },
-  "extends": [
-    "eslint:recommended",
-    "plugin:react/recommended",
-    "plugin:react-hooks/recommended"
-  ],
-  "plugins": ["react", "react-hooks"],
-  "settings": {
-    "react": { "version": "detect" }
-  },
+  "extends": ["react-app"],
+  "env": { "browser": true, "node": true, "jest": true, "es2022": true },
+  "globals": { "process": "readonly", "__dirname": "readonly" },
   "rules": {
     "no-undef": "error",
     "no-unused-vars": "off",
     "react/prop-types": "off",
-    "react/react-in-jsx-scope": "off",
-    "react/display-name": "off",
     "react/no-unescaped-entities": "off",
-    "react-hooks/exhaustive-deps": "off",
-    "react/jsx-key": "warn",
-    "react/no-unknown-property": "off"
+    "react-hooks/exhaustive-deps": "off"
   },
   "ignorePatterns": ["build/", "node_modules/", "public/"]
 }

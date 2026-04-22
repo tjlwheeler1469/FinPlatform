@@ -34,6 +34,7 @@ export const adviserBaseNav = [
     name: "Today",
     icon: LayoutDashboard,
     items: [
+      { path: "/retirement-control-center", label: "Control Center", icon: Gauge, title: "Retirement-first adviser dashboard", badge: "NEW" },
       { path: "/advisor-command-center", label: "Dashboard", icon: LayoutDashboard, title: "Firm overview, priorities & daily briefing — all in one" },
     ]
   },
@@ -81,7 +82,8 @@ export const clientPortalNav = [
     name: "Dashboard",
     icon: LayoutDashboard,
     items: [
-      { path: "/client-portal", label: "My Dashboard", icon: Eye, title: "Client Dashboard", badge: "HOME" },
+      { path: "/client-home", label: "Home", icon: Gauge, title: "Your retirement readiness at a glance", badge: "NEW" },
+      { path: "/client-portal", label: "Full Dashboard", icon: Eye, title: "Snapshot, Retirement, Investments, Budget, Goals, Tax" },
     ]
   },
   {

@@ -1,0 +1,92 @@
+{
+  "summary": "Iter 196 — Frontend-only validation of Phase 2 Retirement Decision OS (Retirement Control Center, ClientDecisionHub, ClientHome). 10 of 11 acceptance items PASS. The only failure is Intelligence Feed showing 1 item instead of 'at least 2' — likely because there are only 2 clients in the book so most cross-book signals collapse to a single market-impact card. Everything else (KPIs, priority clients, client list with row navigation, Decision Hub default tab + dial + 5 factors + 5 sections, live simulator scoring, what-moves-the-needle 3 actions, Opportunity Engine cards, ClientHome live what-if, and 3 regression routes) renders cleanly with no ErrorBoundary.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {"flow": "Intelligence Feed (RetirementControlCenter)", "issue": "Only 1 feed item rendered (acceptance asks for >=2). With only thompson_family + chen_family in the book, the buildIntelligenceFeed aggregation collapses to a single 'Market' severity-medium card. Either seed more book-wide signals (e.g. always emit a low/info 'opportunity-summary' card and a 'compliance/review-due' card) or relax the criterion. Non-blocking — feed renders, item is well-formed with severity badge.", "affected_selectors": ["[data-testid=intelligence-feed]", "[data-testid^=feed-item-]"]}
+    ],
+    "design_issues": []
+  },
+  "detailed_results": {
+    "1_retirement_control_center_renders": {"pass": true, "no_error_boundary": true, "testid_present": true},
+    "2_book_overview_kpis": {
+      "pass": true,
+      "kpi-on-track": "100% (2/2 clients >= 75)",
+      "kpi-at-risk": "0% (0 clients below 60)",
+      "kpi-shortfall": "$0",
+      "kpi-avg-score": "93",
+      "kpi-opportunity": "$0"
+    },
+    "3_intelligence_feed": {"pass": false, "expected": ">=2 items", "actual": 1, "first_item_severity": "medium", "first_item_tag": "Market"},
+    "4_priority_clients": {"pass": true, "priority-thompson_family": true, "priority-chen_family": true},
+    "5_client_list_and_navigation": {
+      "pass": true,
+      "client-list_present": true,
+      "client-row-thompson_family": true,
+      "client-row-chen_family": true,
+      "click_navigates_to": "/client-360?id=thompson_family"
+    },
+    "6_client360_decision_hub_default": {
+      "pass": true,
+      "tab-decision_state": "active",
+      "client-decision-hub": true,
+      "hub-score-dial": true,
+      "factors_all_5_present": true,
+      "sections_all_5_present": true
+    },
+    "7_scenario_simulator_live": {
+      "pass": true,
+      "before": "90 STRONG",
+      "after_drag_age_down_and_spending_up": "54 AT RISK",
+      "sim-delta": "-36 pts vs baseline (90)",
+      "score_changed_live": true
+    },
+    "8_what_moves_the_needle": {
+      "pass": true,
+      "needle-action-0": "Rebalance to target growth allocation (+4)",
+      "needle-action-1": "Reduce retirement spending by 10% (+1)",
+      "needle-action-2": "Delay retirement by 2 years (+0)"
+    },
+    "9_opportunity_engine": {"pass": true, "opp_count": 1, "alert_count": 1},
+    "10_client_home_live_whatif": {
+      "pass": true,
+      "client-home": true,
+      "home-score-dial": true,
+      "home-future-income": true,
+      "home-gap": true,
+      "home-next-action": true,
+      "home-whatif": true,
+      "home-slider-age": true,
+      "home-scenario-dial": true,
+      "before_slider_change": "89 ON TRACK",
+      "after_slider_change": "83 ON TRACK",
+      "live_recalc_works": true
+    },
+    "11_regression_routes": {
+      "/advisor-command-center": {"renders": true, "no_error_boundary": true},
+      "/dashboard": {"renders": true, "no_error_boundary": true},
+      "/client-portal": {"renders": true, "no_error_boundary": true}
+    }
+  },
+  "test_report_links": [],
+  "action_items": [
+    "MINOR: Make Intelligence Feed always emit at least 2 cards even on a small book (e.g. a 'Top opportunity across the book' card + the existing market card), so the feed feels alive when only 1-2 clients are loaded — needed to satisfy the 'at least 2 feed items' acceptance criterion."
+  ],
+  "critical_code_review_comments": [
+    "RetirementControlCenter.jsx is clean (~210 lines), pure-derived state via useMemo, no API calls — good.",
+    "ClientDecisionHub.jsx Scenario Simulator correctly recomputes via computeReadiness with reduced numSims (150) per slider change — verified live (90 -> 54 when retire age dropped + spending raised). Performance felt acceptable.",
+    "ClientHome.jsx baseline computeReadiness uses numSims:200 and scenario uses 150 — sensible tradeoff. Live recalc on age slider verified (89 -> 83).",
+    "buildIntelligenceFeed emits only 1 card with a 2-client book; consider 1-2 'always-on' info cards (book-wide opportunity summary, NPS/satisfaction, review-due) so the feed never looks underfilled.",
+    "All required data-testids are present and stable — no flakiness during the test run.",
+    "No console errors (only standard non-blocking warnings); no ErrorBoundary triggered on any tested route."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (frontend-only)", "frontend": "10/11 acceptance items (91%)"},
+  "test_credentials": "localStorage only — wealth_command_compliance_v5='permanent', app_mode='adviser'|'client', selected_client={id:'client_1'}.",
+  "seed_data_creation": "None. All compute is client-side off CLIENT_DATA fixture (thompson_family + chen_family).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Phase 2 retirement OS shipped successfully. Only outstanding item is the intelligence feed showing 1 card (vs >=2 spec). Likely a tiny tweak in /app/frontend/src/engine/bookAggregator.js to emit 1-2 always-on info cards. Score-changed verification in the simulator requires moving the retire-age slider DOWN (early retirement) or spending UP, because the test client (thompson_family) baseline is already 90/STRONG and capped at the upper bound when you push toward 'better' inputs.",
+  "rca_of_the_issue": "Intelligence Feed underfilled: with only 2 high-scoring clients in CLIENT_DATA, the deterministic rules in bookAggregator.buildIntelligenceFeed only trigger the 'market movement' card. Mitigation: emit one info-tier 'book-summary' card and/or 'review-due' card unconditionally so the feed always has >=2 entries."
+}

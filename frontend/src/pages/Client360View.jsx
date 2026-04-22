@@ -17,6 +17,7 @@ import UnifiedInvestments from "@/pages/UnifiedInvestments";
 import UnifiedTaxCentre from "@/pages/UnifiedTaxCentre";
 import AdviserGoals from "@/components/AdviserGoals";
 import MeetingMode from "@/components/MeetingMode";
+import ClientDecisionHub from "@/components/readiness/ClientDecisionHub";
 import PortfolioRebalancing from "@/pages/PortfolioRebalancing";
 
 import ClientHeader from "./client360/ClientHeader";
@@ -27,6 +28,7 @@ import ContactAdvisorSection from "./client360/ContactAdvisorSection";
 import { formatCurrency, formatDate, getTransactionColor, getCommIcon, getClientData } from "./client360/utils";
 
 const TAB_DEFS = [
+  { value: "decision", label: "Decision Hub" },
   { value: "overview", label: "Overview" },
   { value: "retirement", label: "Retirement" },
   { value: "budget", label: "Budget" },
@@ -47,7 +49,7 @@ const TAB_DEFS = [
 const Client360View = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("decision");
   const [meetingMode, setMeetingMode] = useState(false);
 
   const storedClient = localStorage.getItem("selected_client");
@@ -81,6 +83,10 @@ const Client360View = () => {
               </TabsTrigger>
             ))}
           </TabsList>
+
+          <TabsContent value="decision" className="space-y-6" data-testid="tab-content-decision">
+            <ClientDecisionHub client={client._canonical || client} />
+          </TabsContent>
 
           <TabsContent value="overview" className="space-y-6"><OverviewTab client={client} /></TabsContent>
 
