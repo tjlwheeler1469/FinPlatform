@@ -1,0 +1,69 @@
+{
+  "summary": "Calculation stress test across all Adviser-mode calculators. 86/86 pure JS engine assertions pass + 29/29 retirementEngine regression. UI smoke-tested 7 calculator routes — no NaN/Infinity/undefined leakage. Loan calc backend output matches manual amortisation formula exactly ($3,160.34/mo, $637,722 total interest for $500k @ 6.5% 30y). The two duplicated TAX_BRACKETS/calculateTax implementations (StrategicPlanning.jsx + TrustDistributionAnalysis.jsx) produce identical tax to within $1 across 12 income points — drift is a single-cent rounding artefact only, not a HIGH bug.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Recharts containers on /cgt /sg-calculator /scenario-modelling /retirement-workshop /smsf-optimizer", "issues": ["Console warnings: 'The width(-1) and height(-1) of chart should be greater than 0' — ResponsiveContainer parent has 0 height during initial mount. Cosmetic, charts render once layout settles, but should add minHeight to avoid recharts warnings."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/frontend/src/lib/calculations.test.mjs",
+    "/app/frontend/src/lib/retirementEngine.test.mjs",
+    "/app/frontend/test-loader.mjs"
+  ],
+  "action_items": [
+    "OPTIONAL refactor: extract the duplicated TAX_BRACKETS + calculateTax (StrategicPlanning.jsx L109/117 and TrustDistributionAnalysis.jsx L52/63) into /app/frontend/src/lib/auTax.js. Both already produce identical tax (max $1 rounding diff) but DRY violation is a maintenance risk if FY26-27 brackets change.",
+    "OPTIONAL: align CGT_DISCOUNT.smsf in RetirementPlanner.jsx (0.333) with CGT.jsx (1/3 ≈ 0.3333). Drift = $0.0033 per dollar of gain, immaterial but flagged for code-quality.",
+    "OPTIONAL: add minHeight to ResponsiveContainer wrappers on calculator pages to silence recharts width(-1)/height(-1) warnings on initial mount.",
+    "Note: RetirementReadinessEngine.computeReadiness() is non-deterministic (uses Math.random in projectRetirement). Observed noise is 2-5 score points across 5 runs with 300 sims — within reasonable tolerance, but if exact reproducibility is required, plumb a seedable RNG (e.g. seedrandom) into projectRetirement."
+  ],
+  "critical_code_review_comments": [
+    "TAX_BRACKETS duplicated verbatim in two pages — DRY violation. Currently identical (FY24-25 Stage-3) so no functional drift, but extract into shared module before next FY change.",
+    "CGT entity-type vocabulary inconsistent: RetirementPlanner uses {personal, joint, trust, company, smsf}; CGT.jsx uses {individual, trust, super, smsf, company}. Standardise to a single enum to prevent future bugs.",
+    "computeReadiness uses Monte Carlo via Math.random — same input → ±2-5 point variation between runs. Acceptable for UX, but seedable RNG would make outputs reproducible and testable.",
+    "SuperannuationGuarantee.jsx uses SG_RATE = 12% — correct for FY25-26 (current as of Jan 2026, since FY25-26 runs 1 Jul 2025 – 30 Jun 2026). The brief mentioned 11.5% (FY24-25) but the code is correctly forward-rolled.",
+    "/app/frontend/src/pages/RetirementPlanner.jsx is 1818 lines — exceeds 700-line guideline. Split into RetirementPlanner + sub-components."
+  ],
+  "updated_files": [
+    "/app/frontend/src/lib/calculations.test.mjs (NEW, 86 assertions)",
+    "/app/frontend/test-loader.mjs (NEW, resolves @/ alias for node test runner)"
+  ],
+  "success_rate": {
+    "backend": "n/a (frontend-only stress test)",
+    "frontend": "100% (29/29 retirement + 86/86 calculation assertions + 7/7 calculator pages render clean, 0 NaN/Infinity)"
+  },
+  "test_credentials": "no auth required; localStorage seeded: wealth_command_compliance_v5='permanent', app_mode='adviser', selected_client=thompson_family",
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "To re-run all calculation tests: `cd /app/frontend && node --experimental-loader ./test-loader.mjs src/lib/calculations.test.mjs` (covers tax bracket duplication, CGT, loan amortisation, SG/SMSF caps, Monte Carlo invariants, readiness engine factors/classify/whatMovesTheNeedle/riskPanel, rules engine R3, scenario ordering). The retirementEngine.test.mjs is the existing 29-test regression — keep both green. The custom test-loader.mjs maps @/ → src/ so node can resolve Vite aliases. UI smoke confirmed loan, cgt, sg-calculator, retirement-confidence, scenario-modelling, retirement-workshop, smsf-optimizer all render without NaN/Infinity. No critical bugs found in this iteration.",
+  "calculator_matrix": {
+    "tax_brackets_dup": "PASS — SP and TD return identical tax within $1 across [0,18200,45000,100000,135000,190000,250000,500000]",
+    "ato_2024_25_stage3": "PASS — $45k=$5,188 / $100k=$22,788 / $135k=$33,988 / $190k=$55,438 / $250k=$83,638",
+    "cgt_individual_24mo": "PASS — $100k gain × 50% disc × 37% = $18,500",
+    "cgt_smsf_24mo": "PASS — $100k gain × 1/3 disc × 15% ≈ $10,000",
+    "cgt_company_24mo": "PASS — $100k gain × 0% disc × 30% = $30,000",
+    "cgt_11mo_no_discount": "PASS",
+    "cgt_loss_preserved": "PASS",
+    "loan_500k_6.5_30y": "PASS — calc=$3,160.34/mo formula; UI backend returned $3,160 + $637,722 interest",
+    "loan_0pct_edge": "PASS",
+    "sg_fy25_26_12pct": "PASS — $0→$0, $100k→$12k, $500k→capped at $30k",
+    "smsf_caps": "PASS — concessional=$30k, non-conc=$120k, Div293=$250k, benefit @37% = 22%",
+    "scenario_ordering_delay_higher": "PASS — retire-now $800k → +5y $1.09M → +10y $1.48M; success% 0% → 9% → 36%",
+    "monte_carlo_invariants": "PASS — no NaN, P10≤P50≤P90 every year, success% ∈ [0,100]",
+    "budget_freq_conversion": "PASS — monthly/fortnightly/weekly scaling correct",
+    "goal_progress_capped": "PASS — over-funded clamped at 100%",
+    "readiness_classify_buckets": "PASS — 0/59→AtRisk, 60/74→Watchlist, 75/89→OnTrack, 90/100→Strong",
+    "readiness_determinism": "PASS within ±5 points (Monte Carlo noise — non-seeded RNG)",
+    "readiness_factors_count": "PASS — 5 factors with correct weights (30/25/20/15/10)",
+    "what_moves_needle": "PASS — 3 actions sorted by uplift desc",
+    "risk_panel": "PASS — 4 risk items, valid severities",
+    "rules_R3_concessional_gap": "PASS — fires when contrib < cap-5k",
+    "ui_smoke_no_NaN": "PASS — /loan-calculator, /cgt, /sg-calculator, /retirement-confidence, /scenario-modelling, /retirement-workshop, /smsf-optimizer all render with no NaN/Infinity/undefined"
+  }
+}
