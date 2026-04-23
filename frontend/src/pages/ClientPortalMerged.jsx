@@ -846,9 +846,9 @@ const ClientPortalMerged = () => {
               sessionStorage.removeItem("client_session");
             }
           }
-        } catch (error) {
+        } catch {
           // Network error, use stored data for demo
-          const data = JSON.parse(storedData);
+          const data = JSON.parse(storedSession);
           if (data.token === "demo_token") {
             setClientAuth(data);
           }
