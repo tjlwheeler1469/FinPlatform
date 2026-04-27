@@ -46,6 +46,28 @@
         -->
         <title>Wealth Command | Financial Advisor OS</title>
         <script>window.addEventListener("error",function(e){if(e.error instanceof DOMException&&e.error.name==="DataCloneError"&&e.message&&e.message.includes("PerformanceServerTiming")){e.stopImmediatePropagation();e.preventDefault()}},true);</script>
+        <script>
+        // Silence browser-extension runtime errors from surfacing in the React/webpack dev overlay.
+        // Extensions like Ant Video Downloader / Grammarly / translation add-ons occasionally throw
+        // `TypeError: Response body is already used` when they intercept fetch responses. These errors
+        // originate in chrome-extension:// code, never in our bundle, and cannot be fixed here.
+        (function(){
+          var fromExtension = function(src){ return typeof src === "string" && (src.indexOf("chrome-extension://") === 0 || src.indexOf("moz-extension://") === 0 || src.indexOf("safari-extension://") === 0); };
+          window.addEventListener("error", function(e){
+            if (fromExtension(e.filename) || (e.error && e.error.stack && e.error.stack.indexOf("chrome-extension://") !== -1)) {
+              e.stopImmediatePropagation(); e.preventDefault();
+            }
+          }, true);
+          window.addEventListener("unhandledrejection", function(e){
+            var reason = e.reason || {};
+            var stack = (reason && reason.stack) || "";
+            var msg = (reason && reason.message) || String(reason);
+            if (stack.indexOf("chrome-extension://") !== -1 || stack.indexOf("moz-extension://") !== -1 || /Response body is already used/i.test(msg)) {
+              e.stopImmediatePropagation(); e.preventDefault();
+            }
+          }, true);
+        })();
+        </script>
         <script src="https://assets.emergent.sh/scripts/emergent-main.js"></script>
         
         <!-- Service Worker Registration -->

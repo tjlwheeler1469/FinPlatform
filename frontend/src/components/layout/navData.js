@@ -14,6 +14,7 @@ export const personalNavGroups = [
     icon: LayoutDashboard,
     items: [
       { path: "/dashboard", label: "My Dashboard", icon: Eye, title: "Retirement, investments, budget, tax & sandbox — all in one", badge: "HOME" },
+      { path: "/messages", label: "Messages", icon: Mail, title: "Message your adviser" },
     ]
   },
   {
@@ -22,7 +23,6 @@ export const personalNavGroups = [
     items: [
       { path: "/my-vault", label: "Vault", icon: FolderLock, title: "Secure storage for meeting notes, SOA, ROA, FSG & signed documents", badge: "SECURE" },
       { path: "/documents", label: "Documents", icon: FileText, title: "Statements & secure documents" },
-      { path: "/messages", label: "Messages", icon: Mail, title: "Message your adviser" },
       { path: "/bank-feeds", label: "Connected Accounts", icon: Landmark, title: "Bank feeds" },
       { path: "/my-settings", label: "Settings", icon: Settings, title: "Profile, ID verification, TFN, MyGov & ATO linkage" },
       { path: "/security", label: "Security", icon: Shield, title: "Security & privacy" },
@@ -72,8 +72,10 @@ export const clientContextNav = [
     items: [
       { path: "/client-comms-checklist", label: "Checklist", icon: ListTodo, title: "Required Communications Checklist & Timeline" },
       { path: "/meeting-notes", label: "Meeting Notes", icon: Video, title: "Meeting Notes" },
+      { path: "/documents", label: "Documents", icon: FileText, title: "Documents & communications" },
       { path: "/reports", label: "Reports", icon: FileText, title: "Reports" },
       { path: "/document-vault", label: "Vault", icon: FolderOpen, title: "Document Vault" },
+      { path: "/ai-copilot-advanced", label: "AI Insights", icon: Brain, title: "AI-driven insights & next best actions" },
     ]
   },
 ];

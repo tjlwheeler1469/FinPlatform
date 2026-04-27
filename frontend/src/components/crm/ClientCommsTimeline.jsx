@@ -333,11 +333,9 @@ const ClientCommsTimeline = ({ clientId: propClientId, embedded = true }) => {
         <TabsList className="bg-white border h-10 w-full justify-start gap-1 px-1">
           <TabsTrigger value="checklist" className="gap-1.5 text-xs" data-testid="ct-tab-checklist"><ShieldCheck className="h-3.5 w-3.5" /> Checklist</TabsTrigger>
           <TabsTrigger value="timeline" className="gap-1.5 text-xs" data-testid="ct-tab-timeline"><History className="h-3.5 w-3.5" /> Timeline</TabsTrigger>
-          <TabsTrigger value="vault" className="gap-1.5 text-xs" data-testid="ct-tab-vault"><FolderLock className="h-3.5 w-3.5" /> Vault</TabsTrigger>
         </TabsList>
         <TabsContent value="checklist" className="pt-3"><ChecklistPanel clientId={clientId} statusMap={statusMap} /></TabsContent>
         <TabsContent value="timeline" className="pt-3"><TimelinePanel events={events} /></TabsContent>
-        <TabsContent value="vault" className="pt-3"><VaultPanel clientId={clientId} files={vaultFiles} /></TabsContent>
       </Tabs>
     </div>
   );
