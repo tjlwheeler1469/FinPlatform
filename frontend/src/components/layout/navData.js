@@ -64,6 +64,7 @@ export const clientContextNav = [
     items: [
       { path: "/dashboard", label: "Client Overview", icon: Wallet, title: "Overview, Goals, Retirement, Investments, Budget & Tax", badge: "360" },
       { path: "/client-invoicing", label: "Invoicing", icon: Receipt, title: "Invoices, fees & billing for this client" },
+      { path: "/messages", label: "Messages", icon: Mail, title: "Message this client" },
     ]
   },
   {
@@ -72,9 +73,7 @@ export const clientContextNav = [
     items: [
       { path: "/client-comms-checklist", label: "Checklist", icon: ListTodo, title: "Required Communications Checklist & Timeline" },
       { path: "/meeting-notes", label: "Meeting Notes", icon: Video, title: "Meeting Notes" },
-      { path: "/documents", label: "Documents", icon: FileText, title: "Documents & communications" },
-      { path: "/reports", label: "Reports", icon: FileText, title: "Reports" },
-      { path: "/document-vault", label: "Vault", icon: FolderOpen, title: "Document Vault" },
+      { path: "/document-vault", label: "Vault", icon: FolderOpen, title: "Document Vault · Reports & signed documents" },
       { path: "/ai-copilot-advanced", label: "AI Insights", icon: Brain, title: "AI-driven insights & next best actions" },
     ]
   },

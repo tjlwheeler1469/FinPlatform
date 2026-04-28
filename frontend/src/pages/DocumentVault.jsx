@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, lazy, Suspense } from "react";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -68,6 +68,9 @@ const CATEGORY_COLORS = {
   estate: "bg-emerald-100 text-emerald-700",
   other: "bg-gray-100 text-gray-700"
 };
+
+// Lazy-load the Reports generator so it only mounts when the Reports tab is opened.
+const LazyReportGenerator = lazy(() => import("@/pages/ReportGenerator"));
 
 const DocumentVault = () => {
   const [documents, setDocuments] = useState(null);
@@ -228,6 +231,7 @@ const DocumentVault = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList>
             <TabsTrigger value="documents">Documents</TabsTrigger>
+            <TabsTrigger value="reports" data-testid="vault-tab-reports">Reports</TabsTrigger>
             <TabsTrigger value="insights">AI Insights</TabsTrigger>
           </TabsList>
 
@@ -437,6 +441,13 @@ const DocumentVault = () => {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* Reports Tab — embeds the Report Generator so reports live in the Vault */}
+          <TabsContent value="reports" className="space-y-4 mt-4" data-testid="vault-reports-tab-content">
+            <Suspense fallback={<div className="py-8 text-center text-muted-foreground text-sm">Loading reports…</div>}>
+              <LazyReportGenerator embedded />
+            </Suspense>
           </TabsContent>
 
           {/* AI Insights Tab */}

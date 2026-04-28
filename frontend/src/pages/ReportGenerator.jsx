@@ -176,7 +176,7 @@ const DEMO_SCENARIOS = [
   }
 ];
 
-const ReportGenerator = () => {
+const ReportGenerator = ({ embedded = false }) => {
   const { portfolio } = usePortfolio();
   const [scenarios] = useState(DEMO_SCENARIOS);
   const [selectedScenario, setSelectedScenario] = useState(null);
@@ -442,8 +442,8 @@ const ReportGenerator = () => {
     return text;
   };
 
-  return (
-    <Layout>
+  const content = (
+    <>
       <div className="space-y-8" data-testid="report-generator-page">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -950,8 +950,10 @@ const ReportGenerator = () => {
           }
         }
       `}</style>
-    </Layout>
+    </>
   );
+
+  return embedded ? content : <Layout>{content}</Layout>;
 };
 
 export default ReportGenerator;

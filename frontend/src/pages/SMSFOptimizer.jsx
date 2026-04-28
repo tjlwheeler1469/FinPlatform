@@ -470,15 +470,32 @@ const SMSFOptimizer = ({ embedded = false }) => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {(result?.recommendations || []).map((rec, index) => (
-                        <div 
-                          key={`item-${index}`} 
-                          className="flex items-start gap-3 p-3 rounded-lg bg-muted/50"
-                        >
-                          <CheckCircle className="h-5 w-5 text-[#10B981] flex-shrink-0 mt-0.5" />
-                          <p className="text-sm">{rec}</p>
-                        </div>
-                      ))}
+                      {(result?.recommendations || []).map((rec, index) => {
+                        // Backend may return either a plain string or a structured
+                        // object with { type, title, description, impact, priority }.
+                        const title = typeof rec === "string" ? rec : (rec?.title || rec?.type || "");
+                        const body = typeof rec === "string" ? "" : (rec?.description || "");
+                        const impact = typeof rec === "string" ? "" : (rec?.impact || "");
+                        const priority = typeof rec === "string" ? "" : (rec?.priority || "");
+                        return (
+                          <div 
+                            key={`item-${index}`} 
+                            className="flex items-start gap-3 p-3 rounded-lg bg-muted/50"
+                          >
+                            <CheckCircle className="h-5 w-5 text-[#10B981] flex-shrink-0 mt-0.5" />
+                            <div className="flex-1 min-w-0">
+                              {title && <p className="text-sm font-semibold">{title}</p>}
+                              {body && <p className="text-sm text-muted-foreground mt-0.5">{body}</p>}
+                              {(impact || priority) && (
+                                <div className="flex gap-2 mt-2">
+                                  {impact && <Badge variant="secondary" className="text-[10px]">{impact}</Badge>}
+                                  {priority && <Badge variant="outline" className="text-[10px] capitalize">{priority} priority</Badge>}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </CardContent>
                 </Card>

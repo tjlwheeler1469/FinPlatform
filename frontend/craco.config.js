@@ -61,6 +61,26 @@ let webpackConfig = {
 };
 
 webpackConfig.devServer = (devServerConfig) => {
+  // Silence webpack-dev-server error overlay for errors that originate in
+  // browser extensions (chrome-extension:// etc). Those errors are raised by
+  // user-installed extensions hooking fetch — they are not our bug and
+  // cannot be fixed in our bundle.
+  devServerConfig.client = {
+    ...(devServerConfig.client || {}),
+    overlay: {
+      errors: true,
+      warnings: false,
+      runtimeErrors: (error) => {
+        const stack = (error && error.stack) || "";
+        const message = (error && error.message) || String(error || "");
+        if (stack.indexOf("chrome-extension://") !== -1) return false;
+        if (stack.indexOf("moz-extension://") !== -1) return false;
+        if (/Response body is already used/i.test(message)) return false;
+        return true;
+      },
+    },
+  };
+
   // Add health check endpoints if enabled
   if (config.enableHealthCheck && setupHealthEndpoints && healthPluginInstance) {
     const originalSetupMiddlewares = devServerConfig.setupMiddlewares;
