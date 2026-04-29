@@ -35,6 +35,7 @@ import {
   RotateCcw
 } from "lucide-react";
 import { usePortfolio } from "@/App";
+import { getActiveClient } from "@/data/clientData";
 import {
   BarChart,
   Bar,
@@ -110,19 +111,24 @@ const FREQUENCY_OPTIONS = [
 
 const HouseholdBudget = ({ embedded = false }) => {
   const { portfolio } = usePortfolio();
-  
-  // Income sources - integrated from portfolio
-  const [incomes, setIncomes] = useState([
-    { id: 1, source: "Employment (James)", amount: 3558, frequency: "weekly" },
-    { id: 2, source: "Employment (Sarah)", amount: 1827, frequency: "weekly" },
+  // Pull the active client's household income/expense targets so the Budget
+  // page is consistent with Overview / Tax tabs (single source of truth).
+  const activeClient = getActiveClient?.();
+  const targetAnnualIncome = activeClient?.profile?.incomeHousehold;
+  const targetAnnualExpenses = activeClient?.profile?.expensesAnnual;
+
+  // Build raw income lines
+  const rawIncomes = [
+    { id: 1, source: "Employment (Primary)", amount: 3558, frequency: "weekly" },
+    { id: 2, source: "Employment (Secondary)", amount: 1827, frequency: "weekly" },
     { id: 3, source: "Rental Income (Sydney)", amount: portfolio.investments?.properties?.[0]?.rental_income || 0, frequency: "annual" },
     { id: 4, source: "Rental Income (Melbourne)", amount: portfolio.investments?.properties?.[1]?.rental_income || 0, frequency: "annual" },
     { id: 5, source: "Dividends", amount: Math.round((portfolio.investments?.shares_value || 0) * ((portfolio.investments?.shares_dividend_yield || 0) / 100)), frequency: "annual" },
     { id: 6, source: "Term Deposit Interest", amount: Math.round((portfolio.investments?.term_deposit_amount || 0) * ((portfolio.investments?.term_deposit_rate || 0) / 100)), frequency: "annual" }
-  ]);
+  ];
 
-  // Regular expenses with various frequencies
-  const [expenses, setExpenses] = useState([
+  // Build raw expense lines
+  const rawExpenses = [
     { id: 1, category: "mortgage", description: "Sydney Mortgage", amount: Math.round((portfolio.investments?.properties?.[0]?.mortgage_amount || 0) * 0.065 / 12), frequency: "monthly" },
     { id: 2, category: "mortgage", description: "Melbourne Mortgage", amount: Math.round((portfolio.investments?.properties?.[1]?.mortgage_amount || 0) * 0.062 / 12), frequency: "monthly" },
     { id: 3, category: "utilities", description: "Electricity & Gas", amount: 350, frequency: "monthly" },
@@ -137,7 +143,22 @@ const HouseholdBudget = ({ embedded = false }) => {
     { id: 12, category: "education", description: "School Fees", amount: (portfolio.expenses?.school_fees || 9600) / 4, frequency: "quarterly" },
     { id: 13, category: "entertainment", description: "Streaming & Subscriptions", amount: 120, frequency: "monthly" },
     { id: 14, category: "savings", description: "Emergency Fund", amount: 250, frequency: "fortnightly" }
-  ]);
+  ];
+
+  // Rescale every line item so the annual totals match the active client's
+  // profile figures shown on Overview / Tax / Retirement screens.
+  const rawAnnualIncome = rawIncomes.reduce((s, l) => s + (l.amount || 0) * 12 * FREQUENCY_TO_MONTHLY[l.frequency], 0);
+  const rawAnnualExpense = rawExpenses.reduce((s, l) => s + (l.amount || 0) * 12 * FREQUENCY_TO_MONTHLY[l.frequency], 0);
+  const incomeScale = targetAnnualIncome && rawAnnualIncome > 0 ? targetAnnualIncome / rawAnnualIncome : 1;
+  const expenseScale = targetAnnualExpenses && rawAnnualExpense > 0 ? targetAnnualExpenses / rawAnnualExpense : 1;
+
+  const [incomes, setIncomes] = useState(
+    rawIncomes.map((l) => ({ ...l, amount: Math.round((l.amount || 0) * incomeScale) }))
+  );
+
+  const [expenses, setExpenses] = useState(
+    rawExpenses.map((l) => ({ ...l, amount: Math.round((l.amount || 0) * expenseScale) }))
+  );
 
   // One-off costs
   const [oneOffCosts, setOneOffCosts] = useState([
