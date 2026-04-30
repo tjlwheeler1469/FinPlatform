@@ -64,13 +64,13 @@ export const clientContextNav = [
     items: [
       { path: "/dashboard", label: "Client Overview", icon: Wallet, title: "Overview, Goals, Retirement, Investments, Budget & Tax", badge: "360" },
       { path: "/client-invoicing", label: "Invoicing", icon: Receipt, title: "Invoices, fees & billing for this client" },
-      { path: "/messages", label: "Messages", icon: Mail, title: "Message this client" },
     ]
   },
   {
-    name: "Documents",
-    icon: FileText,
+    name: "Communications",
+    icon: Mail,
     items: [
+      { path: "/messages", label: "Messages", icon: Mail, title: "Message this client" },
       { path: "/client-comms-checklist", label: "Checklist", icon: ListTodo, title: "Required Communications Checklist & Timeline" },
       { path: "/meeting-notes", label: "Meeting Notes", icon: Video, title: "Meeting Notes" },
       { path: "/document-vault", label: "Vault", icon: FolderOpen, title: "Document Vault · Reports & signed documents" },

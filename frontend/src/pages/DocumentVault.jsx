@@ -232,7 +232,6 @@ const DocumentVault = () => {
           <TabsList>
             <TabsTrigger value="documents">Documents</TabsTrigger>
             <TabsTrigger value="reports" data-testid="vault-tab-reports">Reports</TabsTrigger>
-            <TabsTrigger value="insights">AI Insights</TabsTrigger>
           </TabsList>
 
           <TabsContent value="documents" className="space-y-4 mt-4">
@@ -448,129 +447,6 @@ const DocumentVault = () => {
             <Suspense fallback={<div className="py-8 text-center text-muted-foreground text-sm">Loading reports…</div>}>
               <LazyReportGenerator embedded />
             </Suspense>
-          </TabsContent>
-
-          {/* AI Insights Tab */}
-          <TabsContent value="insights" className="space-y-4 mt-4">
-            {portfolioInsights ? (
-              <>
-                {/* Coverage Analysis */}
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base">Document Coverage Analysis</CardTitle>
-                    <CardDescription>AI-powered analysis of your document portfolio</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                      {Object.entries(portfolioInsights.coverage_analysis || {}).map(([key, value]) => (
-                        <div key={key} className="p-3 border rounded-lg text-center">
-                          {value ? (
-                            <CheckCircle className="h-6 w-6 text-green-500 mx-auto mb-2" />
-                          ) : (
-                            <AlertTriangle className="h-6 w-6 text-amber-500 mx-auto mb-2" />
-                          )}
-                          <p className="text-xs font-medium capitalize">
-                            {key.replace(/_/g, " ")}
-                          </p>
-                          <Badge variant={value ? "secondary" : "outline"} className={value ? "bg-green-100 text-green-700" : ""}>
-                            {value ? "Found" : "Missing"}
-                          </Badge>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Gaps Identified */}
-                {portfolioInsights.gaps_identified?.length > 0 && (
-                  <Card className="border-amber-200 bg-amber-50/50">
-                    <CardHeader className="pb-2">
-                      <div className="flex items-center gap-2">
-                        <AlertTriangle className="h-5 w-5 text-amber-600" />
-                        <CardTitle className="text-base">Document Gaps Identified</CardTitle>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        {portfolioInsights.gaps_identified.map((gap, i) => (
-                          <div key={`item-${i}`} className="flex items-start gap-3 p-3 bg-white rounded-lg border">
-                            <AlertTriangle className={`h-5 w-5 ${gap.priority === "High" ? "text-red-500" : "text-amber-500"}`} />
-                            <div className="flex-1">
-                              <p className="font-medium">{gap.type}</p>
-                              <p className="text-sm text-muted-foreground">{gap.recommendation}</p>
-                            </div>
-                            <Badge variant={gap.priority === "High" ? "destructive" : "secondary"}>
-                              {gap.priority}
-                            </Badge>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {/* Upcoming Renewals */}
-                {portfolioInsights.upcoming_renewals?.length > 0 && (
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-5 w-5 text-blue-500" />
-                        <CardTitle className="text-base">Upcoming Renewals</CardTitle>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2">
-                        {portfolioInsights.upcoming_renewals.map((renewal, i) => (
-                          <div key={`item-${i}`} className="flex items-center gap-4 p-3 border rounded-lg">
-                            <Clock className="h-5 w-5 text-blue-500" />
-                            <div className="flex-1">
-                              <p className="font-medium">{renewal.document}</p>
-                              <p className="text-sm text-muted-foreground">
-                                Expires: {new Date(renewal.expiry_date).toLocaleDateString()}
-                              </p>
-                            </div>
-                            <Badge variant={renewal.days_until < 30 ? "destructive" : "secondary"}>
-                              {renewal.days_until} days
-                            </Badge>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {/* Action Items */}
-                {portfolioInsights.action_items?.length > 0 && (
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base">Recommended Actions</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2">
-                        {portfolioInsights.action_items.map((action, i) => (
-                          <div key={`item-${i}`} className="flex items-center gap-4 p-3 border rounded-lg">
-                            <Lightbulb className="h-5 w-5 text-amber-500" />
-                            <div className="flex-1">
-                              <p className="font-medium">{action.action}</p>
-                            </div>
-                            <Badge variant={action.priority === "High" ? "destructive" : "secondary"}>
-                              {action.count} items
-                            </Badge>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-              </>
-            ) : (
-              <Card>
-                <CardContent className="p-8 text-center">
-                  <Brain className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                  <p className="text-muted-foreground">Upload documents to see AI-powered insights</p>
-                </CardContent>
-              </Card>
-            )}
           </TabsContent>
         </Tabs>
 

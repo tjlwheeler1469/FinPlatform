@@ -12,6 +12,7 @@ import {
   ChevronRight, Send, CheckCircle2, FileText, Play,
 } from "lucide-react";
 import { groupFeedByCategory, CATEGORY_META } from "@/engine/bookAggregator";
+import { CLIENT_DATA } from "@/data/clientData";
 import AdviceDraftModal from "@/components/intelligence/AdviceDraftModal";
 
 const API = process.env.REACT_APP_BACKEND_URL;
@@ -84,8 +85,18 @@ const IntelligenceFeed = ({ feed }) => {
     logLocalAction(actionId, item);
     if (actionId === "simulate") {
       if (item.clientId) {
-        localStorage.setItem("selected_client", JSON.stringify({ id: item.clientId }));
-        navigate(`/client-360?id=${item.clientId}&tab=decision`);
+        // Activate the client in adviser context and jump straight to that
+        // client's Overview page. Resolve the full client record from
+        // CLIENT_DATA so the sidebar selector + header card render properly.
+        const fromCatalog = CLIENT_DATA?.[item.clientId];
+        const payload = {
+          id: item.clientId,
+          client_id: item.clientId,
+          name: fromCatalog?.name || item.clientName || item.clientId,
+        };
+        localStorage.setItem("app_mode", "adviser");
+        localStorage.setItem("selected_client", JSON.stringify(payload));
+        navigate(`/dashboard`);
       } else {
         toast.info("Open a client to simulate.");
       }
