@@ -96,7 +96,25 @@ const IntelligenceFeed = ({ feed }) => {
         };
         localStorage.setItem("app_mode", "adviser");
         localStorage.setItem("selected_client", JSON.stringify(payload));
-        navigate(`/dashboard`);
+        // Stash the simulation context so AdviserClientDashboard can show
+        // a banner with the headline + impact + scoreDelta + financialImpact.
+        try {
+          sessionStorage.setItem(
+            `pending_simulation:${item.clientId}`,
+            JSON.stringify({
+              id: item.id,
+              headline: item.headline,
+              message: item.message,
+              category: item.category,
+              urgency: item.urgency,
+              impactScore: item.impactScore,
+              scoreDelta: item.scoreDelta,
+              financialImpact: item.financialImpact,
+              ts: Date.now(),
+            })
+          );
+        } catch { /* sessionStorage unavailable — banner will simply not show */ }
+        navigate(`/dashboard?simulate=1`);
       } else {
         toast.info("Open a client to simulate.");
       }

@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +10,7 @@ import {
   TrendingUp, TrendingDown, AlertTriangle, Zap, Target, Calendar, FileText,
   Activity, DollarSign, ArrowRight, Briefcase, Home, PiggyBank, Building2,
   CheckCircle2, ArrowUpRight, ArrowDownRight, Gauge, ChevronRight, Sparkles,
+  Play, X,
 } from "lucide-react";
 import { CLIENT_DATA, computeClientTotals } from "@/data/clientData";
 import { projectRetirement } from "@/components/ScenarioEngine";
@@ -454,6 +455,7 @@ const WhatChangedCard = ({ changes }) => (
 // -------- Main Dashboard ----------
 const AdviserClientDashboard = ({ clientId = "thompson_family" }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const client = CLIENT_DATA[clientId] || CLIENT_DATA.thompson_family;
   const totals = computeClientTotals(clientId);
   const [liveTick, setLiveTick] = useState(Date.now());
@@ -461,6 +463,25 @@ const AdviserClientDashboard = ({ clientId = "thompson_family" }) => {
     const iv = setInterval(() => setLiveTick(Date.now()), 30000);
     return () => clearInterval(iv);
   }, []);
+
+  // Simulation arriving from Intelligence Feed → /dashboard?simulate=1.
+  // Full payload is stashed in sessionStorage so the banner can show
+  // headline + score/$ impact and let the adviser apply or clear it.
+  const [simulation, setSimulation] = useState(null);
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get("simulate") !== "1") return;
+    try {
+      const raw = sessionStorage.getItem(`pending_simulation:${clientId}`);
+      if (raw) setSimulation(JSON.parse(raw));
+    } catch { /* ignore */ }
+  }, [location.search, clientId]);
+
+  const clearSimulation = () => {
+    try { sessionStorage.removeItem(`pending_simulation:${clientId}`); } catch { /* ignore */ }
+    setSimulation(null);
+    navigate(`/dashboard`, { replace: true });
+  };
 
   // Base retirement confidence (for reference)
   const baseScenario = useMemo(() => {
@@ -535,6 +556,59 @@ const AdviserClientDashboard = ({ clientId = "thompson_family" }) => {
 
   return (
     <div className="space-y-5" data-testid="adviser-client-dashboard">
+      {/* SIMULATION BANNER — appears when arriving from Intelligence Feed → Simulate */}
+      {simulation && (
+        <Card className="border-2 border-[#D4A84C] bg-gradient-to-r from-[#FFF8E7] to-[#FFFDF7] shadow-md" data-testid="simulation-banner">
+          <CardContent className="p-4">
+            <div className="flex items-start gap-4 flex-wrap">
+              <div className="h-9 w-9 rounded-full bg-[#D4A84C] flex items-center justify-center text-white flex-shrink-0">
+                <Play className="h-4 w-4" />
+              </div>
+              <div className="flex-1 min-w-[260px]">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-[#8a6c1a]">Simulating from Mission Control</p>
+                  {simulation.urgency && (
+                    <Badge variant="outline" className="text-[10px] border-[#D4A84C] text-[#8a6c1a]">{simulation.urgency}</Badge>
+                  )}
+                </div>
+                <p className="text-sm font-semibold text-[#1a2744] mt-0.5" data-testid="simulation-headline">{simulation.headline}</p>
+                {simulation.message && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{simulation.message}</p>}
+              </div>
+              <div className="flex items-center gap-5 flex-wrap">
+                {Number.isFinite(simulation.scoreDelta) && (
+                  <div className="text-center">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Confidence Δ</p>
+                    <p className={`text-lg font-bold ${simulation.scoreDelta >= 0 ? "text-emerald-700" : "text-rose-600"}`} data-testid="simulation-score-delta">
+                      {simulation.scoreDelta >= 0 ? "+" : ""}{simulation.scoreDelta} pts
+                    </p>
+                  </div>
+                )}
+                {Number.isFinite(simulation.financialImpact) && simulation.financialImpact !== 0 && (
+                  <div className="text-center">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Financial Impact</p>
+                    <p className={`text-lg font-bold ${simulation.financialImpact >= 0 ? "text-emerald-700" : "text-rose-600"}`} data-testid="simulation-financial-impact">
+                      {simulation.financialImpact >= 0 ? "+" : "−"}{fmt(Math.abs(simulation.financialImpact))}
+                    </p>
+                  </div>
+                )}
+                {Number.isFinite(simulation.impactScore) && (
+                  <div className="text-center">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Priority</p>
+                    <p className="text-lg font-bold text-[#1a2744]">{simulation.impactScore}</p>
+                  </div>
+                )}
+              </div>
+              <Button size="sm" variant="ghost" onClick={clearSimulation} data-testid="clear-simulation" className="text-muted-foreground hover:text-[#1a2744]">
+                <X className="h-4 w-4 mr-1" /> Clear
+              </Button>
+            </div>
+            <div className="mt-3 flex items-center gap-2 text-[11px] text-muted-foreground">
+              <span>Adjust the Live Scenario sliders below to test this strategy. Use Apply or Generate Advice from Mission Control once satisfied.</span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* GLOBAL HEADER — sticky, premium */}
       <Card className="border-2 border-[#1a2744]/20 sticky top-2 z-20 shadow-sm" data-testid="client-dashboard-header">
         <CardContent className="p-4">
