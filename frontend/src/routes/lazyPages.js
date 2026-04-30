@@ -172,6 +172,7 @@ export const RetirementControlCenter = lazyRetry(() => import("@/pages/Retiremen
 export const ClientHome = lazyRetry(() => import("@/pages/ClientHome"));
 export const ClientMessages = lazyRetry(() => import("@/pages/ClientMessages"));
 export const AdviceDocumentBuilder = lazyRetry(() => import("@/pages/AdviceDocumentBuilder"));
+export const ClientCapture = lazyRetry(() => import("@/pages/ClientCapture"));
 export const ClientReadinessPortal = lazyRetry(() => import("@/pages/ClientReadinessPortal"));
 export const ClientOnboarding = lazyRetry(() => import("@/pages/ClientOnboarding"));
 export const ClientSetupWizard = lazyRetry(() => import("@/pages/ClientSetupWizard"));

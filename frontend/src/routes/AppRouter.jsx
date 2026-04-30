@@ -37,7 +37,7 @@ import {
   // Client
   PersonalDashboard, UnifiedDashboard, UnifiedClientOverview, SimpleClientPortal,
   SimpleClientView, ClientPortal, ClientPortalMerged, ClientWealth, ClientCompliance,
-  ClientReadinessPortal, ClientMessages, AdviceDocumentBuilder,
+  ClientReadinessPortal, ClientMessages, AdviceDocumentBuilder, ClientCapture,
   ClientCRM, ClientHealthDashboard, ClientComparison, Client360View, ClientOnboarding,
   ClientSetupWizard, ClientFinancialDashboard, FamilyOverview, FamilyMemberProfile,
   FamilyWealthDashboard, ClientInvoicingPage, ClientCommsChecklistPage,
@@ -219,6 +219,7 @@ const AppRouter = () => (
     <Route path="/client-readiness" element={<ClientReadinessPortal />} />
     <Route path="/messages" element={<ClientMessages />} />
     <Route path="/advice-document-builder" element={<AdviceDocumentBuilder />} />
+    <Route path="/client-capture" element={<ClientCapture />} />
     <Route path="/client-portal-old" element={<ClientPortalMerged />} />
     <Route path="/onboarding" element={<ClientOnboarding />} />
     <Route path="/financial-dashboard" element={<Navigate to="/dashboard" replace />} />

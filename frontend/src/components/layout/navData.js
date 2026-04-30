@@ -63,6 +63,7 @@ export const clientContextNav = [
     icon: Eye,
     items: [
       { path: "/dashboard", label: "Client Overview", icon: Wallet, title: "Overview, Goals, Retirement, Investments, Budget & Tax", badge: "360" },
+      { path: "/client-capture", label: "Key Dates & Disclosures", icon: ListTodo, title: "Xplan-style client capture: contact, service overview, reviews, FSG, risk profile" },
       { path: "/client-invoicing", label: "Invoicing", icon: Receipt, title: "Invoices, fees & billing for this client" },
     ]
   },
