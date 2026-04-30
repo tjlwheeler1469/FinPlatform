@@ -1,3 +1,11 @@
+## April 2026 — ASIC SOA/ROA redesign + adviser-level Xplan Sync
+- **SOA template rewritten** to ASIC INFO 267 letter format: letterhead (licensee + adviser + ref), "About this document", "Your reasons for seeking advice", "What my advice does not cover", "Overview of my recommendations", "Your current situation" (prose + at-a-glance data sidebar), "My advice and why it's appropriate" (numbered recs with rationale / expected benefit / key risks / cost), "Things you need to know", "Advice fees and conflicts of interest", "Next steps", "Authority to Proceed" signature block. Serif Georgia body + navy/gold accents.
+- **ROA template rewritten** to ASIC INFO 266 letter format (8-section follow-up letter referencing the prior SOA).
+- **Active-client lock-in**: Client dropdown removed from `AdviceDocumentBuilder` and `ClientCapture` — both pages now show a read-only "active client" badge tied to the adviser's selected client.
+- **Xplan Sync Hub relocated** from adviser-client left-nav → adviser-level Firm sidebar (firm-wide integration, not per-client).
+- **Files rewritten**: `/app/frontend/src/lib/adviceDocumentEngine.js` (340 lines, section builders + stable doc refs), `/app/frontend/src/pages/AdviceDocumentBuilder.jsx` (6 new section renderers: Letterhead / Paragraph / Situation / AdviceDetail / Fees / Authority).
+
+
 ## April 2026 — Implementation Pack + Alpaca Broker + PDF Attachments
 - **One-click Implementation Pack** (`POST /api/implementation-pack/{client_id}`): orchestrates PDF storage → notify_client (with attachment) → create N execution tickets (one per SOA recommendation, auto-categorised trade/super/insurance/rebalance) → Xmerge push → single audit record. UI button on `AdviceDocumentBuilder` renders a 4-step audit-trail card with refs for compliance replay. 8/8 pytest tests green (iter 205).
 - **Alpaca broker adapter live-ready**: `execution_rails.broker_adapter` now calls `alpaca_trading.get_trading_client()` when `ALPACA_API_KEY`+`ALPACA_SECRET_KEY` are set. Falls back to mock lifecycle otherwise. AU tickers have `.AX` stripped for paper-trade sanity.

@@ -16,148 +16,173 @@ import { Download, FileText, Save, Eye, Upload, Tag, Mail, Rocket, ShoppingBag, 
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-// ---------- Section renderers (HTML preview) ----------
-const SectionCover = ({ s }) => (
-  <div className="page-soa flex flex-col items-center justify-center text-center py-24" data-soa-section={s.id}>
-    <div className="mb-12">
-      <div className="text-[11px] font-bold tracking-[0.5em] text-muted-foreground uppercase">{s.preparedBy} · {s.fsl}</div>
+// ---------- Section renderers (ASIC letter format) ----------
+
+// Letterhead — adviser + licensee + client block + date + document ref.
+const SectionLetterhead = ({ s }) => (
+  <div className="page-soa px-12 py-10 border-b" data-soa-section={s.id} style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
+    <div className="flex justify-between items-start mb-10">
+      <div>
+        <div className="w-10 h-10 rounded-sm bg-[#1a2744] mb-3" />
+        <p className="text-lg font-bold text-[#1a2744] leading-tight">{s.licensee.name}</p>
+        <p className="text-xs text-gray-500 leading-tight">{s.licensee.afsl}</p>
+      </div>
+      <div className="text-right text-xs text-gray-500 leading-tight">
+        <p>{s.adviser.address}</p>
+        <p className="mt-0.5">Tel: {s.adviser.phone}</p>
+        <p>{s.adviser.email}</p>
+        <p className="mt-2 font-mono text-[10px] text-gray-400">Ref: {s.reference}</p>
+      </div>
     </div>
-    <h1 className="text-5xl font-bold text-[#1a2744] mb-3">{s.title}</h1>
-    <p className="text-lg text-muted-foreground mb-12">Prepared for {s.preparedFor}</p>
-    <div className="space-y-1 text-xs text-muted-foreground">
-      <p><strong className="text-[#1a2744]">As at:</strong> {s.asAt}</p>
-      <p><strong className="text-[#1a2744]">Document ref:</strong> {s.documentRef}</p>
-      <p><strong className="text-[#1a2744]">Adviser:</strong> {s.preparedBy} · {s.ar}</p>
+    <div className="mb-8">
+      <p className="text-sm">{s.date}</p>
     </div>
+    <div className="mb-8">
+      <p className="text-sm font-semibold text-[#1a2744]">{s.client.name}</p>
+      {s.client.address && <p className="text-sm text-gray-600 whitespace-pre-line">{s.client.address}</p>}
+    </div>
+    <h1 className="text-3xl font-bold text-[#1a2744] mb-2 border-b-2 border-[#1a2744] pb-3">{s.title}</h1>
+    <p className="text-sm text-gray-600 italic mt-3">Dear {s.client.name.split(" ")[0] || s.client.name},</p>
   </div>
 );
 
-const SectionStandard = ({ s }) => (
-  <div className="page-soa space-y-3 py-6" data-soa-section={s.id}>
-    <h2 className="text-2xl font-bold text-[#1a2744] border-b-2 border-[#D4A84C] pb-2">{s.heading}</h2>
-    {s.body && <p className="text-sm leading-relaxed">{s.body}</p>}
-    {s.metrics && (
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
-        {s.metrics.map((m, i) => (
-          <div key={i} className="border rounded p-3 bg-slate-50">
-            <p className="text-[10px] text-muted-foreground uppercase">{m.label}</p>
-            <p className="text-lg font-bold text-[#1a2744]">{m.value}</p>
-          </div>
-        ))}
-      </div>
-    )}
+// Standard narrative paragraph section — heading + prose + optional bullets/numbered.
+const SectionParagraph = ({ s }) => (
+  <div className="page-soa px-12 py-6" data-soa-section={s.id} style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
+    <h2 className="text-lg font-bold text-[#1a2744] mb-3">{s.heading}</h2>
+    {s.paragraphs && s.paragraphs.map((p, i) => (
+      <p key={i} className="text-[13px] leading-7 text-gray-800 mb-3">{p}</p>
+    ))}
     {s.bullets && (
-      <ul className="list-disc pl-6 space-y-1 text-sm">
+      <ul className="list-disc pl-6 space-y-1 text-[13px] leading-6 text-gray-800">
         {s.bullets.map((b, i) => <li key={i}>{b}</li>)}
       </ul>
     )}
-    {s.rows && (
-      <table className="w-full text-sm border-collapse mt-2">
-        <tbody>
-          {s.rows.map((r, i) => (
-            <tr key={i} className="border-b">
-              <td className="py-2 px-2 font-medium text-muted-foreground w-1/2">{r[0]}</td>
-              <td className="py-2 px-2 text-[#1a2744] font-semibold">{r[1]}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    )}
-    {s.items && (
-      <ol className="space-y-3 mt-2">
-        {s.items.map((item, i) => (
-          <li key={i} className="border-l-4 border-[#D4A84C] pl-3 py-1">
-            <p className="font-semibold text-[#1a2744]">{item.title || item.n + ". " + item.title}</p>
-            {item.detail && <p className="text-sm text-muted-foreground">{item.detail}</p>}
-            {item.rationale && <p className="text-sm text-muted-foreground">{item.rationale}</p>}
-            {item.impact && <p className="text-xs text-emerald-700 mt-1"><strong>Impact:</strong> {item.impact}</p>}
-            {item.risks && item.risks.length > 0 && <p className="text-xs text-amber-700 mt-1"><strong>Risks:</strong> {item.risks.join("; ")}</p>}
-            {Number.isFinite(item.cost) && <p className="text-xs text-muted-foreground mt-1"><strong>Cost:</strong> {formatCurrency(item.cost)}</p>}
-          </li>
-        ))}
+    {s.numbered && (
+      <ol className="list-decimal pl-6 space-y-2 text-[13px] leading-6 text-gray-800 mt-2">
+        {s.numbered.map((n, i) => <li key={i}>{n}</li>)}
       </ol>
     )}
-    {s.assets && (
-      <div className="mt-3 grid grid-cols-2 gap-4">
-        <div>
-          <p className="text-xs font-bold uppercase text-muted-foreground mb-1">Assets</p>
-          <table className="w-full text-xs">
-            <tbody>
-              {s.assets.map((a, i) => (
-                <tr key={i} className="border-b"><td className="py-1">{a.name || a.type}</td><td className="text-right font-semibold">{formatCurrency(a.value)}</td></tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div>
-          <p className="text-xs font-bold uppercase text-muted-foreground mb-1">Liabilities</p>
-          <table className="w-full text-xs">
-            <tbody>
-              {(s.liabilities || []).map((l, i) => (
-                <tr key={i} className="border-b"><td className="py-1">{l.name || l.type}</td><td className="text-right font-semibold">{formatCurrency(l.value || l.balance)}</td></tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="col-span-2 border-t-2 border-[#D4A84C] pt-2 flex justify-between text-sm font-bold">
-          <span>Net Worth</span><span>{formatCurrency(s.netWorth)}</span>
-        </div>
+  </div>
+);
+
+// Current situation — prose + inline data grid on the right.
+const SectionSituation = ({ s }) => (
+  <div className="page-soa px-12 py-6" data-soa-section={s.id} style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
+    <h2 className="text-lg font-bold text-[#1a2744] mb-3">{s.heading}</h2>
+    <div className="grid grid-cols-3 gap-6">
+      <div className="col-span-2 space-y-3">
+        {s.paragraphs.map((p, i) => (
+          <p key={i} className="text-[13px] leading-7 text-gray-800">{p}</p>
+        ))}
       </div>
-    )}
-    {s.summary && (
-      <div className="grid grid-cols-3 gap-3 mt-2">
-        <Stat l="Portfolio value" v={formatCurrency(s.summary.portfolioValue)} />
-        <Stat l="IRR (since inception)" v={`${s.summary.irrPct.toFixed(2)}%`} />
-        <Stat l="TWR (since inception)" v={`${s.summary.twrPct.toFixed(2)}%`} />
-        <Stat l="Annual income" v={formatCurrency(s.summary.annualIncome)} />
-        <Stat l="Realised CGT (FYTD)" v={formatCurrency(s.summary.realizedCgt)} />
-        <Stat l="Unrealised CGT" v={formatCurrency(s.summary.unrealizedCgt)} />
-      </div>
-    )}
-    {s.holdings && (
-      <table className="w-full text-xs mt-3 border">
-        <thead className="bg-slate-100">
-          <tr><th className="text-left p-2">Holding</th><th className="text-left p-2">Type</th><th className="text-right p-2">Value</th><th className="text-right p-2">% portfolio</th></tr>
-        </thead>
-        <tbody>
-          {s.holdings.map((h, i) => (
-            <tr key={i} className="border-t"><td className="p-2">{h.name}</td><td className="p-2">{h.type}</td><td className="text-right p-2">{formatCurrency(h.value)}</td><td className="text-right p-2">{h.pctOfPortfolio}%</td></tr>
-          ))}
-        </tbody>
-      </table>
-    )}
-    {s.scenario && (
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
-        <Stat l="Confidence" v={`${s.scenario.confidence}%`} />
-        <Stat l="Portfolio at retirement" v={formatCurrency(s.scenario.portfolioAtRetirement)} />
-        <Stat l="Success probability" v={`${s.scenario.successProb}%`} />
-        <Stat l="Years sustainable" v={String(s.scenario.yearsSustainable)} />
-      </div>
-    )}
-    {s.signatures && (
-      <div className="grid grid-cols-2 gap-12 mt-12">
-        {s.signatures.map((sig, i) => (
-          <div key={i} className="border-t-2 border-[#1a2744] pt-2">
-            <p className="text-xs font-bold uppercase text-muted-foreground">{sig.role}</p>
-            <p className="text-sm font-semibold">{sig.name}</p>
-            <p className="text-xs text-muted-foreground">Date: {sig.date}</p>
+      <div className="col-span-1 border-l-2 border-gray-200 pl-4">
+        <p className="text-[10px] font-semibold tracking-wider text-gray-500 uppercase mb-2">At a glance</p>
+        {s.keyFigures.map((f, i) => (
+          <div key={i} className="py-1.5 border-b border-gray-100 flex justify-between items-baseline">
+            <span className="text-[11px] text-gray-600">{f.label}</span>
+            <span className="text-[12px] font-semibold text-[#1a2744]">{f.value}</span>
           </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+// My advice — numbered narrative with rationale / impact / risks.
+const SectionAdviceDetail = ({ s }) => (
+  <div className="page-soa px-12 py-6" data-soa-section={s.id} style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
+    <h2 className="text-lg font-bold text-[#1a2744] mb-3">{s.heading}</h2>
+    {s.paragraphs && s.paragraphs.map((p, i) => (
+      <p key={i} className="text-[13px] leading-7 text-gray-800 mb-3">{p}</p>
+    ))}
+    <div className="mt-4 space-y-6">
+      {s.recommendations.map((r) => (
+        <div key={r.n}>
+          <p className="text-[13px] font-semibold text-[#1a2744] mb-1.5">{r.n}. {r.title}</p>
+          {r.rationale && <p className="text-[13px] leading-7 text-gray-800 mb-2">{r.rationale}</p>}
+          {r.impact && (
+            <p className="text-[12px] text-gray-700 italic mb-1">
+              <span className="font-semibold not-italic">Expected benefit: </span>{r.impact}
+            </p>
+          )}
+          {r.risks && r.risks.length > 0 && (
+            <p className="text-[12px] text-gray-700 italic mb-1">
+              <span className="font-semibold not-italic">Key risks: </span>{r.risks.join("; ")}.
+            </p>
+          )}
+          {Number.isFinite(r.cost) && r.cost > 0 && (
+            <p className="text-[12px] text-gray-700 italic">
+              <span className="font-semibold not-italic">Implementation cost: </span>${r.cost.toLocaleString()}
+            </p>
+          )}
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+// Fees — simple two-column table + conflicts disclosure.
+const SectionFees = ({ s }) => (
+  <div className="page-soa px-12 py-6" data-soa-section={s.id} style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
+    <h2 className="text-lg font-bold text-[#1a2744] mb-3">{s.heading}</h2>
+    {s.paragraphs && s.paragraphs.map((p, i) => (
+      <p key={i} className="text-[13px] leading-7 text-gray-800 mb-3">{p}</p>
+    ))}
+    <table className="w-full border-collapse mt-2 max-w-[480px]">
+      <tbody>
+        {s.rows.map((r, i) => (
+          <tr key={i} className="border-b border-gray-200">
+            <td className="py-2 text-[13px] text-gray-800">{r[0]}</td>
+            <td className="py-2 text-[13px] text-right font-semibold text-[#1a2744]">{r[1]}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    {s.conflicts && s.conflicts.length > 0 && (
+      <div className="mt-5">
+        <p className="text-[12px] font-semibold text-[#1a2744] mb-1">Conflicts of interest</p>
+        {s.conflicts.map((c, i) => (
+          <p key={i} className="text-[12px] leading-6 text-gray-700 mb-1">{c}</p>
         ))}
       </div>
     )}
   </div>
 );
 
-const Stat = ({ l, v }) => (
-  <div className="border rounded p-2 bg-slate-50">
-    <p className="text-[10px] text-muted-foreground uppercase">{l}</p>
-    <p className="text-sm font-bold text-[#1a2744]">{v}</p>
+// Authority to Proceed — signature lines.
+const SectionAuthority = ({ s }) => (
+  <div className="page-soa px-12 py-8 border-t-2 border-[#1a2744] mt-4" data-soa-section={s.id} style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
+    <h2 className="text-lg font-bold text-[#1a2744] mb-3">{s.heading}</h2>
+    {s.paragraphs && s.paragraphs.map((p, i) => (
+      <p key={i} className="text-[13px] leading-7 text-gray-800 mb-3">{p}</p>
+    ))}
+    <div className="grid grid-cols-2 gap-12 mt-10">
+      {s.signatures.map((sig, i) => (
+        <div key={i}>
+          <div className="border-b border-gray-700 h-10" />
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 mt-1">{sig.role}</p>
+          <p className="text-[13px] font-semibold text-[#1a2744]">{sig.name}</p>
+          <p className="text-[11px] text-gray-600">Date: {sig.date}</p>
+        </div>
+      ))}
+    </div>
+    <p className="text-[10px] text-gray-400 italic mt-8">
+      Yours sincerely, — this document is signed and retained by your adviser in accordance with s912G of the Corporations Act 2001 (Cth).
+    </p>
   </div>
 );
 
 const renderSection = (s) => {
-  if (s.type === "cover") return <SectionCover key={s.id} s={s} />;
-  return <SectionStandard key={s.id} s={s} />;
+  switch (s.type) {
+    case "letterhead":    return <SectionLetterhead key={s.id} s={s} />;
+    case "paragraph":     return <SectionParagraph key={s.id} s={s} />;
+    case "situation":     return <SectionSituation key={s.id} s={s} />;
+    case "advice-detail": return <SectionAdviceDetail key={s.id} s={s} />;
+    case "fees-table":    return <SectionFees key={s.id} s={s} />;
+    case "authority":     return <SectionAuthority key={s.id} s={s} />;
+    default:              return <SectionParagraph key={s.id} s={s} />;
+  }
 };
 
 // ---------- Page ----------
@@ -434,7 +459,7 @@ const AdviceDocumentBuilder = () => {
                 <TabsTrigger value="roa" data-testid="builder-tab-roa">ROA</TabsTrigger>
               </TabsList>
             </Tabs>
-            <select value={clientId} onChange={(e) => setClientId(e.target.value)} className="text-sm border rounded px-2 py-1 bg-white" data-testid="builder-client-select">
+            <select value={clientId} onChange={(e) => setClientId(e.target.value)} className="text-sm border rounded px-2 py-1 bg-white hidden" data-testid="builder-client-select" aria-hidden="true">
               {Object.entries(CLIENT_DATA)
                 .filter(([k]) => k !== "advisor")
                 .map(([id, c]) => {
@@ -442,6 +467,10 @@ const AdviceDocumentBuilder = () => {
                   return (<option key={id} value={id}>{label}</option>);
                 })}
             </select>
+            <div className="text-xs text-muted-foreground flex items-center gap-1.5 border rounded px-2.5 py-1 bg-slate-50" data-testid="builder-active-client">
+              <span className="font-semibold text-[#1a2744]">{(CLIENT_DATA[clientId] || CLIENT_DATA.thompson_family)?.profile?.name || clientId}</span>
+              <span className="text-[10px]">· active client</span>
+            </div>
             <Button variant="outline" size="sm" onClick={() => setShowTokens(s => !s)} data-testid="builder-toggle-tokens" className={showTokens ? "border-[#3B9CDC] text-[#3B9CDC] bg-[#3B9CDC]/10" : ""}><Tag className="h-3.5 w-3.5 mr-1" /> {showTokens ? "Hide" : "Show"} Xplan tokens</Button>
             <Button variant="outline" size="sm" onClick={handlePushToXplan} data-testid="builder-push-xplan" className="border-[#3B9CDC] text-[#3B9CDC]"><Upload className="h-3.5 w-3.5 mr-1" /> Push via Xmerge</Button>
             <Button variant="outline" size="sm" onClick={handleNotifyClient} data-testid="builder-notify-client" className={emailMode === "live" ? "border-emerald-600 text-emerald-700" : "border-amber-500 text-amber-700"}>

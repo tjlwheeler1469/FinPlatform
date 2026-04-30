@@ -196,11 +196,15 @@ const ClientCapture = () => {
               <h1 className="text-xl font-bold text-[#1a2744]">Key Dates & Disclosures</h1>
               <p className="text-xs text-muted-foreground">Xplan-style client capture · sync source for SOA / ROA, FSG &amp; ongoing service obligations.</p>
             </div>
-            <select value={clientId} onChange={(e) => setClientId(e.target.value)} className="text-sm border rounded px-2 py-1 bg-white" data-testid="capture-client-select">
+            <select value={clientId} onChange={(e) => setClientId(e.target.value)} className="text-sm border rounded px-2 py-1 bg-white hidden" data-testid="capture-client-select" aria-hidden="true">
               {Object.entries(CLIENT_DATA).filter(([k]) => k !== "advisor").map(([id, c]) => (
                 <option key={id} value={id}>{c?.profile?.name || id}</option>
               ))}
             </select>
+            <div className="text-xs text-muted-foreground flex items-center gap-1.5 border rounded px-2.5 py-1 bg-slate-50" data-testid="capture-active-client">
+              <span className="font-semibold text-[#1a2744]">{(CLIENT_DATA[clientId] || {})?.profile?.name || clientId}</span>
+              <span className="text-[10px]">· active client</span>
+            </div>
             {dirty && <Badge variant="outline" className="text-amber-700 border-amber-300">Unsaved</Badge>}
             <Button variant="outline" size="sm" onClick={handlePullFromXplan} data-testid="capture-pull-xplan" className="border-[#3B9CDC] text-[#3B9CDC] hover:bg-[#3B9CDC]/10"><Download className="h-3.5 w-3.5 mr-1" /> Pull Xplan</Button>
             <Button variant="outline" size="sm" onClick={handlePushToXplan} data-testid="capture-push-xplan" className="border-[#3B9CDC] text-[#3B9CDC] hover:bg-[#3B9CDC]/10"><Upload className="h-3.5 w-3.5 mr-1" /> Push Xplan</Button>
