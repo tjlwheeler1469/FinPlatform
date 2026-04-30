@@ -16,18 +16,34 @@ import { CLIENT_DATA, getActiveClientId, computeClientTotals } from "@/data/clie
 
 const fmt = (v) => new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD", maximumFractionDigits: 0 }).format(v || 0);
 
-// Box-Muller transform for normal random numbers
-const randn = () => {
+// Box-Muller transform for normal random numbers (with optional seedable RNG)
+const randn = (rng = Math.random) => {
   let u = 0, v = 0;
-  while (u === 0) u = Math.random();
-  while (v === 0) v = Math.random();
+  while (u === 0) u = rng();
+  while (v === 0) v = rng();
   return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+};
+
+// Mulberry32 — fast deterministic PRNG so consumers can pass a stable seed
+// and get identical Monte Carlo results across screens / re-renders.
+const mulberry32 = (seed) => {
+  let t = (seed >>> 0) || 1;
+  return () => {
+    t = (t + 0x6d2b79f5) >>> 0;
+    let r = Math.imul(t ^ (t >>> 15), 1 | t);
+    r = (r + Math.imul(r ^ (r >>> 7), 61 | r)) ^ r;
+    return ((r ^ (r >>> 14)) >>> 0) / 4_294_967_296;
+  };
 };
 
 // Monte Carlo projection engine
 const NUM_SIMS = 500;
 
-export const projectRetirement = ({ currentPortfolio, annualContributions, annualSpending, yearsToRetirement, expectedReturn = 0.065, volatility = 0.12, inflationRate = 0.03 }) => {
+export const projectRetirement = ({
+  currentPortfolio, annualContributions, annualSpending, yearsToRetirement,
+  expectedReturn = 0.065, volatility = 0.12, inflationRate = 0.03, seed,
+}) => {
+  const rng = Number.isInteger(seed) ? mulberry32(seed) : Math.random;
   const realReturn = expectedReturn - inflationRate;
   const realVol = volatility;
   const totalYears = yearsToRetirement + 25; // 25 years in retirement
@@ -43,7 +59,7 @@ export const projectRetirement = ({ currentPortfolio, annualContributions, annua
 
     // Accumulation phase
     for (let y = 1; y <= yearsToRetirement; y++) {
-      const yearReturn = realReturn + realVol * randn();
+      const yearReturn = realReturn + realVol * randn(rng);
       balance = balance * (1 + yearReturn) + annualContributions;
       if (balance < 0) balance = 0;
       path.push(balance);
@@ -51,7 +67,7 @@ export const projectRetirement = ({ currentPortfolio, annualContributions, annua
 
     // Drawdown phase
     for (let y = 1; y <= retirementYears; y++) {
-      const yearReturn = (realReturn * 0.7) + (realVol * 0.8) * randn(); // lower return & vol in retirement
+      const yearReturn = (realReturn * 0.7) + (realVol * 0.8) * randn(rng); // lower return & vol in retirement
       balance = balance * (1 + yearReturn) - annualSpending;
       if (balance < 0) balance = 0;
       path.push(balance);

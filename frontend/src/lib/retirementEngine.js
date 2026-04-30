@@ -7,12 +7,25 @@
 //
 // Percentiles computed from sim distribution at each year.
 
-// Box–Muller normal sample
-export const randn = () => {
+// Box–Muller normal sample. Accepts an optional seeded random source so the
+// engine can return deterministic outputs across screens / re-renders.
+export const randn = (rng = Math.random) => {
   let u = 0, v = 0;
-  while (u === 0) u = Math.random();
-  while (v === 0) v = Math.random();
+  while (u === 0) u = rng();
+  while (v === 0) v = rng();
   return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+};
+
+// Mulberry32 — fast, good-quality 32-bit PRNG. Returns a `() => number` in
+// [0, 1) suitable for substituting `Math.random` when reproducibility matters.
+export const mulberry32 = (seed) => {
+  let t = (seed >>> 0) || 1;
+  return () => {
+    t = (t + 0x6d2b79f5) >>> 0;
+    let r = Math.imul(t ^ (t >>> 15), 1 | t);
+    r = (r + Math.imul(r ^ (r >>> 7), 61 | r)) ^ r;
+    return ((r ^ (r >>> 14)) >>> 0) / 4_294_967_296;
+  };
 };
 
 // Percentile helper — returns value at `pct` from sorted array
@@ -45,6 +58,9 @@ export const projectRetirement = ({
   inflationRate = 0.025,
   numSims = 500,
   legacyGoal = 0,
+  // Optional integer seed → deterministic Monte Carlo across re-renders.
+  // Leave undefined for live exploratory mode (uses Math.random).
+  seed = undefined,
 }) => {
   // Guardrails — prevent NaN and Infinity from bad inputs (use ?? to allow 0)
   currentPortfolio = Math.max(0, Number.isFinite(+currentPortfolio) ? +currentPortfolio : 0);
@@ -57,6 +73,10 @@ export const projectRetirement = ({
   inflationRate = Math.max(0, Number.isFinite(+inflationRate) ? +inflationRate : 0.025);
   numSims = Math.max(50, Math.round(Number.isFinite(+numSims) ? +numSims : 500));
   legacyGoal = Math.max(0, Number.isFinite(+legacyGoal) ? +legacyGoal : 0);
+
+  // Seedable RNG so consumers (Readiness Portal, Control Centre, etc.) can
+  // pass a stable seed to get identical results between screens.
+  const rng = Number.isInteger(seed) ? mulberry32(seed) : Math.random;
 
   const totalYears = yearsToRetirement + yearsInRetirement;
   const realReturn = expectedReturn - inflationRate;
@@ -71,7 +91,7 @@ export const projectRetirement = ({
 
     // Accumulation: contributions grow with inflation (real terms handled by using realReturn)
     for (let y = 1; y <= yearsToRetirement; y++) {
-      const r = realReturn + volatility * randn();
+      const r = realReturn + volatility * randn(rng);
       bal = bal * (1 + r) + annualContributions;
       if (bal <= 0) { bal = 0; depleted = true; }
       path.push(bal);
@@ -80,7 +100,7 @@ export const projectRetirement = ({
     // Drawdown: spending is in today's dollars, but we use real return so no need to inflate
     // Slightly reduce vol + return during retirement (glide-path)
     for (let y = 1; y <= yearsInRetirement; y++) {
-      const r = realReturn * 0.75 + volatility * 0.85 * randn();
+      const r = realReturn * 0.75 + volatility * 0.85 * randn(rng);
       bal = bal * (1 + r) - annualSpending;
       if (bal <= 0) { bal = 0; depleted = true; }
       path.push(bal);

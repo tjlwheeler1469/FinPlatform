@@ -210,7 +210,66 @@ const BalanceSheetCard = ({ client, totals }) => {
   );
 };
 
-const EmbeddedScenarioCard = ({ client, baseConfidence }) => {
+// Map a simulation item from the Intelligence Feed into concrete slider
+// adjustments for the Live Scenario engine. Pure function, deterministic.
+// Returns null if no meaningful mapping exists.
+const mapSimulationToSliders = (sim, current, client) => {
+  if (!sim) return null;
+  const cat = String(sim.category || "").toLowerCase();
+  const headline = String(sim.headline || "").toLowerCase();
+  const next = { ...current };
+
+  // 1) Portfolio / rebalance — pull volatility down toward Balanced (12σ)
+  if (cat.includes("portfolio") || /rebalance|allocation|drift|equity/.test(headline)) {
+    next.volatility = Math.max(8, Math.min(current.volatility, 12));
+  }
+
+  // 2) Contributions / super — bump annual contributions; size based on
+  // financialImpact when available, else a sensible default.
+  if (cat.includes("super") || cat.includes("contribution") || /contribut|salary sacrific|concessional/.test(headline)) {
+    const yearsToRet = Math.max(1, current.retireAge - client.profile.age);
+    const inferredYearly = Number.isFinite(sim.financialImpact)
+      ? Math.max(5_000, Math.round(Math.abs(sim.financialImpact) / yearsToRet / 1000) * 1000)
+      : 15_000;
+    next.annualContrib = Math.min(300_000, current.annualContrib + inferredYearly);
+  }
+
+  // 3) Tax — add tax savings to contributions, scale by impact
+  if (cat.includes("tax") || /tax|cgt|deduction|harvesting/.test(headline)) {
+    const yearsToRet = Math.max(1, current.retireAge - client.profile.age);
+    const inferred = Number.isFinite(sim.financialImpact)
+      ? Math.max(2_000, Math.round(Math.abs(sim.financialImpact) / yearsToRet / 1000) * 1000)
+      : 5_000;
+    next.annualContrib = Math.min(300_000, current.annualContrib + inferred);
+  }
+
+  // 4) Spending — trim annual spending modestly to model outcome
+  if (cat.includes("spend") || /budget|expense|drift|spending/.test(headline)) {
+    next.annualSpend = Math.max(50_000, Math.round(current.annualSpend * 0.94));
+  }
+
+  // 5) Retirement timing — delay by 2 years to test sequencing buffer
+  if (/sequenc|retirement age|delay|defer/.test(headline) || cat.includes("retirement")) {
+    next.retireAge = Math.min(75, current.retireAge + 2);
+  }
+
+  // If nothing matched but the strategy has a positive financial impact,
+  // assume contribution increase as a safe default.
+  if (
+    next.retireAge === current.retireAge &&
+    next.annualSpend === current.annualSpend &&
+    next.annualContrib === current.annualContrib &&
+    next.volatility === current.volatility &&
+    Number.isFinite(sim.financialImpact) && sim.financialImpact > 0
+  ) {
+    const yearsToRet = Math.max(1, current.retireAge - client.profile.age);
+    next.annualContrib = Math.min(300_000, current.annualContrib + Math.max(5_000, Math.round(sim.financialImpact / yearsToRet / 1000) * 1000));
+  }
+
+  return next;
+};
+
+const EmbeddedScenarioCard = ({ client, baseConfidence, simulation, applyTrigger = 0, seed }) => {
   const liquidAssets = useMemo(() =>
     client.assets.filter(a => ["Super", "Shares", "Managed Fund", "Cash", "Trust Portfolio"].includes(a.type))
       .reduce((s, a) => s + a.value, 0),
@@ -220,6 +279,23 @@ const EmbeddedScenarioCard = ({ client, baseConfidence }) => {
   const [annualSpend, setAnnualSpend] = useState(client.retirement.retirement_spending);
   const [annualContrib, setAnnualContrib] = useState(client.retirement.annual_contributions);
   const [volatility, setVolatility] = useState(12); // σ% — 6%=conservative, 12%=balanced, 20%=aggressive
+
+  // When the parent fires applyTrigger (Apply Simulation button on banner),
+  // derive new slider values from the simulation payload and apply them.
+  useEffect(() => {
+    if (!applyTrigger || !simulation) return;
+    const next = mapSimulationToSliders(
+      simulation,
+      { retireAge, annualSpend, annualContrib, volatility },
+      client
+    );
+    if (!next) return;
+    if (next.retireAge !== retireAge) setRetireAge(next.retireAge);
+    if (next.annualSpend !== annualSpend) setAnnualSpend(next.annualSpend);
+    if (next.annualContrib !== annualContrib) setAnnualContrib(next.annualContrib);
+    if (next.volatility !== volatility) setVolatility(next.volatility);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [applyTrigger]);
 
   const scenario = useMemo(() => {
     const yearsToRet = Math.max(1, retireAge - client.profile.age);
@@ -231,9 +307,10 @@ const EmbeddedScenarioCard = ({ client, baseConfidence }) => {
       expectedReturn: 0.065,
       volatility: volatility / 100,
       inflationRate: 0.03,
+      seed,
     });
     return { ...result, yearsToRet };
-  }, [liquidAssets, retireAge, annualSpend, annualContrib, volatility, client.profile.age]);
+  }, [liquidAssets, retireAge, annualSpend, annualContrib, volatility, client.profile.age, seed]);
 
   const delta = scenario.confidence - baseConfidence;
 
@@ -262,6 +339,30 @@ const EmbeddedScenarioCard = ({ client, baseConfidence }) => {
           </div>
           <p className="text-[11px] text-white/70 mt-1">Portfolio at retirement: {fmt(scenario.portfolioAtRetirement)}</p>
         </div>
+
+        {/* "With Strategy" projection — only when arriving from Mission Control with an active simulation */}
+        {simulation && (
+          <div className="mb-4 rounded-lg border border-[#D4A84C] bg-[#FFFDF7] p-3" data-testid="with-strategy-projection">
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-[#8a6c1a]">With Strategy</p>
+              <Badge variant="outline" className="text-[10px] border-[#D4A84C] text-[#8a6c1a]">{simulation.headline?.slice(0, 36)}</Badge>
+            </div>
+            <div className="flex items-baseline gap-3 flex-wrap">
+              {Number.isFinite(simulation.scoreDelta) && (
+                <span className="text-2xl font-bold text-emerald-700">
+                  {Math.min(100, Math.max(0, baseConfidence + simulation.scoreDelta))}%
+                </span>
+              )}
+              <span className="text-[11px] text-muted-foreground">projected confidence</span>
+              {Number.isFinite(simulation.financialImpact) && simulation.financialImpact !== 0 && (
+                <span className="ml-auto text-[12px] font-semibold text-emerald-700">
+                  {simulation.financialImpact >= 0 ? "+" : "−"}{fmt(Math.abs(simulation.financialImpact))} lifetime
+                </span>
+              )}
+            </div>
+            <p className="text-[10px] text-muted-foreground mt-1">Click <strong>Apply Simulation</strong> on the banner to push these values into the sliders below.</p>
+          </div>
+        )}
 
         {/* Sliders */}
         <div className="space-y-3">
@@ -468,6 +569,9 @@ const AdviserClientDashboard = ({ clientId = "thompson_family" }) => {
   // Full payload is stashed in sessionStorage so the banner can show
   // headline + score/$ impact and let the adviser apply or clear it.
   const [simulation, setSimulation] = useState(null);
+  // Increments each time the adviser clicks "Apply Simulation". The Live
+  // Scenario card watches this and snaps its sliders to a strategy preset.
+  const [applyTrigger, setApplyTrigger] = useState(0);
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     if (params.get("simulate") !== "1") return;
@@ -483,6 +587,24 @@ const AdviserClientDashboard = ({ clientId = "thompson_family" }) => {
     navigate(`/dashboard`, { replace: true });
   };
 
+  const applySimulation = () => {
+    setApplyTrigger((n) => n + 1);
+    toast.success("Strategy applied to Live Scenario", {
+      description: "Sliders updated below — confidence recalculating.",
+    });
+  };
+
+  // Stable per-client seed so all Monte Carlo runs for this client (here,
+  // in the Readiness Portal, Mission Control, etc.) return identical numbers.
+  const stableSeed = useMemo(() => {
+    let h = 0x811c9dc5;
+    for (let i = 0; i < clientId.length; i++) {
+      h ^= clientId.charCodeAt(i);
+      h = Math.imul(h, 0x01000193) >>> 0;
+    }
+    return h || 1;
+  }, [clientId]);
+
   // Base retirement confidence (for reference)
   const baseScenario = useMemo(() => {
     const liquidAssets = client.assets.filter(a => ["Super", "Shares", "Managed Fund", "Cash", "Trust Portfolio"].includes(a.type))
@@ -493,8 +615,9 @@ const AdviserClientDashboard = ({ clientId = "thompson_family" }) => {
       annualContributions: client.retirement.annual_contributions,
       annualSpending: client.retirement.retirement_spending,
       yearsToRetirement: yearsToRet,
+      seed: stableSeed,
     });
-  }, [client]);
+  }, [client, stableSeed]);
 
   const surplus = baseScenario.portfolioAtRetirement - (client.retirement.retirement_spending * 25);
   const topRisk = surplus < 0
@@ -598,6 +721,9 @@ const AdviserClientDashboard = ({ clientId = "thompson_family" }) => {
                   </div>
                 )}
               </div>
+              <Button size="sm" variant="default" onClick={applySimulation} data-testid="apply-simulation" className="bg-[#D4A84C] hover:bg-[#b8902a] text-white">
+                <Zap className="h-4 w-4 mr-1" /> Apply Simulation
+              </Button>
               <Button size="sm" variant="ghost" onClick={clearSimulation} data-testid="clear-simulation" className="text-muted-foreground hover:text-[#1a2744]">
                 <X className="h-4 w-4 mr-1" /> Clear
               </Button>
@@ -675,7 +801,7 @@ const AdviserClientDashboard = ({ clientId = "thompson_family" }) => {
           <BalanceSheetCard client={client} totals={totals} />
         </div>
         <div className="lg:col-span-2">
-          <EmbeddedScenarioCard client={client} baseConfidence={baseScenario.confidence} />
+          <EmbeddedScenarioCard client={client} baseConfidence={baseScenario.confidence} simulation={simulation} applyTrigger={applyTrigger} seed={stableSeed} />
         </div>
       </div>
 

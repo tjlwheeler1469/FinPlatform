@@ -48,54 +48,20 @@ const formatCurrency = (value) => {
   }).format(value);
 };
 
-// Australian 2024-25 Tax Brackets
-const TAX_BRACKETS = [
-  { min: 0, max: 18200, rate: 0, label: "$0 - $18,200" },
-  { min: 18201, max: 45000, rate: 0.16, label: "$18,201 - $45,000" },
-  { min: 45001, max: 135000, rate: 0.30, label: "$45,001 - $135,000" },
-  { min: 135001, max: 190000, rate: 0.37, label: "$135,001 - $190,000" },
-  { min: 190001, max: Infinity, rate: 0.45, label: "$190,001+" }
-];
-
-// Undistributed trust income rate
-const UNDISTRIBUTED_RATE = 0.47;
-
-const calculateTax = (income) => {
-  if (income <= 0) return 0;
-  
-  let tax = 0;
-  let remaining = income;
-  
-  for (const bracket of TAX_BRACKETS) {
-    if (remaining <= 0) break;
-    
-    const bracketSize = bracket.max - bracket.min + (bracket.min === 0 ? 0 : 1);
-    const taxableInBracket = Math.min(remaining, bracketSize);
-    
-    if (income > bracket.min) {
-      tax += taxableInBracket * bracket.rate;
-      remaining -= taxableInBracket;
-    }
-  }
-  
-  // Medicare levy 2% for income over threshold
-  if (income > 24276) {
-    tax += income * 0.02;
-  }
-  
-  return Math.round(tax);
-};
+// Tax calculations come from the central /lib/auTax.js engine — single
+// source of truth for ATO 2024-25 brackets across the platform.
+import { TAX_BRACKETS, calculateTax, TRUST_UNDISTRIBUTED_RATE as UNDISTRIBUTED_RATE } from "@/lib/auTax";
 
 const getTaxBreakdown = (income) => {
   const breakdown = [];
   let remaining = income;
-  
+
   for (const bracket of TAX_BRACKETS) {
     if (remaining <= 0) break;
-    
+
     const bracketSize = bracket.max - bracket.min + (bracket.min === 0 ? 0 : 1);
     const taxableInBracket = Math.min(remaining, bracketSize);
-    
+
     if (income > bracket.min) {
       breakdown.push({
         bracket: bracket.label,
@@ -106,7 +72,7 @@ const getTaxBreakdown = (income) => {
       remaining -= taxableInBracket;
     }
   }
-  
+
   // Medicare levy
   if (income > 24276) {
     breakdown.push({
@@ -116,7 +82,7 @@ const getTaxBreakdown = (income) => {
       tax: Math.round(income * 0.02)
     });
   }
-  
+
   return breakdown;
 };
 

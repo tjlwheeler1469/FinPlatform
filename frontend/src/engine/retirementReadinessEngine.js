@@ -3,6 +3,19 @@
 // Inputs: client object (same shape as /app/frontend/src/data/clientData.js).
 import { projectRetirement } from "@/lib/retirementEngine";
 
+// Stable 32-bit hash for an arbitrary string — used as the Monte Carlo seed
+// per client so every screen that runs computeReadiness for the same client
+// gets identical confidence/score/projected-income figures.
+const stableSeed = (input) => {
+  const str = String(input || "default");
+  let h = 0x811c9dc5; // FNV-1a basis
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h || 1;
+};
+
 // ── Asset classification helpers ───────────────────────────────────────────
 const LIQUID_TYPES = ["Super", "SMSF", "Shares", "Managed Fund", "Bonds", "Cash", "Alternatives", "Trust Portfolio"];
 const GROWTH_TYPES = ["Shares", "Managed Fund", "Alternatives", "Trust Portfolio", "Crypto"];
@@ -116,7 +129,10 @@ export const computeReadiness = (client, opts = {}) => {
   const annualSpending = client.retirement?.retirement_spending || 150000;
   const liquid = liquidWealth(client);
 
-  // Monte Carlo projection (reused from existing engine)
+  // Monte Carlo projection (reused from existing engine). Pass a stable
+  // per-client seed so the same client always produces the same score
+  // across screens (Mission Control, Readiness Portal, Overview tab).
+  const seed = stableSeed(client.client_id || client.id || client.profile?.name);
   const proj = projectRetirement({
     currentPortfolio: liquid,
     annualContributions,
@@ -124,6 +140,7 @@ export const computeReadiness = (client, opts = {}) => {
     yearsToRetirement: Math.max(0, retireAge - currentAge),
     yearsInRetirement: Math.max(1, lifeExp - retireAge),
     numSims: opts.numSims || 300,
+    seed,
   });
 
   // Projected retirement income (median) = portfolio at retirement / years in retirement, real

@@ -105,26 +105,9 @@ const formatCurrency = (value) => {
   }).format(value);
 };
 
-// Tax calculation with 2024-25 brackets (Stage 3)
-const TAX_BRACKETS = [
-  { min: 0, max: 18200, rate: 0 },
-  { min: 18201, max: 45000, rate: 0.16 },
-  { min: 45001, max: 135000, rate: 0.30 },
-  { min: 135001, max: 190000, rate: 0.37 },
-  { min: 190001, max: Infinity, rate: 0.45 }
-];
-
-const calculateTax = (income) => {
-  let tax = 0;
-  for (const bracket of TAX_BRACKETS) {
-    if (income > bracket.min) {
-      const taxableInBracket = Math.min(income, bracket.max) - bracket.min;
-      tax += Math.max(0, taxableInBracket) * bracket.rate;
-    }
-  }
-  if (income > 24276) tax += income * 0.02; // Medicare
-  return Math.round(tax);
-};
+// Tax calculations come from the central /lib/auTax.js engine — single source
+// of truth for ATO 2024-25 brackets across the platform.
+import { TAX_BRACKETS, calculateTax } from "@/lib/auTax";
 
 const COLORS = ['#1a2744', '#D4A84C', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'];
 
