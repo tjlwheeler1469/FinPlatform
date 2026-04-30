@@ -19,6 +19,7 @@ ROUTE_REGISTRY = [
     ("routes.scheduled_digests", "router", "/api", "Scheduled Digests"),
     ("routes.compliance_reports", "router", "/api", "Compliance Reports"),
     ("routes.client_capture", "router", "/api", "Client Capture (Xplan-style)"),
+    ("routes.xplan_sync", "router", "/api", "Xplan 5-Module Sync Surface"),
     ("routes.tax", "router", "/api", "Tax"),
     ("routes.analysis", "router", "/api", "Analysis"),
     ("routes.crm", "router", "/api", "CRM"),

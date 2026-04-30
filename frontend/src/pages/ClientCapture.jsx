@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CLIENT_DATA, getActiveClientId } from "@/data/clientData";
-import { Save, RotateCcw, ContactRound, ListChecks, Handshake, FileSearch, BookOpen, Gauge } from "lucide-react";
+import { Save, RotateCcw, ContactRound, ListChecks, Handshake, FileSearch, BookOpen, Gauge, Download, Upload } from "lucide-react";
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
@@ -154,6 +154,36 @@ const ClientCapture = () => {
 
   const handleReset = () => { setData(original); toast.info("Changes reverted"); };
 
+  const handlePullFromXplan = async () => {
+    try {
+      const r = await fetch(`${API}/api/xplan-sync/capture/${clientId}/pull`, { method: "POST" });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const out = await r.json();
+      // Refetch the merged record so the UI reflects the pulled fields.
+      const r2 = await fetch(`${API}/api/client-capture/${clientId}`);
+      if (r2.ok) {
+        const fresh = await r2.json();
+        setData((prev) => ({ ...prev, ...fresh, service_overview: { ...prev.service_overview, ...(fresh.service_overview || {}) } }));
+        setOriginal((prev) => ({ ...prev, ...fresh, service_overview: { ...prev.service_overview, ...(fresh.service_overview || {}) } }));
+      }
+      toast.success(`Pulled from Xplan (${out.mode})`, { description: out.fields_pulled?.length ? `${out.fields_pulled.length} fields refreshed` : "No changes" });
+    } catch (e) {
+      toast.error("Pull failed", { description: String(e).slice(0, 200) });
+    }
+  };
+
+  const handlePushToXplan = async () => {
+    if (dirty) await handleSave();
+    try {
+      const r = await fetch(`${API}/api/xplan-sync/capture/${clientId}/push`, { method: "POST" });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const out = await r.json();
+      toast.success(`Pushed to Xplan (${out.mode})`, { description: `${out.fields_pushed || 0} fields synced` });
+    } catch (e) {
+      toast.error("Push failed", { description: String(e).slice(0, 200) });
+    }
+  };
+
   if (!data) return <Layout><div className="p-8 text-center text-muted-foreground">Loading…</div></Layout>;
 
   return (
@@ -172,6 +202,8 @@ const ClientCapture = () => {
               ))}
             </select>
             {dirty && <Badge variant="outline" className="text-amber-700 border-amber-300">Unsaved</Badge>}
+            <Button variant="outline" size="sm" onClick={handlePullFromXplan} data-testid="capture-pull-xplan" className="border-[#3B9CDC] text-[#3B9CDC] hover:bg-[#3B9CDC]/10"><Download className="h-3.5 w-3.5 mr-1" /> Pull Xplan</Button>
+            <Button variant="outline" size="sm" onClick={handlePushToXplan} data-testid="capture-push-xplan" className="border-[#3B9CDC] text-[#3B9CDC] hover:bg-[#3B9CDC]/10"><Upload className="h-3.5 w-3.5 mr-1" /> Push Xplan</Button>
             <Button variant="outline" size="sm" onClick={handleReset} disabled={!dirty} data-testid="capture-reset"><RotateCcw className="h-3.5 w-3.5 mr-1" /> Reset</Button>
             <Button size="sm" onClick={handleSave} disabled={saving || !dirty} data-testid="capture-save" className="bg-[#1a2744] hover:bg-[#0f1830] text-white"><Save className="h-3.5 w-3.5 mr-1" /> {saving ? "Saving…" : "Save"}</Button>
           </CardContent>
