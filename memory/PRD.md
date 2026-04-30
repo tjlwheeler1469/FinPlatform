@@ -1,3 +1,9 @@
+## April 2026 — Implementation Pack + Alpaca Broker + PDF Attachments
+- **One-click Implementation Pack** (`POST /api/implementation-pack/{client_id}`): orchestrates PDF storage → notify_client (with attachment) → create N execution tickets (one per SOA recommendation, auto-categorised trade/super/insurance/rebalance) → Xmerge push → single audit record. UI button on `AdviceDocumentBuilder` renders a 4-step audit-trail card with refs for compliance replay. 8/8 pytest tests green (iter 205).
+- **Alpaca broker adapter live-ready**: `execution_rails.broker_adapter` now calls `alpaca_trading.get_trading_client()` when `ALPACA_API_KEY`+`ALPACA_SECRET_KEY` are set. Falls back to mock lifecycle otherwise. AU tickers have `.AX` stripped for paper-trade sanity.
+- **PDF attachments in Notify Client**: `POST /api/notify/client` accepts `attachment_base64` + `attachment_name`; resend `attachments` param used in live mode. Mocked log records `has_attachment`/`attachment_name`.
+
+
 ## April 2026 — P2/P3 Completions
 - **P2 RESEND email**: "Notify Client" button in `AdviceDocumentBuilder` with LIVE/MOCKED badge driven by `/api/email-resend/status`; calls `/api/notify/client` which falls back to audit-logged mock when no `RESEND_API_KEY`.
 - **P3 Execution Rails**: New `/app/backend/routes/execution_rails.py` with adapter registry (broker / super_platform / insurance / contribution / rebalance). `POST /api/exec-rails/tickets/{id}/dispatch` transitions ticket through the pipeline, writes audit events to `execution_rail_events`. Each adapter reads its `*_API_KEY` env var to flip from mock → live.
