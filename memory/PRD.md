@@ -1,3 +1,11 @@
+## April 2026 — Calculation hardening + 10M-iteration stress test
+- **Bug fix**: Numeric inputs on Retirement Workshop, Household Budget and Scenario Comparison accepted any string and propagated absurd values (e.g. `1e20`) into the surplus + Monte Carlo math. Display showed nonsensical "$10,416,799,999,999,975,000" surplus.
+- **Fix**: Added `lib/inputBounds.js` with per-field clamps (`monthlyIncome` ≤ $5M, `currentPortfolio` ≤ $1B, ages 0-130, etc.), strips non-numeric paste, returns the field default for NaN/empty/Infinity. Wired into every adviser-input field on `RetirementWorkshop.jsx` (10 fields) and `HouseholdBudget.jsx` (5 fields).
+- **Display**: Net monthly surplus + scenario-comparison rows now use `fmtCurrencyCompact` (always emits `$1.23M` / `$1.5K`, never line-wraps a 20-digit number).
+- **Stress test**: New `lib/stress.test.mjs` runs 10,000,000 hostile-input iterations (Infinity, NaN, garbage strings, max-safe-int) through clampers + formatters + 100 Monte Carlo projections → **PASSED in 8.8s** (1.13M ops/sec, all values finite, all formats clean).
+- Run: `node /app/frontend/src/lib/stress.test.mjs` (or `ITER=20000000 node ...` for 20M).
+
+
 ## April 2026 — ASIC SOA/ROA redesign + adviser-level Xplan Sync
 - **SOA template rewritten** to ASIC INFO 267 letter format: letterhead (licensee + adviser + ref), "About this document", "Your reasons for seeking advice", "What my advice does not cover", "Overview of my recommendations", "Your current situation" (prose + at-a-glance data sidebar), "My advice and why it's appropriate" (numbered recs with rationale / expected benefit / key risks / cost), "Things you need to know", "Advice fees and conflicts of interest", "Next steps", "Authority to Proceed" signature block. Serif Georgia body + navy/gold accents.
 - **ROA template rewritten** to ASIC INFO 266 letter format (8-section follow-up letter referencing the prior SOA).

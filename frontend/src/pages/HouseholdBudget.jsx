@@ -36,6 +36,16 @@ import {
 } from "lucide-react";
 import { usePortfolio } from "@/App";
 import { getActiveClient } from "@/data/clientData";
+import { clampInput } from "@/lib/inputBounds";
+
+// Per-line amount clamp: bounds any single line at $5M (well above any plausible
+// household income/expense line item). Prevents adviser data-entry typos from
+// propagating into multi-quintillion totals.
+const clampLineAmount = (raw) => {
+  const n = Number(String(raw).replace(/[^\d.\-]/g, ""));
+  if (!Number.isFinite(n) || n < 0) return 0;
+  return Math.min(n, 5_000_000);
+};
 import {
   BarChart,
   Bar,
@@ -334,12 +344,12 @@ const HouseholdBudget = ({ embedded = false }) => {
                 </div>
                 <div className="space-y-1.5">
                   <Label className="text-xs">Extra Monthly Savings</Label>
-                  <Input type="number" value={whatIfAdjustments.extraSavings} onChange={e => setWhatIfAdjustments(p => ({...p, extraSavings: Number(e.target.value)}))}
+                  <Input type="number" min="0" max="1000000" value={whatIfAdjustments.extraSavings} onChange={e => setWhatIfAdjustments(p => ({...p, extraSavings: clampInput(e.target.value, "extraMonthlySavings")}))}
                     className="h-8 text-xs" placeholder="$0" data-testid="whatif-extra-savings" />
                 </div>
                 <div className="space-y-1.5">
                   <Label className="text-xs">Annual Lump Sum</Label>
-                  <Input type="number" value={whatIfAdjustments.lumpSum} onChange={e => setWhatIfAdjustments(p => ({...p, lumpSum: Number(e.target.value)}))}
+                  <Input type="number" min="0" max="100000000" value={whatIfAdjustments.lumpSum} onChange={e => setWhatIfAdjustments(p => ({...p, lumpSum: clampInput(e.target.value, "legacyGoal")}))}
                     className="h-8 text-xs" placeholder="$0" data-testid="whatif-lump-sum" />
                 </div>
                 <div className="space-y-1.5">
@@ -551,8 +561,10 @@ const HouseholdBudget = ({ embedded = false }) => {
                         />
                         <Input
                           type="number"
+                          min="0"
+                          max="5000000"
                           value={income.amount}
-                          onChange={(e) => updateIncome(income.id, 'amount', Number(e.target.value))}
+                          onChange={(e) => updateIncome(income.id, 'amount', clampLineAmount(e.target.value))}
                           placeholder="Amount"
                         />
                         <Select 
@@ -633,8 +645,10 @@ const HouseholdBudget = ({ embedded = false }) => {
                           />
                           <Input
                             type="number"
+                            min="0"
+                            max="5000000"
                             value={expense.amount}
-                            onChange={(e) => updateExpense(expense.id, 'amount', Number(e.target.value))}
+                            onChange={(e) => updateExpense(expense.id, 'amount', clampLineAmount(e.target.value))}
                             placeholder="Amount"
                           />
                           <Select 
@@ -713,8 +727,10 @@ const HouseholdBudget = ({ embedded = false }) => {
                           />
                           <Input
                             type="number"
+                            min="0"
+                            max="5000000"
                             value={cost.amount}
-                            onChange={(e) => updateOneOff(cost.id, 'amount', Number(e.target.value))}
+                            onChange={(e) => updateOneOff(cost.id, 'amount', clampLineAmount(e.target.value))}
                             placeholder="Amount"
                           />
                           <Select 

@@ -26,16 +26,11 @@ import {
 } from "lucide-react";
 import { CLIENT_DATA, getActiveClientId } from "@/data/clientData";
 import { projectRetirement, buildScenarioFromInputs } from "@/lib/retirementEngine";
+import { clampInput, fmtCurrencyCompact, fmtCurrencyFull } from "@/lib/inputBounds";
 
-const fmt = (v) =>
-  new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD", maximumFractionDigits: 0 }).format(v || 0);
+const fmt = fmtCurrencyFull;
 
-const fmtShort = (v) => {
-  const abs = Math.abs(v || 0);
-  if (abs >= 1_000_000) return `$${(v / 1_000_000).toFixed(2)}M`;
-  if (abs >= 1_000) return `$${(v / 1_000).toFixed(0)}k`;
-  return `$${Math.round(v || 0)}`;
-};
+const fmtShort = fmtCurrencyCompact;
 
 const SCENARIO_COLORS = ["#1a2744", "#10b981", "#f59e0b", "#8b5cf6", "#ec4899"];
 
@@ -161,18 +156,18 @@ const ScenarioEditor = ({ scenario, onChange, onRemove, isBase, color, result, b
           <TabsContent value="budget" className="space-y-3 pt-3">
             <div className="grid grid-cols-2 gap-3">
               <FieldRow label="Monthly Income" hint="Household combined take-home income.">
-                <Input type="number" value={i.monthlyIncome} onChange={(e) => update({ monthlyIncome: +e.target.value })} className="h-8 text-sm" data-testid={`input-income-${scenario.id}`} />
+                <Input type="number" min="0" max="5000000" value={i.monthlyIncome} onChange={(e) => update({ monthlyIncome: clampInput(e.target.value, "monthlyIncome") })} className="h-8 text-sm" data-testid={`input-income-${scenario.id}`} />
               </FieldRow>
               <FieldRow label="Monthly Expenses" hint="Total household spending per month today.">
-                <Input type="number" value={i.monthlyExpenses} onChange={(e) => update({ monthlyExpenses: +e.target.value })} className="h-8 text-sm" data-testid={`input-expenses-${scenario.id}`} />
+                <Input type="number" min="0" max="5000000" value={i.monthlyExpenses} onChange={(e) => update({ monthlyExpenses: clampInput(e.target.value, "monthlyExpenses") })} className="h-8 text-sm" data-testid={`input-expenses-${scenario.id}`} />
               </FieldRow>
               <FieldRow label="Extra Monthly Savings" hint="Additional savings beyond current rate (will be added to annual contributions).">
-                <Input type="number" value={i.extraMonthlySavings} onChange={(e) => update({ extraMonthlySavings: +e.target.value })} className="h-8 text-sm" data-testid={`input-extra-${scenario.id}`} />
+                <Input type="number" min="0" max="1000000" value={i.extraMonthlySavings} onChange={(e) => update({ extraMonthlySavings: clampInput(e.target.value, "extraMonthlySavings") })} className="h-8 text-sm" data-testid={`input-extra-${scenario.id}`} />
               </FieldRow>
               <div className="flex items-end">
                 <div className="w-full p-2 rounded bg-gray-50 text-xs">
                   <p className="text-muted-foreground">Net monthly surplus</p>
-                  <p className="font-semibold">{fmt(i.monthlyIncome - i.monthlyExpenses + i.extraMonthlySavings)}</p>
+                  <p className="font-semibold">{fmtShort(i.monthlyIncome - i.monthlyExpenses + i.extraMonthlySavings)}</p>
                 </div>
               </div>
             </div>
@@ -181,10 +176,10 @@ const ScenarioEditor = ({ scenario, onChange, onRemove, isBase, color, result, b
           <TabsContent value="investments" className="space-y-3 pt-3">
             <div className="grid grid-cols-2 gap-3">
               <FieldRow label="Current Portfolio" hint="Sum of investible assets (super + shares + funds + cash).">
-                <Input type="number" value={i.currentPortfolio} onChange={(e) => update({ currentPortfolio: +e.target.value })} className="h-8 text-sm" data-testid={`input-portfolio-${scenario.id}`} />
+                <Input type="number" min="0" max="1000000000" value={i.currentPortfolio} onChange={(e) => update({ currentPortfolio: clampInput(e.target.value, "currentPortfolio") })} className="h-8 text-sm" data-testid={`input-portfolio-${scenario.id}`} />
               </FieldRow>
               <FieldRow label="Annual Contributions" hint="Super contributions + savings to investment accounts per year.">
-                <Input type="number" value={i.annualContributions} onChange={(e) => update({ annualContributions: +e.target.value })} className="h-8 text-sm" data-testid={`input-contrib-${scenario.id}`} />
+                <Input type="number" min="0" max="5000000" value={i.annualContributions} onChange={(e) => update({ annualContributions: clampInput(e.target.value, "annualContributions") })} className="h-8 text-sm" data-testid={`input-contrib-${scenario.id}`} />
               </FieldRow>
             </div>
             <FieldRow label={`Expected Return: ${i.expectedReturn}% p.a.`} hint="Average nominal annual return.">
@@ -198,20 +193,20 @@ const ScenarioEditor = ({ scenario, onChange, onRemove, isBase, color, result, b
           <TabsContent value="goals" className="space-y-3 pt-3">
             <div className="grid grid-cols-3 gap-3">
               <FieldRow label="Current Age">
-                <Input type="number" value={i.currentAge} onChange={(e) => update({ currentAge: +e.target.value })} className="h-8 text-sm" data-testid={`input-age-${scenario.id}`} />
+                <Input type="number" min="0" max="120" value={i.currentAge} onChange={(e) => update({ currentAge: clampInput(e.target.value, "currentAge") })} className="h-8 text-sm" data-testid={`input-age-${scenario.id}`} />
               </FieldRow>
               <FieldRow label="Retirement Age">
-                <Input type="number" value={i.retirementAge} onChange={(e) => update({ retirementAge: +e.target.value })} className="h-8 text-sm" data-testid={`input-retire-age-${scenario.id}`} />
+                <Input type="number" min="0" max="120" value={i.retirementAge} onChange={(e) => update({ retirementAge: clampInput(e.target.value, "retirementAge") })} className="h-8 text-sm" data-testid={`input-retire-age-${scenario.id}`} />
               </FieldRow>
               <FieldRow label="Life Expectancy">
-                <Input type="number" value={i.lifeExpectancy} onChange={(e) => update({ lifeExpectancy: +e.target.value })} className="h-8 text-sm" data-testid={`input-life-${scenario.id}`} />
+                <Input type="number" min="0" max="130" value={i.lifeExpectancy} onChange={(e) => update({ lifeExpectancy: clampInput(e.target.value, "lifeExpectancy") })} className="h-8 text-sm" data-testid={`input-life-${scenario.id}`} />
               </FieldRow>
             </div>
             <FieldRow label="Annual Retirement Spending" hint="Desired annual spending in retirement (in today's dollars).">
-              <Input type="number" value={i.retirementSpending} onChange={(e) => update({ retirementSpending: +e.target.value })} className="h-8 text-sm" data-testid={`input-spend-${scenario.id}`} />
+              <Input type="number" min="0" max="5000000" value={i.retirementSpending} onChange={(e) => update({ retirementSpending: clampInput(e.target.value, "retirementSpending") })} className="h-8 text-sm" data-testid={`input-spend-${scenario.id}`} />
             </FieldRow>
             <FieldRow label="Legacy / Inheritance Goal" hint="Desired balance remaining at life expectancy (0 = spend all).">
-              <Input type="number" value={i.legacyGoal} onChange={(e) => update({ legacyGoal: +e.target.value })} className="h-8 text-sm" data-testid={`input-legacy-${scenario.id}`} />
+              <Input type="number" min="0" max="100000000" value={i.legacyGoal} onChange={(e) => update({ legacyGoal: clampInput(e.target.value, "legacyGoal") })} className="h-8 text-sm" data-testid={`input-legacy-${scenario.id}`} />
             </FieldRow>
           </TabsContent>
 
@@ -412,7 +407,7 @@ const RetirementWorkshop = ({ embedded = false, clientId: propClientId }) => {
                     <tr className="border-b">
                       <td className="py-2 pr-4">Monthly Surplus</td>
                       {scenarios.map((s) => (
-                        <td key={s.id} className="py-2 px-2 text-center font-medium">{fmt(s.inputs.monthlyIncome - s.inputs.monthlyExpenses + s.inputs.extraMonthlySavings)}</td>
+                        <td key={s.id} className="py-2 px-2 text-center font-medium">{fmtShort(s.inputs.monthlyIncome - s.inputs.monthlyExpenses + s.inputs.extraMonthlySavings)}</td>
                       ))}
                     </tr>
                     <tr className="border-b">
