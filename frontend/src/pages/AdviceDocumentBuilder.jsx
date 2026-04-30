@@ -1,7 +1,7 @@
 // AdviceDocumentBuilder — generate a printable SOA or ROA from the active
 // adviser client and download it as a PDF. Saves a record into the
 // /api/compliance-docs/document collection so it appears in the Vault.
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { toast } from "sonner";
@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import Layout from "@/components/Layout";
 import { CLIENT_DATA, getActiveClientId } from "@/data/clientData";
 import { buildAdviceDocument, formatCurrency } from "@/lib/adviceDocumentEngine";
-import { Download, FileText, Save, Eye } from "lucide-react";
+import { Download, FileText, Save, Eye, Upload, Tag, Mail, Rocket, ShoppingBag } from "lucide-react";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -165,6 +165,22 @@ const AdviceDocumentBuilder = () => {
   const [docType, setDocType] = useState("soa");
   const [clientId, setClientId] = useState(() => getActiveClientId() || "thompson_family");
   const [generating, setGenerating] = useState(false);
+  const [showTokens, setShowTokens] = useState(false);
+  const [tokens, setTokens] = useState({});
+  const [emailMode, setEmailMode] = useState("mocked");
+
+  // Pull the canonical Xmerge token dictionary on mount so each rendered
+  // section can show its Xplan field code as a hoverable badge.
+  useEffect(() => {
+    fetch(`${API_URL}/api/xplan-sync/xmerge/tokens`)
+      .then((r) => r.ok ? r.json() : { tokens: {} })
+      .then((d) => setTokens(d.tokens || {}))
+      .catch(() => setTokens({}));
+    fetch(`${API_URL}/api/email-resend/status`)
+      .then((r) => r.ok ? r.json() : { mode: "mocked" })
+      .then((d) => setEmailMode(d.mode || "mocked"))
+      .catch(() => setEmailMode("mocked"));
+  }, []);
 
   const client = CLIENT_DATA[clientId] || CLIENT_DATA.thompson_family;
   const document = useMemo(() => buildAdviceDocument({ docType, client }), [docType, client]);
@@ -222,6 +238,90 @@ const AdviceDocumentBuilder = () => {
     }
   };
 
+  const handlePushToXplan = async () => {
+    try {
+      const payload = {
+        docType,
+        documentRef: document.documentRef,
+        sections: document.sections.map((s) => ({ id: s.id, type: s.type, heading: s.heading })),
+        tokenMap: tokens,
+      };
+      const r = await fetch(`${API_URL}/api/xplan-sync/xmerge/${clientId}/push-document`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const out = await r.json();
+      toast.success(`Pushed to Xplan via Xmerge (${out.mode})`, {
+        description: `${out.tokens_used.length} field tokens · ref ${out.document_ref}`,
+      });
+    } catch (e) {
+      toast.error("Push failed", { description: String(e).slice(0, 200) });
+    }
+  };
+
+  const handleNotifyClient = async () => {
+    try {
+      const body = `Your ${docType.toUpperCase()} "${document.client.name}" is ready.\n\nDocument ref: ${document.documentRef}\nPrepared by: ${document.adviser.name}\n\nPlease review and sign at your earliest convenience.`;
+      const r = await fetch(`${API_URL}/api/notify/client`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          client_id: document.client.id,
+          client_name: document.client.name,
+          to_email: document.client.email || "client@example.com",
+          subject: `Your ${docType.toUpperCase()} is ready — ${document.documentRef}`,
+          body,
+          source_item_id: document.documentRef,
+        }),
+      });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const out = await r.json();
+      if (out.mode === "mocked") {
+        toast.info("Notify Client (MOCKED)", {
+          description: "Email logged only. Set RESEND_API_KEY to send live.",
+        });
+      } else if (out.mode === "live") {
+        toast.success("Email sent via Resend", { description: out.notification?.delivery_ref || "" });
+      } else {
+        toast.error("Email failed", { description: out.notification?.error || "unknown" });
+      }
+    } catch (e) {
+      toast.error("Notify failed", { description: String(e).slice(0, 200) });
+    }
+  };
+
+  const handleDispatchToRails = async () => {
+    try {
+      // Create ticket tied to the SOA/ROA then dispatch
+      const ticketRes = await fetch(`${API_URL}/api/execution/tickets`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          client_id: document.client.id,
+          client_name: document.client.name,
+          ticket_type: "rebalance",
+          headline: `Execute recommendations for ${docType.toUpperCase()} ${document.documentRef}`,
+          message: `Dispatched from Advice Document Builder`,
+          source_item_id: document.documentRef,
+          urgency: "SOON",
+          payload: { doc_ref: document.documentRef, doc_type: docType },
+        }),
+      });
+      if (!ticketRes.ok) throw new Error("Ticket creation failed");
+      const { ticket } = await ticketRes.json();
+      const dispatchRes = await fetch(`${API_URL}/api/exec-rails/tickets/${ticket.ticket_id}/dispatch`, { method: "POST" });
+      if (!dispatchRes.ok) throw new Error("Dispatch failed");
+      const out = await dispatchRes.json();
+      toast.success(`Dispatched to execution rails`, {
+        description: `${out.event.adapter} · ${out.event.mode} · ref ${out.event.external_ref}`,
+      });
+    } catch (e) {
+      toast.error("Execution rails failed", { description: String(e).slice(0, 200) });
+    }
+  };
+
   return (
     <Layout>
       <div className="max-w-[1100px] mx-auto p-4 space-y-4" data-testid="advice-document-builder">
@@ -246,6 +346,16 @@ const AdviceDocumentBuilder = () => {
                   return (<option key={id} value={id}>{label}</option>);
                 })}
             </select>
+            <Button variant="outline" size="sm" onClick={() => setShowTokens(s => !s)} data-testid="builder-toggle-tokens" className={showTokens ? "border-[#3B9CDC] text-[#3B9CDC] bg-[#3B9CDC]/10" : ""}><Tag className="h-3.5 w-3.5 mr-1" /> {showTokens ? "Hide" : "Show"} Xplan tokens</Button>
+            <Button variant="outline" size="sm" onClick={handlePushToXplan} data-testid="builder-push-xplan" className="border-[#3B9CDC] text-[#3B9CDC]"><Upload className="h-3.5 w-3.5 mr-1" /> Push via Xmerge</Button>
+            <Button variant="outline" size="sm" onClick={handleNotifyClient} data-testid="builder-notify-client" className={emailMode === "live" ? "border-emerald-600 text-emerald-700" : "border-amber-500 text-amber-700"}>
+              <Mail className="h-3.5 w-3.5 mr-1" /> Notify Client
+              <Badge variant="outline" className={`ml-2 text-[9px] ${emailMode === "live" ? "border-emerald-600 text-emerald-700" : "border-amber-500 text-amber-700"}`}>
+                {emailMode === "live" ? "LIVE" : "MOCKED"}
+              </Badge>
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleDispatchToRails} data-testid="builder-dispatch-rails" className="border-violet-500 text-violet-700"><Rocket className="h-3.5 w-3.5 mr-1" /> Execute Strategy</Button>
+            <Button variant="outline" size="sm" onClick={() => window.location.assign("/product-marketplace")} data-testid="builder-view-marketplace" className="border-slate-400 text-slate-700"><ShoppingBag className="h-3.5 w-3.5 mr-1" /> Marketplace</Button>
             <Button variant="outline" size="sm" onClick={handleSaveToVault} data-testid="builder-save-vault"><Save className="h-3.5 w-3.5 mr-1" /> Save to Vault</Button>
             <Button size="sm" onClick={handleDownload} disabled={generating} data-testid="builder-download-pdf" className="bg-[#1a2744] hover:bg-[#0f1830] text-white">
               <Download className="h-3.5 w-3.5 mr-1" /> {generating ? "Generating…" : "Download PDF"}
@@ -258,9 +368,24 @@ const AdviceDocumentBuilder = () => {
             <Eye className="h-3.5 w-3.5" /> Preview · {document.documentRef} · {document.sections.length} sections
             <Badge variant="outline" className="ml-auto text-[10px]">RG175 compliant</Badge>
             <Badge variant="outline" className="text-[10px]">IPS-style portfolio</Badge>
+            {showTokens && <Badge variant="outline" className="text-[10px] border-[#3B9CDC] text-[#3B9CDC]">{Object.keys(tokens).length} Xmerge tokens</Badge>}
           </CardContent>
           <CardContent className="p-0">
-            <div id="soa-document-root" className="bg-white text-[#1a2744]" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+            <div id="soa-document-root" className={`bg-white text-[#1a2744] ${showTokens ? "soa-tokens-on" : ""}`} style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+              {showTokens && (
+                <div className="px-6 pt-4">
+                  <div className="border border-[#3B9CDC] bg-[#3B9CDC]/5 rounded p-3 text-[11px]">
+                    <p className="font-semibold text-[#1a2744] mb-1">Xplan / Xmerge field codes — preview overlay</p>
+                    <p className="text-muted-foreground mb-2">Each token below is wired into the SOA/ROA template. When you click <strong>Push via Xmerge</strong> the document is pushed back to Xplan and the codes resolve to live client fields.</p>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-1 font-mono text-[10px]">
+                      {Object.entries(tokens).slice(0, 21).map(([k, v]) => (
+                        <div key={k} className="flex items-center gap-2 truncate"><span className="text-muted-foreground truncate">{k}</span><span className="text-[#3B9CDC]">→</span><span className="font-bold">{v}</span></div>
+                      ))}
+                    </div>
+                    {Object.keys(tokens).length > 21 && <p className="text-[10px] text-muted-foreground mt-2">+ {Object.keys(tokens).length - 21} more tokens</p>}
+                  </div>
+                </div>
+              )}
               {document.sections.map(renderSection)}
             </div>
           </CardContent>

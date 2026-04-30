@@ -1,3 +1,10 @@
+## April 2026 — P2/P3 Completions
+- **P2 RESEND email**: "Notify Client" button in `AdviceDocumentBuilder` with LIVE/MOCKED badge driven by `/api/email-resend/status`; calls `/api/notify/client` which falls back to audit-logged mock when no `RESEND_API_KEY`.
+- **P3 Execution Rails**: New `/app/backend/routes/execution_rails.py` with adapter registry (broker / super_platform / insurance / contribution / rebalance). `POST /api/exec-rails/tickets/{id}/dispatch` transitions ticket through the pipeline, writes audit events to `execution_rail_events`. Each adapter reads its `*_API_KEY` env var to flip from mock → live.
+- **New page**: `/execution-rails` (ExecutionRails.jsx) — visual dispatch board + adapter matrix + history drill-down. Exposed in adviser Firm sidebar with RAILS badge.
+- **Advice Document Builder buttons**: added Notify Client, Execute Strategy (dispatch to rails), View Marketplace, alongside existing Save to Vault / Push via Xmerge.
+
+
 # Wealth Command Centre - PRD
 
 ## Original Problem Statement

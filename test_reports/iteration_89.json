@@ -39,7 +39,7 @@
     "frontend": "100% (all requested features verified)"
   },
   "test_credentials": {
-    "preview_url": "https://retire-dash-1.preview.emergentagent.com"
+    "preview_url": "https://xplan-sync-hub.preview.emergentagent.com"
   },
   "seed_data_creation": "Demo mode creates 4 sample Australian financial advisor clients with portfolios, assets, liabilities, and goals",
   "retest_needed": false,

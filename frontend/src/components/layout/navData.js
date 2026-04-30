@@ -51,6 +51,8 @@ export const adviserBaseNav = [
     name: "Firm",
     icon: Settings,
     items: [
+      { path: "/execution-rails", label: "Execution Rails", icon: Zap, title: "Route advice tickets through broker / super / insurance / contribution adapters", badge: "RAILS" },
+      { path: "/product-marketplace", label: "Marketplace", icon: Briefcase, title: "Insurance, mortgages & investment products with referral tracking" },
       { path: "/adviser-compliance", label: "Compliance", icon: Shield, title: "Compliance Dashboard" },
       { path: "/notification-settings", label: "Settings", icon: Settings, title: "Notifications, integrations & security" },
     ]

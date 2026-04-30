@@ -137,6 +137,94 @@ async def xmerge_render(client_id: str, payload: dict):
     }
 
 
+# Canonical Xplan/Xmerge field-code dictionary used to map our internal
+# document fields back to Xplan tokens. Comes from the Xplan field reference
+# (Site → Definitions → Field Codes). Keys are our internal section.field
+# names; values are the Xplan codes the SOA / ROA template expects.
+XMERGE_TOKENS = {
+    # Cover page
+    "client.fullname":            "[entity_name]",
+    "client.dob":                 "[entity_dob]",
+    "client.address":             "[entity_addr_full]",
+    "client.email":               "[entity_email_pref]",
+    "client.phone":               "[entity_tel_pref]",
+    "client.tfn":                 "[entity_tfn]",
+    "client.gender":              "[entity_gender]",
+    "client.marital":             "[entity_marital_status]",
+    # Adviser / licensee
+    "adviser.name":               "[adv_name]",
+    "adviser.afsl":               "[adv_afsl]",
+    "adviser.ar":                 "[adv_ar_no]",
+    "adviser.dealer":             "[adv_dealer_group]",
+    # Service / dates
+    "service.last_soa":           "[so_last_implemented_soa]",
+    "service.last_roa":           "[so_last_review_roa]",
+    "service.applicable_soa":     "[so_applicable_soa]",
+    "service.fact_find":          "[so_fact_find_signed]",
+    "service.risk_profile_date":  "[so_last_risk_profile]",
+    "service.aml":                "[so_aml_completion]",
+    "service.annual_fee":         "[so_annual_fee]",
+    # Risk profile
+    "risk.profile":               "[rp_profile]",
+    "risk.score":                 "[rp_score]",
+    # Fees
+    "fees.advice":                "[fee_advice]",
+    "fees.implementation":        "[fee_impl]",
+    "fees.ongoing":               "[fee_ongoing_pa]",
+    # Scenario / projections (custom Xplan extension fields)
+    "scenario.confidence":        "[xt_confidence]",
+    "scenario.portfolio_at_ret":  "[xt_portfolio_ret]",
+    "scenario.years_sustainable": "[xt_years_sus]",
+    "portfolio.value":            "[ips_portfolio_value]",
+    "portfolio.irr":              "[ips_irr]",
+    "portfolio.twr":              "[ips_twr]",
+    "portfolio.realised_cgt":     "[ips_cgt_realised]",
+    "portfolio.unrealised_cgt":   "[ips_cgt_unrealised]",
+    # FSG
+    "fsg.version":                "[fsg_version]",
+    "fsg.issuer":                 "[fsg_issuer]",
+    "fsg.method":                 "[fsg_delivery]",
+}
+
+
+@router.get("/xmerge/tokens")
+async def xmerge_token_dictionary():
+    """Return the canonical internal-field → Xplan-token dictionary so the
+    SOA / ROA Builder can stamp each document field with its Xplan code
+    (visible in the rendered HTML preview as a tooltip / badge)."""
+    return {
+        "mode": _mode(),
+        "tokens": XMERGE_TOKENS,
+        "count": len(XMERGE_TOKENS),
+        "doc": "Internal section.field → Xplan field-code mapping. Used by the SOA / ROA Builder to ensure the document round-trips through Xmerge with no broken tokens.",
+    }
+
+
+@router.post("/xmerge/{client_id}/push-document")
+async def xmerge_push_document(client_id: str, payload: dict):
+    """Push a generated SOA / ROA back to Xplan as a Xmerge template instance.
+    The frontend sends `{ docType, documentRef, sections, tokenMap }`. In live
+    mode this would POST to /xmerge/templates/{tid}/instances. In mock mode
+    we record the push in xplan_sync_log + xmerge_documents."""
+    doc = {
+        "client_id": client_id,
+        "doc_type": payload.get("docType", "soa"),
+        "document_ref": payload.get("documentRef"),
+        "section_count": len(payload.get("sections", [])),
+        "tokens_used": list(payload.get("tokenMap", {}).keys()),
+        "mode": _mode(),
+        "ts": datetime.now(timezone.utc).isoformat(),
+    }
+    await db["xmerge_documents"].insert_one({**doc})
+    await db["xplan_sync_log"].insert_one({
+        "client_id": client_id, "direction": "push", "module": "xmerge",
+        "fields_pushed": len(doc["tokens_used"]), "mode": _mode(),
+        "ts": doc["ts"],
+    })
+    doc.pop("_id", None)
+    return {"status": "ok", **doc}
+
+
 @router.post("/plannerpal/{client_id}/transcribe")
 async def plannerpal_transcribe(client_id: str):
     """PlannerPal — generate meeting summary, action items, and follow-up email."""

@@ -138,6 +138,7 @@ export const WorkflowDashboard = lazyRetry(() => import("@/pages/WorkflowDashboa
 export const BookIntelligence = lazyRetry(() => import("@/pages/BookIntelligence"));
 export const MeetingAutomation = lazyRetry(() => import("@/pages/MeetingAutomation"));
 export const BatchExecution = lazyRetry(() => import("@/pages/BatchExecution"));
+export const ExecutionRails = lazyRetry(() => import("@/pages/ExecutionRails"));
 export const MeetingPrep = lazyRetry(() => import("@/pages/MeetingPrep"));
 export const MeetingNotes = lazyRetry(() => import("@/pages/MeetingNotes"));
 export const MeetingSummaryGenerator = lazyRetry(() => import("@/pages/MeetingSummaryGenerator"));
