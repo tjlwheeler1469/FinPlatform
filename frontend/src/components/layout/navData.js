@@ -73,6 +73,7 @@ export const clientContextNav = [
       { path: "/messages", label: "Messages", icon: Mail, title: "Message this client" },
       { path: "/client-comms-checklist", label: "Checklist", icon: ListTodo, title: "Required Communications Checklist & Timeline" },
       { path: "/meeting-notes", label: "Meeting Notes", icon: Video, title: "Meeting Notes" },
+      { path: "/advice-document-builder", label: "SOA / ROA Builder", icon: FileText, title: "Generate Statement of Advice or Record of Advice (RG175 compliant, IPS-style portfolio detail)", badge: "NEW" },
       { path: "/document-vault", label: "Vault", icon: FolderOpen, title: "Document Vault · Reports & signed documents" },
       { path: "/ai-copilot-advanced", label: "AI Insights", icon: Brain, title: "AI-driven insights & next best actions" },
     ]
