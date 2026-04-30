@@ -45,16 +45,53 @@ def _live(env_key: str) -> bool:
 
 
 async def broker_adapter(ticket: Dict[str, Any]) -> Dict[str, Any]:
-    """Broker adapter — Alpaca / SelfWealth / CommSec iress."""
-    live = _live("ALPACA_API_KEY")
+    """Broker adapter — Alpaca paper trading (live when ALPACA_API_KEY set)."""
     payload = ticket.get("payload") or {}
     symbol = payload.get("symbol", "VAS.AX")
     qty = payload.get("qty", 0)
     side = payload.get("side", "buy")
     ref = f"BRK-{uuid.uuid4().hex[:8].upper()}"
+
+    # Attempt live Alpaca paper trading if credentials present
+    live_mode = False
+    live_detail = None
+    try:
+        from routes.alpaca_trading import get_trading_client, ALPACA_AVAILABLE
+        if ALPACA_AVAILABLE:
+            tc = get_trading_client()
+            if tc is not None and qty > 0:
+                from alpaca.trading.requests import MarketOrderRequest
+                from alpaca.trading.enums import OrderSide, TimeInForce
+                # Alpaca uses US symbols — strip .AX suffix for paper-trade sanity
+                ticker = str(symbol).upper().split(".")[0] or "SPY"
+                order = MarketOrderRequest(
+                    symbol=ticker,
+                    qty=float(qty),
+                    side=OrderSide.BUY if side.lower() == "buy" else OrderSide.SELL,
+                    time_in_force=TimeInForce.DAY,
+                )
+                result = tc.submit_order(order)
+                ref = str(getattr(result, "id", ref))
+                live_mode = True
+                live_detail = f"Alpaca {side.upper()} {qty} {ticker} · status={getattr(result, 'status', 'submitted')}"
+    except Exception as e:
+        logger.warning("Alpaca submit failed, falling back to mock: %s", e)
+
+    if live_mode:
+        return {
+            "adapter": "broker",
+            "mode": "live",
+            "stages": [
+                {"stage": "submitted", "at": _now(), "external_ref": ref, "detail": live_detail},
+                {"stage": "accepted",  "at": _now(), "external_ref": ref, "detail": "Alpaca paper venue acknowledged"},
+                {"stage": "settled",   "at": _now(), "external_ref": ref, "detail": "Order filled (paper)"},
+            ],
+            "external_ref": ref,
+        }
+
     return {
         "adapter": "broker",
-        "mode": "live" if live else "mock",
+        "mode": "mock",
         "stages": [
             {"stage": "submitted", "at": _now(), "external_ref": ref,
              "detail": f"{side.upper()} {qty} {symbol}"},
@@ -167,9 +204,16 @@ ADAPTER_MAP = {
 @router.get("/adapters")
 async def list_adapters() -> dict:
     """Return the adapter registry + which ones are in live mode."""
+    # Broker live check must actually see the client (keys may be in env only)
+    broker_live = False
+    try:
+        from routes.alpaca_trading import get_trading_client
+        broker_live = get_trading_client() is not None
+    except Exception:
+        broker_live = False
     return {
         "adapters": [
-            {"ticket_type": "trade",            "name": "Broker",            "live": _live("ALPACA_API_KEY")},
+            {"ticket_type": "trade",            "name": "Broker (Alpaca)",   "live": broker_live},
             {"ticket_type": "super_change",     "name": "Super Platform",    "live": _live("HUB24_API_KEY") or _live("NETWEALTH_API_KEY")},
             {"ticket_type": "insurance_quote",  "name": "Insurance",         "live": _live("AIA_API_KEY") or _live("TAL_API_KEY")},
             {"ticket_type": "contribution",     "name": "Contribution",      "live": False},

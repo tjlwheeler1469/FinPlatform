@@ -29,6 +29,8 @@ class NotifyPayload(BaseModel):
     body: str
     source_item_id: Optional[str] = None
     actor: Optional[str] = "adviser"
+    attachment_base64: Optional[str] = None  # base64 PDF content (no data: prefix)
+    attachment_name: Optional[str] = None    # e.g. "SOA-Thompson-2026-04-30.pdf"
 
 
 @router.post("/client")
@@ -44,12 +46,19 @@ async def notify_client(payload: NotifyPayload) -> dict:
         try:
             import resend
             resend.api_key = resend_key
-            result = resend.Emails.send({
+            params = {
                 "from": os.environ.get("RESEND_FROM_EMAIL", "adviser@wealth-command.app"),
                 "to": [payload.to_email],
                 "subject": payload.subject,
                 "html": f"<pre style='font-family:system-ui;white-space:pre-wrap'>{payload.body}</pre>",
-            })
+            }
+            if payload.attachment_base64 and payload.attachment_name:
+                # Resend expects a list of {filename, content} (base64 str)
+                params["attachments"] = [{
+                    "filename": payload.attachment_name,
+                    "content": payload.attachment_base64,
+                }]
+            result = resend.Emails.send(params)
             delivery_ref = result.get("id") if isinstance(result, dict) else str(result)
         except Exception as e:
             logger.exception("Resend send failed")
@@ -69,6 +78,8 @@ async def notify_client(payload: NotifyPayload) -> dict:
         "mode": mode,
         "delivery_ref": delivery_ref,
         "error": error,
+        "has_attachment": bool(payload.attachment_base64),
+        "attachment_name": payload.attachment_name,
         "created_at": now,
     }
     await db[COLLECTION].insert_one(doc)

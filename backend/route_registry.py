@@ -14,6 +14,7 @@ ROUTE_REGISTRY = [
     ("routes.advice_copilot", "router", "/api", "Advice Copilot"),
     ("routes.execution_tickets", "router", "/api", "Execution Tickets"),
     ("routes.execution_rails", "router", "/api", "Execution Rails (adapters)"),
+    ("routes.implementation_pack", "router", "/api", "Implementation Pack"),
     ("routes.notify_client", "router", "/api", "Client Notifications"),
     ("routes.market_snapshot", "router", "/api", "Market Snapshot"),
     ("routes.adviser_reports", "router", "/api", "Adviser Reports"),
