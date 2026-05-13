@@ -134,9 +134,20 @@ async def upsert_capture(client_id: str, payload: ClientCapture):
 
 
 @router.get("")
-async def list_captures():
-    cur = db[COL].find({}, {"_id": 0, "client_id": 1, "contact.client_name": 1, "updated_at": 1})
+async def list_captures(limit: int = 100, skip: int = 0):
+    """List capture records. Paginated to prevent unbounded scans
+    in production where many clients may exist."""
+    limit = max(1, min(500, int(limit)))
+    skip = max(0, int(skip))
+    cur = (
+        db[COL]
+        .find({}, {"_id": 0, "client_id": 1, "contact.client_name": 1, "updated_at": 1})
+        .sort("updated_at", -1)
+        .skip(skip)
+        .limit(limit)
+    )
     out = []
     async for d in cur:
         out.append(_strip_id(d))
-    return {"records": out, "count": len(out)}
+    total = await db[COL].count_documents({})
+    return {"records": out, "count": len(out), "total": total, "limit": limit, "skip": skip}
