@@ -133,7 +133,7 @@ class TestNextBestActionEngine:
             for action in data["actions"]:
                 assert action["category"] == category
                 
-        print(f"✓ Actions by category filter working for all categories")
+        print("✓ Actions by category filter working for all categories")
     
     def test_execute_action(self):
         """POST /api/next-action/execute/{action_id} marks action as executed"""
@@ -145,11 +145,11 @@ class TestNextBestActionEngine:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] is True
+        assert data["success"]
         assert data["action_id"] == action_id
         assert data["status"] == "executed"
         assert "executed_at" in data
-        print(f"✓ Action execution endpoint working")
+        print("✓ Action execution endpoint working")
     
     def test_snooze_action(self):
         """POST /api/next-action/snooze/{action_id} snoozes action"""
@@ -161,11 +161,11 @@ class TestNextBestActionEngine:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] is True
+        assert data["success"]
         assert data["action_id"] == action_id
         assert data["status"] == "snoozed"
         assert "snoozed_until" in data
-        print(f"✓ Action snooze endpoint working")
+        print("✓ Action snooze endpoint working")
 
 
 class TestPracticeHealthDashboard:
@@ -326,7 +326,7 @@ class TestPracticeHealthDashboard:
         assert "top_quartile" in data
         assert "your_percentile" in data
         
-        print(f"✓ Benchmarks: Your practice vs industry average and top quartile")
+        print("✓ Benchmarks: Your practice vs industry average and top quartile")
 
 
 class TestMeetingWorkflowAutomation:
@@ -353,7 +353,7 @@ class TestMeetingWorkflowAutomation:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] is True
+        assert data["success"]
         assert "meeting_id" in data
         assert "meeting" in data
         assert "prep_task_id" in data
@@ -393,7 +393,7 @@ class TestMeetingWorkflowAutomation:
         for task in data["tasks"]:
             assert task["status"] == "pending"
             
-        print(f"✓ Tasks filter by status working")
+        print("✓ Tasks filter by status working")
     
     def test_get_workflow_stats(self):
         """GET /api/meeting-automation/workflow-stats returns stats"""
@@ -437,7 +437,7 @@ class TestMeetingWorkflowAutomation:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] is True
+        assert data["success"]
         assert "task_id" in data
         assert "task" in data
         
@@ -473,7 +473,7 @@ class TestMeetingWorkflowAutomation:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] is True
+        assert data["success"]
         assert data["task_id"] == task_id
         assert data["status"] == "completed"
         
@@ -500,7 +500,7 @@ class TestMeetingWorkflowAutomation:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] is True
+        assert data["success"]
         assert "note" in data
         assert data["note"]["type"] == "general"
         

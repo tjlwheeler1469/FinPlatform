@@ -37,10 +37,10 @@ class TestHealthCheck:
         data = response.json()
         
         adviceos = data.get("adviceos", {})
-        assert adviceos.get("pdf_reports") is True, "PDF reports should be enabled"
-        assert adviceos.get("notification_service") is True, "Notification service should be enabled"
-        assert adviceos.get("voice_interface") is True, "Voice interface should be enabled"
-        assert adviceos.get("licensee_dashboard") is True, "Licensee dashboard should be enabled"
+        assert adviceos.get("pdf_reports"), "PDF reports should be enabled"
+        assert adviceos.get("notification_service"), "Notification service should be enabled"
+        assert adviceos.get("voice_interface"), "Voice interface should be enabled"
+        assert adviceos.get("licensee_dashboard"), "Licensee dashboard should be enabled"
         print(f"✓ AdviceOS features verified: {adviceos}")
 
 
@@ -124,7 +124,7 @@ class TestKnowledgeGraphMongoDB:
         )
         assert response.status_code == 200
         data = response.json()
-        assert data.get("success") is True
+        assert data.get("success")
         
         # Verify persistence by fetching
         get_response = requests.get(f"{BASE_URL}/api/financial-graph/client/{test_client_id}")
@@ -408,7 +408,7 @@ class TestNotificationService:
         )
         assert response.status_code == 200
         data = response.json()
-        assert data.get("success") is True
+        assert data.get("success")
         
         # Verify persistence
         get_response = requests.get(f"{BASE_URL}/api/notifications/settings/lic_test")
@@ -416,7 +416,7 @@ class TestNotificationService:
         saved = get_response.json()
         assert saved["severity_threshold"] == "high"
         
-        print(f"✓ Notification settings saved and verified")
+        print("✓ Notification settings saved and verified")
     
     def test_notification_logs(self):
         """Test getting notification logs"""
@@ -458,7 +458,7 @@ class TestLicenseeDashboard:
         assert response.status_code == 200
         data = response.json()
         
-        assert data.get("success") is True
+        assert data.get("success")
         assert "licensee_id" in data
         
         self.test_licensee_id = data["licensee_id"]
@@ -517,7 +517,7 @@ class TestLicenseeDashboard:
         assert response.status_code == 200
         data = response.json()
         
-        assert data.get("success") is True
+        assert data.get("success")
         assert "adviser_id" in data
         
         print(f"✓ Adviser added: {data['adviser_id']}")
@@ -546,7 +546,7 @@ class TestLicenseeDashboard:
         assert response.status_code == 200
         data = response.json()
         
-        assert data.get("success") is True
+        assert data.get("success")
         assert "product_id" in data
         
         print(f"✓ APL product added: {data['product_id']}")
@@ -596,7 +596,7 @@ class TestLicenseeDashboard:
         assert response.status_code == 200
         data = response.json()
         
-        assert data.get("success") is True
+        assert data.get("success")
         
         print(f"✓ Custom rule added: {rule_data['rule_name']}")
 
@@ -614,7 +614,7 @@ class TestWebsocketsCompatibility:
         # Verify endpoint responds (no import errors)
         assert "configured" in data or "status" in data or "paper_trading" in data
         
-        print(f"✓ Alpaca endpoint working (no websockets conflict)")
+        print("✓ Alpaca endpoint working (no websockets conflict)")
     
     def test_realtime_data_endpoint(self):
         """Test realtime data endpoint works"""
@@ -622,7 +622,7 @@ class TestWebsocketsCompatibility:
         # Should return 200
         assert response.status_code == 200
         
-        print(f"✓ Realtime data endpoint working")
+        print("✓ Realtime data endpoint working")
 
 
 if __name__ == "__main__":

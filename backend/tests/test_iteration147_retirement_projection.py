@@ -207,7 +207,7 @@ class TestRetirementProjectionGet:
         assert get_response.status_code == 200
         
         data = get_response.json()
-        assert data["has_projection"] == True
+        assert data["has_projection"]
         assert data["client_id"] == client_id
         assert "monte_carlo" in data
         assert "deterministic" in data
@@ -223,10 +223,10 @@ class TestRetirementProjectionGet:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["has_projection"] == False
+        assert not data["has_projection"]
         assert data["client_id"] == client_id
         
-        print(f"SUCCESS: Correctly returned has_projection=False for nonexistent client")
+        print("SUCCESS: Correctly returned has_projection=False for nonexistent client")
 
 
 class TestClientSetup:

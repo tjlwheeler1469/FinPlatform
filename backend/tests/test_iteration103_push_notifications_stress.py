@@ -66,7 +66,7 @@ class TestPushNotificationCRUD:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] is True
+        assert data["success"]
         assert "notification_id" in data
         assert data["notification_id"].startswith("NOTIF-")
         print(f"Created notification: {data['notification_id']}")
@@ -99,7 +99,7 @@ class TestPushNotificationCRUD:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] is True
+        assert data["success"]
         print(f"Created urgent breach notification: {data['notification_id']}")
 
 
@@ -139,7 +139,7 @@ class TestNotificationPreferences:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] is True
+        assert data["success"]
         print(f"Saved preferences for user {user_id}")
     
     def test_get_preferences(self):
@@ -167,7 +167,7 @@ class TestDemoAndTestEndpoints:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] is True
+        assert data["success"]
         assert data["notifications_created"] == 5  # 5 demo notifications
         assert len(data["notification_ids"]) == 5
         print(f"Seeded {data['notifications_created']} demo notifications for {user_id}")
@@ -181,7 +181,7 @@ class TestDemoAndTestEndpoints:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] is True
+        assert data["success"]
         assert "notification_id" in data
         assert "channels" in data
         assert "in_app" in data["channels"]
@@ -207,8 +207,8 @@ class TestBreachTrigger:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] is True
-        print(f"Breach notification triggered for BREACH-TEST-103")
+        assert data["success"]
+        print("Breach notification triggered for BREACH-TEST-103")
 
 
 class TestNotificationManagement:
@@ -238,7 +238,7 @@ class TestNotificationManagement:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] is True
+        assert data["success"]
         print(f"Marked notification {notification_id} as read")
     
     def test_mark_all_read(self):
@@ -250,7 +250,7 @@ class TestNotificationManagement:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] is True
+        assert data["success"]
         print(f"Marked all notifications as read for {user_id}, count: {data.get('marked_read', 0)}")
 
 
@@ -320,7 +320,7 @@ class TestQuickStressTests:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] is True
+        assert data["success"]
         assert "test_id" in data
         assert data["test_id"].startswith("STRESS-")
         assert data["config"]["concurrent_users"] == 100
@@ -379,9 +379,9 @@ class TestPushSubscriptions:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] is True
+        assert data["success"]
         assert data["subscription_type"] == "web_push"
-        print(f"Subscribed to web push for user test_user_103")
+        print("Subscribed to web push for user test_user_103")
     
     def test_get_user_subscriptions(self):
         """Test getting user's push subscriptions"""

@@ -420,7 +420,7 @@ class TestComplianceDocuments:
         assert data["status"] == "updated"
         assert data["new_status"] == "pending_review"
         
-        print(f"✓ Updated document status to pending_review")
+        print("✓ Updated document status to pending_review")
     
     def test_submit_document_review(self, test_client_id, test_adviser_id):
         """POST /api/compliance-docs/document/{id}/review submits compliance review"""
@@ -513,9 +513,9 @@ class TestHealthCheck:
         
         # Check adviceos section includes new features
         adviceos = data.get("adviceos", {})
-        assert adviceos.get("retirement_milestones") is True, "retirement_milestones not in health check"
-        assert adviceos.get("soa_roa_compliance") is True, "soa_roa_compliance not in health check"
-        assert adviceos.get("budget_expenses") is True, "budget_expenses not in health check"
+        assert adviceos.get("retirement_milestones"), "retirement_milestones not in health check"
+        assert adviceos.get("soa_roa_compliance"), "soa_roa_compliance not in health check"
+        assert adviceos.get("budget_expenses"), "budget_expenses not in health check"
         
         print("✓ Health check includes all new features")
 

@@ -121,14 +121,14 @@ class TestAdvisorCommandCenterAPIs:
         """Test command center daily digest"""
         response = requests.get(f"{BASE_URL}/api/command-center/daily-digest")
         assert response.status_code == 200
-        data = response.json()
+        _ = response.json()
         print("Command center daily digest: PASS")
     
     def test_monitoring_daily_scan(self):
         """Test monitoring daily scan"""
         response = requests.get(f"{BASE_URL}/api/monitoring/daily-scan")
         assert response.status_code == 200
-        data = response.json()
+        _ = response.json()
         print("Monitoring daily scan: PASS")
     
     def test_next_action_today(self):
@@ -143,7 +143,7 @@ class TestAdvisorCommandCenterAPIs:
         """Test practice health dashboard"""
         response = requests.get(f"{BASE_URL}/api/practice-health/dashboard")
         assert response.status_code == 200
-        data = response.json()
+        _ = response.json()
         print("Practice health dashboard: PASS")
 
 
@@ -236,14 +236,14 @@ class TestGraphAPIs:
         """Test graph overview endpoint"""
         response = requests.get(f"{BASE_URL}/api/graph/overview")
         assert response.status_code == 200
-        data = response.json()
+        _ = response.json()
         print("Graph overview: PASS")
     
     def test_graph_insights(self):
         """Test graph insights endpoint"""
         response = requests.get(f"{BASE_URL}/api/graph/insights")
         assert response.status_code == 200
-        data = response.json()
+        _ = response.json()
         print("Graph insights: PASS")
 
 

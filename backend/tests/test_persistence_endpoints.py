@@ -43,7 +43,7 @@ class TestHealthAndRefactoring:
         assert "personal" in data
         assert "company" in data
         assert data["personal"]["year"] == "2024-25"
-        print(f"✓ Tax rates endpoint working - confirms modular imports")
+        print("✓ Tax rates endpoint working - confirms modular imports")
 
 
 class TestNetWorthHistory:
@@ -97,7 +97,7 @@ class TestNetWorthHistory:
         
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] is True
+        assert data["success"]
         assert data["date"] == "2024-01"
         print(f"✓ Net worth snapshot saved successfully for date {data['date']}")
     
@@ -165,7 +165,7 @@ class TestDebtManagement:
         
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] is True
+        assert data["success"]
         assert data["debt_id"] == "TEST_debt_001"
         print(f"✓ Debt item saved successfully: {data['debt_id']}")
     
@@ -197,7 +197,7 @@ class TestDebtManagement:
         assert data["source"] == "database"
         debt_ids = [d["debt_id"] for d in data["debts"]]
         assert "TEST_debt_verify" in debt_ids
-        print(f"✓ Saved debt verified in GET response (source: database)")
+        print("✓ Saved debt verified in GET response (source: database)")
     
     def test_delete_debt(self):
         """DELETE /api/planning/debts/{debt_id} - deletes debt"""
@@ -222,7 +222,7 @@ class TestDebtManagement:
         delete_response = requests.delete(f"{BASE_URL}/api/planning/debts/TEST_debt_to_delete")
         assert delete_response.status_code == 200
         data = delete_response.json()
-        assert data["success"] is True
+        assert data["success"]
         assert data["debt_id"] == "TEST_debt_to_delete"
         print(f"✓ Debt deleted successfully: {data['debt_id']}")
 
@@ -281,7 +281,7 @@ class TestInsuranceCoverage:
         
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] is True
+        assert data["success"]
         assert data["coverage_id"] == "TEST_ins_001"
         print(f"✓ Insurance coverage saved successfully: {data['coverage_id']}")
     
@@ -311,7 +311,7 @@ class TestInsuranceCoverage:
         assert data["source"] == "database"
         coverage_ids = [c["coverage_id"] for c in data["coverage"]]
         assert "TEST_ins_verify" in coverage_ids
-        print(f"✓ Saved insurance verified in GET response (source: database)")
+        print("✓ Saved insurance verified in GET response (source: database)")
 
 
 class TestRevenueTracking:
@@ -373,7 +373,7 @@ class TestRevenueTracking:
             assert entry["commissions"] >= 0
             assert entry["total"] > 0
         
-        print(f"✓ Revenue data values validated - all totals match component sums")
+        print("✓ Revenue data values validated - all totals match component sums")
 
 
 class TestExistingEndpoints:

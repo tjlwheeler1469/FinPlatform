@@ -86,7 +86,7 @@ class TestTransactionModelerPropertyAPI:
         # Verify total upfront cost
         assert purchase_costs["total_upfront_cost"] > expected_deposit, "Total upfront should be more than deposit"
         
-        print(f"Upfront costs verification PASSED:")
+        print("Upfront costs verification PASSED:")
         print(f"  Deposit: ${purchase_costs['deposit']:,.0f}")
         print(f"  Stamp Duty: ${purchase_costs['stamp_duty']:,.0f}")
         print(f"  Legal Fees: ${purchase_costs['legal_fees']:,.0f}")
@@ -124,7 +124,7 @@ class TestTransactionModelerPropertyAPI:
         assert cash_flow["annual_rental_income"] > 0, "Rental income should be positive"
         assert cash_flow["annual_loan_payment"] > 0, "Loan payment should be positive"
         
-        print(f"Cash flow verification PASSED:")
+        print("Cash flow verification PASSED:")
         print(f"  Annual Rental: ${cash_flow['annual_rental_income']:,.0f}")
         print(f"  Annual Loan Payment: ${cash_flow['annual_loan_payment']:,.0f}")
         print(f"  Net Cash Flow: ${cash_flow['net_annual_cashflow']:,.0f}")
@@ -163,7 +163,7 @@ class TestTransactionModelerPropertyAPI:
         assert summary["10_year_rental_income"] > 0, "Rental income should be positive"
         assert summary["10_year_total_return"] > 0, "Total return should be positive"
         
-        print(f"10-year projection verification PASSED:")
+        print("10-year projection verification PASSED:")
         print(f"  Capital Growth: ${summary['10_year_capital_growth']:,.0f}")
         print(f"  Rental Income: ${summary['10_year_rental_income']:,.0f}")
         print(f"  Total Return: ${summary['10_year_total_return']:,.0f}")
@@ -236,7 +236,7 @@ class TestTransactionModelerFundAPI:
         summary = data["analysis"]["summary"]
         assert summary["10_year_roi"] > 0, "10-year ROI should be positive"
         
-        print(f"Fund returns verification PASSED:")
+        print("Fund returns verification PASSED:")
         print(f"  Net Return Rate: {annual_analysis['net_return_rate']}%")
         print(f"  10-year ROI: {summary['10_year_roi']}%")
 
@@ -308,9 +308,9 @@ class TestTransactionModelerStockAPI:
         cgt = analysis["cgt_analysis"]
         assert "gross_gain" in cgt, "Should have gross_gain"
         assert "cgt_discount_eligible" in cgt, "Should have CGT discount eligibility"
-        assert cgt["cgt_discount_eligible"] is True, "Should be eligible for 50% discount (held > 12 months)"
+        assert cgt["cgt_discount_eligible"], "Should be eligible for 50% discount (held > 12 months)"
         
-        print(f"Stock sell with CGT test PASSED:")
+        print("Stock sell with CGT test PASSED:")
         print(f"  Gross Gain: ${cgt['gross_gain']:,.2f}")
         print(f"  CGT Discount: {cgt['cgt_discount_eligible']}")
         print(f"  Tax Payable: ${cgt['tax_payable']:,.2f}")
@@ -361,7 +361,7 @@ class TestCRMClientCreation:
         assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
         data = response.json()
         
-        assert data.get("success") is True, "Response should indicate success"
+        assert data.get("success"), "Response should indicate success"
         assert "client" in data, "Response should include client data"
         
         client = data["client"]
@@ -410,7 +410,7 @@ class TestCRMClientCreation:
         data = response.json()
         assert data["client"]["type"] == "household"
         
-        print(f"Household client creation test PASSED")
+        print("Household client creation test PASSED")
 
 
 class TestCRMClientUpdate:
@@ -439,7 +439,7 @@ class TestCRMClientUpdate:
             assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
             data = response.json()
             
-            assert data.get("success") is True
+            assert data.get("success")
             assert data["client"]["phone"] == "0400 UPDATED"
             
             print(f"Client update test PASSED - Updated client: {client_id}")

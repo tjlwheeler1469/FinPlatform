@@ -22,14 +22,14 @@ class TestAdviceCopilot:
             "client_id": "chen_family",
             "client_name": "Michael & Lisa Chen",
             "headline": "Rebalance to growth-tilt portfolio",
-            "message": "Client is 12 years from retirement and currently 60/40.",
+            "message": "Client == 12 years from retirement and currently 60/40.",
             "context": {"readiness_score": 78, "classification": "on_track", "score_delta": 6, "financial_impact": 145000, "urgency": "SOON", "confidence": 82},
             "actor": "adviser",
         }
         r = s.post(f"{API}/advice/drafts", json=payload, timeout=60)
         assert r.status_code == 200, r.text
         data = r.json()
-        assert data["success"] is True
+        assert data["success"]
         d = data["draft"]
         assert d["status"] == "draft"
         assert d["version"] == 1

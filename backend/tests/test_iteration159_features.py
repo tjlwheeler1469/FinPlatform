@@ -34,7 +34,7 @@ class TestNotificationSettings:
             assert key in data, f"Missing notification key: {key}"
             assert isinstance(data[key], bool), f"{key} should be boolean"
         
-        print(f"✓ Default notification settings returned with all 10 types")
+        print("✓ Default notification settings returned with all 10 types")
     
     def test_update_notification_settings(self):
         """PUT /api/adviser-notifications/settings/{adviser_id} updates settings"""
@@ -62,16 +62,16 @@ class TestNotificationSettings:
         
         data = response.json()
         assert data["status"] == "saved"
-        assert data["review_due"] == False
-        assert data["birthday_reminders"] == True
+        assert not data["review_due"]
+        assert data["birthday_reminders"]
         
         # Verify persistence with GET
         get_response = requests.get(f"{BASE_URL}/api/adviser-notifications/settings/{test_adviser}")
         assert get_response.status_code == 200
         
         persisted = get_response.json()
-        assert persisted["review_due"] == False
-        assert persisted["birthday_reminders"] == True
+        assert not persisted["review_due"]
+        assert persisted["birthday_reminders"]
         
         print(f"✓ Notification settings updated and persisted for {test_adviser}")
 
@@ -102,7 +102,7 @@ class TestClientInvoicing:
         assert sent_invoice["status"] == "sent"
         assert sent_invoice["total"] == 1815
         
-        print(f"✓ Demo invoices returned: INV-202604-A1B2C3 (paid $3,630), INV-202604-D4E5F6 (sent $1,815)")
+        print("✓ Demo invoices returned: INV-202604-A1B2C3 (paid $3,630), INV-202604-D4E5F6 (sent $1,815)")
     
     def test_create_invoice(self):
         """POST /api/invoices/ creates new invoice with GST calculation"""
@@ -204,7 +204,7 @@ class TestClientOnboarding:
         assert response.status_code == 200
         assert response.json()["masked_tfn"] == "***-***-789"
         
-        print(f"✓ TFN with spaces accepted and cleaned")
+        print("✓ TFN with spaces accepted and cleaned")
     
     def test_submit_tfn_invalid(self):
         """POST /api/client-onboarding/tfn rejects invalid TFN"""
@@ -224,7 +224,7 @@ class TestClientOnboarding:
         )
         assert response2.status_code == 400, f"Expected 400 for non-numeric TFN, got {response2.status_code}"
         
-        print(f"✓ Invalid TFN correctly rejected")
+        print("✓ Invalid TFN correctly rejected")
     
     def test_get_tfn_status(self):
         """GET /api/client-onboarding/tfn/{client_id} returns TFN status"""
@@ -240,10 +240,10 @@ class TestClientOnboarding:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["submitted"] == True
+        assert data["submitted"]
         assert "submitted_at" in data
         
-        print(f"✓ TFN status returned correctly")
+        print("✓ TFN status returned correctly")
     
     def test_get_tfn_status_not_submitted(self):
         """GET /api/client-onboarding/tfn/{client_id} for non-existent client"""
@@ -251,9 +251,9 @@ class TestClientOnboarding:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["submitted"] == False
+        assert not data["submitted"]
         
-        print(f"✓ Non-submitted TFN status returned correctly")
+        print("✓ Non-submitted TFN status returned correctly")
     
     def test_info_update(self):
         """POST /api/client-onboarding/info-update updates client info"""
@@ -282,7 +282,7 @@ class TestClientOnboarding:
         )
         assert response3.status_code == 200
         
-        print(f"✓ Info updates (phone, email, address) successful")
+        print("✓ Info updates (phone, email, address) successful")
     
     def test_info_update_invalid_field(self):
         """POST /api/client-onboarding/info-update rejects invalid fields"""
@@ -294,7 +294,7 @@ class TestClientOnboarding:
         )
         assert response.status_code == 400
         
-        print(f"✓ Invalid field correctly rejected")
+        print("✓ Invalid field correctly rejected")
     
     def test_get_info_updates(self):
         """GET /api/client-onboarding/info-updates/{client_id} returns updates"""
@@ -315,7 +315,7 @@ class TestClientOnboarding:
         assert len(updates) >= 1
         assert updates[0]["field"] == "phone"
         
-        print(f"✓ Info updates retrieved successfully")
+        print("✓ Info updates retrieved successfully")
     
     def test_sync_to_xplan_mocked(self):
         """POST /api/client-onboarding/sync-xplan syncs data (MOCKED)"""
@@ -342,7 +342,7 @@ class TestClientOnboarding:
         assert data["status"] == "synced"
         assert "MOCKED" in data["message"]
         
-        print(f"✓ Xplan sync completed (MOCKED)")
+        print("✓ Xplan sync completed (MOCKED)")
     
     def test_get_documents_empty(self):
         """GET /api/client-onboarding/documents/{client_id} returns empty list"""
@@ -352,7 +352,7 @@ class TestClientOnboarding:
         docs = response.json()
         assert isinstance(docs, list)
         
-        print(f"✓ Documents endpoint returns list")
+        print("✓ Documents endpoint returns list")
 
 
 class TestHNWClientData:

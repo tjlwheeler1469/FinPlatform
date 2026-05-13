@@ -94,8 +94,8 @@ class AdviserUser(HttpUser):
         self.client.get(f"/api/trading/cgt-summary/{client_id}", headers=self.headers, name="CGT Summary")
     
     @task(4)
-    def practice_health(self):
-        """Check practice health"""
+    def intelligence_practice_health(self):
+        """Check intelligence practice health endpoint"""
         self.client.get("/api/intelligence/practice-health", headers=self.headers, name="Practice Health")
     
     @task(4)

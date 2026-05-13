@@ -31,7 +31,7 @@ class TestReadinessEventPost:
         r = session.post(f"{PREFIX}/readiness-events", json=payload, timeout=10)
         assert r.status_code == 200, r.text
         body = r.json()
-        assert body.get("success") is True
+        assert body.get("success")
         assert "event_id" in body and isinstance(body["event_id"], str) and body["event_id"].startswith("rre_")
 
     def test_post_missing_client_id_returns_400(self, session):

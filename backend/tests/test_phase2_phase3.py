@@ -37,7 +37,7 @@ class TestCRMHouseholds:
         assert "status" in household
         assert "total_assets" in household
         assert "net_worth" in household
-        print(f"✓ Households have correct structure with required fields")
+        print("✓ Households have correct structure with required fields")
     
     def test_get_household_by_id(self):
         """GET /api/crm/households/{household_id} returns specific household"""
@@ -47,7 +47,7 @@ class TestCRMHouseholds:
         assert data["household_id"] == "hh_wheeler001"
         assert "Wheeler" in data["name"]
         assert "members" in data
-        print(f"✓ GET /api/crm/households/hh_wheeler001 - Returns Wheeler Family")
+        print("✓ GET /api/crm/households/hh_wheeler001 - Returns Wheeler Family")
 
 
 class TestCRMTasks:
@@ -76,7 +76,7 @@ class TestCRMTasks:
         assert "priority" in task
         assert "status" in task
         assert "category" in task
-        print(f"✓ Tasks have required fields: task_id, title, priority, status, category")
+        print("✓ Tasks have required fields: task_id, title, priority, status, category")
     
     def test_create_task(self):
         """POST /api/crm/tasks creates a new task"""
@@ -90,7 +90,7 @@ class TestCRMTasks:
         response = requests.post(f"{BASE_URL}/api/crm/tasks", json=task_data)
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] is True
+        assert data["success"]
         assert "task_id" in data
         print(f"✓ POST /api/crm/tasks - Created task {data['task_id']}")
 
@@ -122,7 +122,7 @@ class TestCRMMeetings:
         assert "scheduled_at" in meeting
         assert "duration_minutes" in meeting
         assert "location" in meeting
-        print(f"✓ Meetings have required fields: meeting_id, title, meeting_type, scheduled_at, duration_minutes, location")
+        print("✓ Meetings have required fields: meeting_id, title, meeting_type, scheduled_at, duration_minutes, location")
 
 
 class TestCRMNotes:
@@ -147,7 +147,7 @@ class TestCRMNotes:
         response = requests.post(f"{BASE_URL}/api/crm/notes", json=note_data)
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] is True
+        assert data["success"]
         assert "note_id" in data
         print(f"✓ POST /api/crm/notes - Created note {data['note_id']}")
 
@@ -171,7 +171,7 @@ class TestGoalTracker:
         assert response.status_code == 200
         data = response.json()
         assert len(data["goals"]) >= 4
-        print(f"✓ Goals endpoint returns at least 4 goals")
+        print("✓ Goals endpoint returns at least 4 goals")
     
     def test_goals_have_progress_percent(self):
         """Goals have progress_percent field"""
@@ -187,7 +187,7 @@ class TestGoalTracker:
             assert "current_amount" in goal
             assert "progress_percent" in goal
             assert 0 <= goal["progress_percent"] <= 100
-        print(f"✓ All goals have progress_percent between 0-100")
+        print("✓ All goals have progress_percent between 0-100")
     
     def test_goals_include_retirement_education_house_emergency(self):
         """Goals include retirement, education, house, and emergency types"""
@@ -200,7 +200,7 @@ class TestGoalTracker:
         assert "education" in goal_types
         assert "house" in goal_types
         assert "emergency" in goal_types
-        print(f"✓ Goals include all 4 types: retirement, education, house, emergency")
+        print("✓ Goals include all 4 types: retirement, education, house, emergency")
     
     def test_create_goal(self):
         """POST /api/goals creates a new goal"""
@@ -216,7 +216,7 @@ class TestGoalTracker:
         response = requests.post(f"{BASE_URL}/api/goals", json=goal_data)
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] is True
+        assert data["success"]
         assert "goal_id" in data
         print(f"✓ POST /api/goals - Created goal {data['goal_id']}")
 
@@ -267,7 +267,7 @@ class TestAIAdvisor:
         assert "impact" in rec
         assert "confidence" in rec
         assert "timeframe" in rec
-        print(f"✓ AI recommendations have required fields: rank, title, description, impact, confidence, timeframe")
+        print("✓ AI recommendations have required fields: rank, title, description, impact, confidence, timeframe")
     
     def test_ai_advice_has_analysis(self):
         """AI advice includes analysis section"""
@@ -284,7 +284,7 @@ class TestAIAdvisor:
         assert "analysis" in data
         assert "key_strengths" in data["analysis"]
         assert "areas_for_improvement" in data["analysis"]
-        print(f"✓ AI advice includes analysis with key_strengths and areas_for_improvement")
+        print("✓ AI advice includes analysis with key_strengths and areas_for_improvement")
     
     def test_ai_advice_has_retirement_outlook(self):
         """AI advice includes retirement outlook"""
@@ -300,7 +300,7 @@ class TestAIAdvisor:
         
         assert "retirement_outlook" in data
         assert "success_probability" in data["retirement_outlook"]
-        print(f"✓ AI advice includes retirement_outlook with success_probability")
+        print("✓ AI advice includes retirement_outlook with success_probability")
     
     def test_ai_advice_has_disclaimers(self):
         """AI advice includes disclaimers"""
@@ -354,7 +354,7 @@ class TestPortfolioAggregator:
         data = response.json()
         assert "household_id" in data
         assert data["household_id"] == "hh_wheeler001"
-        print(f"✓ GET /api/portfolio/aggregated/hh_wheeler001 - Returns 200")
+        print("✓ GET /api/portfolio/aggregated/hh_wheeler001 - Returns 200")
     
     def test_aggregated_portfolio_has_totals(self):
         """Aggregated portfolio has total_assets, total_liabilities, net_worth"""
@@ -393,7 +393,7 @@ class TestPortfolioAggregator:
             assert "balance" in account
             assert "status" in account
             assert "last_synced" in account
-        print(f"✓ All accounts have required fields")
+        print("✓ All accounts have required fields")
     
     def test_accounts_include_all_types(self):
         """Accounts include bank, super, brokerage, mortgage types"""
@@ -406,7 +406,7 @@ class TestPortfolioAggregator:
         assert "super" in account_types
         assert "brokerage" in account_types
         assert "mortgage" in account_types
-        print(f"✓ Accounts include all types: bank, super, brokerage, mortgage")
+        print("✓ Accounts include all types: bank, super, brokerage, mortgage")
     
     def test_aggregated_portfolio_has_asset_allocation(self):
         """Aggregated portfolio has asset allocation breakdown"""
@@ -425,7 +425,7 @@ class TestPortfolioAggregator:
         for key, value in allocation.items():
             assert "amount" in value
             assert "percent" in value
-        print(f"✓ Asset allocation includes cash, shares, super, property with amounts and percentages")
+        print("✓ Asset allocation includes cash, shares, super, property with amounts and percentages")
     
     def test_aggregated_portfolio_has_monthly_snapshot(self):
         """Aggregated portfolio has monthly snapshot"""
@@ -446,7 +446,7 @@ class TestPortfolioAggregator:
         response = requests.post(f"{BASE_URL}/api/portfolio/sync/hh_wheeler001")
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] is True
+        assert data["success"]
         assert "synced_at" in data
         print(f"✓ POST /api/portfolio/sync - Synced at {data['synced_at']}")
 

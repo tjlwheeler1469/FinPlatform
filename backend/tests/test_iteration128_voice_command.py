@@ -57,8 +57,8 @@ class TestVoiceCommandRetirementContext:
         data = response.json()
         
         # Verify success and structured response
-        assert data.get("success") is True
-        assert data.get("structured") is True
+        assert data.get("success")
+        assert data.get("structured")
         assert data.get("result_type") == "retirement_analysis"
         assert data.get("page_context") == "retirement"
         
@@ -87,7 +87,7 @@ class TestVoiceCommandRetirementContext:
         )
         assert response.status_code == 200
         data = response.json()
-        assert data.get("success") is True
+        assert data.get("success")
         
         result = data.get("result", {})
         tax = result.get("tax_considerations", {})
@@ -113,8 +113,8 @@ class TestVoiceCommandSharesContext:
         assert response.status_code == 200
         data = response.json()
         
-        assert data.get("success") is True
-        assert data.get("structured") is True
+        assert data.get("success")
+        assert data.get("structured")
         assert data.get("result_type") == "stock_insight"
         assert data.get("page_context") == "shares"
         
@@ -144,7 +144,7 @@ class TestVoiceCommandWhatIfScenario:
         )
         assert response1.status_code == 200
         data1 = response1.json()
-        assert data1.get("success") is True
+        assert data1.get("success")
         assert data1.get("result_type") == "retirement_analysis"
         print(f"✓ Initial analysis: session={session_id}")
         
@@ -162,7 +162,7 @@ class TestVoiceCommandWhatIfScenario:
         )
         assert response2.status_code == 200
         data2 = response2.json()
-        assert data2.get("success") is True
+        assert data2.get("success")
         
         result2 = data2.get("result", {})
         
@@ -189,7 +189,7 @@ class TestVoiceCommandOtherContexts:
         )
         assert response.status_code == 200
         data = response.json()
-        assert data.get("success") is True
+        assert data.get("success")
         assert data.get("page_context") == "adviceos"
         print(f"✓ AdviceOS context: result_type={data.get('result_type')}")
     
@@ -205,7 +205,7 @@ class TestVoiceCommandOtherContexts:
         )
         assert response.status_code == 200
         data = response.json()
-        assert data.get("success") is True
+        assert data.get("success")
         assert data.get("page_context") == "dashboard"
         print(f"✓ Dashboard context: result_type={data.get('result_type')}")
     
@@ -221,7 +221,7 @@ class TestVoiceCommandOtherContexts:
         )
         assert response.status_code == 200
         data = response.json()
-        assert data.get("success") is True
+        assert data.get("success")
         print(f"✓ Default context: result_type={data.get('result_type')}")
 
 

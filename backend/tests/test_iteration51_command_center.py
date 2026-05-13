@@ -115,7 +115,7 @@ class TestCommandCenterAPIs:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["success"] is True
+        assert data["success"]
         assert data["alert_id"] == "test_alert_123"
         assert "dismissed_at" in data
     
@@ -125,7 +125,7 @@ class TestCommandCenterAPIs:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["success"] is True
+        assert data["success"]
         assert data["alert_id"] == "test_alert_456"
         assert "snoozed_until" in data
     
@@ -330,7 +330,7 @@ class TestHoldingsAPIs:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["success"] is True
+        assert data["success"]
         assert "transaction_id" in data
         assert "transaction" in data
         assert data["transaction"]["transaction_type"] == "buy"
@@ -351,7 +351,7 @@ class TestHoldingsAPIs:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["success"] is True
+        assert data["success"]
         assert "transaction_id" in data
         assert "realized_gain" in data
     

@@ -71,8 +71,8 @@ class TestMFASetup:
         data = response.json()
         
         if response.status_code == 200:
-            assert data.get("success") is False or "error" in data
-        print(f"✓ MFA Verify TOTP (invalid code) handled correctly")
+            assert not data.get("success") or "error" in data
+        print("✓ MFA Verify TOTP (invalid code) handled correctly")
     
     def test_mfa_send_sms_code(self):
         """Test /api/mfa/send-sms sends SMS code (MOCKED)"""
@@ -84,7 +84,7 @@ class TestMFASetup:
         data = response.json()
         
         assert "success" in data, "Missing 'success' in response"
-        assert data["success"] is True, "SMS send should succeed"
+        assert data["success"], "SMS send should succeed"
         
         # Demo code should be returned (MOCKED)
         if "demo_code" in data:
@@ -170,7 +170,7 @@ class TestAuditLogging:
         data = response.json()
         
         assert "success" in data, "Missing 'success' in response"
-        assert data["success"] is True, "Audit log should succeed"
+        assert data["success"], "Audit log should succeed"
         assert "event_id" in data, "Missing 'event_id' in response"
         
         print(f"✓ Audit Log Event created: event_id={data['event_id']}")
@@ -321,7 +321,7 @@ class TestExistingFeatures:
         assert response.status_code == 200
         data = response.json()
         assert "accounts" in data or "summary" in data
-        print(f"✓ Accounts aggregated passed (MOCKED)")
+        print("✓ Accounts aggregated passed (MOCKED)")
     
     def test_copilot_suggestions(self):
         """Test /api/copilot/suggestions returns suggestions"""
@@ -329,7 +329,7 @@ class TestExistingFeatures:
         assert response.status_code == 200
         data = response.json()
         assert "suggestions" in data or isinstance(data, list)
-        print(f"✓ Copilot suggestions passed")
+        print("✓ Copilot suggestions passed")
     
     def test_copilot_chat(self):
         """Test /api/copilot/chat returns AI response"""
@@ -341,7 +341,7 @@ class TestExistingFeatures:
         assert response.status_code == 200
         data = response.json()
         assert "response" in data or "message" in data
-        print(f"✓ Copilot chat passed")
+        print("✓ Copilot chat passed")
 
 
 class TestSecurityPage:

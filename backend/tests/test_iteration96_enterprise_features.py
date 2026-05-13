@@ -54,24 +54,24 @@ class TestHealthCheck:
         response = api_client.get(f"{BASE_URL}/api/health")
         assert response.status_code == 200
         data = response.json()
-        assert data["adviceos"]["incident_management"] is True
-        print("PASS: incident_management is True in health check")
+        assert data["adviceos"]["incident_management"]
+        print("PASS: incident_management == True in health check")
     
     def test_health_includes_event_streaming(self, api_client):
         """Health check should include event_streaming."""
         response = api_client.get(f"{BASE_URL}/api/health")
         assert response.status_code == 200
         data = response.json()
-        assert data["adviceos"]["event_streaming"] is True
-        print("PASS: event_streaming is True in health check")
+        assert data["adviceos"]["event_streaming"]
+        print("PASS: event_streaming == True in health check")
     
     def test_health_includes_enterprise_docs(self, api_client):
         """Health check should include enterprise_docs."""
         response = api_client.get(f"{BASE_URL}/api/health")
         assert response.status_code == 200
         data = response.json()
-        assert data["adviceos"]["enterprise_docs"] is True
-        print("PASS: enterprise_docs is True in health check")
+        assert data["adviceos"]["enterprise_docs"]
+        print("PASS: enterprise_docs == True in health check")
 
 # ==================== INCIDENT MANAGEMENT TESTS ====================
 
@@ -95,7 +95,7 @@ class TestIncidentManagement:
         
         # Verify P1 is critical and regulatory reportable
         assert severities["P1"]["name"] == "Critical"
-        assert severities["P1"]["regulatory_reportable"] is True
+        assert severities["P1"]["regulatory_reportable"]
         assert severities["P1"]["response_time"] == "15 minutes"
         
         # Verify classification guidance exists
@@ -232,7 +232,7 @@ class TestIncidentManagement:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["success"] is True
+        assert data["success"]
         assert data["incident_id"] == test_incident_id
         assert data["new_status"] == "investigating"
         
@@ -292,7 +292,7 @@ class TestEventStreaming:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["success"] is True
+        assert data["success"]
         assert "event_id" in data
         assert data["event_id"].startswith("evt_")
         assert data["event_type"] == "audit.created"
@@ -311,7 +311,7 @@ class TestEventStreaming:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["success"] is True
+        assert data["success"]
         assert data["event_type"] == "custom.test_event"
         
         print("PASS: Custom event published successfully")
@@ -379,7 +379,7 @@ class TestEventStreaming:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["success"] is True
+        assert data["success"]
         assert "rule_id" in data
         assert data["rule_id"].startswith("rule_")
         

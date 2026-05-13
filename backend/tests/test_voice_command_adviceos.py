@@ -29,7 +29,7 @@ class TestVoiceCommandRouter:
         })
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] == True
+        assert data["success"]
         assert data["result_type"] == "retirement_analysis"
         result = data["result"]
         assert "retirement_analysis" in result
@@ -45,8 +45,8 @@ class TestVoiceCommandRouter:
         })
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] == True
-        assert data["structured"] == True
+        assert data["success"]
+        assert data["structured"]
         assert data["page_context"] == "shares"
 
     def test_general_query(self, client: httpx.Client) -> None:
@@ -58,7 +58,7 @@ class TestVoiceCommandRouter:
         })
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] == True
+        assert data["success"]
 
     def test_missing_text(self, client: httpx.Client) -> None:
         """Test error handling for missing text."""
@@ -101,4 +101,4 @@ class TestHealthAndExistingRoutes:
         })
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] == True
+        assert data["success"]

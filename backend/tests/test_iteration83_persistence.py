@@ -44,7 +44,7 @@ class TestClientContactPersistence:
         data = response.json()
         assert "message_id" in data, "Response should include message_id"
         assert data["status"] == "delivered", f"Expected status 'delivered', got {data.get('status')}"
-        assert data["delivery_method"] == "platform", f"Delivery method should match request"
+        assert data["delivery_method"] == "platform", "Delivery method should match request"
         assert "confirmation" in data, "Response should include confirmation message"
         
         print(f"✅ Message sent successfully: {data['message_id']}")
@@ -105,7 +105,7 @@ class TestClientContactPersistence:
         
         assert read_response.status_code == 200, f"Expected 200, got {read_response.status_code}"
         data = read_response.json()
-        assert data["success"] is True
+        assert data["success"]
         assert data["status"] == "read"
         
         print(f"✅ Message marked as read: {message_id}")
@@ -165,7 +165,7 @@ class TestFinancialPlanPersistence:
         assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
         
         data = response.json()
-        assert data["success"] is True, "Response should indicate success"
+        assert data["success"], "Response should indicate success"
         assert "plan" in data, "Response should include plan object"
         
         plan = data["plan"]
@@ -234,7 +234,7 @@ class TestFinancialPlanPersistence:
         # Verify yearly projections has correct length
         assert len(projections["yearly_projections"]) == test_plan_request["scenario"]["timeframe"] + 1
         
-        print(f"✅ Projections calculated correctly")
+        print("✅ Projections calculated correctly")
         print(f"   Initial: ${projections['initial_investment']:,.0f}")
         print(f"   Final: ${projections['projected_final_value']:,.0f}")
         print(f"   Annualized return: {projections['annualized_return']}%")

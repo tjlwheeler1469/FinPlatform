@@ -164,7 +164,7 @@ class TestFinancialPlanAPI:
         data = response.json()
         
         # Verify success and plan structure
-        assert data.get("success") is True, "Response should indicate success"
+        assert data.get("success"), "Response should indicate success"
         assert "plan" in data, "Response should have plan object"
         
         plan = data["plan"]
@@ -346,7 +346,7 @@ class TestKnowledgeGraphAI:
         # Check if answer contains useful information (not just empty)
         assert len(data["answer"]) > 50, "Answer should be substantial"
         
-        print(f"✓ AI Q&A working")
+        print("✓ AI Q&A working")
         print(f"  Question: {data['question']}")
         print(f"  Answer preview: {data['answer'][:200]}...")
     
@@ -362,7 +362,7 @@ class TestKnowledgeGraphAI:
         
         # Check data sources include retirement risks
         assert "retirement_risks" in data.get("data_sources_used", [])
-        print(f"✓ Retirement risk query uses correct data sources")
+        print("✓ Retirement risk query uses correct data sources")
     
     def test_ai_ask_revenue_opportunities(self):
         """AI should provide revenue opportunity information"""
@@ -375,7 +375,7 @@ class TestKnowledgeGraphAI:
         data = response.json()
         
         assert "opportunities" in data.get("data_sources_used", [])
-        print(f"✓ Revenue opportunity query uses correct data sources")
+        print("✓ Revenue opportunity query uses correct data sources")
 
 
 class TestGraphActionsExecution:

@@ -33,7 +33,7 @@ class TestDecisionEngineHealthScore:
         data = response.json()
         
         # Verify response structure
-        assert data["success"] is True
+        assert data["success"]
         assert "overall_score" in data
         assert "grade" in data
         assert "grade_description" in data
@@ -69,7 +69,7 @@ class TestDecisionEngineHealthScore:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["success"] is True
+        assert data["success"]
         # Higher savings rate should give better score
         assert data["component_scores"]["savings_rate"] >= 100  # 30% * 4 = 120, capped at 100
         # Lower debt ratio should give better score
@@ -86,7 +86,7 @@ class TestDecisionEngineRecommendations:
         data = response.json()
         
         # Verify response structure
-        assert data["success"] is True
+        assert data["success"]
         assert "recommendations" in data
         assert "total_recommendations" in data
         assert "high_priority_count" in data
@@ -125,7 +125,7 @@ class TestDecisionEngineNetWorthProjection:
         data = response.json()
         
         # Verify response structure
-        assert data["success"] is True
+        assert data["success"]
         assert "projections" in data
         assert "summary" in data
         assert "assumptions" in data
@@ -157,7 +157,7 @@ class TestDecisionEngineNetWorthProjection:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["success"] is True
+        assert data["success"]
         assert len(data["projections"]) == 11  # 0 to 10 years
         assert data["assumptions"]["annual_savings"] == 100000
         assert data["assumptions"]["growth_rate"] == 0.08
@@ -174,7 +174,7 @@ class TestDecisionEngineMonteCarloAdvanced:
         data = response.json()
         
         # Verify response structure
-        assert data["success"] is True
+        assert data["success"]
         assert "success_probability" in data
         assert "target_value" in data
         assert "simulations" in data
@@ -217,7 +217,7 @@ class TestDecisionEngineMonteCarloAdvanced:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["success"] is True
+        assert data["success"]
         assert data["target_value"] == 1500000
         assert data["simulations"] == 5000
 
@@ -232,7 +232,7 @@ class TestDecisionEngineWealthBrief:
         data = response.json()
         
         # Verify response structure
-        assert data["success"] is True
+        assert data["success"]
         assert "brief" in data
         assert "generated_at" in data
         
@@ -263,7 +263,7 @@ class TestDecisionEngineQuickAnalysis:
         data = response.json()
         
         # Verify response structure
-        assert data["success"] is True
+        assert data["success"]
         assert "analysis" in data
         assert "timestamp" in data
         
@@ -288,7 +288,7 @@ class TestDecisionEngineScenario:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["success"] is True
+        assert data["success"]
         assert data["scenario_id"] == "retire_early_5"
         assert "base_projection" in data
         assert "scenario_projection" in data
@@ -304,7 +304,7 @@ class TestDecisionEngineScenario:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["success"] is True
+        assert data["success"]
         # Increasing savings should result in positive difference
         assert data["comparison"]["difference"] > 0
 

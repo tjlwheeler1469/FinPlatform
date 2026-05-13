@@ -66,7 +66,7 @@ class TestAuthRoutes:
         })
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] is True
+        assert data["success"]
         print(f"✓ Registration successful: {unique_email}")
 
 
@@ -220,7 +220,7 @@ class TestEmailRoutes:
         assert response.status_code == 200
         data = response.json()
         assert "success" in data or "demo_mode" in data
-        print(f"✓ Test email: sent (demo mode)")
+        print("✓ Test email: sent (demo mode)")
 
 
 class TestBankFeedsRoutes:
@@ -321,22 +321,22 @@ class TestAdditionalRoutes:
         """Test portfolio monitoring endpoint"""
         response = requests.get(f"{BASE_URL}/api/monitoring/book-insights")
         assert response.status_code == 200
-        data = response.json()
-        print(f"✓ Portfolio monitoring: book insights available")
+        _ = response.json()
+        print("✓ Portfolio monitoring: book insights available")
     
     def test_intelligence_analysis(self):
         """Test intelligence analysis endpoint"""
         response = requests.get(f"{BASE_URL}/api/intelligence/comprehensive-analysis")
         assert response.status_code == 200
-        data = response.json()
-        print(f"✓ Intelligence analysis available")
+        _ = response.json()
+        print("✓ Intelligence analysis available")
     
     def test_tax_opportunities(self):
         """Test tax opportunities endpoint"""
         response = requests.get(f"{BASE_URL}/api/intelligence/tax-opportunities")
         assert response.status_code == 200
-        data = response.json()
-        print(f"✓ Tax opportunities available")
+        _ = response.json()
+        print("✓ Tax opportunities available")
 
 
 if __name__ == "__main__":

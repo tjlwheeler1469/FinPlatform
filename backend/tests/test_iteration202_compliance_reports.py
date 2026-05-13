@@ -57,7 +57,7 @@ class TestComplianceReportsAggregator:
         assert c["drafts_approved"] > 0
         # If any of them have data, fallback must NOT be recommended
         if any(c.values()):
-            assert d["fallback_recommended"] is False
+            assert not d["fallback_recommended"]
 
     def test_risk_and_audit_payloads(self, api):
         d = api.get(f"{BASE_URL}/api/compliance-reports/data", timeout=30).json()

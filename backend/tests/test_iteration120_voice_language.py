@@ -62,7 +62,7 @@ class TestVoiceAssistant:
         )
         assert response.status_code == 200
         data = response.json()
-        assert data.get('error') is False or data.get('error') is None, f"Chat returned error: {data}"
+        assert not data.get('error') or data.get('error') is None, f"Chat returned error: {data}"
         # Check response mentions retirement-related terms
         response_lower = data['response'].lower()
         assert any(term in response_lower for term in ['retire', 'super', 'save', 'invest', 'pension', 'fund']), \
@@ -130,7 +130,7 @@ class TestMarketDataAPI:
         # Check for at least some currency pairs
         currency_found = any('AUD' in name for name in indicator_names)
         assert currency_found, f"Should include AUD currency pairs. Found: {indicator_names}"
-        print(f"PASS: Market data includes currency pairs")
+        print("PASS: Market data includes currency pairs")
 
 
 class TestComplianceDashboard:
@@ -215,7 +215,7 @@ class TestTradingHoldings:
         assert response.status_code == 200, f"Holdings failed: {response.status_code}"
         data = response.json()
         assert 'holdings' in data or 'summary' in data, "Response should contain holdings data"
-        print(f"PASS: Holdings endpoint returned data")
+        print("PASS: Holdings endpoint returned data")
     
     def test_holdings_summary(self):
         """Test holdings summary has required fields"""
@@ -227,7 +227,7 @@ class TestTradingHoldings:
             # Check for key summary fields
             assert 'total_value' in summary or 'total_cost_base' in summary, \
                 "Summary should have value fields"
-            print(f"PASS: Holdings summary structure correct")
+            print("PASS: Holdings summary structure correct")
     
     def test_holdings_data_not_nan(self):
         """Test that holdings data doesn't contain NaN values"""
@@ -243,7 +243,7 @@ class TestTradingHoldings:
                 assert holding['current_value'] is not None, f"current_value is None for {holding.get('symbol')}"
             if 'avg_cost' in holding:
                 assert holding['avg_cost'] is not None, f"avg_cost is None for {holding.get('symbol')}"
-        print(f"PASS: Holdings data has no NaN values")
+        print("PASS: Holdings data has no NaN values")
 
 
 class TestCGTSummary:
@@ -253,7 +253,7 @@ class TestCGTSummary:
         """Test CGT summary endpoint"""
         response = requests.get(f"{BASE_URL}/api/trading/cgt-summary/client_1", timeout=30)
         assert response.status_code == 200, f"CGT summary failed: {response.status_code}"
-        print(f"PASS: CGT summary endpoint works")
+        print("PASS: CGT summary endpoint works")
 
 
 class TestNavigationRoutes:

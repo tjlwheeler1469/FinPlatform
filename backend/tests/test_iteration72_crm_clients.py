@@ -84,7 +84,7 @@ class TestCRMClientsEndpoint:
         for expected in expected_names:
             assert expected in client_names, f"Expected client not found: {expected}"
         
-        print(f"PASS: All 8 expected clients present")
+        print("PASS: All 8 expected clients present")
     
     def test_client_wealth_data(self):
         """Verify specific client wealth data"""
@@ -167,7 +167,7 @@ class TestCRMAnalyticsEndpoint:
         assert "smsf" in by_type
         assert "partnership" in by_type
         
-        print(f"PASS: Analytics by type includes all client types")
+        print("PASS: Analytics by type includes all client types")
     
     def test_analytics_tasks(self):
         """Verify task analytics"""
@@ -240,7 +240,7 @@ class TestCRMClientByIdEndpoint:
             data = response.json()
             assert data["client_id"] == client_id
         
-        print(f"PASS: All 8 clients accessible by ID")
+        print("PASS: All 8 clients accessible by ID")
 
 
 class TestCRMTasksEndpoint:

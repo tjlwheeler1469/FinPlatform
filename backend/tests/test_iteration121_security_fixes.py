@@ -78,7 +78,7 @@ class TestVoiceAssistantAPI:
         data = response.json()
         assert "response" in data, "Should have response field"
         assert len(data.get("response", "")) > 50, "Response should be substantial"
-        print(f"Voice assistant responded successfully with GPT-5.2")
+        print("Voice assistant responded successfully with GPT-5.2")
 
 
 class TestComplianceDashboardAPI:
@@ -128,7 +128,7 @@ class TestScenarioTemplatesSafeParser:
         income_gap_start = adjusted.get("income_gap_start")
         if income_gap_start:
             assert income_gap_start == 47, f"Formula should evaluate to 47, got {income_gap_start}"
-        print(f"Scenario template applied successfully with safe formula evaluation")
+        print("Scenario template applied successfully with safe formula evaluation")
     
     def test_scenario_template_safe_eval_arithmetic(self):
         """Test that arithmetic expressions are safely evaluated"""
@@ -149,7 +149,7 @@ class TestScenarioTemplatesSafeParser:
         adjusted = data.get("adjusted_inputs", {})
         # retirement_age should be set to 55 (absolute)
         assert adjusted.get("retirement_age") == 55
-        print(f"Safe arithmetic evaluation working correctly")
+        print("Safe arithmetic evaluation working correctly")
 
 
 class TestScalingInfrastructureSHA256:
@@ -161,7 +161,7 @@ class TestScalingInfrastructureSHA256:
         assert response.status_code == 200
         data = response.json()
         assert data.get("status") == "healthy"
-        print(f"Infrastructure health check passed")
+        print("Infrastructure health check passed")
     
     def test_infrastructure_metrics(self):
         """Infrastructure metrics should work"""

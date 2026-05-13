@@ -18,8 +18,8 @@ class TestEmailResendStatus:
         r = api_client.get(f"{BASE_URL}/api/email-resend/status", timeout=15)
         assert r.status_code == 200
         data = r.json()
-        assert data.get("sdk_installed") is True
-        assert data.get("api_key_configured") is False
+        assert data.get("sdk_installed")
+        assert not data.get("api_key_configured")
         assert data.get("mode") == "mocked"
 
 
@@ -34,7 +34,7 @@ class TestEmailResendSend:
         assert r.status_code == 200
         data = r.json()
         assert data.get("status") == "mocked"
-        assert data.get("mocked") is True
+        assert data.get("mocked")
 
     def test_send_invalid_email_returns_422(self, api_client):
         payload = {"recipient_email": "not-an-email", "subject": "hi", "html_content": "<p>hi</p>"}

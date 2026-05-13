@@ -49,7 +49,7 @@ class TestNewsHeadlines:
         for headline in data["headlines"]:
             if headline.get("category"):
                 assert headline["category"] == "markets", f"Expected category 'markets', got {headline['category']}"
-        print(f"✓ News headlines category filter working")
+        print("✓ News headlines category filter working")
     
     def test_get_news_sources(self):
         """Test GET /api/news/sources returns list of available sources"""
@@ -107,7 +107,7 @@ class TestDecisionEngine:
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         
         data = response.json()
-        assert data.get("success") is True, "Response should have success=True"
+        assert data.get("success"), "Response should have success=True"
         assert "recommendations" in data, "Response should contain 'recommendations'"
         assert len(data["recommendations"]) > 0, "Should have at least one recommendation"
         
@@ -141,7 +141,7 @@ class TestDecisionEngine:
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         
         data = response.json()
-        assert data.get("success") is True, "Response should have success=True"
+        assert data.get("success"), "Response should have success=True"
         assert "overall_score" in data, "Response should contain 'overall_score'"
         assert "grade" in data, "Response should contain 'grade'"
         assert "component_scores" in data, "Response should contain 'component_scores'"
@@ -162,9 +162,9 @@ class TestXplanSync:
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         
         data = response.json()
-        assert data.get("success") is True, "Response should have success=True"
+        assert data.get("success"), "Response should have success=True"
         assert data.get("mode") == "demo", "Mode should be 'demo'"
-        print(f"✓ Xplan demo mode enabled")
+        print("✓ Xplan demo mode enabled")
     
     def test_xplan_status_after_demo_enabled(self):
         """Test GET /api/xplan/status shows connected in demo mode"""
@@ -176,7 +176,7 @@ class TestXplanSync:
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         
         data = response.json()
-        assert data.get("connected") is True, "Should be connected in demo mode"
+        assert data.get("connected"), "Should be connected in demo mode"
         assert data.get("mode") == "demo", "Mode should be 'demo'"
         print(f"✓ Xplan status: connected={data['connected']}, mode={data['mode']}")
     
@@ -204,8 +204,8 @@ class TestXplanSync:
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         
         data = response.json()
-        assert data.get("success") is True, "Push should succeed in demo mode"
-        print(f"✓ Xplan push strategy working (demo mode)")
+        assert data.get("success"), "Push should succeed in demo mode"
+        print("✓ Xplan push strategy working (demo mode)")
 
 
 class TestMacroDashboard:
@@ -219,19 +219,19 @@ class TestMacroDashboard:
         data = response.json()
         assert "highlights" in data, "Response should contain 'highlights'"
         assert "market_status" in data, "Response should contain 'market_status'"
-        print(f"✓ Macro overview working")
+        print("✓ Macro overview working")
     
     def test_macro_indices(self):
         """Test GET /api/macro/indices returns market indices"""
         response = requests.get(f"{BASE_URL}/api/macro/indices")
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
-        print(f"✓ Macro indices working")
+        print("✓ Macro indices working")
     
     def test_macro_currencies(self):
         """Test GET /api/macro/currencies returns currency data"""
         response = requests.get(f"{BASE_URL}/api/macro/currencies")
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
-        print(f"✓ Macro currencies working")
+        print("✓ Macro currencies working")
 
 
 if __name__ == "__main__":

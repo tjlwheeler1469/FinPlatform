@@ -40,7 +40,7 @@ class TestVoiceCommandProcess:
         data = response.json()
         # Either success or error with budget message
         assert "success" in data or "error" in data
-        print(f"PASS: Voice command endpoint exists and responds")
+        print("PASS: Voice command endpoint exists and responds")
     
     def test_voice_command_retirement_query(self):
         """POST /api/voice-command/process with retirement query"""
@@ -61,7 +61,7 @@ class TestVoiceCommandProcess:
             assert result_type == "retirement_analysis", f"Expected retirement_analysis, got {result_type}"
             # Verify retirement_analysis structure
             assert "retirement_analysis" in result or "client_summary" in result
-            print(f"PASS: Retirement query returns retirement_analysis type with structured data")
+            print("PASS: Retirement query returns retirement_analysis type with structured data")
         elif "Budget" in str(data.get("error", "")):
             print(f"SKIP: LLM budget exceeded (external limitation) - {data.get('error')}")
             pytest.skip("LLM budget exceeded - external API limitation")
@@ -96,7 +96,7 @@ class TestVoiceCommandProcess:
             else:
                 print(f"INFO: Got {result_type} instead of buffett_analysis")
         elif "Budget" in str(data.get("error", "")):
-            print(f"SKIP: LLM budget exceeded (external limitation)")
+            print("SKIP: LLM budget exceeded (external limitation)")
             pytest.skip("LLM budget exceeded - external API limitation")
         else:
             assert "success" in data
@@ -148,7 +148,7 @@ class TestVoiceCommandProcess:
                 assert "result" in result
                 assert "amount" in result.get("result", {})
                 assert "breakdown" in result
-                print(f"PASS: CGT calculation returns tax_calculation with amount and breakdown")
+                print("PASS: CGT calculation returns tax_calculation with amount and breakdown")
             else:
                 print(f"INFO: Got {result_type} instead of tax_calculation")
         elif "Budget" in str(data.get("error", "")):
@@ -174,7 +174,7 @@ class TestVoiceCommandProcess:
             result_type = result.get("type") or data.get("result_type")
             if result_type == "compliance_check":
                 assert "checklist" in result or "regulatory_framework" in result
-                print(f"PASS: Compliance query returns compliance_check with checklist/regulatory_framework")
+                print("PASS: Compliance query returns compliance_check with checklist/regulatory_framework")
             else:
                 print(f"INFO: Got {result_type} instead of compliance_check")
         elif "Budget" in str(data.get("error", "")):
@@ -200,7 +200,7 @@ class TestVoiceCommandProcess:
             result_type = result.get("type") or data.get("result_type")
             if result_type == "soa_draft":
                 assert "sections" in result or "strategies_recommended" in result
-                print(f"PASS: SOA draft returns soa_draft type with sections/strategies")
+                print("PASS: SOA draft returns soa_draft type with sections/strategies")
             else:
                 print(f"INFO: Got {result_type} instead of soa_draft")
         elif "Budget" in str(data.get("error", "")):
@@ -239,13 +239,13 @@ class TestVoiceCommandProcess:
             result = data2.get("result", {})
             # What-if should include comparison
             if "what_if_comparison" in result:
-                print(f"PASS: What-if follow-up includes what_if_comparison")
+                print("PASS: What-if follow-up includes what_if_comparison")
             else:
-                print(f"INFO: What-if response received but no what_if_comparison field")
+                print("INFO: What-if response received but no what_if_comparison field")
         elif "Budget" in str(data2.get("error", "")):
             pytest.skip("LLM budget exceeded - external API limitation")
         else:
-            print(f"INFO: Session persistence test - endpoint responds correctly")
+            print("INFO: Session persistence test - endpoint responds correctly")
 
 
 class TestVoiceCommandTranscribe:

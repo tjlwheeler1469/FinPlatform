@@ -36,7 +36,7 @@ class TestAICopilot:
         data = response.json()
         
         # Verify response structure
-        assert data.get("success") is True
+        assert data.get("success")
         assert "answer" in data
         assert "session_id" in data
         assert len(data["answer"]) > 100  # Should have substantial response
@@ -60,10 +60,10 @@ class TestAICopilot:
         assert response.status_code == 200
         data = response.json()
         
-        assert data.get("success") is True
+        assert data.get("success")
         assert "answer" in data
         assert "parsed" in data
-        print(f"✓ AI Copilot with context answered")
+        print("✓ AI Copilot with context answered")
         print(f"  Parsed data: {data.get('parsed', {})}")
     
     def test_copilot_session_history(self):
@@ -273,7 +273,7 @@ class TestFinancialPlanGeneration:
         data = response.json()
         
         # Verify response structure
-        assert data.get("success") is True
+        assert data.get("success")
         assert "plan" in data
         assert "client_name" in data
         assert len(data["plan"]) > 500  # Should be substantial plan
@@ -412,7 +412,7 @@ class TestDecisionEngineAPIs:
         data = response.json()
         
         assert "projections" in data or isinstance(data, list)
-        print(f"✓ Net worth projection calculated")
+        print("✓ Net worth projection calculated")
 
 
 class TestAIWealthBrief:

@@ -205,12 +205,12 @@ class TestActionLayerAPIs:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] is True
+        assert data["success"]
         assert "execution_id" in data
         assert data["status"] == "completed"
         assert "summary" in data
         assert "portfolios" in data
-        assert data["demo_mode"] is True
+        assert data["demo_mode"]
         
         summary = data["summary"]
         assert "portfolios_rebalanced" in summary
@@ -230,13 +230,13 @@ class TestActionLayerAPIs:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] is True
+        assert data["success"]
         assert "execution_id" in data
         assert data["status"] == "completed"
         assert "harvested_positions" in data
         assert "replacement_positions" in data
         assert "summary" in data
-        assert data["demo_mode"] is True
+        assert data["demo_mode"]
         
         summary = data["summary"]
         assert "total_losses_harvested" in summary
@@ -250,7 +250,7 @@ class TestActionLayerAPIs:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["preview"] is True
+        assert data["preview"]
         assert "drift_threshold" in data
         assert "portfolios_affected" in data
         assert "total_trades" in data
@@ -265,7 +265,7 @@ class TestActionLayerAPIs:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["preview"] is True
+        assert data["preview"]
         assert "opportunities" in data
         assert "summary" in data
         
@@ -353,7 +353,7 @@ class TestBrokerResearchAPIs:
         response = requests.get(f"{BASE_URL}/api/broker-research/stock/INVALIDXYZ")
         assert response.status_code == 404
         
-        print(f"✓ Invalid stock returns 404 as expected")
+        print("✓ Invalid stock returns 404 as expected")
     
     def test_upgrades_downgrades(self):
         """Test /api/broker-research/upgrades-downgrades returns changes"""

@@ -52,7 +52,7 @@ class TestVoiceRetirementAnalysis:
         
         # Check success field
         assert "success" in data, "Response missing 'success' field"
-        assert data["success"] == True, f"Analysis failed: {data.get('error', 'Unknown error')}"
+        assert data["success"], f"Analysis failed: {data.get('error', 'Unknown error')}"
         
         # Check raw_input is echoed back
         assert "raw_input" in data, "Response missing 'raw_input' field"
@@ -74,7 +74,7 @@ class TestVoiceRetirementAnalysis:
     def test_voice_retirement_analyze_complex_scenario(self):
         """Test with more complex client scenario including entities"""
         payload = {
-            "text": "Client John is 52 years old with $1.8M in personal shares, $600K in SMSF, $450K in family trust, investment property worth $900K with $300K mortgage. Wife Sarah is 50 with $400K super. They want to retire at 60 with $100K annual income.",
+            "text": "Client John == 52 years old with $1.8M in personal shares, $600K in SMSF, $450K in family trust, investment property worth $900K with $300K mortgage. Wife Sarah == 50 with $400K super. They want to retire at 60 with $100K annual income.",
             "session_id": "test_complex_127"
         }
         response = requests.post(
@@ -86,8 +86,8 @@ class TestVoiceRetirementAnalysis:
         
         assert response.status_code == 200, f"Complex scenario failed: {response.status_code}"
         data = response.json()
-        assert data.get("success") == True, f"Complex analysis failed: {data.get('error')}"
-        print(f"✓ Complex scenario analysis completed")
+        assert data.get("success"), f"Complex analysis failed: {data.get('error')}"
+        print("✓ Complex scenario analysis completed")
         
         if data.get("structured") and data.get("analysis"):
             analysis = data["analysis"]
@@ -131,12 +131,12 @@ class TestVoiceRetirementAnalysis:
         
         assert response.status_code == 200, f"CGT/franking test failed: {response.status_code}"
         data = response.json()
-        assert data.get("success") == True, f"CGT/franking analysis failed: {data.get('error')}"
+        assert data.get("success"), f"CGT/franking analysis failed: {data.get('error')}"
         
         if data.get("structured") and data.get("analysis"):
             analysis = data["analysis"]
             tc = analysis.get("tax_considerations", {})
-            print(f"✓ CGT/Franking analysis:")
+            print("✓ CGT/Franking analysis:")
             print(f"  - CGT liability: {tc.get('estimated_cgt_liability', 'N/A')}")
             print(f"  - CGT discount: {tc.get('cgt_discount_available', 'N/A')}")
             print(f"  - Franking credits: {tc.get('franking_credits_value', 'N/A')}")

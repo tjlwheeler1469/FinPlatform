@@ -27,7 +27,7 @@ class TestMonteCarloAPI:
             }
         )
         assert response.status_code == 200
-        print(f"✅ Monte Carlo API returned 200")
+        print("✅ Monte Carlo API returned 200")
     
     def test_monte_carlo_returns_required_fields(self):
         """Test that Monte Carlo returns all required fields"""

@@ -38,7 +38,7 @@ class TestClientWealthDataAPI:
         # Verify demo data values
         assert data["client_id"] == "demo_client"
         assert data["client_name"] == "James & Sarah Mitchell"
-        assert data["is_couple"] is True
+        assert data["is_couple"]
         assert len(data["people"]) == 2
         assert len(data["assets"]) >= 5
         print(f"✓ Demo client snapshot returned with {len(data['assets'])} assets, net worth: ${data['net_worth']:,}")
@@ -157,7 +157,7 @@ class TestAgePensionAPI:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["eligible"] is False
+        assert not data["eligible"]
         assert "qualifying_age" in data
         assert "years_until_eligible" in data
         
@@ -204,7 +204,7 @@ class TestMultiTenantAPI:
         assert response.status_code == 200
         
         data = response.json()
-        assert data["success"] is True
+        assert data["success"]
         assert data["licensee_id"] == "LIC-DEMO0001"
         assert "advisers" in data
         assert len(data["advisers"]) >= 2
@@ -222,7 +222,7 @@ class TestMultiTenantAPI:
         assert data["total"] >= 1
         
         # Verify demo licensee exists
-        licensee_ids = [l.get("licensee_id") or l.get("id") for l in data["licensees"]]
+        licensee_ids = [lic.get("licensee_id") or lic.get("id") for lic in data["licensees"]]
         assert any("DEMO" in str(lid) for lid in licensee_ids), "Demo licensee should exist"
         
         print(f"✓ Licensees list returned: {data['total']} licensees")
@@ -289,7 +289,7 @@ class TestDocumentGenerationAPI:
         assert "fees" in template
         assert "warnings" in template
         
-        print(f"✓ SOA template returned with required fields")
+        print("✓ SOA template returned with required fields")
     
     def test_generate_soa_pdf(self):
         """Test POST /api/documents/generate/soa generates SOA PDF"""
@@ -339,10 +339,10 @@ class TestDocumentGenerationAPI:
                 print(f"✓ SOA PDF generated: {len(response.content)} bytes")
             else:
                 data = response.json()
-                if data.get("success") is False:
+                if not data.get("success"):
                     print(f"⚠ SOA PDF generation not available: {data.get('error')}")
                 else:
-                    print(f"✓ SOA generation response received")
+                    print("✓ SOA generation response received")
         else:
             print(f"⚠ SOA generation returned status {response.status_code}")
 
@@ -370,7 +370,7 @@ class TestHealthAndIntegration:
             response = requests.get(f"{BASE_URL}{endpoint}")
             assert response.status_code == 200, f"Endpoint {endpoint} failed with {response.status_code}"
         
-        print(f"✓ All wealth-data routes registered and accessible")
+        print("✓ All wealth-data routes registered and accessible")
     
     def test_age_pension_routes_registered(self):
         """Verify age-pension routes are accessible"""
@@ -383,7 +383,7 @@ class TestHealthAndIntegration:
             response = requests.get(f"{BASE_URL}{endpoint}")
             assert response.status_code == 200, f"Endpoint {endpoint} failed with {response.status_code}"
         
-        print(f"✓ All age-pension routes registered and accessible")
+        print("✓ All age-pension routes registered and accessible")
     
     def test_tenant_routes_registered(self):
         """Verify tenant routes are accessible"""
@@ -396,7 +396,7 @@ class TestHealthAndIntegration:
             response = requests.get(f"{BASE_URL}{endpoint}")
             assert response.status_code == 200, f"Endpoint {endpoint} failed with {response.status_code}"
         
-        print(f"✓ All tenant routes registered and accessible")
+        print("✓ All tenant routes registered and accessible")
 
 
 if __name__ == "__main__":

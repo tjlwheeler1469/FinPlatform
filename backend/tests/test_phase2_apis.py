@@ -56,7 +56,7 @@ class TestFactFindAPI:
         
         assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
         data = response.json()
-        assert data.get("success") is True
+        assert data.get("success")
         assert data.get("client_id") == "test_client_001"
         print(f"Factfind saved successfully: {data}")
     
@@ -103,7 +103,7 @@ class TestESignatureAPI:
         
         assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
         data = response.json()
-        assert data.get("success") is True
+        assert data.get("success")
         assert "request_id" in data
         print(f"Signature request created: {data.get('request_id')}")
         return data.get("request_id")
@@ -143,7 +143,7 @@ class TestESignatureAPI:
         
         assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
         data = response.json()
-        assert data.get("success") is True
+        assert data.get("success")
         print(f"Document signed: {data}")
     
     def test_get_signature_request_by_id(self):
@@ -188,8 +188,8 @@ class TestMFAAPI:
         
         assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
         data = response.json()
-        assert data.get("success") is True
-        assert data.get("mfa_enabled") is True
+        assert data.get("success")
+        assert data.get("mfa_enabled")
         print(f"MFA setup successful: {data}")
     
     def test_get_mfa_status(self):
@@ -200,7 +200,7 @@ class TestMFAAPI:
         assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
         data = response.json()
         assert data.get("user_id") == "test_user_mfa_001"
-        assert data.get("enabled") is True
+        assert data.get("enabled")
         print(f"MFA status: enabled={data.get('enabled')}")
     
     def test_verify_mfa(self):
@@ -215,7 +215,7 @@ class TestMFAAPI:
         
         assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
         data = response.json()
-        assert data.get("success") is True
+        assert data.get("success")
         print(f"MFA verification: {data}")
     
     def test_disable_mfa(self):
@@ -230,7 +230,7 @@ class TestMFAAPI:
         
         assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
         data = response.json()
-        assert data.get("success") is True
+        assert data.get("success")
         print(f"MFA disabled: {data}")
 
 

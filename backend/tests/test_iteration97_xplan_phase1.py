@@ -140,7 +140,7 @@ class TestXplanMockAPI:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["success"] is True
+        assert data["success"]
         assert "note_id" in data
         assert data["client_id"] == client_id
         assert "created_date" in data
@@ -204,7 +204,7 @@ class TestXplanIntegrationService:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["success"] is True
+        assert data["success"]
         assert "message" in data
         assert "token_prefix" in data
         print(f"PASS: Connected to Xplan - {data['message']}")
@@ -308,10 +308,10 @@ class TestXplanIntegrationService:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["success"] is True
+        assert data["success"]
         assert "note_id" in data
         assert data["client_id"] == "XP-001"
-        assert data["synced_to_xplan"] is True
+        assert data["synced_to_xplan"]
         print(f"PASS: File note written to Xplan - {data['note_id']}")
     
     def test_integration_list_file_notes(self):
@@ -364,11 +364,11 @@ class TestXplanIntegrationService:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["success"] is True
+        assert data["success"]
         assert data["client_id"] == client_id
         assert "synced" in data
-        assert data["synced"]["client_data"] is True
-        assert data["synced"]["portfolio"] is True
+        assert data["synced"]["client_data"]
+        assert data["synced"]["portfolio"]
         assert "duration_seconds" in data
         print(f"PASS: Synced client {client_id} in {data['duration_seconds']}s")
 
@@ -466,7 +466,7 @@ class TestAuditLogging:
         
         if data["logs"]:
             # Find a log with duration
-            logs_with_duration = [l for l in data["logs"] if l.get("duration_ms") is not None]
+            logs_with_duration = [log for log in data["logs"] if log.get("duration_ms") is not None]
             if logs_with_duration:
                 log = logs_with_duration[0]
                 assert "duration_ms" in log

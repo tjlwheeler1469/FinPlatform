@@ -52,7 +52,7 @@ class TestStockPrices:
                 print(f"SUCCESS: {price['symbol']} - ${price['price']} ({price['name']})")
         
         # Verify mock data flag
-        assert data["is_mock_data"] is True  # No Alpha Vantage key configured
+        assert data["is_mock_data"]  # No Alpha Vantage key configured
         print(f"SUCCESS: Stock prices returned (mock data: {data['is_mock_data']})")
     
     def test_get_stock_prices_unknown_symbol(self):
@@ -139,7 +139,7 @@ class TestRetirementPlanning:
         assert "balance" in first_proj
         assert "phase" in first_proj
         
-        print(f"SUCCESS: Retirement plan calculated")
+        print("SUCCESS: Retirement plan calculated")
         print(f"  - Total at retirement: ${summary['total_at_retirement']:,.0f}")
         print(f"  - Sustainable income: ${summary['sustainable_annual_income']:,.0f}/year")
         print(f"  - Money lasts until age: {summary['money_lasts_until_age']}")
@@ -205,22 +205,22 @@ class TestEstatePlanning:
         assert len(data["beneficiaries"]) == 3
         spouse = next((b for b in data["beneficiaries"] if b["name"] == "Sarah Wheeler"), None)
         assert spouse is not None
-        assert spouse["is_tax_dependant"] is True  # Spouse is tax dependant
+        assert spouse["is_tax_dependant"]  # Spouse is tax dependant
         assert spouse["potential_super_tax"] == 0  # No tax for dependants
         
         # Adult children should have potential super tax
         emily = next((b for b in data["beneficiaries"] if b["name"] == "Emily Wheeler"), None)
         assert emily is not None
-        assert emily["is_tax_dependant"] is False
+        assert not emily["is_tax_dependant"]
         assert emily["potential_super_tax"] > 0  # Tax for non-dependants
         
         # Verify checklist
         assert len(data["checklist"]) > 0
         will_item = next((c for c in data["checklist"] if c["item"] == "Valid Will"), None)
         assert will_item is not None
-        assert will_item["complete"] is True
+        assert will_item["complete"]
         
-        print(f"SUCCESS: Estate plan analyzed")
+        print("SUCCESS: Estate plan analyzed")
         print(f"  - Total estate: ${summary['total_estate_value']:,.0f}")
         print(f"  - Beneficiaries: {summary['num_beneficiaries']}")
         print(f"  - Potential super death tax: ${data['tax_considerations']['potential_super_death_tax']:,.0f}")
@@ -301,7 +301,7 @@ class TestGoalPlanning:
         assert "total_monthly_required" in summary
         assert "monthly_surplus_shortfall" in summary
         
-        print(f"SUCCESS: Goal planning analyzed")
+        print("SUCCESS: Goal planning analyzed")
         print(f"  - Goals on track: {summary['goals_on_track']}/{summary['total_goals']}")
         print(f"  - Monthly required: ${summary['total_monthly_required']:,.0f}")
         print(f"  - Surplus/Shortfall: ${summary['monthly_surplus_shortfall']:,.0f}")
@@ -352,12 +352,12 @@ class TestFinancialAdvisorChat:
         assert "suggestions" in data
         
         # Should be in demo mode (no LLM key)
-        assert data["ai_enabled"] is False
+        assert not data["ai_enabled"]
         
         # Should have suggestions
         assert len(data["suggestions"]) > 0
         
-        print(f"SUCCESS: Chat response received (demo mode)")
+        print("SUCCESS: Chat response received (demo mode)")
         print(f"  - Response: {data['response'][:100]}...")
         print(f"  - AI enabled: {data['ai_enabled']}")
     
@@ -371,7 +371,7 @@ class TestFinancialAdvisorChat:
         
         # Should get tax-related response
         assert "tax" in data["response"].lower() or "18,200" in data["response"]
-        print(f"SUCCESS: Tax question answered")
+        print("SUCCESS: Tax question answered")
         print(f"  - Response: {data['response'][:150]}...")
     
     def test_chat_super_question(self):
@@ -384,7 +384,7 @@ class TestFinancialAdvisorChat:
         
         # Should get super-related response
         assert "super" in data["response"].lower() or "contribution" in data["response"].lower()
-        print(f"SUCCESS: Super question answered")
+        print("SUCCESS: Super question answered")
         print(f"  - Response: {data['response'][:150]}...")
     
     def test_chat_property_question(self):
@@ -397,7 +397,7 @@ class TestFinancialAdvisorChat:
         
         # Should get property-related response
         assert "property" in data["response"].lower() or "rental" in data["response"].lower()
-        print(f"SUCCESS: Property question answered")
+        print("SUCCESS: Property question answered")
     
     def test_chat_with_conversation_id(self):
         """Test chat with existing conversation ID"""
@@ -447,7 +447,7 @@ class TestPropertyValuations:
         assert valuation["suburb"] == "bondi"
         assert valuation["data_source"] == "mock_suburb_medians"
         
-        print(f"SUCCESS: Property valuation received")
+        print("SUCCESS: Property valuation received")
         print(f"  - Current: ${valuation['current_value']:,.0f}")
         print(f"  - Estimated: ${valuation['estimated_value']:,.0f}")
         print(f"  - Change: {valuation['change_percent']}%")

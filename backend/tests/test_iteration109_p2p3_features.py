@@ -36,7 +36,7 @@ class TestScalingInfrastructure:
         assert components.get("rate_limiter") == "operational"
         assert components.get("job_queue") == "operational"
         assert components.get("database") == "operational"
-        print(f"PASS: Health check returned healthy status with all components operational")
+        print("PASS: Health check returned healthy status with all components operational")
     
     def test_system_metrics(self):
         """Test GET /api/infrastructure/metrics returns system metrics"""
@@ -416,7 +416,7 @@ class TestIntegration:
         
         data = history_response.json()
         assert "chart_data" in data
-        print(f"PASS: Integration test - confidence calculation and history retrieval working")
+        print("PASS: Integration test - confidence calculation and history retrieval working")
     
     def test_all_new_endpoints_accessible(self):
         """Verify all new P2/P3 endpoints are accessible"""

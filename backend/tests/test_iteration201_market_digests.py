@@ -64,7 +64,7 @@ class TestDigestStatus:
         r = requests.get(f"{BASE}/api/digests/status", timeout=10)
         assert r.status_code == 200, r.text
         data = r.json()
-        assert data.get("scheduler_running") is True
+        assert data.get("scheduler_running")
         jobs = data.get("jobs") or []
         ids = {j["id"] for j in jobs}
         assert {"signal_daily", "actions_weekly"}.issubset(ids), f"missing jobs: {ids}"
@@ -74,7 +74,7 @@ class TestDigestStatus:
             assert j.get("next_run"), f"no next_run for {j['id']}"
             datetime.fromisoformat(j["next_run"].replace("Z", "+00:00"))
         # Resend not configured (per problem statement)
-        assert data.get("resend_configured") is False
+        assert not data.get("resend_configured")
         assert data.get("mode") == "mocked"
         assert data.get("default_recipient")
 
@@ -115,7 +115,7 @@ class TestDigestSendAndLog:
         r = requests.post(f"{BASE}/api/digests/send/signal", json={}, timeout=10)
         assert r.status_code == 200, r.text
         body = r.json()
-        assert body.get("success") is True
+        assert body.get("success")
         assert body.get("triggered") == "signal_daily"
         assert body.get("mode") == "mocked"
         # Async task — wait a moment for log insert
@@ -129,7 +129,7 @@ class TestDigestSendAndLog:
         r = requests.post(f"{BASE}/api/digests/send/actions", json={}, timeout=10)
         assert r.status_code == 200, r.text
         body = r.json()
-        assert body.get("success") is True
+        assert body.get("success")
         assert body.get("triggered") == "actions_weekly"
         assert body.get("mode") == "mocked"
         time.sleep(2)

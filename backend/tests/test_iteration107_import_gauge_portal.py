@@ -33,7 +33,7 @@ class TestWealthDataSnapshot:
         assert "total_income" in data, "Missing total_income"
         assert "total_expenses" in data, "Missing total_expenses"
         
-        print(f"PASS: Wealth snapshot returns complete data for demo_client")
+        print("PASS: Wealth snapshot returns complete data for demo_client")
         print(f"  - Net Worth: ${data['net_worth']:,}")
         print(f"  - Total Assets: ${data['total_assets']:,}")
         print(f"  - Is Couple: {data['is_couple']}")
@@ -52,7 +52,7 @@ class TestWealthDataSnapshot:
         assert "retirement_age" in person, "Missing retirement_age in person"
         assert "name" in person, "Missing name in person"
         
-        print(f"PASS: People data available for age import")
+        print("PASS: People data available for age import")
         print(f"  - Primary person: {person['name']}, Age: {person['current_age']}, Retirement: {person['retirement_age']}")
     
     def test_wealth_snapshot_has_assets_breakdown(self):
@@ -76,7 +76,7 @@ class TestWealthDataSnapshot:
         super_total = sum(a["value"] for a in data["assets"] if "super" in a.get("type", ""))
         investment_total = sum(a["value"] for a in data["assets"] if a.get("type") in ["shares_au", "shares_intl", "etf", "managed_fund"])
         
-        print(f"PASS: Assets breakdown available for import")
+        print("PASS: Assets breakdown available for import")
         print(f"  - Super Balance: ${super_total:,}")
         print(f"  - Investment Balance: ${investment_total:,}")
     
@@ -89,7 +89,7 @@ class TestWealthDataSnapshot:
         assert "net_worth" in data, "Should return demo data with net_worth"
         assert data["net_worth"] > 0, "Demo data should have positive net worth"
         
-        print(f"PASS: Unknown client returns demo data gracefully")
+        print("PASS: Unknown client returns demo data gracefully")
 
 
 class TestClientPortalEndpoints:
@@ -108,7 +108,7 @@ class TestClientPortalEndpoints:
             summary = data["summary"]
             assert "net_worth" in summary, "Missing net_worth in summary"
             
-        print(f"PASS: Client portal dashboard returns data")
+        print("PASS: Client portal dashboard returns data")
         print(f"  - Client: {data.get('name', 'N/A')}")
     
     def test_client_portal_net_worth(self):
@@ -121,7 +121,7 @@ class TestClientPortalEndpoints:
         has_financial_data = "assets" in data or "liabilities" in data or "net_worth" in data
         assert has_financial_data, "Missing financial data in net worth response"
         
-        print(f"PASS: Client portal net worth endpoint working")
+        print("PASS: Client portal net worth endpoint working")
     
     def test_client_portal_goals(self):
         """Test client portal goals endpoint"""
@@ -131,7 +131,7 @@ class TestClientPortalEndpoints:
         data = response.json()
         assert "goals" in data or "summary" in data, "Missing goals data"
         
-        print(f"PASS: Client portal goals endpoint working")
+        print("PASS: Client portal goals endpoint working")
     
     def test_client_portal_notifications(self):
         """Test client portal notifications endpoint"""
@@ -141,7 +141,7 @@ class TestClientPortalEndpoints:
         data = response.json()
         assert "notifications" in data, "Missing notifications array"
         
-        print(f"PASS: Client portal notifications endpoint working")
+        print("PASS: Client portal notifications endpoint working")
         print(f"  - Notifications count: {len(data.get('notifications', []))}")
 
 
@@ -191,7 +191,7 @@ class TestConfidenceEngineIntegration:
         score = data["confidence_score"]
         assert 0 <= score <= 100, f"Confidence score {score} out of range"
         
-        print(f"PASS: Confidence calculation with imported values")
+        print("PASS: Confidence calculation with imported values")
         print(f"  - Imported Net Worth: ${net_worth:,}")
         print(f"  - Imported Age: {current_age}, Retirement: {retirement_age}")
         print(f"  - Calculated Confidence: {score:.1f}%")
@@ -209,7 +209,7 @@ class TestWealthDataListAndEntities:
         assert "clients" in data, "Missing clients array"
         assert "total" in data, "Missing total count"
         
-        print(f"PASS: Client list endpoint working")
+        print("PASS: Client list endpoint working")
         print(f"  - Total clients: {data['total']}")
     
     def test_entity_types(self):
@@ -225,7 +225,7 @@ class TestWealthDataListAndEntities:
         for entity in expected_entities:
             assert entity in entity_values, f"Missing entity type: {entity}"
         
-        print(f"PASS: Entity types endpoint working")
+        print("PASS: Entity types endpoint working")
         print(f"  - Entities: {entity_values}")
     
     def test_asset_types(self):
@@ -241,7 +241,7 @@ class TestWealthDataListAndEntities:
         for asset in expected_assets:
             assert asset in asset_values, f"Missing asset type: {asset}"
         
-        print(f"PASS: Asset types endpoint working")
+        print("PASS: Asset types endpoint working")
         print(f"  - Asset types count: {len(asset_values)}")
 
 

@@ -261,7 +261,7 @@ class TestBuffettRouteRemoved:
         # We just verify the stock-trading related endpoints work
         response = requests.get(f"{BASE_URL}/api/trading/holdings/client_1")
         # This should work as trading endpoints exist
-        assert response.status_code in [200, 404], f"Trading endpoint should respond"
+        assert response.status_code in [200, 404], "Trading endpoint should respond"
 
 
 class TestHealthCheck:

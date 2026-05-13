@@ -265,7 +265,7 @@ class TestComplianceCenter:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["success"] is True
+        assert data["success"]
         assert "soa_id" in data
         assert "soa" in data
         
@@ -287,7 +287,7 @@ class TestComplianceCenter:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["success"] is True
+        assert data["success"]
         assert "log_id" in data
     
     def test_get_audit_logs(self):

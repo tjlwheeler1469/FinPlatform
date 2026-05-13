@@ -58,10 +58,10 @@ class TestNotificationServiceMockMode:
         data = response.json()
         assert "email_result" in data
         assert "sms_result" in data
-        assert data["email_result"]["success"] is True
-        assert data["email_result"]["mock"] is True
-        assert data["sms_result"]["success"] is True
-        assert data["sms_result"]["mock"] is True
+        assert data["email_result"]["success"]
+        assert data["email_result"]["mock"]
+        assert data["sms_result"]["success"]
+        assert data["sms_result"]["mock"]
         print(f"PASS: Mock notifications sent - Email log_id: {data['email_result'].get('log_id')}, SMS log_id: {data['sms_result'].get('log_id')}")
     
     def test_get_mock_notifications(self):
@@ -168,7 +168,7 @@ class TestXplanPhase2:
         # Either has deep sync data or message about no data
         if "sync_id" in data:
             assert "holdings" in data or "components" in data
-            print(f"PASS: Deep portfolio data retrieved for TEST_CLIENT_002")
+            print("PASS: Deep portfolio data retrieved for TEST_CLIENT_002")
         else:
             print(f"PASS: Deep portfolio endpoint working - {data.get('message', 'No data yet')}")
 
@@ -213,7 +213,7 @@ class TestClientProfileRetirement:
         assert response.status_code == 200
         data = response.json()
         assert data.get("status") == "success"
-        assert data.get("profile_updated") is True
+        assert data.get("profile_updated")
         print(f"PASS: Retirement calculation saved - Client ID: {data['client_id']}")
     
     def test_save_decumulation_calculation(self):
@@ -246,7 +246,7 @@ class TestClientProfileRetirement:
         assert response.status_code == 200
         data = response.json()
         assert data.get("status") == "success"
-        assert data.get("profile_updated") is True
+        assert data.get("profile_updated")
         print(f"PASS: Decumulation calculation saved - Client ID: {data['client_id']}")
 
 
@@ -290,13 +290,13 @@ class TestHealthCheck:
         
         # Check AdviceOS features
         adviceos = data.get("adviceos", {})
-        assert adviceos.get("websocket_service") is True
-        assert adviceos.get("notification_service") is True
-        assert adviceos.get("xplan_phase2") is True
-        assert adviceos.get("platform_integrations") is True
-        assert adviceos.get("client_profile_retirement") is True
+        assert adviceos.get("websocket_service")
+        assert adviceos.get("notification_service")
+        assert adviceos.get("xplan_phase2")
+        assert adviceos.get("platform_integrations")
+        assert adviceos.get("client_profile_retirement")
         
-        print(f"PASS: Health check - All new features enabled")
+        print("PASS: Health check - All new features enabled")
 
 
 if __name__ == "__main__":

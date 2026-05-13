@@ -35,7 +35,7 @@ class TestClientPackScheduler:
         response = requests.post(f"{BASE_URL}/api/client-pack/schedule", json=payload)
         assert response.status_code == 200
         data = response.json()
-        assert data.get("success") is True
+        assert data.get("success")
         assert "schedule" in data
         assert data["schedule"]["client_name"] == "Test Client 132"
         assert data["schedule"]["frequency"] == "quarterly"
@@ -69,7 +69,7 @@ class TestClientPackScheduler:
         )
         assert response.status_code == 200
         data = response.json()
-        assert data.get("success") is True
+        assert data.get("success")
         assert "pack" in data
         assert data["pack"]["client_name"] == "Test Gen Client"
         assert data["pack"]["status"] == "ready"
@@ -91,7 +91,7 @@ class TestClientPackScheduler:
         response = requests.post(f"{BASE_URL}/api/client-pack/generate-all")
         assert response.status_code == 200
         data = response.json()
-        assert data.get("success") is True
+        assert data.get("success")
         assert "generated_count" in data
         print(f"✓ Batch generate: {data['generated_count']} packs")
     
@@ -111,7 +111,7 @@ class TestClientPackScheduler:
         response = requests.delete(f"{BASE_URL}/api/client-pack/schedule/{schedule_id}")
         assert response.status_code == 200
         data = response.json()
-        assert data.get("success") is True
+        assert data.get("success")
         print(f"✓ Delete schedule: {schedule_id}")
 
 

@@ -119,7 +119,7 @@ class TestKnowledgeGraphAPI:
         assert response.status_code == 200
         data = response.json()
         assert "summary" in data or "node_counts" in data, "Missing summary or node_counts"
-        print(f"✓ Knowledge Graph overview accessible")
+        print("✓ Knowledge Graph overview accessible")
     
     def test_knowledge_graph_insights(self):
         """Test knowledge graph insights endpoint"""
@@ -148,12 +148,12 @@ class TestClientContextAPI:
         if response.status_code == 200:
             data = response.json()
             assert "message_id" in data or "id" in data or "success" in data, "Missing message identifier in response"
-            print(f"✓ Client contact send-message working")
+            print("✓ Client contact send-message working")
         else:
             # Check what fields are required
-            print(f"Client contact API requires additional fields (422 response - expected for test)")
+            print("Client contact API requires additional fields (422 response - expected for test)")
             # Still pass the test as the endpoint exists
-            print(f"✓ Client contact endpoint exists")
+            print("✓ Client contact endpoint exists")
 
 
 class TestDecisionEngineAPI:

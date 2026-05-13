@@ -1,3 +1,11 @@
+## April 2026 — Round 2 review fixes (test-suite cleanup)
+- **Items 1, 2, 5 reconfirmed clean** from prior pass: `eval()` already replaced by `ast.literal_eval`, `data_feeds.py` random already uses `_stdrandom.Random(seed)`, 0 F821 undefined names.
+- **Item 4 — `is` vs `==` in tests** (576 instances reported): mechanical fix applied via Python script. `is True/False/<int>` → `== True/False/<int>` and `is not …` → `!= …` across **60 test files, 352 lines**. `is None`/`is not None` idioms preserved correctly.
+- **Follow-on E712 cleanup**: removed the now-redundant `== True/== False` (canonical Python form is `assert x` / `assert not x`) in **65 files, 364 lines**.
+- **Misc test-suite hygiene**: deduped `practice_health` method in `load_test.py`, renamed ambiguous `l` → `lic`/`log` in 2 files, marked 11 unused `data = response.json()` locals with `_` to silence F841.
+- **210/210 test files compile cleanly**. Backend ruff reports **All checks passed** across entire backend including tests.
+
+
 ## April 2026 — Code Quality / Security review fixes
 - **eval() vulnerabilities**: Reviewed — `routes/scenario_templates.py` already uses `ast.literal_eval()`, no live `eval()` calls in production code (review report was stale). Test-file mentions are in comments/docstrings only.
 - **Undefined variables (F821)**: 4 occurrences in `services/data_feeds.py` (`random.seed()` calls without `import random`). Fixed by importing `random as _stdrandom` and replacing each `random.seed(hash(x) % 2**32)` with a function-local deterministic `_rng = _stdrandom.Random(hash(x) % 2**32)` shadowing the module-level `secrets.SystemRandom`. Determinism preserved, lint silent.

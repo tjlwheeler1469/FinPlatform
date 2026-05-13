@@ -48,7 +48,7 @@ class TestImplementationPack:
         r = session.post(f"{API}/implementation-pack/{CLIENT_ID}", json=payload)
         assert r.status_code == 200, r.text
         data = r.json()
-        assert data["success"] is True
+        assert data["success"]
         assert data["pack_id"].startswith("pack_")
         assert isinstance(data["ticket_ids"], list)
         assert len(data["ticket_ids"]) == 2
@@ -56,10 +56,10 @@ class TestImplementationPack:
         assert data["xmerge_mode"] in ("mock", "live")
         # Verify steps array
         steps = {s["step"]: s for s in data["steps"]}
-        assert "pdf_stored" in steps and steps["pdf_stored"]["ok"] is True
+        assert "pdf_stored" in steps and steps["pdf_stored"]["ok"]
         assert "notify_client" in steps
         assert "tickets_created" in steps and steps["tickets_created"]["count"] == 2
-        assert "xmerge_push" in steps and steps["xmerge_push"]["ok"] is True
+        assert "xmerge_push" in steps and steps["xmerge_push"]["ok"]
         # Stash
         pytest.pack_id = data["pack_id"]
         pytest.first_ticket_id = data["ticket_ids"][0]
@@ -97,14 +97,14 @@ class TestExecutionRails:
         assert broker is not None
         assert broker["name"] == "Broker (Alpaca)"
         # Without keys we expect live=False
-        assert broker["live"] is False
+        assert not broker["live"]
 
     def test_dispatch_trade_ticket_mock(self, session):
         # Use the trade ticket created by implementation-pack
         r = session.post(f"{API}/exec-rails/tickets/{pytest.first_ticket_id}/dispatch")
         assert r.status_code == 200, r.text
         data = r.json()
-        assert data["success"] is True
+        assert data["success"]
         evt = data["event"]
         assert evt["adapter"] == "broker"
         assert evt["mode"] == "mock"  # No Alpaca keys configured
@@ -127,9 +127,9 @@ class TestNotifyClient:
         r = session.post(f"{API}/notify/client", json=body)
         assert r.status_code == 200, r.text
         data = r.json()
-        assert data["success"] is True
+        assert data["success"]
         n = data["notification"]
-        assert n["has_attachment"] is True
+        assert n["has_attachment"]
         assert n["attachment_name"] == "SOA-Test.pdf"
         assert data["mode"] in ("mocked", "live")
 
@@ -145,7 +145,7 @@ class TestNotifyClient:
         r = session.post(f"{API}/notify/client", json=body)
         assert r.status_code == 200
         data = r.json()
-        assert data["success"] is True
+        assert data["success"]
         n = data["notification"]
-        assert n["has_attachment"] is False
+        assert not n["has_attachment"]
         assert n["attachment_name"] is None

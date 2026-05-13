@@ -116,7 +116,7 @@ class TestMacroDashboard:
                 assert isinstance(data[region], list), f"{region} should be a list"
                 print(f"  - {region}: {len(data[region])} indices")
         
-        print(f"PASS: GET /api/macro/indices")
+        print("PASS: GET /api/macro/indices")
     
     def test_get_currencies(self):
         """GET /api/macro/currencies should return currency pairs"""
@@ -125,7 +125,7 @@ class TestMacroDashboard:
         
         data = response.json()
         assert "major" in data or "aud_crosses" in data, "Should have currency categories"
-        print(f"PASS: GET /api/macro/currencies")
+        print("PASS: GET /api/macro/currencies")
 
 
 class TestNewsHeadlines:
@@ -198,7 +198,7 @@ class TestDecisionEngine:
         
         data = response.json()
         assert "success" in data, "Response should have 'success' field"
-        assert data["success"] is True, "Health score calculation should succeed"
+        assert data["success"], "Health score calculation should succeed"
         assert "overall_score" in data, "Response should have 'overall_score'"
         assert "grade" in data, "Response should have 'grade'"
         assert "component_scores" in data, "Response should have 'component_scores'"
@@ -227,7 +227,7 @@ class TestDecisionEngine:
         
         data = response.json()
         assert "success" in data, "Response should have 'success' field"
-        assert data["success"] is True, "Recommendations should succeed"
+        assert data["success"], "Recommendations should succeed"
         assert "recommendations" in data, "Response should have 'recommendations'"
         assert isinstance(data["recommendations"], list), "Recommendations should be a list"
         
@@ -291,7 +291,7 @@ class TestLiveStockData:
         data = response.json()
         assert "indices" in data or "market_status" in data, "Response should have market data"
         
-        print(f"PASS: GET /api/live/market-summary")
+        print("PASS: GET /api/live/market-summary")
 
 
 class TestKnowledgeGraph:
@@ -352,10 +352,10 @@ class TestFinancialPlans:
         assert response.status_code in [200, 201, 422], f"Expected 200/201/422, got {response.status_code}"
         
         if response.status_code in [200, 201]:
-            data = response.json()
-            print(f"PASS: POST /api/financial-plan/generate - Plan created")
+            _ = response.json()
+            print("PASS: POST /api/financial-plan/generate - Plan created")
         else:
-            print(f"PASS: POST /api/financial-plan/generate - Endpoint exists (validation error expected)")
+            print("PASS: POST /api/financial-plan/generate - Endpoint exists (validation error expected)")
 
 
 class TestCryptoPrices:
@@ -370,7 +370,7 @@ class TestCryptoPrices:
         # Should have crypto price data
         assert "prices" in data or "cryptocurrencies" in data or isinstance(data, list), "Response should have crypto data"
         
-        print(f"PASS: GET /api/crypto/prices")
+        print("PASS: GET /api/crypto/prices")
 
 
 class TestCRMTasks:
@@ -398,15 +398,15 @@ class TestAdditionalEndpoints:
         
         data = response.json()
         assert "energy" in data or "metals" in data, "Should have commodity categories"
-        print(f"PASS: GET /api/macro/commodities")
+        print("PASS: GET /api/macro/commodities")
     
     def test_get_bonds(self):
         """GET /api/macro/bonds should return bond yields"""
         response = requests.get(f"{BASE_URL}/api/macro/bonds")
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         
-        data = response.json()
-        print(f"PASS: GET /api/macro/bonds")
+        _ = response.json()
+        print("PASS: GET /api/macro/bonds")
     
     def test_get_crypto_from_macro(self):
         """GET /api/macro/crypto should return crypto prices"""
@@ -422,8 +422,8 @@ class TestAdditionalEndpoints:
         response = requests.get(f"{BASE_URL}/api/macro/futures")
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         
-        data = response.json()
-        print(f"PASS: GET /api/macro/futures")
+        _ = response.json()
+        print("PASS: GET /api/macro/futures")
     
     def test_net_worth_projection(self):
         """GET /api/decision-engine/net-worth-projection should return projections"""

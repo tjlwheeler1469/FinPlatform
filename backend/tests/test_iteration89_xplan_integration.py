@@ -36,7 +36,7 @@ class TestXplanDemoMode:
         assert response.status_code == 200
         
         data = response.json()
-        assert data.get("success") is True
+        assert data.get("success")
         assert data.get("mode") == "demo"
         print(f"Demo mode enabled: {data}")
     
@@ -50,7 +50,7 @@ class TestXplanDemoMode:
         assert response.status_code == 200
         
         data = response.json()
-        assert data.get("connected") is True
+        assert data.get("connected")
         assert data.get("mode") == "demo"
         assert "site_url" in data
         print(f"Status after demo: {data}")
@@ -72,7 +72,7 @@ class TestXplanSync:
         assert response.status_code == 200
         
         data = response.json()
-        assert data.get("success") is True
+        assert data.get("success")
         assert data.get("sync_type") == "full"
         print(f"Sync started: {data}")
     
@@ -87,7 +87,7 @@ class TestXplanSync:
         assert response.status_code == 200
         
         data = response.json()
-        assert data.get("success") is True
+        assert data.get("success")
         assert data.get("sync_type") == "clients"
         print(f"Clients sync started: {data}")
 
@@ -188,7 +188,7 @@ class TestXplanTestConnection:
         assert response.status_code == 200
         
         data = response.json()
-        assert data.get("success") is True
+        assert data.get("success")
         assert data.get("mode") == "demo"
         print(f"Test connection (demo): {data}")
 
@@ -242,7 +242,7 @@ class TestXplanConfigure:
         assert response.status_code == 200
         
         data = response.json()
-        assert data.get("success") is True
+        assert data.get("success")
         assert data.get("mode") == "demo"
         print(f"Configure response: {data}")
 
@@ -268,7 +268,7 @@ class TestXplanPush:
         assert response.status_code == 200
         
         data = response.json()
-        assert data.get("success") is True
+        assert data.get("success")
         assert data.get("mode") == "demo"
         assert "xplan_ref" in data
         print(f"Push note response: {data}")
@@ -289,7 +289,7 @@ class TestXplanPush:
         assert response.status_code == 200
         
         data = response.json()
-        assert data.get("success") is True
+        assert data.get("success")
         print(f"Push strategy response: {data}")
     
     def test_push_document_to_xplan(self):
@@ -309,7 +309,7 @@ class TestXplanPush:
         assert response.status_code == 200
         
         data = response.json()
-        assert data.get("success") is True
+        assert data.get("success")
         print(f"Push document response: {data}")
 
 

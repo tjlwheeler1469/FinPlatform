@@ -79,7 +79,7 @@ class TestBuffettEngineAPI:
                 assert field in idea, f"Missing field: {field} in {idea.get('symbol', 'unknown')}"
             assert idea["action"] in ["BUY", "HOLD", "AVOID"]
             assert 0 <= idea["confidence"] <= 100
-        print(f"PASS: All stocks have required fields and valid action/confidence values")
+        print("PASS: All stocks have required fields and valid action/confidence values")
     
     def test_buffett_screen_source_is_live(self):
         """Verify source indicates live data"""
@@ -197,7 +197,7 @@ class TestHybridEngineAPI:
         data = response.json()
         
         assert "confidence_score" in data or "display" in data
-        print(f"PASS: Hybrid engine calculation successful")
+        print("PASS: Hybrid engine calculation successful")
 
 
 class TestLifecycleAPIs:

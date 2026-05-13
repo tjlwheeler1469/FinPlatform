@@ -49,7 +49,7 @@ class TestAdviceOSInitialization:
         response = requests.post(f"{BASE_URL}/api/reports/generate-demo-data")
         assert response.status_code == 200
         data = response.json()
-        assert data.get("success") is True
+        assert data.get("success")
         print(f"✓ Demo data generated: {data.get('created', {})}")
 
 
@@ -84,7 +84,7 @@ class TestScenarioGenerator:
         
         # Verify no 'best option' or 'recommended' ranking
         for scenario in scenarios:
-            assert "recommended" not in str(scenario).lower() or scenario.get("recommended") != True
+            assert not "recommended" not in str(scenario).lower() or scenario.get("recommended")
             assert "best_option" not in scenario
             assert "ranking" not in scenario
         print("✓ No 'best option' or 'recommended' ranking found in scenarios")
@@ -425,7 +425,7 @@ class TestReportsDashboard:
         assert "breaches" in summary
         assert "decisions" in summary
         
-        print(f"✓ Dashboard summary retrieved:")
+        print("✓ Dashboard summary retrieved:")
         print(f"  Compliance Score: {summary['compliance_score']}%")
         print(f"  Total Scenarios: {summary['scenarios']['total']}")
         print(f"  Compliance Checks: {summary['compliance_checks']['total']}")
@@ -542,7 +542,7 @@ class TestCRMCommandCenter:
         
         # Should have summary stats
         assert "total_clients" in data or "summary" in data
-        print(f"✓ CRM stats endpoint working")
+        print("✓ CRM stats endpoint working")
         if "total_aum" in data:
             print(f"  Total AUM: ${data['total_aum']:,.0f}")
 

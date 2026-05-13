@@ -337,7 +337,7 @@ class TestMeetingPrepAPIs:
         assert data["client_name"] == "Patel Holdings"
         assert data["meeting_type"] == "planning"
         
-        print(f"✓ Meeting prep for Patel Holdings generated successfully")
+        print("✓ Meeting prep for Patel Holdings generated successfully")
 
 
 class TestCopilotAPIs:
@@ -358,8 +358,8 @@ class TestCopilotAPIs:
         
         # Copilot may return 200 or may not be fully implemented
         if response.status_code == 200:
-            data = response.json()
-            print(f"✓ Copilot query returned response")
+            _ = response.json()
+            print("✓ Copilot query returned response")
         else:
             print(f"⚠ Copilot query returned {response.status_code} - may be mocked")
 
@@ -372,8 +372,8 @@ class TestMarketDataAPIs:
         response = requests.get(f"{BASE_URL}/api/market/overview")
         
         if response.status_code == 200:
-            data = response.json()
-            print(f"✓ Market overview returned data")
+            _ = response.json()
+            print("✓ Market overview returned data")
         else:
             # Market data may be mocked
             print(f"⚠ Market overview returned {response.status_code} - using mock data in frontend")

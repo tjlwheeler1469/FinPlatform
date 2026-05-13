@@ -100,7 +100,7 @@ class TestScenarioTemplatesAPI:
         )
         assert response.status_code == 200
         data = response.json()
-        assert data["requirements_met"] == False
+        assert not data["requirements_met"]
         assert len(data["requirement_issues"]) > 0
 
 

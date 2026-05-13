@@ -106,7 +106,7 @@ class TestMFASetup:
         assert response.status_code == 200
         data = response.json()
         assert "user_id" in data
-        print(f"✅ MFA setup initiated for test_user_126")
+        print("✅ MFA setup initiated for test_user_126")
     
     def test_mfa_verify(self):
         """Test MFA verification (mock accepts any 6-digit code)"""

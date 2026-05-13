@@ -396,7 +396,7 @@ class TestHybridEngineAISuggestions:
             assert "projected_confidence" in suggestion
             assert "delta" in suggestion
             assert "auto_applied" in suggestion
-            assert suggestion["auto_applied"] is False, "AI should NOT auto-apply changes"
+            assert not suggestion["auto_applied"], "AI should NOT auto-apply changes"
         
         print(f"✓ AI suggestions: {len(data['ai_suggestions'])} suggestions, {len(data['identified_risks'])} risks")
 
@@ -570,7 +570,7 @@ class TestHybridEngineFactorWeights:
                 total += int(value.replace('%', ''))
         
         assert total == 100, f"Weights should sum to 100%, got {total}%"
-        print(f"✓ Factor weights sum to 100%")
+        print("✓ Factor weights sum to 100%")
     
     def test_factor_contributions_in_calculation(self):
         """Verify factor contributions are calculated correctly"""

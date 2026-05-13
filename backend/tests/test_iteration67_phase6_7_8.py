@@ -55,7 +55,7 @@ class TestMeetingAutomationEngine:
         response = requests.post(f"{BASE_URL}/api/meeting-automation/process", json=payload)
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] is True
+        assert data["success"]
         assert "meeting_id" in data
         assert "summary" in data
         assert "outputs" in data
@@ -158,10 +158,10 @@ class TestBatchExecution:
         response = requests.post(f"{BASE_URL}/api/batch-execution/execute", json=payload)
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] is True
+        assert data["success"]
         assert "batch_id" in data
         assert "trades_generated" in data
-        assert data["requires_approval"] is True  # auto_execute was False
+        assert data["requires_approval"]  # auto_execute was False
         print(f"✓ Batch created: {data['batch_id']}, {data['trades_generated']} trades")
     
     def test_batch_execution_batches(self):
@@ -426,7 +426,7 @@ class TestIntegration:
         
         dashboard = dashboard_res.json()
         net_worth = net_worth_res.json()
-        portfolios = portfolios_res.json()
+        _ = portfolios_res.json()
         goals = goals_res.json()
         
         # Verify data consistency

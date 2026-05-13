@@ -25,18 +25,18 @@ class TestHealthCheck:
         
         # Verify new workflow engine capabilities
         workflow_engine = data.get("workflow_engine", {})
-        assert workflow_engine.get("client_onboarding") is True
-        assert workflow_engine.get("annual_review") is True
-        assert workflow_engine.get("tax_planning") is True
-        assert workflow_engine.get("portfolio_rebalance") is True
+        assert workflow_engine.get("client_onboarding")
+        assert workflow_engine.get("annual_review")
+        assert workflow_engine.get("tax_planning")
+        assert workflow_engine.get("portfolio_rebalance")
         
         # Verify book intelligence capability
         intelligence = data.get("intelligence", {})
-        assert intelligence.get("book_intelligence") is True
+        assert intelligence.get("book_intelligence")
         
         # Verify alpaca paper trading capability
         execution = data.get("execution_layer", {})
-        assert execution.get("alpaca_paper_trading") is True
+        assert execution.get("alpaca_paper_trading")
         
         # Check capabilities list
         capabilities = data.get("capabilities", [])
@@ -191,7 +191,7 @@ class TestWorkflowQuickStart:
         assert response.status_code == 200, f"Failed to create workflow: {response.text}"
         
         data = response.json()
-        assert data["success"] is True
+        assert data["success"]
         assert "workflow_id" in data
         assert "workflow" in data
         assert "message" in data
@@ -227,7 +227,7 @@ class TestWorkflowQuickStart:
         assert response.status_code == 200, f"Failed to create workflow: {response.text}"
         
         data = response.json()
-        assert data["success"] is True
+        assert data["success"]
         workflow = data["workflow"]
         assert workflow["total_steps"] == 8
         print(f"Annual review workflow created: {data['workflow_id']}")
@@ -399,7 +399,7 @@ class TestAlpacaTrading:
         assert "message" in data
         
         # SDK should be installed
-        assert data["sdk_installed"] is True, "Alpaca SDK should be installed"
+        assert data["sdk_installed"], "Alpaca SDK should be installed"
         
         # Configuration status depends on API keys
         status = data["status"]
@@ -413,8 +413,8 @@ class TestAlpacaTrading:
         assert response.status_code == 200, f"Failed to get demo account: {response.text}"
         
         data = response.json()
-        assert data["success"] is True
-        assert data["demo_mode"] is True
+        assert data["success"]
+        assert data["demo_mode"]
         assert "account" in data
         assert "message" in data
         
@@ -439,8 +439,8 @@ class TestAlpacaTrading:
         assert response.status_code == 200, f"Failed to get demo positions: {response.text}"
         
         data = response.json()
-        assert data["success"] is True
-        assert data["demo_mode"] is True
+        assert data["success"]
+        assert data["demo_mode"]
         assert "positions" in data
         assert "summary" in data
         assert "message" in data
@@ -584,7 +584,7 @@ class TestWorkflowAdvanced:
         assert response.status_code == 200, f"Failed to create workflow: {response.text}"
         
         data = response.json()
-        assert data["success"] is True
+        assert data["success"]
         assert "workflow_id" in data
         
         workflow = data["workflow"]
