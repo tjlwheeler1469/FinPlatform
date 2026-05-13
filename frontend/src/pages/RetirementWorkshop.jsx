@@ -27,6 +27,7 @@ import {
 import { CLIENT_DATA, getActiveClientId } from "@/data/clientData";
 import { projectRetirement, buildScenarioFromInputs } from "@/lib/retirementEngine";
 import { clampInput, fmtCurrencyCompact, fmtCurrencyFull } from "@/lib/inputBounds";
+import { useScenario, setScenario } from "@/lib/scenarioStore";
 
 const fmt = fmtCurrencyFull;
 
@@ -85,7 +86,12 @@ const FieldRow = ({ label, children, hint }) => (
 
 // Single scenario editor panel
 const ScenarioEditor = ({ scenario, onChange, onRemove, isBase, color, result, baseResult }) => {
-  const update = (patch) => onChange({ ...scenario, inputs: { ...scenario.inputs, ...patch } });
+  const update = (patch) => {
+    onChange({ ...scenario, inputs: { ...scenario.inputs, ...patch } });
+    // Base scenario writes through to the global store so other pages see
+    // the same numbers immediately.
+    if (isBase) setScenario(undefined, patch);
+  };
   const i = scenario.inputs;
 
   const deltaConfidence = baseResult ? result.confidence - baseResult.confidence : 0;
@@ -229,7 +235,25 @@ const ScenarioEditor = ({ scenario, onChange, onRemove, isBase, color, result, b
 const RetirementWorkshop = ({ embedded = false, clientId: propClientId }) => {
   const clientId = propClientId || getActiveClientId();
   const client = CLIENT_DATA[clientId] || CLIENT_DATA.thompson_family;
-  const initialInputs = useMemo(() => buildInitialInputs(client), [client]);
+  // Initial inputs come from the global scenario store so any field edited
+  // on Household Budget, Tax tab or Budget Reforms screen flows in here.
+  const scenarioStore = useScenario(clientId);
+  const initialInputs = useMemo(() => {
+    const base = buildInitialInputs(client);
+    return {
+      ...base,
+      monthlyIncome: scenarioStore.monthlyIncome ?? base.monthlyIncome,
+      monthlyExpenses: scenarioStore.monthlyExpenses ?? base.monthlyExpenses,
+      extraMonthlySavings: scenarioStore.extraMonthlySavings ?? base.extraMonthlySavings,
+      currentPortfolio: scenarioStore.currentPortfolio ?? base.currentPortfolio,
+      annualContributions: scenarioStore.annualContributions ?? base.annualContributions,
+      currentAge: scenarioStore.currentAge ?? base.currentAge,
+      retirementAge: scenarioStore.retirementAge ?? base.retirementAge,
+      lifeExpectancy: scenarioStore.lifeExpectancy ?? base.lifeExpectancy,
+      retirementSpending: scenarioStore.retirementSpending ?? base.retirementSpending,
+      legacyGoal: scenarioStore.legacyGoal ?? base.legacyGoal,
+    };
+  }, [client, scenarioStore]);
 
   const [scenarios, setScenarios] = useState(() => [
     { id: "base", name: "Current Plan", inputs: { ...initialInputs } },

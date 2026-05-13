@@ -1,3 +1,16 @@
+## April 2026 — 2026–27 Budget Tax Engine (Negative Gearing, CGT, Trust Reform)
+- **Source documents reviewed verbatim**: budget.gov.au/content/downloads.htm → "Tax explainer — Negative Gearing and Capital Gains Tax Reform" + "Tax explainer — Minimum tax on discretionary trusts" + "Tax explainer — New tax cuts for Australian workers".
+- **`lib/auTax.js` rewritten** to a date-aware engine encoding all policy rules: announcement date (12 May 2026 19:30 AEST), CGT/NG reform date (1 July 2027), trust reform date (1 July 2028). 26/26 unit tests in `auTax.test.mjs` pass.
+  - `calculateTax(income, {refDate})`: applies WATO $250 offset post 1 Jul 2027.
+  - `calculateCGT({propertyType, purchaseDate, saleDate, isMainResidence, isMeansTested, cumulativeCpi, electNewBuildDiscount, ...})`: 6 regimes — pre-reform-50pc-discount, post-reform indexation+30pc-min-tax, new-build-election (whichever cheaper), affordable-housing-60pc-discount, transitional-pre-and-post, main-residence-exempt.
+  - `negativeGearingStatus({propertyType, purchaseDate, refDate})`: 5 statuses — A_grandfathered, B_transitional, C_post_reform, D_new_build, E_non_residential.
+  - `applyRentalLossDeduction(...)`: quarantining rules for existing dwellings purchased post-announcement.
+  - `calculateTrustMinimumTax(...)`: 30% min tax with franking-credit offset, corporate-no-credit, testamentary exclusion.
+- **`lib/scenarioStore.js`**: new global in-memory + localStorage store. `useScenario()` / `useScenarioUpdater()` / `setScenario()`. Stable reference (no re-render loops). Cross-tab sync via storage event.
+- **New page `/budget-reforms`** (BudgetReforms2027.jsx): tabbed UI — Property impact (NG status + CGT today vs +5y post-reform), Trust impact, "What changed" ASIC-style summary with policy citations. Linked from client-context sidebar with TAX badge.
+- **Cross-page input flow**: RetirementWorkshop "Current Plan" base scenario writes through to the global store on every edit, so the same income/expenses/portfolio populate the Budget Reforms calculator and any future Tax tab.
+
+
 ## April 2026 — Calculation hardening + 10M-iteration stress test
 - **Bug fix**: Numeric inputs on Retirement Workshop, Household Budget and Scenario Comparison accepted any string and propagated absurd values (e.g. `1e20`) into the surplus + Monte Carlo math. Display showed nonsensical "$10,416,799,999,999,975,000" surplus.
 - **Fix**: Added `lib/inputBounds.js` with per-field clamps (`monthlyIncome` ≤ $5M, `currentPortfolio` ≤ $1B, ages 0-130, etc.), strips non-numeric paste, returns the field default for NaN/empty/Infinity. Wired into every adviser-input field on `RetirementWorkshop.jsx` (10 fields) and `HouseholdBudget.jsx` (5 fields).

@@ -67,6 +67,7 @@ export const clientContextNav = [
     items: [
       { path: "/dashboard", label: "Client Overview", icon: Wallet, title: "Overview, Goals, Retirement, Investments, Budget & Tax", badge: "360" },
       { path: "/client-capture", label: "Key Dates & Disclosures", icon: ListTodo, title: "Xplan-style client capture: contact, service overview, reviews, FSG, risk profile" },
+      { path: "/budget-reforms", label: "Budget 2027 Reforms", icon: Landmark, title: "Negative gearing, CGT (new vs existing) & discretionary trust reforms · 2026–27 Federal Budget", badge: "TAX" },
       { path: "/client-invoicing", label: "Invoicing", icon: Receipt, title: "Invoices, fees & billing for this client" },
     ]
   },
