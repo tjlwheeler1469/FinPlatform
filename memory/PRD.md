@@ -1,3 +1,14 @@
+## April 2026 — Budget Reform end-to-end
+- **SOA recommendations engine** is now Budget-aware: `adviceDocumentEngine.js` detects investment properties + family trusts and:
+  - Auto-inserts a "Tax law changes" amber callout section right after "Your reasons for seeking advice" — uses days-until countdowns and verbatim Budget rules.
+  - Adds an investment-property recommendation (auditing cost base, grandfathering position, sell-pre-vs-sell-post-1-Jul-2027 modelling, restructure decision) sized by total inv-property value + inv-loan exposure.
+  - Adds a discretionary-trust recommendation (1 Jul 2028 min-tax exposure, 3-year rollover relief).
+  - Contribution-cap helper: estimates SG floor (11.5% × HH income) and reports remaining concessional cap room with marginal-tax-arbitrage saving math.
+- **HouseholdBudget** now reads from + writes to the global `scenarioStore`. Editing line items propagates the new total monthlyIncome / monthlyExpenses through Retirement Workshop, Budget Reforms calculator, SOA Builder, etc.
+- **New page `/budget-exposure`** (BudgetExposureReport.jsx) — Portfolio-wide table of every client's NG status, inv-property value, CGT now vs +1y post-reform, trust min-tax exposure, risk score (LOW/MEDIUM/HIGH). Includes a dedicated "Pre-1 July 2027 Sell-Window Alerts" section that lists clients with material CGT swing on B-transitional properties (the single biggest planning trigger). Countdown banner (414 / 780 days). One-click deep-link to each client's Budget Reforms page. Added to adviser Firm sidebar with REFORM badge.
+- **New section type `callout`** in the SOA renderer (`SectionCallout` in AdviceDocumentBuilder.jsx) — amber-bordered alert with intro / bullets / source footer.
+
+
 ## April 2026 — 2026–27 Budget Tax Engine (Negative Gearing, CGT, Trust Reform)
 - **Source documents reviewed verbatim**: budget.gov.au/content/downloads.htm → "Tax explainer — Negative Gearing and Capital Gains Tax Reform" + "Tax explainer — Minimum tax on discretionary trusts" + "Tax explainer — New tax cuts for Australian workers".
 - **`lib/auTax.js` rewritten** to a date-aware engine encoding all policy rules: announcement date (12 May 2026 19:30 AEST), CGT/NG reform date (1 July 2027), trust reform date (1 July 2028). 26/26 unit tests in `auTax.test.mjs` pass.

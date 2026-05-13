@@ -173,10 +173,29 @@ const SectionAuthority = ({ s }) => (
   </div>
 );
 
+// Callout — Budget 2026-27 tax law changes alert (amber accent).
+const SectionCallout = ({ s }) => (
+  <div className="page-soa px-12 py-6" data-soa-section={s.id} style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
+    <div className="border-l-4 border-amber-500 bg-amber-50 p-5 rounded-r">
+      <h2 className="text-lg font-bold text-[#1a2744] mb-2 flex items-center gap-2">
+        <span className="text-amber-600">⚠</span> {s.heading}
+      </h2>
+      {s.intro && <p className="text-[13px] leading-7 text-gray-800 mb-3">{s.intro}</p>}
+      {s.bullets && (
+        <ul className="list-disc pl-6 space-y-2 text-[13px] leading-6 text-gray-800">
+          {s.bullets.map((b, i) => <li key={i} className="whitespace-pre-line">{b}</li>)}
+        </ul>
+      )}
+      {s.footer && <p className="text-[11px] text-gray-600 italic mt-3 pt-3 border-t border-amber-200">{s.footer}</p>}
+    </div>
+  </div>
+);
+
 const renderSection = (s) => {
   switch (s.type) {
     case "letterhead":    return <SectionLetterhead key={s.id} s={s} />;
     case "paragraph":     return <SectionParagraph key={s.id} s={s} />;
+    case "callout":       return <SectionCallout key={s.id} s={s} />;
     case "situation":     return <SectionSituation key={s.id} s={s} />;
     case "advice-detail": return <SectionAdviceDetail key={s.id} s={s} />;
     case "fees-table":    return <SectionFees key={s.id} s={s} />;

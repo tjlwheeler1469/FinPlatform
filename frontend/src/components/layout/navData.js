@@ -5,7 +5,7 @@ import {
   Target, Activity, Bot, Upload, Database, Link2, Shield,
   UserPlus, Sparkles, Bell, Zap, CreditCard,
   Settings, MessageSquare, Brain, ListTodo, Video,
-  Bitcoin, Coins, Cable, Gauge, Calendar, FolderLock, Receipt, Mail
+  Bitcoin, Coins, Cable, Gauge, Calendar, FolderLock, Receipt, Mail, AlertTriangle
 } from "lucide-react";
 
 export const personalNavGroups = [
@@ -52,6 +52,7 @@ export const adviserBaseNav = [
     icon: Settings,
     items: [
       { path: "/xplan-sync-hub", label: "Xplan Sync Hub", icon: Database, title: "Push & Pull across all 5 Xplan modules · Core · Xtools+ · WealthSolver · IPS · Reporting", badge: "XPLAN" },
+      { path: "/budget-exposure", label: "Budget Exposure", icon: AlertTriangle, title: "Portfolio-wide exposure to the 2026-27 Budget reforms · NG · CGT · Trust min-tax · Sell-window alerts", badge: "REFORM" },
       { path: "/execution-rails", label: "Execution Rails", icon: Zap, title: "Route advice tickets through broker / super / insurance / contribution adapters", badge: "RAILS" },
       { path: "/product-marketplace", label: "Marketplace", icon: Briefcase, title: "Insurance, mortgages & investment products with referral tracking" },
       { path: "/adviser-compliance", label: "Compliance", icon: Shield, title: "Compliance Dashboard" },

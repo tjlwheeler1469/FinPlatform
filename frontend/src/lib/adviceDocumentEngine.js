@@ -15,9 +15,28 @@
 //    + "Cooling-off" + "Next steps"
 //  - ROA is a 2-3 page follow-up referencing the prior SOA
 
-import { calculateTax, getMarginalRate } from "@/lib/auTax";
+import { calculateTax, getMarginalRate, CGT_REFORM_DATE, NG_REFORM_DATE, TRUST_REFORM_DATE } from "@/lib/auTax";
 import { projectRetirement } from "@/lib/retirementEngine";
 import { computeReadiness } from "@/engine/retirementReadinessEngine";
+
+// ----- 2026-27 Budget rule helpers -----
+const HAS_INVESTMENT_PROPERTY = (client) =>
+  (client.assets || []).some((a) => a.type === "Property" && /invest|rental/i.test(a.name || ""));
+
+const INVESTMENT_PROPERTY_VALUE = (client) =>
+  (client.assets || [])
+    .filter((a) => a.type === "Property" && /invest|rental/i.test(a.name || ""))
+    .reduce((s, a) => s + (a.value || 0), 0);
+
+const INVESTMENT_LOANS_VALUE = (client) =>
+  (client.liabilities || [])
+    .filter((l) => /invest/i.test(l.name || ""))
+    .reduce((s, l) => s + (l.value || l.balance || 0), 0);
+
+const HAS_FAMILY_TRUST = (client) =>
+  (client.assets || []).some((a) => /trust/i.test(a.entity || "") || /trust/i.test(a.name || ""));
+
+const daysUntil = (date) => Math.max(0, Math.ceil((date - new Date()) / (1000 * 60 * 60 * 24)));
 
 // ---------- formatters ----------
 export const formatCurrency = (v) => `$${Math.round(v || 0).toLocaleString()}`;
@@ -81,6 +100,32 @@ const soaReasons = (client) => ({
     : ["retirement strategy and superannuation", "investment portfolio construction and rebalancing", "personal risk protection (life, TPD, income protection)", "cash-flow, tax and estate-planning considerations"]
   ),
 });
+
+// 2026-27 Budget "Tax law changes" callout — only inserted when the projection
+// crosses 1 July 2027 OR the client has Budget-affected holdings.
+const soaTaxLawCallout = (client) => {
+  const hasInvProp = HAS_INVESTMENT_PROPERTY(client);
+  const hasTrust = HAS_FAMILY_TRUST(client);
+  const dCgt = daysUntil(CGT_REFORM_DATE);
+  const dTrust = daysUntil(TRUST_REFORM_DATE);
+  const bullets = [];
+  if (hasInvProp) {
+    bullets.push(`From 1 July 2027 (${dCgt} days away) — the 50% CGT discount is being replaced by cost-base indexation plus a 30% minimum tax. Existing dwellings purchased after 12 May 2026 lose negative gearing against wages from 1 July 2027 (losses will only offset other residential income). New builds keep both incentives.`);
+  }
+  if (hasTrust) {
+    bullets.push(`From 1 July 2028 (${dTrust} days away) — a 30% minimum tax will apply to distributions from discretionary trusts. Non-corporate beneficiaries receive a non-refundable credit; corporate beneficiaries do not. Testamentary trusts existing at announcement are excluded.`);
+  }
+  bullets.push(`Working Australians Tax Offset (WATO) of up to $250 begins 1 July 2027, lifting the effective tax-free threshold to $19,985.`);
+
+  return {
+    id: "tax-law-changes",
+    type: "callout",
+    heading: "Important tax law changes effective during this plan's horizon",
+    intro: `The 2026–27 Federal Budget introduced material changes that affect how I have modelled your plan. These changes are reflected in every projection and recommendation in this document.`,
+    bullets,
+    footer: `Source: 2026–27 Federal Budget (announced 12 May 2026 19:30 AEST) — Tax explainers on negative gearing, CGT and discretionary trusts.`,
+  };
+};
 
 const soaScopeOut = () => ({
   id: "scope-out",
@@ -285,39 +330,75 @@ const roaAuthority = (client, adviser) => soaAuthority(client, adviser);
 
 const defaultSoaRecs = (client, scenario) => {
   const margRate = getMarginalRate(client.profile.incomeHousehold || 0);
-  const concessionalRoom = Math.max(0, 30_000 - 12_000);
+  // Concessional cap = $30,000 p.a. (2024-25 onward, unchanged in 2026-27 Budget).
+  // Estimate current concessional contributions: 11.5% SG of household income
+  // plus any explicit annual_contributions tagged as salary-sacrifice (we
+  // approximate using 11.5% SG as the floor).
+  const CONCESSIONAL_CAP = 30_000;
+  const sgFloor = Math.min((client.profile.incomeHousehold || 0) * 0.115, CONCESSIONAL_CAP);
+  const concessionalRoom = Math.max(0, CONCESSIONAL_CAP - sgFloor);
   const yearsToRet = Math.max(1, client.retirement.retirement_age - client.profile.age);
-  return [
-    {
-      title: "Maximise concessional super contributions via salary sacrifice",
-      amount: concessionalRoom,
-      rationale: `You currently have approximately ${formatCurrency(concessionalRoom)} of unused concessional cap each year. Salary-sacrificing this amount into super reduces your marginal-rate tax (currently ${(margRate * 100).toFixed(0)}%) and replaces it with a 15% contributions tax. Over ${yearsToRet} years this represents a material tax saving compounding inside super.`,
-      impact: `Estimated annual tax saving of ${formatCurrency(concessionalRoom * (margRate - 0.15))}.`,
-      risks: ["Funds locked in super until preservation age (age 60)", "Division 293 if income exceeds $250,000"],
-      cost: 0,
-    },
-    {
-      title: `Rebalance to your ${client.profile.riskProfile || "Balanced"} target allocation`,
-      rationale: `Your portfolio has drifted from the target allocation agreed at our last review. Rebalancing locks in gains in over-weight sectors and re-deploys to under-weight ones, reducing concentration risk and restoring the risk/return profile you signed up to.`,
-      impact: `Projected retirement confidence increase of ~3-5 percentage points and modest lifetime portfolio uplift.`,
-      risks: ["Triggers small CGT events on the rebalance trades", "Short-term tracking error against the existing mix"],
-      cost: 950,
-    },
-    {
-      title: "Review and right-size your personal insurances",
-      rationale: `Adequate Life, TPD and Income Protection cover protects your plan against shock events. Holding some cover inside super (where appropriate) can be cost-effective. I will run a personal insurance needs analysis using the multiples method and compare 3 providers.`,
-      impact: `Closes your identified protection gap and preserves the retirement plan against premature loss of income or life.`,
-      risks: ["Underwriting may impose loadings or exclusions", "Policy terms differ across providers"],
-      cost: 1500,
-    },
-    {
-      title: "Update estate-planning documents",
-      rationale: `I recommend you review your Will, Enduring Power of Attorney and Binding Death Benefit Nomination with a qualified estate lawyer. These documents should be refreshed every 3-5 years or after any major life event.`,
-      impact: `Reduces the risk of intestacy, family conflict and unintended tax outcomes at death.`,
-      risks: ["Requires ongoing review", "Independent legal advice required"],
-      cost: 0,
-    },
-  ];
+  const hasInvProp = HAS_INVESTMENT_PROPERTY(client);
+  const invPropValue = INVESTMENT_PROPERTY_VALUE(client);
+  const invLoans = INVESTMENT_LOANS_VALUE(client);
+  const recs = [];
+
+  recs.push({
+    title: "Maximise concessional super contributions via salary sacrifice",
+    amount: concessionalRoom,
+    rationale: `The concessional cap is $${CONCESSIONAL_CAP.toLocaleString()} p.a. (unchanged in the 2026–27 Budget). Estimated SG contributions of $${Math.round(sgFloor).toLocaleString()} leave approximately $${Math.round(concessionalRoom).toLocaleString()} of unused cap each year. Salary-sacrificing this amount into super reduces marginal-rate tax (currently ${(margRate * 100).toFixed(0)}%) and replaces it with a 15% contributions tax. Over ${yearsToRet} years this compounds inside super.`,
+    impact: `Estimated annual tax saving of ${formatCurrency(concessionalRoom * (margRate - 0.15))}. From 1 July 2027 the new Working Australians Tax Offset (WATO) reduces tax by up to $250 — already reflected in the projection.`,
+    risks: ["Funds locked in super until preservation age (age 60)", "Division 293 if income exceeds $250,000"],
+    cost: 0,
+  });
+
+  // Budget 2026-27 — Investment property recommendation
+  if (hasInvProp) {
+    recs.push({
+      title: "Review your investment-property position ahead of the 1 July 2027 CGT & negative-gearing changes",
+      amount: invPropValue,
+      rationale: `You hold investment property worth approximately ${formatCurrency(invPropValue)} with associated loans of ${formatCurrency(invLoans)}. From 1 July 2027 the 50% CGT discount is replaced by cost-base indexation + 30% minimum tax for existing dwellings, and negative gearing against wages is phased out for properties purchased after 12 May 2026. Properties HELD at the 12 May 2026 announcement are grandfathered and remain eligible for the 50% discount and full negative gearing. We should:\n  · Crystallise the 1 July 2027 cost-base position for each property (valuation or apportionment formula).\n  · Model the CGT swing under "sell pre vs sell post 1 July 2027" for each holding.\n  · Decide whether to retain, dispose of, or convert any property to your main residence ahead of the transition.`,
+      impact: `Avoids an avoidable 30% minimum-tax floor on future gains and preserves negative gearing entitlements where eligible.`,
+      risks: ["Disposing pre-1 Jul 2027 triggers CGT now (vs deferral)", "Market timing", "Stamp duty + transaction costs on restructure"],
+      cost: 2200,
+    });
+  }
+
+  recs.push({
+    title: `Rebalance to your ${client.profile.riskProfile || "Balanced"} target allocation`,
+    rationale: `Your portfolio has drifted from the target allocation agreed at our last review. Rebalancing locks in gains in over-weight sectors and re-deploys to under-weight ones, reducing concentration risk and restoring the risk/return profile you signed up to.`,
+    impact: `Projected retirement confidence increase of ~3-5 percentage points and modest lifetime portfolio uplift.`,
+    risks: ["Triggers small CGT events on the rebalance trades", "Short-term tracking error against the existing mix"],
+    cost: 950,
+  });
+
+  // Budget 2026-27 — Trust recommendation
+  if (HAS_FAMILY_TRUST(client)) {
+    recs.push({
+      title: "Prepare your discretionary trust for the 1 July 2028 minimum-tax regime",
+      rationale: `From 1 July 2028 a 30% minimum tax applies to discretionary-trust distributions. Non-corporate beneficiaries receive a non-refundable credit but corporate beneficiaries do not. The Budget provides 3-year rollover relief from 1 July 2027 to restructure out of discretionary trusts into companies or fixed trusts where appropriate. We will:\n  · Map your projected distributions and identify the marginal-rate uplift.\n  · Review whether a company structure (30% flat + franking) is more efficient than retaining the discretionary trust.\n  · Confirm any testamentary-trust assets existing at announcement remain excluded.`,
+      impact: `Avoids an unnecessary marginal tax uplift on adult-beneficiary distributions and uses the 3-year rollover window strategically.`,
+      risks: ["Restructure costs (legal + accounting + possible CGT)", "Loss of streaming flexibility post-restructure"],
+      cost: 4500,
+    });
+  }
+
+  recs.push({
+    title: "Review and right-size your personal insurances",
+    rationale: `Adequate Life, TPD and Income Protection cover protects your plan against shock events. Holding some cover inside super (where appropriate) can be cost-effective. I will run a personal insurance needs analysis using the multiples method and compare 3 providers.`,
+    impact: `Closes your identified protection gap and preserves the retirement plan against premature loss of income or life.`,
+    risks: ["Underwriting may impose loadings or exclusions", "Policy terms differ across providers"],
+    cost: 1500,
+  });
+
+  recs.push({
+    title: "Update estate-planning documents",
+    rationale: `I recommend you review your Will, Enduring Power of Attorney and Binding Death Benefit Nomination with a qualified estate lawyer. These documents should be refreshed every 3-5 years or after any major life event.`,
+    impact: `Reduces the risk of intestacy, family conflict and unintended tax outcomes at death.`,
+    risks: ["Requires ongoing review", "Independent legal advice required"],
+    cost: 0,
+  });
+  return recs;
 };
 
 const defaultRoaRecs = (client) => [
@@ -418,6 +499,7 @@ export const buildAdviceDocument = ({
       soaLetterhead(cView, adviser, ref),
       soaAbout(cView, mDate),
       soaReasons(cView),
+      soaTaxLawCallout(cView),
       soaScopeOut(),
       soaOverviewOfAdvice(recs),
       soaCurrentSituation(cView),

@@ -37,6 +37,7 @@ import {
 import { usePortfolio } from "@/App";
 import { getActiveClient } from "@/data/clientData";
 import { clampInput } from "@/lib/inputBounds";
+import { useScenario, setScenario } from "@/lib/scenarioStore";
 
 // Per-line amount clamp: bounds any single line at $5M (well above any plausible
 // household income/expense line item). Prevents adviser data-entry typos from
@@ -124,8 +125,16 @@ const HouseholdBudget = ({ embedded = false }) => {
   // Pull the active client's household income/expense targets so the Budget
   // page is consistent with Overview / Tax tabs (single source of truth).
   const activeClient = getActiveClient?.();
-  const targetAnnualIncome = activeClient?.profile?.incomeHousehold;
-  const targetAnnualExpenses = activeClient?.profile?.expensesAnnual;
+  // Scenario store — keep monthlyIncome / monthlyExpenses in sync with the
+  // Retirement Workshop, Budget Reforms calculator and SOA builder. When the
+  // adviser saves a budget here, the scaled annualised totals flow through.
+  const scenario = useScenario();
+  const targetAnnualIncome = scenario?.monthlyIncome
+    ? scenario.monthlyIncome * 12
+    : activeClient?.profile?.incomeHousehold;
+  const targetAnnualExpenses = scenario?.monthlyExpenses
+    ? scenario.monthlyExpenses * 12
+    : activeClient?.profile?.expensesAnnual;
 
   // Build raw income lines
   const rawIncomes = [
@@ -213,6 +222,20 @@ const HouseholdBudget = ({ embedded = false }) => {
 
   const monthlySurplus = totalMonthlyIncome - totalMonthlyExpenses - averageMonthlyOneOff + extraSavings;
   const annualSurplus = monthlySurplus * 12;
+
+  // Write back into the global scenario store so any edits made on this page
+  // (income / expense line items, frequency changes) flow into Retirement
+  // Workshop, Budget Reforms calculator, SOA Builder, etc.
+  useEffect(() => {
+    if (whatIfMode) return; // don't pollute the store with hypothetical scenarios
+    const patch = {
+      monthlyIncome: Math.round(totalMonthlyIncome),
+      monthlyExpenses: Math.round(totalMonthlyExpenses),
+    };
+    if (patch.monthlyIncome !== scenario?.monthlyIncome || patch.monthlyExpenses !== scenario?.monthlyExpenses) {
+      setScenario(undefined, patch);
+    }
+  }, [totalMonthlyIncome, totalMonthlyExpenses, whatIfMode, scenario?.monthlyIncome, scenario?.monthlyExpenses]);
 
   // Add handlers
   const addIncome = () => {
