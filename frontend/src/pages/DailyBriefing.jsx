@@ -198,7 +198,7 @@ const ClientCard = ({ client, priority }) => {
             )}
           </div>
 
-          <Link to={`/client-360`} onClick={() => {
+          <Link to={`/dashboard`} onClick={() => {
             localStorage.setItem('selected_client', JSON.stringify({
               id: client.id,
               name: client.name,
@@ -371,7 +371,7 @@ const DailyBriefing = ({ embedded = false }) => {
                           <Badge style={{ backgroundColor: getConfidenceColor(client.confidence), color: 'white' }}>
                             {client.confidence}%
                           </Badge>
-                          <Link to="/client-360" onClick={() => {
+                          <Link to="/dashboard" onClick={() => {
                             localStorage.setItem('selected_client', JSON.stringify({
                               id: client.id, name: client.name, aum: client.aum
                             }));

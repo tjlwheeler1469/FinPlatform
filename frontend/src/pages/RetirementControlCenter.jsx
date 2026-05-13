@@ -50,7 +50,7 @@ const RetirementControlCenter = () => {
 
   const openClient = (id) => {
     localStorage.setItem("selected_client", JSON.stringify({ id }));
-    navigate(`/client-360?id=${id}`);
+    navigate(`/dashboard`);
   };
 
   return (

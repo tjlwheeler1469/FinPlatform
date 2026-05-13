@@ -38,7 +38,7 @@ import {
   PersonalDashboard, UnifiedDashboard, UnifiedClientOverview, SimpleClientPortal,
   SimpleClientView, ClientPortal, ClientPortalMerged, ClientWealth, ClientCompliance,
   ClientReadinessPortal, ClientMessages, AdviceDocumentBuilder, ClientCapture, XplanSyncHub,
-  ClientCRM, ClientHealthDashboard, ClientComparison, Client360View, ClientOnboarding,
+  ClientCRM, ClientHealthDashboard, ClientComparison, ClientOnboarding,
   ClientSetupWizard, ClientFinancialDashboard, FamilyOverview, FamilyMemberProfile,
   FamilyWealthDashboard, ClientInvoicingPage, ClientCommsChecklistPage,
   RetirementControlCenter, ClientHome,
@@ -209,7 +209,8 @@ const AppRouter = () => (
     <Route path="/clients" element={<Navigate to="/adviser-hub" replace />} />
     <Route path="/adviser-hub" element={<AdviserHub />} />
     <Route path="/client-setup" element={<Suspense fallback={<PageLoader />}><ClientSetupWizard /></Suspense>} />
-    <Route path="/client-360" element={<Client360View />} />
+    {/* Client 360 page removed — adviser profile now lives on the main Dashboard */}
+    <Route path="/client-360" element={<Navigate to="/dashboard" replace />} />
     <Route path="/client-health" element={<ClientHealthDashboard />} />
     <Route path="/client-comparison" element={<ClientComparison />} />
     <Route path="/client-wealth" element={<ClientWealth />} />

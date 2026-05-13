@@ -168,7 +168,7 @@ export const ClientCompliance = lazyRetry(() => import("@/pages/ClientCompliance
 export const ClientCRM = lazyRetry(() => import("@/pages/ClientCRM"));
 export const ClientHealthDashboard = lazyRetry(() => import("@/pages/ClientHealthDashboard"));
 export const ClientComparison = lazyRetry(() => import("@/pages/ClientComparison"));
-export const Client360View = lazyRetry(() => import("@/pages/Client360View"));
+// Client360View removed — adviser profile lives on the main Dashboard route.
 export const ClientInvoicingPage = lazyRetry(() => import("@/pages/ClientInvoicingPage"));
 export const ClientCommsChecklistPage = lazyRetry(() => import("@/pages/ClientCommsChecklistPage"));
 export const RetirementControlCenter = lazyRetry(() => import("@/pages/RetirementControlCenter"));
