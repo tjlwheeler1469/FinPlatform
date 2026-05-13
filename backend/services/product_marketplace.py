@@ -211,7 +211,7 @@ def get_product_recommendations(
         "category": "Life Insurance",
         "gap_identified": True,
         "recommended_coverage": life_coverage_needed,
-        "reason": f"10x annual income provides family protection",
+        "reason": "10x annual income provides family protection",
         "products": [p for p in INSURANCE_PRODUCTS if p["category"] == "life"][:2]
     })
     recommendations["summary"]["insurance_gaps_identified"] += 1

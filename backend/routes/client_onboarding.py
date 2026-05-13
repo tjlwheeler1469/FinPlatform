@@ -4,10 +4,13 @@ from fastapi.responses import Response
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime, timezone
-import os, uuid, requests
+import os
+import uuid
+import requests
 from pymongo import MongoClient
 from cryptography.fernet import Fernet
-import base64, hashlib
+import base64
+import hashlib
 
 router = APIRouter(prefix="/api/client-onboarding", tags=["client-onboarding"])
 

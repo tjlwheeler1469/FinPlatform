@@ -196,19 +196,19 @@ def get_audit_logs(
     filtered_logs = AUDIT_LOGS.copy()
     
     if user_id:
-        filtered_logs = [l for l in filtered_logs if l["user_id"] == user_id]
+        filtered_logs = [log for log in filtered_logs if log["user_id"] == user_id]
     
     if event_type:
-        filtered_logs = [l for l in filtered_logs if l["event_type"] == event_type]
+        filtered_logs = [log for log in filtered_logs if log["event_type"] == event_type]
     
     if risk_level:
-        filtered_logs = [l for l in filtered_logs if l["risk_level"] == risk_level]
+        filtered_logs = [log for log in filtered_logs if log["risk_level"] == risk_level]
     
     if start_date:
-        filtered_logs = [l for l in filtered_logs if l["timestamp"] >= start_date]
+        filtered_logs = [log for log in filtered_logs if log["timestamp"] >= start_date]
     
     if end_date:
-        filtered_logs = [l for l in filtered_logs if l["timestamp"] <= end_date]
+        filtered_logs = [log for log in filtered_logs if log["timestamp"] <= end_date]
     
     # Sort by timestamp descending
     filtered_logs.sort(key=lambda x: x["timestamp"], reverse=True)

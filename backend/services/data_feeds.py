@@ -11,6 +11,7 @@ All data is encrypted at rest using AES-256-GCM per APRA CPS 234.
 """
 
 import secrets
+import random as _stdrandom  # used for deterministic seeded mock-data only
 _rng = secrets.SystemRandom()
 import hashlib
 from datetime import datetime, timezone, timedelta
@@ -90,7 +91,7 @@ class SecureDataFeedService:
         
         Simulates Open Banking API response with encrypted PII.
         """
-        random.seed(hash(customer_id) % 2**32)
+        _rng = _stdrandom.Random(hash(customer_id) % 2**32)
         
         _ = _rng.choice(CDR_BANKS)  # Bank selection for seed consistency
         num_accounts = _rng.randint(2, 5)
@@ -150,7 +151,7 @@ class SecureDataFeedService:
     
     def get_cdr_transactions(self, account_id: str, days: int = 90) -> Dict[str, Any]:
         """Get CDR-compliant transaction data."""
-        random.seed(hash(account_id) % 2**32)
+        _rng = _stdrandom.Random(hash(account_id) % 2**32)
         
         transactions = []
         categories = [
@@ -207,7 +208,7 @@ class SecureDataFeedService:
     
     def get_super_balance(self, member_number: str) -> Dict[str, Any]:
         """Get superannuation balance and allocation."""
-        random.seed(hash(member_number) % 2**32)
+        _rng = _stdrandom.Random(hash(member_number) % 2**32)
         
         fund = _rng.choice(SUPER_FUNDS)
         balance = round(_rng.uniform(100000, 2000000), 2)
@@ -287,7 +288,7 @@ class SecureDataFeedService:
     
     def get_property_valuation(self, address: str) -> Dict[str, Any]:
         """Get property valuation estimate."""
-        random.seed(hash(address) % 2**32)
+        _rng = _stdrandom.Random(hash(address) % 2**32)
         
         # Base value depends on suburb
         suburb_factor = 1 + (hash(address.split()[-1] if address else "Sydney") % 10) / 10

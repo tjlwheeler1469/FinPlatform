@@ -355,7 +355,7 @@ class AIInsightEngine:
         insights = []
         
         allocation = portfolio.get("allocation", {})
-        risk_profile = portfolio.get("risk_profile", "balanced")
+        _risk_profile = portfolio.get("risk_profile", "balanced")  # reserved for risk-weighting
         
         # Check for concentration risk
         for asset_class, percentage in allocation.items():

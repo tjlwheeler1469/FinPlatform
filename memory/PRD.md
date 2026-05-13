@@ -1,3 +1,14 @@
+## April 2026 — Code Quality / Security review fixes
+- **eval() vulnerabilities**: Reviewed — `routes/scenario_templates.py` already uses `ast.literal_eval()`, no live `eval()` calls in production code (review report was stale). Test-file mentions are in comments/docstrings only.
+- **Undefined variables (F821)**: 4 occurrences in `services/data_feeds.py` (`random.seed()` calls without `import random`). Fixed by importing `random as _stdrandom` and replacing each `random.seed(hash(x) % 2**32)` with a function-local deterministic `_rng = _stdrandom.Random(hash(x) % 2**32)` shadowing the module-level `secrets.SystemRandom`. Determinism preserved, lint silent.
+- **Mutable default argument**: 1 found at `routes/tax.py:451` (`years: List[str] = ["2024-25", ...]`). Replaced with `years: Optional[List[str]] = None` + in-function default. Verified `/api/tax/comparison` still returns 3-year comparison.
+- **Insecure random in production routes**: Replaced `random.randint/uniform/choice` with `secrets.SystemRandom()` instances in `client_pack_scheduler.py`, `live_data.py`, `confidence_history.py`. `market_snapshot.py` retained its deterministic `random.Random(seed)` pattern (correct for seeded mock output). Verified `/api/live/stock/CBA` returns valid data.
+- **Dead-code locals (F841)**: 9 occurrences in `knowledge_graph/ai_engine.py`, `services/account_aggregation.py`, `services/ai_wealth_brief.py`, `services/ai_wealth_copilot.py`, `services/decision_engine.py`, `services/estate_planning.py`, `services/scenario_simulator.py`. Prefixed with `_` per Python convention; comments retained to mark "reserved for future use" intent.
+- **Other lint**: E401 multi-imports auto-fixed in `routes/client_onboarding.py` + `routes/invoices.py`. F541 (f-string without placeholder) auto-fixed in 3 services files. E741 (ambiguous `l`) renamed to `log` in `services/audit_service.py`.
+- **Backend lint**: `ruff` reports **0 errors** across `/app/backend` (excluding tests).
+- **High-complexity refactors** (`_initialize_demo_data`, `get_portfolios_needing_rebalance`, `detect_cross_client_risks`, etc.): NOT addressed in this pass — these are large surgical refactors with no functional or security impact. Recommended as a follow-up sprint with a dedicated unit-test scaffold first.
+
+
 ## April 2026 — Budget Reform end-to-end
 - **SOA recommendations engine** is now Budget-aware: `adviceDocumentEngine.js` detects investment properties + family trusts and:
   - Auto-inserts a "Tax law changes" amber callout section right after "Your reasons for seeking advice" — uses days-until countdowns and verbatim Budget rules.

@@ -466,7 +466,7 @@ def generate_client_insights(
     opportunities.append({
         "type": "Early Retirement",
         "potential": f"{3} years earlier",
-        "detail": f"Increasing savings $500/month brings retirement forward"
+        "detail": "Increasing savings $500/month brings retirement forward"
     })
     
     return {

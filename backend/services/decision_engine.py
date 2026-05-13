@@ -435,7 +435,7 @@ def calculate_goal_progress(goals: List[Dict], current_values: Dict) -> List[Dic
             required_monthly = remaining / (years_remaining * 12)
             
             # Assume current savings rate
-            projected_monthly = remaining / (years_remaining * 12 * 1.5)  # Assuming growth
+            _projected_monthly = remaining / (years_remaining * 12 * 1.5)  # diagnostic only
             on_track = progress >= (100 - years_remaining * 5)
         else:
             required_monthly = None

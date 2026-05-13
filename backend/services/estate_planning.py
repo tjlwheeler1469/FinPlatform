@@ -46,7 +46,7 @@ def calculate_estate_projections(
     
     # Tax calculations (simplified Australian death taxes - mainly super death benefits tax)
     super_death_benefit_tax = super_balance * 0.15  # Non-dependent beneficiaries
-    other_taxes = 0  # Australia has no inheritance tax on most assets
+    _other_taxes = 0  # Australia has no inheritance tax on most assets
     
     return {
         "current_age": current_age,

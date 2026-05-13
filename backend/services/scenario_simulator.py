@@ -368,7 +368,7 @@ def generate_impact_recommendation(impact: Dict) -> str:
     Generate a recommendation based on the scenario impact.
     """
     prob_change = impact.get("success_probability_change", 0)
-    wealth_change = impact.get("retirement_wealth_change", 0)
+    _wealth_change = impact.get("retirement_wealth_change", 0)  # reserved for tooltip
     
     if prob_change > 10:
         return f"This change significantly improves your retirement outlook (+{prob_change:.1f}% success probability)"

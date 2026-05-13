@@ -51,11 +51,15 @@ def _next_quarter_date() -> str:
 
 
 def _generate_mock_pack_data(client_name: str) -> dict:
-    """Generate realistic pack data for a client."""
-    import random
-    portfolio_val = random.randint(800000, 8000000)
-    ret = round(random.uniform(3.5, 14.2), 1)
-    bench = round(ret - random.uniform(-1.5, 3.0), 1)
+    """Generate realistic pack data for a client.
+    Uses secrets.SystemRandom() — this is mock demo content, not security-
+    sensitive, but secrets keeps Bandit / lint quiet and is the right default.
+    """
+    import secrets
+    _rng = secrets.SystemRandom()
+    portfolio_val = _rng.randint(800000, 8000000)
+    ret = round(_rng.uniform(3.5, 14.2), 1)
+    bench = round(ret - _rng.uniform(-1.5, 3.0), 1)
     return {
         "type": "client_pack",
         "client_name": client_name,
@@ -72,9 +76,9 @@ def _generate_mock_pack_data(client_name: str) -> dict:
                 {"asset_class": "Cash", "value": int(portfolio_val * 0.05), "percentage": "5%"},
             ],
             "top_holdings": [
-                {"name": "CBA", "value": int(portfolio_val * 0.08), "weight": "8%", "return_ytd": f"+{round(random.uniform(5, 18), 1)}%"},
-                {"name": "BHP", "value": int(portfolio_val * 0.06), "weight": "6%", "return_ytd": f"+{round(random.uniform(2, 12), 1)}%"},
-                {"name": "CSL", "value": int(portfolio_val * 0.05), "weight": "5%", "return_ytd": f"+{round(random.uniform(8, 22), 1)}%"},
+                {"name": "CBA", "value": int(portfolio_val * 0.08), "weight": "8%", "return_ytd": f"+{round(_rng.uniform(5, 18), 1)}%"},
+                {"name": "BHP", "value": int(portfolio_val * 0.06), "weight": "6%", "return_ytd": f"+{round(_rng.uniform(2, 12), 1)}%"},
+                {"name": "CSL", "value": int(portfolio_val * 0.05), "weight": "5%", "return_ytd": f"+{round(_rng.uniform(8, 22), 1)}%"},
             ],
         },
         "performance_report": {
@@ -84,22 +88,22 @@ def _generate_mock_pack_data(client_name: str) -> dict:
             "alpha": f"+{round(ret - bench, 1)}%",
             "commentary": f"{client_name} portfolio outperformed the benchmark by {round(ret - bench, 1)}% this quarter, driven by strong equity selection in Australian financials and healthcare.",
             "attribution": [
-                {"factor": "Asset Allocation", "contribution": f"+{round(random.uniform(0.5, 2.0), 1)}%"},
-                {"factor": "Security Selection", "contribution": f"+{round(random.uniform(0.3, 1.5), 1)}%"},
-                {"factor": "Currency", "contribution": f"{round(random.uniform(-0.5, 0.5), 1)}%"},
+                {"factor": "Asset Allocation", "contribution": f"+{round(_rng.uniform(0.5, 2.0), 1)}%"},
+                {"factor": "Security Selection", "contribution": f"+{round(_rng.uniform(0.3, 1.5), 1)}%"},
+                {"factor": "Currency", "contribution": f"{round(_rng.uniform(-0.5, 0.5), 1)}%"},
             ],
         },
         "compliance_checklist": {
-            "review_status": random.choice(["Current", "Current", "Due Soon"]),
-            "last_soa_date": (datetime.now() - timedelta(days=random.randint(30, 180))).strftime("%d %b %Y"),
-            "next_review_due": (datetime.now() + timedelta(days=random.randint(30, 365))).strftime("%d %b %Y"),
+            "review_status": _rng.choice(["Current", "Current", "Due Soon"]),
+            "last_soa_date": (datetime.now() - timedelta(days=_rng.randint(30, 180))).strftime("%d %b %Y"),
+            "next_review_due": (datetime.now() + timedelta(days=_rng.randint(30, 365))).strftime("%d %b %Y"),
             "fee_disclosure_current": True,
-            "risk_profile_current": random.choice([True, True, False]),
+            "risk_profile_current": _rng.choice([True, True, False]),
             "items": [
                 {"item": "Annual Review Completed", "status": "Complete", "notes": "Reviewed all holdings and risk profile"},
                 {"item": "Fee Disclosure Statement", "status": "Complete", "notes": "FDS sent and acknowledged"},
-                {"item": "Risk Profile Review", "status": random.choice(["Complete", "Pending"]), "notes": "Updated risk questionnaire"},
-                {"item": "Insurance Needs Analysis", "status": random.choice(["Complete", "Overdue"]), "notes": "Life and TPD coverage reviewed"},
+                {"item": "Risk Profile Review", "status": _rng.choice(["Complete", "Pending"]), "notes": "Updated risk questionnaire"},
+                {"item": "Insurance Needs Analysis", "status": _rng.choice(["Complete", "Overdue"]), "notes": "Life and TPD coverage reviewed"},
             ],
         },
         "key_recommendations": [

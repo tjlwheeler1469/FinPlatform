@@ -381,7 +381,7 @@ class DecisionCenter:
             recommendations.append({
                 "type": "early_retirement",
                 "title": "Early retirement possible",
-                "description": f"Could potentially retire up to 3 years earlier",
+                "description": "Could potentially retire up to 3 years earlier",
                 "impact": "Maintain >75% success probability"
             })
         

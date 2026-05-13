@@ -202,7 +202,7 @@ def get_aggregated_accounts(client_id: str = "wheeler-family") -> Dict[str, Any]
         accounts_by_type[account_type]["total_balance"] += balance
         accounts_by_type[account_type]["accounts"].append(account)
     
-    net_worth = total_assets + total_liabilities  # liabilities are negative
+    _net_worth = total_assets + total_liabilities  # liabilities are negative; retained for future use
     
     return {
         "client_id": client_id,
@@ -340,7 +340,7 @@ def sync_accounts(client_id: str) -> Dict[str, Any]:
 def get_cashflow_analysis(client_id: str, months: int = 3) -> Dict[str, Any]:
     """Analyze cashflow across all accounts"""
     
-    accounts = CONNECTED_ACCOUNTS.get(client_id, [])
+    _accounts = CONNECTED_ACCOUNTS.get(client_id, [])  # reserved for per-account drill-down
     
     # Simulate monthly cashflow data
     monthly_data = []

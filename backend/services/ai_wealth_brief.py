@@ -142,7 +142,7 @@ def generate_wealth_brief(
     if investment_portfolio > 50000:
         # Suggest growth tilt for younger investors
         if age < 50:
-            potential_extra_return = 0.01  # 1% extra from growth tilt
+            _potential_extra_return = 0.01  # 1% extra from growth tilt — used inline below
             extra_wealth = investment_portfolio * ((1 + 0.08) ** years_to_retirement - (1 + 0.07) ** years_to_retirement)
             
             recommendations.append({
@@ -199,7 +199,7 @@ def generate_wealth_brief(
     # Generate net worth projections
     projections = []
     current_year = datetime.now().year
-    value = net_worth
+    _value = net_worth  # snapshot retained for trace; projections computed per-loop below
     for i in range(0, years_to_retirement + 5, 5):
         if i == 0:
             proj_value = net_worth

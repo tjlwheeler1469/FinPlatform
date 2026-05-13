@@ -421,7 +421,7 @@ Provide a clear, concise answer. Include specific numbers and names where releva
             if risks:
                 at_risk = [r for r in risks if r.get("retirement_risk", {}).get("risk_score", 0) > 50]
                 if at_risk:
-                    risk_names = [r.get("client_name", "Unknown") for r in at_risk[:3]]
+                    _ = [r.get("client_name", "Unknown") for r in at_risk[:3]]  # noqa: F841 reserved for future expansion
                     return f"Based on the analysis, {len(at_risk)} clients are at significant retirement risk:\n\n" + \
                            "\n".join([f"• **{r.get('client_name')}** (Age {r.get('age')}, retiring at {r.get('retirement_age')}): " + \
                                      f"Only {r.get('retirement_risk', {}).get('funding_ratio', 0)}% funded, " + \

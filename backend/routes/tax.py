@@ -4,7 +4,7 @@ Handles all tax calculation endpoints including CGT, income tax, and comparisons
 """
 from fastapi import APIRouter
 from pydantic import BaseModel
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 import logging
 
 logger = logging.getLogger(__name__)
@@ -450,9 +450,11 @@ async def get_historical_tax_rates():
 @router.post("/comparison")
 async def compare_tax_years(
     taxable_income: float,
-    years: List[str] = ["2024-25", "2023-24", "2022-23"]
+    years: Optional[List[str]] = None
 ):
     """Compare tax across different years."""
+    if years is None:
+        years = ["2024-25", "2023-24", "2022-23"]
     comparisons = []
     for year in years:
         if year in HISTORICAL_TAX_BRACKETS:
