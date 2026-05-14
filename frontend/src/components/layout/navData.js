@@ -52,6 +52,7 @@ export const adviserBaseNav = [
     icon: Settings,
     items: [
       { path: "/xplan-sync-hub", label: "Xplan Sync Hub", icon: Database, title: "Push & Pull across all 5 Xplan modules · Core · Xtools+ · WealthSolver · IPS · Reporting", badge: "XPLAN" },
+      { path: "/deals", label: "Deals", icon: Briefcase, title: "CRM pipeline · every SOA / ROA / Implementation Pack tracked from draft → executed", badge: "CRM" },
       { path: "/budget-exposure", label: "Budget Exposure", icon: AlertTriangle, title: "Portfolio-wide exposure to the 2026-27 Budget reforms · NG · CGT · Trust min-tax · Sell-window alerts", badge: "REFORM" },
       { path: "/execution-rails", label: "Execution Rails", icon: Zap, title: "Route advice tickets through broker / super / insurance / contribution adapters", badge: "RAILS" },
       { path: "/product-marketplace", label: "Marketplace", icon: Briefcase, title: "Insurance, mortgages & investment products with referral tracking" },
@@ -80,7 +81,7 @@ export const clientContextNav = [
       { path: "/client-comms-checklist", label: "Checklist", icon: ListTodo, title: "Required Communications Checklist & Timeline" },
       { path: "/meeting-notes", label: "Meeting Notes", icon: Video, title: "Meeting Notes" },
       { path: "/advice-document-builder", label: "SOA / ROA Builder", icon: FileText, title: "Generate Statement of Advice or Record of Advice (RG175 compliant, ASIC info-267/266 format)", badge: "NEW" },
-      { path: "/document-vault", label: "Vault", icon: FolderOpen, title: "Document Vault · Reports & signed documents" },
+      { path: "/vault-documents", label: "Vault", icon: FolderOpen, title: "Document Vault · versioned PDFs (v1/v2/v3) + metadata tag search · local persistent disk" },
       { path: "/ai-copilot-advanced", label: "AI Insights", icon: Brain, title: "AI-driven insights & next best actions" },
     ]
   },

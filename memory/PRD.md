@@ -1,3 +1,17 @@
+## April 2026 — Phase A + B (CRM entity-centric + Storage versioning)
+### Phase A — Entity-centric CRM
+- **New `routes/deals.py` + `/api/deals/*`**: first-class Deal entity (deal_id, client_id, deal_type, stage, expected_value, expected_close, links[], history[]). Stages: draft → review → signed → executed → archived → lost. Endpoints: create, list (paginated, filtered), read, patch, stage-transition (with reason logged to history), link-resource, pipeline summary.
+- **Implementation Pack auto-creates a Deal**: every pack creation in `routes/implementation_pack.py` now creates a Deal in the `review` stage with links to the PDF, notify, all execution tickets and Xmerge push. Returns the new `deal_id` in the pack response.
+- **`pages/DealsPipeline.jsx`**: kanban-style board across 6 stages. Each card shows title, client, type, value, link count, age. One-click "advance to next stage" + manual stage selector. Per-column subtotal + global pipeline value. Linked from adviser Firm sidebar with CRM badge.
+- **`adviceDocumentEngine.js`** now consults the `scenarioStore` first for property/trust — so edits on Budget Reforms calculator propagate into SOA recommendations. Two distinct property recommendations now generated based on `propertyType === "new"` vs `"existing"`.
+
+### Phase B — Storage & versioning
+- **New `routes/local_files.py` + `/api/files/*`**: persistent file storage at `/data/object_storage/<yyyy>/<mm>/<object_id>`. Endpoints: `POST /upload`, `POST /upload-base64`, `GET /{object_id}` (streams from disk), `GET /{object_id}/meta`, `GET /versions/{family_key}` (chain), `GET /search?tag&client_id&deal_id&family_key&only_latest`, `GET /_/usage`, `DELETE /{object_id}` (soft delete). Each upload computes sha256, mime, size, tags, owner_client_id, source_deal_id, source_pack_id, family_key (for versioning). Latest-only and is_latest flags maintained automatically when a new version lands.
+- **Implementation Pack** rewired: PDF now persisted to disk via `_persist()` (NOT base64 in MongoDB). Returns `obj_xxx` ref and version number. Mongo-fallback path retained for resilience.
+- **`pages/VaultDocuments.jsx`**: family-grouped Vault with expand to reveal v1/v2/v3 chain. Tag filter, owner/family search, latest-only toggle, per-version download link (direct `/api/files/{object_id}`). Footer shows total bytes on disk + storage root.
+- **Verified end-to-end**: uploaded v1/v2/v3 via curl → only v3 is_latest=true → versions endpoint returns full chain → tag search returns latest only → file bytes on disk at `/data/object_storage/2026/05/`.
+
+
 ## April 2026 — Round 2 review fixes (test-suite cleanup)
 - **Items 1, 2, 5 reconfirmed clean** from prior pass: `eval()` already replaced by `ast.literal_eval`, `data_feeds.py` random already uses `_stdrandom.Random(seed)`, 0 F821 undefined names.
 - **Item 4 — `is` vs `==` in tests** (576 instances reported): mechanical fix applied via Python script. `is True/False/<int>` → `== True/False/<int>` and `is not …` → `!= …` across **60 test files, 352 lines**. `is None`/`is not None` idioms preserved correctly.

@@ -141,6 +141,8 @@ export const BatchExecution = lazyRetry(() => import("@/pages/BatchExecution"));
 export const ExecutionRails = lazyRetry(() => import("@/pages/ExecutionRails"));
 export const BudgetReforms2027 = lazyRetry(() => import("@/pages/BudgetReforms2027"));
 export const BudgetExposureReport = lazyRetry(() => import("@/pages/BudgetExposureReport"));
+export const DealsPipeline = lazyRetry(() => import("@/pages/DealsPipeline"));
+export const VaultDocuments = lazyRetry(() => import("@/pages/VaultDocuments"));
 export const MeetingPrep = lazyRetry(() => import("@/pages/MeetingPrep"));
 export const MeetingNotes = lazyRetry(() => import("@/pages/MeetingNotes"));
 export const MeetingSummaryGenerator = lazyRetry(() => import("@/pages/MeetingSummaryGenerator"));

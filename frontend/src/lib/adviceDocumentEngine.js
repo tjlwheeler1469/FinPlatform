@@ -18,23 +18,53 @@
 import { calculateTax, getMarginalRate, CGT_REFORM_DATE, NG_REFORM_DATE, TRUST_REFORM_DATE } from "@/lib/auTax";
 import { projectRetirement } from "@/lib/retirementEngine";
 import { computeReadiness } from "@/engine/retirementReadinessEngine";
+import { getScenario } from "@/lib/scenarioStore";
 
 // ----- 2026-27 Budget rule helpers -----
-const HAS_INVESTMENT_PROPERTY = (client) =>
-  (client.assets || []).some((a) => a.type === "Property" && /invest|rental/i.test(a.name || ""));
+// Reads property/trust state from BOTH the client's structured assets AND the
+// global scenario store (BudgetReforms2027 writes there). The store wins when
+// populated so adviser edits flow into the SOA recommendations engine.
+const _scenarioFor = (client) => {
+  try {
+    const id = client?.client_id || client?.profile?.user_id;
+    return id ? getScenario(id) : null;
+  } catch {
+    return null;
+  }
+};
 
-const INVESTMENT_PROPERTY_VALUE = (client) =>
-  (client.assets || [])
+const HAS_INVESTMENT_PROPERTY = (client) => {
+  const s = _scenarioFor(client);
+  if (s && s.propertyType === "existing" && (s.propertyValue || 0) > 0) return true;
+  if (s && s.propertyType === "new" && (s.propertyValue || 0) > 0) return true;
+  return (client.assets || []).some((a) => a.type === "Property" && /invest|rental/i.test(a.name || ""));
+};
+
+const INVESTMENT_PROPERTY_VALUE = (client) => {
+  const s = _scenarioFor(client);
+  if (s && (s.propertyType === "existing" || s.propertyType === "new") && s.propertyValue > 0) {
+    return s.propertyValue;
+  }
+  return (client.assets || [])
     .filter((a) => a.type === "Property" && /invest|rental/i.test(a.name || ""))
-    .reduce((s, a) => s + (a.value || 0), 0);
+    .reduce((s2, a) => s2 + (a.value || 0), 0);
+};
 
 const INVESTMENT_LOANS_VALUE = (client) =>
   (client.liabilities || [])
     .filter((l) => /invest/i.test(l.name || ""))
     .reduce((s, l) => s + (l.value || l.balance || 0), 0);
 
-const HAS_FAMILY_TRUST = (client) =>
-  (client.assets || []).some((a) => /trust/i.test(a.entity || "") || /trust/i.test(a.name || ""));
+const PROPERTY_TYPE_FOR_RECS = (client) => {
+  const s = _scenarioFor(client);
+  return s?.propertyType || "existing";
+};
+
+const HAS_FAMILY_TRUST = (client) => {
+  const s = _scenarioFor(client);
+  if (s?.hasDiscretionaryTrust) return true;
+  return (client.assets || []).some((a) => /trust/i.test(a.entity || "") || /trust/i.test(a.name || ""));
+};
 
 const daysUntil = (date) => Math.max(0, Math.ceil((date - new Date()) / (1000 * 60 * 60 * 24)));
 
@@ -354,14 +384,26 @@ const defaultSoaRecs = (client, scenario) => {
 
   // Budget 2026-27 — Investment property recommendation
   if (hasInvProp) {
-    recs.push({
-      title: "Review your investment-property position ahead of the 1 July 2027 CGT & negative-gearing changes",
-      amount: invPropValue,
-      rationale: `You hold investment property worth approximately ${formatCurrency(invPropValue)} with associated loans of ${formatCurrency(invLoans)}. From 1 July 2027 the 50% CGT discount is replaced by cost-base indexation + 30% minimum tax for existing dwellings, and negative gearing against wages is phased out for properties purchased after 12 May 2026. Properties HELD at the 12 May 2026 announcement are grandfathered and remain eligible for the 50% discount and full negative gearing. We should:\n  · Crystallise the 1 July 2027 cost-base position for each property (valuation or apportionment formula).\n  · Model the CGT swing under "sell pre vs sell post 1 July 2027" for each holding.\n  · Decide whether to retain, dispose of, or convert any property to your main residence ahead of the transition.`,
-      impact: `Avoids an avoidable 30% minimum-tax floor on future gains and preserves negative gearing entitlements where eligible.`,
-      risks: ["Disposing pre-1 Jul 2027 triggers CGT now (vs deferral)", "Market timing", "Stamp duty + transaction costs on restructure"],
-      cost: 2200,
-    });
+    const ptype = PROPERTY_TYPE_FOR_RECS(client);
+    if (ptype === "new") {
+      recs.push({
+        title: "Optimise the new-build investment-property election ahead of 1 July 2027",
+        amount: invPropValue,
+        rationale: `You hold a NEW BUILD investment property worth approximately ${formatCurrency(invPropValue)}. New builds retain full negative-gearing entitlements AND, on disposal, allow the investor to ELECT either the existing 50% CGT discount OR the new indexation + 30% minimum tax — whichever delivers the better outcome. We should:\n  · Model both election paths at projected sale dates so you can hold to the better outcome.\n  · Confirm the property continues to meet the "new build" criteria (build-completion date, first-tenanted date).\n  · Document the election decision and underlying calculation in the file note for audit.`,
+        impact: `Preserves both the negative-gearing and discount entitlements unique to new builds, and locks in the optimal CGT path at disposal.`,
+        risks: ["Election cannot be revoked once made", "Property must remain classified as new-build for the duration"],
+        cost: 1800,
+      });
+    } else {
+      recs.push({
+        title: "Review your investment-property position ahead of the 1 July 2027 CGT & negative-gearing changes",
+        amount: invPropValue,
+        rationale: `You hold an EXISTING DWELLING investment property worth approximately ${formatCurrency(invPropValue)} with associated loans of ${formatCurrency(invLoans)}. From 1 July 2027 the 50% CGT discount is replaced by cost-base indexation + 30% minimum tax for existing dwellings, and negative gearing against wages is phased out for properties purchased after 12 May 2026. Properties HELD at the 12 May 2026 announcement are grandfathered and remain eligible for the 50% discount and full negative gearing. We should:\n  · Crystallise the 1 July 2027 cost-base position for each property (valuation or apportionment formula).\n  · Model the CGT swing under "sell pre vs sell post 1 July 2027" for each holding.\n  · Decide whether to retain, dispose of, or convert any property to your main residence ahead of the transition.`,
+        impact: `Avoids an avoidable 30% minimum-tax floor on future gains and preserves negative gearing entitlements where eligible.`,
+        risks: ["Disposing pre-1 Jul 2027 triggers CGT now (vs deferral)", "Market timing", "Stamp duty + transaction costs on restructure"],
+        cost: 2200,
+      });
+    }
   }
 
   recs.push({

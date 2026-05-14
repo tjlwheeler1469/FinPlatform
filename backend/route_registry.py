@@ -15,6 +15,8 @@ ROUTE_REGISTRY = [
     ("routes.execution_tickets", "router", "/api", "Execution Tickets"),
     ("routes.execution_rails", "router", "/api", "Execution Rails (adapters)"),
     ("routes.implementation_pack", "router", "/api", "Implementation Pack"),
+    ("routes.deals", "router", "/api", "Deals (CRM pipeline)"),
+    ("routes.local_files", "router", "/api", "Files & Versioning (local object storage)"),
     ("routes.notify_client", "router", "/api", "Client Notifications"),
     ("routes.market_snapshot", "router", "/api", "Market Snapshot"),
     ("routes.adviser_reports", "router", "/api", "Adviser Reports"),

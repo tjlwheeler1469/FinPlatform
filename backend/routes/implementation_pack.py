@@ -23,6 +23,7 @@ from pydantic import BaseModel
 import uuid
 import logging
 import os
+import base64
 
 from db import db
 
@@ -61,23 +62,42 @@ async def create_pack(client_id: str, payload: PackPayload) -> dict:
     started = _now()
     refs: Dict[str, Any] = {"pack_id": pack_id, "steps": []}
 
-    # Step 1 — Persist PDF (store base64 locally; object storage is optional)
+    # Step 1 — Persist PDF to local object storage (NOT base64 in MongoDB).
+    # Each pack PDF is a new version in the family keyed by the document ref so
+    # the adviser can see v1/v2/v3 on the Vault.
     if payload.pdf_base64 and payload.pdf_name:
-        pdf_doc = {
-            "pack_id": pack_id,
-            "client_id": client_id,
-            "doc_ref": payload.doc_ref,
-            "filename": payload.pdf_name,
-            "size_bytes": len(payload.pdf_base64) * 3 // 4,
-            "created_at": _now(),
-        }
-        # Base64 content stored separately to keep the index light
-        await db["implementation_pack_pdfs"].insert_one({
-            **pdf_doc, "_id": pack_id, "pdf_base64": payload.pdf_base64,
-        })
-        refs["pdf_ref"] = pack_id
-        refs["steps"].append({"step": "pdf_stored", "ok": True, "ref": pack_id,
-                              "size_kb": pdf_doc["size_bytes"] // 1024})
+        try:
+            content = base64.b64decode(payload.pdf_base64)
+            # _persist accepts bytes and returns full metadata including version.
+            from routes.local_files import _persist
+            pdf_meta = await _persist(
+                content,
+                filename=payload.pdf_name,
+                mime="application/pdf",
+                owner_client_id=client_id,
+                tags=[payload.doc_type, "implementation-pack"],
+                source_deal_id=None,
+                source_pack_id=pack_id,
+                family_key=payload.doc_ref,  # v1/v2/v3 chain keyed by SOA ref
+            )
+            refs["pdf_ref"] = pdf_meta["object_id"]
+            refs["pdf_version"] = pdf_meta["version"]
+            refs["steps"].append({
+                "step": "pdf_stored", "ok": True,
+                "ref": pdf_meta["object_id"], "version": pdf_meta["version"],
+                "size_kb": pdf_meta["size_bytes"] // 1024,
+                "storage": "disk",
+            })
+        except Exception as e:
+            logger.exception("PDF persistence failed; falling back to mongo base64")
+            await db["implementation_pack_pdfs"].insert_one({
+                "_id": pack_id, "pack_id": pack_id, "client_id": client_id,
+                "doc_ref": payload.doc_ref, "filename": payload.pdf_name,
+                "size_bytes": len(payload.pdf_base64) * 3 // 4,
+                "pdf_base64": payload.pdf_base64, "created_at": _now(),
+            })
+            refs["pdf_ref"] = pack_id
+            refs["steps"].append({"step": "pdf_stored", "ok": True, "ref": pack_id, "storage": "mongo-fallback", "error": str(e)[:120]})
     else:
         refs["steps"].append({"step": "pdf_stored", "ok": False, "detail": "no pdf provided"})
 
@@ -192,6 +212,41 @@ async def create_pack(client_id: str, payload: PackPayload) -> dict:
         "completed_at": _now(),
     }
     await db[COLLECTION].insert_one(pack_doc)
+
+    # Step 6 — Auto-create a Deal entity for CRM pipeline tracking. We link
+    # every artefact produced above so the adviser can see the full advice
+    # workflow on the pipeline board.
+    deal_id = f"deal_{uuid.uuid4().hex[:10]}"
+    deal_doc = {
+        "_id": deal_id,
+        "deal_id": deal_id,
+        "client_id": client_id,
+        "client_name": payload.client_name,
+        "deal_type": "implementation_pack",
+        "title": f"{payload.doc_type.upper()} {payload.doc_ref}",
+        "stage": "review",  # PDF created + emailed; awaiting client signature
+        "adviser_id": "default_adviser",
+        "adviser_name": payload.adviser_name or "Adviser",
+        "expected_value": 0,
+        "expected_close": None,
+        "notes": f"Auto-created from Implementation Pack {pack_id}",
+        "links": [
+            {"kind": "implementation_pack", "ref": pack_id, "label": "Implementation Pack", "linked_at": _now()},
+            {"kind": "advice_document",    "ref": payload.doc_ref, "label": f"{payload.doc_type.upper()} document", "linked_at": _now()},
+            *([{"kind": "notification", "ref": refs.get("notify_ref"), "label": f"Email ({refs.get('notify_mode')})", "linked_at": _now()}] if refs.get("notify_ref") else []),
+            *[{"kind": "execution_ticket", "ref": tid, "label": "Execution ticket", "linked_at": _now()} for tid in ticket_ids],
+        ],
+        "created_at": _now(),
+        "updated_at": _now(),
+        "history": [
+            {"at": _now(), "event": "created", "by": "implementation-pack", "stage": "review", "pack_id": pack_id},
+        ],
+    }
+    try:
+        await db["deals"].insert_one(deal_doc)
+        pack_doc["deal_id"] = deal_id
+    except Exception as e:
+        logger.warning("Failed to auto-create Deal for pack %s: %s", pack_id, e)
     pack_doc.pop("_id", None)
     return {"success": True, **pack_doc}
 
@@ -205,8 +260,19 @@ async def list_packs(client_id: str, limit: int = 20) -> dict:
 
 @router.get("/pdf/{pack_id}")
 async def download_pack_pdf(pack_id: str) -> dict:
-    """Retrieve the stored PDF base64 for a pack (for download / re-send)."""
+    """Retrieve the stored PDF metadata for a pack (for download / re-send).
+    Resolves to /api/files/{object_id} when stored on disk, or returns the
+    legacy base64 fallback record."""
+    pack = await db[COLLECTION].find_one({"pack_id": pack_id}, {"_id": 0})
+    if not pack:
+        raise HTTPException(404, "Pack not found")
+    if pack.get("pdf_ref") and pack.get("pdf_ref", "").startswith("obj_"):
+        return {"pack_id": pack_id, "storage": "disk",
+                "object_id": pack["pdf_ref"],
+                "version": pack.get("pdf_version", 1),
+                "download_url": f"/api/files/{pack['pdf_ref']}"}
+    # Legacy mongo-fallback path
     doc = await db["implementation_pack_pdfs"].find_one({"pack_id": pack_id}, {"_id": 0})
     if not doc:
         raise HTTPException(404, "PDF not found for this pack")
-    return doc
+    return {**doc, "storage": "mongo-fallback"}
