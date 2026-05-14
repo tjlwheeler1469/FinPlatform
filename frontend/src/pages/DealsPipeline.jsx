@@ -13,6 +13,7 @@ import {
   FileText, Pencil, Archive, XCircle, Link as LinkIcon,
 } from "lucide-react";
 import { fmtCurrencyCompact } from "@/lib/inputBounds";
+import { useRbac } from "@/lib/rbac";
 
 const API = process.env.REACT_APP_BACKEND_URL;
 const FS = fmtCurrencyCompact;
@@ -91,6 +92,7 @@ const StageColumn = ({ stage, deals, onAdvance, onChangeStage }) => {
 const DealsPipeline = () => {
   const [deals, setDeals] = useState([]);
   const [summary, setSummary] = useState(null);
+  const { requireOrToast } = useRbac();
 
   const refresh = useCallback(async () => {
     try {

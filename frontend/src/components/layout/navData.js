@@ -53,6 +53,8 @@ export const adviserBaseNav = [
     items: [
       { path: "/xplan-sync-hub", label: "Xplan Sync Hub", icon: Database, title: "Push & Pull across all 5 Xplan modules · Core · Xtools+ · WealthSolver · IPS · Reporting", badge: "XPLAN" },
       { path: "/deals", label: "Deals", icon: Briefcase, title: "CRM pipeline · every SOA / ROA / Implementation Pack tracked from draft → executed", badge: "CRM" },
+      { path: "/webhooks-admin", label: "Webhooks", icon: Cable, title: "Outbound HMAC-signed event subscriptions for Slack/Zapier/internal systems", badge: "API" },
+      { path: "/rbac-admin", label: "Roles", icon: Shield, title: "Role-Based Access Control matrix · principal / adviser / paraplanner / client", badge: "RBAC" },
       { path: "/budget-exposure", label: "Budget Exposure", icon: AlertTriangle, title: "Portfolio-wide exposure to the 2026-27 Budget reforms · NG · CGT · Trust min-tax · Sell-window alerts", badge: "REFORM" },
       { path: "/execution-rails", label: "Execution Rails", icon: Zap, title: "Route advice tickets through broker / super / insurance / contribution adapters", badge: "RAILS" },
       { path: "/product-marketplace", label: "Marketplace", icon: Briefcase, title: "Insurance, mortgages & investment products with referral tracking" },

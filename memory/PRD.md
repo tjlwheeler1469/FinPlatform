@@ -1,3 +1,22 @@
+## April 2026 — Phase C + D + Version restore (Webhooks, Server-side PDF, RBAC)
+### Phase C — Workflow automation
+- **Outbound webhooks** (`routes/webhooks.py` + `/api/webhooks/*`): subscription model (event_type, target_url, secret, active, success/failure counters). Every delivery HMAC-SHA256 signed (`X-Halcyon-Signature`). Full delivery log + manual retry. Auto-fired by `routes/deals.py` on `deal.created`, `deal.stage_changed`, `deal.signed`, `deal.executed`.
+- **Server-side PDF rendering** (`routes/pdf_render.py` + `/api/render/pdf-from-html`): uses the system `chromium --headless --print-to-pdf` binary to render adviser-supplied HTML into typeset-quality PDFs (real fonts, no canvas rasterisation). Result auto-persists to the Vault via `_persist()` with version + family_key. Tested: 17.9 KB PDF produced from HTML snippet end-to-end.
+- **Webhooks Admin UI** (`pages/WebhooksAdmin.jsx`): register/toggle/delete subscriptions, test-fire any event type, browse delivery log with retry button. Auto-copies secret to clipboard on subscription create.
+
+### Phase D — Granular RBAC
+- **`routes/rbac.py`** + `/api/rbac/*`: explicit permission matrix across 4 roles (principal, adviser, paraplanner, client) and 22 permissions. Audit log records every gate check (success or denial) via `/api/rbac/audit-gate`. Role currently passed via `X-Role` header (production plug-in for any auth provider).
+- **`lib/rbac.js`** mirrors the matrix on the frontend with `useRbac()` hook + `<AuthGate>` component. Every gated action calls `requireOrToast()` which checks locally and fires the audit ping in parallel.
+- **`pages/RbacAdmin.jsx`**: full permission matrix with role-switcher for live testing. Current role's column highlighted.
+- **Wired gates**: Vault `restore` button gated on `file.restore_version`; DealsPipeline stage transitions gated on `deal.stage_change`.
+
+### Version restore
+- New endpoint `POST /api/files/versions/{family_key}/restore/{object_id}` — reads the target version's bytes and re-persists as `v(N+1)` (full audit, original kept intact).
+- Vault UI shows a "restore" action next to every non-latest version (only when role has `file.restore_version`).
+
+**Tested live**: webhook subscribe → test-fire → delivered HTTP 200 to httpbin; PDF render returns 17.9 KB binary saved as obj_xxx v1; RBAC: adviser=16 perms, paraplanner=8 perms, principal=22 perms, client gate denial recorded; vault restore creates v2 from v1 bytes.
+
+
 ## April 2026 — Phase A + B (CRM entity-centric + Storage versioning)
 ### Phase A — Entity-centric CRM
 - **New `routes/deals.py` + `/api/deals/*`**: first-class Deal entity (deal_id, client_id, deal_type, stage, expected_value, expected_close, links[], history[]). Stages: draft → review → signed → executed → archived → lost. Endpoints: create, list (paginated, filtered), read, patch, stage-transition (with reason logged to history), link-resource, pipeline summary.

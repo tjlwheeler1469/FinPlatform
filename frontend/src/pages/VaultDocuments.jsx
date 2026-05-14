@@ -10,9 +10,10 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
   FolderLock, Search, Download, RefreshCw, FileText, Layers, HardDrive,
-  Tag as TagIcon, ChevronDown, ChevronRight,
+  Tag as TagIcon, ChevronDown, ChevronRight, RotateCcw,
 } from "lucide-react";
 import { fmtCurrencyCompact } from "@/lib/inputBounds";
+import { useRbac } from "@/lib/rbac";
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
@@ -26,21 +27,43 @@ const fmtBytes = (n) => {
 
 const fmtDate = (iso) => new Date(iso).toLocaleString("en-AU", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
 
-const VersionRow = ({ obj }) => (
-  <div className="flex items-center gap-2 text-[11px] py-1.5 px-2 hover:bg-slate-50 rounded">
-    <Badge variant="outline" className="text-[10px] font-mono">v{obj.version}</Badge>
-    <span className="text-muted-foreground">{fmtDate(obj.created_at)}</span>
-    <span className="text-muted-foreground">·</span>
-    <span>{fmtBytes(obj.size_bytes)}</span>
-    {obj.is_latest && <Badge variant="outline" className="text-[9px] bg-emerald-50 border-emerald-300 text-emerald-800 ml-1">LATEST</Badge>}
-    <a href={`${API}/api/files/${obj.object_id}`} target="_blank" rel="noopener noreferrer" className="ml-auto text-[#3B9CDC] hover:underline" data-testid={`download-${obj.object_id}`}>
-      <Download className="h-3 w-3 inline mr-0.5" />
-      download
-    </a>
-  </div>
-);
+const VersionRow = ({ obj, family, onRestored }) => {
+  const { requireOrToast } = useRbac();
+  const restore = async () => {
+    if (!requireOrToast("file.restore_version", { targetKind: "file", targetRef: obj.object_id })) return;
+    if (!window.confirm(`Restore v${obj.version} as the new latest? A new version will be created with these bytes.`)) return;
+    try {
+      const r = await fetch(`${API}/api/files/versions/${family}/restore/${obj.object_id}`, { method: "POST" });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const out = await r.json();
+      toast.success(`v${out.restored_from_version} restored as v${out.new_version}`);
+      onRestored?.();
+    } catch (e) {
+      toast.error("Restore failed", { description: String(e).slice(0, 200) });
+    }
+  };
+  return (
+    <div className="flex items-center gap-2 text-[11px] py-1.5 px-2 hover:bg-slate-50 rounded">
+      <Badge variant="outline" className="text-[10px] font-mono">v{obj.version}</Badge>
+      <span className="text-muted-foreground">{fmtDate(obj.created_at)}</span>
+      <span className="text-muted-foreground">·</span>
+      <span>{fmtBytes(obj.size_bytes)}</span>
+      {obj.is_latest && <Badge variant="outline" className="text-[9px] bg-emerald-50 border-emerald-300 text-emerald-800 ml-1">LATEST</Badge>}
+      <div className="ml-auto flex gap-3">
+        {!obj.is_latest && (
+          <button onClick={restore} className="text-amber-700 hover:underline" data-testid={`restore-${obj.object_id}`}>
+            <RotateCcw className="h-3 w-3 inline mr-0.5" /> restore
+          </button>
+        )}
+        <a href={`${API}/api/files/${obj.object_id}`} target="_blank" rel="noopener noreferrer" className="text-[#3B9CDC] hover:underline" data-testid={`download-${obj.object_id}`}>
+          <Download className="h-3 w-3 inline mr-0.5" /> download
+        </a>
+      </div>
+    </div>
+  );
+};
 
-const FamilyCard = ({ family, objects }) => {
+const FamilyCard = ({ family, objects, onRefresh }) => {
   const [open, setOpen] = useState(false);
   const latest = objects.find((o) => o.is_latest) || objects[objects.length - 1];
   const tags = Array.from(new Set(objects.flatMap((o) => o.tags || [])));
@@ -67,7 +90,7 @@ const FamilyCard = ({ family, objects }) => {
         </div>
         {open && (
           <div className="mt-2 pl-6 border-l-2 border-slate-200">
-            {[...objects].sort((a, b) => a.version - b.version).map((o) => <VersionRow key={o.object_id} obj={o} />)}
+            {[...objects].sort((a, b) => a.version - b.version).map((o) => <VersionRow key={o.object_id} obj={o} family={family} onRestored={onRefresh} />)}
           </div>
         )}
       </CardContent>
@@ -151,7 +174,7 @@ const VaultDocuments = () => {
               No documents in the Vault yet. Generate an Implementation Pack from the SOA / ROA builder — its PDF will land here automatically.
             </CardContent></Card>
           )}
-          {Object.entries(families).map(([fk, objs]) => <FamilyCard key={fk} family={fk} objects={objs} />)}
+          {Object.entries(families).map(([fk, objs]) => <FamilyCard key={fk} family={fk} objects={objs} onRefresh={refresh} />)}
         </div>
       </div>
     </Layout>

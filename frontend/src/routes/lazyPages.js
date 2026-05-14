@@ -143,6 +143,8 @@ export const BudgetReforms2027 = lazyRetry(() => import("@/pages/BudgetReforms20
 export const BudgetExposureReport = lazyRetry(() => import("@/pages/BudgetExposureReport"));
 export const DealsPipeline = lazyRetry(() => import("@/pages/DealsPipeline"));
 export const VaultDocuments = lazyRetry(() => import("@/pages/VaultDocuments"));
+export const WebhooksAdmin = lazyRetry(() => import("@/pages/WebhooksAdmin"));
+export const RbacAdmin = lazyRetry(() => import("@/pages/RbacAdmin"));
 export const MeetingPrep = lazyRetry(() => import("@/pages/MeetingPrep"));
 export const MeetingNotes = lazyRetry(() => import("@/pages/MeetingNotes"));
 export const MeetingSummaryGenerator = lazyRetry(() => import("@/pages/MeetingSummaryGenerator"));

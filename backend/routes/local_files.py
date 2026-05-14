@@ -217,6 +217,34 @@ async def search(
     return {"objects": rows, "count": len(rows), "total": total, "limit": limit, "skip": skip}
 
 
+@router.post("/versions/{family_key}/restore/{object_id}")
+async def restore_version(family_key: str, object_id: str) -> dict:
+    """Restore a prior version as the new latest. Creates v(N+1) with the
+    selected version's bytes — preserves full audit trail."""
+    target = await db[COL].find_one(
+        {"family_key": family_key, "object_id": object_id, "deleted": {"$ne": True}},
+        {"_id": 0},
+    )
+    if not target:
+        raise HTTPException(404, "Target version not found in family")
+    src_path = STORAGE_ROOT / target["path_relative"]
+    if not src_path.exists():
+        raise HTTPException(410, "Source bytes missing on disk")
+    content = src_path.read_bytes()
+    restored = await _persist(
+        content,
+        filename=target["filename"],
+        mime=target["mime"],
+        owner_client_id=target.get("owner_client_id"),
+        tags=list(set((target.get("tags") or []) + ["restored"])),
+        source_deal_id=target.get("source_deal_id"),
+        source_pack_id=target.get("source_pack_id"),
+        family_key=family_key,
+    )
+    return {"success": True, "restored_from_version": target["version"],
+            "new_version": restored["version"], "new_object_id": restored["object_id"]}
+
+
 @router.get("/versions/{family_key}")
 async def list_versions(family_key: str) -> dict:
     cur = db[COL].find({"family_key": family_key}, {"_id": 0}).sort("version", 1)

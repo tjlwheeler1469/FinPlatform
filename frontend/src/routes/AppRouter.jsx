@@ -30,7 +30,7 @@ import {
   AdviserDashboard, AdviserHub, AdvisorCommandCenter, AdvisorIntelligenceDashboard,
   DailyBriefing, CommandCenter, IntelligenceEngine, DecisionCenter, DecisionEngine,
   DecisionDashboard, NextBestActions, ClientIntelligenceFeed, WorkflowDashboard,
-  BookIntelligence, MeetingAutomation, BatchExecution, ExecutionRails, BudgetReforms2027, BudgetExposureReport, DealsPipeline, VaultDocuments, MeetingPrep, MeetingNotes,
+  BookIntelligence, MeetingAutomation, BatchExecution, ExecutionRails, BudgetReforms2027, BudgetExposureReport, DealsPipeline, VaultDocuments, WebhooksAdmin, RbacAdmin, MeetingPrep, MeetingNotes,
   MeetingSummaryGenerator, Copilot, AIAdvisor, AICopilot, AICopilotAdvanced,
   AIInsights, FinancialAdvisorChat, FinancialPlanGenerator, FinancialRecommendations,
   AdviceWorkflow, FeedbackAnalytics,
@@ -191,6 +191,8 @@ const AppRouter = () => (
     <Route path="/budget-exposure" element={<BudgetExposureReport />} />
     <Route path="/deals" element={<DealsPipeline />} />
     <Route path="/vault-documents" element={<VaultDocuments />} />
+    <Route path="/webhooks-admin" element={<WebhooksAdmin />} />
+    <Route path="/rbac-admin" element={<RbacAdmin />} />
     <Route path="/knowledge-graph" element={<Navigate to="/advisor-command-center" replace />} />
     <Route path="/ai-copilot" element={<Navigate to="/ai-copilot-advanced" replace />} />
     <Route path="/ai-copilot-advanced" element={<AICopilotAdvanced />} />

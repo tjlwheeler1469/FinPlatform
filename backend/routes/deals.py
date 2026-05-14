@@ -22,7 +22,7 @@ Endpoints (all under /api/deals):
   POST   /{deal_id}/link         link an existing document/pack/ticket to the deal
   GET    /pipeline/summary       per-stage counts + $ pipeline value
 """
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, BackgroundTasks
 from pydantic import BaseModel, Field
 from datetime import datetime, timezone
 from typing import Optional, List, Dict, Any
@@ -30,6 +30,7 @@ import uuid
 import logging
 
 from db import db
+from routes.webhooks import emit as emit_webhook
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/deals", tags=["Deals"])
@@ -182,7 +183,7 @@ async def update_deal(deal_id: str, patch: DealUpdate) -> dict:
 
 
 @router.post("/{deal_id}/stage")
-async def transition_stage(deal_id: str, payload: DealStage) -> dict:
+async def transition_stage(deal_id: str, payload: DealStage, background: BackgroundTasks) -> dict:
     if payload.new_stage not in VALID_STAGES:
         raise HTTPException(400, f"stage must be one of {VALID_STAGES}")
     doc = await db[COL].find_one({"deal_id": deal_id}, {"_id": 0, "stage": 1})
@@ -201,7 +202,18 @@ async def transition_stage(deal_id: str, payload: DealStage) -> dict:
             }},
         },
     )
-    return await read_deal(deal_id)
+    updated = await read_deal(deal_id)
+    # Fan-out to webhook subscribers
+    await emit_webhook("deal.stage_changed",
+                       {"deal_id": deal_id, "from": doc["stage"], "to": payload.new_stage,
+                        "reason": payload.reason or "", "deal": updated},
+                       background=background)
+    # Specific signed / executed events for finer-grained subscribers
+    if payload.new_stage == "signed":
+        await emit_webhook("deal.signed", {"deal_id": deal_id, "deal": updated}, background=background)
+    elif payload.new_stage == "executed":
+        await emit_webhook("deal.executed", {"deal_id": deal_id, "deal": updated}, background=background)
+    return updated
 
 
 @router.post("/{deal_id}/link")
