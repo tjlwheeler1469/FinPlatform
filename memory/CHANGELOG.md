@@ -1,3 +1,32 @@
+## Feb 2026 — Backlog completion: Outreach + E-sign freeze + Chip filters (Iter 207)
+
+### P2 — Budget Reform outreach (BudgetExposureReport)
+- One-click "Email" button per sell-window row → POSTs `/api/notify/client` with full pre-filled body (CGT swing, days-to-reform, restructure options, meeting CTA). Falls back to MOCKED log when no `RESEND_API_KEY`.
+- "Invite" button per row → generates a downloadable `.ics` calendar file (universal — works in Google/Outlook/Apple Calendar) for a 30-min review meeting 7 days out.
+- "Draft N outreach emails" pill at the top of the page → bulk-fires emails to every sell-window client at once.
+- New test IDs: `bulk-outreach-btn`, `sell-window-row-{id}`, `email-{id}`, `ics-{id}`, `row-email-{id}`, `row-ics-{id}`.
+
+### P3 — E-signature webhook completion (`routes/esignature.py`)
+- New endpoint `POST /api/e-signature/event` accepts `{family_key, signer_email, provider, envelope_id, client_id?, deal_id?}`. HMAC-verified (`X-Esignature-Signature` against `ESIGNATURE_INBOUND_SECRET`) when secret configured, otherwise open inbound for dev.
+- On a valid event: marks **every version** in the family as `is_frozen=true` with signer/envelope metadata, writes a structured row to `rbac_audit` (`event="document_signed"`), advances the linked Deal to `signed` stage, and emits an outbound `deal.signed` webhook so subscribers fan out automatically.
+- `local_files._persist()` now **rejects new versions** for a frozen family with HTTP 423 — closes the loop so a signed SOA can never be silently re-versioned.
+- New endpoints: `GET /api/e-signature/signed` (audit replay), `GET /api/e-signature/status/{family_key}`.
+- VaultDocuments UI shows a `SIGNED · FROZEN` amber badge + "signed by {email} via {provider}" meta on the family card.
+- Backend pytest: `tests/test_esignature_freeze.py` — **3/3 PASS** (freeze + 423 reject + 404 on unknown family + signed audit replay).
+
+### P3 — Execution Rails real adapters (verified existing)
+- Adapters in `execution_rails.py` already env-key driven (`ALPACA_API_KEY`, etc.) with graceful fallback to mock — structurally complete. Adding live super-platform / insurance SDK calls requires the user's API credentials.
+
+### Optional UX consistency — chip filters
+- `WebhooksAdmin`: delivery log now filterable by status (`All / Delivered / Failed / Pending`) via `ChipFilter`.
+- `ExecutionRails`: tickets filterable by status (`All / Pending / Executing / Completed / Failed`).
+- `AdviserHub`: status filter converted from button-group to ChipFilter (preserves `data-testid="filter-{status}"` for backwards compat).
+
+### Tests
+- Iter 207 testing-agent verdict: **backend 100% (3/3 pytest), frontend 100% on all observable criteria, zero console errors across all 8 PageShell routes.**
+
+
+
 ## Feb 2026 — UI/UX unification (Truth Journey aesthetic rollout — Iter 206)
 - **PageShell rolled out across 8 main pages** to deliver a unified airy, navy/gold design system:
   - `/deals` (DealsPipeline.jsx)

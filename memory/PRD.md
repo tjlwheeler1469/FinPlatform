@@ -1,3 +1,25 @@
+## Feb 2026 — Backlog completion (Iter 207)
+
+### P2 — Budget Reform outreach wiring (DONE)
+- `BudgetExposureReport.jsx` now has per-row Email + Calendar Invite buttons and a "Draft N outreach emails" bulk action for clients in the Pre-1 Jul 2027 sell-window. Wires through `/api/notify/client` (mocked when no `RESEND_API_KEY`) and generates `.ics` files for universal calendar import.
+
+### P3 — E-signature webhook completion (DONE)
+- New `routes/esignature.py` with `/api/e-signature/event` inbound webhook. Marks all versions in the family as frozen (is_frozen=true with signer/envelope metadata), writes `document_signed` audit row to `rbac_audit`, advances linked Deal to `signed` stage, and emits `deal.signed` outbound webhook.
+- `_persist()` in `local_files.py` returns HTTP 423 for upload attempts on frozen families — guarantees signed documents are immutable.
+- `VaultDocuments` UI displays SIGNED·FROZEN badge + signer details.
+- Backend tests: `tests/test_esignature_freeze.py` 3/3 PASS.
+
+### P3 — Execution Rails real adapters (verified)
+- Already env-key driven with mock fallback. Live mode auto-enabled when `ALPACA_API_KEY` (and equivalent per-adapter keys) present.
+
+### UX polish
+- `ChipFilter` rolled out to `/webhooks-admin` (events status filter), `/execution-rails` (ticket status filter) and `/adviser-hub` (replaces the legacy status button group while preserving `data-testid="filter-*"`).
+
+### Open backlog
+- P3 — Advice Marketplace, Open API platform, White-label infra (scaffolding deferred to a dedicated phase; non-trivial product surface).
+
+
+
 ## Feb 2026 — Truth Journey UI Aesthetic — Full Rollout (Iter 206)
 - `PageShell.jsx` adopted across 8 main pages (DealsPipeline, BudgetExposureReport, VaultDocuments, WebhooksAdmin, RbacAdmin, ExecutionRails, AdviserHub, RetirementWorkshop). Every page now has airy serif hero typography, gold-accent on the key noun, KPI cluster top-right with 4 metrics, pill-shaped CTAs, optional chip filters. Navy/gold branding preserved; content untouched.
 - RetirementWorkshop embedded path explicitly excluded so it stays clean inside Client360 / RetirementHub tabs.
