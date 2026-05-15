@@ -36,7 +36,7 @@
     "frontend": "100% (both pages load live data, refresh works)"
   },
   "test_credentials": {
-    "preview_url": "https://xplan-sync-hub.preview.emergentagent.com",
+    "preview_url": "https://decision-engine-109.preview.emergentagent.com",
     "crypto_page": "/crypto-portfolio",
     "hybrids_page": "/hybrids-trading"
   },

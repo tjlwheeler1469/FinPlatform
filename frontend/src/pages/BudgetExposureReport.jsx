@@ -10,6 +10,7 @@
 //  - Sort + filter + countdown banner
 import { useMemo, useState } from "react";
 import Layout from "@/components/Layout";
+import { PageShell, ChipFilter, PillButton, Tile } from "@/components/PageShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -128,73 +129,73 @@ const BudgetExposureReport = () => {
 
   return (
     <Layout>
-      <div className="max-w-[1400px] mx-auto p-4 space-y-4" data-testid="budget-exposure-report">
-
-        {/* Countdown banner */}
-        <Card className="bg-gradient-to-r from-amber-50 to-rose-50 border-l-4 border-amber-500">
-          <CardContent className="p-5 flex items-center gap-4">
-            <Calendar className="h-10 w-10 text-amber-600" />
-            <div className="flex-1">
-              <h1 className="text-xl font-bold text-[#1a2744]">Budget Reform Exposure · Portfolio-wide</h1>
-              <p className="text-xs text-amber-700">
-                <strong>{daysUntil(NG_REFORM_DATE)} days</strong> until 1 July 2027 (NG / CGT reforms) ·
-                <strong className="ml-2">{daysUntil(TRUST_REFORM_DATE)} days</strong> until 1 July 2028 (trust min-tax) ·
-                <strong className="ml-2">{exposures.length}</strong> clients reviewed
-              </p>
+      <PageShell
+        eyebrow="REFORM"
+        title="Budget reform exposure"
+        accent="portfolio-wide"
+        subtitle="Every client's exposure to the 2026-27 Budget reforms — negative gearing, CGT regimes and discretionary-trust min-tax — with sell-window alerts on the highest-risk holdings."
+        meta={`${daysUntil(NG_REFORM_DATE)} days to 1 Jul 2027 · ${daysUntil(TRUST_REFORM_DATE)} days to 1 Jul 2028 · ${exposures.length} clients reviewed`}
+        metrics={[
+          { label: "Sell-window alerts", value: String(sellWindowCount), hint: sellWindowCount > 0 ? "urgent" : "none" },
+          { label: "Total CGT swing", value: FS(totalAtRisk) },
+          { label: "Clients w/ trusts", value: String(exposures.filter((e) => e.hasTrust).length) },
+          { label: "Active clients", value: String(exposures.length) },
+        ]}
+        filters={(
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex items-center gap-2 border border-slate-300 rounded-full px-3 py-1.5 max-w-xs">
+              <Search className="h-3.5 w-3.5 text-slate-400" />
+              <input
+                placeholder="Filter clients…"
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                className="bg-transparent text-[12px] focus:outline-none w-full"
+                data-testid="exposure-filter"
+              />
             </div>
-            <div className="grid grid-cols-3 gap-3">
-              <Metric label="Sell-window alerts" value={sellWindowCount} highlight={sellWindowCount > 0 ? "rose" : "slate"} />
-              <Metric label="Total CGT swing" value={FS(totalAtRisk)} highlight="amber" />
-              <Metric label="Clients w/ trusts" value={exposures.filter((e) => e.hasTrust).length} highlight="violet" />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Toolbar */}
-        <Card>
-          <CardContent className="p-3 flex items-center gap-3">
-            <Search className="h-4 w-4 text-gray-400" />
-            <Input placeholder="Filter clients…" value={filter} onChange={(e) => setFilter(e.target.value)} className="max-w-xs h-8" data-testid="exposure-filter" />
-            <div className="flex items-center gap-1">
-              <span className="text-xs text-muted-foreground">Sort:</span>
-              {["riskScore", "cgtSwing", "trustExposure", "name"].map((s) => (
-                <Button key={s} variant={sortBy === s ? "default" : "ghost"} size="sm" onClick={() => setSortBy(s)} className="h-7 text-[11px] capitalize" data-testid={`sort-${s}`}>
-                  {s.replace("Score", " score").replace("Swing", " swing").replace("Exposure", " exposure")}
-                </Button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Sell-window alerts (priority) */}
-        {sellWindowCount > 0 && (
-          <Card className="border-l-4 border-rose-500">
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2 text-base text-rose-700">
-                <AlertTriangle className="h-4 w-4" /> Pre-1 July 2027 Sell-Window Alerts ({sellWindowCount})
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {exposures.filter((e) => e.sellWindowAlert).map((e) => (
-                <div key={e.id} className="border rounded p-3 bg-rose-50/50">
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="font-semibold text-[#1a2744]">{e.name}</p>
-                    <Badge variant="outline" className="text-[10px] bg-rose-100 text-rose-800 border-rose-300">CGT swing {F(e.totalCgtSwing)}</Badge>
-                  </div>
-                  <p className="text-[11px] text-rose-700">
-                    Holds {e.invPropCount} existing investment {e.invPropCount === 1 ? "property" : "properties"} purchased post-12-May-2026 with material unrealised gain. Selling before 1 July 2027 secures the 50% CGT discount; selling after triggers the new indexation + 30% min-tax regime.
-                  </p>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+            <ChipFilter
+              value={sortBy}
+              onChange={setSortBy}
+              dataTestidPrefix="sort"
+              options={[
+                { value: "riskScore", label: "Sort: Risk" },
+                { value: "cgtSwing", label: "Sort: CGT swing" },
+                { value: "trustExposure", label: "Sort: Trust exposure" },
+                { value: "name", label: "Sort: Name" },
+              ]}
+            />
+          </div>
         )}
+      >
+        <div className="space-y-6" data-testid="budget-exposure-report">
 
-        {/* Full table */}
-        <Card>
-          <CardContent className="p-0">
+          {/* Sell-window alerts (priority) */}
+          {sellWindowCount > 0 && (
+            <Tile className="border-l-4 border-rose-500 p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <AlertTriangle className="h-5 w-5 text-rose-600" />
+                <h2 className="text-base font-bold text-rose-800">Pre-1 July 2027 sell-window alerts ({sellWindowCount})</h2>
+              </div>
+              <div className="space-y-2">
+                {exposures.filter((e) => e.sellWindowAlert).map((e) => (
+                  <div key={e.id} className="border border-rose-200 rounded-lg p-3 bg-rose-50/30">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="font-semibold text-[#1a2744]">{e.name}</p>
+                      <Badge variant="outline" className="text-[10px] bg-rose-100 text-rose-800 border-rose-300">CGT swing {F(e.totalCgtSwing)}</Badge>
+                    </div>
+                    <p className="text-[11px] text-rose-700">
+                      Holds {e.invPropCount} existing investment {e.invPropCount === 1 ? "property" : "properties"} purchased post-12-May-2026 with material unrealised gain. Selling before 1 July 2027 secures the 50% CGT discount; selling after triggers the new indexation + 30% min-tax regime.
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </Tile>
+          )}
+
+          {/* Full table — wrapped in Tile for the new aesthetic */}
+          <Tile className="p-0 overflow-hidden">
             <table className="w-full text-sm">
-              <thead className="bg-slate-50 border-b text-[10px] uppercase tracking-wide text-slate-600">
+              <thead className="bg-slate-50/60 border-b border-slate-200 text-[10px] uppercase tracking-wide text-slate-600">
                 <tr>
                   <th className="text-left p-3">Client</th>
                   <th className="text-left p-3">NG status</th>
@@ -215,10 +216,10 @@ const BudgetExposureReport = () => {
                   const ngLabel = e.propsByStatus.length === 0 ? "—"
                     : Array.from(new Set(e.propsByStatus.map((p) => p.ngStatus.status.replace(/_/g, " ")))).join(", ");
                   return (
-                    <tr key={e.id} className="border-b hover:bg-slate-50" data-testid={`exposure-row-${e.id}`}>
+                    <tr key={e.id} className="border-t border-slate-100 hover:bg-slate-50" data-testid={`exposure-row-${e.id}`}>
                       <td className="p-3">
                         <p className="font-semibold text-[#1a2744]">{e.name}</p>
-                        <p className="text-[10px] text-muted-foreground">{e.invPropCount} inv prop · {e.hasTrust ? "has trust" : "no trust"}</p>
+                        <p className="text-[10px] text-slate-500">{e.invPropCount} inv prop · {e.hasTrust ? "has trust" : "no trust"}</p>
                       </td>
                       <td className="p-3 text-[11px] capitalize">{ngLabel}</td>
                       <td className="p-3 text-right">{FS(totalInvValue)}</td>
@@ -228,22 +229,22 @@ const BudgetExposureReport = () => {
                       <td className="p-3 text-right">{e.hasTrust ? FS(e.trustMinTaxExposure) : "—"}</td>
                       <td className="p-3 text-center"><RiskPill score={e.riskScore} /></td>
                       <td className="p-3 text-center">
-                        <Button size="sm" variant="outline" onClick={() => { localStorage.setItem("selected_client", JSON.stringify({ id: e.id })); window.location.assign("/budget-reforms"); }} className="h-7 text-[10px]" data-testid={`open-budget-${e.id}`}>
-                          <ExternalLink className="h-3 w-3 mr-1" /> Open
-                        </Button>
+                        <PillButton variant="ghost" onClick={() => { localStorage.setItem("selected_client", JSON.stringify({ id: e.id })); window.location.assign("/budget-reforms"); }} className="text-[10px] py-1 px-3" data-testid={`open-budget-${e.id}`}>
+                          <ExternalLink className="h-3 w-3 inline mr-0.5" /> Open
+                        </PillButton>
                       </td>
                     </tr>
                   );
                 })}
               </tbody>
             </table>
-          </CardContent>
-        </Card>
+          </Tile>
 
-        <p className="text-[10px] text-muted-foreground italic text-center">
-          Working assumption: investment properties have ~50% unrealised gain and a ~5y holding period. Adviser refines per client on the Budget Reforms page. · Engine: <code>/app/frontend/src/lib/auTax.js</code> · 26/26 unit tests passing.
-        </p>
-      </div>
+          <p className="text-[10px] text-slate-400 italic text-center">
+            Working assumption: investment properties have ~50% unrealised gain and a ~5y holding period. Adviser refines per client on the Budget Reforms page. · Engine: <code>/app/frontend/src/lib/auTax.js</code> · 26/26 unit tests passing.
+          </p>
+        </div>
+      </PageShell>
     </Layout>
   );
 };

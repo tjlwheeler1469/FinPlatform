@@ -5,6 +5,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
 import Layout from "@/components/Layout";
+import { PageShell, ChipFilter, PillButton, Tile } from "@/components/PageShell";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -168,39 +169,80 @@ const DealsPipeline = () => {
     } catch { toast.error("Stage change failed"); }
   };
 
+  // Stage filter — null means "all"
+  const [stageFilter, setStageFilter] = useState("all");
+  const visibleDeals = stageFilter === "all" ? deals : deals.filter((d) => d.stage === stageFilter);
+  const totalDealsByStage = (id) => deals.filter((d) => d.stage === id).length;
+
   return (
     <Layout>
-      <div className="max-w-[1800px] mx-auto p-4 space-y-4" data-testid="deals-pipeline">
-        <Card>
-          <CardContent className="p-4 flex items-center gap-3 flex-wrap">
-            <Briefcase className="h-6 w-6 text-[#1a2744]" />
-            <div className="flex-1">
-              <h1 className="text-xl font-bold text-[#1a2744]">Deals Pipeline</h1>
-              <p className="text-xs text-muted-foreground">
-                CRM-grade tracking of every advice engagement · {summary?.total_count ?? 0} deals · {FS(summary?.total_value ?? 0)} total pipeline value
-              </p>
+      <PageShell
+        eyebrow="CRM"
+        title="Deals pipeline"
+        accent={summary?.total_count ? `${summary.total_count} active` : null}
+        subtitle="Every SOA, ROA and Implementation Pack tracked from draft to executed — with full audit trail on each stage transition."
+        meta={summary?.total_value ? `${summary.total_count} deals · ${FS(summary.total_value)} pipeline value` : null}
+        metrics={[
+          { label: "Draft", value: String(totalDealsByStage("draft")) },
+          { label: "In review", value: String(totalDealsByStage("review")) },
+          { label: "Signed + executed", value: String(totalDealsByStage("signed") + totalDealsByStage("executed")) },
+          { label: "Pipeline $", value: FS(summary?.total_value ?? 0) },
+        ]}
+        actions={(
+          <>
+            <PillButton variant="ghost" onClick={refresh} data-testid="refresh-pipeline">
+              <RefreshCw className="h-3.5 w-3.5 inline mr-1.5" /> Refresh
+            </PillButton>
+            <PillButton onClick={seedDemoDeal} data-testid="seed-demo-deal">
+              <PlusCircle className="h-3.5 w-3.5 inline mr-1.5" /> Seed demo
+            </PillButton>
+          </>
+        )}
+        filters={(
+          <ChipFilter
+            value={stageFilter}
+            onChange={setStageFilter}
+            dataTestidPrefix="stage-filter"
+            options={[
+              { value: "all", label: "All", count: deals.length },
+              ...STAGES.map((s) => ({ value: s.id, label: s.label, count: totalDealsByStage(s.id) })),
+            ]}
+          />
+        )}
+      >
+        <div data-testid="deals-pipeline" className="space-y-6">
+          {stageFilter === "all" ? (
+            <div className="flex gap-3 overflow-x-auto pb-4">
+              {STAGES.map((s) => (
+                <StageColumn
+                  key={s.id}
+                  stage={s}
+                  deals={deals.filter((d) => d.stage === s.id)}
+                  onAdvance={advanceStage}
+                  onChangeStage={changeStageManually}
+                />
+              ))}
             </div>
-            <Button variant="outline" size="sm" onClick={seedDemoDeal} data-testid="seed-demo-deal"><PlusCircle className="h-3.5 w-3.5 mr-1" /> Seed demo</Button>
-            <Button variant="outline" size="sm" onClick={refresh} data-testid="refresh-pipeline"><RefreshCw className="h-3.5 w-3.5 mr-1" /> Refresh</Button>
-          </CardContent>
-        </Card>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {visibleDeals.length === 0 && (
+                <Tile className="col-span-full text-center py-12 text-sm text-slate-500">
+                  No deals in the <strong>{STAGES.find((s) => s.id === stageFilter)?.label}</strong> stage yet.
+                </Tile>
+              )}
+              {visibleDeals.map((d) => (
+                <Tile key={d.deal_id}>
+                  <DealCard deal={d} onAdvance={advanceStage} onChangeStage={changeStageManually} />
+                </Tile>
+              ))}
+            </div>
+          )}
 
-        <div className="flex gap-3 overflow-x-auto pb-4">
-          {STAGES.map((s) => (
-            <StageColumn
-              key={s.id}
-              stage={s}
-              deals={deals.filter((d) => d.stage === s.id)}
-              onAdvance={advanceStage}
-              onChangeStage={changeStageManually}
-            />
-          ))}
+          <p className="text-[10px] text-slate-400 italic text-center pt-4">
+            Implementation Packs auto-create a Deal in the <strong>review</strong> stage. Each Deal links its PDF, notification, execution tickets and Xmerge push for full audit.
+          </p>
         </div>
-
-        <p className="text-[10px] text-muted-foreground italic text-center">
-          Implementation Packs auto-create a Deal in the <strong>review</strong> stage. Each Deal links its PDF, notification, execution tickets and Xmerge push for full audit.
-        </p>
-      </div>
+      </PageShell>
     </Layout>
   );
 };

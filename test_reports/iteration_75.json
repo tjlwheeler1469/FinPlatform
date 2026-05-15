@@ -29,7 +29,7 @@
     "frontend": "100% (all features working)"
   },
   "test_credentials": {
-    "api_base_url": "https://xplan-sync-hub.preview.emergentagent.com"
+    "api_base_url": "https://decision-engine-109.preview.emergentagent.com"
   },
   "seed_data_creation": "None - using default form values",
   "retest_needed": false,

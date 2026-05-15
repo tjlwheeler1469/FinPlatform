@@ -26,7 +26,7 @@
     "frontend": "100% (all 8 features verified)"
   },
   "test_credentials": {
-    "preview_url": "https://xplan-sync-hub.preview.emergentagent.com",
+    "preview_url": "https://decision-engine-109.preview.emergentagent.com",
     "test_page": "/client-360",
     "compliance_bypass": "localStorage.setItem('wealth_command_compliance_v5', 'permanent')"
   },

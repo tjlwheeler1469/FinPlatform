@@ -10,7 +10,7 @@
 - **Users**: 1,000 concurrent
 - **Ramp-up**: 50 users/second
 - **Duration**: 60 seconds
-- **Target**: https://xplan-sync-hub.preview.emergentagent.com
+- **Target**: https://decision-engine-109.preview.emergentagent.com
 
 ---
 

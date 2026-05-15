@@ -6,7 +6,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://xplan-sync-hub.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://decision-engine-109.preview.emergentagent.com')
 
 class TestHealthAndBasicAPIs:
     """Basic health and API availability tests"""

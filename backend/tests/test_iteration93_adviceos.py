@@ -17,7 +17,7 @@ import os
 import json
 from datetime import datetime
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://xplan-sync-hub.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://decision-engine-109.preview.emergentagent.com').rstrip('/')
 
 
 class TestHealthCheck:

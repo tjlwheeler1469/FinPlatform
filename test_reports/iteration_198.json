@@ -22,7 +22,7 @@
       "first_item_action_buttons": {"simulate": true, "apply": true, "generate": true, "notify": true},
       "apply_action_logs_to_localstorage": true,
       "adviser_action_log_entries_after_3_actions": 3,
-      "simulate_navigates_to_client_360": "https://xplan-sync-hub.preview.emergentagent.com/client-360?id=chen_family&tab=decision"
+      "simulate_navigates_to_client_360": "https://decision-engine-109.preview.emergentagent.com/client-360?id=chen_family&tab=decision"
     },
     "future_impact_engine": {
       "renders": true,

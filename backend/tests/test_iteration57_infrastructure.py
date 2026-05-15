@@ -14,7 +14,7 @@ from datetime import datetime
 # Get BASE_URL from environment
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 if not BASE_URL:
-    BASE_URL = "https://xplan-sync-hub.preview.emergentagent.com"
+    BASE_URL = "https://decision-engine-109.preview.emergentagent.com"
 
 
 class TestHealthCheck:

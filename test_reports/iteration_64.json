@@ -41,7 +41,7 @@
     "frontend": "100% (all pages verified working)"
   },
   "test_credentials": {
-    "api_base_url": "https://xplan-sync-hub.preview.emergentagent.com"
+    "api_base_url": "https://decision-engine-109.preview.emergentagent.com"
   },
   "seed_data_creation": "No seed data needed - all APIs use simulated/demo data with price jitter",
   "retest_needed": false,
