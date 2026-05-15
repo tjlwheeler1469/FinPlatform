@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
   FolderLock, Search, Download, RefreshCw, FileText, Layers, HardDrive,
-  Tag as TagIcon, ChevronDown, ChevronRight, RotateCcw,
+  Tag as TagIcon, ChevronDown, ChevronRight, RotateCcw, Lock,
 } from "lucide-react";
 import { fmtCurrencyCompact } from "@/lib/inputBounds";
 import { useRbac } from "@/lib/rbac";
@@ -68,6 +68,7 @@ const FamilyCard = ({ family, objects, onRefresh }) => {
   const [open, setOpen] = useState(false);
   const latest = objects.find((o) => o.is_latest) || objects[objects.length - 1];
   const tags = Array.from(new Set(objects.flatMap((o) => o.tags || [])));
+  const isFrozen = objects.some((o) => o.is_frozen);
   return (
     <Card data-testid={`family-${family}`}>
       <CardContent className="p-3">
@@ -77,12 +78,20 @@ const FamilyCard = ({ family, objects, onRefresh }) => {
             <div className="flex items-center gap-2 flex-wrap">
               <p className="text-sm font-semibold text-[#1a2744] truncate">{latest.filename}</p>
               <Badge variant="outline" className="text-[9px]"><Layers className="h-2.5 w-2.5 mr-0.5" />{objects.length} version{objects.length === 1 ? "" : "s"}</Badge>
+              {isFrozen && (
+                <Badge variant="outline" className="text-[9px] bg-amber-50 border-amber-300 text-amber-800" data-testid={`frozen-${family}`}>
+                  <Lock className="h-2.5 w-2.5 mr-0.5" /> SIGNED · FROZEN
+                </Badge>
+              )}
               {tags.map((t) => (
                 <Badge key={t} variant="outline" className="text-[9px] capitalize"><TagIcon className="h-2.5 w-2.5 mr-0.5" />{t}</Badge>
               ))}
             </div>
             <p className="text-[10px] text-muted-foreground mt-0.5">
               Family <span className="font-mono">{family}</span> · owner {latest.owner_client_id || "—"} · latest {fmtDate(latest.created_at)}
+              {isFrozen && latest.signer_email && (
+                <> · signed by <span className="font-mono">{latest.signer_email}</span> via {latest.provider}</>
+              )}
             </p>
           </div>
           <Button variant="ghost" size="sm" onClick={() => setOpen((v) => !v)} className="h-7" data-testid={`toggle-${family}`}>

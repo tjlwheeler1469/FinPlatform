@@ -79,6 +79,22 @@ async def _persist(content: bytes, *, filename: str, mime: str,
                    family_key: Optional[str]) -> dict:
     now = datetime.now(timezone.utc)
     object_id = f"obj_{uuid.uuid4().hex}"
+
+    # If this family has been frozen by an e-signature event, refuse new
+    # versions — the document is signed and immutable.
+    if family_key:
+        frozen = await db[COL].find_one(
+            {"family_key": family_key, "is_frozen": True},
+            {"_id": 0, "family_key": 1, "frozen_at": 1, "envelope_id": 1},
+        )
+        if frozen:
+            raise HTTPException(
+                423,
+                f"document family '{family_key}' is frozen (signed at "
+                f"{frozen.get('frozen_at')}, envelope {frozen.get('envelope_id')}); "
+                f"new versions are not allowed",
+            )
+
     path = _disk_path(object_id, now)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(content)

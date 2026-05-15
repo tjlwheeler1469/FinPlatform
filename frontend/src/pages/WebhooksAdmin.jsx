@@ -4,7 +4,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import Layout from "@/components/Layout";
-import { PageShell, PillButton, Tile } from "@/components/PageShell";
+import { PageShell, PillButton, Tile, ChipFilter } from "@/components/PageShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -95,6 +95,10 @@ const WebhooksAdmin = () => {
   const totalFailure = subs.reduce((s, x) => s + (x.failure_count || 0), 0);
   const activeSubs = subs.filter((s) => s.active).length;
 
+  const [statusFilter, setStatusFilter] = useState("all");
+  const filteredEvents = events.filter((e) => statusFilter === "all" || e.status === statusFilter);
+  const eventCount = (s) => events.filter((e) => e.status === s).length;
+
   return (
     <Layout>
       <PageShell
@@ -114,6 +118,19 @@ const WebhooksAdmin = () => {
             <RefreshCw className="h-3.5 w-3.5 inline mr-1.5" /> Refresh
           </PillButton>
         )}
+        filters={events.length > 0 ? (
+          <ChipFilter
+            value={statusFilter}
+            onChange={setStatusFilter}
+            dataTestidPrefix="webhook-status"
+            options={[
+              { value: "all", label: "All", count: events.length },
+              { value: "delivered", label: "Delivered", count: eventCount("delivered") },
+              { value: "failed", label: "Failed", count: eventCount("failed") },
+              { value: "pending", label: "Pending", count: eventCount("pending") },
+            ]}
+          />
+        ) : null}
       >
         <div className="space-y-6" data-testid="webhooks-admin">
 
@@ -153,10 +170,10 @@ const WebhooksAdmin = () => {
         </Card>
 
         <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-base">Delivery log ({events.length})</CardTitle></CardHeader>
+          <CardHeader className="pb-2"><CardTitle className="text-base">Delivery log ({filteredEvents.length}{statusFilter !== "all" ? ` of ${events.length}` : ""})</CardTitle></CardHeader>
           <CardContent className="p-0">
-            {events.length === 0 && <p className="p-6 text-center text-xs text-muted-foreground">No webhook events yet. Subscriptions will populate this log on first delivery.</p>}
-            {events.map((e) => {
+            {filteredEvents.length === 0 && <p className="p-6 text-center text-xs text-muted-foreground">{statusFilter === "all" ? "No webhook events yet. Subscriptions will populate this log on first delivery." : `No ${statusFilter} events.`}</p>}
+            {filteredEvents.map((e) => {
               const meta = STATUS_META[e.status] || STATUS_META.pending;
               const Icon = meta.icon;
               return (

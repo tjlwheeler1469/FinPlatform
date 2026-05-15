@@ -8,7 +8,10 @@
 //    as a quick proxy, adviser refines on the client's Budget Reforms page)
 //  - Trust min-tax exposure for clients with discretionary trusts
 //  - Sort + filter + countdown banner
+//  - One-click outreach: draft email + .ics calendar invite for the
+//    "Pre-1 Jul 2027 sell window" cohort
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
 import Layout from "@/components/Layout";
 import { PageShell, ChipFilter, PillButton, Tile } from "@/components/PageShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,13 +19,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertTriangle, Home, Landmark, Calendar, FileText, Download, ExternalLink, Search } from "lucide-react";
+import { AlertTriangle, Home, Landmark, Calendar, FileText, Download, ExternalLink, Search, Mail, CalendarPlus, Send } from "lucide-react";
 import { CLIENT_DATA } from "@/data/clientData";
 import { fmtCurrencyCompact, fmtCurrencyFull } from "@/lib/inputBounds";
 import {
   calculateCGT, negativeGearingStatus,
   ANNOUNCEMENT_DATE, NG_REFORM_DATE, TRUST_REFORM_DATE,
 } from "@/lib/auTax";
+
+const API = process.env.REACT_APP_BACKEND_URL;
 
 const F = fmtCurrencyFull;
 const FS = fmtCurrencyCompact;
@@ -127,6 +132,126 @@ const BudgetExposureReport = () => {
   const sellWindowCount = exposures.filter((e) => e.sellWindowAlert).length;
   const totalAtRisk = exposures.reduce((s, e) => s + e.totalCgtSwing, 0);
 
+  // ----- Outreach helpers -----
+  // Format a date as YYYYMMDDTHHMMSSZ for .ics
+  const icsDate = (d) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+
+  const buildEmailBody = (e) => {
+    const daysToReform = daysUntil(NG_REFORM_DATE);
+    return [
+      `Hi ${e.name.split(" ")[0]},`,
+      "",
+      "I wanted to flag an urgent planning matter on your investment portfolio.",
+      "",
+      `The 2026-27 Federal Budget reforms come into effect on 1 July 2027 (${daysToReform} days away).`,
+      `You currently hold ${e.invPropCount} investment ${e.invPropCount === 1 ? "property" : "properties"} purchased after 12 May 2026 — these will transition out of the legacy 50% CGT discount on that date.`,
+      "",
+      `Our analysis suggests a CGT swing of approximately ${F(e.totalCgtSwing)} between selling before vs after the reform date.`,
+      "",
+      "I'd like to walk through three options together:",
+      "  1. Sell pre-1 Jul 2027 — secure the 50% CGT discount under the legacy regime.",
+      "  2. Hold past 1 Jul 2027 — pay tax under the new indexation + 30% min-tax regime.",
+      "  3. Restructure (e.g. trust transfer, family-trust election) before the window closes.",
+      "",
+      "Could we book a 30-minute review this week? I'll bring the modelling and refined cost-base data for each property.",
+      "",
+      "Best regards,",
+      "Your Adviser",
+    ].join("\n");
+  };
+
+  const buildICS = (e, when) => {
+    const dt = when || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // +7 days
+    dt.setHours(10, 0, 0, 0);
+    const end = new Date(dt.getTime() + 30 * 60 * 1000);
+    const uid = `budget-review-${e.id}-${Date.now()}@halcyon-wealth`;
+    return [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//Halcyon Wealth//Budget Reform Outreach//EN",
+      "BEGIN:VEVENT",
+      `UID:${uid}`,
+      `DTSTAMP:${icsDate(new Date())}`,
+      `DTSTART:${icsDate(dt)}`,
+      `DTEND:${icsDate(end)}`,
+      `SUMMARY:Budget Reform Review — ${e.name}`,
+      `DESCRIPTION:CGT swing ${F(e.totalCgtSwing)} on ${e.invPropCount} investment property/ies. Discuss sell-pre / sell-post / restructure options before the 1 July 2027 NG+CGT reform.`,
+      "LOCATION:Halcyon Wealth Adviser Suite",
+      "STATUS:TENTATIVE",
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ].join("\r\n");
+  };
+
+  const downloadICS = (e) => {
+    const blob = new Blob([buildICS(e)], { type: "text/calendar" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `budget-review-${e.name.replace(/\s+/g, "-").toLowerCase()}.ics`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Calendar invite downloaded", { description: `Open the .ics in Google/Outlook/Apple Calendar to schedule with ${e.name}.` });
+  };
+
+  const draftEmail = async (e) => {
+    try {
+      const r = await fetch(`${API}/api/notify/client`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          client_id: e.id,
+          client_name: e.name,
+          subject: `Urgent: 2026-27 Budget Reform impact on your portfolio — ${F(e.totalCgtSwing)} CGT swing`,
+          body: buildEmailBody(e),
+          actor: "budget-exposure-report",
+          source_item_id: "budget-reform-outreach",
+        }),
+      });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const out = await r.json();
+      const noteId = out.notification?.note_id || out.note_id;
+      const deliveryRef = out.notification?.delivery_ref || out.delivery_ref;
+      toast.success(`Email drafted for ${e.name}`, {
+        description: out.mode === "live" ? `Sent live via Resend (${deliveryRef || noteId}).` : `MOCKED — logged as ${noteId}. Set RESEND_API_KEY to send for real.`,
+        duration: 7000,
+      });
+    } catch (err) {
+      toast.error("Draft failed", { description: String(err).slice(0, 200) });
+    }
+  };
+
+  const bulkDraftSellWindow = async () => {
+    const cohort = exposures.filter((e) => e.sellWindowAlert);
+    if (cohort.length === 0) {
+      toast.info("No clients currently in the sell-window cohort.");
+      return;
+    }
+    toast.info(`Drafting ${cohort.length} outreach email${cohort.length === 1 ? "" : "s"}…`);
+    let ok = 0;
+    for (const e of cohort) {
+      try {
+        await fetch(`${API}/api/notify/client`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            client_id: e.id,
+            client_name: e.name,
+            subject: `Urgent: 2026-27 Budget Reform impact on your portfolio — ${F(e.totalCgtSwing)} CGT swing`,
+            body: buildEmailBody(e),
+            actor: "budget-exposure-report-bulk",
+            source_item_id: "budget-reform-bulk-outreach",
+          }),
+        });
+        ok++;
+      } catch (err) { /* keep going */ }
+    }
+    toast.success(`${ok}/${cohort.length} emails drafted`, {
+      description: "Track delivery on the Notifications log. Set RESEND_API_KEY to send live.",
+      duration: 8000,
+    });
+  };
+
   return (
     <Layout>
       <PageShell
@@ -141,6 +266,11 @@ const BudgetExposureReport = () => {
           { label: "Clients w/ trusts", value: String(exposures.filter((e) => e.hasTrust).length) },
           { label: "Active clients", value: String(exposures.length) },
         ]}
+        actions={sellWindowCount > 0 ? (
+          <PillButton variant="accent" onClick={bulkDraftSellWindow} data-testid="bulk-outreach-btn">
+            <Send className="h-3.5 w-3.5 inline mr-1.5" /> Draft {sellWindowCount} outreach email{sellWindowCount === 1 ? "" : "s"}
+          </PillButton>
+        ) : null}
         filters={(
           <div className="flex items-center gap-3 flex-wrap">
             <div className="flex items-center gap-2 border border-slate-300 rounded-full px-3 py-1.5 max-w-xs">
@@ -178,10 +308,18 @@ const BudgetExposureReport = () => {
               </div>
               <div className="space-y-2">
                 {exposures.filter((e) => e.sellWindowAlert).map((e) => (
-                  <div key={e.id} className="border border-rose-200 rounded-lg p-3 bg-rose-50/30">
-                    <div className="flex items-center justify-between mb-1">
+                  <div key={e.id} className="border border-rose-200 rounded-lg p-3 bg-rose-50/30" data-testid={`sell-window-row-${e.id}`}>
+                    <div className="flex items-center justify-between mb-1 gap-2 flex-wrap">
                       <p className="font-semibold text-[#1a2744]">{e.name}</p>
-                      <Badge variant="outline" className="text-[10px] bg-rose-100 text-rose-800 border-rose-300">CGT swing {F(e.totalCgtSwing)}</Badge>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <Badge variant="outline" className="text-[10px] bg-rose-100 text-rose-800 border-rose-300">CGT swing {F(e.totalCgtSwing)}</Badge>
+                        <PillButton variant="ghost" onClick={() => draftEmail(e)} className="text-[10px] py-1 px-3" data-testid={`email-${e.id}`}>
+                          <Mail className="h-3 w-3 inline mr-1" /> Email
+                        </PillButton>
+                        <PillButton variant="ghost" onClick={() => downloadICS(e)} className="text-[10px] py-1 px-3" data-testid={`ics-${e.id}`}>
+                          <CalendarPlus className="h-3 w-3 inline mr-1" /> Invite
+                        </PillButton>
+                      </div>
                     </div>
                     <p className="text-[11px] text-rose-700">
                       Holds {e.invPropCount} existing investment {e.invPropCount === 1 ? "property" : "properties"} purchased post-12-May-2026 with material unrealised gain. Selling before 1 July 2027 secures the 50% CGT discount; selling after triggers the new indexation + 30% min-tax regime.
@@ -229,9 +367,21 @@ const BudgetExposureReport = () => {
                       <td className="p-3 text-right">{e.hasTrust ? FS(e.trustMinTaxExposure) : "—"}</td>
                       <td className="p-3 text-center"><RiskPill score={e.riskScore} /></td>
                       <td className="p-3 text-center">
-                        <PillButton variant="ghost" onClick={() => { localStorage.setItem("selected_client", JSON.stringify({ id: e.id })); window.location.assign("/budget-reforms"); }} className="text-[10px] py-1 px-3" data-testid={`open-budget-${e.id}`}>
-                          <ExternalLink className="h-3 w-3 inline mr-0.5" /> Open
-                        </PillButton>
+                        <div className="flex items-center justify-center gap-1.5 flex-wrap">
+                          <PillButton variant="ghost" onClick={() => { localStorage.setItem("selected_client", JSON.stringify({ id: e.id })); window.location.assign("/budget-reforms"); }} className="text-[10px] py-1 px-3" data-testid={`open-budget-${e.id}`}>
+                            <ExternalLink className="h-3 w-3 inline mr-0.5" /> Open
+                          </PillButton>
+                          {e.sellWindowAlert && (
+                            <>
+                              <PillButton variant="ghost" onClick={() => draftEmail(e)} className="text-[10px] py-1 px-3" data-testid={`row-email-${e.id}`}>
+                                <Mail className="h-3 w-3 inline" />
+                              </PillButton>
+                              <PillButton variant="ghost" onClick={() => downloadICS(e)} className="text-[10px] py-1 px-3" data-testid={`row-ics-${e.id}`}>
+                                <CalendarPlus className="h-3 w-3 inline" />
+                              </PillButton>
+                            </>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );

@@ -6,7 +6,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
 import Layout from "@/components/Layout";
-import { PageShell, PillButton, Tile } from "@/components/PageShell";
+import { PageShell, PillButton, Tile, ChipFilter } from "@/components/PageShell";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -102,6 +102,10 @@ const ExecutionRails = () => {
   const completedCount = tickets.filter((t) => t.status === "completed").length;
   const liveAdapters = adapters.filter((a) => a.live).length;
 
+  const [statusFilter, setStatusFilter] = useState("all");
+  const filteredTickets = statusFilter === "all" ? tickets : tickets.filter((t) => t.status === statusFilter);
+  const ticketCount = (s) => tickets.filter((t) => t.status === s).length;
+
   return (
     <Layout>
       <PageShell
@@ -126,6 +130,20 @@ const ExecutionRails = () => {
             </PillButton>
           </>
         )}
+        filters={tickets.length > 0 ? (
+          <ChipFilter
+            value={statusFilter}
+            onChange={setStatusFilter}
+            dataTestidPrefix="ticket-status"
+            options={[
+              { value: "all", label: "All", count: tickets.length },
+              { value: "pending", label: "Pending", count: ticketCount("pending") },
+              { value: "executing", label: "Executing", count: ticketCount("executing") },
+              { value: "completed", label: "Completed", count: ticketCount("completed") },
+              { value: "failed", label: "Failed", count: ticketCount("failed") },
+            ]}
+          />
+        ) : null}
       >
         <div className="space-y-4" data-testid="execution-rails">
 
@@ -150,13 +168,13 @@ const ExecutionRails = () => {
           <CardContent className="p-0">
             <div className="p-4 border-b flex items-center gap-2">
               <Activity className="h-4 w-4 text-violet-600" />
-              <p className="text-sm font-semibold">Tickets ({tickets.length})</p>
+              <p className="text-sm font-semibold">Tickets ({filteredTickets.length}{statusFilter !== "all" ? ` of ${tickets.length}` : ""})</p>
             </div>
-            {tickets.length === 0 && (
-              <div className="p-8 text-center text-xs text-muted-foreground">No execution tickets yet. Click <strong>Seed demo ticket</strong> above.</div>
+            {filteredTickets.length === 0 && (
+              <div className="p-8 text-center text-xs text-muted-foreground">{statusFilter === "all" ? <>No execution tickets yet. Click <strong>Seed demo ticket</strong> above.</> : `No ${statusFilter} tickets.`}</div>
             )}
             <div className="divide-y">
-              {tickets.map((t) => (
+              {filteredTickets.map((t) => (
                 <div key={t.ticket_id} className="p-4" data-testid={`ticket-${t.ticket_id}`}>
                   <div className="flex items-start gap-4">
                     <div className="flex-1 min-w-0">

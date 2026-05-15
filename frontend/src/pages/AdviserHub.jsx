@@ -1,7 +1,7 @@
 import { useState, useEffect, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
-import { PageShell, PillButton } from "@/components/PageShell";
+import { PageShell, PillButton, ChipFilter } from "@/components/PageShell";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -239,19 +239,18 @@ const AdviserHub = () => {
                   data-testid="search-input"
                 />
               </div>
-              <div className="flex gap-1 bg-muted rounded-lg p-1 flex-shrink-0">
-                {["all", "active", "prospect", "review"].map((status) => (
-                  <Button
-                    key={status}
-                    variant={statusFilter === status ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => setStatusFilter(status)}
-                    className={statusFilter === status ? "bg-[#1a2744]" : ""}
-                    data-testid={`filter-${status}`}
-                  >
-                    {status === "all" ? "All" : status.charAt(0).toUpperCase() + status.slice(1)}
-                  </Button>
-                ))}
+              <div className="flex-shrink-0">
+                <ChipFilter
+                  value={statusFilter}
+                  onChange={setStatusFilter}
+                  dataTestidPrefix="filter"
+                  options={[
+                    { value: "all", label: "All", count: clients.length },
+                    { value: "active", label: "Active", count: clients.filter((c) => c.status === "active").length },
+                    { value: "prospect", label: "Prospect", count: clients.filter((c) => c.status === "prospect").length },
+                    { value: "review", label: "Review", count: clients.filter((c) => c.status === "review").length },
+                  ]}
+                />
               </div>
               <span className="text-xs text-muted-foreground ml-auto">
                 Showing <strong className="text-[#1a2744]">{filteredClients.length}</strong> of {clients.length}
