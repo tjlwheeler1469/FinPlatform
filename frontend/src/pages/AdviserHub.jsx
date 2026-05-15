@@ -1,6 +1,7 @@
 import { useState, useEffect, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
+import { PageShell, PillButton } from "@/components/PageShell";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -169,70 +170,25 @@ const AdviserHub = () => {
 
   return (
     <Layout>
+      <PageShell
+        eyebrow="PRACTICE"
+        title="Client hub"
+        accent={`${clients.length} households`}
+        subtitle="All client communications, compliance and e-signatures start here — one workspace for every relationship in your book."
+        meta={`${clients.filter((c) => c.status === "active").length} active · ${clients.filter((c) => c.status === "prospect").length} prospects · ${clients.filter((c) => c.status === "review").length} reviews due`}
+        metrics={[
+          { label: "Total AUM", value: formatCurrency(totalAUM) },
+          { label: "Active clients", value: String(clients.filter((c) => c.status === "active").length) },
+          { label: "Reviews due", value: String(clients.filter((c) => c.status === "review").length) },
+          { label: "Total accounts", value: String(totalAccounts) },
+        ]}
+        actions={(
+          <PillButton onClick={() => setShowClientModal(true)} data-testid="add-client-btn">
+            <Plus className="h-3.5 w-3.5 inline mr-1.5" /> New client
+          </PillButton>
+        )}
+      >
       <div className="space-y-6" data-testid="adviser-hub">
-        {/* Header */}
-        <div className="flex items-start justify-between gap-4 pb-1 border-b border-gray-100">
-          <div>
-            <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.15em] text-muted-foreground font-semibold">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#D4A84C]" />
-              Practice
-            </div>
-            <h1 className="text-3xl font-bold text-[#1a2744] mt-1">Client Hub</h1>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              {clients.length} households · all client communications, compliance and e-signatures start here
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              onClick={() => setShowClientModal(true)}
-              className="bg-[#1a2744] hover:bg-[#1a2744]/90 shadow-sm"
-              data-testid="add-client-btn"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              New Client
-            </Button>
-          </div>
-        </div>
-
-        {/* Summary Stats — compact ribbon */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-          <Card className="bg-gradient-to-br from-[#1a2744] to-[#2a3754] text-white border-0 shadow-sm">
-            <CardContent className="p-4">
-              <p className="text-[10px] uppercase tracking-wide text-white/60 font-medium">Total AUM</p>
-              <p className="text-2xl font-bold mt-0.5">{formatCurrency(totalAUM)}</p>
-              <p className="text-[10px] text-white/50 mt-1">Across {clients.length} households</p>
-            </CardContent>
-          </Card>
-          <Card className="border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-            <CardContent className="p-4">
-              <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-medium">Active Clients</p>
-              <p className="text-2xl font-bold mt-0.5 text-[#1a2744]">{clients.filter((c) => c.status === "active").length}</p>
-              <p className="text-[10px] text-emerald-600 mt-1">●︎ Engaged &amp; current</p>
-            </CardContent>
-          </Card>
-          <Card className="border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-            <CardContent className="p-4">
-              <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-medium">Prospects</p>
-              <p className="text-2xl font-bold mt-0.5 text-[#1a2744]">{clients.filter((c) => c.status === "prospect").length}</p>
-              <p className="text-[10px] text-blue-600 mt-1">◐ In pipeline</p>
-            </CardContent>
-          </Card>
-          <Card className="border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-            <CardContent className="p-4">
-              <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-medium">Reviews Due</p>
-              <p className="text-2xl font-bold mt-0.5 text-amber-600">{clients.filter((c) => c.status === "review").length}</p>
-              <p className="text-[10px] text-amber-600 mt-1">⚑ Action needed</p>
-            </CardContent>
-          </Card>
-          <Card className="border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-            <CardContent className="p-4">
-              <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-medium">Total Accounts</p>
-              <p className="text-2xl font-bold mt-0.5 text-[#1a2744]">{totalAccounts}</p>
-              <p className="text-[10px] text-muted-foreground mt-1">Linked custodians</p>
-            </CardContent>
-          </Card>
-        </div>
-
         {/* Tabs for different views */}
         <Tabs defaultValue="clients" className="space-y-4">
           <div className="overflow-x-auto">
@@ -547,6 +503,7 @@ const AdviserHub = () => {
           </TabsContent>
         </Tabs>
       </div>
+      </PageShell>
 
       {/* Client Create Modal */}
       <ClientModal

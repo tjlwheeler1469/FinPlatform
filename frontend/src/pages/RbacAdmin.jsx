@@ -1,6 +1,7 @@
 // RbacAdmin — permission matrix viewer + role switcher (demo).
 import { useState } from "react";
 import Layout from "@/components/Layout";
+import { PageShell, PillButton } from "@/components/PageShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -50,23 +51,32 @@ const RbacAdmin = () => {
   const { role: currentRole } = useRbac();
   const [showMatrix, setShowMatrix] = useState(true);
 
+  // Count permissions per role for the KPI cluster
+  const totalPerms = Object.keys(ROLE_MATRIX).length;
+  const permCounts = Object.fromEntries(
+    ROLES.map((r) => [r, Object.values(ROLE_MATRIX).filter((row) => row[r]).length])
+  );
+  const currentRolePerms = permCounts[currentRole] ?? 0;
+
   return (
     <Layout>
-      <div className="max-w-[1100px] mx-auto p-4 space-y-4" data-testid="rbac-admin">
-        <Card>
-          <CardContent className="p-4 flex items-center gap-3 flex-wrap">
-            <Shield className="h-6 w-6 text-[#1a2744]" />
-            <div className="flex-1">
-              <h1 className="text-xl font-bold text-[#1a2744]">Role-Based Access Control</h1>
-              <p className="text-xs text-muted-foreground">
-                Current session role: <strong className="text-[#1a2744]">{currentRole}</strong> · Permission matrix below mirrors backend `routes/rbac.py`.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+      <PageShell
+        eyebrow="ACCESS CONTROL"
+        title="Roles & permissions"
+        accent={currentRole}
+        subtitle="Granular role-based access across 4 roles and 22 permissions. Every gated action calls /api/rbac/audit-gate (success or denial) so the firm has a full server-side audit trail."
+        meta={`${totalPerms} total permissions · ${ROLES.length} roles · matrix mirrors backend routes/rbac.py`}
+        metrics={[
+          { label: "Principal", value: String(permCounts.principal ?? 0), hint: "max access" },
+          { label: "Adviser", value: String(permCounts.adviser ?? 0) },
+          { label: "Paraplanner", value: String(permCounts.paraplanner ?? 0) },
+          { label: "Client", value: String(permCounts.client ?? 0) },
+        ]}
+      >
+        <div className="space-y-4" data-testid="rbac-admin">
 
         <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><UserCog className="h-4 w-4" /> Demo: switch role</CardTitle></CardHeader>
+          <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><UserCog className="h-4 w-4" /> Demo: switch role · {currentRolePerms} of {totalPerms} permissions</CardTitle></CardHeader>
           <CardContent className="flex gap-2 pt-2 flex-wrap">
             {ROLES.map((r) => (
               <Button
@@ -126,7 +136,8 @@ const RbacAdmin = () => {
         <p className="text-[10px] text-muted-foreground italic text-center">
           Every gated action calls <code>/api/rbac/audit-gate</code> (success or denial) so the firm has a full server-side audit trail.
         </p>
-      </div>
+        </div>
+      </PageShell>
     </Layout>
   );
 };

@@ -6,6 +6,7 @@
 //  • Extensively validated calculations (unit-tested engine in @/lib/retirementEngine)
 import { useMemo, useState, useCallback } from "react";
 import Layout from "@/components/Layout";
+import { PageShell, PillButton } from "@/components/PageShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -321,26 +322,28 @@ const RetirementWorkshop = ({ embedded = false, clientId: propClientId }) => {
 
   const content = (
       <div className="space-y-6" data-testid="retirement-workshop-page">
-        {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-bold text-[#1a2744] flex items-center gap-2">
-              <Gauge className="h-6 w-6 text-[#D4A84C]" />
-              Retirement Workshop · {client.profile.name}
-            </h1>
-            <p className="text-xs text-muted-foreground mt-1">
-              Multi-scenario Monte Carlo analysis · {scenarios.length} scenario{scenarios.length !== 1 ? "s" : ""} · {results[0]?.numSims || 500} sims each
-            </p>
+        {/* Inline header — only when embedded as a tab. Standalone uses PageShell. */}
+        {embedded && (
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+            <div>
+              <h1 className="text-2xl font-bold text-[#1a2744] flex items-center gap-2">
+                <Gauge className="h-6 w-6 text-[#D4A84C]" />
+                Retirement Workshop · {client.profile.name}
+              </h1>
+              <p className="text-xs text-muted-foreground mt-1">
+                Multi-scenario Monte Carlo analysis · {scenarios.length} scenario{scenarios.length !== 1 ? "s" : ""} · {results[0]?.numSims || 500} sims each
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={resetAll} data-testid="reset-btn">
+                <RotateCcw className="h-3.5 w-3.5 mr-1.5" /> Reset
+              </Button>
+              <Button variant="outline" size="sm" onClick={addScenario} disabled={scenarios.length >= 10} data-testid="add-scenario-btn">
+                <Plus className="h-3.5 w-3.5 mr-1.5" /> Add Scenario
+              </Button>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={resetAll} data-testid="reset-btn">
-              <RotateCcw className="h-3.5 w-3.5 mr-1.5" /> Reset
-            </Button>
-            <Button variant="outline" size="sm" onClick={addScenario} disabled={scenarios.length >= 10} data-testid="add-scenario-btn">
-              <Plus className="h-3.5 w-3.5 mr-1.5" /> Add Scenario
-            </Button>
-          </div>
-        </div>
+        )}
 
         {/* Scenario Editors (side-by-side, horizontal-scrollable on narrow) */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" data-testid="scenario-grid">
@@ -501,7 +504,38 @@ const RetirementWorkshop = ({ embedded = false, clientId: propClientId }) => {
       </div>
   );
 
-  return embedded ? content : <Layout><div className="p-6">{content}</div></Layout>;
+  if (embedded) return content;
+
+  const baseConfidence = baseResult?.confidence ?? 0;
+  return (
+    <Layout>
+      <PageShell
+        eyebrow="WORKSHOP"
+        title="Retirement workshop"
+        accent={client.profile?.name}
+        subtitle={`Multi-scenario Monte Carlo analysis with P10 / P50 / P90 confidence bands — ${scenarios.length} scenario${scenarios.length !== 1 ? "s" : ""} · ${results[0]?.numSims || 500} sims each.`}
+        meta={`Confidence today: ${baseConfidence}% · ${client.retirement?.current_age ?? "—"} → ${client.retirement?.retirement_age ?? "—"} → ${client.retirement?.life_expectancy ?? "—"} y`}
+        metrics={[
+          { label: "Scenarios", value: String(scenarios.length) },
+          { label: "Confidence", value: `${baseConfidence}%` },
+          { label: "Portfolio @ retire", value: fmtShort(baseResult?.portfolioAtRetirement || 0) },
+          { label: "Sims / scenario", value: String(results[0]?.numSims || 500) },
+        ]}
+        actions={(
+          <>
+            <PillButton variant="ghost" onClick={resetAll} data-testid="reset-btn">
+              <RotateCcw className="h-3.5 w-3.5 inline mr-1.5" /> Reset
+            </PillButton>
+            <PillButton onClick={addScenario} data-testid="add-scenario-btn" disabled={scenarios.length >= 10}>
+              <Plus className="h-3.5 w-3.5 inline mr-1.5" /> Add scenario
+            </PillButton>
+          </>
+        )}
+      >
+        {content}
+      </PageShell>
+    </Layout>
+  );
 };
 
 export default RetirementWorkshop;

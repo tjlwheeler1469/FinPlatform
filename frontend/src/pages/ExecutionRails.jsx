@@ -6,6 +6,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
 import Layout from "@/components/Layout";
+import { PageShell, PillButton, Tile } from "@/components/PageShell";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -97,20 +98,36 @@ const ExecutionRails = () => {
     } catch {}
   };
 
+  const pendingCount = tickets.filter((t) => t.status === "pending").length;
+  const completedCount = tickets.filter((t) => t.status === "completed").length;
+  const liveAdapters = adapters.filter((a) => a.live).length;
+
   return (
     <Layout>
-      <div className="max-w-[1200px] mx-auto p-4 space-y-4" data-testid="execution-rails">
-        <Card>
-          <CardContent className="p-4 flex items-center gap-3">
-            <Rocket className="h-6 w-6 text-violet-600" />
-            <div className="flex-1">
-              <h1 className="text-xl font-bold text-[#1a2744]">Execution Rails</h1>
-              <p className="text-xs text-muted-foreground">Route advice tickets through broker / super / insurance / contribution adapters. Each dispatch is audit-logged.</p>
-            </div>
-            <Button variant="outline" size="sm" onClick={seedDemoTicket} data-testid="rails-seed-demo"><Zap className="h-3.5 w-3.5 mr-1" /> Seed demo ticket</Button>
-            <Button variant="outline" size="sm" onClick={refresh} data-testid="rails-refresh"><RefreshCw className="h-3.5 w-3.5 mr-1" /> Refresh</Button>
-          </CardContent>
-        </Card>
+      <PageShell
+        eyebrow="RAILS"
+        title="Execution rails"
+        accent={pendingCount ? `${pendingCount} pending` : null}
+        subtitle="Route advice tickets through broker, super, insurance, contribution and rebalance adapters. Each dispatch is audit-logged for compliance replay."
+        meta={`${adapters.length} adapters registered · ${liveAdapters} live · ${tickets.length} tickets in flight`}
+        metrics={[
+          { label: "Pending", value: String(pendingCount) },
+          { label: "Completed", value: String(completedCount) },
+          { label: "Live adapters", value: `${liveAdapters} / ${adapters.length}` },
+          { label: "Total tickets", value: String(tickets.length) },
+        ]}
+        actions={(
+          <>
+            <PillButton variant="ghost" onClick={refresh} data-testid="rails-refresh">
+              <RefreshCw className="h-3.5 w-3.5 inline mr-1.5" /> Refresh
+            </PillButton>
+            <PillButton onClick={seedDemoTicket} data-testid="rails-seed-demo">
+              <Zap className="h-3.5 w-3.5 inline mr-1.5" /> Seed demo ticket
+            </PillButton>
+          </>
+        )}
+      >
+        <div className="space-y-4" data-testid="execution-rails">
 
         <Card>
           <CardContent className="p-4">
@@ -177,7 +194,8 @@ const ExecutionRails = () => {
             </div>
           </CardContent>
         </Card>
-      </div>
+        </div>
+      </PageShell>
     </Layout>
   );
 };

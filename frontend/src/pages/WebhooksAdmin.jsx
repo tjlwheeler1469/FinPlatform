@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import Layout from "@/components/Layout";
+import { PageShell, PillButton, Tile } from "@/components/PageShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -90,19 +91,31 @@ const WebhooksAdmin = () => {
     setTimeout(refresh, 800);
   };
 
+  const totalSuccess = subs.reduce((s, x) => s + (x.success_count || 0), 0);
+  const totalFailure = subs.reduce((s, x) => s + (x.failure_count || 0), 0);
+  const activeSubs = subs.filter((s) => s.active).length;
+
   return (
     <Layout>
-      <div className="max-w-[1200px] mx-auto p-4 space-y-4" data-testid="webhooks-admin">
-        <Card>
-          <CardContent className="p-4 flex items-center gap-3">
-            <Cable className="h-6 w-6 text-[#1a2744]" />
-            <div className="flex-1">
-              <h1 className="text-xl font-bold text-[#1a2744]">Outbound Webhooks</h1>
-              <p className="text-xs text-muted-foreground">Fan-out platform events to Slack, Zapier, your audit warehouse, etc. Every POST is HMAC-SHA256 signed.</p>
-            </div>
-            <Button variant="outline" size="sm" onClick={refresh} data-testid="webhook-refresh"><RefreshCw className="h-3.5 w-3.5 mr-1" /> Refresh</Button>
-          </CardContent>
-        </Card>
+      <PageShell
+        eyebrow="AUTOMATION"
+        title="Outbound webhooks"
+        accent={subs.length ? `${activeSubs} active` : null}
+        subtitle="Fan-out platform events to Slack, Zapier, your audit warehouse — every POST HMAC-SHA256 signed (X-Halcyon-Signature) with full delivery log + manual retry."
+        meta={`${subs.length} subscriptions · ${events.length} recent deliveries · ${validTypes.length} event types supported`}
+        metrics={[
+          { label: "Active subs", value: String(activeSubs) },
+          { label: "Delivered", value: String(totalSuccess) },
+          { label: "Failed", value: String(totalFailure) },
+          { label: "Recent events", value: String(events.length) },
+        ]}
+        actions={(
+          <PillButton variant="ghost" onClick={refresh} data-testid="webhook-refresh">
+            <RefreshCw className="h-3.5 w-3.5 inline mr-1.5" /> Refresh
+          </PillButton>
+        )}
+      >
+        <div className="space-y-6" data-testid="webhooks-admin">
 
         <Card>
           <CardHeader className="pb-2">
@@ -162,7 +175,8 @@ const WebhooksAdmin = () => {
             })}
           </CardContent>
         </Card>
-      </div>
+        </div>
+      </PageShell>
     </Layout>
   );
 };

@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import Layout from "@/components/Layout";
+import { PageShell, ChipFilter, PillButton, Tile } from "@/components/PageShell";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -141,42 +142,65 @@ const VaultDocuments = () => {
 
   return (
     <Layout>
-      <div className="max-w-[1200px] mx-auto p-4 space-y-4" data-testid="vault-documents">
-        <Card>
-          <CardContent className="p-4 flex items-center gap-3 flex-wrap">
-            <FolderLock className="h-6 w-6 text-[#1a2744]" />
-            <div className="flex-1">
-              <h1 className="text-xl font-bold text-[#1a2744]">Document Vault</h1>
-              <p className="text-xs text-muted-foreground">
-                {usage?.total_count ?? 0} documents · {usage?.latest_count ?? 0} latest versions · {fmtBytes(usage?.total_bytes ?? 0)} on disk
-                <span className="ml-2 font-mono text-[10px]">{usage?.storage_root}</span>
-              </p>
+      <PageShell
+        eyebrow="VAULT"
+        title="Document vault"
+        accent={usage?.latest_count ? `${usage.latest_count} families` : null}
+        subtitle="Every SOA, ROA and Implementation Pack persisted to local disk with full version chain — restore any previous version with one click."
+        meta={`${fmtBytes(usage?.total_bytes ?? 0)} on disk · ${usage?.total_count ?? 0} total documents`}
+        metrics={[
+          { label: "Documents", value: String(usage?.total_count ?? 0) },
+          { label: "Latest versions", value: String(usage?.latest_count ?? 0) },
+          { label: "On disk", value: fmtBytes(usage?.total_bytes ?? 0) },
+          { label: "Storage", value: "Local disk", hint: usage?.storage_root || "/data/object_storage" },
+        ]}
+        actions={(
+          <PillButton variant="ghost" onClick={refresh} data-testid="vault-refresh">
+            <RefreshCw className="h-3.5 w-3.5 inline mr-1.5" /> Refresh
+          </PillButton>
+        )}
+        filters={(
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex items-center gap-2 border border-slate-300 rounded-full px-3 py-1.5 max-w-xs">
+              <Search className="h-3.5 w-3.5 text-slate-400" />
+              <input
+                placeholder="Filename, owner or family…"
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                className="bg-transparent text-[12px] focus:outline-none w-full"
+                data-testid="vault-search"
+              />
             </div>
-            <Button variant="outline" size="sm" onClick={refresh} data-testid="vault-refresh"><RefreshCw className="h-3.5 w-3.5 mr-1" /> Refresh</Button>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-3 flex items-center gap-3 flex-wrap">
-            <Search className="h-4 w-4 text-slate-400" />
-            <Input placeholder="Search filename, owner or family…" value={filter} onChange={(e) => setFilter(e.target.value)} className="max-w-xs h-8" data-testid="vault-search" />
-            <Input placeholder="Tag filter (e.g. soa)" value={tagFilter} onChange={(e) => setTagFilter(e.target.value)} className="max-w-[180px] h-8" data-testid="vault-tag" />
-            <Button variant={showAllVersions ? "default" : "outline"} size="sm" onClick={() => setShowAllVersions((v) => !v)} data-testid="vault-toggle-versions">
-              <Layers className="h-3.5 w-3.5 mr-1" /> {showAllVersions ? "Showing all versions" : "Latest only"}
-            </Button>
-            <span className="text-[11px] text-muted-foreground ml-auto"><HardDrive className="h-3 w-3 inline mr-1" />local persistent disk</span>
-          </CardContent>
-        </Card>
-
-        <div className="space-y-2">
+            <div className="flex items-center gap-2 border border-slate-300 rounded-full px-3 py-1.5 max-w-[200px]">
+              <TagIcon className="h-3.5 w-3.5 text-slate-400" />
+              <input
+                placeholder="Tag (e.g. soa)"
+                value={tagFilter}
+                onChange={(e) => setTagFilter(e.target.value)}
+                className="bg-transparent text-[12px] focus:outline-none w-full"
+                data-testid="vault-tag"
+              />
+            </div>
+            <PillButton
+              variant={showAllVersions ? "primary" : "ghost"}
+              onClick={() => setShowAllVersions((v) => !v)}
+              data-testid="vault-toggle-versions"
+            >
+              <Layers className="h-3.5 w-3.5 inline mr-1.5" /> {showAllVersions ? "All versions" : "Latest only"}
+            </PillButton>
+            <span className="text-[10px] text-slate-400 ml-auto"><HardDrive className="h-3 w-3 inline mr-1" />local persistent disk</span>
+          </div>
+        )}
+      >
+        <div className="space-y-2" data-testid="vault-documents">
           {Object.entries(families).length === 0 && (
-            <Card><CardContent className="p-10 text-center text-sm text-muted-foreground">
+            <Tile className="text-center py-12 text-sm text-slate-500">
               No documents in the Vault yet. Generate an Implementation Pack from the SOA / ROA builder — its PDF will land here automatically.
-            </CardContent></Card>
+            </Tile>
           )}
           {Object.entries(families).map(([fk, objs]) => <FamilyCard key={fk} family={fk} objects={objs} onRefresh={refresh} />)}
         </div>
-      </div>
+      </PageShell>
     </Layout>
   );
 };

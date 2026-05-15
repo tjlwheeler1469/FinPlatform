@@ -1,0 +1,49 @@
+{
+  "summary": "Iter 206: Validated the PageShell (Truth Journey aesthetic) rollout across 8 main pages — /deals, /budget-exposure, /vault-documents, /webhooks-admin, /rbac-admin, /execution-rails, /adviser-hub, /retirement-workshop. All 8 pages render data-testid='page-shell', correct hero titles, gold (#D4A84C) accent text, exactly 4 KPI metrics in the top-right cluster, pill-shaped CTAs, navy (#1a2744) branding preserved. RetirementWorkshop standalone wraps in PageShell; embedded mode (used in /client/:id retirement tab and RetirementHub) returns plain content — verified in source (line 507: `if (embedded) return content;`). No 500/blank screens on regression (/ and /dashboard load Retirement Control Center). 100% pass on visual integrity criteria.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "RbacAdmin", "issue": "React console warning: 'Each child in a list should have a unique key prop' — caused by bare <>...</> Fragment at line 115 inside PERMISSIONS.map. Should be <React.Fragment key={group}>. Non-breaking but pollutes console.", "selector": "/app/frontend/src/pages/RbacAdmin.jsx:115", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "/retirement-workshop", "issues": ["PageShell metrics use data-testid='metric-confidence', and inner scenario cards also expose a 'CONFIDENCE' badge with the same testid pattern (10 elements match metric-* on this page vs. 4 expected). Not a visual bug — just a testid collision that may confuse future automation. Suggest namespacing scenario-card metrics differently."]}
+    ]
+  },
+  "page_shell_validation_matrix": {
+    "/deals": {"shell": true, "title": "Deals pipeline + '4 active' gold accent", "metrics": ["Draft","In review","Signed + executed","Pipeline $"], "chip_filter": true, "pills": 10, "gold_accent": true},
+    "/budget-exposure": {"shell": true, "title": "Budget reform exposure + 'portfolio-wide' gold accent", "metrics": ["Sell-window alerts","Total CGT swing","Clients w/ trusts","Active clients"], "chip_filter": true, "pills": 12, "gold_accent": true},
+    "/vault-documents": {"shell": true, "title": "Document vault + '2 families' gold accent", "metrics": ["Documents","Latest versions","On disk","Storage"], "chip_filter": false, "pills": 3, "gold_accent": true, "note": "search + tag inputs visible inline; chip filter not used here which matches request"},
+    "/webhooks-admin": {"shell": true, "title": "Outbound webhooks + '1 active' gold accent", "metrics": ["Active subs","Delivered","Failed","Recent events"], "pills": 3, "gold_accent": true},
+    "/rbac-admin": {"shell": true, "title": "Roles & permissions + 'adviser' gold accent", "metrics": ["Principal","Adviser","Paraplanner","Client"], "pills": 1, "gold_accent": true},
+    "/execution-rails": {"shell": true, "title": "Execution rails + '20 pending' gold accent", "metrics": ["Pending","Completed","Live adapters","Total tickets"], "pills": 3, "gold_accent": true},
+    "/adviser-hub": {"shell": true, "title": "Client hub + '8 households' gold accent", "metrics": ["Total AUM ($93.33M)","Active clients (6)","Reviews due (1)","Total accounts (36)"], "pills": 2, "gold_accent": true, "note": "All 7 tabs (All Clients/Portfolio/Activity/Segments/Comms/SOA-ROA/E-Sign) preserved; client cards grid with 8 households rendered correctly."},
+    "/retirement-workshop": {"shell": true, "title": "Retirement workshop + 'David & Sarah Thompson' gold accent", "metrics": ["Scenarios (2)","Confidence (100%)","Portfolio @ retire ($12.20M)","Sims / scenario (500)"], "pills": 3, "gold_accent": true, "note": "Standalone mode wraps in PageShell; embedded mode (RetirementHub.jsx:95, Client360View.jsx:94) passes embedded=true → returns plain content without PageShell wrapper. Verified in source line 507."}
+  },
+  "regression_check": {
+    "/": "OK — h1='Retirement Control Center', body 4794 chars",
+    "/dashboard": "OK — same dashboard, no errors",
+    "/vault, /webhooks, /rbac": "These short paths from the request do NOT exist as routes; actual routes are /vault-documents, /webhooks-admin, /rbac-admin. Unknown paths render empty body (no 404 fallback). Pre-existing, not introduced by this iteration."
+  },
+  "test_report_links": [],
+  "action_items": [
+    "RbacAdmin.jsx line 115: replace <> with <React.Fragment key={group}> inside PERMISSIONS.map to silence React key warning.",
+    "RetirementWorkshop scenario cards: rename inner 'metric-confidence' testid (or wrap in scenario-card scope like data-testid='scenario-metric-confidence') so it doesn't collide with PageShell's metric-confidence in test selectors.",
+    "Optional UX consistency: consider adding a chip filter on /webhooks-admin (active/disabled subs), /execution-rails (pending/completed), and /adviser-hub (segment chips) to fully match the Truth Journey aesthetic which encourages chip filters as the primary in-page navigator. Currently only /deals and /budget-exposure expose them.",
+    "Route naming discrepancy with the original request (request said /vault, /webhooks, /rbac — App actually serves /vault-documents, /webhooks-admin, /rbac-admin). Either add redirects or update routing docs."
+  ],
+  "critical_code_review_comments": [
+    "PageShell.jsx generates metric testids from label text (toLowerCase + replace spaces with dashes). Special characters like '/' in 'Sims / scenario' produce 'metric-sims-/-scenario' — illegal-ish but works. Consider stripping non-alphanumerics.",
+    "RbacAdmin.jsx:115 — React.Fragment without key inside .map causes console warning on every render.",
+    "RetirementWorkshop.jsx standalone block (lines 510-538) duplicates the eyebrow/title/metrics/actions definition that already exists for the embedded inline header (lines 326-…). Could extract into a shared meta object to keep both paths in sync (DRY).",
+    "PageShell uses inline color literal '#D4A84C' / '#1a2744' in multiple components — already centralised in tailwind config? Verify tailwind theme tokens are used to avoid drift."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a (frontend-only test)", "frontend": "100% on PageShell rollout, 1 minor console warning"},
+  "test_credentials": "localStorage wealth_command_compliance_v5='permanent', app_mode='adviser' (set via add_init_script)",
+  "seed_data_creation": "None — only read-only navigation",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "PageShell rollout fully verified on 8 routes. All show data-testid='page-shell', data-testid='page-title' with gold accent <span>, 4 metric-* testids in cluster, navy/gold branding intact. Embedded RetirementWorkshop confirmed not wrapping in PageShell (source line 507). Only outstanding: (1) React key warning on RbacAdmin line 115 (cosmetic), (2) metric testid collision on /retirement-workshop scenario cards. Routes /vault, /webhooks, /rbac in the original request do NOT exist; correct routes are /vault-documents, /webhooks-admin, /rbac-admin.",
+  "rca of the issue": "N/A — no functional bugs. Single console warning RCA: RbacAdmin renders a <>...</> fragment as the direct child of PERMISSIONS.map((..)=>...), violating React's list-key requirement. Fix: change <> to <React.Fragment key={group}> and drop the redundant key={group} from the inner <tr>."
+}
