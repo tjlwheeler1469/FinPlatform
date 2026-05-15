@@ -1,5 +1,5 @@
 // RbacAdmin — permission matrix viewer + role switcher (demo).
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import Layout from "@/components/Layout";
 import { PageShell, PillButton } from "@/components/PageShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -112,8 +112,8 @@ const RbacAdmin = () => {
               </thead>
               <tbody>
                 {PERMISSIONS.map(([group, perms]) => (
-                  <>
-                    <tr key={group} className="bg-slate-100 border-t">
+                  <Fragment key={group}>
+                    <tr className="bg-slate-100 border-t">
                       <td colSpan={5} className="px-3 py-1.5 text-[10px] uppercase tracking-wide font-bold text-slate-600">{group}</td>
                     </tr>
                     {perms.map((p) => (
@@ -126,7 +126,7 @@ const RbacAdmin = () => {
                         ))}
                       </tr>
                     ))}
-                  </>
+                  </Fragment>
                 ))}
               </tbody>
             </table>

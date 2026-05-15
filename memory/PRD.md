@@ -1,3 +1,11 @@
+## Feb 2026 — Truth Journey UI Aesthetic — Full Rollout (Iter 206)
+- `PageShell.jsx` adopted across 8 main pages (DealsPipeline, BudgetExposureReport, VaultDocuments, WebhooksAdmin, RbacAdmin, ExecutionRails, AdviserHub, RetirementWorkshop). Every page now has airy serif hero typography, gold-accent on the key noun, KPI cluster top-right with 4 metrics, pill-shaped CTAs, optional chip filters. Navy/gold branding preserved; content untouched.
+- RetirementWorkshop embedded path explicitly excluded so it stays clean inside Client360 / RetirementHub tabs.
+- Fixes applied post-test: React Fragment key warning (RbacAdmin), testid collision (RetirementWorkshop scenario cards).
+- Testing agent iter 206: 100% pass on visual integrity across all 8 routes.
+
+
+
 ## April 2026 — Phase C + D + Version restore (Webhooks, Server-side PDF, RBAC)
 ### Phase C — Workflow automation
 - **Outbound webhooks** (`routes/webhooks.py` + `/api/webhooks/*`): subscription model (event_type, target_url, secret, active, success/failure counters). Every delivery HMAC-SHA256 signed (`X-Halcyon-Signature`). Full delivery log + manual retry. Auto-fired by `routes/deals.py` on `deal.created`, `deal.stage_changed`, `deal.signed`, `deal.executed`.

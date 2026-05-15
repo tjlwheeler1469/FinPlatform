@@ -131,13 +131,13 @@ const ScenarioEditor = ({ scenario, onChange, onRemove, isBase, color, result, b
       <CardContent className="space-y-4">
         {/* Confidence Summary */}
         <div className="grid grid-cols-3 gap-3 text-center p-3 rounded-md" style={{ backgroundColor: `${color}08` }} data-testid={`scenario-metrics-${scenario.id}`}>
-          <div data-testid={`metric-confidence-${scenario.id}`}>
+          <div data-testid={`scenario-metric-confidence-${scenario.id}`}>
             <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Confidence</p>
             <p className="text-2xl font-bold" style={{ color: result.confidence >= 80 ? "#10b981" : result.confidence >= 60 ? "#3b82f6" : "#f59e0b" }}>
               {result.confidence}%
             </p>
           </div>
-          <div data-testid={`metric-at-retirement-${scenario.id}`}>
+          <div data-testid={`scenario-metric-at-retirement-${scenario.id}`}>
             <p className="text-[10px] text-muted-foreground uppercase tracking-wide">At Retirement</p>
             <p className="text-lg font-bold" style={{ color }}>{fmtShort(result.portfolioAtRetirement)}</p>
             {!isBase && deltaPortfolio !== 0 && (
@@ -146,7 +146,7 @@ const ScenarioEditor = ({ scenario, onChange, onRemove, isBase, color, result, b
               </p>
             )}
           </div>
-          <div data-testid={`metric-p10-${scenario.id}`}>
+          <div data-testid={`scenario-metric-p10-${scenario.id}`}>
             <p className="text-[10px] text-muted-foreground uppercase tracking-wide">P10 Balance</p>
             <p className="text-lg font-bold text-rose-600">{fmtShort(result.p10AtLifeEnd)}</p>
           </div>

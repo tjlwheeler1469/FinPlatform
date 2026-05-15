@@ -1,3 +1,20 @@
+## Feb 2026 — UI/UX unification (Truth Journey aesthetic rollout — Iter 206)
+- **PageShell rolled out across 8 main pages** to deliver a unified airy, navy/gold design system:
+  - `/deals` (DealsPipeline.jsx)
+  - `/budget-exposure` (BudgetExposureReport.jsx)
+  - `/vault-documents` (VaultDocuments.jsx)
+  - `/webhooks-admin` (WebhooksAdmin.jsx)
+  - `/rbac-admin` (RbacAdmin.jsx)
+  - `/execution-rails` (ExecutionRails.jsx)
+  - `/adviser-hub` (AdviserHub.jsx)
+  - `/retirement-workshop` (RetirementWorkshop.jsx — standalone only; embedded path preserved as plain content for use inside Client360 / RetirementHub tabs).
+- Every shell page now exposes `[data-testid="page-shell"]`, large serif hero typography (text-3xl/4xl/5xl), gold (#D4A84C) accent on the key noun in the title, KPI cluster top-right with 4 inline metrics, pill-shaped CTAs (PillButton) and (where applicable) chip-filter pills (ChipFilter). Navy (#1a2744) branding and ALL existing content preserved.
+- Fixed React Fragment key warning in `RbacAdmin.jsx` (use `<Fragment key={group}>` instead of bare `<>`).
+- Renamed RetirementWorkshop scenario-card metric testids from `metric-*-{id}` to `scenario-metric-*-{id}` to avoid collision with PageShell's `metric-*` cluster.
+- Testing agent iter 206 verdict: **100% pass on visual integrity criteria across all 8 routes, no regressions on `/` or `/dashboard`.**
+
+
+
 ## Calculation Stress Test (22 April 2026) — Iteration 203
 
 **Scope:** All calculators across Adviser Mode → Client Overview tabs (Overview, Goals, Retirement & Super, Investments, Budget, Tax) plus standalone calculator pages.
