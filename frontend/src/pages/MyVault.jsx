@@ -1,21 +1,33 @@
 // My Vault — read-only secure document store for the end-client.
-// Shows meeting notes + signed compliance documents (SOA, ROA, FSG, FDS etc).
-// Data source: same `listVault` from commsLedger.js used by the adviser's vault.
-import { useEffect, useMemo, useState } from "react";
+// Source of truth is the SAME backend object storage as the adviser's Vault:
+// `/api/files/search?client_id={id}&only_latest=true` returns the latest
+// version of every document family owned by the active client.
+//
+// We deliberately use a read-only stance — no upload, no version restore,
+// no delete buttons. Download is the only action.
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FolderLock, Download, FileSignature, FileText, Search, Lock, Calendar as CalendarIcon, Shield } from "lucide-react";
-import { listVault, listEvents } from "@/lib/commsLedger";
+import { FolderLock, Download, FileSignature, FileText, Search, Lock, Calendar as CalendarIcon, Shield, RefreshCw, Layers, Tag as TagIcon } from "lucide-react";
 import { CLIENT_DATA, getActiveClientId } from "@/data/clientData";
 import { toast } from "sonner";
 
-const fmt = (iso) => iso ? new Date(iso).toLocaleDateString("en-AU", { day: "2-digit", month: "short", year: "numeric" }) : "—";
+const API = process.env.REACT_APP_BACKEND_URL;
 
-// Mock meeting-notes log — in production this would come from the CRM
+const fmt = (iso) => iso ? new Date(iso).toLocaleDateString("en-AU", { day: "2-digit", month: "short", year: "numeric" }) : "—";
+const fmtBytes = (n) => {
+  if (!Number.isFinite(n)) return "—";
+  if (n >= 1e9) return `${(n / 1e9).toFixed(1)} GB`;
+  if (n >= 1e6) return `${(n / 1e6).toFixed(1)} MB`;
+  if (n >= 1e3) return `${(n / 1e3).toFixed(0)} KB`;
+  return `${n} B`;
+};
+
+// Mock meeting-notes log — adviser-curated, stays as-is for now.
 const MOCK_MEETING_NOTES = (clientId) => [
   { id: "mn_1", title: "Annual Strategy Review 2026", date: "2026-03-18", summary: "Reviewed portfolio rebalancing, super contribution strategy and estate planning updates.", attendees: "David Thompson, Sarah Thompson, Sarah Chen (Adviser)", recordingAvailable: true },
   { id: "mn_2", title: "Q4 2025 Portfolio Review", date: "2025-12-10", summary: "Discussed Q4 performance (+9.4% YTD), agreed to rotate 5% from property into Australian equities.", attendees: "David Thompson, Sarah Chen", recordingAvailable: true },
@@ -26,41 +38,48 @@ const MOCK_MEETING_NOTES = (clientId) => [
 const MyVault = () => {
   const clientId = getActiveClientId();
   const client = CLIENT_DATA[clientId] || CLIENT_DATA.thompson_family;
-  const [tick, setTick] = useState(0);
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState("all");
+  const [tagFilter, setTagFilter] = useState("all");
+  const [docs, setDocs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const refresh = () => setTick((t) => t + 1);
-    window.addEventListener("comms-ledger-changed", refresh);
-    window.addEventListener("storage", refresh);
-    return () => {
-      window.removeEventListener("comms-ledger-changed", refresh);
-      window.removeEventListener("storage", refresh);
-    };
-  }, []);
+  const refresh = useCallback(async () => {
+    setLoading(true);
+    try {
+      const url = new URL(`${API}/api/files/search`);
+      url.searchParams.set("client_id", clientId);
+      url.searchParams.set("only_latest", "true");
+      url.searchParams.set("limit", "200");
+      const r = await fetch(url.toString());
+      const data = await r.json();
+      setDocs(data.objects || []);
+    } catch (e) {
+      toast.error("Failed to load Vault", { description: String(e).slice(0, 200) });
+    } finally {
+      setLoading(false);
+    }
+  }, [clientId]);
 
-  const signedFiles = useMemo(() => listVault(clientId), [clientId, tick]);
-  const events = useMemo(() => listEvents(clientId), [clientId, tick]);
+  useEffect(() => { refresh(); }, [refresh]);
+
   const meetingNotes = useMemo(() => MOCK_MEETING_NOTES(clientId), [clientId]);
 
-  const filteredFiles = signedFiles.filter((f) =>
-    (filter === "all" || f.docType === filter) &&
-    (!search || f.name.toLowerCase().includes(search.toLowerCase()) || (f.docType || "").toLowerCase().includes(search.toLowerCase()))
-  );
+  const allTags = useMemo(() => Array.from(new Set(docs.flatMap((d) => d.tags || []))).filter(Boolean), [docs]);
 
-  const download = (f) => {
-    const blob = new Blob([
-      `HALCYON WEALTH — SECURE DOCUMENT VAULT\n\n` +
-      `Document: ${f.docName}\nType: ${f.docType}\nSigned by: ${f.signedBy}\nSigned at: ${fmt(f.addedAt)}\nSignature hash: ${f.signatureHash}\n\n--- MOCK DOCUMENT ---`
-    ], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a"); a.href = url; a.download = f.name; a.click();
-    URL.revokeObjectURL(url);
-    toast.success("Downloaded");
-  };
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase().trim();
+    return docs.filter((d) => {
+      const matchesTag = tagFilter === "all" || (d.tags || []).includes(tagFilter);
+      const matchesSearch =
+        !q ||
+        (d.filename || "").toLowerCase().includes(q) ||
+        (d.family_key || "").toLowerCase().includes(q) ||
+        (d.tags || []).some((t) => t.toLowerCase().includes(q));
+      return matchesTag && matchesSearch;
+    });
+  }, [docs, search, tagFilter]);
 
-  const docTypes = Array.from(new Set(signedFiles.map((f) => f.docType))).filter(Boolean);
+  const signedCount = docs.filter((d) => d.is_frozen).length;
 
   return (
     <Layout>
@@ -74,64 +93,87 @@ const MyVault = () => {
             <FolderLock className="h-7 w-7 text-[#D4A84C]" /> My Vault
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Secure storage for meeting notes, signed SOAs/ROAs/FSGs and compliance documents · 7-year retention · encrypted at rest
+            Secure storage for meeting notes, signed SOAs/ROAs/FSGs and compliance documents · synced live with your adviser · encrypted at rest
           </p>
         </div>
 
         {/* Stat ribbon */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <Card><CardContent className="p-4"><p className="text-[10px] uppercase tracking-wide text-muted-foreground">Signed Documents</p><p className="text-2xl font-bold text-[#1a2744]" data-testid="vault-signed-count">{signedFiles.length}</p></CardContent></Card>
+          <Card><CardContent className="p-4"><p className="text-[10px] uppercase tracking-wide text-muted-foreground">Documents</p><p className="text-2xl font-bold text-[#1a2744]" data-testid="vault-doc-count">{docs.length}</p></CardContent></Card>
+          <Card><CardContent className="p-4"><p className="text-[10px] uppercase tracking-wide text-muted-foreground">Signed &amp; Frozen</p><p className="text-2xl font-bold text-[#1a2744]" data-testid="vault-signed-count">{signedCount}</p></CardContent></Card>
           <Card><CardContent className="p-4"><p className="text-[10px] uppercase tracking-wide text-muted-foreground">Meeting Notes</p><p className="text-2xl font-bold text-[#1a2744]" data-testid="vault-meetings-count">{meetingNotes.length}</p></CardContent></Card>
-          <Card><CardContent className="p-4"><p className="text-[10px] uppercase tracking-wide text-muted-foreground">Document Types</p><p className="text-2xl font-bold text-[#1a2744]">{docTypes.length}</p></CardContent></Card>
           <Card className="bg-gradient-to-br from-[#1a2744] to-[#2a3754] text-white border-0"><CardContent className="p-4"><p className="text-[10px] uppercase tracking-wide text-white/60">Security</p><p className="text-base font-bold mt-0.5 flex items-center gap-1.5"><Shield className="h-4 w-4 text-[#D4A84C]" /> AES-256</p><p className="text-[10px] text-white/50 mt-1">Encrypted at rest</p></CardContent></Card>
         </div>
 
-        <Tabs defaultValue="signed">
+        <Tabs defaultValue="docs">
           <TabsList className="bg-white border h-10 w-full justify-start">
-            <TabsTrigger value="signed" className="gap-1.5" data-testid="vault-tab-signed"><FileSignature className="h-3.5 w-3.5" /> Signed Documents</TabsTrigger>
+            <TabsTrigger value="docs" className="gap-1.5" data-testid="vault-tab-docs"><FileSignature className="h-3.5 w-3.5" /> Documents</TabsTrigger>
             <TabsTrigger value="meetings" className="gap-1.5" data-testid="vault-tab-meetings"><CalendarIcon className="h-3.5 w-3.5" /> Meeting Notes</TabsTrigger>
-            <TabsTrigger value="timeline" className="gap-1.5" data-testid="vault-tab-timeline"><FileText className="h-3.5 w-3.5" /> Activity Timeline</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="signed" className="pt-3 space-y-3">
+          <TabsContent value="docs" className="pt-3 space-y-3">
             <div className="flex flex-wrap items-center gap-2 bg-white border rounded-lg p-3">
               <div className="relative flex-1 min-w-[200px]">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-                <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search documents..." className="pl-8 h-8 text-sm" data-testid="vault-search" />
+                <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search documents, tags, families..." className="pl-8 h-8 text-sm" data-testid="vault-search" />
               </div>
               <div className="flex gap-1 bg-muted rounded-md p-1 flex-wrap">
-                {["all", ...docTypes].map((t) => (
-                  <Button key={t} size="sm" variant={filter === t ? "default" : "ghost"} onClick={() => setFilter(t)} className={`h-7 text-[11px] ${filter === t ? "bg-[#1a2744]" : ""}`}>{t === "all" ? "All" : t}</Button>
+                {["all", ...allTags].map((t) => (
+                  <Button key={t} size="sm" variant={tagFilter === t ? "default" : "ghost"} onClick={() => setTagFilter(t)} className={`h-7 text-[11px] ${tagFilter === t ? "bg-[#1a2744]" : ""}`} data-testid={`vault-filter-${t}`}>{t === "all" ? "All" : t}</Button>
                 ))}
               </div>
+              <Button variant="outline" size="sm" onClick={refresh} disabled={loading} data-testid="vault-refresh" className="h-7 text-[11px]">
+                <RefreshCw className={`h-3 w-3 mr-1 ${loading ? "animate-spin" : ""}`} /> Refresh
+              </Button>
             </div>
 
             <Card>
               <CardContent className="p-0">
-                {filteredFiles.length === 0 ? (
+                {filtered.length === 0 ? (
                   <p className="text-center text-sm text-muted-foreground py-16">
                     <FolderLock className="h-10 w-10 mx-auto mb-2 opacity-30" />
-                    No signed documents yet. Your vault fills automatically when you return signed SOAs, ROAs or other compliance documents to your adviser.
+                    {loading ? "Loading your documents…" : "No documents yet. Your vault fills automatically when your adviser issues a new SOA, ROA or compliance document."}
                   </p>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead><tr className="border-b text-left text-xs text-muted-foreground bg-gray-50">
-                        <th className="py-2 px-3">Document</th><th className="py-2 px-3">Type</th><th className="py-2 px-3">Signed</th><th className="py-2 px-3">Signature Hash</th><th className="py-2 px-3 text-right">Action</th>
+                        <th className="py-2 px-3">Document</th><th className="py-2 px-3">Tags</th><th className="py-2 px-3">Issued</th><th className="py-2 px-3">Size</th><th className="py-2 px-3 text-right">Action</th>
                       </tr></thead>
                       <tbody>
-                        {filteredFiles.map((f) => (
-                          <tr key={f.id} className="border-b hover:bg-gray-50" data-testid={`vault-file-${f.id}`}>
+                        {filtered.map((d) => (
+                          <tr key={d.object_id} className="border-b hover:bg-gray-50" data-testid={`vault-file-${d.object_id}`}>
                             <td className="py-2 px-3">
                               <div className="flex items-center gap-2">
                                 <FileSignature className="h-4 w-4 text-[#D4A84C]" />
-                                <div><p className="text-xs font-medium">{f.name}</p><p className="text-[10px] text-muted-foreground">{f.source}</p></div>
+                                <div>
+                                  <p className="text-xs font-medium flex items-center gap-1.5 flex-wrap">
+                                    {d.filename}
+                                    <Badge variant="outline" className="text-[9px]"><Layers className="h-2.5 w-2.5 mr-0.5" />v{d.version}</Badge>
+                                    {d.is_frozen && (
+                                      <Badge variant="outline" className="text-[9px] bg-amber-50 border-amber-300 text-amber-800" data-testid={`vault-frozen-${d.object_id}`}>
+                                        <Lock className="h-2.5 w-2.5 mr-0.5" /> SIGNED
+                                      </Badge>
+                                    )}
+                                  </p>
+                                  <p className="text-[10px] text-muted-foreground font-mono">{d.family_key}</p>
+                                </div>
                               </div>
                             </td>
-                            <td className="py-2 px-3"><Badge variant="outline" className="text-[10px]">{f.docType}</Badge></td>
-                            <td className="py-2 px-3 text-[11px]">{fmt(f.addedAt)}</td>
-                            <td className="py-2 px-3 font-mono text-[10px] text-muted-foreground">{f.signatureHash}</td>
-                            <td className="py-2 px-3 text-right"><Button size="sm" variant="ghost" onClick={() => download(f)} className="h-7 text-[11px]" data-testid={`vault-dl-${f.id}`}><Download className="h-3 w-3 mr-1" />Download</Button></td>
+                            <td className="py-2 px-3">
+                              <div className="flex gap-1 flex-wrap">
+                                {(d.tags || []).map((t) => (
+                                  <Badge key={t} variant="outline" className="text-[9px] capitalize"><TagIcon className="h-2.5 w-2.5 mr-0.5" />{t}</Badge>
+                                ))}
+                              </div>
+                            </td>
+                            <td className="py-2 px-3 text-[11px]">{fmt(d.created_at)}</td>
+                            <td className="py-2 px-3 text-[11px]">{fmtBytes(d.size_bytes)}</td>
+                            <td className="py-2 px-3 text-right">
+                              <a href={`${API}/api/files/${d.object_id}`} target="_blank" rel="noopener noreferrer" data-testid={`vault-dl-${d.object_id}`}>
+                                <Button size="sm" variant="ghost" className="h-7 text-[11px]"><Download className="h-3 w-3 mr-1" />Download</Button>
+                              </a>
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -164,30 +206,6 @@ const MyVault = () => {
                 </CardContent>
               </Card>
             ))}
-          </TabsContent>
-
-          <TabsContent value="timeline" className="pt-3">
-            <Card>
-              <CardHeader className="pb-2"><CardTitle className="text-sm">Your compliance trail ({events.length})</CardTitle></CardHeader>
-              <CardContent>
-                {events.length === 0 ? (
-                  <p className="text-center text-sm text-muted-foreground py-10">No activity yet.</p>
-                ) : (
-                  <div className="space-y-2">
-                    {events.slice(0, 30).map((e) => (
-                      <div key={e.id} className="flex items-start gap-3 py-2 border-b last:border-0">
-                        <FileText className="h-4 w-4 text-[#1a2744] mt-0.5 flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">{e.title}</p>
-                          {e.docType && <Badge variant="outline" className="text-[9px] mt-0.5">{e.docType}</Badge>}
-                        </div>
-                        <p className="text-[10px] text-muted-foreground flex-shrink-0">{fmt(e.ts)}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
           </TabsContent>
         </Tabs>
 

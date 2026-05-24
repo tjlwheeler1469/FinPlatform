@@ -178,7 +178,7 @@ const DealsPipeline = () => {
     <Layout>
       <PageShell
         eyebrow="CRM"
-        title="Deals pipeline"
+        title="Activity"
         accent={summary?.total_count ? `${summary.total_count} active` : null}
         subtitle="Every SOA, ROA and Implementation Pack tracked from draft to executed — with full audit trail on each stage transition."
         meta={summary?.total_value ? `${summary.total_count} deals · ${FS(summary.total_value)} pipeline value` : null}

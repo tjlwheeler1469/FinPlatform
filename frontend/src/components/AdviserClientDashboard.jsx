@@ -416,11 +416,12 @@ const EmbeddedScenarioCard = ({ client, baseConfidence, simulation, applyTrigger
 
 // -------- Row 3 ----------
 const TodaysPrioritiesCard = () => {
+  const navigate = useNavigate();
   const items = [
-    { count: 3, label: "clients below 75% confidence", tone: "rose", icon: AlertTriangle },
-    { count: 2, label: "urgent risks", tone: "amber", icon: Activity },
-    { count: 1, label: "rebalance pending", tone: "amber", icon: TrendingUp },
-    { count: 4, label: "reviews due this week", tone: "gray", icon: Calendar },
+    { count: 3, label: "clients below 75% confidence", tone: "rose", icon: AlertTriangle, to: "/retirement-control-center", testid: "priority-confidence" },
+    { count: 2, label: "urgent risks", tone: "amber", icon: Activity, to: "/budget-exposure", testid: "priority-risks" },
+    { count: 1, label: "rebalance pending", tone: "amber", icon: TrendingUp, to: "/portfolio-rebalancing", testid: "priority-rebalance" },
+    { count: 4, label: "reviews due this week", tone: "gray", icon: Calendar, to: "/adviser-compliance", testid: "priority-reviews" },
   ];
   return (
     <Card data-testid="card-priorities">
@@ -434,15 +435,21 @@ const TodaysPrioritiesCard = () => {
         </div>
         <div className="space-y-2">
           {items.map((item, i) => {
-            const bg = { rose: "bg-rose-50", amber: "bg-amber-50", gray: "bg-gray-50" }[item.tone];
+            const bg = { rose: "bg-rose-50 hover:bg-rose-100", amber: "bg-amber-50 hover:bg-amber-100", gray: "bg-gray-50 hover:bg-gray-100" }[item.tone];
             const text = { rose: "text-rose-700", amber: "text-amber-700", gray: "text-gray-700" }[item.tone];
             return (
-              <div key={i} className={`flex items-center gap-3 p-2.5 rounded-md ${bg}`} data-testid={`priority-${i}`}>
+              <button
+                key={i}
+                type="button"
+                onClick={() => navigate(item.to)}
+                className={`w-full flex items-center gap-3 p-2.5 rounded-md transition-colors text-left ${bg} cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#D4A84C]`}
+                data-testid={item.testid}
+              >
                 <item.icon className={`h-4 w-4 ${text}`} />
                 <span className={`text-2xl font-bold ${text}`}>{item.count}</span>
                 <span className="text-xs text-gray-700 flex-1">{item.label}</span>
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              </div>
+              </button>
             );
           })}
         </div>

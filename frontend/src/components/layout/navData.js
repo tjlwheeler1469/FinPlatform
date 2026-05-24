@@ -52,7 +52,7 @@ export const adviserBaseNav = [
     icon: Settings,
     items: [
       { path: "/xplan-sync-hub", label: "Xplan Sync Hub", icon: Database, title: "Push & Pull across all 5 Xplan modules · Core · Xtools+ · WealthSolver · IPS · Reporting", badge: "XPLAN" },
-      { path: "/deals", label: "Deals", icon: Briefcase, title: "CRM pipeline · every SOA / ROA / Implementation Pack tracked from draft → executed", badge: "CRM" },
+      { path: "/deals", label: "Activity", icon: Briefcase, title: "Activity pipeline · every SOA / ROA / Implementation Pack tracked from draft → executed", badge: "CRM" },
       { path: "/webhooks-admin", label: "Webhooks", icon: Cable, title: "Outbound HMAC-signed event subscriptions for Slack/Zapier/internal systems", badge: "API" },
       { path: "/rbac-admin", label: "Roles", icon: Shield, title: "Role-Based Access Control matrix · principal / adviser / paraplanner / client", badge: "RBAC" },
       { path: "/budget-exposure", label: "Budget Exposure", icon: AlertTriangle, title: "Portfolio-wide exposure to the 2026-27 Budget reforms · NG · CGT · Trust min-tax · Sell-window alerts", badge: "REFORM" },
@@ -70,7 +70,7 @@ export const clientContextNav = [
     icon: Eye,
     items: [
       { path: "/dashboard", label: "Client Overview", icon: Wallet, title: "Overview, Goals, Retirement, Investments, Budget & Tax", badge: "360" },
-      { path: "/client-capture", label: "Key Dates & Disclosures", icon: ListTodo, title: "Xplan-style client capture: contact, service overview, reviews, FSG, risk profile" },
+      { path: "/client-capture", label: "Client Information", icon: ListTodo, title: "Client information: contact, service overview, reviews, FSG, risk profile" },
       { path: "/budget-reforms", label: "Budget 2027 Reforms", icon: Landmark, title: "Negative gearing, CGT (new vs existing) & discretionary trust reforms · 2026–27 Federal Budget", badge: "TAX" },
       { path: "/client-invoicing", label: "Invoicing", icon: Receipt, title: "Invoices, fees & billing for this client" },
     ]

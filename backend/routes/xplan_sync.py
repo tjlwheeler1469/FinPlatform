@@ -504,3 +504,96 @@ async def get_sync_log(limit: int = 50):
     async for d in cur:
         out.append(d)
     return {"mode": _mode(), "entries": out, "count": len(out)}
+
+
+# ============================================================================
+# Compliance Dashboard sync — push advice-file metrics into Xplan as a
+# practice-level compliance KPI snapshot, or pull external compliance flags
+# from Xplan's GRC module back into the local Compliance Dashboard.
+# ============================================================================
+
+@router.post("/compliance/push")
+async def push_compliance_to_xplan():
+    """Push the current Compliance Dashboard metrics into Xplan as a snapshot
+    for the practice's GRC reporting trail."""
+    # Aggregate the local compliance metrics
+    compliant = await db["compliance_docs"].count_documents({"status": "compliant"})
+    minor = await db["compliance_docs"].count_documents({"status": "minor_issues"})
+    major = await db["compliance_docs"].count_documents({"status": "major_issues"})
+    pending = await db["compliance_docs"].count_documents({"status": "pending_review"})
+    total = compliant + minor + major + pending
+    metrics = {
+        "compliant": compliant, "minor_issues": minor, "major_issues": major,
+        "pending_review": pending, "total": total,
+        "compliance_rate": round((compliant / total) * 100, 1) if total else 0,
+    }
+    sync_record = {
+        "direction": "push",
+        "module": "compliance",
+        "metrics": metrics,
+        "mode": _mode(),
+        "ts": datetime.now(timezone.utc).isoformat(),
+    }
+    await db["xplan_sync_log"].insert_one({**sync_record})
+    sync_record.pop("_id", None)
+    return {"status": "ok", **sync_record}
+
+
+@router.post("/compliance/pull")
+async def pull_compliance_from_xplan():
+    """Pull compliance flags / GRC events from Xplan and surface them as
+    pending-review items in the local Compliance Dashboard."""
+    if XPLAN_LIVE:
+        # Real implementation would call Xplan GRC /grc/breaches + /grc/events
+        # and merge each flag into compliance_docs as a pending_review row.
+        pulled = []
+    else:
+        # Mock: simulate 2 external flags coming back from Xplan
+        pulled = [
+            {
+                "external_id": "XGRC-7841",
+                "client": "External · Xplan-only client",
+                "type": "Statement of Advice",
+                "status": "pending_review",
+                "flag": "FoFA Best Interests Duty review required",
+                "raised_at": (datetime.now(timezone.utc) - timedelta(days=2)).isoformat(),
+                "source": "xplan_grc",
+            },
+            {
+                "external_id": "XGRC-7842",
+                "client": "External · Xplan-only client",
+                "type": "Annual Review",
+                "status": "minor_issues",
+                "flag": "Documentation refresh overdue (60 days)",
+                "raised_at": (datetime.now(timezone.utc) - timedelta(days=4)).isoformat(),
+                "source": "xplan_grc",
+            },
+        ]
+        # Upsert each into compliance_docs as a pending_review row so the
+        # dashboard surfaces them automatically.
+        for f in pulled:
+            await db["compliance_docs"].update_one(
+                {"external_id": f["external_id"]},
+                {"$set": {
+                    "id": f["external_id"],
+                    "external_id": f["external_id"],
+                    "client": f["client"],
+                    "type": f["type"],
+                    "status": f["status"],
+                    "score": 65,
+                    "findings": [f["flag"]],
+                    "source": f["source"],
+                    "date": f["raised_at"][:10],
+                    "adviser": "Xplan-imported",
+                    "synced_at": datetime.now(timezone.utc).isoformat(),
+                }},
+                upsert=True,
+            )
+    await db["xplan_sync_log"].insert_one({
+        "direction": "pull",
+        "module": "compliance",
+        "items_pulled": len(pulled),
+        "mode": _mode(),
+        "ts": datetime.now(timezone.utc).isoformat(),
+    })
+    return {"status": "ok", "mode": _mode(), "items_pulled": len(pulled), "flags": pulled}

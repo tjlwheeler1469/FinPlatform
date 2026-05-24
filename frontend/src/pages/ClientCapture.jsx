@@ -193,8 +193,8 @@ const ClientCapture = () => {
         <Card>
           <CardContent className="p-4 flex items-center gap-4 flex-wrap">
             <div className="flex-1 min-w-[260px]">
-              <h1 className="text-xl font-bold text-[#1a2744]">Key Dates & Disclosures</h1>
-              <p className="text-xs text-muted-foreground">Xplan-style client capture · sync source for SOA / ROA, FSG &amp; ongoing service obligations.</p>
+              <h1 className="text-xl font-bold text-[#1a2744]">Client Information</h1>
+              <p className="text-xs text-muted-foreground">Client contact, service overview, reviews, FSG &amp; risk profile · sync source for SOA / ROA &amp; ongoing service obligations.</p>
             </div>
             <select value={clientId} onChange={(e) => setClientId(e.target.value)} className="text-sm border rounded px-2 py-1 bg-white hidden" data-testid="capture-client-select" aria-hidden="true">
               {Object.entries(CLIENT_DATA).filter(([k]) => k !== "advisor").map(([id, c]) => (

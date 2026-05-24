@@ -157,6 +157,45 @@ const AdviserComplianceDashboard = () => {
     }
   }, []);
 
+  // Xplan push/pull — fan compliance metrics into Xplan or pull GRC flags back.
+  const [xplanBusy, setXplanBusy] = useState(false);
+
+  const pushToXplan = async () => {
+    setXplanBusy(true);
+    try {
+      const r = await fetch(`${API_URL}/api/xplan-sync/compliance/push`, { method: 'POST' });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const out = await r.json();
+      toast.success(`Pushed compliance metrics to Xplan (${out.mode})`, {
+        description: `${out.metrics?.total ?? 0} advice files · ${out.metrics?.compliance_rate ?? 0}% compliant`,
+        duration: 6000,
+      });
+    } catch (err) {
+      toast.error('Xplan push failed', { description: String(err).slice(0, 200) });
+    } finally {
+      setXplanBusy(false);
+    }
+  };
+
+  const pullFromXplan = async () => {
+    setXplanBusy(true);
+    try {
+      const r = await fetch(`${API_URL}/api/xplan-sync/compliance/pull`, { method: 'POST' });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const out = await r.json();
+      toast.success(`Pulled ${out.items_pulled} GRC flag${out.items_pulled === 1 ? '' : 's'} from Xplan (${out.mode})`, {
+        description: out.items_pulled > 0 ? 'New flags added to pending review queue.' : 'No new flags.',
+        duration: 6000,
+      });
+      // Reload dashboard to surface newly-pulled flags
+      await fetchDashboard();
+    } catch (err) {
+      toast.error('Xplan pull failed', { description: String(err).slice(0, 200) });
+    } finally {
+      setXplanBusy(false);
+    }
+  };
+
   useEffect(() => {
     fetchDashboard();
   }, [fetchDashboard]);
@@ -214,6 +253,14 @@ const AdviserComplianceDashboard = () => {
             <Button variant="outline" onClick={fetchDashboard}>
               <RefreshCw className="h-4 w-4 mr-2" />
               Refresh
+            </Button>
+            <Button variant="outline" onClick={pullFromXplan} disabled={xplanBusy} className="border-[#3B9CDC] text-[#3B9CDC] hover:bg-[#3B9CDC]/10" data-testid="compliance-pull-xplan">
+              <Download className="h-4 w-4 mr-2" />
+              Pull Xplan
+            </Button>
+            <Button variant="outline" onClick={pushToXplan} disabled={xplanBusy} className="border-[#3B9CDC] text-[#3B9CDC] hover:bg-[#3B9CDC]/10" data-testid="compliance-push-xplan">
+              <Upload className="h-4 w-4 mr-2" />
+              Push Xplan
             </Button>
             <Button variant="outline">
               <Download className="h-4 w-4 mr-2" />

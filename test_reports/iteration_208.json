@@ -1,0 +1,48 @@
+{
+  "summary": "Tested all 5 user-requested iter 208 features. Backend: 6/6 pytest cases pass (push, pull x2 idempotent, files/search parity x3). Frontend: 4 of 5 features fully working; one partial — Xplan Pull triggers 2 GRC flags toast but the new XGRC-7841/XGRC-7842 rows do NOT appear in /adviser-compliance Advice Files table after Pull+Refresh. Today's Priorities buttons + navigation, MyVault new layout, Client Information H1, Activity sidebar rename, /deals title rename, push toast all verified. Note: Today's Priorities lives at /dashboard (when adviser+selected_client), NOT /adviser-client-dashboard (that route doesn't exist).",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "MyVault.jsx (line ~150)",
+        "issue": "React HTML hydration warning: <div> (Badge component) is nested inside <p> filename element. Causes 'In HTML, <div> cannot be a descendant of <p>' console errors on /my-vault.",
+        "selector": "[data-testid^='vault-file-'] p",
+        "priority": "LOW"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "Adviser Compliance Pull Xplan",
+        "issue": "Backend /api/xplan-sync/compliance/pull returns 2 flags (XGRC-7841 SOA + XGRC-7842 Annual Review) and toast 'Pulled 2 GRC flag(s) from Xplan' fires correctly, BUT the new XGRC rows do not appear in the Adviser Compliance Dashboard 'Advice Files' tab even after clicking Refresh. Likely the dashboard's data source query filters out source='xplan_grc' or reads from a different collection than the pull writes to. Total Files counter stays at 0.",
+        "affected_selectors": ["[data-testid='compliance-pull-xplan']", "[data-testid='compliance-push-xplan']"]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration208_features.py",
+    "/app/test_reports/pytest/iteration208.xml"
+  ],
+  "action_items": [
+    "Investigate why upserted xplan_grc compliance_docs (XGRC-7841/7842) do not surface in Adviser Compliance Dashboard's Advice Files table or in the metrics counters after Pull. Check the dashboard's data feed (likely /api/compliance/* or similar) to ensure it includes source='xplan_grc' documents AND triggers a refetch after Pull.",
+    "Fix MyVault.jsx Badge inside <p> hydration warning — wrap filename in <span> or move Badge outside the <p>."
+  ],
+  "critical_code_review_comments": [
+    "MyVault.jsx line 150: <Badge> rendered as a <div> inside a <p> tag — invalid HTML, causes React hydration warning. Use <span> wrapper or restructure.",
+    "Today's Priorities card lives at /dashboard route (DashboardRouter → UnifiedClientOverview → AdviserClientDashboard) — the task description's reference to /adviser-client-dashboard is misleading; that route returns 'No routes matched location'. Add a route alias if external links are expected.",
+    "After compliance/pull upserts xplan_grc flags into compliance_docs, the dashboard does not auto-refresh those rows. Pull handler should explicitly call the dashboard data fetcher after success."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration208_features.py (new)"
+  ],
+  "success_rate": {"backend": "100%", "frontend": "85%"},
+  "test_credentials": "No login. LocalStorage: wealth_command_compliance_v5='permanent', app_mode='adviser' (for adviser flows) or 'client' (for /my-vault), selected_client='{\"id\":\"thompson_family\"}'.",
+  "seed_data_creation": "None created; relied on existing thompson_family vault docs (2 files) and the deterministic mocked xplan_grc flags from /api/xplan-sync/compliance/pull.",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All 5 user requests have been verified end-to-end. The only outstanding integration gap is the Pull Xplan -> Advice Files table refresh on /adviser-compliance — XGRC rows are persisted by backend but not displayed. Reproduce by setting localStorage as documented, visit /adviser-compliance, click [data-testid='compliance-pull-xplan'], wait for toast, then click 'Advice Files' tab. Expected: 2 new rows with type 'Statement of Advice' and 'Annual Review' from External · Xplan-only client. Observed: tab still empty. Today's Priorities card data-testids are at /dashboard (adviser mode with selected client) — NOT /adviser-client-dashboard.",
+  "rca of the issue": "Adviser Compliance Dashboard 'Advice Files' tab data feed likely queries compliance_docs with a filter that excludes documents whose source='xplan_grc' (or it's keyed off owner_client_id of real adviser clients only, while the mock flags use 'external_xplan_only'). The pull endpoint upserts on external_id (idempotent OK), but the dashboard's GET endpoint doesn't union these in. Mitigation: (1) Have the dashboard data endpoint include source IN ('local','xplan_grc'); (2) After Pull success, trigger the dashboard refetch in pullFromXplan() handler in AdviserComplianceDashboard.jsx."
+}
