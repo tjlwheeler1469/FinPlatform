@@ -223,7 +223,7 @@ async def get_compliance_dashboard() -> Dict[str, Any]:
             "adviser": doc.get("adviser_name", ""),
             "status": display_status,
             "riskProfile": doc.get("advice_areas", ["General"])[0] if doc.get("advice_areas") else "General",
-            "investmentAmount": doc.get("advice_fee", 0) * 100 or 250000,
+            "investmentAmount": (doc.get("advice_fee") or 0) * 100 or 250000,
             "score": doc.get("compliance_score"),
             "findings": doc.get("review_conditions", []),
             "nextReview": (doc.get("review_due_date") or "")[:10],

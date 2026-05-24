@@ -147,15 +147,15 @@ const MyVault = () => {
                               <div className="flex items-center gap-2">
                                 <FileSignature className="h-4 w-4 text-[#D4A84C]" />
                                 <div>
-                                  <p className="text-xs font-medium flex items-center gap-1.5 flex-wrap">
-                                    {d.filename}
+                                  <div className="text-xs font-medium flex items-center gap-1.5 flex-wrap">
+                                    <span>{d.filename}</span>
                                     <Badge variant="outline" className="text-[9px]"><Layers className="h-2.5 w-2.5 mr-0.5" />v{d.version}</Badge>
                                     {d.is_frozen && (
                                       <Badge variant="outline" className="text-[9px] bg-amber-50 border-amber-300 text-amber-800" data-testid={`vault-frozen-${d.object_id}`}>
                                         <Lock className="h-2.5 w-2.5 mr-0.5" /> SIGNED
                                       </Badge>
                                     )}
-                                  </p>
+                                  </div>
                                   <p className="text-[10px] text-muted-foreground font-mono">{d.family_key}</p>
                                 </div>
                               </div>

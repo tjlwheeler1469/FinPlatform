@@ -516,16 +516,18 @@ async def get_sync_log(limit: int = 50):
 async def push_compliance_to_xplan():
     """Push the current Compliance Dashboard metrics into Xplan as a snapshot
     for the practice's GRC reporting trail."""
-    # Aggregate the local compliance metrics
-    compliant = await db["compliance_docs"].count_documents({"status": "compliant"})
-    minor = await db["compliance_docs"].count_documents({"status": "minor_issues"})
-    major = await db["compliance_docs"].count_documents({"status": "major_issues"})
-    pending = await db["compliance_docs"].count_documents({"status": "pending_review"})
-    total = compliant + minor + major + pending
+    # Aggregate the local compliance metrics from the SOA/ROA collection
+    # (compliance_documents — same collection the dashboard reads from).
+    coll = db["compliance_documents"]
+    total = await coll.count_documents({})
+    pending = await coll.count_documents({"status": {"$in": ["pending_review", "pending_signature"]}})
+    rejected = await coll.count_documents({"review_outcome": {"$in": ["rejected", "requires_changes"]}})
+    approved = await coll.count_documents({"review_outcome": "approved"})
     metrics = {
-        "compliant": compliant, "minor_issues": minor, "major_issues": major,
-        "pending_review": pending, "total": total,
-        "compliance_rate": round((compliant / total) * 100, 1) if total else 0,
+        "compliant": approved, "minor_issues": 0,
+        "major_issues": rejected, "pending_review": pending,
+        "total": total,
+        "compliance_rate": round((approved / total) * 100, 1) if total else 0,
     }
     sync_record = {
         "direction": "push",
@@ -541,51 +543,55 @@ async def push_compliance_to_xplan():
 
 @router.post("/compliance/pull")
 async def pull_compliance_from_xplan():
-    """Pull compliance flags / GRC events from Xplan and surface them as
-    pending-review items in the local Compliance Dashboard."""
+    """Pull compliance flags / GRC events from Xplan and upsert them into
+    `compliance_documents` so they surface in the Compliance Dashboard."""
+    now_iso = datetime.now(timezone.utc).isoformat()
     if XPLAN_LIVE:
         # Real implementation would call Xplan GRC /grc/breaches + /grc/events
-        # and merge each flag into compliance_docs as a pending_review row.
+        # and merge each flag into compliance_documents as a pending_review row.
         pulled = []
     else:
         # Mock: simulate 2 external flags coming back from Xplan
         pulled = [
             {
                 "external_id": "XGRC-7841",
-                "client": "External · Xplan-only client",
-                "type": "Statement of Advice",
+                "client_name": "External · Xplan-only client",
+                "document_type": "soa",
                 "status": "pending_review",
                 "flag": "FoFA Best Interests Duty review required",
                 "raised_at": (datetime.now(timezone.utc) - timedelta(days=2)).isoformat(),
-                "source": "xplan_grc",
             },
             {
                 "external_id": "XGRC-7842",
-                "client": "External · Xplan-only client",
-                "type": "Annual Review",
-                "status": "minor_issues",
+                "client_name": "External · Xplan-only client",
+                "document_type": "roa",
+                "status": "pending_review",
                 "flag": "Documentation refresh overdue (60 days)",
                 "raised_at": (datetime.now(timezone.utc) - timedelta(days=4)).isoformat(),
-                "source": "xplan_grc",
             },
         ]
-        # Upsert each into compliance_docs as a pending_review row so the
-        # dashboard surfaces them automatically.
+        # Upsert each into `compliance_documents` (the collection the
+        # dashboard reads from) so they surface in Advice Files.
         for f in pulled:
-            await db["compliance_docs"].update_one(
-                {"external_id": f["external_id"]},
+            await db["compliance_documents"].update_one(
+                {"document_id": f["external_id"]},
                 {"$set": {
-                    "id": f["external_id"],
+                    "document_id": f["external_id"],
                     "external_id": f["external_id"],
-                    "client": f["client"],
-                    "type": f["type"],
+                    "client_name": f["client_name"],
+                    "document_type": f["document_type"],
+                    "advice_areas": ["GRC / Xplan-imported"],
+                    "advice_date": f["raised_at"][:10],
+                    "created_at": f["raised_at"],
+                    "adviser_name": "Xplan-imported",
                     "status": f["status"],
-                    "score": 65,
-                    "findings": [f["flag"]],
-                    "source": f["source"],
-                    "date": f["raised_at"][:10],
-                    "adviser": "Xplan-imported",
-                    "synced_at": datetime.now(timezone.utc).isoformat(),
+                    "review_outcome": None,
+                    "compliance_score": 65,
+                    "review_conditions": [f["flag"]],
+                    "review_due_date": now_iso,
+                    "advice_fee": 0,
+                    "source": "xplan_grc",
+                    "synced_at": now_iso,
                 }},
                 upsert=True,
             )
@@ -594,6 +600,6 @@ async def pull_compliance_from_xplan():
         "module": "compliance",
         "items_pulled": len(pulled),
         "mode": _mode(),
-        "ts": datetime.now(timezone.utc).isoformat(),
+        "ts": now_iso,
     })
     return {"status": "ok", "mode": _mode(), "items_pulled": len(pulled), "flags": pulled}

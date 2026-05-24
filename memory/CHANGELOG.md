@@ -1,3 +1,38 @@
+## Feb 2026 — Iter 208: Vault parity, Xplan compliance sync, navigation polish
+
+### 1. Vault parity (adviser ↔ client)
+- `MyVault.jsx` rewritten to consume `/api/files/search?client_id={id}&only_latest=true` — same backend object storage as the adviser's Vault. NO more localStorage mocking.
+- Read-only stance preserved (no upload / delete / restore buttons for clients).
+- New layout: airy 4-card stat ribbon (Documents / Signed & Frozen / Meeting Notes / AES-256), Documents + Meeting Notes tabs.
+- Frozen documents (signed via e-sig webhook) display amber `SIGNED` badge — same visual cue as the adviser side.
+- Test IDs: `my-vault`, `vault-doc-count`, `vault-signed-count`, `vault-meetings-count`, `vault-search`, `vault-refresh`, `vault-file-{object_id}`, `vault-dl-{object_id}`, `vault-frozen-{object_id}`.
+
+### 2. Today's Priorities — clickable to next screens
+- `AdviserClientDashboard.TodaysPrioritiesCard` rows are now `<button>` elements (not divs) wired through `useNavigate()`:
+  - `priority-confidence` → `/retirement-control-center`
+  - `priority-risks` → `/budget-exposure`
+  - `priority-rebalance` → `/portfolio-rebalancing`
+  - `priority-reviews` → `/adviser-compliance`
+- Hover-state background + ChevronRight + focus ring for keyboard nav.
+
+### 3. Rename `Key Dates & Disclosures` → `Client Information`
+- `navData.js` label updated, `ClientCapture.jsx` H1 updated.
+
+### 4. Rename `Deals pipeline` → `Activity`
+- `navData.js` label updated (path `/deals` preserved), `DealsPipeline.jsx` PageShell title set to `Activity`.
+
+### 5. Adviser Compliance Dashboard — Push / Pull from Xplan
+- Backend: new endpoints in `routes/xplan_sync.py`:
+  - `POST /api/xplan-sync/compliance/push` → aggregates `compliance_documents` and posts a snapshot. Returns metrics + mode (`live`/`mock`).
+  - `POST /api/xplan-sync/compliance/pull` → returns 2 mock XGRC flags (XGRC-7841 SOA, XGRC-7842 ROA) and upserts them into `compliance_documents` (correct collection) so they surface in the dashboard automatically.
+- Frontend toolbar buttons: `Pull Xplan` / `Push Xplan` (data-testids `compliance-pull-xplan`, `compliance-push-xplan`). Pull auto-refreshes the dashboard so new rows appear in the Advice Files tab.
+- Fixed pre-existing `TypeError` in `soa_roa_compliance.py:226` where `advice_fee=None` crashed the dashboard endpoint.
+
+### Test verdict
+- Iter 208 testing-agent verdict: backend 100%, frontend 85% with one integration gap (XGRC rows not surfacing). **Both issues fixed in this iteration**: (a) collection name corrected (`compliance_docs` → `compliance_documents`), (b) MyVault Badge-in-`<p>` HTML hydration warning fixed via `<span>` wrapper. End-to-end re-verified: `totalFiles=9` (7→9), `XGRC rows in adviceFiles=2`.
+
+
+
 ## Feb 2026 — Backlog completion: Outreach + E-sign freeze + Chip filters (Iter 207)
 
 ### P2 — Budget Reform outreach (BudgetExposureReport)
