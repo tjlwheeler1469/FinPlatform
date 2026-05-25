@@ -3,16 +3,17 @@
 // `/api/files/search?client_id={id}&only_latest=true` returns the latest
 // version of every document family owned by the active client.
 //
-// We deliberately use a read-only stance — no upload, no version restore,
-// no delete buttons. Download is the only action.
+// Meeting notes are loaded from `/api/meetings/by-client/{client_id}` (Mongo-
+// persisted) and fall back to a small built-in demo set on first load so the
+// page is never empty.
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Layout from "@/components/Layout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FolderLock, Download, FileSignature, FileText, Search, Lock, Calendar as CalendarIcon, Shield, RefreshCw, Layers, Tag as TagIcon } from "lucide-react";
+import { FolderLock, Download, FileSignature, Search, Lock, Calendar as CalendarIcon, Shield, RefreshCw, Layers, Tag as TagIcon } from "lucide-react";
 import { CLIENT_DATA, getActiveClientId } from "@/data/clientData";
 import { toast } from "sonner";
 
@@ -27,32 +28,39 @@ const fmtBytes = (n) => {
   return `${n} B`;
 };
 
-// Mock meeting-notes log — adviser-curated, stays as-is for now.
-const MOCK_MEETING_NOTES = (clientId) => [
-  { id: "mn_1", title: "Annual Strategy Review 2026", date: "2026-03-18", summary: "Reviewed portfolio rebalancing, super contribution strategy and estate planning updates.", attendees: "David Thompson, Sarah Thompson, Sarah Chen (Adviser)", recordingAvailable: true },
-  { id: "mn_2", title: "Q4 2025 Portfolio Review", date: "2025-12-10", summary: "Discussed Q4 performance (+9.4% YTD), agreed to rotate 5% from property into Australian equities.", attendees: "David Thompson, Sarah Chen", recordingAvailable: true },
-  { id: "mn_3", title: "EOFY Tax Planning Session", date: "2025-05-22", summary: "Actioned concessional super top-up, CGT harvesting from Telstra holding, trust distribution resolution drafted.", attendees: "David Thompson, Sarah Thompson, Sarah Chen", recordingAvailable: false },
-  { id: "mn_4", title: "SMSF Trustee Annual Meeting", date: "2024-11-08", summary: "Reviewed SMSF investment strategy, rebalanced property allocation, updated BDBN.", attendees: "David Thompson, Sarah Chen", recordingAvailable: false },
-];
-
 const MyVault = () => {
   const clientId = getActiveClientId();
   const client = CLIENT_DATA[clientId] || CLIENT_DATA.thompson_family;
   const [search, setSearch] = useState("");
   const [tagFilter, setTagFilter] = useState("all");
   const [docs, setDocs] = useState([]);
+  const [meetings, setMeetings] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
+      // 1. Fetch documents from the unified object-storage backend.
       const url = new URL(`${API}/api/files/search`);
       url.searchParams.set("client_id", clientId);
       url.searchParams.set("only_latest", "true");
       url.searchParams.set("limit", "200");
-      const r = await fetch(url.toString());
-      const data = await r.json();
-      setDocs(data.objects || []);
+      const [filesRes, meetingsRes] = await Promise.all([
+        fetch(url.toString()),
+        fetch(`${API}/api/meetings/by-client/${encodeURIComponent(clientId)}`),
+      ]);
+      const filesData = filesRes.ok ? await filesRes.json() : { objects: [] };
+      let meetingsData = meetingsRes.ok ? await meetingsRes.json() : { meetings: [] };
+      // First-load helper: trigger demo seed if collection is empty, then retry.
+      if ((meetingsData.meetings || []).length === 0) {
+        try {
+          await fetch(`${API}/api/meetings/seed-demo`, { method: "POST" });
+          const retry = await fetch(`${API}/api/meetings/by-client/${encodeURIComponent(clientId)}`);
+          if (retry.ok) meetingsData = await retry.json();
+        } catch (_) { /* seed best-effort */ }
+      }
+      setDocs(filesData.objects || []);
+      setMeetings(meetingsData.meetings || []);
     } catch (e) {
       toast.error("Failed to load Vault", { description: String(e).slice(0, 200) });
     } finally {
@@ -61,8 +69,6 @@ const MyVault = () => {
   }, [clientId]);
 
   useEffect(() => { refresh(); }, [refresh]);
-
-  const meetingNotes = useMemo(() => MOCK_MEETING_NOTES(clientId), [clientId]);
 
   const allTags = useMemo(() => Array.from(new Set(docs.flatMap((d) => d.tags || []))).filter(Boolean), [docs]);
 
@@ -101,7 +107,7 @@ const MyVault = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <Card><CardContent className="p-4"><p className="text-[10px] uppercase tracking-wide text-muted-foreground">Documents</p><p className="text-2xl font-bold text-[#1a2744]" data-testid="vault-doc-count">{docs.length}</p></CardContent></Card>
           <Card><CardContent className="p-4"><p className="text-[10px] uppercase tracking-wide text-muted-foreground">Signed &amp; Frozen</p><p className="text-2xl font-bold text-[#1a2744]" data-testid="vault-signed-count">{signedCount}</p></CardContent></Card>
-          <Card><CardContent className="p-4"><p className="text-[10px] uppercase tracking-wide text-muted-foreground">Meeting Notes</p><p className="text-2xl font-bold text-[#1a2744]" data-testid="vault-meetings-count">{meetingNotes.length}</p></CardContent></Card>
+          <Card><CardContent className="p-4"><p className="text-[10px] uppercase tracking-wide text-muted-foreground">Meeting Notes</p><p className="text-2xl font-bold text-[#1a2744]" data-testid="vault-meetings-count">{meetings.length}</p></CardContent></Card>
           <Card className="bg-gradient-to-br from-[#1a2744] to-[#2a3754] text-white border-0"><CardContent className="p-4"><p className="text-[10px] uppercase tracking-wide text-white/60">Security</p><p className="text-base font-bold mt-0.5 flex items-center gap-1.5"><Shield className="h-4 w-4 text-[#D4A84C]" /> AES-256</p><p className="text-[10px] text-white/50 mt-1">Encrypted at rest</p></CardContent></Card>
         </div>
 
@@ -185,14 +191,22 @@ const MyVault = () => {
           </TabsContent>
 
           <TabsContent value="meetings" className="pt-3 space-y-2">
-            {meetingNotes.map((m) => (
-              <Card key={m.id} className="hover:shadow-md transition-shadow" data-testid={`vault-meeting-${m.id}`}>
+            {meetings.length === 0 ? (
+              <Card><CardContent className="p-10 text-center text-sm text-muted-foreground">
+                <CalendarIcon className="h-10 w-10 mx-auto mb-2 opacity-30" />
+                {loading ? "Loading meeting notes…" : "No meeting notes yet. Your adviser will publish a record after each session."}
+              </CardContent></Card>
+            ) : meetings.map((m) => (
+              <Card key={m.meeting_id} className="hover:shadow-md transition-shadow" data-testid={`vault-meeting-${m.meeting_id}`}>
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <h4 className="font-semibold text-[#1a2744]">{m.title}</h4>
-                        {m.recordingAvailable && <Badge variant="outline" className="text-[9px] bg-blue-50 text-blue-700 border-blue-200">Recording</Badge>}
+                        {m.recording_available && <Badge variant="outline" className="text-[9px] bg-blue-50 text-blue-700 border-blue-200">Recording</Badge>}
+                        {(m.tags || []).map((t) => (
+                          <Badge key={t} variant="outline" className="text-[9px] capitalize"><TagIcon className="h-2.5 w-2.5 mr-0.5" />{t.replace(/_/g, " ")}</Badge>
+                        ))}
                       </div>
                       <p className="text-sm text-muted-foreground mt-1">{m.summary}</p>
                       <p className="text-[11px] text-muted-foreground mt-2"><strong>Attendees:</strong> {m.attendees}</p>

@@ -20,6 +20,7 @@ ROUTE_REGISTRY = [
     ("routes.webhooks", "router", "/api", "Webhooks (outbound)"),
     ("routes.rbac", "router", "/api", "RBAC (roles + audit)"),
     ("routes.esignature", "router", "/api", "E-Signature inbound webhook + freeze"),
+    ("routes.meetings", "router", "/api", "Client meeting notes (Mongo-persisted)"),
     ("routes.pdf_render", "router", "/api", "Server-side PDF rendering (chromium)"),
     ("routes.notify_client", "router", "/api", "Client Notifications"),
     ("routes.market_snapshot", "router", "/api", "Market Snapshot"),

@@ -13,8 +13,9 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { CLIENT_DATA, getActiveClientId } from "@/data/clientData";
 import {
-  RefreshCw, Upload, Database, Activity, Briefcase, BarChart3,
-  FileText, Receipt, Users, FileSearch, ChevronRight,
+  RefreshCw, Upload, Download, Database, Activity, Briefcase, BarChart3,
+  FileText, Receipt, Users, FileSearch, ChevronRight, ShieldCheck,
+  ArrowUpRight, ArrowDownLeft, Clock, CheckCircle2, History,
 } from "lucide-react";
 
 const API = process.env.REACT_APP_BACKEND_URL;
@@ -80,9 +81,28 @@ const XplanSyncHub = () => {
     } else if (tab === "reporting") {
       load("val", `/api/xplan-sync/reporting/${clientId}/valuation`, { method: "POST" });
       load("commpay", `/api/xplan-sync/reporting/commpay`);
+    } else if (tab === "synclog") {
+      load("synclog", `/api/xplan-sync/log?limit=100`);
+      load("xmerge_tokens", `/api/xplan-sync/xmerge/tokens`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab, clientId]);
+
+  const pushCompliance = async () => {
+    try {
+      const r = await fetchJson(`/api/xplan-sync/compliance/push`, { method: "POST" });
+      toast.success(`Compliance pushed (${r.mode})`, { description: `${r.metrics?.total ?? 0} files · ${r.metrics?.compliance_rate ?? 0}% compliant` });
+      load("synclog", `/api/xplan-sync/log?limit=100`);
+    } catch (e) { toast.error("Push failed", { description: String(e).slice(0, 120) }); }
+  };
+
+  const pullCompliance = async () => {
+    try {
+      const r = await fetchJson(`/api/xplan-sync/compliance/pull`, { method: "POST" });
+      toast.success(`Pulled ${r.items_pulled} GRC flag${r.items_pulled === 1 ? "" : "s"} (${r.mode})`);
+      load("synclog", `/api/xplan-sync/log?limit=100`);
+    } catch (e) { toast.error("Pull failed", { description: String(e).slice(0, 120) }); }
+  };
 
   const syncFeeds = async () => {
     try {
@@ -135,6 +155,7 @@ const XplanSyncHub = () => {
             <TabsTrigger value="wealthsolver" data-testid="hub-tab-wealthsolver"><Briefcase className="h-3.5 w-3.5 mr-1" /> WealthSolver</TabsTrigger>
             <TabsTrigger value="ips" data-testid="hub-tab-ips"><BarChart3 className="h-3.5 w-3.5 mr-1" /> IPS</TabsTrigger>
             <TabsTrigger value="reporting" data-testid="hub-tab-reporting"><FileText className="h-3.5 w-3.5 mr-1" /> Reporting</TabsTrigger>
+            <TabsTrigger value="synclog" data-testid="hub-tab-synclog"><History className="h-3.5 w-3.5 mr-1" /> Sync Log</TabsTrigger>
           </TabsList>
 
           {/* MODULE 1 — Core */}
@@ -327,6 +348,78 @@ const XplanSyncHub = () => {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* MODULE 6 — Firm-level Sync Log + push/pull audit trail */}
+          <TabsContent value="synclog" className="space-y-4 mt-3">
+            <Card>
+              <CardContent className="p-5">
+                <ModuleHeader icon={ShieldCheck} title="Compliance push & pull" subtitle="Firm-level snapshot to Xplan GRC + inbound pull of external breach flags" mode={data.synclog?.mode}>
+                  <Button size="sm" variant="outline" onClick={pushCompliance} className="border-emerald-500 text-emerald-700" data-testid="hub-push-compliance">
+                    <ArrowUpRight className="h-3.5 w-3.5 mr-1" /> Push compliance
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={pullCompliance} className="border-sky-500 text-sky-700" data-testid="hub-pull-compliance">
+                    <ArrowDownLeft className="h-3.5 w-3.5 mr-1" /> Pull compliance
+                  </Button>
+                </ModuleHeader>
+                <p className="text-[11px] text-muted-foreground">
+                  Every push aggregates `compliance_documents` and writes a `direction=push` row to the audit log. Every pull surfaces external GRC flags as pending-review rows in the Compliance Dashboard.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-5">
+                <ModuleHeader icon={FileSearch} title="Xmerge token catalogue" subtitle={`${(data.xmerge_tokens?.tokens || []).length} merge tokens registered for SOA / ROA / FSG generation`} mode={data.xmerge_tokens?.mode} />
+                {(data.xmerge_tokens?.tokens || []).slice(0, 12).length > 0 && (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
+                    {(data.xmerge_tokens.tokens || []).slice(0, 12).map((t, i) => (
+                      <div key={i} className="border rounded p-2 bg-slate-50">
+                        <p className="text-[11px] font-mono text-[#1a2744]">{t.token || t.name || t}</p>
+                        {t.description && <p className="text-[10px] text-muted-foreground mt-0.5">{t.description}</p>}
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {(data.xmerge_tokens?.tokens || []).length > 12 && (
+                  <p className="text-[10px] text-muted-foreground mt-2">… and {(data.xmerge_tokens.tokens || []).length - 12} more</p>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-5">
+                <ModuleHeader icon={History} title={`Delivery audit log (${(data.synclog?.entries || []).length} events)`} subtitle="Every push and pull to / from Xplan — fully replayable" mode={data.synclog?.mode}>
+                  <Button size="sm" variant="outline" onClick={() => load("synclog", `/api/xplan-sync/log?limit=100`)}><RefreshCw className="h-3.5 w-3.5 mr-1" /> Refresh</Button>
+                </ModuleHeader>
+                {(data.synclog?.entries || []).length === 0 ? (
+                  <p className="text-center text-xs text-muted-foreground py-8">No sync events recorded yet. Use the Push / Pull buttons above to populate this log.</p>
+                ) : (
+                  <div className="divide-y" data-testid="hub-sync-log">
+                    {(data.synclog?.entries || []).map((e, i) => {
+                      const DirIcon = e.direction === "push" ? ArrowUpRight : ArrowDownLeft;
+                      const dirColor = e.direction === "push" ? "border-emerald-300 text-emerald-700 bg-emerald-50" : "border-sky-300 text-sky-700 bg-sky-50";
+                      return (
+                        <div key={i} className="py-2 flex items-center gap-2 flex-wrap text-[12px]" data-testid={`hub-event-${i}`}>
+                          <Badge variant="outline" className={`${dirColor} text-[10px] gap-1`}><DirIcon className="h-3 w-3" />{e.direction}</Badge>
+                          <Badge variant="outline" className="text-[10px]">{e.module || "compliance"}</Badge>
+                          <span className="text-muted-foreground">
+                            {e.metrics && (<>total <strong>{e.metrics.total ?? 0}</strong> · {e.metrics.compliance_rate ?? 0}% compliant</>)}
+                            {e.items_pulled !== undefined && (<>pulled <strong>{e.items_pulled}</strong></>)}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground ml-auto"><Clock className="h-2.5 w-2.5 inline mr-1" />{e.ts ? new Date(e.ts).toLocaleString() : "—"}</span>
+                          {e.mode === "live" ? <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> : <Badge variant="outline" className="text-[9px] border-amber-300 text-amber-700">MOCK</Badge>}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <p className="text-[10px] text-muted-foreground text-center">
+              Set <code>XPLAN_API_KEY</code> in the backend <code>.env</code> to flip every adapter from MOCK → LIVE — no other code changes required.
+            </p>
           </TabsContent>
         </Tabs>
       </div>

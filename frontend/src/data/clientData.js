@@ -8,7 +8,7 @@ export const CLIENT_DATA = {
       { id: 1, name: 'David - AustralianSuper (Balanced)', type: 'Super', entity: 'Super', value: 1850000, change: 8.2 },
       { id: 2, name: 'Sarah - REST Super (Growth)', type: 'Super', entity: 'Super', value: 1420000, change: 7.8 },
       { id: 3, name: 'Family Home - Glen Waverley', type: 'Property', entity: 'Personal', value: 2850000, change: 4.1 },
-      { id: 4, name: 'Investment Unit - Brunswick', type: 'Property', entity: 'Joint', value: 1280000, change: 3.8 },
+      { id: 4, name: 'Investment Unit - Brunswick', type: 'Property', entity: 'Joint', value: 1280000, change: 3.8, purchaseDate: '2026-05-20', costBase: 620000 },
       { id: 5, name: 'Holiday House - Portsea', type: 'Property', entity: 'Joint', value: 1950000, change: 5.2 },
       { id: 6, name: 'Vanguard High Growth ETF (VAS)', type: 'Shares', entity: 'Personal', value: 420000, change: 9.5 },
       { id: 7, name: 'BHP Group Ltd', type: 'Shares', entity: 'Personal', value: 185000, change: 6.2 },
@@ -55,7 +55,7 @@ export const CLIENT_DATA = {
       { id: 5, name: 'Michael - AMP Super (Aggressive)', type: 'Super', entity: 'Super', value: 2800000, change: 9.1 },
       { id: 6, name: 'Lisa - Hostplus Super (Growth)', type: 'Super', entity: 'Super', value: 1950000, change: 8.5 },
       { id: 7, name: 'Family Home - Mosman', type: 'Property', entity: 'Personal', value: 5200000, change: 3.2 },
-      { id: 8, name: 'Investment Apartment - Surry Hills', type: 'Property', entity: 'Trust', value: 1850000, change: 4.1 },
+      { id: 8, name: 'Investment Apartment - Surry Hills', type: 'Property', entity: 'Trust', value: 1850000, change: 4.1, purchaseDate: '2026-06-10', costBase: 850000 },
       { id: 9, name: 'Cash Management Account', type: 'Cash', entity: 'Trust', value: 600000, change: 4.5 },
     ],
     liabilities: [

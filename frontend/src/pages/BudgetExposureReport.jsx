@@ -49,12 +49,15 @@ const computeExposure = (id, client) => {
   const hasTrust = detectFamilyTrust(client);
   const distributedIncome = hasTrust ? trustDistributions(client) : 0;
   const propsByStatus = invProps.map((p) => {
-    // Use a default assumed purchase date: 5 years ago. The adviser can refine
-    // on the client's Budget Reforms page.
-    const purchaseDate = new Date(); purchaseDate.setFullYear(purchaseDate.getFullYear() - 5);
+    // Use the property's own purchase date when supplied (so adviser-curated
+    // demo data drives the B_transitional sell-window scenario), otherwise
+    // fall back to "5 years ago" as a conservative working assumption.
+    const purchaseDate = p.purchaseDate ? new Date(p.purchaseDate) : (() => {
+      const d = new Date(); d.setFullYear(d.getFullYear() - 5); return d;
+    })();
     const status = negativeGearingStatus({ purchaseDate, propertyType: "existing", refDate: new Date("2027-07-01") });
-    // Assume 50% of current value is unrealised gain (conservative working assumption).
-    const assumedCostBase = p.value * 0.5;
+    // Prefer the property's recorded cost base; otherwise assume 50% of value.
+    const assumedCostBase = p.costBase ?? p.value * 0.5;
     const preReformCgt = calculateCGT({
       income: client.profile.incomeHousehold || 0, costBase: assumedCostBase, saleProceeds: p.value,
       purchaseDate, saleDate: new Date("2027-06-30"), propertyType: "existing",

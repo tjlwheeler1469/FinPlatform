@@ -1,0 +1,41 @@
+{
+  "summary": "Iter 209 testing — 3 enhancements verified. Backend: 7/7 pytest pass (seed-demo idempotent, by-client thompson_family=4 + chen_family=2 with required fields and desc sort, xplan-sync/log returns 25 entries, push/pull compliance work). Frontend: 2 of 3 features fully working (MyVault meetings 4 cards rendered with tags + Recording badge + count=4; Budget Exposure shows $239.1K total CGT swing, Thompson $86.3K, Chen $133.6K HIGH, all 5 data-testids present, sell-window alerts visible). CRITICAL: XplanSyncHub /xplan-sync-hub 'Sync Log' tab CRASHES with ErrorBoundary on click because backend /api/xplan-sync/xmerge/tokens returns tokens as an OBJECT (dict mapping token name → placeholder) but frontend calls `.slice(0, 12)` on it. Tab renders nothing — hub-sync-log, hub-push-compliance, hub-pull-compliance all missing. Regression: 11/11 routes load OK at first paint (the error only fires after switching to Sync Log tab).",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "XplanSyncHub.jsx (lines 373-385)",
+        "issue": "TypeError: ((intermediate value) || []).slice is not a function — when clicking the 'Sync Log' tab the entire tab crashes via ErrorBoundary. Root cause: data.xmerge_tokens.tokens is an OBJECT (dict) returned by /api/xplan-sync/xmerge/tokens (shape: {\"client.fullname\":\"[entity_name]\", ...}) but the code does `(data.xmerge_tokens?.tokens || []).slice(0, 12)`. Object has no .slice method. Result: data-testids hub-sync-log / hub-push-compliance / hub-pull-compliance never render.",
+        "selector": "[data-testid='hub-tab-synclog']",
+        "priority": "CRITICAL"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration209_features.py",
+    "/app/test_reports/pytest/iteration209.xml"
+  ],
+  "action_items": [
+    "Fix XplanSyncHub.jsx Sync Log tab crash: convert tokens object → array before .slice. Suggested fix at the top of the tab content: `const tokenList = Array.isArray(data.xmerge_tokens?.tokens) ? data.xmerge_tokens.tokens : Object.entries(data.xmerge_tokens?.tokens || {}).map(([k,v])=>({name:k, placeholder:v}));` then use tokenList.slice(0,12). Alternatively normalize on the backend to return tokens as a list. After fix, validate that hub-sync-log, hub-push-compliance, hub-pull-compliance render, the audit log shows 25+ events from /api/xplan-sync/log, and Push/Pull buttons fire toasts + refresh the log."
+  ],
+  "critical_code_review_comments": [
+    "XplanSyncHub.jsx assumes xmerge_tokens.tokens is an array (.slice / .map / .length) but the backend returns a plain object map. This is an API contract mismatch — either fix frontend or change backend response shape. Either way, defensive code (Array.isArray check) should be added before .slice().",
+    "Same file at lines 374, 376, 384, 385 repeats the same dangerous `(data.xmerge_tokens?.tokens || []).slice/.map/.length` pattern — DRY this into a useMemo'd `tokenList` constant.",
+    "Audit log entries don't have data-testid='hub-event-{i}' visible until the tab actually renders (blocked by the slice crash). Once fixed, the 25 entries should render with the existing per-row data-testids."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration209_features.py (new)"
+  ],
+  "success_rate": {"backend": "100%", "frontend": "67%"},
+  "test_credentials": "No login. LocalStorage: wealth_command_compliance_v5='permanent'. For /my-vault: app_mode='client' + selected_client='{\"id\":\"thompson_family\"}'. For everything else: app_mode='adviser'.",
+  "seed_data_creation": "Backend POST /api/meetings/seed-demo inserted 6 meeting notes (4 thompson_family + 2 chen_family) on first call; subsequent calls insert 0 (idempotent confirmed). Total meetings collection now has >=6 docs.",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "ALL 3 ENHANCEMENTS verified except for one critical frontend bug. (1) Backend meetings API and seed-demo idempotency PASS. (2) MyVault Meeting Notes tab fully renders 4 thompson cards with title/tags(capitalized)/summary/attendees/date/Recording badge. vault-meetings-count='4'. (3) Budget Exposure sell-window alerts tile visible with both rows (Thompson $86.3K, Chen $133.6K HIGH), bulk-outreach-btn + all 4 email/ics data-testids present, Total CGT Swing KPI = $239.1K. (4) XplanSyncHub 'Sync Log' tab — data-testid='hub-tab-synclog' EXISTS on the tabs row, but clicking it triggers ErrorBoundary due to .slice on an object (see action_items). After main agent fix, re-verify hub-sync-log/hub-push-compliance/hub-pull-compliance + Push/Pull → toast + audit log refresh.",
+  "rca of the issue": "Reproduction: 1) localStorage set wealth_command_compliance_v5='permanent', app_mode='adviser'. 2) Visit /xplan-sync-hub. 3) Click [data-testid='hub-tab-synclog']. 4) Observe ErrorBoundary fallback ('Application TypeError ... .slice is not a function'). RCA: backend GET /api/xplan-sync/xmerge/tokens returns shape {mode:'mock', tokens:{ 'client.fullname':'[entity_name]', ... }} — tokens is an OBJECT. XplanSyncHub.jsx line 374 calls `(data.xmerge_tokens?.tokens || []).slice(0, 12)` which throws because Object has no .slice method. The whole tab panel is wrapped in one component so the entire tab dies. Mitigation: (a) Frontend — normalize tokens to an array via Object.entries before consumption; (b) Backend — change response to return tokens as `[{name, placeholder}]`. Frontend fix is lower risk and isolated."
+}
