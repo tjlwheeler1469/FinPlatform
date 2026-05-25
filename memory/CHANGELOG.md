@@ -1,3 +1,34 @@
+## Feb 2026 — Iter 209-210: Xplan Sync Hub, Mongo Meetings, Budget Reform demo seed
+
+### 1. Xplan Sync Hub — new "Sync Log" tab (firm-level audit + push/pull)
+- Added a 6th tab to the existing `XplanSyncHub.jsx` (under `/xplan-sync-hub`) that surfaces every Xplan integration touchpoint in one pane:
+  - **Compliance push / pull** module card with `hub-push-compliance` and `hub-pull-compliance` buttons. Push aggregates `compliance_documents` and writes to `/api/xplan-sync/compliance/push`. Pull surfaces external GRC flags into the Compliance Dashboard.
+  - **Xmerge token catalogue** rendering the live `/api/xplan-sync/xmerge/tokens` map (35 tokens — backend returns an object map; frontend coerces via `Object.entries` to `{name, placeholder}` pairs).
+  - **Delivery audit log** consuming `/api/xplan-sync/log` (every push/pull across compliance + future modules, with mode = `mock | live`). 29 events visible at last test.
+- Test IDs: `hub-tab-synclog`, `hub-push-compliance`, `hub-pull-compliance`, `hub-sync-log`, `hub-event-{i}`.
+- Iter 209 caught a CRITICAL `.slice` TypeError because the backend `xmerge/tokens` returns an OBJECT not an array — fix applied (IIFE + `Array.isArray` check + `Object.entries` fallback). Iter 210 re-test: **100% PASS**.
+
+### 2. MyVault meeting notes — Mongo-persisted backend
+- New `routes/meetings.py` (collection `client_meetings`) with endpoints:
+  - `GET  /api/meetings/by-client/{client_id}` — list per-client, desc by date.
+  - `POST /api/meetings/log` — add a new note.
+  - `POST /api/meetings/seed-demo` — idempotent seed (4 thompson + 2 chen).
+- `MyVault.jsx` now consumes `/api/meetings/by-client/{id}` (no more client-side mock). First-load auto-seeds the collection if it returns empty, so the page is never blank on a fresh DB.
+- Test IDs: `vault-meeting-{meeting_id}`, `vault-meetings-count`. Each card shows `recording_available` badge + tag chips.
+
+### 3. Budget Reform outreach demo seed
+- Added `purchaseDate` + `costBase` fields to 2 investment properties in `clientData.js`:
+  - **Thompson — Brunswick** : 2026-05-20 · $620K (CGT swing ≈ $86K)
+  - **Chen — Surry Hills** : 2026-06-10 · $850K (CGT swing ≈ $133K)
+- Updated `computeExposure` in `BudgetExposureReport.jsx` to use these fields when present (falls back to "5 years ago" assumption otherwise).
+- Result: Pre-1 July 2027 sell-window alerts tile is now visible on first load, "Draft 2 outreach emails" pill action appears, per-row Email + Invite buttons render.
+
+### Test verdict
+- Iter 209: 7/7 backend pytest, frontend 2/3 (Sync Log .slice bug caught).
+- Iter 210: frontend 15/15 PASS including all regressions across the 6 hub tabs.
+
+
+
 ## Feb 2026 — Iter 208: Vault parity, Xplan compliance sync, navigation polish
 
 ### 1. Vault parity (adviser ↔ client)
