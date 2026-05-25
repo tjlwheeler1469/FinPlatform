@@ -370,20 +370,34 @@ const XplanSyncHub = () => {
 
             <Card>
               <CardContent className="p-5">
-                <ModuleHeader icon={FileSearch} title="Xmerge token catalogue" subtitle={`${(data.xmerge_tokens?.tokens || []).length} merge tokens registered for SOA / ROA / FSG generation`} mode={data.xmerge_tokens?.mode} />
-                {(data.xmerge_tokens?.tokens || []).slice(0, 12).length > 0 && (
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-                    {(data.xmerge_tokens.tokens || []).slice(0, 12).map((t, i) => (
-                      <div key={i} className="border rounded p-2 bg-slate-50">
-                        <p className="text-[11px] font-mono text-[#1a2744]">{t.token || t.name || t}</p>
-                        {t.description && <p className="text-[10px] text-muted-foreground mt-0.5">{t.description}</p>}
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {(data.xmerge_tokens?.tokens || []).length > 12 && (
-                  <p className="text-[10px] text-muted-foreground mt-2">… and {(data.xmerge_tokens.tokens || []).length - 12} more</p>
-                )}
+                {(() => {
+                  // Normalize tokens — backend returns either an array or an
+                  // object map; we coerce to an array for safe rendering.
+                  const raw = data.xmerge_tokens?.tokens;
+                  const tokenList = Array.isArray(raw)
+                    ? raw
+                    : (raw && typeof raw === "object")
+                      ? Object.entries(raw).map(([name, placeholder]) => ({ name, placeholder, description: placeholder }))
+                      : [];
+                  return (
+                    <>
+                      <ModuleHeader icon={FileSearch} title="Xmerge token catalogue" subtitle={`${tokenList.length} merge tokens registered for SOA / ROA / FSG generation`} mode={data.xmerge_tokens?.mode} />
+                      {tokenList.length > 0 && (
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
+                          {tokenList.slice(0, 12).map((t, i) => (
+                            <div key={i} className="border rounded p-2 bg-slate-50">
+                              <p className="text-[11px] font-mono text-[#1a2744]">{t.token || t.name || String(t)}</p>
+                              {(t.description || t.placeholder) && <p className="text-[10px] text-muted-foreground mt-0.5">{t.description || t.placeholder}</p>}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {tokenList.length > 12 && (
+                        <p className="text-[10px] text-muted-foreground mt-2">… and {tokenList.length - 12} more</p>
+                      )}
+                    </>
+                  );
+                })()}
               </CardContent>
             </Card>
 
