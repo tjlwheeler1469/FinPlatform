@@ -1,3 +1,36 @@
+## Feb 2026 — Iter 212: 4 big-ticket features shipped end-to-end
+
+### 1. Compliance Evidence Pack PDF export
+- New `routes/evidence_pack.py` with `GET /api/evidence/preview-html` (in-app preview) and `POST /api/evidence/generate` (renders HTML → PDF via headless Chromium, persists to Vault with family_key `compliance_evidence_pack` so versions accumulate).
+- Aggregates: compliance metrics (total/approved/pending/rejected/rate), Xplan sync log (rolling 30 days), e-signature audit (rolling 30 days), RBAC denials (rolling 30 days).
+- New action on Xplan Sync Hub > Sync Log tab: `Generate evidence pack` pill button. Toast surfaces v + KB + a download action.
+- Refactored `pdf_render.py` to expose `_render_pdf_bytes()` helper for DRY reuse.
+
+### 2. Advice Marketplace
+- New `routes/advice_marketplace.py` + 6 curated demo templates (`tpl_eofy_tax_loss_harvest`, `tpl_bring_forward_ncc`, `tpl_smsf_lrba_payoff`, `tpl_trust_succession_2028`, `tpl_negative_gearing_transitional`, `tpl_estate_bdbn_refresh`).
+- New `/advice-marketplace` page (3-col grid, ChipFilter category, search, `Clone to Deal` action). Clone increments `clone_count`, creates a draft Deal tagged `marketplace` + `source_template_id`.
+
+### 3. Open API platform
+- New `routes/open_api.py` with scoped token issuance (SHA-256 hashed at rest, plaintext returned ONCE), revocation with audit trail (`rbac_audit`), 9 permission scopes across 5 categories, and a dynamic `GET /spec` returning the live FastAPI OpenAPI 3.1 schema for partner SDK generation.
+- New `/open-api-platform` page: issue/revoke tokens, download OpenAPI spec as JSON, copy plaintext token (amber banner shown once, scoped via Checkbox grid).
+
+### 4. White-label / firm branding
+- New `routes/branding.py` (Mongo doc `firm_branding/_id=default`) with current/update/reset endpoints. Hex validation on colours (returns HTTP 400 on invalid).
+- New `/firm-branding` page: editor on the left, live preview on the right (colour picker re-paints the swatch instantly), Save disabled until dirty.
+
+### 5. Compare contribution paths toggle
+- New `components/ContributionPathCompare.jsx` — runs APRA fund vs SMSF projection at the same household inputs (salary, age, super balance, annual contribution, return rate) over the years-to-67 horizon. Surfaces a single recommendation banner.
+- Added `toggle-compare-paths` button at the top of the Contribution Calculator tab inside RetirementHub. Lazy-loaded.
+
+### Test verdict
+- Iter 212: **backend 17/17 pytest PASS**, **frontend 5/5 critical flows PASS**, 0 functional bugs, 2 pre-existing cosmetic console warnings (confirmed false positives or non-functional).
+- New test file: `/app/backend/tests/test_iteration212_features.py`.
+
+### Nav additions
+- Firm section now includes: Advice Marketplace, API Platform (DEV badge), Firm Branding — using new lucide-react icons (Store, Key, Palette).
+
+
+
 ## Feb 2026 — Iter 211: Navigation & labelling overhaul
 
 11 user-requested cleanups across the global nav and client-tabs:

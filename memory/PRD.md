@@ -1,3 +1,16 @@
+## Feb 2026 — Iter 212: P3 roadmap complete
+
+All previously-deferred P3 items now shipped:
+- **Advice Marketplace** (`/advice-marketplace`) — 6 curated strategy templates, clone-to-Deal pipeline.
+- **Open API Platform** (`/open-api-platform`) — scoped API tokens (SHA-256 hashed, revocable, audited), 9 permission scopes, dynamic OpenAPI 3.1 spec download.
+- **White-label / Firm Branding** (`/firm-branding`) — firm name, colours, logo, PDF footer, AFSL — Mongo-persisted with live preview.
+- **Compliance Evidence Pack PDF** — one-click 30-day audit bundle from the Xplan Sync Hub.
+- **Compare Contribution Paths** — APRA vs SMSF side-by-side comparator inside the Contribution Calculator tab.
+
+Iter 212: 17/17 backend pytest PASS, 5/5 frontend critical flows PASS.
+
+
+
 ## Feb 2026 — Backlog completion (Iter 207)
 
 ### P2 — Budget Reform outreach wiring (DONE)
