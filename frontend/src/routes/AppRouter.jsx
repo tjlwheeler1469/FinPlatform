@@ -117,7 +117,7 @@ const AppRouter = () => (
     <Route path="/investments" element={<UnifiedInvestments />} />
     <Route path="/unlisted-investments" element={<Navigate to="/investments" replace />} />
     <Route path="/property-portfolio" element={<Navigate to="/investments" replace />} />
-    <Route path="/smsf-optimizer" element={<Navigate to="/investments" replace />} />
+    <Route path="/smsf-optimizer" element={<Navigate to="/retirement-confidence" replace />} />
     <Route path="/super-pension" element={<Navigate to="/investments" replace />} />
     <Route path="/share-portfolio" element={<SharePortfolio />} />
     <Route path="/dividend-reinvestment" element={<DividendReinvestment />} />

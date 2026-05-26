@@ -1,3 +1,26 @@
+## Feb 2026 — Iter 211: Navigation & labelling overhaul
+
+11 user-requested cleanups across the global nav and client-tabs:
+
+1. **Hidden** `/budget-reforms` from the client-context Overview nav (route still works as a deep link).
+2. **Moved** `SOA / ROA Builder` (`/advice-document-builder`) to the **top** of the Communications nav.
+3. **Renamed** the UnifiedClientOverview tab `Retirement & Super` → `Retirement`.
+4. **Renamed** the RetirementHub tab `Super & Pension` → `Contribution Calculator`.
+5. **Verified** Retirement Planner numbers flow correctly from Budget + Investments via `scenarioStore` (`HouseholdBudget.setScenario(...)` → `RetirementWorkshop.useScenario()`). Added `lib/scenarioStore.test.mjs` — 4/4 PASS.
+6. **Renamed** the RetirementHub tab `Retirement Plan` → `Retirement Planner`.
+7. **Combined** SMSF Contribution Optimiser into the Contribution Calculator tab — SuperOptimiser at the top, SMSFOptimizer stacked below with a gold-dashed divider.
+8. **Removed** the standalone SMSF tab from RetirementHub (data-testid `rh-tab-smsf` no longer exists).
+9. **Renamed** adviser Today nav `Control Center` → `Client Overview` (path `/retirement-control-center` unchanged).
+10. **Reordered** adviser Today nav — Dashboard now sits ABOVE Client Overview.
+11. **Renamed** clientContextNav Overview entry `Client Overview` → `Overview` (path `/dashboard`).
+12. **Cleanup**: updated `<ErrorBoundary label="Retirement">` (was "Retirement & Super") and pointed the legacy `/smsf-optimizer` redirect at `/retirement-confidence` (RetirementHub) instead of `/investments`.
+
+### Test verdict
+- Iter 211: **100% PASS** (11/11 spec items + 13/13 regression routes + 4/4 scenarioStore integration tests).
+- Pre-existing minor flagged: SuperOptimiser FY-dropdown `<span>` inside `<option>` hydration warning (not caused by this iter — deferred).
+
+
+
 ## Feb 2026 — Iter 209-210: Xplan Sync Hub, Mongo Meetings, Budget Reform demo seed
 
 ### 1. Xplan Sync Hub — new "Sync Log" tab (firm-level audit + push/pull)

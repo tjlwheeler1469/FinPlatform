@@ -74,7 +74,7 @@ const UnifiedClientOverview = () => {
               </ErrorBoundary>
             </TabsContent>
             <TabsContent value="retirement" className="mt-0">
-              <ErrorBoundary label="Retirement & Super">
+              <ErrorBoundary label="Retirement">
                 <Suspense fallback={<TabLoader />}>
                   <RetirementHub clientId={getClientId()} embedded />
                 </Suspense>
