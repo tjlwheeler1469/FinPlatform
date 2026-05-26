@@ -2,17 +2,19 @@
 // (Super & Pension + SMSF) in one page.
 // Single source of truth: pulls from CLIENT_DATA so sub-tabs share consistent
 // salary, super balance, and assets — no duplicate inputs across tabs.
-import { useMemo, lazy, Suspense } from "react";
+import { useMemo, useState, lazy, Suspense } from "react";
 import Layout from "@/components/Layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Gauge, Calculator, Loader2, Landmark } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Gauge, Calculator, Loader2, Landmark, GitCompare } from "lucide-react";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { CLIENT_DATA, getActiveClientId } from "@/data/clientData";
 
 const RetirementWorkshop = lazy(() => import("@/pages/RetirementWorkshop"));
 const SuperOptimiser = lazy(() => import("@/components/SuperOptimiser"));
 const SMSFOptimizer = lazy(() => import("@/pages/SMSFOptimizer"));
+const ContributionPathCompare = lazy(() => import("@/components/ContributionPathCompare"));
 
 const fmt = (v) => new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD", maximumFractionDigits: 0 }).format(v || 0);
 
@@ -27,6 +29,7 @@ const tabClass = "gap-1.5 text-xs sm:text-sm px-3 py-1.5 rounded-md transition-c
 const RetirementHub = ({ embedded = false, clientId: propClientId }) => {
   const clientId = propClientId || getActiveClientId();
   const client = CLIENT_DATA[clientId] || CLIENT_DATA.thompson_family;
+  const [showCompare, setShowCompare] = useState(false);
 
   // Portfolio-integrated defaults derived from CLIENT_DATA (single source).
   // These flow into SuperOptimiser so caps/contributions reflect client context.
@@ -97,6 +100,26 @@ const RetirementHub = ({ embedded = false, clientId: propClientId }) => {
           </ErrorBoundary>
         </TabsContent>
         <TabsContent value="super" className="pt-3 space-y-6">
+          {/* Compare contribution paths toggle — APRA vs SMSF side-by-side. */}
+          <div className="flex justify-end">
+            <Button
+              variant={showCompare ? "default" : "outline"}
+              size="sm"
+              onClick={() => setShowCompare((v) => !v)}
+              className={showCompare ? "bg-[#1a2744] text-white" : ""}
+              data-testid="toggle-compare-paths"
+            >
+              <GitCompare className="h-3.5 w-3.5 mr-1.5" />
+              {showCompare ? "Hide path comparison" : "Compare contribution paths"}
+            </Button>
+          </div>
+          {showCompare && (
+            <ErrorBoundary label="Compare contribution paths">
+              <Suspense fallback={<TabLoader />}>
+                <ContributionPathCompare defaults={superDefaults} />
+              </Suspense>
+            </ErrorBoundary>
+          )}
           {/* Concessional / non-concessional contribution scenarios */}
           <ErrorBoundary label="Super & Pension contributions">
             <Suspense fallback={<TabLoader />}>

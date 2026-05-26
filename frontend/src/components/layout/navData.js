@@ -5,7 +5,8 @@ import {
   Target, Activity, Bot, Upload, Database, Link2, Shield,
   UserPlus, Sparkles, Bell, Zap, CreditCard,
   Settings, MessageSquare, Brain, ListTodo, Video,
-  Bitcoin, Coins, Cable, Gauge, Calendar, FolderLock, Receipt, Mail, AlertTriangle
+  Bitcoin, Coins, Cable, Gauge, Calendar, FolderLock, Receipt, Mail, AlertTriangle,
+  Store, Key, Palette
 } from "lucide-react";
 
 export const personalNavGroups = [
@@ -57,6 +58,9 @@ export const adviserBaseNav = [
       { path: "/rbac-admin", label: "Roles", icon: Shield, title: "Role-Based Access Control matrix · principal / adviser / paraplanner / client", badge: "RBAC" },
       { path: "/budget-exposure", label: "Budget Exposure", icon: AlertTriangle, title: "Portfolio-wide exposure to the 2026-27 Budget reforms · NG · CGT · Trust min-tax · Sell-window alerts", badge: "REFORM" },
       { path: "/execution-rails", label: "Execution Rails", icon: Zap, title: "Route advice tickets through broker / super / insurance / contribution adapters", badge: "RAILS" },
+      { path: "/advice-marketplace", label: "Advice Marketplace", icon: Store, title: "Pre-built strategy templates · one-click clone into Deals pipeline", badge: "NEW" },
+      { path: "/open-api-platform", label: "API Platform", icon: Key, title: "Scoped API tokens + OpenAPI spec download for partner integrations", badge: "DEV" },
+      { path: "/firm-branding", label: "Firm Branding", icon: Palette, title: "White-label settings · firm name, colours, logo, PDF footer" },
       { path: "/product-marketplace", label: "Marketplace", icon: Briefcase, title: "Insurance, mortgages & investment products with referral tracking" },
       { path: "/adviser-compliance", label: "Compliance", icon: Shield, title: "Compliance Dashboard" },
       { path: "/notification-settings", label: "Settings", icon: Settings, title: "Notifications, integrations & security" },

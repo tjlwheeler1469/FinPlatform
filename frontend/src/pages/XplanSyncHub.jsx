@@ -15,7 +15,7 @@ import { CLIENT_DATA, getActiveClientId } from "@/data/clientData";
 import {
   RefreshCw, Upload, Download, Database, Activity, Briefcase, BarChart3,
   FileText, Receipt, Users, FileSearch, ChevronRight, ShieldCheck,
-  ArrowUpRight, ArrowDownLeft, Clock, CheckCircle2, History,
+  ArrowUpRight, ArrowDownLeft, Clock, CheckCircle2, History, FilePlus,
 } from "lucide-react";
 
 const API = process.env.REACT_APP_BACKEND_URL;
@@ -102,6 +102,25 @@ const XplanSyncHub = () => {
       toast.success(`Pulled ${r.items_pulled} GRC flag${r.items_pulled === 1 ? "" : "s"} (${r.mode})`);
       load("synclog", `/api/xplan-sync/log?limit=100`);
     } catch (e) { toast.error("Pull failed", { description: String(e).slice(0, 120) }); }
+  };
+
+  // Compliance Evidence Pack — render server-side PDF + persist to Vault.
+  const [evidenceBusy, setEvidenceBusy] = useState(false);
+  const generateEvidencePack = async () => {
+    setEvidenceBusy(true);
+    try {
+      const r = await fetchJson(`/api/evidence/generate?days=30`, { method: "POST" });
+      toast.success(`Evidence pack v${r.version} generated (${(r.bytes / 1024).toFixed(0)} KB)`, {
+        description: `${r.metrics.total_files} files audited · ${r.metrics.compliance_rate}% compliant. Persisted to Vault.`,
+        duration: 7000,
+        action: {
+          label: "Download",
+          onClick: () => window.open(`${API}/api/files/${r.object_id}`, "_blank"),
+        },
+      });
+    } catch (e) {
+      toast.error("Evidence pack failed", { description: String(e).slice(0, 200) });
+    } finally { setEvidenceBusy(false); }
   };
 
   const syncFeeds = async () => {
@@ -364,6 +383,19 @@ const XplanSyncHub = () => {
                 </ModuleHeader>
                 <p className="text-[11px] text-muted-foreground">
                   Every push aggregates `compliance_documents` and writes a `direction=push` row to the audit log. Every pull surfaces external GRC flags as pending-review rows in the Compliance Dashboard.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-[#D4A84C]/40 bg-[#D4A84C]/5">
+              <CardContent className="p-5">
+                <ModuleHeader icon={FilePlus} title="Compliance Evidence Pack" subtitle="One-click PDF bundle: audit log + dashboard metrics + e-signature events. Perfect for external auditors / PI insurers." mode="ready">
+                  <Button size="sm" onClick={generateEvidencePack} disabled={evidenceBusy} className="bg-[#1a2744] text-white" data-testid="hub-evidence-pack">
+                    <FilePlus className="h-3.5 w-3.5 mr-1" /> {evidenceBusy ? "Generating…" : "Generate evidence pack"}
+                  </Button>
+                </ModuleHeader>
+                <p className="text-[11px] text-muted-foreground">
+                  Rolling 30-day window. Renders via headless Chromium for letter-quality typesetting. Persisted to the Vault under <code className="font-mono">compliance_evidence_pack</code> so versions accumulate.
                 </p>
               </CardContent>
             </Card>

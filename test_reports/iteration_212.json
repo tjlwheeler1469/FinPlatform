@@ -1,0 +1,53 @@
+{
+  "summary": "Iter 212 — Verified 4 new feature surfaces (Evidence Pack PDF, Advice Marketplace, Open API Platform, Firm Branding) + Contribution Path Compare toggle. Backend: 17/17 pytest pass (all endpoints return correct shape, PDF generated 1000+ bytes, OpenAPI spec returns valid 3.x, hashed_secret never leaks, hex validation works, branding round-trip + reset OK). Frontend: all 5 critical flows render + integrate with backend correctly (6 templates, clone toast with Open Activity action, branding editor with live preview side-by-side, evidence pack button wired on Sync Hub, Compare contribution paths toggle reveals APRA vs SMSF cards with RECOMMENDED badge + gold recommendation banner). One pre-existing console warning carried over from iter 211 (SuperOptimiser <span> inside <option> hydration warning) — same item already flagged previously.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "RetirementHub > Contribution Calculator (SuperOptimiser)",
+        "issues": [
+          "Pre-existing (from iter 211): hydration warning — <span> rendered as child of <option> inside FY dropdown. Per main agent note this is a false positive (option content is plain string interpolation) but React still logs the warning at runtime."
+        ]
+      },
+      {
+        "screen": "Compare contribution paths (RetirementHub)",
+        "issues": [
+          "Recharts logs 'width(-1) and height(-1) of chart should be greater than 0' on initial mount inside the comparison card; chart later resolves correctly but the warning appears in console. Cosmetic only — projection numbers render correctly in the cards."
+        ]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration212_features.py",
+    "/app/test_reports/pytest/iter212_results.xml"
+  ],
+  "action_items": [
+    "(Optional, pre-existing) Fix hydration warning in SuperOptimiser FY <option> children — verify no nested <span> at runtime.",
+    "(Optional, cosmetic) Wrap the comparison Recharts container with an explicit min-height so the initial mount doesn't log the width(-1)/height(-1) warning."
+  ],
+  "critical_code_review_comments": [
+    "routes/open_api.py — token issuance returns plaintext token exactly once; list endpoint projects {_id:0, hashed_secret:0} so hashed_secret is never serialised. Good security hygiene. token_prefix kept for last-N display.",
+    "routes/branding.py — hex validation via regex #[0-9A-Fa-f]{6} is strict and returns HTTP 400 for invalid input as expected. Reset endpoint correctly deletes the doc rather than re-seeding defaults, so /current still surfaces is_default:true.",
+    "routes/evidence_pack.py — re-uses _render_pdf_bytes from pdf_render.py (DRY ✓). Persists via local_files._persist with family_key='compliance_evidence_pack' so version increments on each generation. Aggregation queries each cap at 200 rows which is a sensible bound.",
+    "routes/advice_marketplace.py — seed is idempotent (find_one guard before insert). Clone increments clone_count atomically with $inc. Tags carry 'marketplace' label so the audit trail is clear in the Deals pipeline.",
+    "FirmBranding.jsx live-preview-on-edit pattern (color picker → preview swatch) is clean; save button correctly disabled when no fields are dirty.",
+    "OpenAPI spec exposed at /api/open-api/spec dynamically calls app.openapi() — confirmed it returns a complete 3.1 schema under the live ingress (not just localhost)."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration212_features.py (new)"
+  ],
+  "success_rate": {
+    "backend": "100% (17/17 pytest)",
+    "frontend": "100% (5/5 new flows render & integrate correctly)"
+  },
+  "test_credentials": "None — localStorage seed only (wealth_command_compliance_v5='permanent', app_mode='adviser', selected_client={id:'thompson_family'}).",
+  "seed_data_creation": "POST /api/advice-marketplace/seed inserts 6 demo templates (idempotent). Tests also create TEST_pytest_token API tokens (revoked at end of test).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All 4 P3 features (Evidence Pack, Marketplace, Open API, Branding) and the Compare Contribution Paths toggle are live and fully functional end-to-end. Canonical regression: pytest backend/tests/test_iteration212_features.py. Routes to spot-check after future changes: /advice-marketplace, /open-api-platform, /firm-branding, /xplan-sync-hub (Sync Log tab → hub-evidence-pack button), /dashboard → Retirement → Contribution Calculator (toggle-compare-paths). The SuperOptimiser FY <option> hydration warning is still in console but is a known pre-existing false positive (per main agent note in iter 212 brief)."
+}

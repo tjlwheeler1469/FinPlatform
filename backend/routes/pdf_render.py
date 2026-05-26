@@ -103,14 +103,7 @@ async def pdf_from_html(payload: PdfFromHtmlPayload) -> dict:
   th, td {{ padding: 6px 8px; border-bottom: 1px solid #e2e8f0; }}
 </style></head><body>{payload.html}</body></html>
 """
-    with tempfile.TemporaryDirectory() as tmpdir:
-        html_path = Path(tmpdir) / "in.html"
-        pdf_path = Path(tmpdir) / "out.pdf"
-        html_path.write_text(full_html, encoding="utf-8")
-        await _run_chromium(html_path, pdf_path, payload.paper_size, payload.margin_mm)
-        if not pdf_path.exists():
-            raise HTTPException(500, "chromium ran but produced no PDF")
-        content = pdf_path.read_bytes()
+    content = await _render_pdf_bytes(full_html, paper_size=payload.paper_size, margin_mm=payload.margin_mm)
 
     # Persist to the Vault (handles versioning automatically when family_key is supplied)
     meta = await _persist(
@@ -131,3 +124,21 @@ async def pdf_from_html(payload: PdfFromHtmlPayload) -> dict:
         "download_url": f"/api/files/{meta['object_id']}",
         "renderer": "chromium-headless",
     }
+
+
+async def _render_pdf_bytes(html: str, paper_size: str = "A4", margin_mm: int = 12) -> bytes:
+    """Reusable helper: render arbitrary HTML to PDF bytes via headless Chromium.
+
+    Other routes (e.g. /api/evidence/generate) call this to avoid duplicating the
+    chromium subprocess plumbing.
+    """
+    if not CHROMIUM:
+        raise HTTPException(503, "chromium not installed — server-side PDF rendering unavailable")
+    with tempfile.TemporaryDirectory() as tmpdir:
+        html_path = Path(tmpdir) / "in.html"
+        pdf_path = Path(tmpdir) / "out.pdf"
+        html_path.write_text(html, encoding="utf-8")
+        await _run_chromium(html_path, pdf_path, paper_size, margin_mm)
+        if not pdf_path.exists():
+            raise HTTPException(500, "chromium ran but produced no PDF")
+        return pdf_path.read_bytes()
