@@ -1,3 +1,16 @@
+## Feb 2026 — Iter 213: Contribution Calculator — unified single-page layout
+
+- **Renamed** SuperOptimiser inline header `Super Contribution Optimiser` → `Contribution Calculator` (subtitle preserved).
+- **Removed** the gold-dashed divider + "SMSF contribution optimiser — spouse / personal / Div 293 modelling for self-managed funds" subtitle in RetirementHub.
+- **Conditionally hidden** the embedded SMSFOptimizer's H1 ("SMSF Contribution Optimizer") + subtitle ("Maximize your superannuation tax benefits and retirement savings") + 3 redundant info cards (Concessional / NCC / Div 293) when `embedded=true`. Standalone deep-link behaviour preserved.
+- **Fixed** pre-existing JSX parse error at `SuperOptimiser.jsx:190` where an inline `>` inside JSX text was breaking lint — escaped to `{'>'}`.
+- **Pinpointed** the long-standing `<span> inside <option>` hydration warning: it's caused by an **Emergent dev-tool injecting `<span data-ve-dynamic='true'>` wrappers** at runtime — not application code. Confirmed as a tooling artifact, not a bug.
+
+### Test verdict
+- Iter 213: **15/15 PASS** (all forbidden strings removed, header renamed, embedded info cards correctly hidden, compare-paths toggle still works, all 15 regression routes return 200).
+
+
+
 ## Feb 2026 — Iter 212: 4 big-ticket features shipped end-to-end
 
 ### 1. Compliance Evidence Pack PDF export
