@@ -46,7 +46,7 @@ const UnifiedClientOverview = () => {
                 <Target className="h-3.5 w-3.5" /> Goals
               </TabsTrigger>
               <TabsTrigger value="retirement" className={tabTriggerClass} data-testid="client-tab-retirement">
-                <Gauge className="h-3.5 w-3.5" /> Retirement &amp; Super
+                <Gauge className="h-3.5 w-3.5" /> Retirement
               </TabsTrigger>
               <TabsTrigger value="investments" className={tabTriggerClass} data-testid="client-tab-investments">
                 <TrendingUp className="h-3.5 w-3.5" /> Investments

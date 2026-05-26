@@ -1,11 +1,12 @@
-// RetirementHub — combined Retirement · Super & Pension · SMSF in one page.
+// RetirementHub — combined Retirement Planner · Contribution Calculator
+// (Super & Pension + SMSF) in one page.
 // Single source of truth: pulls from CLIENT_DATA so sub-tabs share consistent
 // salary, super balance, and assets — no duplicate inputs across tabs.
 import { useMemo, lazy, Suspense } from "react";
 import Layout from "@/components/Layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Gauge, PiggyBank, Building2, Loader2, Landmark } from "lucide-react";
+import { Gauge, Calculator, Loader2, Landmark } from "lucide-react";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { CLIENT_DATA, getActiveClientId } from "@/data/clientData";
 
@@ -84,31 +85,38 @@ const RetirementHub = ({ embedded = false, clientId: propClientId }) => {
 
       <Tabs defaultValue="plan">
         <TabsList className="bg-white border h-10 w-full justify-start gap-1 px-1 overflow-x-auto">
-          <TabsTrigger value="plan" className={tabClass} data-testid="rh-tab-plan"><Gauge className="h-3.5 w-3.5" /> Retirement Plan</TabsTrigger>
-          <TabsTrigger value="super" className={tabClass} data-testid="rh-tab-super"><Landmark className="h-3.5 w-3.5" /> Super &amp; Pension</TabsTrigger>
-          <TabsTrigger value="smsf" className={tabClass} data-testid="rh-tab-smsf"><Building2 className="h-3.5 w-3.5" /> SMSF</TabsTrigger>
+          <TabsTrigger value="plan" className={tabClass} data-testid="rh-tab-plan"><Gauge className="h-3.5 w-3.5" /> Retirement Planner</TabsTrigger>
+          <TabsTrigger value="super" className={tabClass} data-testid="rh-tab-super"><Calculator className="h-3.5 w-3.5" /> Contribution Calculator</TabsTrigger>
         </TabsList>
 
         <TabsContent value="plan" className="pt-3">
-          <ErrorBoundary label="Retirement Plan">
+          <ErrorBoundary label="Retirement Planner">
             <Suspense fallback={<TabLoader />}>
               <RetirementWorkshop clientId={clientId} embedded />
             </Suspense>
           </ErrorBoundary>
         </TabsContent>
-        <TabsContent value="super" className="pt-3">
-          <ErrorBoundary label="Super & Pension">
+        <TabsContent value="super" className="pt-3 space-y-6">
+          {/* Concessional / non-concessional contribution scenarios */}
+          <ErrorBoundary label="Super & Pension contributions">
             <Suspense fallback={<TabLoader />}>
               <SuperOptimiser clientId={clientId} embedded defaults={superDefaults} />
             </Suspense>
           </ErrorBoundary>
-        </TabsContent>
-        <TabsContent value="smsf" className="pt-3">
-          <ErrorBoundary label="SMSF">
-            <Suspense fallback={<TabLoader />}>
-              <SMSFOptimizer embedded clientId={clientId} />
-            </Suspense>
-          </ErrorBoundary>
+          {/* SMSF-specific contribution optimisation (merged in from the
+              old standalone SMSF tab — see iter 211 change request). */}
+          <div className="pt-2 border-t border-dashed border-[#D4A84C]/40">
+            <div className="flex items-center gap-2 mb-3">
+              <Landmark className="h-4 w-4 text-[#D4A84C]" />
+              <h3 className="text-sm font-semibold text-[#1a2744]">SMSF contribution optimiser</h3>
+              <span className="text-[10px] text-muted-foreground italic">— spouse / personal / Div 293 modelling for self-managed funds</span>
+            </div>
+            <ErrorBoundary label="SMSF contribution optimiser">
+              <Suspense fallback={<TabLoader />}>
+                <SMSFOptimizer embedded clientId={clientId} />
+              </Suspense>
+            </ErrorBoundary>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

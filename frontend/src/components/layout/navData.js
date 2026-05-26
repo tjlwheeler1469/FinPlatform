@@ -35,8 +35,8 @@ export const adviserBaseNav = [
     name: "Today",
     icon: LayoutDashboard,
     items: [
-      { path: "/retirement-control-center", label: "Control Center", icon: Gauge, title: "Retirement-first adviser dashboard", badge: "NEW" },
       { path: "/advisor-command-center", label: "Dashboard", icon: LayoutDashboard, title: "Firm overview, priorities & daily briefing — all in one" },
+      { path: "/retirement-control-center", label: "Client Overview", icon: Gauge, title: "Retirement-first adviser dashboard", badge: "NEW" },
     ]
   },
   {
@@ -69,9 +69,8 @@ export const clientContextNav = [
     name: "Overview",
     icon: Eye,
     items: [
-      { path: "/dashboard", label: "Client Overview", icon: Wallet, title: "Overview, Goals, Retirement, Investments, Budget & Tax", badge: "360" },
+      { path: "/dashboard", label: "Overview", icon: Wallet, title: "Overview, Goals, Retirement, Investments, Budget & Tax", badge: "360" },
       { path: "/client-capture", label: "Client Information", icon: ListTodo, title: "Client information: contact, service overview, reviews, FSG, risk profile" },
-      { path: "/budget-reforms", label: "Budget 2027 Reforms", icon: Landmark, title: "Negative gearing, CGT (new vs existing) & discretionary trust reforms · 2026–27 Federal Budget", badge: "TAX" },
       { path: "/client-invoicing", label: "Invoicing", icon: Receipt, title: "Invoices, fees & billing for this client" },
     ]
   },
@@ -79,10 +78,10 @@ export const clientContextNav = [
     name: "Communications",
     icon: Mail,
     items: [
+      { path: "/advice-document-builder", label: "SOA / ROA Builder", icon: FileText, title: "Generate Statement of Advice or Record of Advice (RG175 compliant, ASIC info-267/266 format)", badge: "NEW" },
       { path: "/messages", label: "Messages", icon: Mail, title: "Message this client" },
       { path: "/client-comms-checklist", label: "Checklist", icon: ListTodo, title: "Required Communications Checklist & Timeline" },
       { path: "/meeting-notes", label: "Meeting Notes", icon: Video, title: "Meeting Notes" },
-      { path: "/advice-document-builder", label: "SOA / ROA Builder", icon: FileText, title: "Generate Statement of Advice or Record of Advice (RG175 compliant, ASIC info-267/266 format)", badge: "NEW" },
       { path: "/vault-documents", label: "Vault", icon: FolderOpen, title: "Document Vault · versioned PDFs (v1/v2/v3) + metadata tag search · local persistent disk" },
       { path: "/ai-copilot-advanced", label: "AI Insights", icon: Brain, title: "AI-driven insights & next best actions" },
     ]
