@@ -187,7 +187,7 @@ const StrategyCard = ({ strategy, onChange, onRemove, color, idx, rules }) => {
           <div className="flex items-start gap-2 p-2 bg-amber-50 border border-amber-200 rounded text-xs"><Info className="h-3 w-3 text-amber-600 mt-0.5" /><span className="text-amber-800">Excess concessional: {fmt(result.concessionalExcess)} will be taxed at marginal rate + interest charge.</span></div>
         )}
         {result.div293Due && (
-          <div className="flex items-start gap-2 p-2 bg-rose-50 border border-rose-200 rounded text-xs"><Gavel className="h-3 w-3 text-rose-600 mt-0.5" /><span className="text-rose-800">Div 293 triggered: extra 15% tax = {fmt(result.div293Amount)} (income + concessional > ${rules.div293Threshold.toLocaleString()}).</span></div>
+          <div className="flex items-start gap-2 p-2 bg-rose-50 border border-rose-200 rounded text-xs"><Gavel className="h-3 w-3 text-rose-600 mt-0.5" /><span className="text-rose-800">Div 293 triggered: extra 15% tax = {fmt(result.div293Amount)} (income + concessional {">"} ${rules.div293Threshold.toLocaleString()}).</span></div>
         )}
 
         {/* Sliders */}
@@ -274,7 +274,7 @@ const SuperOptimiser = ({ clientId = "thompson_family", embedded = false, defaul
         <div>
           <h2 className="text-lg font-bold text-[#1a2744] flex items-center gap-2">
             <PiggyBank className="h-5 w-5 text-[#D4A84C]" />
-            Super Contribution Optimiser
+            Contribution Calculator
           </h2>
           <p className="text-xs text-muted-foreground">Strategy modelling · concessional + non-concessional caps · Div 293 · bring-forward & carry-forward · {strategies.length} scenario{strategies.length !== 1 ? "s" : ""}</p>
         </div>

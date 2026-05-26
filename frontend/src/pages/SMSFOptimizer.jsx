@@ -103,58 +103,23 @@ const SMSFOptimizer = ({ embedded = false }) => {
   const concessionalCapUsed = result?.contributions?.total_concessional ? (result.contributions.total_concessional / 30000) * 100 : 0;
 
   const content = (
-      <div className="space-y-8" data-testid="smsf-optimizer-page">
-        {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold  text-foreground">
-            SMSF Contribution Optimizer
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Maximize your superannuation tax benefits and retirement savings
-          </p>
-        </div>
-
-        {/* Info Cards — moved above calculator per user feedback */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card data-testid="concessional-info">
-            <CardHeader>
-              <CardTitle className="text-lg ">Concessional Cap</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-[#1a2744] mb-2">$30,000</div>
-              <p className="text-sm text-muted-foreground">
-                Annual limit for pre-tax contributions including employer super,
-                salary sacrifice, and personal deductible contributions. Taxed at 15%.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card data-testid="nonconcessional-info">
-            <CardHeader>
-              <CardTitle className="text-lg ">Non-Concessional Cap</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-[#D4A84C] mb-2">$120,000</div>
-              <p className="text-sm text-muted-foreground">
-                Annual limit for after-tax contributions. Can bring forward up to
-                3 years ($360,000) if under 75 and TSB under $1.9M.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card data-testid="div293-info">
-            <CardHeader>
-              <CardTitle className="text-lg ">Division 293</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-destructive mb-2">$250,000</div>
-              <p className="text-sm text-muted-foreground">
-                If income + super contributions exceed $250,000, an additional
-                15% tax applies to some concessional contributions.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+      <div className="space-y-6" data-testid="smsf-optimizer-page">
+        {/* Header + 3 info cards rendered ONLY when standalone. Embedded mode
+            (inside Contribution Calculator tab) skips them so the page flows
+            as one cohesive calculator — per iter 213 user feedback. */}
+        {!embedded && (
+          <>
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">SMSF Contribution Optimizer</h1>
+              <p className="text-muted-foreground mt-1">Maximize your superannuation tax benefits and retirement savings</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card data-testid="concessional-info"><CardHeader><CardTitle className="text-lg ">Concessional Cap</CardTitle></CardHeader><CardContent><div className="text-3xl font-bold text-[#1a2744] mb-2">$30,000</div><p className="text-sm text-muted-foreground">Annual limit for pre-tax contributions including employer super, salary sacrifice, and personal deductible contributions. Taxed at 15%.</p></CardContent></Card>
+              <Card data-testid="nonconcessional-info"><CardHeader><CardTitle className="text-lg ">Non-Concessional Cap</CardTitle></CardHeader><CardContent><div className="text-3xl font-bold text-[#D4A84C] mb-2">$120,000</div><p className="text-sm text-muted-foreground">Annual limit for after-tax contributions. Can bring forward up to 3 years ($360,000) if under 75 and TSB under $1.9M.</p></CardContent></Card>
+              <Card data-testid="div293-info"><CardHeader><CardTitle className="text-lg ">Division 293</CardTitle></CardHeader><CardContent><div className="text-3xl font-bold text-destructive mb-2">$250,000</div><p className="text-sm text-muted-foreground">If income + super contributions exceed $250,000, an additional 15% tax applies to some concessional contributions.</p></CardContent></Card>
+            </div>
+          </>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Input Section */}

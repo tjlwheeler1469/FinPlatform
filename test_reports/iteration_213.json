@@ -1,0 +1,47 @@
+{
+  "summary": "Iter 213 frontend-only UI/UX cleanup verified. All 4 forbidden strings removed from the Contribution Calculator tab, the SuperOptimiser header now reads 'Contribution Calculator', and the 3 redundant info cards are correctly hidden when SMSFOptimizer is embedded. Compare-paths toggle works. Retirement Planner tab regression OK. All 15 regression routes return HTTP 200 with no JS page errors. JSX `>` escape on SuperOptimiser line 190 confirmed working (no parse error).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "/retirement-confidence > Contribution Calculator", "issues": ["Recharts emits repeated 'width(-1) and height(-1) should be greater than 0' console warnings on initial mount before tab content becomes visible — cosmetic, pre-existing, not introduced by iter 213."]}
+    ],
+    "hydration_warnings": [
+      {"component": "SuperOptimiser FY selector <option>", "issue": "Hydration warning: '<span> cannot be a child of <option>'. Caused by an Emergent dev-tool injecting a <span data-ve-dynamic='true' style='display:contents'> wrapper inside <option> elements (SuperOptimiser.jsx line 285). Console error visible in dev but does not break the dropdown — appears to be tooling/dev-injection, not application code. Likely also present in iter 212. Flagging for awareness; if seen in production build it would need replacing the inline expression in <option> with a non-wrappable static text."}
+    ]
+  },
+  "tests_executed": {
+    "header_renamed_to_contribution_calculator": "PASS (h2 text='Contribution Calculator')",
+    "no_super_contribution_optimiser_text": "PASS (count=0)",
+    "no_smsf_contribution_optimizer_h1": "PASS (count=0)",
+    "no_maximize_your_superannuation_subtitle": "PASS (count=0)",
+    "no_smsf_contribution_optimiser_divider": "PASS (count=0)",
+    "no_spouse_personal_div293_tagline": "PASS (count=0)",
+    "concessional_info_hidden_in_tab": "PASS",
+    "nonconcessional_info_hidden_in_tab": "PASS",
+    "div293_info_hidden_in_tab": "PASS",
+    "toggle_compare_paths_present": "PASS (button exists, toggles state)",
+    "super_optimiser_embedded_renders": "PASS (data-testid='super-optimiser')",
+    "smsf_optimizer_embedded_renders": "PASS (data-testid='smsf-optimizer-page')",
+    "retirement_planner_tab_regression": "PASS",
+    "div293_jsx_parse_error_resolved": "PASS (Div 293 alert renders with '>' escaped via {'>'}; alert visible in UI)",
+    "regression_routes_200": "PASS (15/15 routes: /, /deals, /budget-exposure, /vault-documents, /webhooks-admin, /rbac-admin, /execution-rails, /adviser-hub, /adviser-compliance, /client-capture, /my-vault, /xplan-sync-hub, /advice-marketplace, /open-api-platform, /firm-branding — all status=200, zero pageerror)"
+  },
+  "test_report_links": [],
+  "action_items": [
+    "OPTIONAL: investigate the hydration warning '<span> cannot be a child of <option>' on SuperOptimiser FY selector. The wrapper appears to be injected by an Emergent dev tool, but if it persists in production it should be addressed (e.g., move the dynamic '· cap {amount}' text out of the <option> children via a sibling label, or guard against dev wrapping)."
+  ],
+  "critical_code_review_comments": [
+    "RetirementHub.jsx is clean and reads well — the {!embedded && ...} guard in SMSFOptimizer.jsx correctly skips both the H1 and the 3 info cards in embedded mode while preserving them for the standalone /smsf-optimizer route (though /smsf-optimizer is currently a Navigate redirect per iter 211, so this path is reachable only via direct embed=false invocation).",
+    "SMSFOptimizer.jsx still imports 'Landmark' and several lucide icons (Lightbulb, PiggyBank, Calendar, TrendingUp) — Landmark is used at line 472 (empty state) but PiggyBank/Calendar/TrendingUp appear unused. Minor — does not block.",
+    "Recharts repeated width(-1) warnings on hidden tabs suggest using AreaChart inside an inactive TabsContent causes premature mount; consider lazy-mounting charts only when their TabsContent is active or wrapping ResponsiveContainer with display:block guard."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a (frontend-only request)", "frontend": "100%"},
+  "test_credentials": "No login. LocalStorage seeded: wealth_command_compliance_v5='permanent', app_mode='adviser', selected_client='{\"id\":\"thompson_family\"}'.",
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iter 213 UI cleanup verified end-to-end. All forbidden strings removed from the embedded Contribution Calculator tab; SuperOptimiser header is now 'Contribution Calculator'; SMSFOptimizer skips H1 and 3 info cards when embedded. JSX parse error on SuperOptimiser line 190 fixed via {'>'}. 15 regression routes all 200. The only outstanding observation is a hydration warning about <span> inside <option> in the FY selector, which appears to be an Emergent dev-tool injection rather than app code — flagged for awareness."
+}
