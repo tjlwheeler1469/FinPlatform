@@ -1,0 +1,39 @@
+{
+  "summary": "Iter 216 testing — 6 of 7 items PASS. CRITICAL: /api-sandbox route conflicts with Kubernetes ingress /api* prefix rule; URL returns FastAPI 404 instead of serving React SPA. All other items verified working: Goals sub-tab removed, 7 editable assumption fields present, reset-to-base button shows/hides correctly, base scenario has no reset buttons, suggest-optimal-btn renders and clicks, meeting_automation auto-publishes to client_meetings (verified via GET /api/meetings/by-client/thompson_family — source='meeting_automation' present), BrandingProvider injects --brand-primary=#1a2744 and --brand-accent=#D4A84C on :root.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "ApiSandbox route",
+        "issue": "Route path '/api-sandbox' is intercepted by Kubernetes ingress /api* prefix rule and routed to FastAPI which returns {\"detail\":\"Not Found\"} (HTTP 404). The React SPA never receives the request, so the page does not render at all. Same problem will hit any URL that starts with '/api'.",
+        "selector": "[data-testid='api-sandbox']",
+        "priority": "CRITICAL"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Retirement Workshop chart container", "issues": ["Recharts logs width(-1)/height(-1) warning when chart container is initially collapsed/hidden — cosmetic console noise only"]}
+    ]
+  },
+  "test_report_links": ["/app/test_reports/iteration_216.json"],
+  "action_items": [
+    "RENAME the /api-sandbox route to a path that does NOT start with /api (e.g. /sandbox, /developer-sandbox, /open-api-sandbox-runner, or /dev-playground). Update AppRouter.jsx Route path, navData.js path, and lazyPages.js if it references it. The Kubernetes ingress rule sends every /api/* and /api-* path to backend:8001; the frontend SPA never sees the request."
+  ],
+  "critical_code_review_comments": [
+    "ApiSandbox route name must avoid '/api' prefix — it is reserved for backend routing by ingress.",
+    "BrandingProvider correctly applies defaults synchronously before fetch so first paint is consistent.",
+    "RetirementWorkshop InputWithReset cleanly compares numeric values; baseValue is hidden for base scenario via isBase guard — correct.",
+    "ApiSandbox.jsx is self-contained but unused once route is broken; fix the path first."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100%", "frontend": "85% (6/7 features work; 1 blocked by route conflict)"},
+  "test_credentials": "No login. LocalStorage compliance bypass used.",
+  "seed_data_creation": "Created 1 meeting_automation record (David Thompson, annual_review, 2026-05-27) via POST /api/meeting-automation/generate-notes",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "After main agent renames /api-sandbox to non-/api path, re-test (a) the renamed page loads with [data-testid='api-sandbox'], (b) nav link points to the new path, (c) GET endpoint execute returns 200, (d) POST endpoint reveals body textarea. All other Iter 216 items already verified passing — no need to re-run.",
+  "rca of the issue": "Kubernetes ingress in this environment forwards any path matching /api or /api-* to the backend FastAPI service at port 8001. The route '/api-sandbox' matches this prefix rule. FastAPI has no /api-sandbox endpoint registered, so it returns HTTP 404 {\"detail\":\"Not Found\"}. The React SPA bundle never receives the navigation request, so AppRouter cannot match the React Route. Reproduction: curl https://decision-engine-109.preview.emergentagent.com/api-sandbox -> returns 404 JSON from FastAPI (Content-Type application/json) instead of HTML. Mitigation: rename the React route and nav entry to a path that does not start with /api (e.g. /sandbox or /developer-sandbox). No backend changes required."
+}

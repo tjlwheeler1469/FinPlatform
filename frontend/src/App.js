@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { XplanSyncProvider, XplanSyncIndicator } from "@/components/XplanSyncNotification";
+import BrandingProvider from "@/components/BrandingProvider";
 import { LanguageProvider } from "@/components/LanguageContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import AppRouter from "@/routes/AppRouter";
@@ -416,6 +417,7 @@ const PortfolioProvider = ({ children }) => {
 function App() {
   return (
     <div className="App min-h-screen bg-background">
+      <BrandingProvider>
       <BrowserRouter>
         <LanguageProvider>
           <AuthProvider>
@@ -436,6 +438,7 @@ function App() {
           </AuthProvider>
         </LanguageProvider>
       </BrowserRouter>
+      </BrandingProvider>
     </div>
   );
 }

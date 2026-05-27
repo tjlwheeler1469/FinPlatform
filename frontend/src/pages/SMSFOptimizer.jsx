@@ -96,6 +96,37 @@ const SMSFOptimizer = ({ embedded = false }) => {
     }
   };
 
+  // "Suggest optimal" — auto-fills salary sacrifice + NCC values based on the
+  // entered taxable income, current concessional usage, and Div 293 threshold.
+  // Heuristic:
+  //   - Fill the concessional cap ($30k) with salary sacrifice up to the point
+  //     where total assessable income (taxable + concessional) hits the Div 293
+  //     threshold ($250k) — avoid the surcharge surprise.
+  //   - For Non-Concessional, suggest $30k (one-tenth of the bring-forward cap)
+  //     if the household has cash on hand (super balance > $250k indicates it).
+  const suggestOptimal = () => {
+    const concessionalCap = 30000;
+    const div293Threshold = 250000;
+    const usedConcessional = (employerContribution || 0) + (personalContribution || 0);
+    const room = Math.max(0, concessionalCap - usedConcessional);
+
+    // Headroom before Div 293 triggers: keep total assessable below $250k.
+    const div293Room = Math.max(0, div293Threshold - taxableIncome - usedConcessional);
+    const optimalSacrifice = Math.max(0, Math.min(room, div293Room));
+
+    // NCC suggestion only when super balance signals capacity to fund post-tax.
+    const optimalNcc = superBalance > 250000 ? 30000 : 0;
+
+    setSalarySacrifice(Math.round(optimalSacrifice));
+    setNonConcessional(optimalNcc);
+    toast.success(
+      `Suggested: $${optimalSacrifice.toLocaleString()} salary sacrifice` +
+      (optimalNcc > 0 ? ` + $${optimalNcc.toLocaleString()} NCC` : "") +
+      ` (avoids Div 293, fills concessional cap)`,
+      { duration: 6000 }
+    );
+  };
+
   // Generate projection chart data
   const generateProjectionData = () => {
     if (!result?.projections) return [];
@@ -168,15 +199,26 @@ const SMSFOptimizer = ({ embedded = false }) => {
                   <> · Non-concessional: <strong>{formatCurrency(nonConcessional + spouseContribution)}</strong> / $120,000 cap</>
                 )}
               </p>
-              <Button
-                onClick={calculateStrategy}
-                className="bg-[#1a2744] hover:bg-[#1a2744]/90"
-                disabled={loading}
-                data-testid="calculate-smsf-btn"
-              >
-                <Calculator className="h-4 w-4 mr-2" />
-                {loading ? "Calculating…" : "Calculate"}
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={suggestOptimal}
+                  className="border-[#D4A84C] text-[#D4A84C] hover:bg-[#D4A84C]/10"
+                  data-testid="suggest-optimal-btn"
+                >
+                  <Lightbulb className="h-4 w-4 mr-1.5" />
+                  Suggest optimal
+                </Button>
+                <Button
+                  onClick={calculateStrategy}
+                  className="bg-[#1a2744] hover:bg-[#1a2744]/90"
+                  disabled={loading}
+                  data-testid="calculate-smsf-btn"
+                >
+                  <Calculator className="h-4 w-4 mr-2" />
+                  {loading ? "Calculating…" : "Calculate"}
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

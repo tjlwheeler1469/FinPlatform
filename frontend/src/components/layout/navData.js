@@ -6,7 +6,7 @@ import {
   UserPlus, Sparkles, Bell, Zap, CreditCard,
   Settings, MessageSquare, Brain, ListTodo, Video,
   Bitcoin, Coins, Cable, Gauge, Calendar, FolderLock, Receipt, Mail, AlertTriangle,
-  Store, Key, Palette
+  Store, Key, Palette, Play
 } from "lucide-react";
 
 export const personalNavGroups = [
@@ -60,6 +60,7 @@ export const adviserBaseNav = [
       { path: "/execution-rails", label: "Execution Rails", icon: Zap, title: "Route advice tickets through broker / super / insurance / contribution adapters", badge: "RAILS" },
       { path: "/advice-marketplace", label: "Advice Marketplace", icon: Store, title: "Pre-built strategy templates · one-click clone into Deals pipeline", badge: "NEW" },
       { path: "/open-api-platform", label: "API Platform", icon: Key, title: "Scoped API tokens + OpenAPI spec download for partner integrations", badge: "DEV" },
+      { path: "/api-sandbox", label: "API Sandbox", icon: Play, title: "Live request runner — paste your token, pick an endpoint, execute against the live API" },
       { path: "/firm-branding", label: "Firm Branding", icon: Palette, title: "White-label settings · firm name, colours, logo, PDF footer" },
       { path: "/product-marketplace", label: "Marketplace", icon: Briefcase, title: "Insurance, mortgages & investment products with referral tracking" },
       { path: "/adviser-compliance", label: "Compliance", icon: Shield, title: "Compliance Dashboard" },

@@ -30,7 +30,7 @@ import {
   AdviserDashboard, AdviserHub, AdvisorCommandCenter, AdvisorIntelligenceDashboard,
   DailyBriefing, CommandCenter, IntelligenceEngine, DecisionCenter, DecisionEngine,
   DecisionDashboard, NextBestActions, ClientIntelligenceFeed, WorkflowDashboard,
-  BookIntelligence, MeetingAutomation, BatchExecution, ExecutionRails, BudgetReforms2027, BudgetExposureReport, DealsPipeline, VaultDocuments, WebhooksAdmin, RbacAdmin, AdviceMarketplace, OpenApiPlatform, FirmBranding, MeetingPrep, MeetingNotes,
+  BookIntelligence, MeetingAutomation, BatchExecution, ExecutionRails, BudgetReforms2027, BudgetExposureReport, DealsPipeline, VaultDocuments, WebhooksAdmin, RbacAdmin, AdviceMarketplace, OpenApiPlatform, FirmBranding, ApiSandbox, MeetingPrep, MeetingNotes,
   MeetingSummaryGenerator, Copilot, AIAdvisor, AICopilot, AICopilotAdvanced,
   AIInsights, FinancialAdvisorChat, FinancialPlanGenerator, FinancialRecommendations,
   AdviceWorkflow, FeedbackAnalytics,
@@ -195,6 +195,7 @@ const AppRouter = () => (
     <Route path="/rbac-admin" element={<RbacAdmin />} />
     <Route path="/advice-marketplace" element={<AdviceMarketplace />} />
     <Route path="/open-api-platform" element={<OpenApiPlatform />} />
+    <Route path="/api-sandbox" element={<ApiSandbox />} />
     <Route path="/firm-branding" element={<FirmBranding />} />
     <Route path="/knowledge-graph" element={<Navigate to="/advisor-command-center" replace />} />
     <Route path="/ai-copilot" element={<Navigate to="/ai-copilot-advanced" replace />} />

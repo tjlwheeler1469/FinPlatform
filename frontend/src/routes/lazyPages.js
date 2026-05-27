@@ -148,6 +148,7 @@ export const RbacAdmin = lazyRetry(() => import("@/pages/RbacAdmin"));
 export const AdviceMarketplace = lazyRetry(() => import("@/pages/AdviceMarketplace"));
 export const OpenApiPlatform = lazyRetry(() => import("@/pages/OpenApiPlatform"));
 export const FirmBranding = lazyRetry(() => import("@/pages/FirmBranding"));
+export const ApiSandbox = lazyRetry(() => import("@/pages/ApiSandbox"));
 export const MeetingPrep = lazyRetry(() => import("@/pages/MeetingPrep"));
 export const MeetingNotes = lazyRetry(() => import("@/pages/MeetingNotes"));
 export const MeetingSummaryGenerator = lazyRetry(() => import("@/pages/MeetingSummaryGenerator"));

@@ -182,7 +182,34 @@ async def generate_meeting_notes(request: MeetingNotesRequest):
     }
     
     MEETINGS[meeting_id] = meeting_record
-    
+
+    # Auto-publish to MyVault — write a parallel record to the Mongo-persisted
+    # `client_meetings` collection so the client-facing /my-vault > Meeting
+    # Notes tab surfaces this meeting without manual seeding (iter 216).
+    try:
+        from db import db
+        summary_text = (notes_result.get("notes", {}).get("summary")
+                        or f"{request.meeting_type.replace('_', ' ').title()} with {request.client_name}")
+        attendees_text = (
+            ", ".join(request.attendees)
+            if isinstance(request.attendees, list) else (request.attendees or "")
+        )
+        await db["client_meetings"].insert_one({
+            "meeting_id": meeting_id,
+            "client_id": request.client_id,
+            "title": summary_text[:120],
+            "date": request.meeting_date,
+            "summary": summary_text,
+            "attendees": attendees_text,
+            "recording_available": False,
+            "adviser_name": None,
+            "tags": ["meeting_automation", request.meeting_type],
+            "source": "meeting_automation",
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        })
+    except Exception as e:
+        logger.warning(f"Failed to publish meeting to client_meetings: {e}")
+
     # Generate compliance log
     compliance_entry = generate_compliance_log(meeting_id, meeting_record)
     

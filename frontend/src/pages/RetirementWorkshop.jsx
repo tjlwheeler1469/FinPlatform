@@ -86,8 +86,34 @@ const FieldRow = ({ label, children, hint }) => (
   </div>
 );
 
+// Reset-to-base wrapper — shows a small ↺ button next to an input when its
+// current value deviates from the equivalent value in the base scenario.
+const InputWithReset = ({ children, scenario, field, isBase, baseValue, onReset }) => {
+  // Skip for base scenario or when baseValue is missing.
+  if (isBase || baseValue === undefined || baseValue === null) return children;
+  // Read the rendered numeric value off the wrapped <Input> so the diff
+  // works for both direct fields and derived fields (Years to retire, etc.).
+  const currentValue = Number(children?.props?.value);
+  const isDirty = Number.isFinite(currentValue) && Number(baseValue) !== currentValue;
+  if (!isDirty) return children;
+  return (
+    <div className="relative">
+      {children}
+      <button
+        type="button"
+        title={`Reset to base scenario value: ${baseValue}`}
+        onClick={() => onReset(Number(baseValue))}
+        className="absolute -right-1 -top-1 h-4 w-4 rounded-full bg-[#D4A84C] text-white flex items-center justify-center hover:bg-[#1a2744] transition-colors shadow-sm"
+        data-testid={`reset-${field}-${scenario.id}`}
+      >
+        <RotateCcw className="h-2.5 w-2.5" />
+      </button>
+    </div>
+  );
+};
+
 // Single scenario editor panel
-const ScenarioEditor = ({ scenario, onChange, onRemove, isBase, color, result, baseResult }) => {
+const ScenarioEditor = ({ scenario, onChange, onRemove, isBase, color, result, baseResult, baseInputs }) => {
   const [expanded, setExpanded] = useState(false);
   const update = (patch) => {
     onChange({ ...scenario, inputs: { ...scenario.inputs, ...patch } });
@@ -172,10 +198,9 @@ const ScenarioEditor = ({ scenario, onChange, onRemove, isBase, color, result, b
           </div>
           <Collapsible open={expanded} onOpenChange={setExpanded}>
             <CollapsibleContent className="pt-2">
-          <TabsList className="grid grid-cols-4 w-full h-8">
+          <TabsList className="grid grid-cols-3 w-full h-8">
             <TabsTrigger value="budget" className="text-[11px]" data-testid={`tab-budget-${scenario.id}`}><Wallet className="h-3 w-3 mr-1" />Budget</TabsTrigger>
             <TabsTrigger value="investments" className="text-[11px]" data-testid={`tab-investments-${scenario.id}`}><TrendingUp className="h-3 w-3 mr-1" />Invest</TabsTrigger>
-            <TabsTrigger value="goals" className="text-[11px]" data-testid={`tab-goals-${scenario.id}`}><Target className="h-3 w-3 mr-1" />Goals</TabsTrigger>
             <TabsTrigger value="assumptions" className="text-[11px]" data-testid={`tab-assumptions-${scenario.id}`}><Sliders className="h-3 w-3 mr-1" />Assum.</TabsTrigger>
           </TabsList>
 
@@ -202,50 +227,95 @@ const ScenarioEditor = ({ scenario, onChange, onRemove, isBase, color, result, b
           <TabsContent value="investments" className="space-y-3 pt-3">
             <div className="grid grid-cols-2 gap-3">
               <FieldRow label="Current Portfolio" hint="Sum of investible assets (super + shares + funds + cash).">
-                <Input type="number" min="0" max="1000000000" value={i.currentPortfolio} onChange={(e) => update({ currentPortfolio: clampInput(e.target.value, "currentPortfolio") })} className="h-8 text-sm" data-testid={`input-portfolio-${scenario.id}`} />
+                <InputWithReset scenario={scenario} field="currentPortfolio" isBase={isBase} baseValue={baseInputs?.currentPortfolio} onReset={(v) => update({ currentPortfolio: v })}>
+                  <Input type="number" min="0" max="1000000000" value={i.currentPortfolio} onChange={(e) => update({ currentPortfolio: clampInput(e.target.value, "currentPortfolio") })} className="h-8 text-sm" data-testid={`input-portfolio-${scenario.id}`} />
+                </InputWithReset>
               </FieldRow>
               <FieldRow label="Annual Contributions" hint="Super contributions + savings to investment accounts per year.">
-                <Input type="number" min="0" max="5000000" value={i.annualContributions} onChange={(e) => update({ annualContributions: clampInput(e.target.value, "annualContributions") })} className="h-8 text-sm" data-testid={`input-contrib-${scenario.id}`} />
+                <InputWithReset scenario={scenario} field="annualContributions" isBase={isBase} baseValue={baseInputs?.annualContributions} onReset={(v) => update({ annualContributions: v })}>
+                  <Input type="number" min="0" max="5000000" value={i.annualContributions} onChange={(e) => update({ annualContributions: clampInput(e.target.value, "annualContributions") })} className="h-8 text-sm" data-testid={`input-contrib-${scenario.id}`} />
+                </InputWithReset>
               </FieldRow>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <FieldRow label="Expected Return (% p.a.)" hint="Average nominal annual return.">
-                <Input type="number" min="0" max="25" step="0.1" value={i.expectedReturn} onChange={(e) => update({ expectedReturn: clampInput(e.target.value, "expectedReturn") })} className="h-8 text-sm" data-testid={`input-return-${scenario.id}`} />
+                <InputWithReset scenario={scenario} field="expectedReturn" isBase={isBase} baseValue={baseInputs?.expectedReturn} onReset={(v) => update({ expectedReturn: v })}>
+                  <Input type="number" min="0" max="25" step="0.1" value={i.expectedReturn} onChange={(e) => update({ expectedReturn: clampInput(e.target.value, "expectedReturn") })} className="h-8 text-sm" data-testid={`input-return-${scenario.id}`} />
+                </InputWithReset>
               </FieldRow>
               <FieldRow label="Volatility σ (%)" hint="Standard deviation of annual returns. Growth: 12-15%. Conservative: 6-8%.">
-                <Input type="number" min="0" max="50" step="0.1" value={i.volatility} onChange={(e) => update({ volatility: clampInput(e.target.value, "volatility") })} className="h-8 text-sm" data-testid={`input-volatility-${scenario.id}`} />
+                <InputWithReset scenario={scenario} field="volatility" isBase={isBase} baseValue={baseInputs?.volatility} onReset={(v) => update({ volatility: v })}>
+                  <Input type="number" min="0" max="50" step="0.1" value={i.volatility} onChange={(e) => update({ volatility: clampInput(e.target.value, "volatility") })} className="h-8 text-sm" data-testid={`input-volatility-${scenario.id}`} />
+                </InputWithReset>
               </FieldRow>
             </div>
-          </TabsContent>
-
-          <TabsContent value="goals" className="space-y-3 pt-3">
-            <div className="grid grid-cols-3 gap-3">
-              <FieldRow label="Current Age">
-                <Input type="number" min="0" max="120" value={i.currentAge} onChange={(e) => update({ currentAge: clampInput(e.target.value, "currentAge") })} className="h-8 text-sm" data-testid={`input-age-${scenario.id}`} />
-              </FieldRow>
-              <FieldRow label="Retirement Age">
-                <Input type="number" min="0" max="120" value={i.retirementAge} onChange={(e) => update({ retirementAge: clampInput(e.target.value, "retirementAge") })} className="h-8 text-sm" data-testid={`input-retire-age-${scenario.id}`} />
-              </FieldRow>
-              <FieldRow label="Life Expectancy">
-                <Input type="number" min="0" max="130" value={i.lifeExpectancy} onChange={(e) => update({ lifeExpectancy: clampInput(e.target.value, "lifeExpectancy") })} className="h-8 text-sm" data-testid={`input-life-${scenario.id}`} />
-              </FieldRow>
-            </div>
-            <FieldRow label="Annual Retirement Spending" hint="Desired annual spending in retirement (in today's dollars).">
-              <Input type="number" min="0" max="5000000" value={i.retirementSpending} onChange={(e) => update({ retirementSpending: clampInput(e.target.value, "retirementSpending") })} className="h-8 text-sm" data-testid={`input-spend-${scenario.id}`} />
-            </FieldRow>
-            <FieldRow label="Legacy / Inheritance Goal" hint="Desired balance remaining at life expectancy (0 = spend all).">
-              <Input type="number" min="0" max="100000000" value={i.legacyGoal} onChange={(e) => update({ legacyGoal: clampInput(e.target.value, "legacyGoal") })} className="h-8 text-sm" data-testid={`input-legacy-${scenario.id}`} />
-            </FieldRow>
           </TabsContent>
 
           <TabsContent value="assumptions" className="space-y-3 pt-3">
-            <FieldRow label="Inflation Rate (% p.a.)" hint="Long-run CPI assumption.">
-              <Input type="number" min="0" max="25" step="0.1" value={i.inflationRate} onChange={(e) => update({ inflationRate: clampInput(e.target.value, "inflationRate") })} className="h-8 text-sm" data-testid={`input-inflation-${scenario.id}`} />
-            </FieldRow>
-            <div className="text-[11px] text-muted-foreground p-3 bg-gray-50 rounded">
-              <p><strong>Real return:</strong> {(i.expectedReturn - i.inflationRate).toFixed(1)}% (after inflation)</p>
-              <p><strong>Years to retire:</strong> {Math.max(0, i.retirementAge - i.currentAge)}</p>
-              <p><strong>Years in retirement:</strong> {Math.max(0, i.lifeExpectancy - i.retirementAge)}</p>
+            <div className="grid grid-cols-3 gap-3">
+              <FieldRow label="Current Age">
+                <InputWithReset
+                  scenario={scenario}
+                  field="currentAge"
+                  isBase={isBase}
+                  baseValue={baseInputs?.currentAge}
+                  onReset={(v) => update({ currentAge: v })}
+                >
+                  <Input type="number" min="0" max="120" value={i.currentAge} onChange={(e) => update({ currentAge: clampInput(e.target.value, "currentAge") })} className="h-8 text-sm" data-testid={`input-age-${scenario.id}`} />
+                </InputWithReset>
+              </FieldRow>
+              <FieldRow label="Years to retire" hint="How many years until retirement. Derives retirement age.">
+                <InputWithReset
+                  scenario={scenario}
+                  field="yearsToRetire"
+                  isBase={isBase}
+                  baseValue={baseInputs ? Math.max(0, baseInputs.retirementAge - baseInputs.currentAge) : undefined}
+                  onReset={(v) => update({ retirementAge: i.currentAge + v })}
+                >
+                  <Input type="number" min="0" max="80" value={Math.max(0, i.retirementAge - i.currentAge)} onChange={(e) => update({ retirementAge: i.currentAge + Math.max(0, Math.min(80, Number(e.target.value) || 0)) })} className="h-8 text-sm" data-testid={`input-years-to-retire-${scenario.id}`} />
+                </InputWithReset>
+              </FieldRow>
+              <FieldRow label="Years in retirement" hint="How long the plan funds spending past retirement. Derives life expectancy.">
+                <InputWithReset
+                  scenario={scenario}
+                  field="yearsInRetirement"
+                  isBase={isBase}
+                  baseValue={baseInputs ? Math.max(0, baseInputs.lifeExpectancy - baseInputs.retirementAge) : undefined}
+                  onReset={(v) => update({ lifeExpectancy: i.retirementAge + v })}
+                >
+                  <Input type="number" min="0" max="80" value={Math.max(0, i.lifeExpectancy - i.retirementAge)} onChange={(e) => update({ lifeExpectancy: i.retirementAge + Math.max(0, Math.min(80, Number(e.target.value) || 0)) })} className="h-8 text-sm" data-testid={`input-years-in-retire-${scenario.id}`} />
+                </InputWithReset>
+              </FieldRow>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <FieldRow label="Annual Retirement Spending" hint="Desired annual spending in retirement (in today's dollars).">
+                <InputWithReset scenario={scenario} field="retirementSpending" isBase={isBase} baseValue={baseInputs?.retirementSpending} onReset={(v) => update({ retirementSpending: v })}>
+                  <Input type="number" min="0" max="5000000" value={i.retirementSpending} onChange={(e) => update({ retirementSpending: clampInput(e.target.value, "retirementSpending") })} className="h-8 text-sm" data-testid={`input-spend-${scenario.id}`} />
+                </InputWithReset>
+              </FieldRow>
+              <FieldRow label="Legacy / Inheritance Goal" hint="Desired balance remaining at life expectancy (0 = spend all).">
+                <InputWithReset scenario={scenario} field="legacyGoal" isBase={isBase} baseValue={baseInputs?.legacyGoal} onReset={(v) => update({ legacyGoal: v })}>
+                  <Input type="number" min="0" max="100000000" value={i.legacyGoal} onChange={(e) => update({ legacyGoal: clampInput(e.target.value, "legacyGoal") })} className="h-8 text-sm" data-testid={`input-legacy-${scenario.id}`} />
+                </InputWithReset>
+              </FieldRow>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <FieldRow label="Inflation Rate (% p.a.)" hint="Long-run CPI assumption.">
+                <InputWithReset scenario={scenario} field="inflationRate" isBase={isBase} baseValue={baseInputs?.inflationRate} onReset={(v) => update({ inflationRate: v })}>
+                  <Input type="number" min="0" max="25" step="0.1" value={i.inflationRate} onChange={(e) => update({ inflationRate: clampInput(e.target.value, "inflationRate") })} className="h-8 text-sm" data-testid={`input-inflation-${scenario.id}`} />
+                </InputWithReset>
+              </FieldRow>
+              <FieldRow label="Real return (% — after inflation)" hint="Real return = Expected return − Inflation. Editing here recomputes Expected return.">
+                <InputWithReset
+                  scenario={scenario}
+                  field="realReturn"
+                  isBase={isBase}
+                  baseValue={baseInputs ? Number((baseInputs.expectedReturn - baseInputs.inflationRate).toFixed(2)) : undefined}
+                  onReset={(v) => update({ expectedReturn: Number((v + i.inflationRate).toFixed(2)) })}
+                >
+                  <Input type="number" min="-10" max="25" step="0.1" value={Number((i.expectedReturn - i.inflationRate).toFixed(2))} onChange={(e) => update({ expectedReturn: Number(((Number(e.target.value) || 0) + i.inflationRate).toFixed(2)) })} className="h-8 text-sm" data-testid={`input-real-return-${scenario.id}`} />
+                </InputWithReset>
+              </FieldRow>
             </div>
           </TabsContent>
             </CollapsibleContent>
@@ -380,6 +450,7 @@ const RetirementWorkshop = ({ embedded = false, clientId: propClientId }) => {
               color={SCENARIO_COLORS[idx % SCENARIO_COLORS.length]}
               result={results[idx]}
               baseResult={idx === 0 ? null : baseResult}
+              baseInputs={idx === 0 ? null : scenarios[0]?.inputs}
             />
           ))}
         </div>
