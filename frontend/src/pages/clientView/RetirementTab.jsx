@@ -27,26 +27,24 @@ const RetirementTab = ({ client }) => {
 
   return (
     <div className="space-y-4">
-      <Card>
-        <CardContent className="p-5 text-center">
-          <p className="text-xs uppercase tracking-wide text-muted-foreground">Retirement Confidence</p>
-          <p className={`text-6xl font-bold ${tone} my-2`} data-testid="client-retirement-confidence">{result.confidence}%</p>
-          <p className="text-sm">You can retire at age <strong>{client.retirement.retirement_age}</strong> spending <strong>{fmt(client.retirement.retirement_spending)}</strong>/yr.</p>
-          <p className="text-[11px] text-muted-foreground mt-2">Based on {result.numSims} Monte Carlo simulations · {client.retirement.retirement_age - client.retirement.current_age} years to go</p>
-        </CardContent>
-      </Card>
+      <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center">
+        <p className="text-[10px] tracking-[0.18em] uppercase text-slate-500 font-semibold">Retirement confidence</p>
+        <p className={`font-serif text-6xl ${tone} mt-3 tabular-nums`} data-testid="client-retirement-confidence">{result.confidence}%</p>
+        <p className="text-sm text-slate-600 mt-3">You can retire at age <span className="font-semibold text-[#1a2744]">{client.retirement.retirement_age}</span> spending <span className="font-semibold text-[#1a2744]">{fmt(client.retirement.retirement_spending)}</span>/yr.</p>
+        <p className="text-[11px] text-slate-400 mt-2">Based on {result.numSims} Monte Carlo simulations · {client.retirement.retirement_age - client.retirement.current_age} years to go</p>
+      </div>
 
       {/* Current Plan (chart) + Super & Pension — stacked top section */}
       <div className="space-y-4" data-testid="client-retirement-current">
-        <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm">Your Current Plan · Projected balance (P10 · P50 · P90)</CardTitle></CardHeader>
+        <Card className="border-slate-200">
+          <CardHeader className="pb-2"><CardTitle className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Your current plan · projected balance (P10 · P50 · P90)</CardTitle></CardHeader>
           <CardContent>
             <div className="h-[260px]">
               <ResponsiveContainer width="100%" height="100%" debounce={50}>
                 <LineChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="age" tick={{ fontSize: 11 }} />
-                  <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `$${(v / 1e6).toFixed(1)}M`} width={55} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+                  <XAxis dataKey="age" tick={{ fontSize: 11, fill: "#64748b" }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 10, fill: "#64748b" }} tickFormatter={(v) => `$${(v / 1e6).toFixed(1)}M`} width={55} axisLine={false} tickLine={false} />
                   <Tooltip formatter={(v) => fmt(v)} labelFormatter={(v) => `Age ${v}`} />
                   <Line type="monotone" dataKey="p10" stroke="#f43f5e" strokeWidth={1.5} dot={false} strokeDasharray="4 3" name="P10 (pessimistic)" />
                   <Line type="monotone" dataKey="p50" stroke="#1a2744" strokeWidth={2.5} dot={false} name="P50 (median)" />
@@ -57,53 +55,53 @@ const RetirementTab = ({ client }) => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-slate-200">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm flex items-center gap-2"><Landmark className="h-4 w-4 text-[#D4A84C]" /> Super &amp; Pension</CardTitle>
+            <CardTitle className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold flex items-center gap-2"><Landmark className="h-3.5 w-3.5 text-[#D4A84C]" strokeWidth={1.5} /> Super &amp; pension</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="grid grid-cols-3 gap-3 text-center">
-              <div className="p-3 bg-gray-50 rounded">
-                <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Total Super Balance</p>
-                <p className="text-xl font-bold text-[#1a2744]">{fmtShort(totalSuper)}</p>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-3 gap-3">
+              <div className="p-4 rounded-xl border border-slate-200 bg-white">
+                <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Total super balance</p>
+                <p className="font-serif text-2xl text-[#1a2744] mt-1 tabular-nums">{fmtShort(totalSuper)}</p>
               </div>
-              <div className="p-3 bg-gray-50 rounded">
-                <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Annual Contributions</p>
-                <p className="text-xl font-bold text-[#1a2744]">{fmt(client.retirement.annual_contributions)}</p>
+              <div className="p-4 rounded-xl border border-slate-200 bg-white">
+                <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Annual contributions</p>
+                <p className="font-serif text-2xl text-[#1a2744] mt-1 tabular-nums">{fmt(client.retirement.annual_contributions)}</p>
               </div>
-              <div className="p-3 bg-gray-50 rounded">
-                <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Retirement Age</p>
-                <p className="text-xl font-bold text-[#1a2744]">{client.retirement.retirement_age}</p>
+              <div className="p-4 rounded-xl border border-slate-200 bg-white">
+                <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Retirement age</p>
+                <p className="font-serif text-2xl text-[#1a2744] mt-1 tabular-nums">{client.retirement.retirement_age}</p>
               </div>
             </div>
 
             <div>
-              <div className="flex justify-between text-xs mb-1"><span>Concessional cap usage (FY25 ${(concessionalCap/1000).toFixed(0)}k)</span><span className="font-semibold">{capUsedPct}%</span></div>
-              <div className="h-2 bg-gray-100 rounded-full overflow-hidden"><div className="h-full bg-[#D4A84C]" style={{ width: `${Math.min(100, capUsedPct)}%` }} /></div>
+              <div className="flex justify-between text-xs mb-1.5"><span className="text-slate-600">Concessional cap usage (FY25 ${(concessionalCap/1000).toFixed(0)}k)</span><span className="font-mono text-[#1a2744] font-semibold">{capUsedPct}%</span></div>
+              <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden"><div className="h-full bg-[#D4A84C]" style={{ width: `${Math.min(100, capUsedPct)}%` }} /></div>
             </div>
 
             {superAssets.length > 0 && (
-              <div className="grid grid-cols-2 gap-x-4 gap-y-1 pt-2 border-t">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1 pt-3 border-t border-slate-100">
                 {superAssets.map((s, i) => (
                   <div key={i} className="flex justify-between text-sm py-1">
-                    <span className="text-muted-foreground">{s.name}</span>
-                    <span className="font-semibold">{fmt(s.value)}</span>
+                    <span className="text-slate-500">{s.name}</span>
+                    <span className="font-mono text-[#1a2744]">{fmt(s.value)}</span>
                   </div>
                 ))}
               </div>
             )}
-            <p className="text-[10px] text-center text-muted-foreground flex items-center justify-center gap-1 pt-1"><Lock className="h-3 w-3" /> View only — speak to your adviser to adjust contributions</p>
+            <p className="text-[10px] text-center text-slate-400 flex items-center justify-center gap-1 pt-1"><Lock className="h-3 w-3" /> View only — speak to your adviser to adjust contributions</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Try Your Own Scenarios — landscape, below */}
-      <Card className="border-[#D4A84C]/40 bg-gradient-to-br from-amber-50/40 to-white" data-testid="client-retirement-sandbox">
+      <Card className="border-slate-200" data-testid="client-retirement-sandbox">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm flex items-center gap-2">
-            <FlaskConical className="h-4 w-4 text-[#D4A84C]" /> Try Your Own Scenarios
+          <CardTitle className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold flex items-center gap-2">
+            <FlaskConical className="h-3.5 w-3.5 text-[#D4A84C]" strokeWidth={1.5} /> Try your own scenarios
           </CardTitle>
-          <p className="text-xs text-muted-foreground">Experiment with contributions, retirement age, and spending — results update live, side-by-side with your current plan.</p>
+          <p className="text-xs text-slate-500 mt-1">Experiment with contributions, retirement age, and spending — results update live, side-by-side with your current plan.</p>
         </CardHeader>
         <CardContent>
           <ClientSandbox

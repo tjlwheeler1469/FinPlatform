@@ -1,12 +1,12 @@
 import {
-  TrendingUp, LayoutDashboard, Calculator, Building2, BarChart3, Landmark,
-  FolderOpen, FileText, PiggyBank, Briefcase, Wallet,
-  Users, Lightbulb, PieChart, CalendarDays, Eye, LineChart,
-  Target, Activity, Bot, Upload, Database, Link2, Shield,
-  UserPlus, Sparkles, Bell, Zap, CreditCard,
-  Settings, MessageSquare, Brain, ListTodo, Video,
-  Bitcoin, Coins, Cable, Gauge, Calendar, FolderLock, Receipt, Mail, AlertTriangle,
-  Store, Key, Palette, Play
+  TrendingUp, LayoutDashboard, Calculator,
+  FolderOpen, FileText, Briefcase,
+  Users, Eye,
+  Target, Database, Shield,
+  UserPlus,
+  Settings, Brain, ListTodo, Video,
+  Gauge, FolderLock, Receipt, Mail,
+  Landmark, Wallet
 } from "lucide-react";
 
 export const personalNavGroups = [
@@ -54,15 +54,7 @@ export const adviserBaseNav = [
     items: [
       { path: "/xplan-sync-hub", label: "Xplan Sync Hub", icon: Database, title: "Push & Pull across all 5 Xplan modules · Core · Xtools+ · WealthSolver · IPS · Reporting", badge: "XPLAN" },
       { path: "/deals", label: "Activity", icon: Briefcase, title: "Activity pipeline · every SOA / ROA / Implementation Pack tracked from draft → executed", badge: "CRM" },
-      { path: "/webhooks-admin", label: "Webhooks", icon: Cable, title: "Outbound HMAC-signed event subscriptions for Slack/Zapier/internal systems", badge: "API" },
       { path: "/rbac-admin", label: "Roles", icon: Shield, title: "Role-Based Access Control matrix · principal / adviser / paraplanner / client", badge: "RBAC" },
-      { path: "/budget-exposure", label: "Budget Exposure", icon: AlertTriangle, title: "Portfolio-wide exposure to the 2026-27 Budget reforms · NG · CGT · Trust min-tax · Sell-window alerts", badge: "REFORM" },
-      { path: "/execution-rails", label: "Execution Rails", icon: Zap, title: "Route advice tickets through broker / super / insurance / contribution adapters", badge: "RAILS" },
-      { path: "/advice-marketplace", label: "Advice Marketplace", icon: Store, title: "Pre-built strategy templates · one-click clone into Deals pipeline", badge: "NEW" },
-      { path: "/open-api-platform", label: "API Platform", icon: Key, title: "Scoped API tokens + OpenAPI spec download for partner integrations", badge: "DEV" },
-      { path: "/developer-sandbox", label: "API Sandbox", icon: Play, title: "Live request runner — paste your token, pick an endpoint, execute against the live API" },
-      { path: "/firm-branding", label: "Firm Branding", icon: Palette, title: "White-label settings · firm name, colours, logo, PDF footer" },
-      { path: "/product-marketplace", label: "Marketplace", icon: Briefcase, title: "Insurance, mortgages & investment products with referral tracking" },
       { path: "/adviser-compliance", label: "Compliance", icon: Shield, title: "Compliance Dashboard" },
       { path: "/notification-settings", label: "Settings", icon: Settings, title: "Notifications, integrations & security" },
     ]

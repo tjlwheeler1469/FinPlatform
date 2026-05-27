@@ -24,49 +24,49 @@ const TaxTab = ({ client }) => {
 
   return (
     <div className="space-y-4">
-      <Card>
+      <Card className="border-slate-200">
         <CardContent className="p-5">
-          <p className="text-xs uppercase tracking-wide text-muted-foreground mb-3">Estimated Annual Tax Position</p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
-            <div className="p-3 bg-gray-50 rounded">
-              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Gross Income</p>
-              <p className="text-lg font-bold text-[#1a2744]">{fmtShort(income)}</p>
+          <p className="text-[10px] tracking-[0.18em] uppercase text-slate-500 font-semibold mb-4">Estimated annual tax position</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="p-4 rounded-xl border border-slate-200 bg-white">
+              <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Gross income</p>
+              <p className="font-serif text-xl text-[#1a2744] mt-1 tabular-nums">{fmtShort(income)}</p>
             </div>
-            <div className="p-3 bg-[#D4A84C]/10 rounded">
-              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Super Salary-Sac</p>
-              <p className="text-lg font-bold text-[#D4A84C]">{fmtShort(superConcessional)}</p>
+            <div className="p-4 rounded-xl border border-slate-200 bg-white">
+              <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Super salary-sac</p>
+              <p className="font-serif text-xl text-[#D4A84C] mt-1 tabular-nums">{fmtShort(superConcessional)}</p>
             </div>
-            <div className="p-3 bg-rose-50 rounded">
-              <p className="text-[10px] uppercase tracking-wide text-rose-700">Est. Tax + Medicare</p>
-              <p className="text-lg font-bold text-rose-700">{fmtShort(totalTax)}</p>
+            <div className="p-4 rounded-xl border border-slate-200 bg-white">
+              <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Est. tax + medicare</p>
+              <p className="font-serif text-xl text-rose-600 mt-1 tabular-nums">{fmtShort(totalTax)}</p>
             </div>
-            <div className="p-3 bg-emerald-50 rounded">
-              <p className="text-[10px] uppercase tracking-wide text-emerald-700">Net (After Tax)</p>
-              <p className="text-lg font-bold text-emerald-700">{fmtShort(netIncome)}</p>
+            <div className="p-4 rounded-xl border border-slate-200 bg-white">
+              <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Net (after tax)</p>
+              <p className="font-serif text-xl text-emerald-600 mt-1 tabular-nums">{fmtShort(netIncome)}</p>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader className="pb-2"><CardTitle className="text-sm">Marginal Tax Bands Applied</CardTitle></CardHeader>
+      <Card className="border-slate-200">
+        <CardHeader className="pb-2"><CardTitle className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Marginal tax bands applied</CardTitle></CardHeader>
         <CardContent>
-          <div className="space-y-1.5">
+          <div className="space-y-0.5">
             {bands.filter((b) => taxable > b.from).map((b, i) => {
               const applied = Math.min(taxable, b.to) - b.from;
               return (
-                <div key={i} className="flex justify-between text-sm py-1.5 border-b last:border-0">
-                  <span className="text-muted-foreground">{fmt(b.from)}{b.to !== Infinity ? ` – ${fmt(b.to)}` : "+"} · {(b.rate * 100).toFixed(0)}%</span>
-                  <span className="font-semibold">{fmt(applied * b.rate)}</span>
+                <div key={i} className="flex justify-between text-sm py-2 border-b border-slate-100 last:border-0">
+                  <span className="text-slate-500">{fmt(b.from)}{b.to !== Infinity ? ` – ${fmt(b.to)}` : "+"} · {(b.rate * 100).toFixed(0)}%</span>
+                  <span className="font-mono text-[#1a2744]">{fmt(applied * b.rate)}</span>
                 </div>
               );
             })}
           </div>
-          <div className="flex justify-between pt-3 mt-2 border-t">
+          <div className="flex justify-between items-end pt-4 mt-2 border-t border-slate-100">
             <span className="font-semibold text-[#1a2744]">Effective tax rate</span>
-            <span className="font-bold text-[#D4A84C]">{effectiveRate.toFixed(1)}%</span>
+            <span className="font-serif text-xl text-[#D4A84C] tabular-nums">{effectiveRate.toFixed(1)}%</span>
           </div>
-          <p className="text-[10px] text-center text-muted-foreground flex items-center justify-center gap-1 pt-3"><Lock className="h-3 w-3" /> Illustrative only — your adviser's tax models include your full entity structure &amp; deductions</p>
+          <p className="text-[10px] text-center text-slate-400 flex items-center justify-center gap-1 pt-3"><Lock className="h-3 w-3" /> Illustrative only — your adviser's tax models include your full entity structure &amp; deductions</p>
         </CardContent>
       </Card>
     </div>
