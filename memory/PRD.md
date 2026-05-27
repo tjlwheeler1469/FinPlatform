@@ -1,4 +1,21 @@
-## Feb 2026 — Iter 218/219: Truth Journey Sweep · 24/24 PASS
+## Feb 2026 — Iter 220: Client / Adviser parity + Nav trim (10/10 PASS)
+
+**Request 1 — Client view now matches Adviser aesthetic**
+- 5 clientView tab files completely refactored: `SnapshotTab.jsx`, `RetirementTab.jsx`, `BudgetTab.jsx`, `InvestmentsTab.jsx`, `TaxTab.jsx`.
+- Navy gradient cards → clean white `rounded-2xl border border-slate-200 bg-white` cards.
+- Bright `text-emerald-300` / `text-rose-300` bold sans-serif numbers → `font-serif text-[#1a2744] tabular-nums` (slate-200 dividers between rows).
+- `bg-gray-50` mini-tiles → `rounded-xl border border-slate-200 bg-white`.
+- Uppercase `text-[10px] tracking-[0.16em]` labels everywhere — same language as the PageShell hero.
+
+**Request 2 — Adviser sidebar trimmed**
+- Removed 8 items from `adviserBaseNav` "Firm" group: Webhooks, Budget Exposure, Execution Rails, Advice Marketplace, API Platform, API Sandbox, Firm Branding, Marketplace.
+- Firm group now: Xplan Sync Hub · Activity · Roles · Compliance · Settings.
+- Deep-link routes intentionally **kept** in `AppRouter.jsx` (`/webhooks-admin`, `/budget-exposure`, `/execution-rails`, `/advice-marketplace`, `/open-api-platform`, `/developer-sandbox`, `/firm-branding`, `/product-marketplace`) so URL bookmarks and external embeds still work — they're just no longer surfaced in primary navigation.
+- Cleaned dead lucide-react imports from navData.js (PieChart, CalendarDays, etc.) — lint clean.
+
+Iter 220 = 10/10 PASS, zero retest needed.
+
+
 
 User reference: image 1 (Client Hub /adviser-hub) — wanted the SAME font, colours, and design "for every page on the platform."
 
