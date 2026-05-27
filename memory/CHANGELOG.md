@@ -1,3 +1,41 @@
+## Feb 2026 — Iter 214: Retirement layout + unified Contribution Calculator
+
+### 1. "Retirement Workshop" → "Retirement"
+- Inline H1 (`RetirementWorkshop.jsx:331`) and PageShell title (`:514`) both renamed.
+
+### 2. Retirement Planner — chart above the fold
+- `ScenarioEditor` Tabs section wrapped in a `<Collapsible>` (collapsed by default) with an inline `Edit details / Hide details` toggle.
+- Compact view shows only the metrics row (Confidence / At Retirement / P10) + a one-line summary. With 2 scenarios at md+, both fit on a single row and the Projected Portfolio Balance chart now renders at y=596.5px (above the 1080px fold on a standard viewport).
+- Used the existing `@/components/ui/collapsible.jsx`. New imports: `ChevronDown`, `ChevronUp`.
+
+### 3. Contribution Calculator — unified single-form input
+- Restructured `SMSFOptimizer.jsx` embedded mode into a single full-width "Your Details" card at the TOP with 9 **manual number inputs** (NO sliders):
+  - Current Age, Taxable Income, Current Super Balance, Employer (SG), Salary Sacrifice, Personal Deductible, **Non-Concessional (post-tax)** (NEW), Spouse Contribution, **Expected Return %** (NEW).
+- Each input uses a reusable `NumberField` helper (prefix `$` / suffix `years|/yr|%`).
+- "Calculate Strategy" / "Calculate SMSF" button **renamed to `Calculate`**.
+- Total-contribution summary line + cap progress sit just below the button.
+- Result section flows below at full width (4 summary cards · cap progress · projection chart · tax impact · recommendations).
+- SuperOptimiser **removed from the Contribution Calculator tab** entirely — the new unified form covers all its inputs.
+
+### 4. Backend `/api/analyze/smsf` — accepts 2 new params
+- `non_concessional_contribution` (default `0`).
+- `expected_return` (default `7.0`) — drives both backend projection AND frontend chart.
+- Response now includes:
+  - `current_contributions.non_concessional` + `total_non_concessional`
+  - `caps.non_concessional_remaining`
+  - `projections.assumed_return`
+- Backwards-compatible: omitting both new params yields the iter-pre-214 behaviour.
+
+### Test verdict
+- Iter 214: **backend pytest 3/3 PASS**, **frontend 17/17 UI assertions PASS**, **regression 16/16 routes 200**.
+- New stable regression suite: `/app/backend/tests/test_iteration214_smsf_params.py`.
+
+### Minor follow-ups noted by code review (no action taken)
+- `NumberField` has no client-side min/max validation — backend should clamp.
+- Contribution caps in `analysis.py` are FY24-25 hardcoded; consider config for FY rollover.
+
+
+
 ## Feb 2026 — Iter 213: Contribution Calculator — unified single-page layout
 
 - **Renamed** SuperOptimiser inline header `Super Contribution Optimiser` → `Contribution Calculator` (subtitle preserved).
