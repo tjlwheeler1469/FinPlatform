@@ -1,12 +1,11 @@
 import { useState, lazy, Suspense } from "react";
 import Layout from "@/components/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, LayoutDashboard, TrendingUp, Gauge, Calculator, Target, PiggyBank } from "lucide-react";
+import { Loader2, LayoutDashboard, TrendingUp, Gauge, Calculator, PiggyBank } from "lucide-react";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
 const UnifiedInvestments = lazy(() => import("@/pages/UnifiedInvestments"));
 const RetirementHub = lazy(() => import("@/pages/RetirementHub"));
-const AdviserGoals = lazy(() => import("@/components/AdviserGoals"));
 const HouseholdBudget = lazy(() => import("@/pages/HouseholdBudget"));
 const UnifiedTaxCentre = lazy(() => import("@/pages/UnifiedTaxCentre"));
 const AdviserClientDashboard = lazy(() => import("@/components/AdviserClientDashboard"));
@@ -42,9 +41,6 @@ const UnifiedClientOverview = () => {
               <TabsTrigger value="overview" className={tabTriggerClass} data-testid="client-tab-overview">
                 <LayoutDashboard className="h-3.5 w-3.5" /> Overview
               </TabsTrigger>
-              <TabsTrigger value="goals" className={tabTriggerClass} data-testid="client-tab-goals">
-                <Target className="h-3.5 w-3.5" /> Goals
-              </TabsTrigger>
               <TabsTrigger value="retirement" className={tabTriggerClass} data-testid="client-tab-retirement">
                 <Gauge className="h-3.5 w-3.5" /> Retirement
               </TabsTrigger>
@@ -63,13 +59,6 @@ const UnifiedClientOverview = () => {
               <ErrorBoundary label="Adviser Client Dashboard">
                 <Suspense fallback={<TabLoader />}>
                   <AdviserClientDashboard clientId={getClientId()} />
-                </Suspense>
-              </ErrorBoundary>
-            </TabsContent>
-            <TabsContent value="goals" className="mt-0">
-              <ErrorBoundary label="Goals">
-                <Suspense fallback={<TabLoader />}>
-                  <AdviserGoals clientId={getClientId()} embedded />
                 </Suspense>
               </ErrorBoundary>
             </TabsContent>

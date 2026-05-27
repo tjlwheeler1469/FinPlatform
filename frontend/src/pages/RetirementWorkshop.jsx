@@ -11,7 +11,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
@@ -209,12 +208,14 @@ const ScenarioEditor = ({ scenario, onChange, onRemove, isBase, color, result, b
                 <Input type="number" min="0" max="5000000" value={i.annualContributions} onChange={(e) => update({ annualContributions: clampInput(e.target.value, "annualContributions") })} className="h-8 text-sm" data-testid={`input-contrib-${scenario.id}`} />
               </FieldRow>
             </div>
-            <FieldRow label={`Expected Return: ${i.expectedReturn}% p.a.`} hint="Average nominal annual return.">
-              <Slider value={[i.expectedReturn * 10]} min={30} max={100} step={5} onValueChange={([v]) => update({ expectedReturn: v / 10 })} />
-            </FieldRow>
-            <FieldRow label={`Volatility (σ): ${i.volatility}%`} hint="Standard deviation of annual returns. Growth: 12-15%. Conservative: 6-8%.">
-              <Slider value={[i.volatility]} min={4} max={24} step={1} onValueChange={([v]) => update({ volatility: v })} />
-            </FieldRow>
+            <div className="grid grid-cols-2 gap-3">
+              <FieldRow label="Expected Return (% p.a.)" hint="Average nominal annual return.">
+                <Input type="number" min="0" max="20" step="0.1" value={i.expectedReturn} onChange={(e) => update({ expectedReturn: clampInput(e.target.value, "expectedReturn") })} className="h-8 text-sm" data-testid={`input-return-${scenario.id}`} />
+              </FieldRow>
+              <FieldRow label="Volatility σ (%)" hint="Standard deviation of annual returns. Growth: 12-15%. Conservative: 6-8%.">
+                <Input type="number" min="0" max="40" step="0.5" value={i.volatility} onChange={(e) => update({ volatility: clampInput(e.target.value, "volatility") })} className="h-8 text-sm" data-testid={`input-volatility-${scenario.id}`} />
+              </FieldRow>
+            </div>
           </TabsContent>
 
           <TabsContent value="goals" className="space-y-3 pt-3">
@@ -238,8 +239,8 @@ const ScenarioEditor = ({ scenario, onChange, onRemove, isBase, color, result, b
           </TabsContent>
 
           <TabsContent value="assumptions" className="space-y-3 pt-3">
-            <FieldRow label={`Inflation Rate: ${i.inflationRate}% p.a.`} hint="Long-run CPI assumption.">
-              <Slider value={[i.inflationRate * 10]} min={10} max={60} step={5} onValueChange={([v]) => update({ inflationRate: v / 10 })} />
+            <FieldRow label="Inflation Rate (% p.a.)" hint="Long-run CPI assumption.">
+              <Input type="number" min="0" max="15" step="0.1" value={i.inflationRate} onChange={(e) => update({ inflationRate: clampInput(e.target.value, "inflationRate") })} className="h-8 text-sm" data-testid={`input-inflation-${scenario.id}`} />
             </FieldRow>
             <div className="text-[11px] text-muted-foreground p-3 bg-gray-50 rounded">
               <p><strong>Real return:</strong> {(i.expectedReturn - i.inflationRate).toFixed(1)}% (after inflation)</p>
