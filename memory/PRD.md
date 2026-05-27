@@ -1,4 +1,17 @@
-## Feb 2026 — Iter 220: Client / Adviser parity + Nav trim (10/10 PASS)
+## Feb 2026 — Iter 221: Adviser Client View matches Adviser aesthetic · 14/14 PASS
+
+Refactored `/app/frontend/src/components/AdviserClientDashboard.jsx` (the inner "Overview" tab of UnifiedClientOverview at /dashboard when an adviser has a client selected) so the entire surface now reads the same as /adviser-hub and /retirement-control-center.
+
+**Changes**:
+- Deleted the duplicate sticky identity card (PageShell already owns identity, KPIs, CTAs above).
+- All 9 inner cards rebuilt: `RetirementReadinessCard`, `AlertsCard`, `OpportunitiesCard`, `BalanceSheetCard`, `EmbeddedScenarioCard`, `TodaysPrioritiesCard`, `MeetingPrepCard`, `WhatChangedCard`, `MarketsStrip`, `SimulationBanner` — every one is now `bg-white border border-slate-200` with `font-serif tabular-nums` numbers, `text-[10px] tracking-[0.16em]` uppercase labels, severity expressed by `1.5×1.5` color dots (rose/amber/emerald/sky) — no more `bg-emerald-50` / `bg-amber-50` / `bg-rose-50` / `bg-gray-50` chips, no more navy gradients, no more text-emerald-700/rose-700 bright dollar values.
+- All CTAs replaced with `PillButton` (rounded-full, navy primary, white ghost).
+- Balance-Sheet progress bars switched from navy `#1a2744` → gold `#D4A84C` to keep the gold-accent thesis consistent.
+- All linters pass. Testing agent confirmed every card now computes to `rgb(255,255,255)` white background.
+
+Iter 221 = 14/14 PASS, 0 ui_bugs, 0 design_issues, 0 console_errors.
+
+
 
 **Request 1 — Client view now matches Adviser aesthetic**
 - 5 clientView tab files completely refactored: `SnapshotTab.jsx`, `RetirementTab.jsx`, `BudgetTab.jsx`, `InvestmentsTab.jsx`, `TaxTab.jsx`.
