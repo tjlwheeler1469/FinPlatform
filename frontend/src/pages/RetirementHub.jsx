@@ -1,21 +1,17 @@
-// RetirementHub — combined Retirement Planner · Contribution Calculator
-// (Super & Pension + SMSF) in one page.
-// Single source of truth: pulls from CLIENT_DATA so sub-tabs share consistent
-// salary, super balance, and assets — no duplicate inputs across tabs.
-import { useMemo, useState, lazy, Suspense } from "react";
+// RetirementHub — combined Retirement Planner + Contribution Calculator
+// using the new MoneySmart-style flows. Wrapped in PageShell so it shares
+// the same airy aesthetic as the rest of the platform.
+import { useState, lazy, Suspense } from "react";
 import Layout from "@/components/Layout";
-import { Card, CardContent } from "@/components/ui/card";
+import { PageShell, PillButton } from "@/components/PageShell";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
 import { Gauge, Calculator, Loader2, GitCompare } from "lucide-react";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { CLIENT_DATA, getActiveClientId } from "@/data/clientData";
 
-const RetirementWorkshop = lazy(() => import("@/pages/RetirementWorkshop"));
-const SMSFOptimizer = lazy(() => import("@/pages/SMSFOptimizer"));
+const RetirementPlannerMoneySmart = lazy(() => import("@/pages/RetirementPlannerMoneySmart"));
+const ContributionCalculator = lazy(() => import("@/pages/ContributionCalculator"));
 const ContributionPathCompare = lazy(() => import("@/components/ContributionPathCompare"));
-
-const fmt = (v) => new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD", maximumFractionDigits: 0 }).format(v || 0);
 
 const TabLoader = () => (
   <div className="flex items-center justify-center py-20">
@@ -23,94 +19,57 @@ const TabLoader = () => (
   </div>
 );
 
-const tabClass = "gap-1.5 text-xs sm:text-sm px-3 py-1.5 rounded-md transition-colors data-[state=active]:bg-[#1a2744]/10 data-[state=active]:text-[#1a2744] data-[state=active]:font-semibold data-[state=active]:shadow-[inset_0_-2px_0_#D4A84C]";
+const tabClass = "gap-1.5 px-4 py-2 rounded-full transition-all border border-transparent data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:border-[#1a2744] data-[state=inactive]:text-slate-600 data-[state=inactive]:hover:border-slate-300";
+
+const fmt = (v) => new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD", maximumFractionDigits: 0 }).format(v || 0);
 
 const RetirementHub = ({ embedded = false, clientId: propClientId }) => {
   const clientId = propClientId || getActiveClientId();
   const client = CLIENT_DATA[clientId] || CLIENT_DATA.thompson_family;
   const [showCompare, setShowCompare] = useState(false);
 
-  // Portfolio-integrated defaults derived from CLIENT_DATA (single source).
-  // These flow into SuperOptimiser so caps/contributions reflect client context.
-  const superDefaults = useMemo(() => {
-    const superAssets = (client.assets || []).filter((a) => a.type === "Super");
-    const superBalance = superAssets.reduce((s, a) => s + a.value, 0);
-    return {
-      salary: client.profile?.incomeHousehold || 0,
-      age: client.profile?.age || 50,
-      superBalance: superBalance || 0,
-      unusedConcessionalFY: 0,
-    };
-  }, [client]);
+  const superTotal = (client.assets || [])
+    .filter((a) => a.type === "Super" || a.type === "SMSF")
+    .reduce((s, a) => s + a.value, 0);
+  const netWorth = (client.assets || []).reduce((s, a) => s + a.value, 0)
+    - (client.liabilities || []).reduce((s, l) => s + l.value, 0);
 
-  const portfolioTotals = useMemo(() => {
-    const assets = (client.assets || []).reduce((s, a) => s + a.value, 0);
-    const liab = (client.liabilities || []).reduce((s, l) => s + l.value, 0);
-    const superTotal = (client.assets || []).filter((a) => a.type === "Super" || a.type === "SMSF").reduce((s, a) => s + a.value, 0);
-    return { netWorth: assets - liab, superTotal, retirementGoal: (client.retirement?.retirement_spending || 0) * 25 };
-  }, [client]);
+  const superDefaults = {
+    salary: client.profile?.incomeHousehold || 0,
+    age: client.profile?.age || 50,
+    superBalance: superTotal,
+    unusedConcessionalFY: 0,
+  };
 
   const content = (
     <div className="space-y-4" data-testid="retirement-hub">
-      {/* Context strip — shared portfolio numbers so sub-tabs align */}
-      <Card className="bg-gradient-to-r from-[#1a2744]/5 to-[#D4A84C]/5 border-[#D4A84C]/30">
-        <CardContent className="p-4 flex flex-wrap items-center gap-6">
-          <div className="flex items-center gap-2">
-            <Gauge className="h-5 w-5 text-[#D4A84C]" />
-            <div>
-              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Household</p>
-              <p className="text-sm font-bold text-[#1a2744]">{client.profile?.name || "—"}</p>
-            </div>
-          </div>
-          <div className="h-8 w-px bg-gray-200" />
-          <div>
-            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Net Worth</p>
-            <p className="text-lg font-bold text-[#1a2744]" data-testid="rh-networth">{fmt(portfolioTotals.netWorth)}</p>
-          </div>
-          <div>
-            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Super / SMSF</p>
-            <p className="text-lg font-bold text-[#1a2744]" data-testid="rh-super">{fmt(portfolioTotals.superTotal)}</p>
-          </div>
-          <div>
-            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Retirement Target (25×)</p>
-            <p className="text-lg font-bold text-[#D4A84C]" data-testid="rh-target">{fmt(portfolioTotals.retirementGoal)}</p>
-          </div>
-          <div>
-            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Retire Age</p>
-            <p className="text-lg font-bold text-[#1a2744]">{client.retirement?.retirement_age || 67}</p>
-          </div>
-          <div className="ml-auto text-[10px] text-muted-foreground italic max-w-xs text-right">
-            All three tools below use the same household data — edits in one flow into the others.
-          </div>
-        </CardContent>
-      </Card>
-
       <Tabs defaultValue="plan">
-        <TabsList className="bg-white border h-10 w-full justify-start gap-1 px-1 overflow-x-auto">
-          <TabsTrigger value="plan" className={tabClass} data-testid="rh-tab-plan"><Gauge className="h-3.5 w-3.5" /> Retirement Planner</TabsTrigger>
-          <TabsTrigger value="super" className={tabClass} data-testid="rh-tab-super"><Calculator className="h-3.5 w-3.5" /> Contribution Calculator</TabsTrigger>
+        <TabsList className="bg-transparent border-0 h-auto w-full justify-start gap-1.5 px-0 p-0 mb-2">
+          <TabsTrigger value="plan" className={tabClass} data-testid="rh-tab-plan">
+            <Gauge className="h-3.5 w-3.5" /> Retirement Planner
+          </TabsTrigger>
+          <TabsTrigger value="super" className={tabClass} data-testid="rh-tab-super">
+            <Calculator className="h-3.5 w-3.5" /> Contribution Calculator
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="plan" className="pt-3">
           <ErrorBoundary label="Retirement Planner">
             <Suspense fallback={<TabLoader />}>
-              <RetirementWorkshop clientId={clientId} embedded />
+              <RetirementPlannerMoneySmart embedded clientId={clientId} />
             </Suspense>
           </ErrorBoundary>
         </TabsContent>
         <TabsContent value="super" className="pt-3 space-y-6">
-          {/* Compare contribution paths toggle — APRA vs SMSF side-by-side. */}
           <div className="flex justify-end">
-            <Button
-              variant={showCompare ? "default" : "outline"}
-              size="sm"
+            <PillButton
+              variant={showCompare ? "primary" : "ghost"}
               onClick={() => setShowCompare((v) => !v)}
-              className={showCompare ? "bg-[#1a2744] text-white" : ""}
               data-testid="toggle-compare-paths"
             >
-              <GitCompare className="h-3.5 w-3.5 mr-1.5" />
+              <GitCompare className="h-3.5 w-3.5 inline -mt-0.5 mr-1.5" />
               {showCompare ? "Hide path comparison" : "Compare contribution paths"}
-            </Button>
+            </PillButton>
           </div>
           {showCompare && (
             <ErrorBoundary label="Compare contribution paths">
@@ -119,13 +78,9 @@ const RetirementHub = ({ embedded = false, clientId: propClientId }) => {
               </Suspense>
             </ErrorBoundary>
           )}
-          {/* Unified Contribution Calculator — single "Your Details" form at the
-              top with all contribution inputs as manual numbers (incl. salary
-              sacrifice, non-concessional and expected return), and the
-              calculated SMSF projection below. */}
           <ErrorBoundary label="Contribution Calculator">
             <Suspense fallback={<TabLoader />}>
-              <SMSFOptimizer embedded clientId={clientId} />
+              <ContributionCalculator embedded />
             </Suspense>
           </ErrorBoundary>
         </TabsContent>
@@ -133,7 +88,19 @@ const RetirementHub = ({ embedded = false, clientId: propClientId }) => {
     </div>
   );
 
-  return embedded ? content : <Layout><div className="p-6">{content}</div></Layout>;
+  return embedded ? content : (
+    <Layout>
+      <PageShell
+        eyebrow="HOUSEHOLD · RETIREMENT"
+        title="Retirement hub"
+        accent="planner · contributions"
+        subtitle={`Project your retirement income and find the contribution mix that closes the gap. Two MoneySmart-aligned calculators, one set of numbers — for ${client.profile?.name || "you"}.`}
+        meta={`HOUSEHOLD · NET WORTH ${fmt(netWorth)} · SUPER ${fmt(superTotal)}`}
+      >
+        {content}
+      </PageShell>
+    </Layout>
+  );
 };
 
 export default RetirementHub;

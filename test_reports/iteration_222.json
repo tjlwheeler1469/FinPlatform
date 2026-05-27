@@ -1,0 +1,80 @@
+{
+  "summary": "Iteration 222 — Frontend-only verification of MoneySmart-style Retirement Planner + Contribution Calculator rewrite. All 17 acceptance criteria pass. /retirement-planner renders new linear sectioned page with sticky Results panel; legacy 7-tab workbench preserved at /retirement-planner-workbench. /contribution-calculator renders with 5 sections, 6 investment-option presets, alt-fund compare, suggest-optimal, and live recalc. RetirementHub regression clean. No console errors on the two new pages.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": ["/app/test_reports/iteration_222.json"],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Recharts emits transient 'width(-1) and height(-1)' warnings on the retirement planner during first paint inside the sticky Results panel. Not blocking (chart renders correctly within 200ms) but could be silenced by setting a minHeight on the ResponsiveContainer wrapper.",
+    "/advisor-command-center logs 'Error fetching data: TypeError: Failed to fetch' on mount (pre-existing, comes from src_pages_AdvisorCommandCenter_jsx — unrelated to this iteration). Page itself renders fully with page-shell, KPIs, Next-best-actions cards. Worth investigating in a future iteration to suppress the noisy console error."
+  ],
+  "verification_details": {
+    "retirement_planner": {
+      "page_shell_and_testid": "PASS — [data-testid='retirement-planner-page'] + page-shell present",
+      "eyebrow_and_title": "PASS — 'CALCULATOR · RETIREMENT' eyebrow + 'Retirement planner' title",
+      "six_sections_in_order": "PASS — section-about-you, section-income, section-super, section-other, section-spending, section-advanced all present + visible",
+      "partner_section_default_hidden": "PASS — section-about-partner absent when Single (default)",
+      "relationship_toggle": "PASS — clicking seg-relationship-couple reveals section-about-partner; seg-relationship-single hides it again",
+      "results_panel_sticky": "PASS — results-panel class = 'lg:sticky lg:top-6 self-start'",
+      "result_income_value": "$47k (initial, salary 95000)",
+      "result_super_at_retirement_value": "$1.09M",
+      "chart": "PASS — 2 recharts areas + 1 ReferenceLine for retirement age",
+      "asfa_couple_comfortable": "PASS — clicking asfa-couple_comfortable sets input-spending=73875",
+      "asfa_single_modest": "PASS — clicking asfa-single_modest sets input-spending=33134",
+      "live_recalc_salary": "PASS — input-your-salary 95000→150000 changes result-income $47k→$55k and super $1.09M→$1.38M within 1.5s",
+      "advanced_section": "PASS — section-advanced has 4 inputs (Investment return 6.5%, Inflation 2.5%, Total fees 0.85%, Life expectancy override). toggle-advanced present.",
+      "workbench_link": "PASS — link-advanced-workbench href='/retirement-planner-workbench'",
+      "console_errors": 0
+    },
+    "retirement_planner_workbench": {
+      "page": "PASS — retirement-planner-page testid present at /retirement-planner-workbench",
+      "tabs_discoverable": "PASS — all 7 legacy tabs found: Overview, People, Assets, Income, Expenses, Assumptions, Projection",
+      "console_errors": 0
+    },
+    "contribution_calculator": {
+      "page_shell_and_testid": "PASS — [data-testid='contribution-calculator'] + page-shell present",
+      "eyebrow_and_title": "PASS — 'CALCULATOR · SUPERANNUATION' eyebrow + 'Contribution calculator' title",
+      "five_sections_in_order": "PASS — section-you-fund, section-your-super, section-fund-fees, section-investment-option, section-compare",
+      "six_investment_options": "PASS — opt-cash, opt-conservative, opt-moderate, opt-balanced, opt-growth, opt-high_growth all present",
+      "default_balanced_selected": "PASS — opt-balanced has 'border-[#1a2744] bg-slate-50 ring-1 ring-[#1a2744]/20'",
+      "option_selection_swap": "PASS — clicking opt-growth gives it ring-1; opt-balanced loses ring-1",
+      "result_balance": "$2.08M (default, growth selected)",
+      "chart_gold_fill": "PASS — recharts area fills with 'url(#balGold)' gradient using #D4A84C stops",
+      "toggle_compare": "PASS — toggle-compare reveals 3 alt-fund fee inputs",
+      "alt_fund_summary": "PASS — alt-fund-summary appears with 'Alternative fund $1.68M Difference +$400k' when alt fees change",
+      "btn_suggest_optimal": "PASS — clicking populates input-salary-sac from '0' to '15600' (positive), toast: 'Suggested $15,600 salary sacrifice — fills concessional cap, stays below Div 293.'",
+      "live_recalc_salary_sac": "PASS — input-salary-sac 0→20000 changes result-balance $2.08M→$2.90M (higher than initial $1.74M baseline)",
+      "console_errors": 0
+    },
+    "retirement_hub_regression": {
+      "route": "/retirement-confidence",
+      "page_shell": "PASS",
+      "tabs": "PASS — both 'Retirement Planner' and 'Contribution Calculator' tabs discoverable",
+      "embedded_components": "PASS — Contribution Calculator tab embeds [data-testid='contribution-calculator'] (verified visually: Step 1 'You & your super fund', Result panel 'Balance at age 67 $1.74M', gold chart, Step 5 Compare visible)",
+      "tab_switching": "Works"
+    },
+    "advisor_command_center_regression": {
+      "page_shell": "PASS",
+      "renders_fully": "PASS — Command center renders Next-best-actions cards, KPIs, Advisor intelligence feed",
+      "console_errors": "Pre-existing 'TypeError: Failed to fetch' from AdvisorCommandCenter_jsx mount effect — unrelated to this iteration (not introduced by retirement/contribution changes). Page UI itself fully renders."
+    },
+    "console_health": {
+      "retirement_planner": "0 errors",
+      "retirement_planner_workbench": "0 errors",
+      "contribution_calculator": "0 errors",
+      "retirement_confidence": "0 errors",
+      "advisor_command_center": "2 pre-existing fetch errors (unrelated to this iteration)"
+    }
+  },
+  "updated_files": [],
+  "success_rate": {"frontend": "100%"},
+  "test_credentials": "None required — localStorage flags only (wealth_command_compliance_v5='permanent', app_mode='adviser')",
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "MoneySmart-style retirement planner at /retirement-planner and contribution calculator at /contribution-calculator are verified end-to-end (all 17 ACs in iter 222 review request pass). Legacy 7-tab workbench preserved at /retirement-planner-workbench (linked via [data-testid='link-advanced-workbench']). RetirementHub at /retirement-confidence embeds both new components in its 2 tabs. Two pre-existing minor concerns flagged for future polish: (1) transient recharts width(-1)/height(-1) warning on planner sticky panel first paint, (2) AdvisorCommandCenter mount-effect fetch failure (unrelated to this iter). Neither blocks user flow."
+}

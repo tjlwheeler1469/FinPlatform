@@ -109,7 +109,9 @@ export const GoalTracker = lazyRetry(() => import("@/pages/GoalTracker"));
 // Retirement
 export const RetirementCalculator = lazyRetry(() => import("@/pages/RetirementCalculator"));
 export const DecumulationCalculator = lazyRetry(() => import("@/pages/DecumulationCalculator"));
-export const RetirementPlanner = lazyRetry(() => import("@/pages/RetirementPlanner"));
+export const RetirementPlanner = lazyRetry(() => import("@/pages/RetirementPlannerMoneySmart"));
+export const RetirementPlannerWorkbench = lazyRetry(() => import("@/pages/RetirementPlanner"));
+export const ContributionCalculator = lazyRetry(() => import("@/pages/ContributionCalculator"));
 export const RetirementConfidenceEngine = lazyRetry(() => import("@/pages/RetirementConfidenceEngine"));
 export const HybridEngineView = lazyRetry(() => import("@/pages/HybridEngineView"));
 export const RetirementConfidence = lazyRetry(() => import("@/pages/RetirementConfidence"));
