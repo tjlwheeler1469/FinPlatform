@@ -1,3 +1,22 @@
+## Feb 2026 — Iter 215: Goals tab removal + manual scenario inputs
+
+### 1. Goals tab removed from UnifiedClientOverview
+- Top-level tabs in `/dashboard` are now: **Overview · Retirement · Investments · Budget · Tax** (5 tabs, down from 6).
+- Removed `client-tab-goals` TabsTrigger + TabsContent + the lazy `AdviserGoals` import + the `Target` icon import.
+- AdviserGoals component is **still reachable** via `/unified-goals-planning` and `Client360View` embedded views — not orphaned.
+
+### 2. Sliders → manual number inputs in `ScenarioEditor`
+- Investments sub-tab: `Expected Return (% p.a.)` and `Volatility σ (%)` — both now `<input type="number">` with `clampInput()` (testids `input-return-{id}`, `input-volatility-{id}`).
+- Assumptions sub-tab: `Inflation Rate (% p.a.)` — now `<input type="number">` with `clampInput()` (testid `input-inflation-{id}`).
+- HTML `min`/`max` attributes aligned with `inputBounds.js`: return 0-25, volatility 0-50, inflation 0-25.
+- `Slider` import removed from `RetirementWorkshop.jsx`.
+
+### Test verdict
+- Iter 215: **100% PASS** on primary acceptance — all sliders replaced, Goals tab gone, 15/15 regression routes 200.
+- Post-test fix: HTML min/max bounds aligned to clampInput bounds (Investments + Assumptions inputs).
+
+
+
 ## Feb 2026 — Iter 214: Retirement layout + unified Contribution Calculator
 
 ### 1. "Retirement Workshop" → "Retirement"

@@ -210,10 +210,10 @@ const ScenarioEditor = ({ scenario, onChange, onRemove, isBase, color, result, b
             </div>
             <div className="grid grid-cols-2 gap-3">
               <FieldRow label="Expected Return (% p.a.)" hint="Average nominal annual return.">
-                <Input type="number" min="0" max="20" step="0.1" value={i.expectedReturn} onChange={(e) => update({ expectedReturn: clampInput(e.target.value, "expectedReturn") })} className="h-8 text-sm" data-testid={`input-return-${scenario.id}`} />
+                <Input type="number" min="0" max="25" step="0.1" value={i.expectedReturn} onChange={(e) => update({ expectedReturn: clampInput(e.target.value, "expectedReturn") })} className="h-8 text-sm" data-testid={`input-return-${scenario.id}`} />
               </FieldRow>
               <FieldRow label="Volatility σ (%)" hint="Standard deviation of annual returns. Growth: 12-15%. Conservative: 6-8%.">
-                <Input type="number" min="0" max="40" step="0.5" value={i.volatility} onChange={(e) => update({ volatility: clampInput(e.target.value, "volatility") })} className="h-8 text-sm" data-testid={`input-volatility-${scenario.id}`} />
+                <Input type="number" min="0" max="50" step="0.1" value={i.volatility} onChange={(e) => update({ volatility: clampInput(e.target.value, "volatility") })} className="h-8 text-sm" data-testid={`input-volatility-${scenario.id}`} />
               </FieldRow>
             </div>
           </TabsContent>
@@ -240,7 +240,7 @@ const ScenarioEditor = ({ scenario, onChange, onRemove, isBase, color, result, b
 
           <TabsContent value="assumptions" className="space-y-3 pt-3">
             <FieldRow label="Inflation Rate (% p.a.)" hint="Long-run CPI assumption.">
-              <Input type="number" min="0" max="15" step="0.1" value={i.inflationRate} onChange={(e) => update({ inflationRate: clampInput(e.target.value, "inflationRate") })} className="h-8 text-sm" data-testid={`input-inflation-${scenario.id}`} />
+              <Input type="number" min="0" max="25" step="0.1" value={i.inflationRate} onChange={(e) => update({ inflationRate: clampInput(e.target.value, "inflationRate") })} className="h-8 text-sm" data-testid={`input-inflation-${scenario.id}`} />
             </FieldRow>
             <div className="text-[11px] text-muted-foreground p-3 bg-gray-50 rounded">
               <p><strong>Real return:</strong> {(i.expectedReturn - i.inflationRate).toFixed(1)}% (after inflation)</p>
