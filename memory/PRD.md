@@ -1,4 +1,29 @@
-## Feb 2026 — Iter 221: Adviser Client View matches Adviser aesthetic · 14/14 PASS
+## Feb 2026 — Iter 222: MoneySmart-style Retirement Planner + Contribution Calculator (17/17 PASS)
+
+User asked to make `/retirement-planner` and the contribution calculator FLOW like MoneySmart's gov.au calculators — linear vertically-stacked sectioned forms with a persistent Results panel, not the legacy 7-tab workbench.
+
+**New: `RetirementPlannerMoneySmart.jsx`** (now mounted at `/retirement-planner`)
+- 6 stacked sections: About you · About your partner (conditional) · Your income · Your super · Other savings · Spending in retirement · Advanced assumptions (collapsible).
+- Sticky Results panel on the right: serif annual income, confidence dot, projection chart with retirement-age reference line, breakdown (from super / from Age Pension / desired spending / shortfall-surplus), super at retirement median + P10/P90 band.
+- ASFA Retirement Standard quick-presets (Single Modest/Comfortable, Couple Modest/Comfortable).
+- Uses the existing `projectRetirement` Monte Carlo engine (seeded so chart is deterministic).
+- Age Pension estimator built in (2025 single/couple thresholds, assets-test taper).
+- Adviser deep-link to legacy workbench at the bottom.
+
+**Legacy preserved: `RetirementPlanner.jsx`** now mounted at `/retirement-planner-workbench` (still has all 7 tabs: Overview · People · Assets · Income · Expenses · Assumptions · Projection — for advisers needing multi-entity / CGT).
+
+**New: `ContributionCalculator.jsx`** (now mounted at `/contribution-calculator`)
+- 5 stacked sections: You & your super fund · Your super (before-tax + after-tax) · Fund fees · Investment option · Compare to another fund.
+- Sticky Results panel: serif balance at retirement, gold area chart, total fees / tax saved / concessional summary, alt-fund delta when compare enabled.
+- 6 investment-option presets (Cash / Conservative / Moderate / Balanced / Growth / High Growth) each showing expected nominal return.
+- Concessional cap usage bar + Division 293 detection + "Suggest optimal salary sacrifice" button.
+- 2024-25 marginal-tax brackets baked in.
+
+**RetirementHub.jsx** rewritten to use both new components in its two embedded tabs ("Retirement Planner" and "Contribution Calculator"). PageShell wrapper preserved.
+
+**Tests**: iter 222 = 17/17 PASS, 0 ui_bugs, 0 design_issues, 0 console_errors on the new pages. Live recalculation confirmed (salary 95k→150k changes result $47k→$55k; salary-sac 0→20k changes balance $2.08M→$2.90M).
+
+
 
 Refactored `/app/frontend/src/components/AdviserClientDashboard.jsx` (the inner "Overview" tab of UnifiedClientOverview at /dashboard when an adviser has a client selected) so the entire surface now reads the same as /adviser-hub and /retirement-control-center.
 

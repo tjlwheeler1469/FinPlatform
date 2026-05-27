@@ -348,8 +348,8 @@ const ContributionCalculator = ({ embedded = false }) => {
               in <span className="font-mono">{calc.yearsToRetirement}</span> years · {calc.option.label.toLowerCase()} option
             </p>
 
-            <div className="h-[180px] mt-5 -mx-1">
-              <ResponsiveContainer width="100%" height="100%" debounce={50}>
+            <div className="h-[180px] mt-5 -mx-1" style={{ minWidth: 0 }}>
+              <ResponsiveContainer width="100%" height="100%" debounce={50} minHeight={180}>
                 <AreaChart data={calc.yourFund.projection} margin={{ top: 2, right: 4, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="balGold" x1="0" y1="0" x2="0" y2="1">
