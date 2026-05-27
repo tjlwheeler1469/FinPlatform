@@ -1,4 +1,30 @@
-## Feb 2026 — Iter 217: A/B/C + UI Polish Sweep (12/12 PASS)
+## Feb 2026 — Iter 218/219: Truth Journey Sweep · 24/24 PASS
+
+User reference: image 1 (Client Hub /adviser-hub) — wanted the SAME font, colours, and design "for every page on the platform."
+
+**Pages now wrapped in `PageShell.jsx` (30+ total)**:
+Iter 217 (verified): /dashboard, /client-portal, /client-setup (wizard), /my-vault, /budget, /adviser-compliance, /meeting-notes, /advice-document-builder, /messages, /documents, /notification-settings, /product-marketplace, /bank-feeds, /ai-copilot-advanced, /client-capture, /client-comms-checklist, /client-invoicing, /loan-calculator, /investments, /advisor-command-center, /my-settings, /retirement-planner, /scenario-modelling, /client-crm + existing /adviser-hub, /retirement-control-center, /xplan-sync-hub, /deals, /vault-documents, /webhooks-admin, /rbac-admin, /budget-exposure, /execution-rails, /advice-marketplace, /open-api-platform, /developer-sandbox, /firm-branding, /client-home, /retirement-workshop, /adviser-hub.
+
+**Polish — AdvisorCommandCenter content**:
+- Next Best Actions cards: dropped bright orange/red/blue gradient borders; replaced with subtle slate-200 borders + color dots (rose/amber/sky/violet) for priority severity.
+- Advisor Intelligence Feed: removed colored bg-orange/green/red/blue boxes; serif numbers + monospace caps labels + slate borders.
+- Client Insights, Portfolio Alerts, Tasks panels: all rebuilt with subtle slate-200 borders + 1.5px color dots for severity.
+- Top "Adviser Dashboard" bar replaced with PageShell hero (eyebrow ADVISER · DAILY OS, serif "Command center", 4 inline metrics, pill toolbar).
+
+**Iter 218 issues found → all fixed iter 219**:
+- MySettings.jsx missing `ShieldCheck` lucide-react import → caused React crash → fixed.
+- `/retirement-planner` route unregistered → added Route in AppRouter.jsx.
+- `/scenario-modelling` rendered UnifiedGoalsPlanning without PageShell → rewrote UnifiedGoalsPlanning with PageShell + 'ADVISER · SCENARIOS' eyebrow + pill tabs.
+- `/client-crm` had Navigate redirect to /adviser-hub → removed redirect, ClientCRM page now mounts directly with full PageShell aesthetic.
+
+**Other improvements**:
+- Renamed `ApiSandbox.jsx` → `DeveloperSandbox.jsx` (`data-testid='developer-sandbox'`).
+- Execution Rails: clear LIVE/MOCK badge per adapter + env-key chips + "where to obtain" copy.
+- Cleaned unused imports (Brain, Activity, TrendingDown, Sparkles, Shield, PortfolioRebalancing, ArrowLeftRight, FolderOpen) across multiple files.
+
+**Tests**: iter 219 = 24/24 PASS (100%), zero console ReferenceErrors on target pages. Lint clean across `/app/frontend/src/pages`.
+
+
 
 **A — `/developer-sandbox` route verified**
 - Route renamed from `/api-sandbox` (caught by `/api*` K8s ingress) → `/developer-sandbox`.
