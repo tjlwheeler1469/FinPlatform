@@ -1,5 +1,6 @@
 import { useState, lazy, Suspense } from "react";
 import Layout from "@/components/Layout";
+import { PageShell } from "@/components/PageShell";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Target, BarChart3 } from "lucide-react";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -14,19 +15,27 @@ const TabLoader = () => (
   </div>
 );
 
+const tabClass = "gap-1.5 px-4 py-2 rounded-full transition-all border border-transparent data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:border-[#1a2744] data-[state=inactive]:text-slate-600 data-[state=inactive]:hover:border-slate-300";
+
 const UnifiedGoalsPlanning = () => {
   const [tab, setTab] = useState("goals");
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gray-50" data-testid="unified-goals-planning">
-        <div className="max-w-[1800px] mx-auto px-4 sm:px-6 pt-4">
+      <PageShell
+        eyebrow="ADVISER · SCENARIOS"
+        title="Goals &amp; scenarios"
+        accent="what-if · stress · plan"
+        subtitle="Set household goals, stress-test retirement, and run Monte Carlo simulations — every scenario syncs back to the unified household record."
+        meta="MONTE CARLO · 500-RUN BASELINE"
+      >
+        <div data-testid="unified-goals-planning">
           <Tabs value={tab} onValueChange={setTab}>
-            <TabsList className="bg-white border mb-4 h-10">
-              <TabsTrigger value="goals" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="tab-goals">
-                <Target className="h-3.5 w-3.5" /> Goals & Scenarios
+            <TabsList className="bg-transparent border-0 mb-6 h-auto w-full justify-start gap-1.5 px-0 p-0">
+              <TabsTrigger value="goals" className={tabClass} data-testid="tab-goals">
+                <Target className="h-3.5 w-3.5" /> Goals &amp; Scenarios
               </TabsTrigger>
-              <TabsTrigger value="monte-carlo" className="gap-1.5 data-[state=active]:bg-[#0f1d35] data-[state=active]:text-white" data-testid="tab-monte-carlo">
+              <TabsTrigger value="monte-carlo" className={tabClass} data-testid="tab-monte-carlo">
                 <BarChart3 className="h-3.5 w-3.5" /> Monte Carlo
               </TabsTrigger>
             </TabsList>
@@ -40,7 +49,7 @@ const UnifiedGoalsPlanning = () => {
             </TabsContent>
           </Tabs>
         </div>
-      </div>
+      </PageShell>
     </Layout>
   );
 };

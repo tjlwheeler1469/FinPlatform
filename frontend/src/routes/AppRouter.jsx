@@ -161,6 +161,7 @@ const AppRouter = () => (
     <Route path="/retirement-confidence" element={<RetirementHub />} />
     <Route path="/retirement-confidence-legacy" element={<RetirementConfidence />} />
     <Route path="/retirement-workshop" element={<RetirementWorkshop />} />
+    <Route path="/retirement-planner" element={<RetirementPlanner />} />
 
     {/* Budget */}
     <Route path="/debt-paydown" element={<DebtPaydownPlanner />} />
@@ -213,7 +214,7 @@ const AppRouter = () => (
     <Route path="/crm" element={<Navigate to="/adviser-hub" replace />} />
     <Route path="/crm-command-center" element={<Navigate to="/adviser-hub" replace />} />
     <Route path="/rockstar-crm" element={<Navigate to="/adviser-hub" replace />} />
-    <Route path="/client-crm" element={<Navigate to="/adviser-hub" replace />} />
+    <Route path="/client-crm" element={<ClientCRM />} />
     <Route path="/clients" element={<Navigate to="/adviser-hub" replace />} />
     <Route path="/adviser-hub" element={<AdviserHub />} />
     <Route path="/client-setup" element={<Suspense fallback={<PageLoader />}><ClientSetupWizard /></Suspense>} />

@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  User, CheckCircle2, AlertCircle, ExternalLink, Lock, Mail, Phone,
+  User, ShieldCheck, CheckCircle2, AlertCircle, ExternalLink, Lock, Mail, Phone,
   MapPin, Landmark, FileBadge, Fingerprint,
 } from "lucide-react";
 import { CLIENT_DATA, getActiveClientId } from "@/data/clientData";
