@@ -1,4 +1,30 @@
-## Feb 2026 — Iter 212: P3 roadmap complete
+## Feb 2026 — Iter 217: A/B/C + UI Polish Sweep (12/12 PASS)
+
+**A — `/developer-sandbox` route verified**
+- Route renamed from `/api-sandbox` (caught by `/api*` K8s ingress) → `/developer-sandbox`.
+- Curl + screenshot confirm 200 / HTML / React SPA renders.
+
+**B — File rename `ApiSandbox.jsx` → `DeveloperSandbox.jsx`**
+- `const ApiSandbox` → `const DeveloperSandbox`; `data-testid="api-sandbox"` → `data-testid="developer-sandbox"`.
+- `lazyPages.js`, `AppRouter.jsx` import updated; old file deleted; grep clean of `ApiSandbox`/`api-sandbox`.
+
+**C — Execution Rails LIVE/MOCK UX**
+- New `Adapter integrations` card on `/execution-rails` shows MOCK/LIVE badge per adapter, env-key chips (`ALPACA_API_KEY`, `ALPACA_SECRET_KEY`, `HUB24_API_KEY`, `AIA_API_KEY`), and "where to obtain" copy (alpaca.markets paper trading, HUB24/Netwealth partner portal, AIA/TAL UW API). Auto-flips to LIVE the moment the env var lands in `/app/backend/.env`.
+- Backend `GET /api/exec-rails/adapters` continues to return `live=false` until keys are present; no code change needed.
+
+**UI polish — Truth Journey shell extended to 4 more high-traffic pages**
+- `RetirementControlCenter` — airy hero with serif title + gold accent, KPI cluster (On track / At risk / Shortfall / Opportunity), removed coloured KpiCard component.
+- `XplanSyncHub` — PageShell with eyebrow `FIRM · XPLAN INTEGRATION`, client selector moved to toolbar actions.
+- `AdvisorCommandCenter` — top zone replaced with PageShell, 6 gradient KPI cards collapsed to 4 inline metrics, search/AI Copilot/Notifications/Refresh moved to pill-button toolbar, focusMessage emoji-stripped for accent rendering.
+- `ClientHome` — `HELLO, DAVID` eyebrow + serif "Your plan is strong" hero + 4 KPI inline metrics (Readiness, Future income, Gap, Retire at).
+
+**Total PageShell coverage**: 16 pages (was 12). All four newly wrapped pages tested green by the testing agent.
+
+Iter 217: backend 100% PASS, frontend 100% PASS, no action items.
+
+
+
+
 
 All previously-deferred P3 items now shipped:
 - **Advice Marketplace** (`/advice-marketplace`) — 6 curated strategy templates, clone-to-Deal pipeline.
