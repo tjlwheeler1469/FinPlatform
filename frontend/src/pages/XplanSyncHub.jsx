@@ -7,6 +7,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import Layout from "@/components/Layout";
+import { PageShell } from "@/components/PageShell";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -151,22 +152,21 @@ const XplanSyncHub = () => {
 
   return (
     <Layout>
-      <div className="max-w-[1200px] mx-auto p-4 space-y-4" data-testid="xplan-sync-hub">
-        <Card>
-          <CardContent className="p-4 flex items-center gap-3 flex-wrap">
-            <Database className="h-6 w-6 text-[#3B9CDC]" />
-            <div className="flex-1 min-w-[260px]">
-              <h1 className="text-xl font-bold text-[#1a2744]">Xplan Sync Hub</h1>
-              <p className="text-xs text-muted-foreground">Push & Pull across all 5 Xplan modules · Core · Xtools+ · WealthSolver · IPS · Reporting</p>
-            </div>
-            <select value={clientId} onChange={(e) => setClientId(e.target.value)} className="text-sm border rounded px-2 py-1 bg-white" data-testid="hub-client-select">
-              {Object.entries(CLIENT_DATA).filter(([k]) => k !== "advisor").map(([id, c]) => (
-                <option key={id} value={id}>{c?.profile?.name || id}</option>
-              ))}
-            </select>
-          </CardContent>
-        </Card>
-
+      <PageShell
+        eyebrow="FIRM · XPLAN INTEGRATION"
+        title="Xplan Sync Hub"
+        accent="five modules · one cockpit"
+        subtitle="Push and pull data across every Xplan / Iress module — Core CRM, Xtools+, WealthSolver, IPS, Reporting. Mock fallback whenever live credentials are absent."
+        meta={`Active client · ${(CLIENT_DATA[clientId]?.profile?.name || clientId).toUpperCase()}`}
+        actions={
+          <select value={clientId} onChange={(e) => setClientId(e.target.value)} className="text-sm border border-slate-300 rounded-full px-4 py-2 bg-white" data-testid="hub-client-select">
+            {Object.entries(CLIENT_DATA).filter(([k]) => k !== "advisor").map(([id, c]) => (
+              <option key={id} value={id}>{c?.profile?.name || id}</option>
+            ))}
+          </select>
+        }
+      >
+        <div className="space-y-4" data-testid="xplan-sync-hub">
         <Tabs value={tab} onValueChange={setTab}>
           <TabsList className="w-full justify-start overflow-x-auto">
             <TabsTrigger value="core" data-testid="hub-tab-core"><Users className="h-3.5 w-3.5 mr-1" /> Core CRM</TabsTrigger>
@@ -468,7 +468,8 @@ const XplanSyncHub = () => {
             </p>
           </TabsContent>
         </Tabs>
-      </div>
+        </div>
+      </PageShell>
     </Layout>
   );
 };

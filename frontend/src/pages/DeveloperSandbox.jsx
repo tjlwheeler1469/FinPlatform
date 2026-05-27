@@ -1,4 +1,6 @@
-// ApiSandbox — live request runner for the Open API platform.
+// DeveloperSandbox — live request runner for the Open API platform.
+// (Route: /developer-sandbox — must NOT begin with /api because the
+// Kubernetes ingress redirects every /api* path to the backend.)
 // Lets a partner paste their token, pick an endpoint from a curated list of
 // the most-used scopes, fill any params, and execute the request against the
 // live API with the response pretty-printed below.
@@ -39,7 +41,7 @@ const METHOD_META = {
   DELETE: { color: "bg-rose-50 border-rose-300 text-rose-800" },
 };
 
-const ApiSandbox = () => {
+const DeveloperSandbox = () => {
   const [token, setToken] = useState("");
   const [endpointIdx, setEndpointIdx] = useState(0);
   const [bodyText, setBodyText] = useState(JSON.stringify(ENDPOINTS[0].sample || {}, null, 2));
@@ -127,7 +129,7 @@ const ApiSandbox = () => {
           { label: "Avg latency", value: history.length ? `${Math.round(history.reduce((s, h) => s + h.elapsed, 0) / history.length)}ms` : "—" },
         ]}
       >
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4" data-testid="api-sandbox">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4" data-testid="developer-sandbox">
 
           {/* Left column — request builder */}
           <div className="lg:col-span-2 space-y-4">
@@ -236,4 +238,4 @@ const ApiSandbox = () => {
   );
 };
 
-export default ApiSandbox;
+export default DeveloperSandbox;

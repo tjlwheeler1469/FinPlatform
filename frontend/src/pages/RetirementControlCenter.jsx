@@ -2,13 +2,13 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
+import { PageShell } from "@/components/PageShell";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-  Target, TrendingDown, AlertTriangle, Sparkles, ChevronRight,
-  Users, Activity, Gauge,
+  Target, AlertTriangle, ChevronRight,
 } from "lucide-react";
 import { buildBook, buildIntelligenceFeed, rankPriorityClients } from "@/engine/bookAggregator";
 import IntelligenceFeed from "@/components/intelligence/IntelligenceFeed";
@@ -19,27 +19,6 @@ const fmt = (v) => {
   if (abs >= 1_000_000) return `$${(v / 1_000_000).toFixed(2)}M`;
   if (abs >= 1_000) return `$${(v / 1_000).toFixed(0)}k`;
   return `$${Math.round(v || 0)}`;
-};
-
-const KpiCard = ({ icon: Icon, label, value, sub, tone = "navy", testId }) => {
-  const toneClasses = {
-    navy: "bg-[#0f1d35] text-white",
-    emerald: "bg-emerald-50 text-emerald-800 border-emerald-200",
-    amber: "bg-amber-50 text-amber-800 border-amber-200",
-    rose: "bg-rose-50 text-rose-800 border-rose-200",
-    gold: "bg-[#D4A84C]/10 text-[#7a5d1f] border-[#D4A84C]/30",
-  };
-  return (
-    <Card className={`border ${toneClasses[tone]}`} data-testid={testId}>
-      <CardContent className="p-4">
-        <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider opacity-80">
-          <Icon className="h-3.5 w-3.5" /> {label}
-        </div>
-        <p className="text-3xl font-bold mt-1 tabular-nums">{value}</p>
-        {sub && <p className="text-xs opacity-70 mt-1">{sub}</p>}
-      </CardContent>
-    </Card>
-  );
 };
 
 const RetirementControlCenter = () => {
@@ -55,28 +34,20 @@ const RetirementControlCenter = () => {
 
   return (
     <Layout>
-      <div className="max-w-[1600px] mx-auto p-4 space-y-5" data-testid="retirement-control-center">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-[#1a2744] flex items-center gap-2">
-              <Gauge className="h-6 w-6 text-[#D4A84C]" /> Retirement Control Center
-            </h1>
-            <p className="text-xs text-muted-foreground">Every screen answers: what should this adviser/client do next to improve retirement outcomes?</p>
-          </div>
-          <Badge variant="outline" className="bg-[#D4A84C]/10 border-[#D4A84C]/40 text-[#7a5d1f]">
-            <Activity className="h-3 w-3 mr-1" /> Live · {book.clients.length} clients
-          </Badge>
-        </div>
-
-        {/* ── Book Overview KPI strip ── */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3" data-testid="book-overview-kpis">
-          <KpiCard icon={Users} label="On Track" value={`${book.kpis.onTrackPct}%`} sub={`${book.clients.filter((c) => c.readiness.score >= 75).length} / ${book.clients.length} clients ≥ 75`} tone="emerald" testId="kpi-on-track" />
-          <KpiCard icon={AlertTriangle} label="At Risk" value={`${book.kpis.atRiskPct}%`} sub={`${book.clients.filter((c) => c.readiness.score < 60).length} clients below 60`} tone="rose" testId="kpi-at-risk" />
-          <KpiCard icon={TrendingDown} label="Total Shortfall" value={fmt(book.kpis.totalShortfall)} sub="Sum of funding gaps across book" tone="amber" testId="kpi-shortfall" />
-          <KpiCard icon={Gauge} label="Avg Readiness" value={`${book.kpis.avgScore}`} sub="0–100 composite" tone="navy" testId="kpi-avg-score" />
-          <KpiCard icon={Sparkles} label="Opportunity Value" value={fmt(book.kpis.totalOpportunityValue)} sub="Ranked opportunities open" tone="gold" testId="kpi-opportunity" />
-        </div>
-
+      <PageShell
+        eyebrow="ADVISER · RETIREMENT FIRST"
+        title="Control Center"
+        accent="every screen answers what to do next"
+        subtitle="Retirement-first decision intelligence for the entire book. Score, shortfall, and the single highest-impact next action — for every household."
+        meta={`LIVE · ${book.clients.length} households tracked`}
+        metrics={[
+          { label: "On track", value: `${book.kpis.onTrackPct}%`, hint: `${book.clients.filter((c) => c.readiness.score >= 75).length} / ${book.clients.length} ≥ 75` },
+          { label: "At risk", value: `${book.kpis.atRiskPct}%`, hint: `${book.clients.filter((c) => c.readiness.score < 60).length} below 60` },
+          { label: "Shortfall", value: fmt(book.kpis.totalShortfall), hint: "Total funding gap" },
+          { label: "Opportunity", value: fmt(book.kpis.totalOpportunityValue), hint: "Ranked open value" },
+        ]}
+      >
+        <div className="space-y-6" data-testid="retirement-control-center">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           {/* ── Intelligence Feed — Mission Control ── */}
           <IntelligenceFeed feed={feed} />
@@ -165,7 +136,8 @@ const RetirementControlCenter = () => {
 
         {/* ── Actions Shipped Report ── */}
         <ActionsShippedReport />
-      </div>
+        </div>
+      </PageShell>
     </Layout>
   );
 };

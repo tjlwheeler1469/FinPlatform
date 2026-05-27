@@ -10,9 +10,19 @@ import { PageShell, PillButton, Tile, ChipFilter } from "@/components/PageShell"
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Rocket, RefreshCw, CheckCircle2, Clock, XCircle, Zap, Activity } from "lucide-react";
+import { Rocket, RefreshCw, CheckCircle2, Clock, XCircle, Zap, Activity, KeyRound, Lock } from "lucide-react";
 
 const API = process.env.REACT_APP_BACKEND_URL;
+
+// Env-key instructions per adapter — surfaced inline so principals know
+// exactly which credential flips the adapter from MOCK to LIVE.
+const LIVE_KEY_DOCS = {
+  trade:           { keys: ["ALPACA_API_KEY", "ALPACA_SECRET_KEY"], where: "alpaca.markets → Paper Trading → API keys" },
+  super_change:    { keys: ["HUB24_API_KEY"], where: "HUB24 / Netwealth partner portal" },
+  insurance_quote: { keys: ["AIA_API_KEY"], where: "AIA / TAL underwriting API" },
+  contribution:    { keys: [], where: "no live banking rail yet — coming Q3 2026" },
+  rebalance:       { keys: ["ALPACA_API_KEY"], where: "Reuses broker adapter for multi-leg orders" },
+};
 
 const STATUS_META = {
   pending:    { color: "bg-amber-50 text-amber-700 border-amber-300",      icon: Clock },
@@ -148,18 +158,52 @@ const ExecutionRails = () => {
         <div className="space-y-4" data-testid="execution-rails">
 
         <Card>
-          <CardContent className="p-4">
-            <p className="text-xs font-bold uppercase text-muted-foreground mb-2">Registered Adapters</p>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
-              {adapters.map((a) => (
-                <div key={a.ticket_type} className="border rounded p-3 bg-slate-50">
-                  <p className="text-sm font-semibold text-[#1a2744]">{a.name}</p>
-                  <p className="text-[10px] text-muted-foreground">{a.ticket_type}</p>
-                  <Badge variant="outline" className={`text-[9px] mt-1 ${a.live ? "border-emerald-600 text-emerald-700" : "border-amber-500 text-amber-700"}`}>
-                    {a.live ? "LIVE" : "MOCK"}
-                  </Badge>
-                </div>
-              ))}
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <KeyRound className="h-4 w-4 text-[#D4A84C]" />
+                <p className="text-sm font-bold text-[#1a2744]">Adapter integrations</p>
+              </div>
+              <Badge variant="outline" className="text-[10px] border-slate-300">
+                {liveAdapters} of {adapters.length} live · {adapters.length - liveAdapters} mock
+              </Badge>
+            </div>
+            <p className="text-[11px] text-muted-foreground mb-4 max-w-2xl">
+              Each ticket type routes through a dedicated adapter. Adapters auto-flip from <span className="font-mono text-amber-700">MOCK</span> to <span className="font-mono text-emerald-700">LIVE</span> when the required environment variables are present in <code className="font-mono">/app/backend/.env</code>. No code change required.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3">
+              {adapters.map((a) => {
+                const docs = LIVE_KEY_DOCS[a.ticket_type] || { keys: [], where: "" };
+                return (
+                  <div key={a.ticket_type} className={`border rounded-lg p-3 transition-all ${a.live ? "border-emerald-300 bg-emerald-50/40" : "border-slate-200 bg-white hover:border-slate-300"}`}>
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <div className="min-w-0">
+                        <p className="text-[13px] font-semibold text-[#1a2744] leading-tight">{a.name}</p>
+                        <p className="text-[10px] text-slate-500 font-mono mt-0.5">{a.ticket_type}</p>
+                      </div>
+                      <Badge variant="outline" className={`text-[9px] font-semibold shrink-0 ${a.live ? "border-emerald-600 text-emerald-700 bg-white" : "border-amber-400 text-amber-700 bg-white"}`}>
+                        {a.live ? "● LIVE" : "○ MOCK"}
+                      </Badge>
+                    </div>
+                    {!a.live && docs.keys.length > 0 && (
+                      <div className="pt-2 border-t border-dashed border-slate-200">
+                        <p className="text-[9px] uppercase tracking-wide text-slate-500 mb-1 flex items-center gap-1">
+                          <Lock className="h-2.5 w-2.5" /> Set to go live
+                        </p>
+                        <div className="flex flex-wrap gap-1 mb-1.5">
+                          {docs.keys.map((k) => (
+                            <code key={k} className="text-[9.5px] font-mono px-1.5 py-0.5 rounded bg-slate-100 text-slate-700">{k}</code>
+                          ))}
+                        </div>
+                        <p className="text-[9.5px] text-slate-400 leading-snug">{docs.where}</p>
+                      </div>
+                    )}
+                    {!a.live && docs.keys.length === 0 && (
+                      <p className="text-[9.5px] text-slate-400 leading-snug pt-2 border-t border-dashed border-slate-200">{docs.where}</p>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </CardContent>
         </Card>

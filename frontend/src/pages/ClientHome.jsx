@@ -1,11 +1,11 @@
 // Client Home — radically simplified: Score · Future Income · Gap · Next Best Action + scenario tool.
 import { useMemo, useState } from "react";
 import Layout from "@/components/Layout";
+import { PageShell } from "@/components/PageShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown, Sparkles, Target, Sliders } from "lucide-react";
 import { CLIENT_DATA, getActiveClientId } from "@/data/clientData";
 import { whatMovesTheNeedle } from "@/engine/retirementReadinessEngine";
@@ -39,16 +39,20 @@ const ClientHome = () => {
 
   return (
     <Layout>
-      <div className="max-w-[1200px] mx-auto p-4 space-y-5" data-testid="client-home">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-          <div>
-            <h1 className="text-2xl font-bold text-[#1a2744]">Hello, {client.profile?.first_name || client.profile?.name.split(" ")[0]}</h1>
-            <p className="text-xs text-muted-foreground">Your retirement plan, at a glance · managed by {client.profile?.advisor || "your adviser"}</p>
-          </div>
-          <Badge variant="outline" className="bg-[#D4A84C]/10 border-[#D4A84C]/40 text-[#7a5d1f] self-start md:self-center">
-            Updated just now
-          </Badge>
-        </div>
+      <PageShell
+        eyebrow={`HELLO, ${(client.profile?.first_name || client.profile?.name?.split(" ")[0] || "").toUpperCase()}`}
+        title="Your plan"
+        accent={`is ${baseline.classification.label.toLowerCase()}`}
+        subtitle={`The four things that matter right now — score, future income, gap, and the single next action that moves the needle. Managed by ${client.profile?.advisor || "your adviser"}.`}
+        meta="UPDATED JUST NOW"
+        metrics={[
+          { label: "Readiness", value: `${baseline.score}`, hint: "0 – 100" },
+          { label: "Future income", value: fmt(baseline.outcome.sustainableIncome), hint: "real / year" },
+          { label: "Gap", value: baseline.outcome.fundingGap > 0 ? fmt(baseline.outcome.fundingGap) : "—", hint: baseline.outcome.fundingGap > 0 ? "shortfall today" : "fully funded" },
+          { label: "Retire at", value: String(client.retirement?.retirement_age || 67), hint: "target age" },
+        ]}
+      >
+      <div className="space-y-5" data-testid="client-home">
 
         {/* The 4 things that matter — everything else is noise */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -156,6 +160,7 @@ const ClientHome = () => {
           </CardContent>
         </Card>
       </div>
+      </PageShell>
     </Layout>
   );
 };

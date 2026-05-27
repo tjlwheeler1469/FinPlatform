@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
+import { PageShell, PillButton } from "@/components/PageShell";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -270,6 +271,11 @@ const AdvisorCommandCenter = () => {
   // Next Best Actions data
   const topActions = nextActions?.top_actions || [];
   const focusMessage = nextActions?.focus_message || "Loading actions...";
+  // Strip leading emoji glyphs / variation-selectors for the airy hero accent
+  const focusAccent = (focusMessage || "")
+    .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\uFE0F]/gu, "")
+    .replace(/\s+/g, " ")
+    .trim();
   const actionImpact = nextActions?.impact_summary || {};
   
   // Key Alerts
@@ -314,135 +320,57 @@ const AdvisorCommandCenter = () => {
 
   return (
     <Layout>
-      <div className="space-y-4" data-testid="advisor-command-center">
-        
-        {/* ===== ZONE 1: TOP NAVIGATION BAR ===== */}
-        <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between bg-white border rounded-lg p-4 shadow-sm">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <Brain className="h-8 w-8 text-[#D4A84C]" />
-              <div>
-                <h1 className="text-xl font-bold text-[#1a2744]">Adviser Dashboard</h1>
-                <p className="text-xs text-muted-foreground">Your daily operating system</p>
-              </div>
-            </div>
-          </div>
-          
-          {/* Global Search */}
-          <div className="flex-1 max-w-md">
-            <div className="relative">
+      <PageShell
+        eyebrow="ADVISER · DAILY OS"
+        title="Command center"
+        accent={focusAccent || "your firm in one view"}
+        subtitle="Every alert, opportunity, and execution surface ranked by impact. Start the day, end the day, and replay every advice decision from one cockpit."
+        meta={`LIVE · ${totalClients} households · ${formatCurrency(totalAUM)} AUA`}
+        metrics={[
+          { label: "AUA", value: formatCurrency(totalAUM), hint: "+2.3% MTD" },
+          { label: "Net flows", value: `+${formatCurrency(netFlows)}`, hint: "Inflows" },
+          { label: "Revenue YTD", value: formatCurrency(revenue), hint: "+12% YoY" },
+          { label: "Risk alerts", value: String(monitoring?.high_priority_alerts || 0), hint: monitoring?.high_priority_alerts > 0 ? "Needs attention" : "All clear" },
+        ]}
+        actions={
+          <>
+            <div className="relative hidden md:block w-72">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input 
-                placeholder="Search clients, portfolios, insights..."
+              <Input
+                placeholder="Search clients, portfolios, insights…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-gray-50"
+                className="pl-10 h-9 rounded-full border-slate-300 bg-white text-sm"
               />
             </div>
-          </div>
-          
-          {/* Quick Actions */}
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={() => navigate('/ai-copilot')} className="hidden lg:flex">
-              <Bot className="h-4 w-4 mr-2" />
-              AI Copilot
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => navigate('/notifications')} className="relative">
-              <Bell className="h-4 w-4" />
+            <PillButton variant="ghost" onClick={() => navigate('/ai-copilot')} className="hidden lg:inline-flex">
+              <Bot className="h-4 w-4 inline -mt-0.5 mr-1.5" /> AI Copilot
+            </PillButton>
+            <PillButton variant="ghost" onClick={() => navigate('/notifications')} className="relative">
+              <Bell className="h-4 w-4 inline -mt-0.5" />
               {monitoring?.total_alerts > 0 && (
-                <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 h-4 w-4 bg-rose-500 rounded-full text-[10px] text-white flex items-center justify-center">
                   {monitoring.total_alerts}
                 </span>
               )}
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => fetchAllData(true)}
-              disabled={refreshing}
-            >
-              <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-            </Button>
-          </div>
+            </PillButton>
+            <PillButton variant="primary" onClick={() => fetchAllData(true)} disabled={refreshing}>
+              <RefreshCw className={`h-4 w-4 inline -mt-0.5 mr-1.5 ${refreshing ? 'animate-spin' : ''}`} /> Refresh
+            </PillButton>
+          </>
+        }
+      >
+        <div className="space-y-4" data-testid="advisor-command-center">
+
+        {/* Practice health pill (one secondary KPI) */}
+        <div className="flex items-center gap-2 text-[11px]">
+          <span className="px-3 py-1 rounded-full border border-emerald-200 bg-emerald-50 text-emerald-700">
+            Practice health · <span className="font-semibold">{healthScore} {healthGrade}</span> · +3 pts vs Q4
+          </span>
         </div>
 
         {/* ===== Dashboard & Briefing (single, high-level view) ===== */}
         <div className="space-y-4" data-testid="dashboard-briefing">
-        <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
-          <Card className="bg-gradient-to-br from-[#1a2744] to-[#2a3754] text-white">
-            <CardContent className="pt-4 pb-4">
-              <p className="text-white/70 text-xs font-medium">Assets Under Advice</p>
-              <p className="text-2xl font-bold">{formatCurrency(totalAUM)}</p>
-              <div className="flex items-center gap-1 mt-1">
-                <ArrowUpRight className="h-3 w-3 text-green-400" />
-                <span className="text-xs text-green-400">+2.3% MTD</span>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="pt-4 pb-4">
-              <p className="text-muted-foreground text-xs font-medium">Clients</p>
-              <p className="text-2xl font-bold text-[#1a2744]">{totalClients}</p>
-              <div className="flex items-center gap-1 mt-1">
-                <ArrowUpRight className="h-3 w-3 text-green-500" />
-                <span className="text-xs text-green-500">+3 this month</span>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="pt-4 pb-4">
-              <p className="text-muted-foreground text-xs font-medium">Net Flows</p>
-              <p className="text-2xl font-bold text-[#1a2744]">+{formatCurrency(netFlows)}</p>
-              <div className="flex items-center gap-1 mt-1">
-                <ArrowUpRight className="h-3 w-3 text-green-500" />
-                <span className="text-xs text-green-500">Inflows</span>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="pt-4 pb-4">
-              <p className="text-muted-foreground text-xs font-medium">Revenue (YTD)</p>
-              <p className="text-2xl font-bold text-[#1a2744]">{formatCurrency(revenue)}</p>
-              <div className="flex items-center gap-1 mt-1">
-                <ArrowUpRight className="h-3 w-3 text-green-500" />
-                <span className="text-xs text-green-500">+12% YoY</span>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className={monitoring?.high_priority_alerts > 0 ? "border-red-200 bg-red-50" : "border-green-200 bg-green-50"}>
-            <CardContent className="pt-4 pb-4">
-              <p className="text-muted-foreground text-xs font-medium">Risk Alerts</p>
-              <p className={`text-2xl font-bold ${monitoring?.high_priority_alerts > 0 ? 'text-red-600' : 'text-green-600'}`}>
-                {monitoring?.high_priority_alerts || 0}
-              </p>
-              <div className="flex items-center gap-1 mt-1">
-                <AlertTriangle className={`h-3 w-3 ${monitoring?.high_priority_alerts > 0 ? 'text-red-500' : 'text-green-500'}`} />
-                <span className={`text-xs ${monitoring?.high_priority_alerts > 0 ? 'text-red-500' : 'text-green-500'}`}>
-                  {monitoring?.high_priority_alerts > 0 ? 'Needs attention' : 'All clear'}
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-          
-          {/* Practice Health Score */}
-          <Card className="border-emerald-200 bg-emerald-50">
-            <CardContent className="pt-4 pb-4">
-              <p className="text-muted-foreground text-xs font-medium">Practice Health</p>
-              <div className="flex items-baseline gap-2">
-                <p className="text-2xl font-bold text-emerald-600">{healthScore}</p>
-                <span className="text-lg font-bold text-emerald-700">{healthGrade}</span>
-              </div>
-              <div className="flex items-center gap-1 mt-1">
-                <TrendingUp className="h-3 w-3 text-emerald-500" />
-                <span className="text-xs text-emerald-500">+3 pts vs Q4</span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
 
         {/* ===== NEXT BEST ACTION ENGINE - THE KILLER FEATURE ===== */}
         <Card className="border-2 border-emerald-500/30 bg-gradient-to-r from-emerald-50/50 to-white">
@@ -951,7 +879,8 @@ const AdvisorCommandCenter = () => {
         <ComplianceFooter />
 
           </div>
-      </div>
+        </div>
+      </PageShell>
     </Layout>
   );
 };
