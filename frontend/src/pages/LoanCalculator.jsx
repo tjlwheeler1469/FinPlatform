@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Layout from "@/components/Layout";
+import { PageShell } from "@/components/PageShell";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -93,18 +94,24 @@ const LoanCalculator = () => {
     newRate: s.new_rate
   })) || [];
 
+  const fmt = (n) => `$${Math.round(n || 0).toLocaleString()}`;
+
   return (
     <Layout>
+      <PageShell
+        eyebrow="CALCULATOR · LOANS"
+        title="Loan calculator"
+        accent="repayments · scenarios · stress"
+        subtitle="Calculate repayments and analyse variable-rate scenarios. Change the rate, change the term, see the lifetime impact."
+        meta={`PRINCIPAL ${fmt(principal)} · ${loanTerm} YEARS @ ${interestRate}%`}
+        metrics={[
+          { label: "Monthly", value: result?.monthly_payment ? fmt(result.monthly_payment) : "—" },
+          { label: "Total interest", value: result?.total_interest ? fmt(result.total_interest) : "—" },
+          { label: "Total paid", value: result?.total_paid ? fmt(result.total_paid) : "—" },
+          { label: "Rate", value: `${interestRate}%` },
+        ]}
+      >
       <div className="space-y-8" data-testid="loan-calculator-page">
-        {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold  text-foreground">
-            Loan Calculator
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Calculate repayments and analyze variable rate scenarios
-          </p>
-        </div>
 
         {/* Loan Calculator Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -449,6 +456,7 @@ const LoanCalculator = () => {
           </CardContent>
         </Card>
       </div>
+      </PageShell>
     </Layout>
   );
 };

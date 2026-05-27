@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
+import { PageShell } from "@/components/PageShell";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -1001,7 +1002,19 @@ const ScenarioModelling = ({ embedded = false }) => {
     </>
   );
 
-  return embedded ? content : <Layout title="Scenario Modelling" subtitle="Goals, Strategy & What-If Analysis">{content}</Layout>;
+  return embedded ? content : (
+    <Layout>
+      <PageShell
+        eyebrow="ADVISER · SCENARIOS"
+        title="Scenario modelling"
+        accent="goals · strategy · what-if"
+        subtitle="Stress-test retirement, set goals, and trial strategies before committing. Every change syncs back to the household scenario store."
+        meta="MONTE CARLO · 500-RUN BASELINE"
+      >
+        {content}
+      </PageShell>
+    </Layout>
+  );
 };
 
 export default ScenarioModelling;

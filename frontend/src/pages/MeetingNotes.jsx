@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import Layout from "@/components/Layout";
+import { PageShell, PillButton } from "@/components/PageShell";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -217,57 +218,43 @@ const MeetingNotes = () => {
 
   return (
     <Layout>
+      <PageShell
+        eyebrow="ADVISER · MEETING INTELLIGENCE"
+        title="Meeting notes"
+        accent={`${meetings.length} captured · AI-summarised`}
+        subtitle={`Automatically recorded calls, full transcripts, and AI-generated summaries for ${clientName}. Powered by Fathom · synced into the client record.`}
+        meta={fathomConnected ? "FATHOM · CONNECTED" : "FATHOM · NOT CONNECTED"}
+        metrics={[
+          { label: "Meetings", value: String(meetings.length) },
+          { label: "Recorded", value: String(meetings.filter((m) => m.has_recording).length) },
+          { label: "AI summary", value: String(meetings.filter((m) => m.has_summary).length) },
+          { label: "This month", value: String(meetings.filter((m) => new Date(m.date).getMonth() === new Date().getMonth()).length) },
+        ]}
+        actions={(
+          <PillButton variant="ghost" onClick={() => setShowFathomSetup(true)} data-testid="connect-fathom-btn">
+            <Settings className="h-3.5 w-3.5 inline -mt-0.5 mr-1.5" /> {fathomConnected ? "Fathom settings" : "Connect Fathom"}
+          </PillButton>
+        )}
+      >
       <div className="space-y-6" data-testid="meeting-notes">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold flex items-center gap-3">
-              <Video className="h-7 w-7 text-[#D4A84C]" />
-              Meeting Notes
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              AI-powered meeting recordings and summaries for {clientName}
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Badge variant={fathomConnected ? "default" : "secondary"} className={fathomConnected ? "bg-emerald-600" : ""}>
-              {fathomConnected ? (
-                <><CheckCircle2 className="h-3 w-3 mr-1" /> Fathom Connected</>
-              ) : (
-                <><AlertCircle className="h-3 w-3 mr-1" /> Fathom Not Connected</>
-              )}
-            </Badge>
-            <Button 
-              variant="outline" 
-              onClick={() => setShowFathomSetup(true)}
-              data-testid="connect-fathom-btn"
-            >
-              <Settings className="h-4 w-4 mr-2" />
-              {fathomConnected ? "Fathom Settings" : "Connect Fathom"}
-            </Button>
-          </div>
-        </div>
 
         {/* Fathom Integration Banner */}
         {!fathomConnected && (
-          <Card className="bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200">
+          <Card className="border border-slate-200 bg-white">
             <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between flex-wrap gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="p-3 bg-white rounded-xl shadow-sm">
-                    <Mic className="h-8 w-8 text-purple-600" />
+                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <Mic className="h-7 w-7 text-[#1a2744]" strokeWidth={1.5} />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg">Connect Fathom for AI Meeting Recording</h3>
-                    <p className="text-muted-foreground">
-                      Automatically capture meetings, generate transcripts, and create AI summaries
-                    </p>
+                    <h3 className="font-serif text-lg text-[#1a2744]">Connect Fathom for AI meeting recording</h3>
+                    <p className="text-sm text-slate-600">Automatically capture meetings, generate transcripts, and create AI summaries.</p>
                   </div>
                 </div>
-                <Button onClick={() => setShowFathomSetup(true)} className="bg-purple-600 hover:bg-purple-700">
-                  <Link2 className="h-4 w-4 mr-2" />
-                  Connect Fathom
-                </Button>
+                <PillButton variant="primary" onClick={() => setShowFathomSetup(true)}>
+                  <Link2 className="h-3.5 w-3.5 inline -mt-0.5 mr-1.5" /> Connect Fathom
+                </PillButton>
               </div>
             </CardContent>
           </Card>
@@ -619,6 +606,7 @@ const MeetingNotes = () => {
           </DialogContent>
         </Dialog>
       </div>
+      </PageShell>
     </Layout>
   );
 };

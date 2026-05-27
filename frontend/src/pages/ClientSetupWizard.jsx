@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import Layout from "@/components/Layout";
+import { PageShell, PillButton } from "@/components/PageShell";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -196,11 +197,7 @@ const ClientSetupWizard = ({ embedded = false }) => {
   const totalSteps = actualSteps.length;
 
   const content = (
-    <div className="max-w-3xl mx-auto space-y-6" data-testid="client-setup-wizard">
-      <div>
-        <h1 className="text-2xl font-bold text-[#1a2744]">New Client Setup</h1>
-        <p className="text-sm text-muted-foreground">Step {step + 1} of {totalSteps}: {actualSteps[step]?.label || ""}</p>
-      </div>
+    <div className="space-y-8" data-testid="client-setup-wizard">
 
       {/* Progress */}
       <div className="flex items-center gap-2">
@@ -211,17 +208,17 @@ const ClientSetupWizard = ({ embedded = false }) => {
               <button
                 onClick={() => i < step && setStep(i)}
                 className={cn(
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all",
-                  i === step ? "bg-[#1a2744] text-white" :
-                  i < step ? "bg-green-100 text-green-700 cursor-pointer" :
-                  "bg-muted text-muted-foreground"
+                  "flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all border",
+                  i === step ? "bg-[#1a2744] text-white border-[#1a2744]" :
+                  i < step ? "bg-white text-emerald-700 border-emerald-300 cursor-pointer" :
+                  "bg-white text-slate-500 border-slate-200"
                 )}
                 data-testid={`step-${s.key}`}
               >
                 {i < step ? <CheckCircle className="h-3.5 w-3.5" /> : <Icon className="h-3.5 w-3.5" />}
                 <span className="hidden sm:inline">{s.label}</span>
               </button>
-              {i < totalSteps - 1 && <div className={`h-px flex-1 ${i < step ? "bg-green-300" : "bg-muted"}`} />}
+              {i < totalSteps - 1 && <div className={`h-px flex-1 ${i < step ? "bg-emerald-200" : "bg-slate-200"}`} />}
             </div>
           );
         })}
@@ -229,29 +226,35 @@ const ClientSetupWizard = ({ embedded = false }) => {
 
       {/* ========== STEP 0: MODE SELECTION ========== */}
       {step === 0 && (
-        <div className="grid grid-cols-2 gap-4">
-          <Card
-            className={cn("cursor-pointer transition-all hover:shadow-md", mode === "single" && "ring-2 ring-[#1a2744]")}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <button
+            className={cn(
+              "text-left rounded-2xl border bg-white p-8 transition-all",
+              mode === "single"
+                ? "border-[#1a2744] shadow-sm ring-1 ring-[#1a2744]/10"
+                : "border-slate-200 hover:border-slate-400"
+            )}
             onClick={() => setMode("single")}
             data-testid="mode-single"
           >
-            <CardContent className="p-6 text-center space-y-3">
-              <User className="h-10 w-10 mx-auto text-[#1a2744]" />
-              <h3 className="font-semibold">Single Client</h3>
-              <p className="text-sm text-muted-foreground">Set up one client with full details, entities, TFN, and ID documents</p>
-            </CardContent>
-          </Card>
-          <Card
-            className={cn("cursor-pointer transition-all hover:shadow-md", mode === "bulk" && "ring-2 ring-[#1a2744]")}
+            <User className="h-9 w-9 text-[#1a2744] mb-6" strokeWidth={1.5} />
+            <h3 className="font-serif text-xl text-[#1a2744]">Single client</h3>
+            <p className="text-sm text-slate-600 mt-2 leading-relaxed">Set up one client with full details, entities, TFN, and ID documents.</p>
+          </button>
+          <button
+            className={cn(
+              "text-left rounded-2xl border bg-white p-8 transition-all",
+              mode === "bulk"
+                ? "border-[#1a2744] shadow-sm ring-1 ring-[#1a2744]/10"
+                : "border-slate-200 hover:border-slate-400"
+            )}
             onClick={() => setMode("bulk")}
             data-testid="mode-bulk"
           >
-            <CardContent className="p-6 text-center space-y-3">
-              <Upload className="h-10 w-10 mx-auto text-[#1a2744]" />
-              <h3 className="font-semibold">Bulk Import (CSV)</h3>
-              <p className="text-sm text-muted-foreground">Import multiple clients from a CSV file in one go</p>
-            </CardContent>
-          </Card>
+            <Upload className="h-9 w-9 text-[#1a2744] mb-6" strokeWidth={1.5} />
+            <h3 className="font-serif text-xl text-[#1a2744]">Bulk import (CSV)</h3>
+            <p className="text-sm text-slate-600 mt-2 leading-relaxed">Import multiple clients from a CSV file in one go.</p>
+          </button>
         </div>
       )}
 
@@ -581,31 +584,43 @@ const ClientSetupWizard = ({ embedded = false }) => {
       )}
 
       {/* Navigation */}
-      <div className="flex justify-between">
-        <Button variant="outline" onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0} data-testid="wizard-prev-btn">
-          <ChevronLeft className="h-4 w-4 mr-1" /> Previous
-        </Button>
+      <div className="flex justify-between pt-6 border-t border-slate-200">
+        <PillButton variant="ghost" onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0} data-testid="wizard-prev-btn">
+          <ChevronLeft className="h-3.5 w-3.5 inline -mt-0.5 mr-1" /> Previous
+        </PillButton>
 
         {mode === "bulk" && step === 2 ? (
-          <Button onClick={handleBulkSubmit} disabled={bulkProgress.running || csvData.length === 0} className="bg-green-600 hover:bg-green-700" data-testid="wizard-bulk-submit-btn">
-            {bulkProgress.running ? <RefreshCw className="h-4 w-4 animate-spin mr-2" /> : <Upload className="h-4 w-4 mr-2" />}
+          <PillButton variant="primary" onClick={handleBulkSubmit} disabled={bulkProgress.running || csvData.length === 0} data-testid="wizard-bulk-submit-btn">
+            {bulkProgress.running ? <RefreshCw className="h-3.5 w-3.5 inline -mt-0.5 mr-1.5 animate-spin" /> : <Upload className="h-3.5 w-3.5 inline -mt-0.5 mr-1.5" />}
             Import {csvData.length} Clients
-          </Button>
+          </PillButton>
         ) : mode === "single" && step === totalSteps - 1 ? (
-          <Button onClick={handleSingleSubmit} disabled={saving || !form.first_name || !form.last_name} className="bg-green-600 hover:bg-green-700" data-testid="wizard-submit-btn">
-            {saving ? <RefreshCw className="h-4 w-4 animate-spin mr-2" /> : <CheckCircle className="h-4 w-4 mr-2" />}
-            Create Client & Sync to Xplan
-          </Button>
+          <PillButton variant="primary" onClick={handleSingleSubmit} disabled={saving || !form.first_name || !form.last_name} data-testid="wizard-submit-btn">
+            {saving ? <RefreshCw className="h-3.5 w-3.5 inline -mt-0.5 mr-1.5 animate-spin" /> : <CheckCircle className="h-3.5 w-3.5 inline -mt-0.5 mr-1.5" />}
+            Create client &amp; sync to Xplan
+          </PillButton>
         ) : (
-          <Button onClick={() => setStep(step + 1)} disabled={!canProceed()} className="bg-[#1a2744]" data-testid="wizard-next-btn">
-            Next <ChevronRight className="h-4 w-4 ml-1" />
-          </Button>
+          <PillButton variant="primary" onClick={() => setStep(step + 1)} disabled={!canProceed()} data-testid="wizard-next-btn">
+            Next <ChevronRight className="h-3.5 w-3.5 inline -mt-0.5 ml-1" />
+          </PillButton>
         )}
       </div>
     </div>
   );
 
-  return embedded ? content : <Layout>{content}</Layout>;
+  const shell = (
+    <PageShell
+      eyebrow="ONBOARDING"
+      title="New client setup"
+      accent={`step ${step + 1} of ${totalSteps} · ${actualSteps[step]?.label?.toLowerCase() || ""}`}
+      subtitle="Capture identity, entities, and tax details once — every downstream workflow (SOA, ROA, Vault, Xplan) pulls from this single source of truth."
+      meta={mode ? `MODE · ${mode.toUpperCase()}` : "SELECT SETUP MODE"}
+    >
+      {content}
+    </PageShell>
+  );
+
+  return embedded ? content : <Layout>{shell}</Layout>;
 };
 
 export default ClientSetupWizard;

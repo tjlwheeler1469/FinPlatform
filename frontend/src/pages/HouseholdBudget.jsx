@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
+import { PageShell, PillButton } from "@/components/PageShell";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -309,28 +310,18 @@ const HouseholdBudget = ({ embedded = false }) => {
 
   const content = (
       <div className="space-y-6" data-testid="household-budget-page">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">
-              Household Budget
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Track income, expenses, and plan for one-off costs
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <label className="flex items-center gap-2 cursor-pointer" data-testid="whatif-toggle">
-              <FlaskConical className={`h-4 w-4 ${whatIfMode ? "text-purple-600" : "text-muted-foreground"}`} />
-              <span className={`text-sm font-medium ${whatIfMode ? "text-purple-600" : "text-muted-foreground"}`}>What-If</span>
-              <Switch checked={whatIfMode} onCheckedChange={setWhatIfMode} />
-            </label>
-            {whatIfMode && (
-              <Button variant="ghost" size="sm" onClick={() => setWhatIfAdjustments({ incomeChange: 0, expenseChange: 0, extraSavings: 0, lumpSum: 0, mortgageRateChange: 0 })} data-testid="reset-whatif">
-                <RotateCcw className="h-3.5 w-3.5 mr-1" /> Reset
-              </Button>
-            )}
-          </div>
+        {/* What-If toggle pinned to top */}
+        <div className="flex items-center justify-end gap-3">
+          <label className="flex items-center gap-2 cursor-pointer" data-testid="whatif-toggle">
+            <FlaskConical className={`h-4 w-4 ${whatIfMode ? "text-violet-600" : "text-slate-400"}`} />
+            <span className={`text-sm font-medium ${whatIfMode ? "text-violet-600" : "text-slate-600"}`}>What-If</span>
+            <Switch checked={whatIfMode} onCheckedChange={setWhatIfMode} />
+          </label>
+          {whatIfMode && (
+            <PillButton variant="ghost" onClick={() => setWhatIfAdjustments({ incomeChange: 0, expenseChange: 0, extraSavings: 0, lumpSum: 0, mortgageRateChange: 0 })} data-testid="reset-whatif">
+              <RotateCcw className="h-3 w-3 inline -mt-0.5 mr-1" /> Reset
+            </PillButton>
+          )}
         </div>
 
         {/* What-If Scenario Panel */}
@@ -841,7 +832,25 @@ const HouseholdBudget = ({ embedded = false }) => {
       </div>
   );
 
-  return embedded ? content : <Layout>{content}</Layout>;
+  const shell = (
+    <PageShell
+      eyebrow="HOUSEHOLD · MONEY IN, MONEY OUT"
+      title="Budget"
+      accent={monthlySurplus >= 0 ? "you're saving" : "you're running short"}
+      subtitle="Track income, expenses, and plan for one-off costs — every cent flows into your retirement scenario, SOA, and goals."
+      meta={whatIfMode ? "WHAT-IF MODE · SIMULATION" : "LIVE · CONNECTED TO SCENARIO STORE"}
+      metrics={[
+        { label: "Income / mo", value: formatCurrency(totalMonthlyIncome) },
+        { label: "Expenses / mo", value: formatCurrency(totalMonthlyExpenses) },
+        { label: "Surplus", value: formatCurrency(monthlySurplus) },
+        { label: "Savings rate", value: totalMonthlyIncome > 0 ? `${Math.round((monthlySurplus / totalMonthlyIncome) * 100)}%` : "—" },
+      ]}
+    >
+      {content}
+    </PageShell>
+  );
+
+  return embedded ? content : <Layout>{shell}</Layout>;
 };
 
 export default HouseholdBudget;

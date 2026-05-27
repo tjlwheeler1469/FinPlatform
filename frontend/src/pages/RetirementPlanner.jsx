@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Layout from '../components/Layout';
+import { PageShell, PillButton } from '../components/PageShell';
 import RetirementVoicePanel from '../components/RetirementVoicePanel';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
@@ -666,116 +667,59 @@ export default function RetirementPlanner() {
 
   return (
     <Layout>
-      <div className="space-y-6 p-6" data-testid="retirement-planner-page">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold flex items-center gap-3">
-              <PiggyBank className="h-8 w-8 text-primary" />
-              Retirement Planner
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Comprehensive retirement planning with multi-entity support, CGT modeling, and variable assumptions
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button variant="outline" onClick={importFromNetWorth} disabled={loading}>
-              <Upload className={`h-4 w-4 mr-2`} />
-              Import from Net Worth
-            </Button>
-            <Button variant="outline" onClick={calculateAgePension} disabled={loading}>
-              <Shield className="h-4 w-4 mr-2" />
-              Check Age Pension
-            </Button>
-            <Button variant="outline" onClick={calculateProjection} disabled={loading}>
-              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-              Recalculate
-            </Button>
-            <Button onClick={calculateProjection} disabled={loading}>
-              <Play className="h-4 w-4 mr-2" />
-              Run Projection
-            </Button>
-          </div>
-        </div>
-
+      <PageShell
+        eyebrow="ADVISER · PROJECTIONS"
+        title="Retirement planner"
+        accent="multi-entity · CGT-aware"
+        subtitle="Comprehensive retirement planning with multi-entity support, capital-gains tax modelling, and variable assumptions. Connected to the household scenario store."
+        meta={`${yearsToRetirement} YEARS TO RETIREMENT · NET WORTH ${formatCurrency(netWorth)}`}
+        metrics={[
+          { label: "Net worth", value: formatCurrency(netWorth) },
+          { label: "Assets", value: formatCurrency(totalAssets) },
+          { label: "Liabilities", value: formatCurrency(totalLiabilities) },
+          { label: "Years out", value: `${yearsToRetirement}` },
+        ]}
+        actions={(
+          <>
+            <PillButton variant="ghost" onClick={importFromNetWorth} disabled={loading}>
+              <Upload className="h-3.5 w-3.5 inline -mt-0.5 mr-1.5" /> Import net worth
+            </PillButton>
+            <PillButton variant="ghost" onClick={calculateAgePension} disabled={loading}>
+              <Shield className="h-3.5 w-3.5 inline -mt-0.5 mr-1.5" /> Age pension
+            </PillButton>
+            <PillButton variant="primary" onClick={calculateProjection} disabled={loading}>
+              <Play className="h-3.5 w-3.5 inline -mt-0.5 mr-1.5" /> Run projection
+            </PillButton>
+          </>
+        )}
+      >
+      <div className="space-y-6" data-testid="retirement-planner-page">
         {/* Voice Retirement Analyser */}
         <RetirementVoicePanel />
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Net Worth</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-primary">{formatCurrency(netWorth)}</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Assets</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-green-600">{formatCurrency(totalAssets)}</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Liabilities</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-red-600">{formatCurrency(totalLiabilities)}</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Annual Income</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">{formatCurrency(totalAnnualIncome)}</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Years to Retirement</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">{yearsToRetirement} years</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Monthly Expenses</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">{formatCurrency(totalMonthlyExpenses)}</p>
-            </CardContent>
-          </Card>
-        </div>
-
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-7">
-            <TabsTrigger value="overview" data-testid="overview-tab">
-              <Eye className="h-4 w-4 mr-2" /> Overview
+          <TabsList className="bg-transparent border-0 h-auto w-full justify-start gap-1.5 px-0 p-0 mb-2 overflow-x-auto">
+            <TabsTrigger value="overview" data-testid="overview-tab" className="gap-1.5 px-4 py-2 rounded-full border border-transparent flex-shrink-0 data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:border-[#1a2744] data-[state=inactive]:text-slate-600 data-[state=inactive]:hover:border-slate-300">
+              <Eye className="h-3.5 w-3.5" /> Overview
             </TabsTrigger>
-            <TabsTrigger value="people" data-testid="people-tab">
-              <Users className="h-4 w-4 mr-2" /> People
+            <TabsTrigger value="people" data-testid="people-tab" className="gap-1.5 px-4 py-2 rounded-full border border-transparent flex-shrink-0 data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:border-[#1a2744] data-[state=inactive]:text-slate-600 data-[state=inactive]:hover:border-slate-300">
+              <Users className="h-3.5 w-3.5" /> People
             </TabsTrigger>
-            <TabsTrigger value="assets" data-testid="assets-tab">
-              <Wallet className="h-4 w-4 mr-2" /> Assets
+            <TabsTrigger value="assets" data-testid="assets-tab" className="gap-1.5 px-4 py-2 rounded-full border border-transparent flex-shrink-0 data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:border-[#1a2744] data-[state=inactive]:text-slate-600 data-[state=inactive]:hover:border-slate-300">
+              <Wallet className="h-3.5 w-3.5" /> Assets
             </TabsTrigger>
-            <TabsTrigger value="income" data-testid="income-tab">
-              <DollarSign className="h-4 w-4 mr-2" /> Income
+            <TabsTrigger value="income" data-testid="income-tab" className="gap-1.5 px-4 py-2 rounded-full border border-transparent flex-shrink-0 data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:border-[#1a2744] data-[state=inactive]:text-slate-600 data-[state=inactive]:hover:border-slate-300">
+              <DollarSign className="h-3.5 w-3.5" /> Income
             </TabsTrigger>
-            <TabsTrigger value="expenses" data-testid="expenses-tab">
-              <TrendingDown className="h-4 w-4 mr-2" /> Expenses
+            <TabsTrigger value="expenses" data-testid="expenses-tab" className="gap-1.5 px-4 py-2 rounded-full border border-transparent flex-shrink-0 data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:border-[#1a2744] data-[state=inactive]:text-slate-600 data-[state=inactive]:hover:border-slate-300">
+              <TrendingDown className="h-3.5 w-3.5" /> Expenses
             </TabsTrigger>
-            <TabsTrigger value="assumptions" data-testid="assumptions-tab">
-              <Settings className="h-4 w-4 mr-2" /> Assumptions
+            <TabsTrigger value="assumptions" data-testid="assumptions-tab" className="gap-1.5 px-4 py-2 rounded-full border border-transparent flex-shrink-0 data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:border-[#1a2744] data-[state=inactive]:text-slate-600 data-[state=inactive]:hover:border-slate-300">
+              <Settings className="h-3.5 w-3.5" /> Assumptions
             </TabsTrigger>
-            <TabsTrigger value="projection" data-testid="projection-tab">
-              <BarChart3 className="h-4 w-4 mr-2" /> Projection
+            <TabsTrigger value="projection" data-testid="projection-tab" className="gap-1.5 px-4 py-2 rounded-full border border-transparent flex-shrink-0 data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:border-[#1a2744] data-[state=inactive]:text-slate-600 data-[state=inactive]:hover:border-slate-300">
+              <BarChart3 className="h-3.5 w-3.5" /> Projection
             </TabsTrigger>
           </TabsList>
 
@@ -1812,6 +1756,7 @@ export default function RetirementPlanner() {
           </TabsContent>
         </Tabs>
       </div>
+      </PageShell>
     </Layout>
   );
 }

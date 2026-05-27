@@ -373,51 +373,48 @@ const AdvisorCommandCenter = () => {
         <div className="space-y-4" data-testid="dashboard-briefing">
 
         {/* ===== NEXT BEST ACTION ENGINE - THE KILLER FEATURE ===== */}
-        <Card className="border-2 border-emerald-500/30 bg-gradient-to-r from-emerald-50/50 to-white">
+        <Card className="border border-slate-200 bg-white">
           <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between flex-wrap gap-2">
               <div>
-                <CardTitle className="flex items-center gap-2 text-xl">
-                  <Zap className="h-6 w-6 text-emerald-600" />
-                  Next Best Actions
-                  <Badge className="bg-emerald-500 text-white text-[10px] ml-2">AI-POWERED</Badge>
+                <CardTitle className="flex items-center gap-2 font-serif text-xl text-[#1a2744]">
+                  <Zap className="h-5 w-5 text-[#D4A84C]" />
+                  Next best actions
+                  <span className="text-[10px] tracking-[0.18em] uppercase text-slate-500 font-sans font-semibold ml-2">AI-powered</span>
                 </CardTitle>
-                <CardDescription>{focusMessage}</CardDescription>
+                <CardDescription className="text-sm text-slate-600 mt-1">{focusMessage}</CardDescription>
               </div>
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-xs bg-white">
-                  {topActions.length} actions • {actionImpact.clients_needing_rebalance || 0} rebalance
-                </Badge>
+                <span className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-mono">
+                  {topActions.length} actions · {actionImpact.clients_needing_rebalance || 0} rebalance
+                </span>
               </div>
             </div>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4">
-              {topActions.slice(0, 4).map((action, i) => (
-                <div 
+              {topActions.slice(0, 4).map((action, i) => {
+                const dotColor =
+                  action.priority === 'critical' ? 'bg-rose-500' :
+                  action.priority === 'high' ? 'bg-amber-500' :
+                  'bg-sky-500';
+                return (
+                <div
                   key={action.id || i}
-                  className={`p-4 rounded-lg border-2 transition-all cursor-pointer hover:shadow-lg ${
-                    action.priority === 'critical' ? 'border-red-400 bg-red-50 hover:border-red-500' :
-                    action.priority === 'high' ? 'border-orange-400 bg-orange-50 hover:border-orange-500' :
-                    'border-blue-300 bg-blue-50 hover:border-blue-400'
-                  }`}
+                  className="p-5 rounded-xl border border-slate-200 bg-white hover:border-slate-400 hover:shadow-sm transition-all cursor-pointer"
                   onClick={() => setSelectedAction(action)}
                   data-testid={`next-action-${i}`}
                 >
-                  <div className="flex items-center justify-between mb-2">
-                    <Badge className={`text-[10px] ${
-                      action.priority === 'critical' ? 'bg-red-500' :
-                      action.priority === 'high' ? 'bg-orange-500' :
-                      'bg-blue-500'
-                    }`}>
-                      {action.priority?.toUpperCase()}
-                    </Badge>
-                    <Badge variant="outline" className="text-[10px]">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="flex items-center gap-1.5 text-[10px] tracking-[0.16em] uppercase text-slate-600 font-semibold">
+                      <span className={`w-1.5 h-1.5 rounded-full ${dotColor}`} />
+                      {action.priority}
+                    </span>
+                    <span className="text-[10px] tracking-wide uppercase text-slate-400 font-mono">
                       {action.category}
-                    </Badge>
+                    </span>
                   </div>
-                  <h4 className="font-semibold text-sm mb-1">{action.title}</h4>
-                  {/* Client pill — clickable, navigates to that client's dashboard */}
+                  <h4 className="font-serif text-[15px] text-[#1a2744] leading-tight mb-2">{action.title}</h4>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -425,27 +422,26 @@ const AdvisorCommandCenter = () => {
                       if (slug) navigateToClient(navigate, slug);
                       else toast.info(`No client context for "${action.client_name}"`);
                     }}
-                    className="text-xs text-[#1a2744] font-medium underline-offset-2 hover:underline mb-2 block text-left"
+                    className="text-xs text-slate-600 hover:text-[#1a2744] underline-offset-2 hover:underline mb-3 block text-left"
                     data-testid={`next-action-${i}-client`}
                   >
-                    👤 {action.client_name}
+                    {action.client_name}
                   </button>
-                  <p className="text-xs text-gray-600 line-clamp-2">{action.description}</p>
+                  <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">{action.description}</p>
                   {action.impact_value && (
-                    <div className="mt-2 pt-2 border-t">
-                      <p className="text-xs font-medium text-emerald-600">
-                        Impact: {typeof action.impact_value === 'number' ? formatCurrency(action.impact_value) : action.impact_value}
+                    <div className="mt-3 pt-3 border-t border-slate-100">
+                      <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500">Impact</p>
+                      <p className="font-serif text-lg text-[#1a2744] mt-0.5">
+                        {typeof action.impact_value === 'number' ? formatCurrency(action.impact_value) : action.impact_value}
                       </p>
                     </div>
                   )}
-                  <div className="flex items-center justify-between mt-3">
-                    <span className="text-[10px] text-muted-foreground">
+                  <div className="flex items-center justify-between mt-4">
+                    <span className="text-[10px] text-slate-400 font-mono uppercase tracking-wide">
                       {action.estimated_time}
                     </span>
-                    <Button
-                      size="sm"
-                      variant="default"
-                      className="h-6 px-2 text-xs bg-[#1a2744] hover:bg-[#1a2744]/90"
+                    <button
+                      className="px-3 py-1.5 rounded-full text-[11px] font-semibold bg-[#1a2744] text-white hover:bg-[#0f1a30] transition-all"
                       onClick={(e) => {
                         e.stopPropagation();
                         const slug = resolveClientSlug(action.client_id || action.client_name);
@@ -457,12 +453,13 @@ const AdvisorCommandCenter = () => {
                       }}
                       data-testid={`next-action-${i}-execute`}
                     >
-                      <Play className="h-3 w-3 mr-1" />
+                      <Play className="h-3 w-3 inline -mt-0.5 mr-1" />
                       Execute
-                    </Button>
+                    </button>
                   </div>
                 </div>
-              ))}
+              );
+              })}
             </div>
             
             {/* Selected Action Expanded View */}
@@ -566,84 +563,76 @@ const AdvisorCommandCenter = () => {
         </Card>
 
         {/* ===== ZONE 3: ADVISOR INTELLIGENCE FEED ===== */}
-        <Card className="border-2 border-[#D4A84C]/30 bg-gradient-to-r from-amber-50/50 to-white">
+        <Card className="border border-slate-200 bg-white">
           <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between flex-wrap gap-2">
               <div>
-                <CardTitle className="flex items-center gap-2 text-xl">
-                  <Zap className="h-6 w-6 text-[#D4A84C]" />
-                  Advisor Intelligence Feed
+                <CardTitle className="flex items-center gap-2 font-serif text-xl text-[#1a2744]">
+                  <Zap className="h-5 w-5 text-[#D4A84C]" />
+                  Advisor intelligence feed
                 </CardTitle>
-                <CardDescription>What requires your attention today</CardDescription>
+                <CardDescription className="text-sm text-slate-600 mt-1">What requires your attention today</CardDescription>
               </div>
-              <Badge variant="outline" className="text-xs">
-                Live • Updated {new Date().toLocaleTimeString()}
-              </Badge>
+              <span className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-mono">
+                Live · Updated {new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+              </span>
             </div>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Portfolio Drift */}
-              <div 
-                className="p-4 bg-white rounded-lg border border-orange-200 hover:shadow-md transition-shadow cursor-pointer"
+              <button
+                className="text-left p-5 bg-white rounded-xl border border-slate-200 hover:border-slate-400 hover:shadow-sm transition-all"
                 onClick={() => navigate('/portfolio-analyzer')}
               >
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="p-2 bg-orange-100 rounded-lg">
-                    <PieChart className="h-5 w-5 text-orange-600" />
-                  </div>
-                  <span className="text-3xl font-bold text-orange-600">{portfoliosDrifted}</span>
+                <div className="flex items-center gap-3 mb-3">
+                  <PieChart className="h-4 w-4 text-slate-400" strokeWidth={1.5} />
+                  <span className="font-serif text-3xl text-[#1a2744]">{portfoliosDrifted}</span>
                 </div>
-                <p className="text-sm font-medium text-gray-900">Portfolios drifted from allocation</p>
-                <p className="text-xs text-muted-foreground mt-1">Rebalancing recommended</p>
-              </div>
+                <p className="text-sm font-semibold text-[#1a2744] leading-snug">Portfolios drifted from allocation</p>
+                <p className="text-[11px] text-slate-500 mt-1">Rebalancing recommended</p>
+              </button>
 
               {/* Tax Opportunities */}
-              <div 
-                className="p-4 bg-white rounded-lg border border-green-200 hover:shadow-md transition-shadow cursor-pointer"
+              <button
+                className="text-left p-5 bg-white rounded-xl border border-slate-200 hover:border-slate-400 hover:shadow-sm transition-all"
                 onClick={() => navigate('/tax-analysis')}
               >
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="p-2 bg-green-100 rounded-lg">
-                    <DollarSign className="h-5 w-5 text-green-600" />
-                  </div>
-                  <span className="text-3xl font-bold text-green-600">{taxOppsCount}</span>
+                <div className="flex items-center gap-3 mb-3">
+                  <DollarSign className="h-4 w-4 text-slate-400" strokeWidth={1.5} />
+                  <span className="font-serif text-3xl text-[#1a2744]">{taxOppsCount}</span>
                 </div>
-                <p className="text-sm font-medium text-gray-900">Tax-loss harvesting opportunities</p>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-sm font-semibold text-[#1a2744] leading-snug">Tax-loss harvesting opportunities</p>
+                <p className="text-[11px] text-slate-500 mt-1">
                   ${taxOpportunities?.total_potential_tax_savings?.toLocaleString() || '28,500'} potential savings
                 </p>
-              </div>
+              </button>
 
               {/* Retirement Risks */}
-              <div 
-                className="p-4 bg-white rounded-lg border border-red-200 hover:shadow-md transition-shadow cursor-pointer"
+              <button
+                className="text-left p-5 bg-white rounded-xl border border-slate-200 hover:border-slate-400 hover:shadow-sm transition-all"
                 onClick={() => navigate('/strategic-planning')}
               >
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="p-2 bg-red-100 rounded-lg">
-                    <Target className="h-5 w-5 text-red-600" />
-                  </div>
-                  <span className="text-3xl font-bold text-red-600">{retirementRisks}</span>
+                <div className="flex items-center gap-3 mb-3">
+                  <Target className="h-4 w-4 text-slate-400" strokeWidth={1.5} />
+                  <span className="font-serif text-3xl text-[#1a2744]">{retirementRisks}</span>
                 </div>
-                <p className="text-sm font-medium text-gray-900">Clients nearing retirement shortfall</p>
-                <p className="text-xs text-muted-foreground mt-1">Action required before EOFY</p>
-              </div>
+                <p className="text-sm font-semibold text-[#1a2744] leading-snug">Clients nearing retirement shortfall</p>
+                <p className="text-[11px] text-slate-500 mt-1">Action required before EOFY</p>
+              </button>
 
               {/* Idle Cash */}
-              <div 
-                className="p-4 bg-white rounded-lg border border-blue-200 hover:shadow-md transition-shadow cursor-pointer"
+              <button
+                className="text-left p-5 bg-white rounded-xl border border-slate-200 hover:border-slate-400 hover:shadow-sm transition-all"
                 onClick={() => navigate('/client-crm')}
               >
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <Wallet className="h-5 w-5 text-blue-600" />
-                  </div>
-                  <span className="text-3xl font-bold text-blue-600">{idleCashClients}</span>
+                <div className="flex items-center gap-3 mb-3">
+                  <Wallet className="h-4 w-4 text-slate-400" strokeWidth={1.5} />
+                  <span className="font-serif text-3xl text-[#1a2744]">{idleCashClients}</span>
                 </div>
-                <p className="text-sm font-medium text-gray-900">Clients holding &gt;$150k idle cash</p>
-                <p className="text-xs text-muted-foreground mt-1">Investment opportunity</p>
-              </div>
+                <p className="text-sm font-semibold text-[#1a2744] leading-snug">Clients holding &gt;$150k idle cash</p>
+                <p className="text-[11px] text-slate-500 mt-1">Investment opportunity</p>
+              </button>
             </div>
           </CardContent>
         </Card>
@@ -654,59 +643,65 @@ const AdvisorCommandCenter = () => {
           {/* ===== ZONE 5: CLIENT INSIGHTS PANEL ===== */}
           <Card className="lg:col-span-1">
             <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Users className="h-5 w-5 text-[#1a2744]" />
-                Client Insights
+              <CardTitle className="flex items-center gap-2 font-serif text-lg text-[#1a2744]">
+                <Users className="h-4 w-4 text-[#D4A84C]" />
+                Client insights
               </CardTitle>
-              <CardDescription className="text-xs">Cross-client intelligence</CardDescription>
+              <CardDescription className="text-xs text-slate-500">Cross-client intelligence</CardDescription>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[300px]">
                 <div className="space-y-3">
-                  {intelligence?.book_wide_insights?.slice(0, 6).map((insight, i) => (
-                    <div 
-                      key={`item-${i}`} 
-                      className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors"
+                  {intelligence?.book_wide_insights?.slice(0, 6).map((insight, i) => {
+                    const dotColor =
+                      insight.severity === 'high' ? 'bg-rose-500' :
+                      insight.severity === 'medium' ? 'bg-amber-500' : 'bg-slate-400';
+                    return (
+                    <button
+                      key={`item-${i}`}
+                      className="w-full text-left p-3 bg-white rounded-lg border border-slate-200 hover:border-slate-400 transition-colors"
                       onClick={() => navigate('/intelligence')}
                     >
-                      <div className="flex items-center justify-between mb-1">
-                        <Badge variant={insight.severity === 'high' ? 'destructive' : insight.severity === 'medium' ? 'default' : 'secondary'} className="text-xs">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="flex items-center gap-1.5 text-[10px] tracking-[0.16em] uppercase text-slate-600 font-semibold">
+                          <span className={`w-1.5 h-1.5 rounded-full ${dotColor}`} />
                           {insight.count} clients
-                        </Badge>
-                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                        </span>
+                        <ChevronRight className="h-4 w-4 text-slate-300" />
                       </div>
-                      <p className="text-sm font-medium">{insight.insight}</p>
+                      <p className="text-sm font-medium text-[#1a2744]">{insight.insight}</p>
                       {insight.action && (
-                        <p className="text-xs text-muted-foreground mt-1">{insight.action}</p>
+                        <p className="text-xs text-slate-500 mt-1">{insight.action}</p>
                       )}
-                    </div>
-                  )) || (
+                    </button>
+                  );
+                  }) || (
                     <>
-                      <div className="p-3 bg-blue-50 rounded-lg">
-                        <Badge className="bg-blue-500 text-xs mb-1">18 clients</Badge>
-                        <p className="text-sm font-medium">Holding &gt;$150k excess cash</p>
-                        <p className="text-xs text-muted-foreground">Deploy to ETFs for better returns</p>
-                      </div>
-                      <div className="p-3 bg-orange-50 rounded-lg">
-                        <Badge className="bg-orange-500 text-xs mb-1">11 clients</Badge>
-                        <p className="text-sm font-medium">Overweight technology sector</p>
-                        <p className="text-xs text-muted-foreground">Consider sector rebalancing</p>
-                      </div>
-                      <div className="p-3 bg-red-50 rounded-lg">
-                        <Badge className="bg-red-500 text-xs mb-1">7 clients</Badge>
-                        <p className="text-sm font-medium">Approaching retirement funding gap</p>
-                        <p className="text-xs text-muted-foreground">Increase super contributions</p>
-                      </div>
-                      <div className="p-3 bg-green-50 rounded-lg">
-                        <Badge className="bg-green-500 text-xs mb-1">6 clients</Badge>
-                        <p className="text-sm font-medium">Tax-loss harvesting opportunity</p>
-                        <p className="text-xs text-muted-foreground">$28,500 potential tax savings</p>
-                      </div>
-                      <div className="p-3 bg-purple-50 rounded-lg">
-                        <Badge className="bg-purple-500 text-xs mb-1">5 clients</Badge>
-                        <p className="text-sm font-medium">Annual review overdue</p>
-                        <p className="text-xs text-muted-foreground">Schedule compliance review</p>
-                      </div>
+                      <button onClick={() => navigate('/intelligence')} className="w-full text-left p-3 bg-white rounded-lg border border-slate-200 hover:border-slate-400 transition-colors">
+                        <span className="flex items-center gap-1.5 text-[10px] tracking-[0.16em] uppercase text-slate-600 font-semibold mb-1.5"><span className="w-1.5 h-1.5 rounded-full bg-sky-500" />18 clients</span>
+                        <p className="text-sm font-medium text-[#1a2744]">Holding &gt;$150k excess cash</p>
+                        <p className="text-xs text-slate-500">Deploy to ETFs for better returns</p>
+                      </button>
+                      <button onClick={() => navigate('/intelligence')} className="w-full text-left p-3 bg-white rounded-lg border border-slate-200 hover:border-slate-400 transition-colors">
+                        <span className="flex items-center gap-1.5 text-[10px] tracking-[0.16em] uppercase text-slate-600 font-semibold mb-1.5"><span className="w-1.5 h-1.5 rounded-full bg-amber-500" />11 clients</span>
+                        <p className="text-sm font-medium text-[#1a2744]">Overweight technology sector</p>
+                        <p className="text-xs text-slate-500">Consider sector rebalancing</p>
+                      </button>
+                      <button onClick={() => navigate('/intelligence')} className="w-full text-left p-3 bg-white rounded-lg border border-slate-200 hover:border-slate-400 transition-colors">
+                        <span className="flex items-center gap-1.5 text-[10px] tracking-[0.16em] uppercase text-slate-600 font-semibold mb-1.5"><span className="w-1.5 h-1.5 rounded-full bg-rose-500" />7 clients</span>
+                        <p className="text-sm font-medium text-[#1a2744]">Approaching retirement funding gap</p>
+                        <p className="text-xs text-slate-500">Increase super contributions</p>
+                      </button>
+                      <button onClick={() => navigate('/intelligence')} className="w-full text-left p-3 bg-white rounded-lg border border-slate-200 hover:border-slate-400 transition-colors">
+                        <span className="flex items-center gap-1.5 text-[10px] tracking-[0.16em] uppercase text-slate-600 font-semibold mb-1.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />6 clients</span>
+                        <p className="text-sm font-medium text-[#1a2744]">Tax-loss harvesting opportunity</p>
+                        <p className="text-xs text-slate-500">$28,500 potential tax savings</p>
+                      </button>
+                      <button onClick={() => navigate('/intelligence')} className="w-full text-left p-3 bg-white rounded-lg border border-slate-200 hover:border-slate-400 transition-colors">
+                        <span className="flex items-center gap-1.5 text-[10px] tracking-[0.16em] uppercase text-slate-600 font-semibold mb-1.5"><span className="w-1.5 h-1.5 rounded-full bg-violet-500" />5 clients</span>
+                        <p className="text-sm font-medium text-[#1a2744]">Annual review overdue</p>
+                        <p className="text-xs text-slate-500">Schedule compliance review</p>
+                      </button>
                     </>
                   )}
                 </div>
@@ -725,19 +720,23 @@ const AdvisorCommandCenter = () => {
           {/* ===== ZONE 6: PORTFOLIO ALERTS PANEL ===== */}
           <Card className="lg:col-span-1">
             <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <BarChart3 className="h-5 w-5 text-[#1a2744]" />
-                Portfolio Alerts
+              <CardTitle className="flex items-center gap-2 font-serif text-lg text-[#1a2744]">
+                <BarChart3 className="h-4 w-4 text-[#D4A84C]" />
+                Portfolio alerts
               </CardTitle>
-              <CardDescription className="text-xs">Requires immediate attention</CardDescription>
+              <CardDescription className="text-xs text-slate-500">Requires immediate attention</CardDescription>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[300px]">
                 <div className="space-y-3">
-                  {monitoring?.alerts?.slice(0, 6).map((alert, i) => (
-                    <div 
+                  {monitoring?.alerts?.slice(0, 6).map((alert, i) => {
+                    const dotColor =
+                      alert.severity === 'high' ? 'bg-rose-500' :
+                      alert.severity === 'medium' ? 'bg-amber-500' : 'bg-slate-400';
+                    return (
+                    <button
                       key={`item-${i}`}
-                      className="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                      className="w-full text-left p-3 bg-white rounded-lg border border-slate-200 hover:border-slate-400 transition-colors"
                       onClick={() => {
                         const slug = resolveClientSlug(alert.client_id || alert.client_name);
                         if (slug) navigateToClient(navigate, slug);
@@ -746,80 +745,62 @@ const AdvisorCommandCenter = () => {
                       data-testid={`portfolio-alert-${i}`}
                     >
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-medium">{alert.client_name}</span>
-                        <Badge variant={alert.severity === 'high' ? 'destructive' : 'secondary'} className="text-xs">
+                        <span className="text-sm font-medium text-[#1a2744]">{alert.client_name}</span>
+                        <span className="flex items-center gap-1.5 text-[10px] tracking-wide uppercase text-slate-600 font-semibold">
+                          <span className={`w-1.5 h-1.5 rounded-full ${dotColor}`} />
                           {alert.type}
-                        </Badge>
+                        </span>
                       </div>
-                      <p className="text-xs text-muted-foreground">{alert.message}</p>
-                    </div>
-                  )) || (
+                      <p className="text-xs text-slate-500">{alert.message}</p>
+                    </button>
+                  );
+                  }) || (
                     <>
-                      <div
-                        className="p-3 border-l-4 border-l-red-500 bg-red-50 rounded-r-lg cursor-pointer hover:bg-red-100"
-                        onClick={() => navigateToClient(navigate, "client_5")}
-                        data-testid="portfolio-alert-fallback-0"
-                      >
+                      <button onClick={() => navigateToClient(navigate, "client_5")} data-testid="portfolio-alert-fallback-0" className="w-full text-left p-3 bg-white rounded-lg border border-slate-200 hover:border-slate-400 transition-colors">
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm font-medium">Patel Holdings</span>
-                          <Badge variant="destructive" className="text-xs">Critical</Badge>
+                          <span className="text-sm font-medium text-[#1a2744]">Patel Holdings</span>
+                          <span className="flex items-center gap-1.5 text-[10px] tracking-wide uppercase text-slate-600 font-semibold"><span className="w-1.5 h-1.5 rounded-full bg-rose-500" />Critical</span>
                         </div>
-                        <p className="text-xs text-muted-foreground">Portfolio drift 8.2% - rebalancing required</p>
-                      </div>
-                      <div
-                        className="p-3 border-l-4 border-l-orange-500 bg-orange-50 rounded-r-lg cursor-pointer hover:bg-orange-100"
-                        onClick={() => navigateToClient(navigate, "thompson_family")}
-                        data-testid="portfolio-alert-fallback-1"
-                      >
+                        <p className="text-xs text-slate-500">Portfolio drift 8.2% — rebalancing required</p>
+                      </button>
+                      <button onClick={() => navigateToClient(navigate, "thompson_family")} data-testid="portfolio-alert-fallback-1" className="w-full text-left p-3 bg-white rounded-lg border border-slate-200 hover:border-slate-400 transition-colors">
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm font-medium">Thompson Family</span>
-                          <Badge className="bg-orange-500 text-xs">High</Badge>
+                          <span className="text-sm font-medium text-[#1a2744]">Thompson Family</span>
+                          <span className="flex items-center gap-1.5 text-[10px] tracking-wide uppercase text-slate-600 font-semibold"><span className="w-1.5 h-1.5 rounded-full bg-amber-500" />High</span>
                         </div>
-                        <p className="text-xs text-muted-foreground">Single stock concentration &gt;15%</p>
-                      </div>
-                      <div
-                        className="p-3 border-l-4 border-l-yellow-500 bg-yellow-50 rounded-r-lg cursor-pointer hover:bg-yellow-100"
-                        onClick={() => navigateToClient(navigate, "chen_family")}
-                        data-testid="portfolio-alert-fallback-2"
-                      >
+                        <p className="text-xs text-slate-500">Single stock concentration &gt;15%</p>
+                      </button>
+                      <button onClick={() => navigateToClient(navigate, "chen_family")} data-testid="portfolio-alert-fallback-2" className="w-full text-left p-3 bg-white rounded-lg border border-slate-200 hover:border-slate-400 transition-colors">
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm font-medium">Chen Investment Trust</span>
-                          <Badge className="bg-yellow-500 text-black text-xs">Medium</Badge>
+                          <span className="text-sm font-medium text-[#1a2744]">Chen Investment Trust</span>
+                          <span className="flex items-center gap-1.5 text-[10px] tracking-wide uppercase text-slate-600 font-semibold"><span className="w-1.5 h-1.5 rounded-full bg-amber-400" />Medium</span>
                         </div>
-                        <p className="text-xs text-muted-foreground">Underperforming benchmark by 3.2%</p>
-                      </div>
-                      <div
-                        className="p-3 border-l-4 border-l-blue-500 bg-blue-50 rounded-r-lg cursor-pointer hover:bg-blue-100"
-                        onClick={() => navigateToClient(navigate, "client_3")}
-                        data-testid="portfolio-alert-fallback-3"
-                      >
+                        <p className="text-xs text-slate-500">Underperforming benchmark by 3.2%</p>
+                      </button>
+                      <button onClick={() => navigateToClient(navigate, "client_3")} data-testid="portfolio-alert-fallback-3" className="w-full text-left p-3 bg-white rounded-lg border border-slate-200 hover:border-slate-400 transition-colors">
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm font-medium">Thompson SMSF</span>
-                          <Badge className="bg-blue-500 text-xs">Info</Badge>
+                          <span className="text-sm font-medium text-[#1a2744]">Thompson SMSF</span>
+                          <span className="flex items-center gap-1.5 text-[10px] tracking-wide uppercase text-slate-600 font-semibold"><span className="w-1.5 h-1.5 rounded-full bg-sky-500" />Info</span>
                         </div>
-                        <p className="text-xs text-muted-foreground">Cash allocation above target</p>
-                      </div>
-                      <div
-                        className="p-3 border-l-4 border-l-orange-500 bg-orange-50 rounded-r-lg cursor-pointer hover:bg-orange-100"
-                        onClick={() => navigateToClient(navigate, "client_6")}
-                        data-testid="portfolio-alert-fallback-4"
-                      >
+                        <p className="text-xs text-slate-500">Cash allocation above target</p>
+                      </button>
+                      <button onClick={() => navigateToClient(navigate, "client_6")} data-testid="portfolio-alert-fallback-4" className="w-full text-left p-3 bg-white rounded-lg border border-slate-200 hover:border-slate-400 transition-colors">
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm font-medium">Liu Family Trust</span>
-                          <Badge className="bg-orange-500 text-xs">High</Badge>
+                          <span className="text-sm font-medium text-[#1a2744]">Liu Family Trust</span>
+                          <span className="flex items-center gap-1.5 text-[10px] tracking-wide uppercase text-slate-600 font-semibold"><span className="w-1.5 h-1.5 rounded-full bg-amber-500" />High</span>
                         </div>
-                        <p className="text-xs text-muted-foreground">Overweight AUS equities by 7%</p>
-                      </div>
+                        <p className="text-xs text-slate-500">Overweight AUS equities by 7%</p>
+                      </button>
                     </>
                   )}
                 </div>
               </ScrollArea>
-              <Button 
-                variant="outline" 
-                className="w-full mt-3 text-xs"
+              <Button
+                variant="outline"
+                className="w-full mt-3 text-xs rounded-full"
                 onClick={() => navigate('/portfolio-analyzer')}
               >
-                View All Portfolio Alerts
+                View all portfolio alerts
                 <ChevronRight className="h-4 w-4 ml-2" />
               </Button>
             </CardContent>
@@ -828,19 +809,21 @@ const AdvisorCommandCenter = () => {
           {/* ===== ZONE 7: TASK & WORKFLOW PANEL ===== */}
           <Card className="lg:col-span-1">
             <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <CheckCircle className="h-5 w-5 text-[#1a2744]" />
-                Tasks & Workflow
+              <CardTitle className="flex items-center gap-2 font-serif text-lg text-[#1a2744]">
+                <CheckCircle className="h-4 w-4 text-[#D4A84C]" />
+                Tasks &amp; workflow
               </CardTitle>
-              <CardDescription className="text-xs">Your action items</CardDescription>
+              <CardDescription className="text-xs text-slate-500">Your action items</CardDescription>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[300px]">
                 <div className="space-y-2">
-                  {tasks.map((task) => (
-                    <div 
+                  {tasks.map((task) => {
+                    const dotColor = task.priority === 'high' ? 'bg-rose-500' : task.priority === 'medium' ? 'bg-amber-500' : 'bg-slate-400';
+                    return (
+                    <button
                       key={task.id}
-                      className="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                      className="w-full text-left p-3 bg-white rounded-lg border border-slate-200 hover:border-slate-400 transition-colors"
                       onClick={() => {
                         const slug = resolveClientSlug(task.client_id || task.client);
                         if (slug) navigateToClient(navigate, slug);
@@ -849,27 +832,26 @@ const AdvisorCommandCenter = () => {
                       data-testid={`task-item-${task.id}`}
                     >
                       <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <p className="text-sm font-medium">{task.title}</p>
-                          <p className="text-xs text-muted-foreground">{task.client}</p>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-[#1a2744] truncate">{task.title}</p>
+                          <p className="text-xs text-slate-500">{task.client}</p>
                         </div>
-                        <Badge 
-                          variant={task.priority === 'high' ? 'destructive' : 'secondary'}
-                          className="text-xs ml-2"
-                        >
+                        <span className="flex items-center gap-1.5 text-[10px] tracking-wide uppercase text-slate-600 font-semibold ml-2 shrink-0">
+                          <span className={`w-1.5 h-1.5 rounded-full ${dotColor}`} />
                           {task.due}
-                        </Badge>
+                        </span>
                       </div>
-                    </div>
-                  ))}
+                    </button>
+                  );
+                  })}
                 </div>
               </ScrollArea>
-              <Button 
-                variant="outline" 
-                className="w-full mt-3 text-xs"
+              <Button
+                variant="outline"
+                className="w-full mt-3 text-xs rounded-full"
                 onClick={() => navigate('/ai-copilot-advanced')}
               >
-                View All Tasks
+                View all tasks
                 <ChevronRight className="h-4 w-4 ml-2" />
               </Button>
             </CardContent>

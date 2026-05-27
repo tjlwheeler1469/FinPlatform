@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
+import { PageShell, PillButton } from "@/components/PageShell";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -224,37 +225,32 @@ const BankFeeds = () => {
 
   return (
     <Layout>
-      <div className="space-y-6" data-testid="bank-feeds-page">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold  text-foreground">
-              Bank Feeds
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Connect your bank accounts to automatically sync transactions
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <Label className="text-sm">Sandbox Mode</Label>
-              <Switch 
-                checked={sandboxMode} 
-                onCheckedChange={setSandboxMode}
-                disabled
-              />
-            </div>
+      <PageShell
+        eyebrow="CONNECTED ACCOUNTS"
+        title="Bank feeds"
+        accent="every dollar, every day"
+        subtitle="Connect your bank accounts and watch transactions flow into your budget, scenario, and tax engine — automatically and securely via Plaid."
+        meta={`${connectedAccounts.length} ACCOUNTS · ${sandboxMode ? "SANDBOX" : "LIVE"}`}
+        metrics={[
+          { label: "Connected", value: String(connectedAccounts.length) },
+          { label: "Total balance", value: connectedAccounts.length > 0 ? `$${connectedAccounts.reduce((s, a) => s + (a.balance || 0), 0).toLocaleString()}` : "—" },
+          { label: "Mode", value: sandboxMode ? "SANDBOX" : "LIVE" },
+          { label: "Provider", value: "Plaid" },
+        ]}
+        actions={(
+          <>
             {connectedAccounts.length > 0 && (
-              <Button variant="outline" onClick={handleSync} disabled={syncing}>
-                <RefreshCw className={`h-4 w-4 mr-2 ${syncing ? 'animate-spin' : ''}`} />
-                {syncing ? 'Syncing...' : 'Sync All'}
-              </Button>
+              <PillButton variant="ghost" onClick={handleSync} disabled={syncing}>
+                <RefreshCw className={`h-3.5 w-3.5 inline -mt-0.5 mr-1.5 ${syncing ? "animate-spin" : ""}`} /> {syncing ? "Syncing…" : "Sync all"}
+              </PillButton>
             )}
-            <Button onClick={() => setShowLinkModal(true)} className="bg-[#1a2744]">
-              <Plus className="h-4 w-4 mr-2" /> Connect Bank
-            </Button>
-          </div>
-        </div>
+            <PillButton variant="primary" onClick={() => setShowLinkModal(true)}>
+              <Plus className="h-3.5 w-3.5 inline -mt-0.5 mr-1.5" /> Connect bank
+            </PillButton>
+          </>
+        )}
+      >
+      <div className="space-y-6" data-testid="bank-feeds-page">
 
         {/* Sandbox Notice */}
         <Card className="bg-amber-50 border-amber-200">
@@ -531,6 +527,7 @@ const BankFeeds = () => {
 
         <ComplianceFooter />
       </div>
+      </PageShell>
     </Layout>
   );
 };

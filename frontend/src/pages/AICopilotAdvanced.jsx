@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import Layout from "@/components/Layout";
+import { PageShell } from "@/components/PageShell";
 import {
   MessageSquare,
   Send,
@@ -140,7 +141,14 @@ const AICopilotAdvanced = () => {
 
   return (
     <Layout>
-      <div className="flex h-[calc(100vh-120px)] gap-4" data-testid="ai-copilot-advanced">
+      <PageShell
+        eyebrow="ADVISER · AI COPILOT"
+        title="Copilot"
+        accent="ask anything · book-wide"
+        subtitle="Natural-language access to every client, portfolio, and decision in your firm. Ranked insights surface what to act on next; suggested queries surface what to ask."
+        meta="GPT-5.2 · GROUNDED IN YOUR BOOK"
+      >
+      <div className="flex h-[calc(100vh-280px)] gap-4" data-testid="ai-copilot-advanced">
         {/* Sidebar - Quick Insights */}
         <div className="w-80 space-y-4 hidden lg:block">
           {/* Quick Insights */}
@@ -413,6 +421,7 @@ const AICopilotAdvanced = () => {
           </Card>
         </div>
       </div>
+      </PageShell>
     </Layout>
   );
 };

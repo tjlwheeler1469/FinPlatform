@@ -1,0 +1,66 @@
+{
+  "summary": "Tested PageShell rollout across 24 pages + AdvisorCommandCenter polish + backend regression checks for iteration 218 (Truth Journey aesthetic consistency). 20/24 pages PASS (PageShell present, correct page-level data-testid inside shell, expected eyebrows/metrics/pills visible). 4 FAIL with distinct root causes. Backend regression PASS: GET /api/exec-rails/adapters returns 5 adapters with live=false; /api-sandbox correctly returns 404. AdvisorCommandCenter renders airy aesthetic correctly — NBA cards now use subtle slate-200 borders with priority dots (HIGH/MEDIUM tinted) instead of gradient borders, matching the demanded design. Console errors observed only on /my-settings (hard React crash, caught by ErrorBoundary).",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "MySettings.jsx",
+        "issue": "CRITICAL: Page crashes — ReferenceError: ShieldCheck is not defined. ShieldCheck icon is referenced on line 116 but missing from the lucide-react named imports on lines 15-18 (User, CheckCircle2, AlertCircle, ExternalLink, Lock, Mail, Phone, MapPin, Landmark, FileBadge, Fingerprint). ErrorBoundary catches and renders fallback so [data-testid='my-settings'] and [data-testid='page-shell'] are NEVER rendered. Fix: add ShieldCheck to the lucide-react import block.",
+        "selector": "[data-testid='my-settings']",
+        "priority": "CRITICAL"
+      },
+      {
+        "component": "AppRouter.jsx — /retirement-planner",
+        "issue": "Route /retirement-planner is NOT registered in routes/AppRouter.jsx — page renders completely blank (body text empty, 0 page-shell, 0 retirement-planner-page testid). The component file RetirementPlanner.jsx exists and is correctly wrapped in PageShell with all 7 pill tabs (Overview/People/Assets/Income/Expenses/Assumptions/Projection) and retirement-planner-page testid, but it is orphaned — never imported into the router. Closest registered routes are /retirement-confidence (RetirementHub) and /retirement-control-center. Fix: add Route path='/retirement-planner' element={<RetirementPlanner/>} to AppRouter.jsx.",
+        "selector": "[data-testid='retirement-planner-page']",
+        "priority": "HIGH"
+      },
+      {
+        "component": "AppRouter.jsx — /scenario-modelling",
+        "issue": "Route /scenario-modelling is wired to UnifiedGoalsPlanning (line 145 in AppRouter.jsx) NOT to ScenarioModelling.jsx. UnifiedGoalsPlanning.jsx only renders <div data-testid='unified-goals-planning'> WITHOUT a PageShell wrap, so [data-testid='page-shell'] is absent. ScenarioModelling.jsx exists with proper PageShell + 'ADVISER · SCENARIOS' eyebrow at line 1007 but is orphaned. Fix: either change AppRouter line 145 to <ScenarioModelling /> OR wrap UnifiedGoalsPlanning in PageShell with the expected eyebrow.",
+        "selector": "[data-testid='page-shell']",
+        "priority": "HIGH"
+      },
+      {
+        "component": "AppRouter.jsx — /client-crm",
+        "issue": "Route /client-crm has a hard <Navigate to='/adviser-hub' replace /> at AppRouter.jsx line 216, so the ClientCRM.jsx page (which is correctly wrapped in PageShell with 'Add client' pill and Clients/Tasks/Workflows tabs) is NEVER rendered. Users land on /adviser-hub instead (AdviserHub.jsx which has different content: 'Client hub / 8 households' eyebrow, 'New client' button, 'All Clients/Portfolio/Activity/Segments/Comms/SOA-ROA/E-Sign' tabs). If the review intent is to surface ClientCRM at /client-crm, remove the Navigate and mount <ClientCRM /> there. If AdviserHub is the intended landing target, the review_request expectations for /client-crm need updating — but the redirect renders a different page than the review requires."
+      , "selector": "[data-testid='client-crm-page']", "priority": "HIGH"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": ["/app/test_reports/iteration_218.json"],
+  "action_items": [
+    "Add `ShieldCheck` to the lucide-react import in /app/frontend/src/pages/MySettings.jsx lines 15-18 — this is a one-word fix that will unbreak the page and ErrorBoundary will stop catching.",
+    "Register `/retirement-planner` route in /app/frontend/src/routes/AppRouter.jsx pointing to RetirementPlanner (or remove the orphaned page if intentional).",
+    "Decide intent for `/scenario-modelling`: either route it to ScenarioModelling.jsx (which already has PageShell) OR wrap the current UnifiedGoalsPlanning component in PageShell with 'ADVISER · SCENARIOS' eyebrow.",
+    "Decide intent for `/client-crm`: either remove the Navigate redirect at AppRouter line 216 and mount ClientCRM, OR update review-request expectations to match the AdviserHub landing target.",
+    "Verify all 20 passing pages remain visually consistent after the above fixes (regression sweep)."
+  ],
+  "critical_code_review_comments": [
+    "Two orphan pages (RetirementPlanner.jsx, ScenarioModelling.jsx) have full PageShell + testid implementations but are not wired into routing — dead code or routing miss. Linters don't catch this.",
+    "MySettings ShieldCheck import miss is exactly the class of bug linters should flag but lucide-react named imports aren't statically checked. Suggest enabling react/jsx-no-undef or no-undef in ESLint to catch this earlier.",
+    "AdvisorCommandCenter NBA cards correctly use subtle slate-200 borders + colored priority dots (HIGH/MEDIUM/CRITICAL badges) — the airy aesthetic polish has been applied as requested.",
+    "Backend /api/exec-rails/adapters returns 5 adapters with live=false consistently — no regression."
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "100%",
+    "frontend": "83% (20 of 24 pages pass; 4 fail due to: 1 missing import, 1 unregistered route, 1 wrong component mapping, 1 hard redirect)"
+  },
+  "test_credentials": "None. LocalStorage bypass: wealth_command_compliance_v5='permanent', app_mode='adviser'|'client', selected_client={id:'thompson_family',name:'David & Sarah Thompson'}.",
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Pages that PASS PageShell+testid+content checks (20): /dashboard, /client-portal, /client-setup, /my-vault, /budget, /adviser-compliance, /meeting-notes, /advice-document-builder, /messages, /documents, /notification-settings, /product-marketplace, /bank-feeds, /ai-copilot-advanced, /client-capture, /client-comms-checklist, /client-invoicing, /loan-calculator, /investments, /advisor-command-center. FAILS (4): /my-settings (ShieldCheck import miss → React crash → ErrorBoundary), /retirement-planner (route not registered → blank page), /scenario-modelling (route points to UnifiedGoalsPlanning which lacks PageShell), /client-crm (redirected to /adviser-hub via <Navigate>). The MySettings fix is one line. The other 3 require routing decisions by main agent.",
+  "rca_of_the_issues": {
+    "my_settings_crash": "Root cause: missing named import. File /app/frontend/src/pages/MySettings.jsx line 116 uses <ShieldCheck className='h-4 w-4 text-emerald-600' /> but the import block (lines 15-18) does not include ShieldCheck. React throws ReferenceError at render, ErrorBoundary catches and replaces the page with the fallback. Reproduction: navigate to /my-settings in client mode. Console shows: 'ReferenceError: ShieldCheck is not defined at MySettings'. Mitigation: append ShieldCheck to the lucide-react import line.",
+    "retirement_planner_blank": "Root cause: no Route entry for path '/retirement-planner' in routes/AppRouter.jsx. The component file exists and is correctly built but never mounted. Reproduction: GET /retirement-planner → blank shell-less page. Mitigation: add a <Route path='/retirement-planner' element={<RetirementPlanner/>}/> in AppRouter.jsx (RetirementPlanner already lazy-loaded via lazyPages.js if present, otherwise add import).",
+    "scenario_modelling_no_shell": "Root cause: AppRouter.jsx line 145 maps /scenario-modelling → UnifiedGoalsPlanning, but UnifiedGoalsPlanning.jsx renders <div data-testid='unified-goals-planning'> without PageShell. ScenarioModelling.jsx (which has PageShell) is orphaned. Mitigation: swap the mapping OR wrap UnifiedGoalsPlanning in PageShell.",
+    "client_crm_redirect": "Root cause: AppRouter.jsx line 216 hard-redirects /client-crm → /adviser-hub via <Navigate replace>. ClientCRM.jsx (with PageShell + 'Add client' pill + Clients/Tasks/Workflows tabs) is never rendered. Mitigation: remove the Navigate and mount ClientCRM directly if review_request expectations are authoritative."
+  }
+}

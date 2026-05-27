@@ -1,6 +1,8 @@
 // Thin page wrapper so ClientInvoicing can be reached via its own left-nav route.
 import Layout from "@/components/Layout";
+import { PageShell } from "@/components/PageShell";
 import ClientInvoicing from "@/components/ClientInvoicing";
+import { CLIENT_DATA } from "@/data/clientData";
 
 const useClientId = () => {
   try {
@@ -13,12 +15,24 @@ const useClientId = () => {
   return "thompson_family";
 };
 
-const ClientInvoicingPage = () => (
-  <Layout>
-    <div className="p-4 max-w-[1600px] mx-auto" data-testid="client-invoicing-page">
-      <ClientInvoicing clientId={useClientId()} />
-    </div>
-  </Layout>
-);
+const ClientInvoicingPage = () => {
+  const clientId = useClientId();
+  const client = CLIENT_DATA[clientId] || CLIENT_DATA.thompson_family;
+  return (
+    <Layout>
+      <PageShell
+        eyebrow="BILLING · INVOICING"
+        title="Invoicing"
+        accent="fees, paid and pending"
+        subtitle="Generate, send, and reconcile invoices against advice fees, plan reviews, and one-off engagements."
+        meta={`ACTIVE CLIENT · ${(client.profile?.name || "").toUpperCase()}`}
+      >
+        <div data-testid="client-invoicing-page">
+          <ClientInvoicing clientId={clientId} />
+        </div>
+      </PageShell>
+    </Layout>
+  );
+};
 
 export default ClientInvoicingPage;

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
+import { PageShell, PillButton } from "@/components/PageShell";
 import { navigateToClient } from "@/lib/navigateToClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -119,111 +120,40 @@ const ClientCRM = () => {
 
   return (
     <Layout>
-      <div className="space-y-6" data-testid="client-crm-page">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">
-              Client CRM
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Manage clients, tasks, and advice workflows
-            </p>
-          </div>
-          <Button className="bg-[#1a2744] hover:bg-[#1a2744]/90">
-            <Plus className="h-4 w-4 mr-2" />
-            Add Client
-          </Button>
-        </div>
-
-        {/* Summary Cards */}
-        {summary && (
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-[#1a2744]/10 flex items-center justify-center">
-                    <Users className="h-5 w-5 text-[#1a2744]" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold">{summary.total}</p>
-                    <p className="text-xs text-muted-foreground">Total Clients</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
-                    <CheckCircle className="h-5 w-5 text-green-600" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-green-600">{summary.active}</p>
-                    <p className="text-xs text-muted-foreground">Active</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                    <User className="h-5 w-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-blue-600">{summary.prospects}</p>
-                    <p className="text-xs text-muted-foreground">Prospects</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
-                    <AlertCircle className="h-5 w-5 text-amber-600" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-amber-600">{summary.review_due}</p>
-                    <p className="text-xs text-muted-foreground">Review Due</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="bg-gradient-to-br from-[#1a2744] to-[#1a2744]/80 text-white">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
-                    <DollarSign className="h-5 w-5 text-[#D4A84C]" />
-                  </div>
-                  <div>
-                    <p className="text-xl font-bold">{formatCurrency(summary.total_aum)}</p>
-                    <p className="text-xs text-white/70">Total AUM</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+      <PageShell
+        eyebrow="ADVISER · CRM"
+        title="Client CRM"
+        accent={`${summary?.total || 0} households · ${summary?.review_due || 0} due`}
+        subtitle="Manage clients, tasks, and advice workflows from one cockpit. Every overdue review, every pending task, every prospect — surfaced and ranked."
+        meta={`${overdueTasks.length} OVERDUE TASKS · ${summary?.active || 0} ACTIVE`}
+        metrics={[
+          { label: "Total", value: String(summary?.total || 0) },
+          { label: "Active", value: String(summary?.active || 0) },
+          { label: "Review due", value: String(summary?.review_due || 0) },
+          { label: "AUM", value: summary ? formatCurrency(summary.total_aum) : "—" },
+        ]}
+        actions={(
+          <PillButton variant="primary">
+            <Plus className="h-3.5 w-3.5 inline -mt-0.5 mr-1.5" /> Add client
+          </PillButton>
         )}
+      >
+      <div className="space-y-6" data-testid="client-crm-page">
 
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="clients" className="gap-2">
-              <Users className="h-4 w-4" />
-              Clients
+          <TabsList className="bg-transparent border-0 h-auto w-full justify-start gap-1.5 px-0 p-0">
+            <TabsTrigger value="clients" className="gap-1.5 px-4 py-2 rounded-full border border-transparent data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:border-[#1a2744] data-[state=inactive]:text-slate-600 data-[state=inactive]:hover:border-slate-300">
+              <Users className="h-3.5 w-3.5" /> Clients
             </TabsTrigger>
-            <TabsTrigger value="tasks" className="gap-2">
-              <ListTodo className="h-4 w-4" />
-              Tasks
+            <TabsTrigger value="tasks" className="gap-1.5 px-4 py-2 rounded-full border border-transparent data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:border-[#1a2744] data-[state=inactive]:text-slate-600 data-[state=inactive]:hover:border-slate-300">
+              <ListTodo className="h-3.5 w-3.5" /> Tasks
               {overdueTasks.length > 0 && (
-                <Badge className="bg-red-500 text-white ml-1">{overdueTasks.length}</Badge>
+                <span className="ml-1 px-1.5 py-0.5 rounded-full text-[9px] bg-rose-500 text-white font-mono">{overdueTasks.length}</span>
               )}
             </TabsTrigger>
-            <TabsTrigger value="workflow" className="gap-2">
-              <FileText className="h-4 w-4" />
-              Workflows
+            <TabsTrigger value="workflow" className="gap-1.5 px-4 py-2 rounded-full border border-transparent data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:border-[#1a2744] data-[state=inactive]:text-slate-600 data-[state=inactive]:hover:border-slate-300">
+              <FileText className="h-3.5 w-3.5" /> Workflows
             </TabsTrigger>
           </TabsList>
 
@@ -457,6 +387,7 @@ const ClientCRM = () => {
           </TabsContent>
         </Tabs>
       </div>
+      </PageShell>
     </Layout>
   );
 };

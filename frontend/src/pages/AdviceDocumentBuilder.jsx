@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import Layout from "@/components/Layout";
+import { PageShell, PillButton } from "@/components/PageShell";
 import { CLIENT_DATA, getActiveClientId } from "@/data/clientData";
 import { buildAdviceDocument, formatCurrency } from "@/lib/adviceDocumentEngine";
 import { Download, FileText, Save, Eye, Upload, Tag, Mail, Rocket, ShoppingBag, Package, CheckCircle2, Loader2 } from "lucide-react";
@@ -464,52 +465,63 @@ const AdviceDocumentBuilder = () => {
 
   return (
     <Layout>
-      <div className="max-w-[1100px] mx-auto p-4 space-y-4" data-testid="advice-document-builder">
-        <Card>
-          <CardContent className="p-4 flex items-center gap-4 flex-wrap">
-            <FileText className="h-6 w-6 text-[#D4A84C]" />
-            <div className="flex-1 min-w-[260px]">
-              <h1 className="text-xl font-bold text-[#1a2744]">Advice Document Builder</h1>
-              <p className="text-xs text-muted-foreground">Generate a draft Statement of Advice (SOA) or Record of Advice (ROA), preview, download as PDF, and save to the Vault.</p>
-            </div>
+      <PageShell
+        eyebrow={`ADVISER · ${docType.toUpperCase()} BUILDER`}
+        title="Advice document"
+        accent={docType === "soa" ? "statement of advice" : "record of advice"}
+        subtitle="Generate a draft SOA or ROA, preview, download as PDF, and save to the Vault. One click to push via Xmerge, notify the client, or execute strategy through the rails."
+        meta={`ACTIVE CLIENT · ${((CLIENT_DATA[clientId] || CLIENT_DATA.thompson_family)?.profile?.name || clientId).toUpperCase()}`}
+        actions={(
+          <>
             <Tabs value={docType} onValueChange={setDocType}>
-              <TabsList>
-                <TabsTrigger value="soa" data-testid="builder-tab-soa">SOA</TabsTrigger>
-                <TabsTrigger value="roa" data-testid="builder-tab-roa">ROA</TabsTrigger>
+              <TabsList className="bg-white border border-slate-200 rounded-full p-1 h-8">
+                <TabsTrigger value="soa" className="text-xs px-3 rounded-full data-[state=active]:bg-[#1a2744] data-[state=active]:text-white" data-testid="builder-tab-soa">SOA</TabsTrigger>
+                <TabsTrigger value="roa" className="text-xs px-3 rounded-full data-[state=active]:bg-[#1a2744] data-[state=active]:text-white" data-testid="builder-tab-roa">ROA</TabsTrigger>
               </TabsList>
             </Tabs>
-            <select value={clientId} onChange={(e) => setClientId(e.target.value)} className="text-sm border rounded px-2 py-1 bg-white hidden" data-testid="builder-client-select" aria-hidden="true">
-              {Object.entries(CLIENT_DATA)
-                .filter(([k]) => k !== "advisor")
-                .map(([id, c]) => {
-                  const label = c?.profile?.name || c?.name || id;
-                  return (<option key={id} value={id}>{label}</option>);
-                })}
-            </select>
-            <div className="text-xs text-muted-foreground flex items-center gap-1.5 border rounded px-2.5 py-1 bg-slate-50" data-testid="builder-active-client">
-              <span className="font-semibold text-[#1a2744]">{(CLIENT_DATA[clientId] || CLIENT_DATA.thompson_family)?.profile?.name || clientId}</span>
-              <span className="text-[10px]">· active client</span>
-            </div>
-            <Button variant="outline" size="sm" onClick={() => setShowTokens(s => !s)} data-testid="builder-toggle-tokens" className={showTokens ? "border-[#3B9CDC] text-[#3B9CDC] bg-[#3B9CDC]/10" : ""}><Tag className="h-3.5 w-3.5 mr-1" /> {showTokens ? "Hide" : "Show"} Xplan tokens</Button>
-            <Button variant="outline" size="sm" onClick={handlePushToXplan} data-testid="builder-push-xplan" className="border-[#3B9CDC] text-[#3B9CDC]"><Upload className="h-3.5 w-3.5 mr-1" /> Push via Xmerge</Button>
-            <Button variant="outline" size="sm" onClick={handleNotifyClient} data-testid="builder-notify-client" className={emailMode === "live" ? "border-emerald-600 text-emerald-700" : "border-amber-500 text-amber-700"}>
-              <Mail className="h-3.5 w-3.5 mr-1" /> Notify Client
-              <Badge variant="outline" className={`ml-2 text-[9px] ${emailMode === "live" ? "border-emerald-600 text-emerald-700" : "border-amber-500 text-amber-700"}`}>
-                {emailMode === "live" ? "LIVE" : "MOCKED"}
-              </Badge>
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleDispatchToRails} data-testid="builder-dispatch-rails" className="border-violet-500 text-violet-700"><Rocket className="h-3.5 w-3.5 mr-1" /> Execute Strategy</Button>
-            <Button variant="outline" size="sm" onClick={() => window.location.assign("/product-marketplace")} data-testid="builder-view-marketplace" className="border-slate-400 text-slate-700"><ShoppingBag className="h-3.5 w-3.5 mr-1" /> Marketplace</Button>
-            <Button variant="outline" size="sm" onClick={handleSaveToVault} data-testid="builder-save-vault"><Save className="h-3.5 w-3.5 mr-1" /> Save to Vault</Button>
-            <Button size="sm" onClick={handleGenerateImplementationPack} disabled={packBusy} data-testid="builder-implementation-pack" className="bg-[#D4A84C] hover:bg-[#b88d34] text-[#1a2744]">
-              {packBusy ? <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" /> : <Package className="h-3.5 w-3.5 mr-1" />}
-              {packBusy ? "Bundling…" : "Implementation Pack"}
-            </Button>
-            <Button size="sm" onClick={handleDownload} disabled={generating} data-testid="builder-download-pdf" className="bg-[#1a2744] hover:bg-[#0f1830] text-white">
-              <Download className="h-3.5 w-3.5 mr-1" /> {generating ? "Generating…" : "Download PDF"}
-            </Button>
-          </CardContent>
-        </Card>
+            <PillButton variant="primary" onClick={handleDownload} disabled={generating} data-testid="builder-download-pdf">
+              <Download className="h-3.5 w-3.5 inline -mt-0.5 mr-1.5" /> {generating ? "Generating…" : "Download PDF"}
+            </PillButton>
+          </>
+        )}
+      >
+      <div className="space-y-4" data-testid="advice-document-builder">
+
+        {/* Action toolbar — secondary, polished */}
+        <div className="flex items-center gap-2 flex-wrap bg-white border border-slate-200 rounded-xl p-3">
+          <PillButton variant="ghost" onClick={() => setShowTokens(s => !s)} data-testid="builder-toggle-tokens" className={showTokens ? "bg-slate-100" : ""}>
+            <Tag className="h-3 w-3 inline -mt-0.5 mr-1" /> {showTokens ? "Hide" : "Show"} Xplan tokens
+          </PillButton>
+          <PillButton variant="ghost" onClick={handlePushToXplan} data-testid="builder-push-xplan">
+            <Upload className="h-3 w-3 inline -mt-0.5 mr-1" /> Push via Xmerge
+          </PillButton>
+          <PillButton variant="ghost" onClick={handleNotifyClient} data-testid="builder-notify-client">
+            <Mail className="h-3 w-3 inline -mt-0.5 mr-1" /> Notify client
+            <span className={`ml-2 px-1.5 py-0.5 rounded text-[9px] font-mono ${emailMode === "live" ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-amber-50 text-amber-700 border border-amber-200"}`}>{emailMode === "live" ? "LIVE" : "MOCK"}</span>
+          </PillButton>
+          <PillButton variant="ghost" onClick={handleDispatchToRails} data-testid="builder-dispatch-rails">
+            <Rocket className="h-3 w-3 inline -mt-0.5 mr-1" /> Execute strategy
+          </PillButton>
+          <PillButton variant="ghost" onClick={() => window.location.assign("/product-marketplace")} data-testid="builder-view-marketplace">
+            <ShoppingBag className="h-3 w-3 inline -mt-0.5 mr-1" /> Marketplace
+          </PillButton>
+          <PillButton variant="ghost" onClick={handleSaveToVault} data-testid="builder-save-vault">
+            <Save className="h-3 w-3 inline -mt-0.5 mr-1" /> Save to vault
+          </PillButton>
+          <div className="ml-auto">
+            <PillButton variant="primary" onClick={handleGenerateImplementationPack} disabled={packBusy} data-testid="builder-implementation-pack" className="!bg-[#D4A84C] !text-[#1a2744] hover:!bg-[#b88d34]">
+              {packBusy ? <Loader2 className="h-3 w-3 inline -mt-0.5 mr-1 animate-spin" /> : <Package className="h-3 w-3 inline -mt-0.5 mr-1" />}
+              {packBusy ? "Bundling…" : "Implementation pack"}
+            </PillButton>
+          </div>
+        </div>
+
+        <select value={clientId} onChange={(e) => setClientId(e.target.value)} className="hidden" data-testid="builder-client-select" aria-hidden="true">
+          {Object.entries(CLIENT_DATA).filter(([k]) => k !== "advisor").map(([id, c]) => {
+            const label = c?.profile?.name || c?.name || id;
+            return (<option key={id} value={id}>{label}</option>);
+          })}
+        </select>
 
         {packResult && (
           <Card data-testid="implementation-pack-result">
@@ -576,6 +588,7 @@ const AdviceDocumentBuilder = () => {
           </CardContent>
         </Card>
       </div>
+      </PageShell>
     </Layout>
   );
 };

@@ -4,6 +4,7 @@
 // — this page only displays current status and provides request-update CTAs.
 import { useState } from "react";
 import Layout from "@/components/Layout";
+import { PageShell } from "@/components/PageShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Settings, User, ShieldCheck, CheckCircle2, AlertCircle, ExternalLink, Lock, Mail, Phone,
+  User, CheckCircle2, AlertCircle, ExternalLink, Lock, Mail, Phone,
   MapPin, Landmark, FileBadge, Fingerprint,
 } from "lucide-react";
 import { CLIENT_DATA, getActiveClientId } from "@/data/clientData";
@@ -53,23 +54,27 @@ const MySettings = () => {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-5 space-y-5" data-testid="my-settings">
-        <div>
-          <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.15em] text-muted-foreground font-semibold">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#D4A84C]" /> Account
-          </div>
-          <h1 className="text-3xl font-bold text-[#1a2744] mt-1 flex items-center gap-2">
-            <Settings className="h-7 w-7 text-[#D4A84C]" /> My Settings
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">Profile · ID verification · Tax file number · MyGov &amp; ATO · Notifications</p>
-        </div>
+      <PageShell
+        eyebrow="ACCOUNT"
+        title="My settings"
+        accent="profile, ID, MyGov"
+        subtitle="Profile, ID verification, Tax File Number, MyGov &amp; ATO linkage, notifications. Updates run through your adviser for compliance."
+        meta={`SECURE · ${(p.name || "").toUpperCase()}`}
+        metrics={[
+          { label: "Identity", value: verifications.identity.status.toUpperCase() },
+          { label: "TFN", value: verifications.tfn.status.toUpperCase() },
+          { label: "MyGov", value: verifications.mygov.status.toUpperCase() },
+          { label: "ATO", value: verifications.ato.status.toUpperCase() },
+        ]}
+      >
+      <div data-testid="my-settings">
 
         <Tabs defaultValue="profile">
-          <TabsList className="bg-white border h-10 w-full justify-start overflow-x-auto">
-            <TabsTrigger value="profile" className="gap-1.5 flex-shrink-0" data-testid="settings-tab-profile"><User className="h-3.5 w-3.5" /> Profile</TabsTrigger>
-            <TabsTrigger value="identity" className="gap-1.5 flex-shrink-0" data-testid="settings-tab-identity"><Fingerprint className="h-3.5 w-3.5" /> ID &amp; TFN</TabsTrigger>
-            <TabsTrigger value="government" className="gap-1.5 flex-shrink-0" data-testid="settings-tab-government"><Landmark className="h-3.5 w-3.5" /> MyGov / ATO</TabsTrigger>
-            <TabsTrigger value="notifications" className="gap-1.5 flex-shrink-0" data-testid="settings-tab-notifications"><Mail className="h-3.5 w-3.5" /> Notifications</TabsTrigger>
+          <TabsList className="bg-transparent border-0 h-auto w-full justify-start gap-1.5 px-0 p-0 mb-5 overflow-x-auto">
+            <TabsTrigger value="profile" className="gap-1.5 px-4 py-2 rounded-full border border-transparent flex-shrink-0 data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:border-[#1a2744] data-[state=inactive]:text-slate-600 data-[state=inactive]:hover:border-slate-300" data-testid="settings-tab-profile"><User className="h-3.5 w-3.5" /> Profile</TabsTrigger>
+            <TabsTrigger value="identity" className="gap-1.5 px-4 py-2 rounded-full border border-transparent flex-shrink-0 data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:border-[#1a2744] data-[state=inactive]:text-slate-600 data-[state=inactive]:hover:border-slate-300" data-testid="settings-tab-identity"><Fingerprint className="h-3.5 w-3.5" /> ID &amp; TFN</TabsTrigger>
+            <TabsTrigger value="government" className="gap-1.5 px-4 py-2 rounded-full border border-transparent flex-shrink-0 data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:border-[#1a2744] data-[state=inactive]:text-slate-600 data-[state=inactive]:hover:border-slate-300" data-testid="settings-tab-government"><Landmark className="h-3.5 w-3.5" /> MyGov / ATO</TabsTrigger>
+            <TabsTrigger value="notifications" className="gap-1.5 px-4 py-2 rounded-full border border-transparent flex-shrink-0 data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:border-[#1a2744] data-[state=inactive]:text-slate-600 data-[state=inactive]:hover:border-slate-300" data-testid="settings-tab-notifications"><Mail className="h-3.5 w-3.5" /> Notifications</TabsTrigger>
           </TabsList>
 
           {/* PROFILE */}
@@ -206,6 +211,7 @@ const MySettings = () => {
           </TabsContent>
         </Tabs>
       </div>
+      </PageShell>
     </Layout>
   );
 };

@@ -6,6 +6,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import Layout from "@/components/Layout";
+import { PageShell, PillButton } from "@/components/PageShell";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -188,30 +189,35 @@ const ClientCapture = () => {
 
   return (
     <Layout>
-      <div className="max-w-[1100px] mx-auto p-4 space-y-4" data-testid="client-capture">
-        {/* Toolbar */}
-        <Card>
-          <CardContent className="p-4 flex items-center gap-4 flex-wrap">
-            <div className="flex-1 min-w-[260px]">
-              <h1 className="text-xl font-bold text-[#1a2744]">Client Information</h1>
-              <p className="text-xs text-muted-foreground">Client contact, service overview, reviews, FSG &amp; risk profile · sync source for SOA / ROA &amp; ongoing service obligations.</p>
-            </div>
-            <select value={clientId} onChange={(e) => setClientId(e.target.value)} className="text-sm border rounded px-2 py-1 bg-white hidden" data-testid="capture-client-select" aria-hidden="true">
-              {Object.entries(CLIENT_DATA).filter(([k]) => k !== "advisor").map(([id, c]) => (
-                <option key={id} value={id}>{c?.profile?.name || id}</option>
-              ))}
-            </select>
-            <div className="text-xs text-muted-foreground flex items-center gap-1.5 border rounded px-2.5 py-1 bg-slate-50" data-testid="capture-active-client">
-              <span className="font-semibold text-[#1a2744]">{(CLIENT_DATA[clientId] || {})?.profile?.name || clientId}</span>
-              <span className="text-[10px]">· active client</span>
-            </div>
-            {dirty && <Badge variant="outline" className="text-amber-700 border-amber-300">Unsaved</Badge>}
-            <Button variant="outline" size="sm" onClick={handlePullFromXplan} data-testid="capture-pull-xplan" className="border-[#3B9CDC] text-[#3B9CDC] hover:bg-[#3B9CDC]/10"><Download className="h-3.5 w-3.5 mr-1" /> Pull Xplan</Button>
-            <Button variant="outline" size="sm" onClick={handlePushToXplan} data-testid="capture-push-xplan" className="border-[#3B9CDC] text-[#3B9CDC] hover:bg-[#3B9CDC]/10"><Upload className="h-3.5 w-3.5 mr-1" /> Push Xplan</Button>
-            <Button variant="outline" size="sm" onClick={handleReset} disabled={!dirty} data-testid="capture-reset"><RotateCcw className="h-3.5 w-3.5 mr-1" /> Reset</Button>
-            <Button size="sm" onClick={handleSave} disabled={saving || !dirty} data-testid="capture-save" className="bg-[#1a2744] hover:bg-[#0f1830] text-white"><Save className="h-3.5 w-3.5 mr-1" /> {saving ? "Saving…" : "Save"}</Button>
-          </CardContent>
-        </Card>
+      <PageShell
+        eyebrow="ADVISER · CLIENT RECORD"
+        title="Client information"
+        accent={dirty ? "unsaved changes" : "synced"}
+        subtitle="Contact, service overview, reviews, FSG and risk profile — the single source of truth that feeds SOA / ROA and ongoing service obligations."
+        meta={`ACTIVE CLIENT · ${((CLIENT_DATA[clientId] || {})?.profile?.name || clientId).toUpperCase()}`}
+        actions={(
+          <>
+            <PillButton variant="ghost" onClick={handlePullFromXplan} data-testid="capture-pull-xplan">
+              <Download className="h-3.5 w-3.5 inline -mt-0.5 mr-1.5" /> Pull Xplan
+            </PillButton>
+            <PillButton variant="ghost" onClick={handlePushToXplan} data-testid="capture-push-xplan">
+              <Upload className="h-3.5 w-3.5 inline -mt-0.5 mr-1.5" /> Push Xplan
+            </PillButton>
+            <PillButton variant="ghost" onClick={handleReset} disabled={!dirty} data-testid="capture-reset">
+              <RotateCcw className="h-3.5 w-3.5 inline -mt-0.5 mr-1.5" /> Reset
+            </PillButton>
+            <PillButton variant="primary" onClick={handleSave} disabled={saving || !dirty} data-testid="capture-save">
+              <Save className="h-3.5 w-3.5 inline -mt-0.5 mr-1.5" /> {saving ? "Saving…" : "Save"}
+            </PillButton>
+          </>
+        )}
+      >
+      <div className="space-y-4" data-testid="client-capture">
+        <select value={clientId} onChange={(e) => setClientId(e.target.value)} className="hidden" data-testid="capture-client-select" aria-hidden="true">
+          {Object.entries(CLIENT_DATA).filter(([k]) => k !== "advisor").map(([id, c]) => (
+            <option key={id} value={id}>{c?.profile?.name || id}</option>
+          ))}
+        </select>
 
         {/* Contact */}
         <Card>
@@ -361,6 +367,7 @@ const ClientCapture = () => {
 
         <p className="text-[11px] text-muted-foreground text-center pb-8">{loading ? "Loading…" : `Last saved ${data.updated_at ? new Date(data.updated_at).toLocaleString() : "—"}`}</p>
       </div>
+      </PageShell>
     </Layout>
   );
 };

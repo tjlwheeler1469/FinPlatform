@@ -8,12 +8,13 @@
 // page is never empty.
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Layout from "@/components/Layout";
+import { PageShell, PillButton } from "@/components/PageShell";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FolderLock, Download, FileSignature, Search, Lock, Calendar as CalendarIcon, Shield, RefreshCw, Layers, Tag as TagIcon } from "lucide-react";
+import { FolderLock, Download, FileSignature, Search, Lock, Calendar as CalendarIcon, RefreshCw, Layers, Tag as TagIcon } from "lucide-react";
 import { CLIENT_DATA, getActiveClientId } from "@/data/clientData";
 import { toast } from "sonner";
 
@@ -89,48 +90,43 @@ const MyVault = () => {
 
   return (
     <Layout>
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-5 space-y-5" data-testid="my-vault">
-        <div>
-          <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.15em] text-muted-foreground font-semibold">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#D4A84C]" />
-            {client.profile?.name || "Your vault"}
-          </div>
-          <h1 className="text-3xl font-bold text-[#1a2744] mt-1 flex items-center gap-2">
-            <FolderLock className="h-7 w-7 text-[#D4A84C]" /> My Vault
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Secure storage for meeting notes, signed SOAs/ROAs/FSGs and compliance documents · synced live with your adviser · encrypted at rest
-          </p>
-        </div>
-
-        {/* Stat ribbon */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <Card><CardContent className="p-4"><p className="text-[10px] uppercase tracking-wide text-muted-foreground">Documents</p><p className="text-2xl font-bold text-[#1a2744]" data-testid="vault-doc-count">{docs.length}</p></CardContent></Card>
-          <Card><CardContent className="p-4"><p className="text-[10px] uppercase tracking-wide text-muted-foreground">Signed &amp; Frozen</p><p className="text-2xl font-bold text-[#1a2744]" data-testid="vault-signed-count">{signedCount}</p></CardContent></Card>
-          <Card><CardContent className="p-4"><p className="text-[10px] uppercase tracking-wide text-muted-foreground">Meeting Notes</p><p className="text-2xl font-bold text-[#1a2744]" data-testid="vault-meetings-count">{meetings.length}</p></CardContent></Card>
-          <Card className="bg-gradient-to-br from-[#1a2744] to-[#2a3754] text-white border-0"><CardContent className="p-4"><p className="text-[10px] uppercase tracking-wide text-white/60">Security</p><p className="text-base font-bold mt-0.5 flex items-center gap-1.5"><Shield className="h-4 w-4 text-[#D4A84C]" /> AES-256</p><p className="text-[10px] text-white/50 mt-1">Encrypted at rest</p></CardContent></Card>
-        </div>
+      <PageShell
+        eyebrow="YOUR VAULT"
+        title="Secure vault"
+        accent={`${docs.length} documents · ${meetings.length} meetings`}
+        subtitle="Encrypted storage for every signed SOA, ROA, FSG and meeting note. Synced live from your adviser. Read-only — contact your adviser to request a new document or signature."
+        meta={`${(client.profile?.name || "").toUpperCase()} · AES-256 · ENCRYPTED AT REST`}
+        metrics={[
+          { label: "Documents", value: String(docs.length) },
+          { label: "Signed & frozen", value: String(signedCount) },
+          { label: "Meeting notes", value: String(meetings.length) },
+          { label: "Security", value: "AES-256" },
+        ]}
+        actions={(
+          <PillButton variant="ghost" onClick={refresh} disabled={loading} data-testid="vault-refresh">
+            <RefreshCw className={`h-3.5 w-3.5 inline -mt-0.5 mr-1.5 ${loading ? "animate-spin" : ""}`} /> Refresh
+          </PillButton>
+        )}
+      >
+      <div className="space-y-5" data-testid="my-vault">
 
         <Tabs defaultValue="docs">
-          <TabsList className="bg-white border h-10 w-full justify-start">
-            <TabsTrigger value="docs" className="gap-1.5" data-testid="vault-tab-docs"><FileSignature className="h-3.5 w-3.5" /> Documents</TabsTrigger>
-            <TabsTrigger value="meetings" className="gap-1.5" data-testid="vault-tab-meetings"><CalendarIcon className="h-3.5 w-3.5" /> Meeting Notes</TabsTrigger>
+          <TabsList className="bg-transparent border-0 h-auto w-full justify-start gap-1.5 px-0 p-0 mb-4">
+            <TabsTrigger value="docs" className="gap-1.5 px-4 py-2 rounded-full transition-all border border-transparent data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:border-[#1a2744] data-[state=inactive]:text-slate-600 data-[state=inactive]:hover:border-slate-300" data-testid="vault-tab-docs"><FileSignature className="h-3.5 w-3.5" /> Documents</TabsTrigger>
+            <TabsTrigger value="meetings" className="gap-1.5 px-4 py-2 rounded-full transition-all border border-transparent data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:border-[#1a2744] data-[state=inactive]:text-slate-600 data-[state=inactive]:hover:border-slate-300" data-testid="vault-tab-meetings"><CalendarIcon className="h-3.5 w-3.5" /> Meeting Notes</TabsTrigger>
           </TabsList>
 
           <TabsContent value="docs" className="pt-3 space-y-3">
-            <div className="flex flex-wrap items-center gap-2 bg-white border rounded-lg p-3">
+            <div className="flex flex-wrap items-center gap-2 bg-white border border-slate-200 rounded-xl p-3">
               <div className="relative flex-1 min-w-[200px]">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-                <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search documents, tags, families..." className="pl-8 h-8 text-sm" data-testid="vault-search" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+                <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search documents, tags, families..." className="pl-8 h-8 text-sm rounded-full border-slate-300" data-testid="vault-search" />
               </div>
-              <div className="flex gap-1 bg-muted rounded-md p-1 flex-wrap">
+              <div className="flex gap-1 flex-wrap">
                 {["all", ...allTags].map((t) => (
-                  <Button key={t} size="sm" variant={tagFilter === t ? "default" : "ghost"} onClick={() => setTagFilter(t)} className={`h-7 text-[11px] ${tagFilter === t ? "bg-[#1a2744]" : ""}`} data-testid={`vault-filter-${t}`}>{t === "all" ? "All" : t}</Button>
+                  <button key={t} onClick={() => setTagFilter(t)} className={`h-7 px-3 text-[11px] rounded-full transition-all border ${tagFilter === t ? "bg-[#1a2744] text-white border-[#1a2744]" : "bg-white text-slate-600 border-slate-300 hover:border-slate-500"}`} data-testid={`vault-filter-${t}`}>{t === "all" ? "All" : t}</button>
                 ))}
               </div>
-              <Button variant="outline" size="sm" onClick={refresh} disabled={loading} data-testid="vault-refresh" className="h-7 text-[11px]">
-                <RefreshCw className={`h-3 w-3 mr-1 ${loading ? "animate-spin" : ""}`} /> Refresh
-              </Button>
             </div>
 
             <Card>
@@ -223,8 +219,9 @@ const MyVault = () => {
           </TabsContent>
         </Tabs>
 
-        <p className="text-[10px] text-center text-muted-foreground flex items-center justify-center gap-1.5"><Lock className="h-3 w-3" /> Read-only · contact your adviser to request a new document or signature</p>
+        <p className="text-[10px] text-center text-slate-400 flex items-center justify-center gap-1.5"><Lock className="h-3 w-3" /> Read-only · contact your adviser to request a new document or signature</p>
       </div>
+      </PageShell>
     </Layout>
   );
 };

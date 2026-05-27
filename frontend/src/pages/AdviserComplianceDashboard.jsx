@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import Layout from '@/components/Layout';
+import { PageShell, PillButton } from '@/components/PageShell';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -227,48 +228,33 @@ const AdviserComplianceDashboard = () => {
 
   return (
     <Layout>
+      <PageShell
+        eyebrow="FIRM · COMPLIANCE"
+        title="Adviser compliance"
+        accent={dashboardMetrics.majorIssues > 0 ? `${dashboardMetrics.majorIssues} major issues` : "ASIC aligned"}
+        subtitle="Monitor advice quality, ASIC compliance, and regulatory alignment across the entire firm. Live data from MongoDB · Xplan sync available."
+        meta={`AFSL · 123456 · ${loading ? "SYNCING" : "LIVE FROM MONGODB"}`}
+        metrics={[
+          { label: "Total files", value: String(dashboardMetrics.totalFiles) },
+          { label: "Compliant", value: String(dashboardMetrics.compliant) },
+          { label: "Issues", value: String(dashboardMetrics.majorIssues + dashboardMetrics.minorIssues) },
+          { label: "Avg score", value: `${dashboardMetrics.avgScore}%` },
+        ]}
+        actions={(
+          <>
+            <PillButton variant="ghost" onClick={fetchDashboard} disabled={loading}>
+              <RefreshCw className={`h-3.5 w-3.5 inline -mt-0.5 mr-1.5 ${loading ? "animate-spin" : ""}`} /> Refresh
+            </PillButton>
+            <PillButton variant="ghost" onClick={pullFromXplan} disabled={xplanBusy} data-testid="compliance-pull-xplan">
+              <Download className="h-3.5 w-3.5 inline -mt-0.5 mr-1.5" /> Pull Xplan
+            </PillButton>
+            <PillButton variant="primary" onClick={pushToXplan} disabled={xplanBusy} data-testid="compliance-push-xplan">
+              <Upload className="h-3.5 w-3.5 inline -mt-0.5 mr-1.5" /> Push Xplan
+            </PillButton>
+          </>
+        )}
+      >
       <div className="space-y-6" data-testid="compliance-dashboard">
-        {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold flex items-center gap-2">
-              <Shield className="h-8 w-8 text-blue-600" />
-              Adviser Compliance Dashboard
-            </h1>
-            <p className="text-muted-foreground">
-              Monitor advice quality, ASIC compliance, and regulatory alignment
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Badge variant="outline" className="text-sm px-3 py-1">
-              AFSL: 123456
-            </Badge>
-            {loading ? (
-              <Badge variant="secondary"><RefreshCw className="h-3 w-3 mr-1 animate-spin" /> Loading...</Badge>
-            ) : (
-              <Badge variant="outline" className="bg-green-50 border-green-200 text-green-700">
-                <Activity className="h-3 w-3 mr-1" /> Live from MongoDB
-              </Badge>
-            )}
-            <Button variant="outline" onClick={fetchDashboard}>
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Refresh
-            </Button>
-            <Button variant="outline" onClick={pullFromXplan} disabled={xplanBusy} className="border-[#3B9CDC] text-[#3B9CDC] hover:bg-[#3B9CDC]/10" data-testid="compliance-pull-xplan">
-              <Download className="h-4 w-4 mr-2" />
-              Pull Xplan
-            </Button>
-            <Button variant="outline" onClick={pushToXplan} disabled={xplanBusy} className="border-[#3B9CDC] text-[#3B9CDC] hover:bg-[#3B9CDC]/10" data-testid="compliance-push-xplan">
-              <Upload className="h-4 w-4 mr-2" />
-              Push Xplan
-            </Button>
-            <Button variant="outline">
-              <Download className="h-4 w-4 mr-2" />
-              Export Report
-            </Button>
-          </div>
-        </div>
-
         {/* Alert Banner */}
         {dashboardMetrics.majorIssues > 0 && (
           <Alert variant="destructive">
@@ -282,26 +268,21 @@ const AdviserComplianceDashboard = () => {
 
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-5 w-full max-w-4xl">
-            <TabsTrigger value="dashboard" className="flex items-center gap-1">
-              <BarChart3 className="h-4 w-4" />
-              Dashboard
+          <TabsList className="bg-transparent border-0 h-auto w-full justify-start gap-1.5 px-0 p-0 overflow-x-auto">
+            <TabsTrigger value="dashboard" className="gap-1.5 px-4 py-2 rounded-full border border-transparent data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:border-[#1a2744] data-[state=inactive]:text-slate-600 data-[state=inactive]:hover:border-slate-300">
+              <BarChart3 className="h-3.5 w-3.5" /> Dashboard
             </TabsTrigger>
-            <TabsTrigger value="files" className="flex items-center gap-1">
-              <FileText className="h-4 w-4" />
-              Advice Files
+            <TabsTrigger value="files" className="gap-1.5 px-4 py-2 rounded-full border border-transparent data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:border-[#1a2744] data-[state=inactive]:text-slate-600 data-[state=inactive]:hover:border-slate-300">
+              <FileText className="h-3.5 w-3.5" /> Advice files
             </TabsTrigger>
-            <TabsTrigger value="asic" className="flex items-center gap-1">
-              <Gavel className="h-4 w-4" />
-              ASIC Framework
+            <TabsTrigger value="asic" className="gap-1.5 px-4 py-2 rounded-full border border-transparent data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:border-[#1a2744] data-[state=inactive]:text-slate-600 data-[state=inactive]:hover:border-slate-300">
+              <Gavel className="h-3.5 w-3.5" /> ASIC framework
             </TabsTrigger>
-            <TabsTrigger value="reports" className="flex items-center gap-1">
-              <BookOpen className="h-4 w-4" />
-              Reports
+            <TabsTrigger value="reports" className="gap-1.5 px-4 py-2 rounded-full border border-transparent data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:border-[#1a2744] data-[state=inactive]:text-slate-600 data-[state=inactive]:hover:border-slate-300">
+              <BookOpen className="h-3.5 w-3.5" /> Reports
             </TabsTrigger>
-            <TabsTrigger value="escalation" className="flex items-center gap-1">
-              <Flag className="h-4 w-4" />
-              Escalation
+            <TabsTrigger value="escalation" className="gap-1.5 px-4 py-2 rounded-full border border-transparent data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:border-[#1a2744] data-[state=inactive]:text-slate-600 data-[state=inactive]:hover:border-slate-300">
+              <Flag className="h-3.5 w-3.5" /> Escalation
             </TabsTrigger>
           </TabsList>
 
@@ -729,6 +710,7 @@ const AdviserComplianceDashboard = () => {
           </TabsContent>
         </Tabs>
       </div>
+      </PageShell>
     </Layout>
   );
 };

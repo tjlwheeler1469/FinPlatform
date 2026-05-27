@@ -3,21 +3,27 @@
 // without needing a dashboard tab. Keeps the adviser chat thread intact
 // (localStorage: client_msgs_<clientId>).
 import Layout from "@/components/Layout";
-import { getActiveClientId } from "@/data/clientData";
+import { PageShell } from "@/components/PageShell";
+import { CLIENT_DATA, getActiveClientId } from "@/data/clientData";
 import MessagesTab from "@/pages/clientView/MessagesTab";
 
 const ClientMessages = () => {
   const clientId = getActiveClientId();
+  const client = CLIENT_DATA[clientId] || CLIENT_DATA.thompson_family;
 
   return (
     <Layout>
-      <div className="max-w-[900px] mx-auto p-4" data-testid="client-messages-page">
-        <div className="mb-4">
-          <h1 className="text-2xl font-bold text-[#1a2744]">Messages</h1>
-          <p className="text-xs text-muted-foreground">Send a message to your adviser — replies appear here.</p>
+      <PageShell
+        eyebrow="MESSAGES"
+        title="Talk to your adviser"
+        accent="encrypted, just between us"
+        subtitle={`Direct line to ${client.profile?.advisor || "your adviser"}. Replies appear here — usually within a business day.`}
+        meta="ENCRYPTED · DELIVERY CONFIRMED · NO ATTACHMENTS"
+      >
+        <div className="max-w-[900px]" data-testid="client-messages-page">
+          <MessagesTab clientId={clientId} />
         </div>
-        <MessagesTab clientId={clientId} />
-      </div>
+      </PageShell>
     </Layout>
   );
 };

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
+import { PageShell, PillButton } from "@/components/PageShell";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -122,63 +123,31 @@ const ProductMarketplace = () => {
 
   return (
     <Layout>
+      <PageShell
+        eyebrow="MARKETPLACE"
+        title="Financial products"
+        accent="compare · curate · recommend"
+        subtitle="Insurance, investments, and loans from top providers — ranked against your client's profile and surfaced with explainable AI recommendations."
+        meta={`${recommendations?.summary?.providers || "20+"} PROVIDERS · LIVE QUOTES`}
+        metrics={[
+          { label: "Insurance gaps", value: String(recommendations?.summary?.insurance_gaps_identified || 0) },
+          { label: "Investment opps", value: String(recommendations?.summary?.investment_opportunities || 0) },
+          { label: "Annual savings", value: formatCurrency(recommendations?.summary?.potential_savings || 0) },
+          { label: "Providers", value: String(recommendations?.summary?.providers || 24) },
+        ]}
+        actions={(
+          <PillButton variant="primary" onClick={fetchRecommendations}>
+            <Sparkles className="h-3.5 w-3.5 inline -mt-0.5 mr-1.5" /> Get recommendations
+          </PillButton>
+        )}
+      >
       <div className="space-y-6" data-testid="product-marketplace">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold">Financial Product Marketplace</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Compare insurance, investments, and loans from top providers
-            </p>
-          </div>
-          <Button onClick={fetchRecommendations}>
-            <Sparkles className="h-4 w-4 mr-2" /> Get Recommendations
-          </Button>
-        </div>
-
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="bg-gradient-to-br from-green-50 to-green-100">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <Shield className="h-8 w-8 text-green-600" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Insurance Gaps</p>
-                  <p className="text-2xl font-bold">{recommendations?.summary?.insurance_gaps_identified || 0}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-gradient-to-br from-blue-50 to-blue-100">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <TrendingUp className="h-8 w-8 text-blue-600" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Investment Opportunities</p>
-                  <p className="text-2xl font-bold">{recommendations?.summary?.investment_opportunities || 0}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-gradient-to-br from-amber-50 to-amber-100">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <DollarSign className="h-8 w-8 text-amber-600" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Potential Annual Savings</p>
-                  <p className="text-2xl font-bold">{formatCurrency(recommendations?.summary?.potential_savings || 0)}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList>
-            <TabsTrigger value="recommendations">AI Recommendations</TabsTrigger>
-            <TabsTrigger value="insurance">Insurance</TabsTrigger>
-            <TabsTrigger value="investments">Investments</TabsTrigger>
-            <TabsTrigger value="loans">Loans</TabsTrigger>
+          <TabsList className="bg-transparent border-0 h-auto w-full justify-start gap-1.5 px-0 p-0">
+            <TabsTrigger value="recommendations" className="gap-1.5 px-4 py-2 rounded-full border border-transparent data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:border-[#1a2744] data-[state=inactive]:text-slate-600 data-[state=inactive]:hover:border-slate-300">AI recommendations</TabsTrigger>
+            <TabsTrigger value="insurance" className="gap-1.5 px-4 py-2 rounded-full border border-transparent data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:border-[#1a2744] data-[state=inactive]:text-slate-600 data-[state=inactive]:hover:border-slate-300">Insurance</TabsTrigger>
+            <TabsTrigger value="investments" className="gap-1.5 px-4 py-2 rounded-full border border-transparent data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:border-[#1a2744] data-[state=inactive]:text-slate-600 data-[state=inactive]:hover:border-slate-300">Investments</TabsTrigger>
+            <TabsTrigger value="loans" className="gap-1.5 px-4 py-2 rounded-full border border-transparent data-[state=active]:bg-[#1a2744] data-[state=active]:text-white data-[state=active]:border-[#1a2744] data-[state=inactive]:text-slate-600 data-[state=inactive]:hover:border-slate-300">Loans</TabsTrigger>
           </TabsList>
 
           {/* Recommendations Tab */}
@@ -469,6 +438,7 @@ const ProductMarketplace = () => {
           </TabsContent>
         </Tabs>
       </div>
+      </PageShell>
     </Layout>
   );
 };

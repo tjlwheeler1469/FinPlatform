@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
+import { PageShell, PillButton } from "@/components/PageShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Bell, Save, Check } from "lucide-react";
+import { Save, Check } from "lucide-react";
 import { toast } from "sonner";
 
 const API = process.env.REACT_APP_BACKEND_URL;
@@ -54,28 +53,18 @@ const NotificationSettings = ({ embedded = false }) => {
   const categories = [...new Set(NOTIFICATION_OPTIONS.map(o => o.category))];
 
   const content = (
-    <div className="space-y-6" data-testid="notification-settings">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-semibold flex items-center gap-2"><Bell className="h-5 w-5" /> Notification Preferences</h2>
-          <p className="text-sm text-muted-foreground">Choose which notifications you'd like to receive</p>
-        </div>
-        <Button onClick={save} disabled={saved} data-testid="save-notifications">
-          {saved ? <><Check className="h-4 w-4 mr-1" /> Saved</> : <><Save className="h-4 w-4 mr-1" /> Save Changes</>}
-        </Button>
-      </div>
-
+    <div className="space-y-5" data-testid="notification-settings">
       {categories.map(cat => (
-        <Card key={cat}>
+        <Card key={cat} className="border border-slate-200">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm">{cat}</CardTitle>
+            <CardTitle className="text-[11px] tracking-[0.18em] uppercase text-slate-500 font-semibold">{cat}</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-4 pt-2">
             {NOTIFICATION_OPTIONS.filter(o => o.category === cat).map(opt => (
-              <div key={opt.key} className="flex items-center justify-between" data-testid={`notif-${opt.key}`}>
+              <div key={opt.key} className="flex items-center justify-between gap-4 py-1" data-testid={`notif-${opt.key}`}>
                 <div>
-                  <p className="text-sm font-medium">{opt.label}</p>
-                  <p className="text-xs text-muted-foreground">{opt.desc}</p>
+                  <p className="text-sm font-medium text-[#1a2744]">{opt.label}</p>
+                  <p className="text-xs text-slate-500 mt-0.5">{opt.desc}</p>
                 </div>
                 <Switch checked={!!settings[opt.key]} onCheckedChange={() => toggle(opt.key)} />
               </div>
@@ -86,7 +75,26 @@ const NotificationSettings = ({ embedded = false }) => {
     </div>
   );
 
-  return embedded ? content : <Layout title="Notification Settings">{content}</Layout>;
+  const enabledCount = Object.values(settings).filter(Boolean).length;
+
+  return embedded ? content : (
+    <Layout>
+      <PageShell
+        eyebrow="PROFILE · NOTIFICATIONS"
+        title="What you want to hear about"
+        accent="and what you don't"
+        subtitle="Tune the signals — review reminders, client activity, market moves, compliance, and document events. Saved instantly to your profile."
+        meta={loading ? "LOADING…" : `${enabledCount} OF ${NOTIFICATION_OPTIONS.length} ENABLED`}
+        actions={(
+          <PillButton variant="primary" onClick={save} disabled={saved} data-testid="save-notifications">
+            {saved ? <><Check className="h-3.5 w-3.5 inline -mt-0.5 mr-1.5" /> Saved</> : <><Save className="h-3.5 w-3.5 inline -mt-0.5 mr-1.5" /> Save changes</>}
+          </PillButton>
+        )}
+      >
+        {content}
+      </PageShell>
+    </Layout>
+  );
 };
 
 export default NotificationSettings;
