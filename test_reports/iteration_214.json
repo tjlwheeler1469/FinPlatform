@@ -1,0 +1,46 @@
+{
+  "summary": "Iter 214 end-to-end verified: (1) Retirement Planner page title renamed to 'Retirement · David & Sarah Thompson' and PageShell title 'Retirement' confirmed. (2) Scenario cards collapsed by default with summary metrics + scenario-toggle-base 'Edit details' button (toggles to 'Hide details' and expands Budget tab inline). (3) Projected Portfolio Balance chart bbox y=596.5px (well within 1100px above-fold on 1920x1080). (4) Contribution Calculator unified into single Your Details card at top (data-testid='smsf-inputs') with all 9 number inputs (age/taxable-income/super-balance/employer/salary-sacrifice/personal/non-concessional/spouse/expected-return), ALL type=number, ZERO sliders. (5) Calculate button text confirmed 'Calculate' (not 'Calculate Strategy' or 'Calculate SMSF'). (6) SuperOptimiser no longer rendered in tab (count=0), no 'SMSF Contribution Optimizer' h1. (7) Fill+Calculate hits POST /api/analyze/smsf with non_concessional_contribution=15000 & expected_return=6.5 in query string; status=200; UI shows Projected at 67=$3,265,928 + Non-Concessional Remaining=$105,000 + projection-chart + cap-progress — all matching backend. (8) Backend pytest 3/3 PASS — new params with full inputs, defaults when new params omitted, and only-required-params smoke. (9) All 16 regression routes (incl. /smsf-optimizer) return 200.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "tests_executed": {
+    "page_title_retirement_not_workshop": "PASS (h1='Retirement · David & Sarah Thompson', 'Retirement Workshop' count=0)",
+    "scenario_toggle_base_collapsed_default": "PASS (text='Edit details' on load)",
+    "scenario_toggle_expands_tabs": "PASS (text→'Hide details', Budget tab visible after expand)",
+    "chart_above_fold_1920x1080": "PASS (chart heading bbox y=596.5 within 1100px)",
+    "smsf_inputs_card_at_top": "PASS (data-testid='smsf-inputs' present)",
+    "all_9_number_inputs_present": "PASS (age/taxable-income/super-balance/employer-contribution/salary-sacrifice/personal-contribution/non-concessional/spouse-contribution/expected-return; all type=number)",
+    "no_sliders_in_smsf_inputs": "PASS (count=0)",
+    "calculate_button_text": "PASS (text='Calculate')",
+    "super_optimiser_not_rendered": "PASS (data-testid='super-optimiser' count=0; no 'SMSF Contribution Optimizer' h1)",
+    "calculate_posts_new_params": "PASS (URL contains non_concessional_contribution=15000 and expected_return=6.5; status=200)",
+    "projection_chart_renders_after_calc": "PASS (data-testid='projection-chart' count=1)",
+    "cap_progress_renders_after_calc": "PASS (data-testid='cap-progress' count=1; Non-Concessional Remaining $105,000)",
+    "ui_projected_balance_matches_backend": "PASS (UI shows $3,265,928; backend projection 3,265,928.46)",
+    "backend_pytest_new_params": "PASS (test_smsf_with_new_params)",
+    "backend_pytest_defaults_for_new_params": "PASS (NCC=0, assumed_return=7.0 when omitted)",
+    "backend_pytest_only_required_params": "PASS",
+    "regression_routes_200": "PASS (16/16: /, /deals, /budget-exposure, /vault-documents, /webhooks-admin, /rbac-admin, /execution-rails, /adviser-hub, /adviser-compliance, /client-capture, /my-vault, /xplan-sync-hub, /advice-marketplace, /open-api-platform, /firm-branding, /smsf-optimizer)"
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration214_smsf_params.py",
+    "/app/test_reports/pytest/iter214_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "analysis.py line 423: total_concessional includes personal_contribution but the 'Personal Deductible' field UI treats it as concessional — matches caps semantics; ok.",
+    "SMSFOptimizer.jsx NumberField uses type='number' with no min/max validation — negative numbers or unreasonable values (e.g. age=200) are accepted client-side. Minor; backend should clamp.",
+    "RetirementHub.jsx still imports 'SuperOptimiser' refs in comment (line 34) — stale comment, harmless.",
+    "Caps in analysis.py are FY24-25 hardcoded ($30k concessional / $120k NCC) — fine for now but consider env/config for FY rollover."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100% (3/3 pytest)", "frontend": "100% (17/17 ui assertions)"},
+  "test_credentials": "No login. LocalStorage seeded: wealth_command_compliance_v5='permanent', app_mode='adviser', selected_client='{\"id\":\"thompson_family\"}'.",
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iter 214 UX refactor verified end-to-end. Backend /api/analyze/smsf now accepts non_concessional_contribution + expected_return; defaults preserved for backwards compat (NCC=0, return=7.0). UI: Retirement Planner header renamed, scenarios collapse by default exposing chart above fold, Contribution Calculator unified into one form with 9 number inputs, Calculate posts new params correctly. Pytest file /app/backend/tests/test_iteration214_smsf_params.py is a stable regression suite for the smsf endpoint."
+}

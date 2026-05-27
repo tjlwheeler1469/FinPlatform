@@ -4,20 +4,15 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Separator } from "@/components/ui/separator";
-import { 
-  Landmark, 
-  DollarSign,
+import {
+  Landmark,
   Calculator,
   TrendingUp,
   AlertCircle,
   CheckCircle,
   Lightbulb,
-  PiggyBank,
-  Calendar
 } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
@@ -43,6 +38,25 @@ const formatCurrency = (value) => {
   }).format(value);
 };
 
+// Inline number-input field used across the "Your Details" form.
+const NumberField = ({ label, value, onChange, testid, prefix, suffix, step = 1 }) => (
+  <div className="space-y-1">
+    <Label className="text-[11px] text-muted-foreground">{label}</Label>
+    <div className="relative">
+      {prefix && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">{prefix}</span>}
+      <Input
+        type="number"
+        step={step}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className={`h-9 text-sm ${prefix ? "pl-6" : ""} ${suffix ? "pr-12" : ""}`}
+        data-testid={testid}
+      />
+      {suffix && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground">{suffix}</span>}
+    </div>
+  </div>
+);
+
 const SMSFOptimizer = ({ embedded = false }) => {
   const [age, setAge] = useState(45);
   const [superBalance, setSuperBalance] = useState(350000);
@@ -51,6 +65,8 @@ const SMSFOptimizer = ({ embedded = false }) => {
   const [salarySacrifice, setSalarySacrifice] = useState(5000);
   const [personalContribution, setPersonalContribution] = useState(0);
   const [spouseContribution, setSpouseContribution] = useState(0);
+  const [nonConcessional, setNonConcessional] = useState(0);
+  const [expectedReturn, setExpectedReturn] = useState(7.0);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -65,14 +81,16 @@ const SMSFOptimizer = ({ embedded = false }) => {
           employer_contribution: employerContribution,
           salary_sacrifice: salarySacrifice,
           personal_contribution: personalContribution,
-          spouse_contribution: spouseContribution
+          spouse_contribution: spouseContribution,
+          non_concessional_contribution: nonConcessional,
+          expected_return: expectedReturn,
         }
       });
       setResult(response.data);
-      toast.success("Strategy calculated");
+      toast.success("Calculated");
     } catch (error) {
       console.error("Error calculating SMSF strategy:", error);
-      toast.error("Failed to calculate strategy");
+      toast.error("Failed to calculate");
     } finally {
       setLoading(false);
     }
@@ -81,13 +99,16 @@ const SMSFOptimizer = ({ embedded = false }) => {
   // Generate projection chart data
   const generateProjectionData = () => {
     if (!result?.projections) return [];
-    
+
     const data = [];
     let balance = superBalance;
-    const annualContribution = result.projections?.annual_contribution || 0;
-    const growthRate = 0.07;
+    const totalConcessional = result.current_contributions?.total_concessional || 0;
+    const totalNonConcessional = result.current_contributions?.total_non_concessional || 0;
+    const netConcessional = totalConcessional * 0.85;
+    const annualContribution = netConcessional + totalNonConcessional;
+    const growthRate = expectedReturn / 100;
     const yearsToRetirement = result.projections?.years_to_retirement || 20;
-    
+
     for (let year = 0; year <= yearsToRetirement; year++) {
       data.push({
         year: `Age ${age + year}`,
@@ -121,139 +142,48 @@ const SMSFOptimizer = ({ embedded = false }) => {
           </>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Input Section */}
-          <Card className="lg:col-span-1" data-testid="smsf-inputs">
-            <CardHeader>
-              <CardTitle className="">Your Details</CardTitle>
-              <CardDescription>Enter your current situation</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Age */}
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <Label>Current Age</Label>
-                  <span className="text-sm font-semibold">{age} years</span>
-                </div>
-                <Slider
-                  value={[age]}
-                  onValueChange={(v) => setAge(v[0])}
-                  min={18}
-                  max={75}
-                  step={1}
-                  data-testid="age-slider"
-                />
-              </div>
-
-              {/* Super Balance */}
-              <div className="space-y-2">
-                <Label>Current Super Balance</Label>
-                <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    type="number"
-                    value={superBalance}
-                    onChange={(e) => setSuperBalance(Number(e.target.value))}
-                    className="pl-10"
-                    data-testid="super-balance-input"
-                  />
-                </div>
-              </div>
-
-              {/* Taxable Income */}
-              <div className="space-y-2">
-                <Label>Taxable Income</Label>
-                <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    type="number"
-                    value={taxableIncome}
-                    onChange={(e) => setTaxableIncome(Number(e.target.value))}
-                    className="pl-10"
-                    data-testid="taxable-income-input"
-                  />
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Contributions */}
-              <div className="space-y-4">
-                <h4 className="font-semibold text-sm">Contributions</h4>
-                
-                <div className="space-y-2">
-                  <Label className="text-xs">Employer (SG)</Label>
-                  <div className="relative">
-                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      type="number"
-                      value={employerContribution}
-                      onChange={(e) => setEmployerContribution(Number(e.target.value))}
-                      className="pl-10"
-                      data-testid="employer-contribution-input"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-xs">Salary Sacrifice</Label>
-                  <div className="relative">
-                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      type="number"
-                      value={salarySacrifice}
-                      onChange={(e) => setSalarySacrifice(Number(e.target.value))}
-                      className="pl-10"
-                      data-testid="salary-sacrifice-input"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-xs">Personal Deductible</Label>
-                  <div className="relative">
-                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      type="number"
-                      value={personalContribution}
-                      onChange={(e) => setPersonalContribution(Number(e.target.value))}
-                      className="pl-10"
-                      data-testid="personal-contribution-input"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-xs">Spouse Contribution</Label>
-                  <div className="relative">
-                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      type="number"
-                      value={spouseContribution}
-                      onChange={(e) => setSpouseContribution(Number(e.target.value))}
-                      className="pl-10"
-                      data-testid="spouse-contribution-input"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <Button 
+        {/* Top: single full-width "Your Details" card with ALL inputs as manual
+            number entries. Results section flows below at full width. */}
+        <Card data-testid="smsf-inputs">
+          <CardHeader className="pb-3">
+            <CardTitle>Your Details</CardTitle>
+            <CardDescription>Enter your current situation</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <NumberField label="Current Age" value={age} onChange={setAge} testid="age-input" suffix="years" />
+              <NumberField label="Taxable Income" value={taxableIncome} onChange={setTaxableIncome} testid="taxable-income-input" prefix="$" />
+              <NumberField label="Current Super Balance" value={superBalance} onChange={setSuperBalance} testid="super-balance-input" prefix="$" />
+              <NumberField label="Employer (SG)" value={employerContribution} onChange={setEmployerContribution} testid="employer-contribution-input" prefix="$" suffix="/yr" />
+              <NumberField label="Salary Sacrifice" value={salarySacrifice} onChange={setSalarySacrifice} testid="salary-sacrifice-input" prefix="$" suffix="/yr" />
+              <NumberField label="Personal Deductible" value={personalContribution} onChange={setPersonalContribution} testid="personal-contribution-input" prefix="$" suffix="/yr" />
+              <NumberField label="Non-Concessional (post-tax)" value={nonConcessional} onChange={setNonConcessional} testid="non-concessional-input" prefix="$" suffix="/yr" />
+              <NumberField label="Spouse Contribution" value={spouseContribution} onChange={setSpouseContribution} testid="spouse-contribution-input" prefix="$" suffix="/yr" />
+              <NumberField label="Expected Return" value={expectedReturn} onChange={setExpectedReturn} testid="expected-return-input" suffix="%" step={0.1} />
+            </div>
+            <div className="mt-4 flex items-center justify-between border-t pt-4">
+              <p className="text-[11px] text-muted-foreground">
+                Total concessional: <strong>{formatCurrency(employerContribution + salarySacrifice + personalContribution)}</strong> / $30,000 cap
+                {nonConcessional + spouseContribution > 0 && (
+                  <> · Non-concessional: <strong>{formatCurrency(nonConcessional + spouseContribution)}</strong> / $120,000 cap</>
+                )}
+              </p>
+              <Button
                 onClick={calculateStrategy}
-                className="w-full bg-[#1a2744] hover:bg-[#1a2744]/90"
+                className="bg-[#1a2744] hover:bg-[#1a2744]/90"
                 disabled={loading}
                 data-testid="calculate-smsf-btn"
               >
                 <Calculator className="h-4 w-4 mr-2" />
-                Calculate Strategy
+                {loading ? "Calculating…" : "Calculate"}
               </Button>
-            </CardContent>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Results */}
-          <div className="lg:col-span-2 space-y-6">
-            {result ? (
-              <>
+        <div className="space-y-6">
+          {result ? (
+            <>
                 {/* Summary Cards */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <Card>
@@ -311,15 +241,15 @@ const SMSFOptimizer = ({ embedded = false }) => {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="p-3 rounded-lg bg-muted">
-                        <p className="text-sm text-muted-foreground">Remaining Cap</p>
+                        <p className="text-sm text-muted-foreground">Concessional Remaining</p>
                         <p className="text-lg font-bold text-[#10B981]">
                           {formatCurrency(result?.caps?.concessional_remaining || 0)}
                         </p>
                       </div>
                       <div className="p-3 rounded-lg bg-muted">
-                        <p className="text-sm text-muted-foreground">Non-Concessional Cap</p>
-                        <p className="text-lg font-bold">
-                          {formatCurrency(result?.caps?.non_concessional_cap || 120000)}
+                        <p className="text-sm text-muted-foreground">Non-Concessional Remaining</p>
+                        <p className="text-lg font-bold text-[#10B981]">
+                          {formatCurrency(result?.caps?.non_concessional_remaining || 0)}
                         </p>
                       </div>
                     </div>
@@ -478,7 +408,6 @@ const SMSFOptimizer = ({ embedded = false }) => {
               </Card>
             )}
           </div>
-        </div>
       </div>
   );
 

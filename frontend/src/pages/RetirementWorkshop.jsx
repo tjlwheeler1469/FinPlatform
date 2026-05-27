@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import {
@@ -23,6 +24,7 @@ import {
 import {
   Plus, Trash2, Save, RotateCcw, TrendingUp, Wallet, Target, Sliders,
   Info, ArrowUpRight, ArrowDownRight, CheckCircle2, AlertTriangle, Gauge,
+  ChevronDown, ChevronUp,
   Calculator,
 } from "lucide-react";
 import { CLIENT_DATA, getActiveClientId } from "@/data/clientData";
@@ -87,6 +89,7 @@ const FieldRow = ({ label, children, hint }) => (
 
 // Single scenario editor panel
 const ScenarioEditor = ({ scenario, onChange, onRemove, isBase, color, result, baseResult }) => {
+  const [expanded, setExpanded] = useState(false);
   const update = (patch) => {
     onChange({ ...scenario, inputs: { ...scenario.inputs, ...patch } });
     // Base scenario writes through to the global store so other pages see
@@ -153,6 +156,23 @@ const ScenarioEditor = ({ scenario, onChange, onRemove, isBase, color, result, b
         </div>
 
         <Tabs defaultValue="budget" className="w-full">
+          <div className="flex items-center justify-between">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setExpanded((v) => !v)}
+              className="h-7 text-[11px] text-muted-foreground hover:text-[#1a2744]"
+              data-testid={`scenario-toggle-${scenario.id}`}
+            >
+              {expanded ? <ChevronUp className="h-3 w-3 mr-1" /> : <ChevronDown className="h-3 w-3 mr-1" />}
+              {expanded ? "Hide details" : "Edit details"}
+            </Button>
+            <p className="text-[10px] text-muted-foreground">
+              {fmtShort(i.monthlyIncome - i.monthlyExpenses + i.extraMonthlySavings)}/mo surplus · {i.expectedReturn}% return · {i.currentAge}→{i.retirementAge}→{i.lifeExpectancy}y
+            </p>
+          </div>
+          <Collapsible open={expanded} onOpenChange={setExpanded}>
+            <CollapsibleContent className="pt-2">
           <TabsList className="grid grid-cols-4 w-full h-8">
             <TabsTrigger value="budget" className="text-[11px]" data-testid={`tab-budget-${scenario.id}`}><Wallet className="h-3 w-3 mr-1" />Budget</TabsTrigger>
             <TabsTrigger value="investments" className="text-[11px]" data-testid={`tab-investments-${scenario.id}`}><TrendingUp className="h-3 w-3 mr-1" />Invest</TabsTrigger>
@@ -227,6 +247,8 @@ const ScenarioEditor = ({ scenario, onChange, onRemove, isBase, color, result, b
               <p><strong>Years in retirement:</strong> {Math.max(0, i.lifeExpectancy - i.retirementAge)}</p>
             </div>
           </TabsContent>
+            </CollapsibleContent>
+          </Collapsible>
         </Tabs>
       </CardContent>
     </Card>
@@ -328,7 +350,7 @@ const RetirementWorkshop = ({ embedded = false, clientId: propClientId }) => {
             <div>
               <h1 className="text-2xl font-bold text-[#1a2744] flex items-center gap-2">
                 <Gauge className="h-6 w-6 text-[#D4A84C]" />
-                Retirement Workshop · {client.profile.name}
+                Retirement · {client.profile.name}
               </h1>
               <p className="text-xs text-muted-foreground mt-1">
                 Multi-scenario Monte Carlo analysis · {scenarios.length} scenario{scenarios.length !== 1 ? "s" : ""} · {results[0]?.numSims || 500} sims each
@@ -511,7 +533,7 @@ const RetirementWorkshop = ({ embedded = false, clientId: propClientId }) => {
     <Layout>
       <PageShell
         eyebrow="WORKSHOP"
-        title="Retirement workshop"
+        title="Retirement"
         accent={client.profile?.name}
         subtitle={`Multi-scenario Monte Carlo analysis with P10 / P50 / P90 confidence bands — ${scenarios.length} scenario${scenarios.length !== 1 ? "s" : ""} · ${results[0]?.numSims || 500} sims each.`}
         meta={`Confidence today: ${baseConfidence}% · ${client.retirement?.current_age ?? "—"} → ${client.retirement?.retirement_age ?? "—"} → ${client.retirement?.life_expectancy ?? "—"} y`}

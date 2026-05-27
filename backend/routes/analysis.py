@@ -396,7 +396,9 @@ async def analyze_smsf(
     employer_contribution: float = Query(default=0),
     salary_sacrifice: float = Query(default=0),
     personal_contribution: float = Query(default=0),
-    spouse_contribution: float = Query(default=0)
+    spouse_contribution: float = Query(default=0),
+    non_concessional_contribution: float = Query(default=0, description="Post-tax (NCC) contributions"),
+    expected_return: float = Query(default=7.0, description="Expected annual return % (e.g. 7.0)"),
 ):
     """
     Optimize SMSF contributions for tax efficiency.
@@ -412,29 +414,34 @@ async def analyze_smsf(
         marginal_rate = 0.37
     else:
         marginal_rate = 0.45
-    
+
     # 2024-25 contribution caps
     concessional_cap = 30000  # Pre-tax contributions
     non_concessional_cap = 120000  # After-tax contributions
-    
+
     # Calculate current total contributions
-    total_concessional = employer_contribution + salary_sacrifice
+    total_concessional = employer_contribution + salary_sacrifice + personal_contribution
     remaining_concessional = max(0, concessional_cap - total_concessional)
-    
+    total_non_concessional = non_concessional_contribution + spouse_contribution
+
     # Tax saving from salary sacrifice
     tax_saving_per_dollar = max(0, marginal_rate - 0.15)
-    
+
     # Optimal additional salary sacrifice
     optimal_sacrifice = remaining_concessional
     tax_saved = optimal_sacrifice * tax_saving_per_dollar
-    
-    # Projected balance (7% return, years to retirement)
+
+    # Projected balance — concessional grows net of 15% contributions tax,
+    # non-concessional comes in post-tax (no further reduction). Annual
+    # return applied as provided (e.g. 7.0% → 1.07 multiplier).
     years_to_retirement = max(0, 67 - age)
-    annual_contribution = employer_contribution + salary_sacrifice + personal_contribution
-    
+    net_concessional_annual = total_concessional * 0.85
+    net_non_concessional_annual = total_non_concessional  # already post-tax
+    return_multiplier = 1.0 + (expected_return / 100.0)
+
     projected_balance = current_super_balance
     for _ in range(years_to_retirement):
-        projected_balance = projected_balance * 1.07 + annual_contribution
+        projected_balance = projected_balance * return_multiplier + net_concessional_annual + net_non_concessional_annual
     
     # Generate recommendations
     recommendations = []
@@ -485,28 +492,29 @@ async def analyze_smsf(
             "salary_sacrifice": salary_sacrifice,
             "personal": personal_contribution,
             "spouse": spouse_contribution,
+            "non_concessional": non_concessional_contribution,
             "total_concessional": total_concessional,
-            "total_non_concessional": personal_contribution + spouse_contribution
+            "total_non_concessional": total_non_concessional,
         },
         "caps": {
             "concessional": concessional_cap,
             "non_concessional": non_concessional_cap,
             "concessional_remaining": remaining_concessional,
-            "non_concessional_remaining": non_concessional_cap - (personal_contribution + spouse_contribution)
+            "non_concessional_remaining": max(0, non_concessional_cap - total_non_concessional),
         },
         "tax_analysis": {
             "marginal_rate": marginal_rate * 100,
             "super_tax_rate": 15,
             "tax_saving_per_dollar": tax_saving_per_dollar * 100,
-            "potential_tax_saved": tax_saved
+            "potential_tax_saved": tax_saved,
         },
         "projections": {
             "years_to_retirement": years_to_retirement,
             "current_balance": current_super_balance,
             "projected_balance_at_67": projected_balance,
-            "assumed_return": 7.0
+            "assumed_return": expected_return,
         },
-        "recommendations": recommendations
+        "recommendations": recommendations,
     }
 
 

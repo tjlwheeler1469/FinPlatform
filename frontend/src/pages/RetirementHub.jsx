@@ -12,7 +12,6 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import { CLIENT_DATA, getActiveClientId } from "@/data/clientData";
 
 const RetirementWorkshop = lazy(() => import("@/pages/RetirementWorkshop"));
-const SuperOptimiser = lazy(() => import("@/components/SuperOptimiser"));
 const SMSFOptimizer = lazy(() => import("@/pages/SMSFOptimizer"));
 const ContributionPathCompare = lazy(() => import("@/components/ContributionPathCompare"));
 
@@ -120,16 +119,11 @@ const RetirementHub = ({ embedded = false, clientId: propClientId }) => {
               </Suspense>
             </ErrorBoundary>
           )}
-          {/* Concessional / non-concessional contribution scenarios */}
-          <ErrorBoundary label="Super & Pension contributions">
-            <Suspense fallback={<TabLoader />}>
-              <SuperOptimiser clientId={clientId} embedded defaults={superDefaults} />
-            </Suspense>
-          </ErrorBoundary>
-          {/* SMSF-specific projection — flows directly below the strategies
-              with no visual break. Header removed in iter 213 per user
-              request to make it one cohesive page. */}
-          <ErrorBoundary label="SMSF projection">
+          {/* Unified Contribution Calculator — single "Your Details" form at the
+              top with all contribution inputs as manual numbers (incl. salary
+              sacrifice, non-concessional and expected return), and the
+              calculated SMSF projection below. */}
+          <ErrorBoundary label="Contribution Calculator">
             <Suspense fallback={<TabLoader />}>
               <SMSFOptimizer embedded clientId={clientId} />
             </Suspense>
