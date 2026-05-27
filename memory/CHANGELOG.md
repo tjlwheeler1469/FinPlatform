@@ -1,3 +1,40 @@
+## Feb 2026 — Iter 216: 7 features shipped (UX cleanup + 4 optional rollouts)
+
+### 1. Goals sub-tab removed from ScenarioEditor
+- `RetirementWorkshop.jsx` ScenarioEditor now has **3 sub-tabs** instead of 4: Budget, Invest, Assum. (Goals removed).
+- Goals fields (Current Age, Retirement Age, Life Expectancy, Annual Retirement Spending, Legacy Goal) merged into the Assumptions tab.
+
+### 2. Editable "Real return", "Years to retire", "Years in retirement"
+- Three new manual number inputs in the Assumptions tab:
+  - `Real return (%)` writes back to `expectedReturn = realReturn + inflationRate`.
+  - `Years to retire` writes back to `retirementAge = currentAge + value`.
+  - `Years in retirement` writes back to `lifeExpectancy = retirementAge + value`.
+
+### 3. Meeting Automation → client_meetings auto-publish
+- `POST /api/meeting-automation/generate-notes` now also inserts a parallel record into the Mongo-persisted `client_meetings` collection (with `source='meeting_automation'`, tagged with `meeting_type`). MyVault > Meeting Notes tab surfaces live-captured meetings automatically.
+
+### 4. "Suggest optimal contributions" auto-fill
+- New `Suggest optimal` button (data-testid `suggest-optimal-btn`) next to Calculate in the Contribution Calculator.
+- Heuristic fills salary-sacrifice to fill the $30k concessional cap WHILE keeping total assessable below the $250k Div 293 threshold. Suggests $30k NCC when super balance > $250k.
+
+### 5. Firm-branding CSS injection on boot
+- New `BrandingProvider.jsx` wraps the app tree, fetches `/api/branding/current` on mount, injects `--brand-primary`, `--brand-accent`, and updates `document.title` (+ favicon if `favicon_url` set). Falls back to defaults synchronously so first paint is correct.
+
+### 6. Open API "Sandbox / Playground" page (`/developer-sandbox`)
+- New page with 7 curated endpoints (Clients, Deals, Files, Webhooks, Evidence, SMSF analyze, …), token paste, JSON body editor for POST endpoints, execute → response panel with HTTP status / elapsed / content-type / copy, and a sticky call-history sidebar.
+- **Important**: route MUST NOT start with `/api` because Kubernetes ingress forwards all `/api*` paths to FastAPI. First attempt at `/api-sandbox` returned 404 from backend — fixed by renaming to `/developer-sandbox` (verified HTTP 200).
+
+### 7. Reset-to-base mini-button
+- New `InputWithReset` wrapper inside `RetirementWorkshop.jsx`. When a non-base scenario's input deviates from the base scenario value, a small ↺ gold button appears at the input's top-right. Click → resets to base value. Applied to ALL inputs in Investments + Assumptions tabs (currentAge, expectedReturn, volatility, currentPortfolio, annualContributions, inflationRate, real return, years-to-retire, years-in-retirement, retirementSpending, legacyGoal).
+
+### Nav additions
+- `API Sandbox` link added to Firm nav section (Play icon).
+
+### Test verdict
+- Iter 216: 6/7 PASS first round; the route conflict identified in code review. Renamed `/api-sandbox` → `/developer-sandbox`; verified 200 OK post-fix. All 7 items shipping.
+
+
+
 ## Feb 2026 — Iter 215: Goals tab removal + manual scenario inputs
 
 ### 1. Goals tab removed from UnifiedClientOverview

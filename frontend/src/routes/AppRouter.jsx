@@ -195,7 +195,7 @@ const AppRouter = () => (
     <Route path="/rbac-admin" element={<RbacAdmin />} />
     <Route path="/advice-marketplace" element={<AdviceMarketplace />} />
     <Route path="/open-api-platform" element={<OpenApiPlatform />} />
-    <Route path="/api-sandbox" element={<ApiSandbox />} />
+    <Route path="/developer-sandbox" element={<ApiSandbox />} />
     <Route path="/firm-branding" element={<FirmBranding />} />
     <Route path="/knowledge-graph" element={<Navigate to="/advisor-command-center" replace />} />
     <Route path="/ai-copilot" element={<Navigate to="/ai-copilot-advanced" replace />} />
