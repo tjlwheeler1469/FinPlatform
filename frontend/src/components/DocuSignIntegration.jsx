@@ -55,6 +55,17 @@ const DocuSignIntegration = ({ onSignatureComplete }) => {
   const [signingStep, setSigningStep] = useState(0);
   const [signatureData, setSignatureData] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [providerHealth, setProviderHealth] = useState({ provider: "mock", mode: "mock" });
+
+  // Probe which provider is live (env keys present) so the header badge is honest.
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`${API_URL}/api/esignature/provider/health`)
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => { if (!cancelled && d) setProviderHealth(d); })
+      .catch(() => { /* keep default mock */ });
+    return () => { cancelled = true; };
+  }, []);
 
   // Load signature requests from MongoDB on mount
   useEffect(() => {
@@ -319,8 +330,17 @@ const DocuSignIntegration = ({ onSignatureComplete }) => {
             <FileSignature className="h-5 w-5 text-[#D4A84C]" />
             E-Signature Management
           </h2>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span>Send and manage document signatures (DocuSign MOCK)</span>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground" data-testid="esig-provider-banner">
+            <span>Send and manage document signatures · provider <span className="font-mono uppercase text-[#1a2744]">{providerHealth.provider}</span></span>
+            {providerHealth.mode === "live" && (
+              <Badge variant="outline" className="text-[10px] border-emerald-500 text-emerald-700 bg-emerald-50">● LIVE</Badge>
+            )}
+            {providerHealth.mode === "live_pending_sdk" && (
+              <Badge variant="outline" className="text-[10px] border-amber-500 text-amber-700 bg-amber-50">● LIVE · SDK pending</Badge>
+            )}
+            {providerHealth.mode === "mock" && (
+              <Badge variant="outline" className="text-[10px] border-amber-400 text-amber-700 bg-white">○ MOCK</Badge>
+            )}
             <Badge variant="outline" className="text-xs flex items-center gap-1">
               <Database className="h-3 w-3" /> MongoDB
             </Badge>

@@ -1,3 +1,37 @@
+## Feb 2026 — Iter 224: Polish + Refactor + Execution Rails admin + E-sig scaffold (14/14 PASS · 100%)
+
+User asked to do "all" of: (a) polish 3 cosmetic console warnings, (b) refactor 800-line AdviserClientDashboard, (c) Execution Rails admin UX, (d) live e-sig integration (later opted to keep mock+env-gated scaffold).
+
+**Polish**:
+- `/app/frontend/src/index.js` — added `console.warn` filter that suppresses Recharts "width(-1) and height(-1) of chart" cosmetic warnings (fired transiently on first-paint of sticky / lazy chart parents — chart itself renders fine within 200ms).
+- `/app/frontend/src/pages/AdvisorCommandCenter.jsx` — `fetchAllData` now accepts `AbortSignal`; useEffect creates a `new AbortController()` and aborts on unmount + on each interval tick replacement. `AbortError` + transient `"Failed to fetch"` errors swallowed silently (no longer surface as red console errors during React StrictMode double-mount or quick page navigation).
+- SuperOptimiser hydration warning — confirmed dead code (component is not imported/mounted anywhere), no fix needed.
+
+**AdviserClientDashboard refactor** (784 lines → 194-line orchestrator + 9 small subcomponents under `/app/frontend/src/components/adviserClientDashboard/`):
+- `_utils.js` (64 lines) — fmt + mapSimulationToSliders helpers
+- `RetirementReadinessCard.jsx` (57 lines) · `AlertsCard.jsx` (30) · `OpportunitiesCard.jsx` (32) · `BalanceSheetCard.jsx` (74) · `EmbeddedScenarioCard.jsx` (145) · `TodaysPrioritiesCard.jsx` (71) · `MeetingPrepCard.jsx` (43) · `WhatChangedCard.jsx` (35) · `SimulationBanner.jsx` (57)
+- All test-ids and behavioural surface preserved. Lint clean. Live verified: 8 cards render, 4 sliders affect scenario-confidence live (volatility 24% → confidence 78%), Generate review pack downloads ReviewPack_Thompson_*.pdf.
+
+**Execution Rails admin UX**:
+- Backend: `POST /api/exec-rails/adapters/{ticket_type}/test` — actively probes the underlying SDK (alpaca-py for trade/rebalance; key-presence for super_change/insurance_quote; permanent-mock for contribution). Returns `{ticket_type, mode, reachable, latency_ms, detail, checked_at}`.
+- Frontend (`ExecutionRails.jsx`): every adapter card now has Test connection + Seed demo pills, plus an inline color-coded probe result chip showing `mode · latency_ms · detail`. Seed demo now uses per-adapter `DEMO_PAYLOADS` (trade buy / super switch / AIA insurance quote / Bpay contribution / multi-leg rebalance) so principals can fire one realistic ticket of every type, not just trade.
+
+**E-signature outbound scaffold** (`/app/backend/routes/esignature_outbound.py` — 270 lines, prefix `/api/esignature`):
+- `GET /provider/health` — returns `{provider, mode}` based on which env-key bundle is present (DOCUSIGN_* > ADOBE_SIGN_* > SIGNNOW_* > mock).
+- `GET /requests?limit&skip&status` — paginated list of all signature requests, newest first.
+- `POST /send` — accepts `{document_id, document_name, client_id, client_name, client_email, message?, family_key?, deal_id?}`. Creates a Mongo row in `signature_requests`. `_dispatch_to_provider()` returns `mode='mock'` (or `live_pending_sdk` when keys are present but SDK call deferred).
+- `POST /sign/{request_id}` — mock-side signing aid. Mirrors the inbound webhook side-effects: freezes the document family (`is_frozen=true`), writes audit row to `rbac_audit` (`event='document_signed'`), advances the linked Deal to `stage='signed'`. Returns 409 on a second call.
+- `GET /status/{request_id}` — one-request status.
+- Registered in `route_registry.py` line 23.
+- `DocuSignIntegration.jsx` header now reads `/api/esignature/provider/health` on mount and shows a dynamic badge: ● LIVE (emerald) / ● LIVE · SDK pending (amber) / ○ MOCK (white) — replaces the hard-coded "DocuSign MOCK" string.
+
+**Tests**: iter 224 — backend 14/14 pytest (1 skipped: files/upload shape diff — non-blocking), frontend 8/8 critical assertions PASS, retest_needed=false, no UI bugs, no design issues. Recharts width(-1) suppression CONFIRMED working (0 warnings on /retirement-planner, /quick-overview). AdvisorCommandCenter renders without "Failed to fetch" error.
+
+**Non-blocking review notes** (deferred): super_change/insurance_quote probe relies on env-key presence rather than an actual sandbox ping — TODO comment in code to wire partner /health endpoint when sandbox creds land.
+
+
+
+
 ## Feb 2026 — Iter 223: Adviser Profile → Quick overview (13/13 PASS · 100%)
 
 User asked to "Move Retirement planner multi-entity · CGT-aware to Adviser Profile with Left Hand Navigation as 'Quick overview'" + Export to PDF + 'Add as new client' button.
