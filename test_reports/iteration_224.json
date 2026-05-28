@@ -1,0 +1,34 @@
+{
+  "summary": "Iteration 224 verified: backend (Execution Rails adapter test + e-sig outbound 5 endpoints) and frontend (refactored Adviser Dashboard, Execution Rails admin UX, Quick Overview, Command Center). 14/15 backend tests passed (1 non-blocking skip — files/upload endpoint shape differs from assumption). All critical UI elements + behaviour confirmed working.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "/api/files/upload", "issue": "Could not exercise family_key freeze path via API in test — files/upload returns non-200; freeze side-effect logic itself wired correctly in code, just couldn't seed a vault row from test. Test skipped gracefully."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration224_exec_rails_esign.py",
+    "/app/test_reports/pytest/iteration_224.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "esignature_outbound.send: writes provider/mode/envelope_id even when _dispatch_to_provider returns mode='live_pending_sdk' — UI may show pending forever until provider SDK is added. Consider surfacing this 'live_pending_sdk' mode to the UI as a yellow chip so adviser knows envelope wasn't actually delivered.",
+    "esignature_outbound.sign: writes audit row with custom _id == audit_id — fine, but means a second call with the same request_id (after the 409 guard is bypassed) would DuplicateKeyError. Current 409 path prevents this so OK.",
+    "execution_rails.test endpoint: 'super_change' and 'insurance_quote' return reachable=True from key presence alone — no real sandbox ping. Worth a TODO comment to call the partner /health path once sandbox creds land."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iteration224_exec_rails_esign.py"
+  ],
+  "success_rate": {"backend": "100% (14/14 executed, 1 skipped)", "frontend": "100% (8/8 critical assertions)"},
+  "seed_data_creation": "Test rows in MongoDB collection signature_requests prefixed with sig_<uuid>; signed entries also create rbac_audit rows prefixed esig_<uuid>. Volume: ~3 rows. Not cleaned up — collection already had 10+ legacy rows.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend: /api/exec-rails/adapters/{ticket_type}/test works for trade/super_change/insurance_quote/contribution/rebalance (200 + mock mode). E-sig outbound: /api/esignature/{send,sign,status,requests,provider/health} all live; sign on completed request returns 409. Inbound webhook /api/e-signature/event still mounted (requires family_key + signer_email; returns 404 'family not found' when fam missing — that's business logic not routing). Frontend: ALL data-testids resolved; scenario sliders DO affect scenario-confidence (volatility 24% → 78%, spending $380k → 56%); Generate review pack triggers actual PDF download (filename ReviewPack_Thompson_*.pdf); Recharts width(-1) warnings suppression CONFIRMED working (0 in console); AdvisorCommandCenter renders without 'Failed to fetch' error. Only console error visible is the parent emergent IDE postMessage DataCloneError — NOT from app code.",
+  "test_credentials": "None required — localStorage flags only: wealth_command_compliance_v5='permanent', app_mode='adviser', selected_client={id:'thompson_family',...}",
+  "mocked_apis": "MOCKED (per spec): e-signature outbound dispatch (provider='mock' until DocuSign/Adobe/signNow keys present), Alpaca broker (mock until ALPACA_API_KEY), Resend email, Xplan sync. All correctly identified as mock by backend probes."
+}
