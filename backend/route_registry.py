@@ -20,6 +20,7 @@ ROUTE_REGISTRY = [
     ("routes.webhooks", "router", "/api", "Webhooks (outbound)"),
     ("routes.rbac", "router", "/api", "RBAC (roles + audit)"),
     ("routes.esignature", "router", "/api", "E-Signature inbound webhook + freeze"),
+    ("routes.esignature_outbound", "router", "/api", "E-Signature outbound — send envelope + track status"),
     ("routes.meetings", "router", "/api", "Client meeting notes (Mongo-persisted)"),
     ("routes.evidence_pack", "router", "/api", "Compliance Evidence Pack PDF"),
     ("routes.advice_marketplace", "router", "/api", "Advice strategy template marketplace"),

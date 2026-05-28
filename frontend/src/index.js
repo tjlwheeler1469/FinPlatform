@@ -12,6 +12,18 @@ const SUPPRESS_PATTERNS = [
 
 const shouldSuppress = (str) => SUPPRESS_PATTERNS.some(p => str?.includes(p));
 
+// Filter cosmetic Recharts ResponsiveContainer measurement warnings that fire transiently
+// during first-paint inside lazy / sticky / tab-hidden chart parents.
+// Recharts emits these via console.warn; the chart itself renders fine within ~200ms.
+const _origConsoleWarn = console.warn;
+console.warn = (...args) => {
+  const first = args[0];
+  if (typeof first === "string" && first.includes("width(-1) and height(-1) of chart")) {
+    return;
+  }
+  _origConsoleWarn.apply(console, args);
+};
+
 window.addEventListener("error", (e) => {
   if (shouldSuppress(e.filename) || shouldSuppress(e.message)) {
     e.stopImmediatePropagation();

@@ -6,11 +6,11 @@
 import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
 import Layout from "@/components/Layout";
-import { PageShell, PillButton, Tile, ChipFilter } from "@/components/PageShell";
+import { PageShell, PillButton, ChipFilter } from "@/components/PageShell";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Rocket, RefreshCw, CheckCircle2, Clock, XCircle, Zap, Activity, KeyRound, Lock } from "lucide-react";
+import { RefreshCw, CheckCircle2, Clock, XCircle, Zap, Activity, KeyRound, Lock, Plug, Loader2 } from "lucide-react";
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
@@ -47,6 +47,8 @@ const ExecutionRails = () => {
   const [tickets, setTickets] = useState([]);
   const [busyId, setBusyId] = useState(null);
   const [events, setEvents] = useState({}); // ticket_id -> events[]
+  const [probeBusy, setProbeBusy] = useState(null); // ticket_type currently being probed
+  const [probeResults, setProbeResults] = useState({}); // ticket_type -> { reachable, mode, latency_ms, detail }
 
   const refresh = useCallback(async () => {
     try {
@@ -63,7 +65,52 @@ const ExecutionRails = () => {
 
   useEffect(() => { refresh(); }, [refresh]);
 
-  const seedDemoTicket = async () => {
+  const probeAdapter = async (ticketType) => {
+    setProbeBusy(ticketType);
+    try {
+      const r = await fetch(`${API}/api/exec-rails/adapters/${ticketType}/test`, { method: "POST" });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const out = await r.json();
+      setProbeResults((prev) => ({ ...prev, [ticketType]: out }));
+      if (out.reachable) {
+        toast.success(`${ticketType}: ${out.mode.toUpperCase()} · reachable`, { description: out.detail });
+      } else {
+        toast.info(`${ticketType}: ${out.mode.toUpperCase()}`, { description: out.detail });
+      }
+    } catch (e) {
+      toast.error(`Probe failed: ${ticketType}`, { description: String(e).slice(0, 200) });
+    } finally {
+      setProbeBusy(null);
+    }
+  };
+
+  // Deterministic demo payloads per ticket type so principals can fire a
+  // realistic ticket through any adapter without hand-crafting the body.
+  const DEMO_PAYLOADS = {
+    trade: {
+      headline: "Buy 100 × VAS.AX (rebalance top-up)",
+      payload: { symbol: "VAS.AX", qty: 100, side: "buy" },
+    },
+    super_change: {
+      headline: "Switch Hostplus → Indexed Balanced (50% portfolio)",
+      payload: { fund: "Hostplus Indexed Balanced", action: "switch", weight: 0.5 },
+    },
+    insurance_quote: {
+      headline: "AIA Income Protection — $8k/mo benefit, 30-day wait",
+      payload: { provider: "AIA", cover_type: "income_protection", monthly_benefit: 8000, waiting_period_days: 30 },
+    },
+    contribution: {
+      headline: "Bpay $5,500 concessional contribution (cap top-up)",
+      payload: { fund: "AustralianSuper", amount: 5500, type: "concessional" },
+    },
+    rebalance: {
+      headline: "Multi-leg rebalance — sell VAS, buy VGS",
+      payload: { legs: [{ symbol: "VAS.AX", side: "sell", qty: 80 }, { symbol: "VGS.AX", side: "buy", qty: 45 }] },
+    },
+  };
+
+  const seedDemoTicket = async (ticketType = "trade") => {
+    const demo = DEMO_PAYLOADS[ticketType] || DEMO_PAYLOADS.trade;
     try {
       await fetch(`${API}/api/execution/tickets`, {
         method: "POST",
@@ -71,15 +118,17 @@ const ExecutionRails = () => {
         body: JSON.stringify({
           client_id: "thompson_family",
           client_name: "David & Sarah Thompson",
-          ticket_type: "trade",
-          headline: "Buy 100 × VAS.AX (rebalance top-up)",
-          message: "Generated from ExecutionRails demo seed",
-          payload: { symbol: "VAS.AX", qty: 100, side: "buy" },
+          ticket_type: ticketType,
+          headline: demo.headline,
+          message: `Seeded from ExecutionRails admin · ${ticketType}`,
+          payload: demo.payload,
         }),
       });
       await refresh();
-      toast.success("Demo ticket created");
-    } catch (e) { toast.error("Seed failed"); }
+      toast.success(`Demo ticket created · ${ticketType}`);
+    } catch {
+      toast.error("Seed failed");
+    }
   };
 
   const dispatch = async (id) => {
@@ -105,7 +154,7 @@ const ExecutionRails = () => {
       const r = await fetch(`${API}/api/exec-rails/events/${id}`).then((r) => r.json());
       const all = (r.events || []).flatMap((e) => e.stages || []);
       setEvents((prev) => ({ ...prev, [id]: all }));
-    } catch {}
+    } catch { /* ignore — events may not exist yet */ }
   };
 
   const pendingCount = tickets.filter((t) => t.status === "pending").length;
@@ -135,8 +184,8 @@ const ExecutionRails = () => {
             <PillButton variant="ghost" onClick={refresh} data-testid="rails-refresh">
               <RefreshCw className="h-3.5 w-3.5 inline mr-1.5" /> Refresh
             </PillButton>
-            <PillButton onClick={seedDemoTicket} data-testid="rails-seed-demo">
-              <Zap className="h-3.5 w-3.5 inline mr-1.5" /> Seed demo ticket
+            <PillButton onClick={() => seedDemoTicket("trade")} data-testid="rails-seed-demo">
+              <Zap className="h-3.5 w-3.5 inline mr-1.5" /> Seed demo trade
             </PillButton>
           </>
         )}
@@ -174,8 +223,10 @@ const ExecutionRails = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3">
               {adapters.map((a) => {
                 const docs = LIVE_KEY_DOCS[a.ticket_type] || { keys: [], where: "" };
+                const probe = probeResults[a.ticket_type];
+                const isProbing = probeBusy === a.ticket_type;
                 return (
-                  <div key={a.ticket_type} className={`border rounded-lg p-3 transition-all ${a.live ? "border-emerald-300 bg-emerald-50/40" : "border-slate-200 bg-white hover:border-slate-300"}`}>
+                  <div key={a.ticket_type} className={`border rounded-lg p-3 transition-all ${a.live ? "border-emerald-300 bg-emerald-50/40" : "border-slate-200 bg-white hover:border-slate-300"}`} data-testid={`adapter-card-${a.ticket_type}`}>
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <div className="min-w-0">
                         <p className="text-[13px] font-semibold text-[#1a2744] leading-tight">{a.name}</p>
@@ -200,6 +251,43 @@ const ExecutionRails = () => {
                     )}
                     {!a.live && docs.keys.length === 0 && (
                       <p className="text-[9.5px] text-slate-400 leading-snug pt-2 border-t border-dashed border-slate-200">{docs.where}</p>
+                    )}
+
+                    {/* Test connection + Seed demo per adapter */}
+                    <div className="flex flex-wrap gap-1.5 pt-2 mt-2 border-t border-dashed border-slate-200">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 text-[10px] px-2"
+                        disabled={isProbing}
+                        onClick={() => probeAdapter(a.ticket_type)}
+                        data-testid={`probe-${a.ticket_type}`}
+                      >
+                        {isProbing
+                          ? <><Loader2 className="h-3 w-3 mr-1 animate-spin" /> Probing…</>
+                          : <><Plug className="h-3 w-3 mr-1" /> Test connection</>}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 text-[10px] px-2"
+                        onClick={() => seedDemoTicket(a.ticket_type)}
+                        data-testid={`seed-${a.ticket_type}`}
+                      >
+                        <Zap className="h-3 w-3 mr-1" /> Seed demo
+                      </Button>
+                    </div>
+
+                    {probe && (
+                      <div className={`mt-2 rounded p-2 border text-[10px] leading-snug ${probe.reachable ? "border-emerald-200 bg-emerald-50/60 text-emerald-800" : "border-slate-200 bg-slate-50 text-slate-700"}`} data-testid={`probe-result-${a.ticket_type}`}>
+                        <div className="flex items-center justify-between mb-0.5">
+                          <span className="font-mono uppercase tracking-wide text-[9px]">
+                            {probe.reachable ? "● reachable" : "○ unreachable"} · {probe.mode}
+                          </span>
+                          <span className="font-mono text-[9px] text-slate-500">{probe.latency_ms}ms</span>
+                        </div>
+                        <p className="text-[10px]">{probe.detail}</p>
+                      </div>
                     )}
                   </div>
                 );

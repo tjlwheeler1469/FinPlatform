@@ -122,21 +122,21 @@ const AdvisorCommandCenter = () => {
     nextActions: null
   });
 
-  const fetchAllData = useCallback(async (showRefreshToast = false) => {
+  const fetchAllData = useCallback(async (showRefreshToast = false, signal) => {
     if (showRefreshToast) setRefreshing(true);
     else setLoading(true);
     
     try {
       const [commandRes, monitoringRes, taxRes, intelligenceRes, practiceRes, clientsRes, actionsRes, graphOverviewRes, graphInsightsRes] = await Promise.all([
-        fetch(`${API_URL}/api/command-center/daily-digest`),
-        fetch(`${API_URL}/api/monitoring/daily-scan`),
-        fetch(`${API_URL}/api/intelligence/tax-opportunities`),
-        fetch(`${API_URL}/api/monitoring/book-insights`),
-        fetch(`${API_URL}/api/practice-health/dashboard`),
-        fetch(`${API_URL}/api/intelligence/comprehensive-analysis`),
-        fetch(`${API_URL}/api/next-action/today?limit=8`),
-        fetch(`${API_URL}/api/graph/overview`),
-        fetch(`${API_URL}/api/graph/insights`)
+        fetch(`${API_URL}/api/command-center/daily-digest`, { signal }),
+        fetch(`${API_URL}/api/monitoring/daily-scan`, { signal }),
+        fetch(`${API_URL}/api/intelligence/tax-opportunities`, { signal }),
+        fetch(`${API_URL}/api/monitoring/book-insights`, { signal }),
+        fetch(`${API_URL}/api/practice-health/dashboard`, { signal }),
+        fetch(`${API_URL}/api/intelligence/comprehensive-analysis`, { signal }),
+        fetch(`${API_URL}/api/next-action/today?limit=8`, { signal }),
+        fetch(`${API_URL}/api/graph/overview`, { signal }),
+        fetch(`${API_URL}/api/graph/insights`, { signal })
       ]);
       
       const [command, monitoring, tax, intelligence, practice, clients, actions, graphOv, graphIns] = await Promise.all([
@@ -167,6 +167,13 @@ const AdvisorCommandCenter = () => {
         toast.success("Dashboard refreshed");
       }
     } catch (error) {
+      // Silently ignore aborted requests (StrictMode double-mount, navigation away)
+      if (error?.name === "AbortError") return;
+      // Network failures are non-fatal — page still renders with previous/empty state
+      if (error?.message?.includes("Failed to fetch")) {
+        // transient network blip — log debug-only, don't toast
+        return;
+      }
       console.error("Error fetching data:", error);
       toast.error("Failed to load dashboard data");
     } finally {
@@ -176,9 +183,16 @@ const AdvisorCommandCenter = () => {
   }, []);
 
   useEffect(() => {
-    fetchAllData();
-    const interval = setInterval(() => fetchAllData(false), 300000);
-    return () => clearInterval(interval);
+    const controller = new AbortController();
+    fetchAllData(false, controller.signal);
+    const interval = setInterval(() => {
+      const c = new AbortController();
+      fetchAllData(false, c.signal);
+    }, 300000);
+    return () => {
+      controller.abort();
+      clearInterval(interval);
+    };
   }, [fetchAllData]);
 
   const handleCopilotQuery = async () => {
