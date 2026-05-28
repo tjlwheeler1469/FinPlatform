@@ -1,3 +1,28 @@
+## Feb 2026 — Iter 227: Branding polish + Retirement page compactness (100% PASS · all assertions verified)
+
+User uploaded 3 screenshots showing remaining off-brand elements and asked for the Retirement Planner page to be made shorter.
+
+**Branding fixes**:
+- `ClientCapture.jsx::SectionHeader` — bright blue `bg-[#3B9CDC]` pill swapped to navy `bg-[#1a2744]` with gold lucide icon. Used by both `CONTACT` (top) and `SERVICE OVERVIEW` (bottom) headers — testing confirmed `rgb(26,39,68)` navy + `rgb(212,168,76)` gold, zero `3B9CDC` leak.
+- `lib/pdfGenerator.js` line 198 — Invoice PAID status text color RGB tuple swapped from `(16, 185, 129)` emerald to `(26, 39, 68)` navy. Draft/sent stays slate (100,116,139).
+- `components/SimpleGoals.jsx` — FULL REWRITE. Old: loud orange `WHAT'S HOLDING YOU BACK` sparkles callout, bright emerald `ON TRACK` badges, loud orange `REVIEW NEEDED` badges, gold `Book →` button. New: subtle gold-bordered white callout, slate-dot uppercase status pills via `STATUS_TONE` map, navy `Next-step` card with gold outline `Book →` CTA, outline-navy primary CTA "Review all goals with adviser". Pulls real CLIENT_DATA retirement projection via `projectRetirement()` for the retirement goal funding %.
+
+**Retirement Planner — page made shorter via collapsible accordion**:
+- New `<Section>` wrapper component inside `RetirementPlannerMoneySmart.jsx` — eyebrow + serif title + chevron toggle header (always visible) + body that renders only when `open===true`. Padding tightened: header `p-5`, body `pt-4` (was `p-6` + `mb-5`).
+- All 6 question sections refactored from open `<section className={SECTION_CLASS}>` blocks to `<Section ...>` components driven by a single-section-open accordion pattern (state `openSection`, helper `toggle(key)`). Only "Step 1 · About you" opens by default.
+- Section testids: `section-about-you` · `section-about-partner` · `section-income` · `section-super` · `section-other` · `section-spending` · `section-advanced` (each with matching `*-toggle` button).
+- Annualised year-by-year projection table now lives behind a separate `showAnnualised`/`toggle-annualised` button inside `annualised-table-card`. Default hidden; click expands to show 30+ rows; click again to collapse.
+- Removed obsolete `showAdvanced`/`setShowAdvanced` state (Step 6 is now just another accordion section).
+- Live verification: only `section-about-you` open default (h=261) · clicking `section-super-toggle` collapses about-you (h=104) and opens super (h=483 with 5 inputs) · `annualised-table` hidden initially → 34 rows after first click → hidden after second click · `result-income` headline still updates when spending changes (40000 → $40k) once user expands `section-spending`.
+
+**Test report**: iter 227 = 100% backend + 100% frontend (zero UI bugs, zero design issues, zero integration issues, `retest_needed=false`, `main_agent_can_self_test=true`). All AbortError regression tests pass — `/advisor-command-center` mount→unmount produces zero console errors.
+
+**Non-blocking review notes**:
+- `RetirementPlannerMoneySmart.jsx` now ~1050 lines. Could split each `<Section>` body into its own file for maintainability — deferred since the accordion is fully working and lint-clean.
+
+
+
+
 ## Feb 2026 — Iter 226: Runtime error fix + data-model hardening + layout overhaul + client-view airy strip (11/11 PASS · 100%)
 
 User asked for 7 things: (1) fix AbortError runtime error on AdvisorCommandCenter; (2) add explicit `member` field on super assets; (3) add explicit `relationship` field on client profile; (4) link 'desired spending' → 'result-income'; (5) ensure Budget income/expenses sync to Retirement Planner salary/spending; (6) restructure Retirement Planner to Investments-style vertical stack with annualised table at bottom; (7) airy strip on ClientHome + Documents & Account.
