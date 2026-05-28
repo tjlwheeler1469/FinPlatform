@@ -442,14 +442,14 @@ const RetirementPlanner = ({ embedded = false }) => {
 
             {/* Adviser deep link */}
             <Link
-              to="/retirement-planner-workbench"
+              to="/quick-overview"
               className="flex items-center justify-between gap-3 rounded-2xl border border-dashed border-slate-300 bg-white p-5 hover:border-[#D4A84C] hover:bg-amber-50/30 transition-all group"
               data-testid="link-advanced-workbench"
             >
               <div>
                 <p className="text-[10px] tracking-[0.18em] uppercase text-slate-500 font-semibold">For advisers</p>
-                <p className="text-sm font-semibold text-[#1a2744] mt-1">Open the advanced retirement workbench</p>
-                <p className="text-[11px] text-slate-500 mt-0.5">Multi-entity, CGT, scenario stacks, Monte Carlo bands, market assumptions.</p>
+                <p className="text-sm font-semibold text-[#1a2744] mt-1">Open the quick-overview workbench</p>
+                <p className="text-[11px] text-slate-500 mt-0.5">Multi-entity, CGT, scenario stacks, Monte Carlo bands. Export to PDF or promote a prospect to a new client.</p>
               </div>
               <ArrowUpRight className="h-5 w-5 text-slate-400 group-hover:text-[#D4A84C] transition-colors" />
             </Link>

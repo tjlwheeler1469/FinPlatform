@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Layout from '../components/Layout';
 import { PageShell, PillButton } from '../components/PageShell';
 import RetirementVoicePanel from '../components/RetirementVoicePanel';
@@ -126,7 +126,7 @@ const getMinimumDrawdownRate = (age) => {
 
 // ==================== MAIN COMPONENT ====================
 
-export default function RetirementPlanner() {
+export default function RetirementPlanner({ embedded = false, onReadyControls } = {}) {
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(false);
   const [projectionData, setProjectionData] = useState(null);
@@ -369,6 +369,26 @@ export default function RetirementPlanner() {
   const primaryPerson = people[0];
   const yearsToRetirement = primaryPerson.retirementAge - primaryPerson.currentAge;
   const retirementYears = primaryPerson.lifeExpectancy - primaryPerson.retirementAge;
+
+  // ==================== SNAPSHOT EXPORT (for embed wrappers e.g. /quick-overview) ====================
+  // We keep the LATEST state in a ref that we refresh on every render. The
+  // controls handle is published ONCE on mount, but `getSnapshot()` always
+  // reads from the ref, so wrappers see fresh values whenever they call it.
+  const _latestRef = useRef(null);
+  _latestRef.current = {
+    people, isCouple, assets, liabilities, incomes, expenses, oneOffExpenses, plannedSales,
+    assumptions, yieldOverrides, projectionData,
+    derived: {
+      totalAssets, totalLiabilities, netWorth,
+      totalAnnualIncome, totalMonthlyExpenses,
+      yearsToRetirement, retirementYears,
+    },
+  };
+  useEffect(() => {
+    if (typeof onReadyControls !== "function") return;
+    onReadyControls({ getSnapshot: () => _latestRef.current });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ==================== PROJECTION CALCULATION ====================
 
@@ -665,35 +685,8 @@ export default function RetirementPlanner() {
     );
   };
 
-  return (
-    <Layout>
-      <PageShell
-        eyebrow="ADVISER · PROJECTIONS"
-        title="Retirement planner"
-        accent="multi-entity · CGT-aware"
-        subtitle="Comprehensive retirement planning with multi-entity support, capital-gains tax modelling, and variable assumptions. Connected to the household scenario store."
-        meta={`${yearsToRetirement} YEARS TO RETIREMENT · NET WORTH ${formatCurrency(netWorth)}`}
-        metrics={[
-          { label: "Net worth", value: formatCurrency(netWorth) },
-          { label: "Assets", value: formatCurrency(totalAssets) },
-          { label: "Liabilities", value: formatCurrency(totalLiabilities) },
-          { label: "Years out", value: `${yearsToRetirement}` },
-        ]}
-        actions={(
-          <>
-            <PillButton variant="ghost" onClick={importFromNetWorth} disabled={loading}>
-              <Upload className="h-3.5 w-3.5 inline -mt-0.5 mr-1.5" /> Import net worth
-            </PillButton>
-            <PillButton variant="ghost" onClick={calculateAgePension} disabled={loading}>
-              <Shield className="h-3.5 w-3.5 inline -mt-0.5 mr-1.5" /> Age pension
-            </PillButton>
-            <PillButton variant="primary" onClick={calculateProjection} disabled={loading}>
-              <Play className="h-3.5 w-3.5 inline -mt-0.5 mr-1.5" /> Run projection
-            </PillButton>
-          </>
-        )}
-      >
-      <div className="space-y-6" data-testid="retirement-planner-page">
+  const _body = (
+        <div className="space-y-6" data-testid="retirement-planner-page">
         {/* Voice Retirement Analyser */}
         <RetirementVoicePanel />
 
@@ -1756,6 +1749,37 @@ export default function RetirementPlanner() {
           </TabsContent>
         </Tabs>
       </div>
+  );
+
+  return embedded ? _body : (
+    <Layout>
+      <PageShell
+        eyebrow="ADVISER · PROJECTIONS"
+        title="Retirement planner"
+        accent="multi-entity · CGT-aware"
+        subtitle="Comprehensive retirement planning with multi-entity support, capital-gains tax modelling, and variable assumptions. Connected to the household scenario store."
+        meta={`${yearsToRetirement} YEARS TO RETIREMENT · NET WORTH ${formatCurrency(netWorth)}`}
+        metrics={[
+          { label: "Net worth", value: formatCurrency(netWorth) },
+          { label: "Assets", value: formatCurrency(totalAssets) },
+          { label: "Liabilities", value: formatCurrency(totalLiabilities) },
+          { label: "Years out", value: `${yearsToRetirement}` },
+        ]}
+        actions={(
+          <>
+            <PillButton variant="ghost" onClick={importFromNetWorth} disabled={loading}>
+              <Upload className="h-3.5 w-3.5 inline -mt-0.5 mr-1.5" /> Import net worth
+            </PillButton>
+            <PillButton variant="ghost" onClick={calculateAgePension} disabled={loading}>
+              <Shield className="h-3.5 w-3.5 inline -mt-0.5 mr-1.5" /> Age pension
+            </PillButton>
+            <PillButton variant="primary" onClick={calculateProjection} disabled={loading}>
+              <Play className="h-3.5 w-3.5 inline -mt-0.5 mr-1.5" /> Run projection
+            </PillButton>
+          </>
+        )}
+      >
+        {_body}
       </PageShell>
     </Layout>
   );

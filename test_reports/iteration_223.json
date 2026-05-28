@@ -1,0 +1,40 @@
+{
+  "summary": "Iteration 223 — End-to-end verification of the Adviser → Profile → Quick overview rewrite. All 13 review-request acceptance criteria PASS. Sidebar shows new 'PROFILE' group with 'Quick overview' item; /quick-overview renders PageShell with eyebrow 'ADVISER · PROFILE', serif title 'Quick overview', gold accent 'multi-entity · CGT-aware'. Hero exposes 4 live KPI tiles (Net worth $2.1M, Assets $2.65M, Years to retire 20, Annual income $186k). Header has both qo-export-pdf (ghost) and qo-add-client (primary). Embedded retirement-planner-page mounts inline with all 7 tabs (Overview/People/Assets/Income/Expenses/Assumptions/Projection). Export PDF clicks → POST /api/pdf-report/generate 200 application/pdf, file downloads as 'quick-overview-prospect-...pdf', toast 'PDF exported' shown. Add as new client → dialog opens → POST /api/crm/clients 200 returns client.client_id (e.g. client_319e0158) → navigated to /adviser-hub?new=client_319e0158. Old /retirement-planner-workbench redirects to /quick-overview. /retirement-planner still loads with eyebrow 'CALCULATOR · RETIREMENT' and link-advanced-workbench → /quick-overview. No 'Maximum update depth' warnings; 0 console errors on /quick-overview.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration223_quick_overview.py",
+    "/app/test_reports/pytest/iteration223.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "AdviserQuickOverview.jsx PDF total_retirement_fund_needed math is `monthlyExpenses * 12 * retirementYears * 0.04 * 25` — that double-counts (×0.04 inverts a SWR, then ×25 reapplies it). Simplifying to `annualExpenses * 25` (or `monthlyExpenses * 12 * retirementYears`) would give a more accurate figure on the exported PDF. Cosmetic for the PDF payload only — backend accepts any number.",
+    "AdviserQuickOverview.jsx setInterval polling every 1s for KPI snapshot diffing works but is a deliberate tradeoff — could be replaced with a useSyncExternalStore subscription on the same ref the planner publishes, eliminating the timer."
+  ],
+  "verification_details": {
+    "redirect": "PASS — /retirement-planner-workbench → /quick-overview",
+    "page_shell_eyebrow_title_accent": "PASS — eyebrow 'ADVISER · PROFILE', title 'Quick overview', accent 'multi-entity · CGT-aware'",
+    "hero_kpis": "PASS — Net worth $2,100,000 / Assets $2,650,000 / Years to retire 20 / Annual income $186,000 all visible and labelled",
+    "header_actions": "PASS — qo-export-pdf (ghost pill, Download icon, 'Export PDF') + qo-add-client (navy primary pill, UserPlus icon, 'Add as new client')",
+    "embedded_workbench": "PASS — [data-testid='retirement-planner-page'] mounted inside [data-testid='quick-overview-page']; all 7 tab labels Overview/People/Assets/Income/Expenses/Assumptions/Projection found in DOM",
+    "sidebar_profile_group": "PASS — Sidebar shows 'PROFILE' group at top of adviser nav with single child 'Quick overview' linking to /quick-overview (screenshot confirms)",
+    "export_pdf_flow": "PASS — Click triggers POST /api/pdf-report/generate → 200 application/pdf → browser download triggered with filename 'quick-overview-prospect-1779934059252.pdf' → toast 'PDF exported' rendered",
+    "add_client_flow": "PASS — qo-add-client opens [data-testid='qo-add-client-dialog'] with First/Last/Email/Phone fields → fill Alex/Carter/alex.carter@example.com → qo-confirm-add → POST /api/crm/clients 200 returns {success:true, client:{client_id:'client_319e0158',…}} → after 600ms redirected to /adviser-hub?new=client_319e0158",
+    "retirement_planner_regression": "PASS — /retirement-planner loads with eyebrow 'CALCULATOR · RETIREMENT'; link-advanced-workbench href === '/quick-overview'",
+    "console_health": "PASS — 0 console errors and 0 'Maximum update depth' warnings on /quick-overview during full flow (load → snapshot poll → PDF export → add client → redirect)",
+    "backend_pytest": "PASS — 2/2 (test_create_quick_overview_client, test_generate_retirement_pdf) in 2.92s"
+  },
+  "updated_files": [
+    "/app/backend/tests/test_iteration223_quick_overview.py"
+  ],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "None required. LocalStorage only: wealth_command_compliance_v5='permanent', app_mode='adviser'",
+  "seed_data_creation": "Test created one CRM client 'Alex Carter' (client_319e0158) and one 'Test Quick' client via pytest. Not cleaned up — backend CRM has no delete endpoint exposed and these are harmless prospect records.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iter 223 Adviser → Profile → Quick overview is fully verified. The new /quick-overview wrapper at /app/frontend/src/pages/AdviserQuickOverview.jsx embeds RetirementPlanner with the ref-backed getSnapshot bridge — no infinite-loop console warnings. Both Export PDF (POST /api/pdf-report/generate) and Add-as-new-client (POST /api/crm/clients then navigate to /adviser-hub?new=<id>) flows work end-to-end. /retirement-planner-workbench redirects to /quick-overview. Backend pytest at /app/backend/tests/test_iteration223_quick_overview.py covers both endpoints (2/2 pass). One non-blocking math comment about PDF's total_retirement_fund_needed formula included for the main agent to consider in a future polish pass."
+}
