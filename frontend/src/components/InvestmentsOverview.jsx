@@ -2,8 +2,8 @@ import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-  TrendingUp, TrendingDown, PieChart, Building2, Wallet, Shield,
-  BarChart3, ArrowLeftRight, Landmark, FileText, DollarSign
+  TrendingUp, PieChart, Building2, Wallet, Shield,
+  BarChart3, ArrowLeftRight,
 } from "lucide-react";
 import {
   PieChart as RechartsPie, Pie, Cell, BarChart, Bar, XAxis, YAxis,
@@ -12,7 +12,9 @@ import {
 } from "recharts";
 import { CLIENT_DATA, getActiveClientId } from "@/data/clientData";
 
-const CHART_COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#EC4899", "#14B8A6", "#F97316"];
+// Muted navy/gold/slate palette — replaces the previous rainbow CHART_COLORS
+// so the Investments page matches the airy Retirement Planner aesthetic.
+const CHART_COLORS = ["#1a2744", "#D4A84C", "#475569", "#94a3b8", "#2d3a55", "#b8902a", "#64748b", "#cbd5e1"];
 
 const formatCurrency = (value) =>
   new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD", minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value || 0);
@@ -71,48 +73,49 @@ const InvestmentsOverview = () => {
 
   return (
     <div className="space-y-6" data-testid="investments-overview">
-      {/* Summary Strip */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <Card>
-          <CardContent className="p-3 text-center">
-            <p className="text-xs text-muted-foreground">Total Assets</p>
-            <p className="text-xl font-bold">{formatCurrency(totalValue)}</p>
+      {/* Summary Strip — airy white cards · navy serif (Image 3 reference) */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3" data-testid="investments-kpi-strip">
+        <Card className="border-slate-200">
+          <CardContent className="p-4">
+            <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Total assets</p>
+            <p className="font-serif text-xl text-[#1a2744] mt-1.5 tabular-nums">{formatCurrency(totalValue)}</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-3 text-center">
-            <p className="text-xs text-muted-foreground">Total Liabilities</p>
-            <p className="text-xl font-bold text-red-600">{formatCurrency(totalLiabilities)}</p>
+        <Card className="border-slate-200">
+          <CardContent className="p-4">
+            <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Total liabilities</p>
+            <p className="font-serif text-xl text-[#1a2744] mt-1.5 tabular-nums">{formatCurrency(totalLiabilities)}</p>
           </CardContent>
         </Card>
-        <Card className="border-[#0f1d35]">
-          <CardContent className="p-3 text-center">
-            <p className="text-xs text-muted-foreground">Net Worth</p>
-            <p className="text-xl font-bold">{formatCurrency(netWorth)}</p>
+        <Card className="border-slate-200">
+          <CardContent className="p-4">
+            <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Net worth</p>
+            <p className="font-serif text-xl text-[#1a2744] mt-1.5 tabular-nums">{formatCurrency(netWorth)}</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-3 text-center">
-            <p className="text-xs text-muted-foreground">Weighted Return</p>
-            <p className={`text-xl font-bold ${Number(weightedReturn) >= 0 ? "text-emerald-600" : "text-red-600"}`}>
+        <Card className="border-slate-200">
+          <CardContent className="p-4">
+            <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Weighted return</p>
+            <p className="font-serif text-xl text-[#1a2744] mt-1.5 tabular-nums">
+              <span className="text-xs text-[#D4A84C] font-sans mr-1">{Number(weightedReturn) >= 0 ? "▲" : "▼"}</span>
               {Number(weightedReturn) >= 0 ? "+" : ""}{weightedReturn}%
             </p>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-3 text-center">
-            <p className="text-xs text-muted-foreground">Holdings</p>
-            <p className="text-xl font-bold">{activeAssets.length}</p>
+        <Card className="border-slate-200">
+          <CardContent className="p-4">
+            <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Holdings</p>
+            <p className="font-serif text-xl text-[#1a2744] mt-1.5 tabular-nums">{activeAssets.length}</p>
           </CardContent>
         </Card>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Asset Allocation Pie */}
-        <Card>
+        <Card className="border-slate-200">
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm">
-              <PieChart className="h-4 w-4 text-blue-500" /> Asset Allocation
+            <CardTitle className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold flex items-center gap-2">
+              <PieChart className="h-3.5 w-3.5 text-[#D4A84C]" strokeWidth={1.5} /> Asset allocation
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -131,10 +134,10 @@ const InvestmentsOverview = () => {
         </Card>
 
         {/* Entity Breakdown */}
-        <Card>
+        <Card className="border-slate-200">
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm">
-              <Building2 className="h-4 w-4 text-purple-500" /> Holdings by Entity
+            <CardTitle className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold flex items-center gap-2">
+              <Building2 className="h-3.5 w-3.5 text-[#D4A84C]" strokeWidth={1.5} /> Holdings by entity
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -157,40 +160,45 @@ const InvestmentsOverview = () => {
 
       {/* Portfolio Rebalancing — ABOVE Top Holdings, with spider/radar chart */}
       <div className="grid lg:grid-cols-2 gap-6">
-        <Card>
+        <Card className="border-slate-200">
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm">
-              <ArrowLeftRight className="h-4 w-4 text-amber-500" /> Portfolio Rebalancing
+            <CardTitle className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold flex items-center gap-2">
+              <ArrowLeftRight className="h-3.5 w-3.5 text-[#D4A84C]" strokeWidth={1.5} /> Portfolio rebalancing
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              {activeRebalancing.map((item, i) => (
-                <div key={i} className="flex items-center justify-between p-2.5 bg-muted/30 rounded-lg" data-testid={`rebalance-row-${i}`}>
-                  <div className="flex items-center gap-4">
-                    <span className="font-medium text-sm w-40">{item.asset}</span>
-                    <div className="flex items-center gap-2 text-xs">
-                      <span className="text-muted-foreground">Current: {item.current}%</span>
-                      <span className="text-muted-foreground">-></span>
-                      <span className="font-medium">Target: {item.target}%</span>
+              {activeRebalancing.map((item, i) => {
+                const tone = item.action === "Buy"
+                  ? "border-[#1a2744] text-[#1a2744] bg-white"
+                  : item.action === "Sell"
+                  ? "border-[#D4A84C] text-[#8a6c1a] bg-white"
+                  : "border-slate-300 text-slate-600 bg-white";
+                return (
+                  <div key={i} className="flex items-center justify-between p-3 border border-slate-200 rounded-lg bg-white" data-testid={`rebalance-row-${i}`}>
+                    <div className="flex items-center gap-4">
+                      <span className="font-medium text-sm w-40 text-[#1a2744]">{item.asset}</span>
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className="text-slate-500">Current: {item.current}%</span>
+                        <span className="text-slate-400">→</span>
+                        <span className="font-medium text-[#1a2744]">Target: {item.target}%</span>
+                      </div>
                     </div>
+                    <Badge variant="outline" className={`text-[10px] font-semibold ${tone}`}>
+                      {item.action} {Math.abs(item.diff)}%
+                    </Badge>
                   </div>
-                  <Badge className={
-                    item.action === "Buy" ? "bg-green-500" : item.action === "Sell" ? "bg-red-500" : "bg-gray-500"
-                  }>
-                    {item.action} {Math.abs(item.diff)}%
-                  </Badge>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </CardContent>
         </Card>
 
         {/* Spider / Radar Chart */}
-        <Card>
+        <Card className="border-slate-200">
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm">
-              <BarChart3 className="h-4 w-4 text-[#1a2744]" /> Allocation Radar
+            <CardTitle className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold flex items-center gap-2">
+              <BarChart3 className="h-3.5 w-3.5 text-[#D4A84C]" strokeWidth={1.5} /> Allocation radar
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -212,39 +220,35 @@ const InvestmentsOverview = () => {
       </div>
 
       {/* Top Holdings */}
-      <Card>
+      <Card className="border-slate-200">
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-sm">
-            <Wallet className="h-4 w-4 text-[#D4A84C]" /> Top Holdings
+          <CardTitle className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold flex items-center gap-2">
+            <Wallet className="h-3.5 w-3.5 text-[#D4A84C]" strokeWidth={1.5} /> Top holdings
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
             {[...activeAssets].sort((a, b) => b.value - a.value).slice(0, 6).map(asset => (
-              <div key={asset.id} className="flex items-center justify-between p-2.5 rounded-lg border hover:bg-muted/30 transition-colors">
+              <div key={asset.id} className="flex items-center justify-between p-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-50/40 transition-colors">
                 <div className="flex items-center gap-3">
-                  <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs ${
-                    asset.type === "Shares" ? "bg-blue-100 text-blue-600" :
-                    asset.type === "Property" ? "bg-purple-100 text-purple-600" :
-                    asset.type === "Super" ? "bg-green-100 text-green-600" :
-                    "bg-gray-100 text-gray-600"
-                  }`}>
-                    {asset.type === "Shares" ? <TrendingUp className="h-4 w-4" /> :
-                     asset.type === "Property" ? <Building2 className="h-4 w-4" /> :
-                     asset.type === "Super" ? <Shield className="h-4 w-4" /> :
-                     <Wallet className="h-4 w-4" />}
+                  <div className="h-8 w-8 rounded-full flex items-center justify-center border border-slate-200 bg-white text-[#1a2744]">
+                    {asset.type === "Shares" ? <TrendingUp className="h-3.5 w-3.5" strokeWidth={1.5} /> :
+                     asset.type === "Property" ? <Building2 className="h-3.5 w-3.5" strokeWidth={1.5} /> :
+                     asset.type === "Super" ? <Shield className="h-3.5 w-3.5" strokeWidth={1.5} /> :
+                     <Wallet className="h-3.5 w-3.5" strokeWidth={1.5} />}
                   </div>
                   <div>
-                    <p className="text-sm font-medium">{asset.name}</p>
+                    <p className="text-sm font-medium text-[#1a2744]">{asset.name}</p>
                     <div className="flex gap-1.5">
-                      <Badge variant="outline" className="text-[10px] px-1">{asset.type}</Badge>
-                      <Badge variant="secondary" className="text-[10px] px-1">{asset.entity}</Badge>
+                      <Badge variant="outline" className="text-[10px] px-1 border-slate-300 text-slate-600">{asset.type}</Badge>
+                      <Badge variant="outline" className="text-[10px] px-1 border-slate-200 text-slate-500">{asset.entity}</Badge>
                     </div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-bold">{formatCurrency(asset.value)}</p>
-                  <p className={`text-xs ${asset.change >= 0 ? "text-emerald-600" : "text-red-600"}`}>
+                  <p className="font-mono text-sm text-[#1a2744]">{formatCurrency(asset.value)}</p>
+                  <p className="text-[10px] text-slate-500 mt-0.5 font-mono">
+                    <span className="text-[#D4A84C] mr-1">{asset.change >= 0 ? "▲" : "▼"}</span>
                     {asset.change >= 0 ? "+" : ""}{asset.change}%
                   </p>
                 </div>

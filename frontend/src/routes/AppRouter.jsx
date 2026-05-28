@@ -21,7 +21,7 @@ import {
   ScenarioSimulator, ScenarioModelling, StrategicPlanning, LifeTimeline,
   LifeTimelinePlanner, TransactionModeler, UnifiedGoalsPlanning, GoalTracker,
   // Retirement
-  RetirementCalculator, DecumulationCalculator, RetirementPlanner, AdviserQuickOverview, ContributionCalculator,
+  RetirementCalculator, DecumulationCalculator, RetirementPlanner, AdviserQuickOverview,
   RetirementConfidenceEngine, HybridEngineView, RetirementConfidence,
   RetirementWorkshop, RetirementHub, SuperannuationGuarantee,
   // Budget
@@ -164,7 +164,7 @@ const AppRouter = () => (
     <Route path="/retirement-planner" element={<RetirementPlanner />} />
     <Route path="/quick-overview" element={<AdviserQuickOverview />} />
     <Route path="/retirement-planner-workbench" element={<Navigate to="/quick-overview" replace />} />
-    <Route path="/contribution-calculator" element={<ContributionCalculator />} />
+    <Route path="/contribution-calculator" element={<Navigate to="/retirement-planner" replace />} />
 
     {/* Budget */}
     <Route path="/debt-paydown" element={<DebtPaydownPlanner />} />

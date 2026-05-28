@@ -111,7 +111,8 @@ export const RetirementCalculator = lazyRetry(() => import("@/pages/RetirementCa
 export const DecumulationCalculator = lazyRetry(() => import("@/pages/DecumulationCalculator"));
 export const RetirementPlanner = lazyRetry(() => import("@/pages/RetirementPlannerMoneySmart"));
 export const AdviserQuickOverview = lazyRetry(() => import("@/pages/AdviserQuickOverview"));
-export const ContributionCalculator = lazyRetry(() => import("@/pages/ContributionCalculator"));
+// ContributionCalculator deprecated — merged into Retirement Planner Step 4.
+// Route /contribution-calculator now 301-redirects to /retirement-planner.
 export const RetirementConfidenceEngine = lazyRetry(() => import("@/pages/RetirementConfidenceEngine"));
 export const HybridEngineView = lazyRetry(() => import("@/pages/HybridEngineView"));
 export const RetirementConfidence = lazyRetry(() => import("@/pages/RetirementConfidence"));

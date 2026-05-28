@@ -78,15 +78,15 @@ const formatCurrency = (value) => {
 const EXPENSE_CATEGORIES = [
   { id: "mortgage", label: "Mortgage/Rent", icon: Home, color: "#1a2744" },
   { id: "utilities", label: "Utilities", icon: Zap, color: "#D4A84C" },
-  { id: "groceries", label: "Groceries", icon: Utensils, color: "#10B981" },
-  { id: "transport", label: "Transport/Car", icon: Car, color: "#3B82F6" },
-  { id: "phone_internet", label: "Phone/Internet", icon: Phone, color: "#8B5CF6" },
-  { id: "insurance", label: "Insurance", icon: Heart, color: "#EC4899" },
-  { id: "education", label: "Education", icon: GraduationCap, color: "#F59E0B" },
-  { id: "shopping", label: "Shopping", icon: ShoppingBag, color: "#6366F1" },
-  { id: "entertainment", label: "Entertainment", icon: Gift, color: "#14B8A6" },
-  { id: "savings", label: "Savings", icon: PiggyBank, color: "#22C55E" },
-  { id: "other", label: "Other", icon: Wallet, color: "#64748B" }
+  { id: "groceries", label: "Groceries", icon: Utensils, color: "#475569" },
+  { id: "transport", label: "Transport/Car", icon: Car, color: "#94a3b8" },
+  { id: "phone_internet", label: "Phone/Internet", icon: Phone, color: "#64748b" },
+  { id: "insurance", label: "Insurance", icon: Heart, color: "#cbd5e1" },
+  { id: "education", label: "Education", icon: GraduationCap, color: "#0f1d35" },
+  { id: "shopping", label: "Shopping", icon: ShoppingBag, color: "#b8902a" },
+  { id: "entertainment", label: "Entertainment", icon: Gift, color: "#e2c989" },
+  { id: "savings", label: "Savings", icon: PiggyBank, color: "#2d3a55" },
+  { id: "other", label: "Other", icon: Wallet, color: "#94a3b8" }
 ];
 
 const ONE_OFF_TYPES = [
@@ -382,67 +382,67 @@ const HouseholdBudget = ({ embedded = false }) => {
           </Card>
         )}
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="bg-[#10B981] text-white">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-1">
-                <TrendingUp className="h-4 w-4" />
-                <p className="text-sm text-white/80">Monthly Income</p>
-              </div>
-              <p className="text-2xl font-bold">{formatCurrency(totalMonthlyIncome)}</p>
+        {/* Summary Cards — airy white cards · navy serif (Image 3 reference) */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4" data-testid="budget-kpi-strip">
+          <Card className="border-slate-200">
+            <CardContent className="p-5">
+              <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold flex items-center gap-1.5">
+                <TrendingUp className="h-3 w-3 text-[#D4A84C]" strokeWidth={1.5} /> Monthly income
+              </p>
+              <p className="font-serif text-2xl text-[#1a2744] mt-2 tabular-nums">{formatCurrency(totalMonthlyIncome)}</p>
             </CardContent>
           </Card>
-          <Card className="bg-[#EF4444] text-white">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-1">
-                <TrendingDown className="h-4 w-4" />
-                <p className="text-sm text-white/80">Monthly Expenses</p>
-              </div>
-              <p className="text-2xl font-bold">{formatCurrency(totalMonthlyExpenses)}</p>
+          <Card className="border-slate-200">
+            <CardContent className="p-5">
+              <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold flex items-center gap-1.5">
+                <TrendingDown className="h-3 w-3 text-[#D4A84C]" strokeWidth={1.5} /> Monthly expenses
+              </p>
+              <p className="font-serif text-2xl text-[#1a2744] mt-2 tabular-nums">{formatCurrency(totalMonthlyExpenses)}</p>
             </CardContent>
           </Card>
-          <Card className="bg-[#D4A84C] text-white">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-1">
-                <Calendar className="h-4 w-4" />
-                <p className="text-sm text-white/80">Annual One-offs</p>
-              </div>
-              <p className="text-2xl font-bold">{formatCurrency(totalAnnualOneOff)}</p>
+          <Card className="border-slate-200">
+            <CardContent className="p-5">
+              <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold flex items-center gap-1.5">
+                <Calendar className="h-3 w-3 text-[#D4A84C]" strokeWidth={1.5} /> Annual one-offs
+              </p>
+              <p className="font-serif text-2xl text-[#1a2744] mt-2 tabular-nums">{formatCurrency(totalAnnualOneOff)}</p>
             </CardContent>
           </Card>
-          <Card className={monthlySurplus >= 0 ? "bg-[#1a2744] text-white" : "bg-destructive text-white"}>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-1">
-                {monthlySurplus >= 0 ? <CheckCircle className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
-                <p className="text-sm text-white/80">Monthly Surplus</p>
-              </div>
-              <p className="text-2xl font-bold">{formatCurrency(monthlySurplus)}</p>
+          <Card className="border-slate-200">
+            <CardContent className="p-5">
+              <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold flex items-center gap-1.5">
+                {monthlySurplus >= 0
+                  ? <CheckCircle className="h-3 w-3 text-[#D4A84C]" strokeWidth={1.5} />
+                  : <AlertCircle className="h-3 w-3 text-[#D4A84C]" strokeWidth={1.5} />}
+                Monthly surplus
+              </p>
+              <p className={`font-serif text-2xl mt-2 tabular-nums ${monthlySurplus >= 0 ? "text-[#1a2744]" : "text-rose-600"}`}>{formatCurrency(monthlySurplus)}</p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Investable Surplus Callout */}
+        {/* Investable Surplus Callout — airy variant */}
         {monthlySurplus > 0 && (
-          <Card className="border-l-4 border-l-[#D4A84C] bg-gradient-to-r from-[#D4A84C]/5 to-transparent" data-testid="investable-surplus">
-            <CardContent className="p-4 flex items-center justify-between">
+          <Card className="border-slate-200" data-testid="investable-surplus">
+            <CardContent className="p-5 flex items-center justify-between gap-4 flex-wrap">
               <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-[#D4A84C]/10 flex items-center justify-center">
-                  <PiggyBank className="h-6 w-6 text-[#D4A84C]" />
+                <div className="h-10 w-10 rounded-full border border-[#D4A84C]/40 bg-white flex items-center justify-center">
+                  <PiggyBank className="h-4 w-4 text-[#D4A84C]" strokeWidth={1.5} />
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Available to Invest</p>
-                  <p className="text-2xl font-bold text-[#1a2744]">{formatCurrency(monthlySurplus)}<span className="text-sm font-normal text-muted-foreground">/month</span></p>
-                  <p className="text-xs text-muted-foreground">{formatCurrency(annualSurplus)}/year after all expenses & one-offs</p>
+                  <p className="text-[10px] tracking-[0.18em] uppercase text-slate-500 font-semibold">Available to invest</p>
+                  <p className="font-serif text-2xl text-[#1a2744] mt-1 tabular-nums">{formatCurrency(monthlySurplus)}<span className="text-sm font-sans font-normal text-slate-500"> /month</span></p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">{formatCurrency(annualSurplus)} / year after all expenses &amp; one-offs</p>
                 </div>
               </div>
               <Button
-                className="bg-[#D4A84C] hover:bg-[#C49A3C] text-black"
+                variant="outline"
+                className="border-[#1a2744] text-[#1a2744] hover:bg-[#1a2744] hover:text-white rounded-full"
                 onClick={() => window.location.href = "/investments"}
                 data-testid="invest-surplus-btn"
               >
-                <TrendingUp className="h-4 w-4 mr-2" />
-                View Investments
+                <TrendingUp className="h-4 w-4 mr-1.5" />
+                View investments
               </Button>
             </CardContent>
           </Card>
@@ -504,8 +504,8 @@ const HouseholdBudget = ({ embedded = false }) => {
                         <YAxis tickFormatter={(v) => `$${(v/1000).toFixed(0)}k`} stroke="hsl(var(--muted-foreground))" />
                         <Tooltip formatter={(v) => formatCurrency(v)} />
                         <Legend />
-                        <Bar dataKey="income" fill="#10B981" name="Income" />
-                        <Bar dataKey="expenses" fill="#EF4444" name="Regular" />
+                        <Bar dataKey="income" fill="#1a2744" name="Income" />
+                        <Bar dataKey="expenses" fill="#94a3b8" name="Regular" />
                         <Bar dataKey="oneOff" fill="#D4A84C" name="One-Off" />
                       </BarChart>
                     </ResponsiveContainer>

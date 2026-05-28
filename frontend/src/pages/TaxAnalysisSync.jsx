@@ -310,31 +310,31 @@ const TaxAnalysisSync = ({ embedded = false }) => {
           </div>
         </div>
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="bg-[#1a2744] text-white">
-            <CardContent className="p-4">
-              <p className="text-sm text-white/70">Family Members</p>
-              <p className="text-2xl font-bold">{familyMembers.length}</p>
-              <p className="text-xs text-white/60">Synced across modules</p>
+        {/* Summary Cards — airy white cards · navy serif (Image 3 reference) */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4" data-testid="tax-kpi-strip">
+          <Card className="border-slate-200">
+            <CardContent className="p-5">
+              <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Family members</p>
+              <p className="font-serif text-2xl text-[#1a2744] mt-2 tabular-nums">{familyMembers.length}</p>
+              <p className="text-[11px] text-slate-500 mt-1">Synced across modules</p>
             </CardContent>
           </Card>
-          <Card>
-            <CardContent className="p-4">
-              <p className="text-sm text-muted-foreground">Total Family Income</p>
-              <p className="text-2xl font-bold">{formatCurrency(totals.totalIncome)}</p>
+          <Card className="border-slate-200">
+            <CardContent className="p-5">
+              <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Total family income</p>
+              <p className="font-serif text-2xl text-[#1a2744] mt-2 tabular-nums">{formatCurrency(totals.totalIncome)}</p>
             </CardContent>
           </Card>
-          <Card className="bg-destructive/10 border-destructive/30">
-            <CardContent className="p-4">
-              <p className="text-sm text-muted-foreground">Total Tax Payable</p>
-              <p className="text-2xl font-bold text-destructive">{formatCurrency(totals.totalTax)}</p>
+          <Card className="border-slate-200">
+            <CardContent className="p-5">
+              <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Total tax payable</p>
+              <p className="font-serif text-2xl text-[#1a2744] mt-2 tabular-nums">{formatCurrency(totals.totalTax)}</p>
             </CardContent>
           </Card>
-          <Card className="bg-[#10B981]/10 border-[#10B981]/30">
-            <CardContent className="p-4">
-              <p className="text-sm text-muted-foreground">Total Net Income</p>
-              <p className="text-2xl font-bold text-[#10B981]">{formatCurrency(totals.totalNet)}</p>
+          <Card className="border-slate-200">
+            <CardContent className="p-5">
+              <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Total net income</p>
+              <p className="font-serif text-2xl text-[#1a2744] mt-2 tabular-nums">{formatCurrency(totals.totalNet)}</p>
             </CardContent>
           </Card>
         </div>
@@ -478,32 +478,32 @@ const TaxAnalysisSync = ({ embedded = false }) => {
                       {/* Results Section */}
                       <div className="space-y-4">
                         <div className="grid grid-cols-2 gap-3">
-                          <div className="p-3 rounded-lg bg-muted/50">
-                            <p className="text-xs text-muted-foreground">Income Tax</p>
-                            <p className="text-lg font-bold">{formatCurrency(member.tax)}</p>
+                          <div className="p-3 rounded-lg border border-slate-200 bg-white">
+                            <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Income tax</p>
+                            <p className="font-serif text-lg text-[#1a2744] mt-0.5 tabular-nums">{formatCurrency(member.tax)}</p>
                           </div>
-                          <div className="p-3 rounded-lg bg-muted/50">
-                            <p className="text-xs text-muted-foreground">Medicare Levy</p>
-                            <p className="text-lg font-bold">{formatCurrency(member.medicare)}</p>
+                          <div className="p-3 rounded-lg border border-slate-200 bg-white">
+                            <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Medicare levy</p>
+                            <p className="font-serif text-lg text-[#1a2744] mt-0.5 tabular-nums">{formatCurrency(member.medicare)}</p>
                           </div>
-                          <div className="p-3 rounded-lg bg-destructive/10">
-                            <p className="text-xs text-muted-foreground">Total Tax</p>
-                            <p className="text-lg font-bold text-destructive">{formatCurrency(member.total)}</p>
+                          <div className="p-3 rounded-lg border border-slate-200 bg-white">
+                            <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Total tax</p>
+                            <p className="font-serif text-lg text-[#1a2744] mt-0.5 tabular-nums">{formatCurrency(member.total)}</p>
                           </div>
-                          <div className="p-3 rounded-lg bg-[#10B981]/10">
-                            <p className="text-xs text-muted-foreground">Net Income</p>
-                            <p className="text-lg font-bold text-[#10B981]">{formatCurrency(member.netIncome)}</p>
+                          <div className="p-3 rounded-lg border border-slate-200 bg-white">
+                            <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Net income</p>
+                            <p className="font-serif text-lg text-[#1a2744] mt-0.5 tabular-nums">{formatCurrency(member.netIncome)}</p>
                           </div>
                         </div>
-                        
-                        <div className="flex items-center justify-between p-3 rounded-lg bg-[#D4A84C]/10 border border-[#D4A84C]/30">
+
+                        <div className="flex items-center justify-between p-3 rounded-lg border border-[#D4A84C]/30 bg-white">
                           <div>
-                            <p className="text-xs text-muted-foreground">Effective Rate</p>
-                            <p className="text-xl font-bold text-[#D4A84C]">{member.effectiveRate.toFixed(1)}%</p>
+                            <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Effective rate</p>
+                            <p className="font-serif text-xl text-[#1a2744] mt-0.5 tabular-nums">{member.effectiveRate.toFixed(1)}%</p>
                           </div>
                           <div className="text-right">
-                            <p className="text-xs text-muted-foreground">Marginal Rate</p>
-                            <p className="text-xl font-bold">{member.marginalRate.toFixed(0)}%</p>
+                            <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Marginal rate</p>
+                            <p className="font-serif text-xl text-[#1a2744] mt-0.5 tabular-nums">{member.marginalRate.toFixed(0)}%</p>
                           </div>
                         </div>
                       </div>

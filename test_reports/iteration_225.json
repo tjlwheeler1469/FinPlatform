@@ -1,0 +1,44 @@
+{
+  "summary": "Frontend-only review of iter 225 (Retirement Planner client-data merge + ContributionCalculator deletion + airy white-on-navy restyle of Budget/Investments/Tax). All critical assertions pass on the live preview URL.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": ["/app/test_reports/iteration_225.json"],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "RetirementPlannerMoneySmart.jsx — result-income (projectedIncome) is derived from sustainableFromSuper + agePensionAnnual only; it does NOT visibly change when annualSpending alone changes (the review request expects it to). It only re-renders if super-at-retirement materially shifts. Compact formatting ($794k) also hides small deltas. Consider exposing the live shortfall/surplus number with finer formatting, or expose annualSpending in projectedIncome derivation if that is the intended UX semantic.",
+    "Couple detection in buildDefaultsFromClient relies on truthy partner_name/age OR incomeHousehold>personal_income heuristic — fragile; prefer an explicit relationship field on the client record.",
+    "Itemized super defaults to owner='you' when entity does not contain 'spouse'/'partner'; for couples without entity tags, all super lands on the primary. Add explicit member assignment UI hint or detect via the `member` field if present in client schema."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "skipped", "frontend": "~95%"},
+  "test_credentials": "n/a — localStorage flags only (wealth_command_compliance_v5='permanent', app_mode='adviser', selected_client=thompson_family)",
+  "seed_data_creation": "none — relied on CLIENT_DATA[thompson_family] embedded constants",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Verified on https://decision-engine-109.preview.emergentagent.com. Key data points: with thompson_family selected, /retirement-planner shows age=50, salary=485000, 2 itemized super rows (matches iter 224 smoke), >10 other-asset rows; add-super-account adds new row (2->3); opt-cash reduces 'Super at retirement (median)' from $19.86M (balanced) to $12.16M (cash) within 1s; /contribution-calculator 301-redirects to /retirement-planner; sidebar contains no 'Contribution Calculator' / 'Quick overview' / 'Profile' links; /dashboard tab clicks render budget-kpi-strip, tax-kpi-strip with airy white look; /quick-overview still routed and renders.",
+  "verified_pass_list": [
+    "[data-testid='retirement-planner-page'] renders on /retirement-planner",
+    "[data-testid='client-data-banner'] contains 'Pre-populated from client record' and 'David & Sarah Thompson'",
+    "[data-testid='input-your-age'] = 50 (auto-populated, not 40)",
+    "[data-testid='input-your-salary'] = 485000 (auto-populated, not 95000)",
+    "2 [data-testid^='super-row-'] rows present initially; clicking [data-testid='add-super-account'] adds a 3rd",
+    "[data-testid='section-other'] contains all required: salary-sac, personal-deductible, after-tax, spouse, admin-flat, admin-pct, invest-pct, opt-balanced, opt-growth, opt-cash, add-other-asset",
+    "/contribution-calculator -> Navigate redirect -> URL becomes /retirement-planner (no 404)",
+    "Sidebar contains no 'Contribution Calculator', 'Quick overview', or 'Profile' entries",
+    "Changing [data-testid='opt-cash'] reduces [data-testid='result-super-at-retirement'] from $19.86M to $12.16M (live re-compute within 1.5s)",
+    "/dashboard Retirement tab renders [data-testid='retirement-planner-page']",
+    "/dashboard Budget tab renders [data-testid='budget-kpi-strip'] and [data-testid='investable-surplus']",
+    "/dashboard Tax tab renders [data-testid='tax-kpi-strip']",
+    "/quick-overview still routes and renders (just unlinked from nav)"
+  ],
+  "minor_observations": [
+    "Investments tab in /dashboard could not be clicked by playwright via get_by_text — the visible Investments tab is occluded by a MobileMenu duplicate label in the DOM tree. Recommend adding a specific data-testid on the desktop dashboard tab triggers (e.g. data-testid='dashboard-tab-investments') so tests aren't dependent on text matching. Budget & Tax tab clicks worked the same way, so this is purely a DOM duplication ordering issue, not a functional bug.",
+    "result-income label uses compact formatting ($794k) which masks sub-$1k deltas when only spending changes — see code review comment #1.",
+    "No console errors observed during full test pass. Recharts width(-1) warning suppression still effective."
+  ],
+  "rca of the issue": "n/a — no blocking issues found."
+}
