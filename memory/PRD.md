@@ -1,3 +1,36 @@
+## Feb 2026 — Iter 228: Big result card at bottom + annual drawdown table + "Retirement & Super" → "Retirement" (100% PASS · 8/8 GREEN)
+
+User asked: (1) Move the Result "Annual retirement income" to the bottom and INCREASE the size + include an annual drawdown/breakdown table; (2) Rename Client View tab "Retirement & Super" → "Retirement".
+
+**Big result card at bottom of Retirement Planner** (`RetirementPlannerMoneySmart.jsx`):
+- Removed the top 4-card `planner-kpi-strip` (verified count=0 in tests).
+- Added new `[data-testid='result-card']` BIG result card directly above the projection chart:
+  - LEFT column: gold "RESULT" eyebrow → serif "Your annual retirement income" h2 → MASSIVE `text-7xl md:text-8xl` serif `$XXX` headline (test confirms text-8xl class active) → status pill `[data-testid='result-status-pill']` ("FULLY FUNDED" / "MINOR GAP" / "UNDERFUNDED") with matching navy/gold/slate dot → confidence percentage.
+  - RIGHT column (bordered, 320px on lg): 4 supporting metrics — Desired spending, Annual surplus/shortfall, Super at retirement (median) + age, From super (4%) + Age pension.
+  - Optional amber `[data-testid='shortfall-hint']` callout below the card when shortfall > 0 with concrete "add $X/yr more or push retirement back 2-3 years" suggestion.
+- Position order verified: `client-data-banner` (top=472) → question accordion → `result-card` (1649) → `results-panel` projection chart (2012) → `annualised-table-card` (2440).
+- Spending → result-income link preserved: `input-spending=40000` → result-income shows `$40k` within 2s.
+
+**Annual drawdown / portfolio breakdown table**:
+- `annualised-table-card` now defaults to `showAnnualised=true` (expanded by default — user explicitly asked for this).
+- Title rephrased: "Year-by-year portfolio & drawdown table" with "Annual drawdown · breakdown" eyebrow.
+- Column "Withdraw" renamed to "Drawdown" for clarity.
+- Drawdown-phase rows now use `bg-[#D4A84C]/[0.04]` (stronger tint than the previous 0.02) to visually separate accumulation vs drawdown.
+- Added `<tfoot>` summary row with "Total contributions (accumulation) +$X" and "Total drawdown −$Y" — verified Thompson totals = +$1.68M contributions and −$3.06M drawdown.
+- 34 tbody rows render correctly (17 accumulation ages 50-66 + 17 drawdown ages 67-83) for Thompson.
+
+**Tab rename — Client View**:
+- `SimpleClientView.jsx` line 54: `TabsTrigger` label "Retirement & Super" → "Retirement". Tab testid `client-tab-retire` unchanged.
+- `PersonalDashboard.jsx` line 581: body copy "visit Retirement & Super in the sidebar" → "visit Retirement in the sidebar".
+- Verified: no occurrence of `Retirement & Super` or `&amp;` anywhere in tab labels or page copy.
+
+**Test report**: iter 228 = 8/8 GREEN (frontend 100%, retest_needed=false, no UI bugs, no design issues, no integration issues, main_agent_can_self_test=true). Two non-blocking critical code review comments:
+1. `RetirementPlannerMoneySmart.jsx` now ~1054 lines — should be split into BigResultCard / AnnualisedTable / accordion-Step subcomponents for maintainability (deferred — fully working, lint-clean).
+2. `tfoot` colSpan layout uses 3-column then 2-column spans across 8 columns — visually fine but could use clearer semantic alignment for screen readers (deferred).
+
+
+
+
 ## Feb 2026 — Iter 227: Branding polish + Retirement page compactness (100% PASS · all assertions verified)
 
 User uploaded 3 screenshots showing remaining off-brand elements and asked for the Retirement Planner page to be made shorter.
