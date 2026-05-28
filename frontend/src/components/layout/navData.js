@@ -6,7 +6,7 @@ import {
   UserPlus,
   Settings, Brain, ListTodo, Video,
   Gauge, FolderLock, Receipt, Mail,
-  Landmark, Wallet, User
+  Landmark, Wallet
 } from "lucide-react";
 
 export const personalNavGroups = [
@@ -32,13 +32,6 @@ export const personalNavGroups = [
 ];
 
 export const adviserBaseNav = [
-  {
-    name: "Profile",
-    icon: User,
-    items: [
-      { path: "/quick-overview", label: "Quick overview", icon: Gauge, title: "Multi-entity, CGT-aware retirement workbench · model prospects · export PDF · add as new client" },
-    ]
-  },
   {
     name: "Today",
     icon: LayoutDashboard,

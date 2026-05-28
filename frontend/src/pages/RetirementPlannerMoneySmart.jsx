@@ -4,17 +4,17 @@
 // panel on the right showing the projected annual retirement income, Age
 // Pension component, super balance trajectory and confidence band.
 //
-// Power-user features (multi-entity, CGT, scenarios) live behind the
-// "Advanced workbench" link → /retirement-planner-workbench.
+// Power-user features (multi-entity, CGT, scenarios) previously lived behind
+// the "Advanced workbench" link — removed per request to keep the planner
+// strictly client-facing.
 
 import { useState, useMemo, useCallback } from "react";
-import { Link } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { PageShell, PillButton } from "@/components/PageShell";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ChevronDown, ChevronUp, ChevronRight, ArrowUpRight, Info } from "lucide-react";
+import { ChevronDown, ChevronUp, ChevronRight, Info } from "lucide-react";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine,
 } from "recharts";
@@ -439,20 +439,6 @@ const RetirementPlanner = ({ embedded = false }) => {
                 </div>
               )}
             </section>
-
-            {/* Adviser deep link */}
-            <Link
-              to="/quick-overview"
-              className="flex items-center justify-between gap-3 rounded-2xl border border-dashed border-slate-300 bg-white p-5 hover:border-[#D4A84C] hover:bg-amber-50/30 transition-all group"
-              data-testid="link-advanced-workbench"
-            >
-              <div>
-                <p className="text-[10px] tracking-[0.18em] uppercase text-slate-500 font-semibold">For advisers</p>
-                <p className="text-sm font-semibold text-[#1a2744] mt-1">Open the quick-overview workbench</p>
-                <p className="text-[11px] text-slate-500 mt-0.5">Multi-entity, CGT, scenario stacks, Monte Carlo bands. Export to PDF or promote a prospect to a new client.</p>
-              </div>
-              <ArrowUpRight className="h-5 w-5 text-slate-400 group-hover:text-[#D4A84C] transition-colors" />
-            </Link>
 
             <p className="text-[11px] text-slate-400 leading-relaxed px-2 pb-4">
               These estimates use MoneySmart methodology: nominal returns less fees and inflation, projected over your time-to-retirement and life expectancy, drawn down at a sustainable rate. Age Pension is estimated on the assets test only and assumes you'll meet eligibility at retirement.
