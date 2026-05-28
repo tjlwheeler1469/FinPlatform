@@ -1,3 +1,48 @@
+## Feb 2026 — Iter 226: Runtime error fix + data-model hardening + layout overhaul + client-view airy strip (11/11 PASS · 100%)
+
+User asked for 7 things: (1) fix AbortError runtime error on AdvisorCommandCenter; (2) add explicit `member` field on super assets; (3) add explicit `relationship` field on client profile; (4) link 'desired spending' → 'result-income'; (5) ensure Budget income/expenses sync to Retirement Planner salary/spending; (6) restructure Retirement Planner to Investments-style vertical stack with annualised table at bottom; (7) airy strip on ClientHome + Documents & Account.
+
+**Runtime error fix** (`AdvisorCommandCenter.jsx`):
+- Replaced `Promise.all([fetch...])` with `Promise.all([safeFetch...])`. `safeFetch` wraps each fetch in try/catch and resolves to `null` on any failure (including AbortError). This means no sibling promise ever rejects unhandled when StrictMode aborts the controller during double-mount cleanup.
+- Added `if (signal?.aborted) return;` guard before any state writes so stale data doesn't render after navigation.
+- Verified: navigated /advisor-command-center → /dashboard → /quick-overview → /retirement-planner with **zero console errors**.
+
+**Data-model hardening** (`clientData.js` + `RetirementPlannerMoneySmart.jsx::buildDefaultsFromClient`):
+- Added `member: 'you' | 'partner' | 'joint'` to every Super/SMSF asset across all 7 client records.
+- Added `relationship: 'couple' | 'single'` to every profile across all 7 client records.
+- `buildDefaultsFromClient` now reads `prof.relationship` explicitly (falls back to legacy heuristic only when missing) and `a.member` explicitly (falls back to entity-name substring only when missing).
+- Verified: Thompson super rows render with David='You' / Sarah='Partner' ownership pills driven by the `member` field — no more substring matching.
+
+**Budget integration**:
+- `buildDefaultsFromClient` now reads `client.budget.monthlyIncome × 12` as the salary fallback and `client.budget.monthlyExpenses × 12` as the spending fallback. When `budget` is absent it falls back to `prof.personal_income` and `retirement.retirement_spending` respectively. Spending now defaults from the client's budget instead of always landing on ASFA Comfortable.
+
+**Layout overhaul** (`RetirementPlannerMoneySmart.jsx`):
+- Removed the sticky right-column `<aside>` and converted to a single-column vertical stack matching the Investments tab pattern.
+- TOP: 4-card `planner-kpi-strip` (Achievable spending · Desired spending · Surplus/Shortfall · Super at retirement) — all numbers driven by live engine.
+- MIDDLE: all 6 question sections stacked top-to-bottom (about-you · income · super itemized · other + contribution strategy + fees + investment option · spending · advanced).
+- BOTTOM: `results-panel` card with the projection chart (taller, 280px) + a metrics strip beneath it · then a brand-new `annualised-table-card` with 34 year-by-year rows showing Age · Phase (Accumulation/Drawdown) · Opening · Contribs · Net return · Fees · Withdraw · Closing.
+- Verified: 34 rows render, first 17 are Accumulation, rest Drawdown.
+
+**Spending → headline link**:
+- New `achievableSpending = min(projectedIncome, annualSpending)` derived value. The headline KPI ('Achievable spending', `data-testid='result-income'`) now visibly responds to spending changes. Verified: spending=$40k → result-income=$40k; spending=$200k → result-income=$200k (capped at projectedIncome only when desired > available).
+- Added `fundingStatus` ('fully_funded' / 'minor_gap' / 'underfunded') label under the KPI.
+
+**Client-view + Documents airy strip**:
+- `ClientHome.jsx` — Future Income / Funding Gap big numbers stripped from emerald-700/amber-700 → navy serif. Score-ring gradient navy hero card → airy white card. What-if delta `text-emerald-600`/`text-rose-600` + TrendingUp/Down icons → unified navy text with gold ▲/▼. New-score inner number → navy. 'Strong' chip → navy palette.
+- `retirementReadinessEngine.js::classify` palette swapped — Strong: navy / On Track: navy / Watchlist: gold / At Risk: slate (was emerald / blue / amber / rose).
+- `DocumentManager.jsx` — DOCUMENT_TYPES color classes swapped from rainbow (bg-blue-100/green-100/amber-100/purple-100/gray-100) to navy/gold/slate outline + white-bg.
+- `ClientMessaging.jsx` — unread highlight `bg-blue-50` → subtle gold `bg-[#D4A84C]/0.06`.
+- `clientView/SnapshotTab.jsx` — alData asset/debt/net-worth colors `#10b981`/`#ef4444`/`#1a2744` → unified `#1a2744`/`#94a3b8`/`#D4A84C`. Income vs Expenses 6-month bars `#10b981`/`#ef4444` → `#1a2744`/`#94a3b8`. 'this year' % indicator `text-emerald-600` → `text-[#1a2744]`.
+- `clientView/utils.js` — ALLOC_COLORS rainbow → navy/gold/slate scale.
+
+**Test report**: iter 226 = 11/11 critical frontend assertions PASS (success_rate 100%, retest_needed=false, no UI bugs, no design issues). All deep-equality checks confirm: AbortError suppression ✓ · KPI strip on top + sticky aside removed ✓ · annualised table at bottom with 34 rows ✓ · spending→result-income link works both directions ✓ · `member` field drives ownership pills ✓ · ClientHome 0 emerald/amber/rose refs, 17 navy + 6 gold refs ✓ · Documents 0 rainbow bg-* refs ✓ · Snapshot 41 navy refs, 0 emerald/red ✓.
+
+**Non-blocking review notes**:
+- `RetirementPlannerMoneySmart.jsx` is now ~940 lines. Could be split into 3-4 sub-components (KpiStrip, QuestionSections, ProjectionChart, AnnualisedTable) for maintainability — deferred since current monolith is fully working and lint-clean.
+
+
+
+
 ## Feb 2026 — Iter 225: Client-data-aware Retirement Planner + ContributionCalc merge + airy strip on Budget/Investments/Tax (13/13 PASS · 100%)
 
 User asked for (a) "make Budget, Investments, Tax pages look like Image 3 (Retirement Planner)" — full pages stripped to airy white + navy-serif (no rainbow donuts, no red/green dollar values, no dark KPI cards); (b) "Pull client data from Investments through to Retirement Planner" — fields auto-populate from `CLIENT_DATA[clientId]` but remain editable; (c) "Itemize super (Step 3) and other liquid assets (Step 4) as separate editable rows"; (d) "Move ContributionCalculator Steps 2-4 into Retirement Planner Step 4 and DELETE ContributionCalculator entirely".
