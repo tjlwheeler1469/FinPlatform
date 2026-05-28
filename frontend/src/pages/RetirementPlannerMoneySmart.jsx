@@ -341,7 +341,7 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
   // ============ Section open/collapse state ============
   // First section open by default; rest collapsed to keep the page short.
   const [openSection, setOpenSection] = useState("about");
-  const [showAnnualised, setShowAnnualised] = useState(false);
+  const [showAnnualised, setShowAnnualised] = useState(true);   // Expanded by default — user requested annual drawdown table at bottom.
   const toggle = (key) => setOpenSection((o) => o === key ? null : key);
 
   // Keep taxableIncome aligned to salary if user hasn't manually drifted.
@@ -556,40 +556,6 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
   // -----------------------------------------------------------
   const body = (
     <div className="space-y-5" data-testid="retirement-planner-page">
-      {/* ===== Top: KPI summary strip — Investments-style ===== */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3" data-testid="planner-kpi-strip">
-        <Card className="border-slate-200">
-          <CardContent className="p-4">
-            <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Achievable spending</p>
-            <p className="font-serif text-xl text-[#1a2744] mt-1.5 tabular-nums" data-testid="result-income">{fmtCompact(computed.achievableSpending)}</p>
-            <p className="text-[10px] text-slate-500 mt-1 font-mono">per year · {computed.fundingStatus === "fully_funded" ? "fully funded" : computed.fundingStatus === "minor_gap" ? "minor gap" : "underfunded"}</p>
-          </CardContent>
-        </Card>
-        <Card className="border-slate-200">
-          <CardContent className="p-4">
-            <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Desired spending</p>
-            <p className="font-serif text-xl text-[#1a2744] mt-1.5 tabular-nums" data-testid="result-desired-spending">{fmtCompact(annualSpending)}</p>
-            <p className="text-[10px] text-slate-500 mt-1 font-mono">your target</p>
-          </CardContent>
-        </Card>
-        <Card className="border-slate-200">
-          <CardContent className="p-4">
-            <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">{computed.shortfall > 0 ? "Annual shortfall" : "Annual surplus"}</p>
-            <p className={`font-serif text-xl mt-1.5 tabular-nums ${computed.shortfall > 0 ? "text-rose-600" : "text-[#1a2744]"}`} data-testid="result-gap">
-              {computed.shortfall > 0 ? "−" : "+"}{fmtCompact(Math.abs(computed.shortfall))}
-            </p>
-            <p className="text-[10px] text-slate-500 mt-1 font-mono">{confidence}% confidence</p>
-          </CardContent>
-        </Card>
-        <Card className="border-slate-200">
-          <CardContent className="p-4">
-            <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Super at retirement</p>
-            <p className="font-serif text-xl text-[#1a2744] mt-1.5 tabular-nums" data-testid="result-super-at-retirement">{fmtCompact(computed.sim.portfolioAtRetirement)}</p>
-            <p className="text-[10px] text-slate-500 mt-1 font-mono">P90 {fmtCompact(computed.sim.p90AtLifeEnd)} · age {computed.yearsToRetirement + yourAge}</p>
-          </CardContent>
-        </Card>
-      </div>
-
       {clientName && (
         <div className="flex items-center gap-3 rounded-2xl border border-[#D4A84C]/40 bg-white p-4" data-testid="client-data-banner">
           <Users className="h-4 w-4 text-[#D4A84C]" />
@@ -600,7 +566,7 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
         </div>
       )}
 
-      {/* ===== Questions: stacked top-down ===== */}
+      {/* ===== Questions: stacked top-down (accordion) ===== */}
       <div className="space-y-5">
         <Section
           eyebrow="Step 1"
@@ -896,14 +862,71 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
         </p>
       </div>
 
-      {/* ===== Bottom: Projection chart + annualised table — Investments-style stacked ===== */}
+      {/* ===== Bottom: BIG result card — large headline, on-brand ===== */}
+      <Card className="border-slate-200" data-testid="result-card">
+        <CardContent className="p-8 md:p-10">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 items-start">
+            {/* Headline */}
+            <div>
+              <p className={EYEBROW}>Result</p>
+              <h2 className="font-serif text-2xl text-[#1a2744] mt-1.5">Your annual retirement income</h2>
+              <p className="font-serif text-7xl md:text-8xl text-[#1a2744] mt-5 tabular-nums leading-none" data-testid="result-income">
+                {fmtCompact(computed.achievableSpending)}
+              </p>
+              <p className="text-sm text-slate-500 mt-4">
+                per year in today's dollars · {computed.isCouple ? "couple" : "single"} · {includeAgePension ? "incl. Age Pension" : "excl. Age Pension"} · investment option {computed.option.label}
+              </p>
+              <div className="mt-5 flex items-center gap-3 flex-wrap">
+                <span className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] tracking-wide uppercase font-semibold ${computed.fundingStatus === "fully_funded" ? "border-[#1a2744] text-[#1a2744]" : computed.fundingStatus === "minor_gap" ? "border-[#D4A84C] text-[#8a6c1a]" : "border-slate-400 text-slate-600"}`} data-testid="result-status-pill">
+                  <span className={`h-1.5 w-1.5 rounded-full ${computed.fundingStatus === "fully_funded" ? "bg-[#1a2744]" : computed.fundingStatus === "minor_gap" ? "bg-[#D4A84C]" : "bg-slate-400"}`} />
+                  {computed.fundingStatus === "fully_funded" ? "Fully funded" : computed.fundingStatus === "minor_gap" ? "Minor gap" : "Underfunded"}
+                </span>
+                <span className="text-xs text-slate-500 font-mono">{confidence}% confidence</span>
+              </div>
+            </div>
+            {/* Right side — supporting numbers */}
+            <div className="space-y-4 lg:border-l lg:border-slate-100 lg:pl-8">
+              <div>
+                <p className="text-[10px] tracking-[0.18em] uppercase text-slate-500 font-semibold">Desired spending</p>
+                <p className="font-serif text-2xl text-[#1a2744] mt-1 tabular-nums" data-testid="result-desired-spending">{fmtCompact(annualSpending)}</p>
+              </div>
+              <div>
+                <p className="text-[10px] tracking-[0.18em] uppercase text-slate-500 font-semibold">{computed.shortfall > 0 ? "Annual shortfall" : "Annual surplus"}</p>
+                <p className={`font-serif text-2xl mt-1 tabular-nums ${computed.shortfall > 0 ? "text-rose-600" : "text-[#1a2744]"}`} data-testid="result-gap">
+                  {computed.shortfall > 0 ? "−" : "+"}{fmtCompact(Math.abs(computed.shortfall))}
+                </p>
+              </div>
+              <div>
+                <p className="text-[10px] tracking-[0.18em] uppercase text-slate-500 font-semibold">Super at retirement (median)</p>
+                <p className="font-serif text-2xl text-[#1a2744] mt-1 tabular-nums" data-testid="result-super-at-retirement">{fmtCompact(computed.sim.portfolioAtRetirement)}</p>
+                <p className="text-[10px] text-slate-400 mt-0.5 font-mono">at age {computed.yearsToRetirement + yourAge}</p>
+              </div>
+              <div>
+                <p className="text-[10px] tracking-[0.18em] uppercase text-slate-500 font-semibold">From super (4%) / Age pension</p>
+                <p className="font-serif text-base text-[#1a2744] mt-1 tabular-nums">
+                  {fmt(computed.sustainableFromSuper)}{includeAgePension ? ` + ${fmt(computed.agePensionAnnual)}` : ""}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {computed.shortfall > 0 && (
+            <div className="mt-7 flex items-start gap-2 text-xs text-amber-700 bg-amber-50/60 border border-amber-200 rounded-lg p-3" data-testid="shortfall-hint">
+              <Info className="h-3.5 w-3.5 flex-shrink-0 mt-0.5" />
+              <span>To close the gap of <span className="font-mono">{fmtCompact(computed.shortfall)}</span>, try adding {fmtCompact(Math.round(computed.shortfall / 0.04 / Math.max(1, computed.yearsToRetirement)))}/yr more in contributions, or pushing retirement back 2-3 years.</span>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* ===== Projection trajectory chart ===== */}
       <Card className="border-slate-200" data-testid="results-panel">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-1 flex-wrap gap-2">
             <div>
               <p className={EYEBROW}>Projection</p>
-              <h3 className="font-serif text-2xl text-[#1a2744] leading-tight">Portfolio trajectory</h3>
-              <p className="text-sm text-slate-500 mt-1">Monte Carlo · 500 simulations · {computed.isCouple ? "couple" : "single"} · {includeAgePension ? "incl. Age Pension" : "excl. Age Pension"}</p>
+              <h3 className="font-serif text-xl text-[#1a2744] leading-tight">Portfolio trajectory</h3>
+              <p className="text-xs text-slate-500 mt-0.5">Monte Carlo · 500 simulations</p>
             </div>
             <div className="flex items-center gap-2 text-xs">
               <span className={`w-1.5 h-1.5 rounded-full ${isOnTrack ? "bg-emerald-500" : confidence >= 60 ? "bg-amber-500" : "bg-rose-500"}`} />
@@ -933,37 +956,10 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
               </AreaChart>
             </ResponsiveContainer>
           </div>
-
-          {/* Side metrics under the chart — Investments KPI strip pattern */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-5 pt-5 border-t border-slate-100">
-            <div>
-              <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">From super (4%)</p>
-              <p className="font-serif text-base text-[#1a2744] mt-0.5 tabular-nums">{fmt(computed.sustainableFromSuper)}</p>
-            </div>
-            <div>
-              <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">From age pension</p>
-              <p className="font-serif text-base text-[#1a2744] mt-0.5 tabular-nums">{includeAgePension ? fmt(computed.agePensionAnnual) : "—"}</p>
-            </div>
-            <div>
-              <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Household contribs / yr</p>
-              <p className="font-serif text-base text-[#1a2744] mt-0.5 tabular-nums">{fmt(computed.annualGrossContrib)}</p>
-            </div>
-            <div>
-              <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Total fees est.</p>
-              <p className="font-serif text-base text-[#1a2744] mt-0.5 tabular-nums">{fmtCompact(computed.totalFeesPaid)}</p>
-            </div>
-          </div>
-
-          {computed.shortfall > 0 && (
-            <div className="mt-5 flex items-start gap-2 text-xs text-amber-700 bg-amber-50/60 border border-amber-200 rounded-lg p-3" data-testid="shortfall-hint">
-              <Info className="h-3.5 w-3.5 flex-shrink-0 mt-0.5" />
-              <span>To close the gap of <span className="font-mono">{fmtCompact(computed.shortfall)}</span>, try adding {fmtCompact(Math.round(computed.shortfall / 0.04 / Math.max(1, computed.yearsToRetirement)))}/yr more in contributions, or pushing retirement back 2-3 years.</span>
-            </div>
-          )}
         </CardContent>
       </Card>
 
-      {/* ===== Annualised projection table — collapsible to keep page short ===== */}
+      {/* ===== Annual drawdown / portfolio breakdown table ===== */}
       <Card className="border-slate-200" data-testid="annualised-table-card">
         <button
           type="button"
@@ -972,9 +968,9 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
           data-testid="toggle-annualised"
         >
           <div>
-            <p className={EYEBROW}>Annualised</p>
-            <h3 className="font-serif text-xl text-[#1a2744] leading-tight mt-1">Year-by-year projection</h3>
-            <p className="text-xs text-slate-500 mt-0.5">{computed.annualisedTable.length} years · option {computed.option.label}{showAnnualised ? "" : " · click to expand"}</p>
+            <p className={EYEBROW}>Annual drawdown · breakdown</p>
+            <h3 className="font-serif text-xl text-[#1a2744] leading-tight mt-1">Year-by-year portfolio &amp; drawdown table</h3>
+            <p className="text-xs text-slate-500 mt-0.5">{computed.annualisedTable.length} years · accumulation → drawdown · option {computed.option.label}{showAnnualised ? "" : " · click to expand"}</p>
           </div>
           {showAnnualised
             ? <ChevronUp className="h-4 w-4 text-slate-400 flex-shrink-0" />
@@ -992,26 +988,39 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
                     <th className="text-right px-2 py-2.5">Contribs</th>
                     <th className="text-right px-2 py-2.5">Net return</th>
                     <th className="text-right px-2 py-2.5">Fees</th>
-                    <th className="text-right px-2 py-2.5">Withdraw</th>
+                    <th className="text-right px-2 py-2.5">Drawdown</th>
                     <th className="text-right px-2 py-2.5">Closing</th>
                   </tr>
                 </thead>
                 <tbody>
                   {computed.annualisedTable.map((row, i) => (
-                    <tr key={i} className={`border-b border-slate-100 hover:bg-slate-50/60 transition-colors ${row.phase === "Drawdown" ? "bg-[#D4A84C]/[0.02]" : ""}`} data-testid={`annualised-row-${i}`}>
+                    <tr key={i} className={`border-b border-slate-100 hover:bg-slate-50/60 transition-colors ${row.phase === "Drawdown" ? "bg-[#D4A84C]/[0.04]" : ""}`} data-testid={`annualised-row-${i}`}>
                       <td className="px-2 py-2 font-mono text-[#1a2744]">{row.age}</td>
                       <td className="px-2 py-2 text-slate-600">
                         <span className={`text-[10px] tracking-wide uppercase font-semibold ${row.phase === "Accumulation" ? "text-[#1a2744]" : "text-[#8a6c1a]"}`}>{row.phase}</span>
                       </td>
                       <td className="px-2 py-2 font-mono text-[#1a2744] text-right">{fmtCompact(row.opening)}</td>
-                      <td className="px-2 py-2 font-mono text-[#1a2744] text-right">{row.contribs ? fmtCompact(row.contribs) : "—"}</td>
-                      <td className="px-2 py-2 font-mono text-[#1a2744] text-right">{fmtCompact(row.netReturn)}</td>
+                      <td className="px-2 py-2 font-mono text-[#1a2744] text-right">{row.contribs ? `+${fmtCompact(row.contribs)}` : "—"}</td>
+                      <td className="px-2 py-2 font-mono text-[#1a2744] text-right">{row.netReturn >= 0 ? "+" : ""}{fmtCompact(row.netReturn)}</td>
                       <td className="px-2 py-2 font-mono text-slate-500 text-right">−{fmtCompact(row.fees)}</td>
                       <td className="px-2 py-2 font-mono text-slate-500 text-right">{row.withdraw ? `−${fmtCompact(row.withdraw)}` : "—"}</td>
                       <td className="px-2 py-2 font-mono text-[#1a2744] text-right font-semibold">{fmtCompact(row.closing)}</td>
                     </tr>
                   ))}
                 </tbody>
+                <tfoot>
+                  <tr className="border-t-2 border-slate-200 text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">
+                    <td colSpan="3" className="px-2 pt-3">Total contributions (accumulation)</td>
+                    <td className="px-2 pt-3 text-right font-mono">
+                      +{fmtCompact(computed.annualisedTable.filter((r) => r.phase === "Accumulation").reduce((s, r) => s + r.contribs, 0))}
+                    </td>
+                    <td colSpan="2" className="px-2 pt-3 text-right">Total drawdown</td>
+                    <td className="px-2 pt-3 text-right font-mono">
+                      −{fmtCompact(computed.annualisedTable.filter((r) => r.phase === "Drawdown").reduce((s, r) => s + r.withdraw, 0))}
+                    </td>
+                    <td className="px-2 pt-3" />
+                  </tr>
+                </tfoot>
               </table>
             </div>
           </div>

@@ -51,7 +51,7 @@ const SimpleClientView = () => {
         <Tabs defaultValue="snapshot">
           <TabsList className="bg-transparent border-0 mb-6 h-auto w-full justify-start gap-1.5 px-0 overflow-x-auto p-0">
             <TabsTrigger value="snapshot" className={tabClass} data-testid="client-tab-snapshot"><LayoutDashboard className="h-3.5 w-3.5" />Snapshot</TabsTrigger>
-            <TabsTrigger value="retirement" className={tabClass} data-testid="client-tab-retire"><Gauge className="h-3.5 w-3.5" />Retirement &amp; Super</TabsTrigger>
+            <TabsTrigger value="retirement" className={tabClass} data-testid="client-tab-retire"><Gauge className="h-3.5 w-3.5" />Retirement</TabsTrigger>
             <TabsTrigger value="investments" className={tabClass} data-testid="client-tab-invest"><TrendingUp className="h-3.5 w-3.5" />Investments</TabsTrigger>
             <TabsTrigger value="budget" className={tabClass} data-testid="client-tab-budget"><PiggyBank className="h-3.5 w-3.5" />Budget</TabsTrigger>
             <TabsTrigger value="goals" className={tabClass} data-testid="client-tab-goals"><Target className="h-3.5 w-3.5" />Goals &amp; Scenarios</TabsTrigger>

@@ -1,0 +1,23 @@
+{
+  "summary": "Iter 228 frontend regression PASSED. All 8 verification points from the review request are GREEN. (1) /dashboard → Retirement tab (Thompson, adviser) [data-testid='planner-kpi-strip'] count = 0 — the old top KPI strip is fully removed. (2) BIG result-card renders with result-income='$180k' (serif text-7xl/text-8xl, navy #1a2744) + result-status-pill='FULLY FUNDED'. (3) Position order verified by getBoundingClientRect: client-data-banner (top=472) → result-card (1649) → results-panel (2012) → annualised-table-card (2440) — result-card appears before projection chart and table as required. (4) annualised-table expanded by default (no toggle needed), 34 tbody rows; thead columns = ['Age','Phase','Opening','Contribs','Net return','Fees','Drawdown','Closing'] — 'Withdraw' is renamed to 'Drawdown'; tfoot shows 'Total contributions (accumulation) +$1.68M | Total drawdown −$3.06M'. (5) Spending link works — clicked section-spending-toggle, set input-spending=40000, result-income updated to '$40k' within 2s, status pill recomputed (stays 'FULLY FUNDED' at $40k as expected). (6) /client-portal (app_mode=client) tabs = 'Snapshot | Retirement | Investments | Budget | Goals & Scenarios | Tax Centre' — [data-testid='client-tab-retire'] label is 'Retirement', NO occurrence of 'Retirement & Super' or '& Super' anywhere on page; clicking the tab loads the Retirement panel ('Retirement confidence 100% · You can retire at age 67 spending $180,000/yr ...'). (7) /personal-dashboard body contains no 'Retirement & Super' string. (8) Regression: /retirement-planner direct route renders all 7 section testids (about-you/about-partner/income/super/other/spending/advanced), planner-kpi-strip=0, result-card=1, no console errors / AbortError / Recharts(-1) warnings.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "RetirementPlannerMoneySmart.jsx is now 1054 lines — pushing past the 700-line threshold. Recommend extracting the BIG result-card, annualised-table, and each accordion question step into separate components for maintainability. Not blocking.",
+    "Annualised-table tfoot uses colSpan='3' then colSpan='2' across 8 columns — visually fine but consider semantic alignment of subtotal labels with their value columns for screen-reader clarity."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a (skipped per request)", "frontend": "100%"},
+  "test_credentials": "LocalStorage flags only: wealth_command_compliance_v5='permanent'; adviser tests: app_mode='adviser' + selected_client={id:'thompson_family',client_id:'thompson_family',name:'David & Sarah Thompson'}; client tests: app_mode='client' + selected_client removed.",
+  "seed_data_creation": "None — read-only verification against existing CLIENT_DATA.thompson_family.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iter 228 complete with zero issues. Key testids on Retirement Planner: result-card (NEW, bottom), result-income (serif text-7xl/text-8xl), result-status-pill (FULLY FUNDED/MINOR GAP/UNDERFUNDED), results-panel (projection chart), annualised-table-card → annualised-table (expanded by default now, 34 rows, 'Drawdown' column + tfoot totals). Hero header on /retirement-planner direct route still shows 4 inline KPIs (Achievable/Desired/Confidence/Years) — this is page-hero, NOT planner-kpi-strip, and was retained intentionally; user only asked to remove the planner-kpi-strip card row. Client view tab label is now 'Retirement' (testid client-tab-retire). PersonalDashboard line 581 'visit Retirement in the sidebar' copy confirmed.",
+  "rca of the issue": "n/a — no issues found."
+}

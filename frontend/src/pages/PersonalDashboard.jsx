@@ -578,7 +578,7 @@ const PersonalDashboard = ({ embedded = false }) => {
                           : " Consider increasing contributions or delaying retirement to improve confidence."}
                       </div>
                       <p className="text-[10px] text-muted-foreground italic text-center">
-                        For the full scenario playground, visit <strong>Retirement &amp; Super</strong> in the sidebar.
+                        For the full scenario playground, visit <strong>Retirement</strong> in the sidebar.
                       </p>
                     </div>
                   )}
