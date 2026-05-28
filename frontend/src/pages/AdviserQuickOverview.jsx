@@ -104,10 +104,15 @@ const AdviserQuickOverview = () => {
           annual_income: s.derived?.totalAnnualIncome,
           monthly_expenses: s.derived?.totalMonthlyExpenses,
         },
-        retirement_analysis: {
-          total_retirement_fund_needed: (s.derived?.totalMonthlyExpenses || 0) * 12 * (s.derived?.retirementYears || 25) * 0.04 * 25,
-          surplus_or_shortfall: 0,
-        },
+        retirement_analysis: (() => {
+          const annualSpend = (s.derived?.totalMonthlyExpenses || 0) * 12;
+          const fundNeeded = Math.round(annualSpend * 25); // 4% sustainable withdrawal rule
+          const currentNetWorth = s.derived?.netWorth || 0;
+          return {
+            total_retirement_fund_needed: fundNeeded,
+            surplus_or_shortfall: currentNetWorth - fundNeeded,
+          };
+        })(),
         entities: Object.entries(assetsByType).map(([type, value]) => ({
           name: type,
           value,

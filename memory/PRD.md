@@ -1,4 +1,26 @@
-## Feb 2026 — Iter 222: MoneySmart-style Retirement Planner + Contribution Calculator (17/17 PASS)
+## Feb 2026 — Iter 223: Adviser Profile → Quick overview (13/13 PASS · 100%)
+
+User asked to "Move Retirement planner multi-entity · CGT-aware to Adviser Profile with Left Hand Navigation as 'Quick overview'" + Export to PDF + 'Add as new client' button.
+
+**New page**: `/app/frontend/src/pages/AdviserQuickOverview.jsx` mounted at `/quick-overview`.
+- PageShell hero — eyebrow `ADVISER · PROFILE`, serif title "Quick overview", gold accent "multi-entity · CGT-aware", 4 live KPI tiles (Net worth · Assets · Years to retire · Annual income) refreshing every 1s via interval-polled ref snapshot.
+- Two header pills: **Export PDF** (white ghost · `Download` icon) and **Add as new client** (navy primary · `UserPlus`).
+- Dashed prospect-context card explaining the workflow.
+- Embeds the full 7-tab workbench inline.
+- Add-as-new-client dialog (4 fields) → POST `/api/crm/clients` → redirects to `/adviser-hub?new=<client_id>` and stores the retirement snapshot in localStorage keyed by the new client_id for future Hub-side restore.
+- Export PDF → POST `/api/pdf-report/generate` with `analysis_data` schema → 200 application/pdf → triggers browser download.
+
+**Workbench refactor**: `RetirementPlanner.jsx` now accepts `{ embedded, onReadyControls }` props. `embedded=true` skips its own Layout+PageShell. `onReadyControls` publishes a ref-backed `getSnapshot()` ONCE on mount (no infinite loops — prior bug fixed).
+
+**Nav**: New "Profile" group at top of `adviserBaseNav` with single item "Quick overview" → `/quick-overview`.
+
+**Old routes preserved**: `/retirement-planner-workbench` now redirects to `/quick-overview` for deep-link compatibility.
+
+**Testing** — iter 223 = 13/13 PASS (100% backend + 100% frontend, 0 ui_bugs, 0 console errors). Backend pytest at `/app/backend/tests/test_iteration223_quick_overview.py` covers both endpoints (2/2). Live verified end-to-end: PDF downloaded as `quick-overview-prospect-…pdf`, client `Alex Carter (client_319e0158)` created with retirement_snapshot stored locally, redirected to `/adviser-hub?new=client_319e0158`.
+
+**Polish applied post-test**: PDF `total_retirement_fund_needed` formula corrected (was double-counting via `× 0.04 × 25`; now uses straight 25× annual expense rule).
+
+
 
 User asked to make `/retirement-planner` and the contribution calculator FLOW like MoneySmart's gov.au calculators — linear vertically-stacked sectioned forms with a persistent Results panel, not the legacy 7-tab workbench.
 
