@@ -192,12 +192,13 @@ export const generateInvoicePDF = (invoice) => {
   doc.setTextColor(60);
   doc.text(invoice.due_date || "On receipt", 140, y + 6);
   doc.setFont("helvetica", "bold");
-  doc.setTextColor(26, 39, 68);
+  doc.setTextColor(26, 39, 68); // Status label is always navy
   doc.text("Status", 140, y + 14);
   doc.setFont("helvetica", "normal");
-  doc.setTextColor(invoice.status === "paid" ? 16 : 60,
-                   invoice.status === "paid" ? 185 : 60,
-                   invoice.status === "paid" ? 129 : 60);
+  // Status value uses navy when paid (on-brand), slate when draft/sent.
+  doc.setTextColor(invoice.status === "paid" ? 26 : 100,
+                   invoice.status === "paid" ? 39 : 116,
+                   invoice.status === "paid" ? 68 : 139);
   doc.text((invoice.status || "draft").toUpperCase(), 140, y + 20);
 
   y += 32;

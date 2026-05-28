@@ -19,12 +19,12 @@ import { Save, RotateCcw, ContactRound, ListChecks, Handshake, FileSearch, BookO
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
-// Section header — the blue pill from Xplan.
+// Section header — airy navy pill matching Retirement Planner reference.
 const SectionHeader = ({ icon: Icon, label }) => (
   <div className="flex items-center gap-2 mb-3">
-    <div className="px-4 py-1.5 rounded-full bg-[#3B9CDC] text-white flex items-center gap-2 shadow-sm">
-      {Icon ? <Icon className="h-3.5 w-3.5" /> : null}
-      <span className="text-xs font-semibold tracking-wide">{label}</span>
+    <div className="px-4 py-1.5 rounded-full bg-[#1a2744] text-white flex items-center gap-2">
+      {Icon ? <Icon className="h-3.5 w-3.5 text-[#D4A84C]" strokeWidth={1.5} /> : null}
+      <span className="text-[10px] tracking-[0.18em] uppercase font-semibold">{label}</span>
     </div>
   </div>
 );

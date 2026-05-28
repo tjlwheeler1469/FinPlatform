@@ -84,10 +84,37 @@ const INVESTMENT_OPTIONS = [
   { key: "high_growth",  label: "High Growth",  nominal: 8.5, desc: "100% growth assets · high risk" },
 ];
 
-const SECTION_CLASS = "rounded-2xl border border-slate-200 bg-white p-6";
-const SECTION_HEAD = "font-serif text-2xl text-[#1a2744] mb-1";
-const SECTION_SUB  = "text-sm text-slate-500 mb-5";
-const EYEBROW      = "text-[10px] tracking-[0.18em] uppercase text-[#D4A84C] font-semibold mb-2";
+const SECTION_CLASS = "rounded-2xl border border-slate-200 bg-white";
+const SECTION_HEAD = "font-serif text-xl text-[#1a2744] leading-tight";
+const SECTION_SUB  = "text-xs text-slate-500 mt-0.5";
+const EYEBROW      = "text-[10px] tracking-[0.18em] uppercase text-[#D4A84C] font-semibold";
+
+// Collapsible section wrapper — header always visible, body toggles.
+// Sections collapse by default; first one opens automatically.
+const Section = ({ eyebrow, title, sub, open, onToggle, testid, children }) => (
+  <section className={SECTION_CLASS} data-testid={testid}>
+    <button
+      type="button"
+      onClick={onToggle}
+      className="w-full flex items-center justify-between gap-4 p-5 hover:bg-slate-50/40 transition-colors rounded-2xl"
+      data-testid={`${testid}-toggle`}
+    >
+      <div className="text-left">
+        <p className={EYEBROW}>{eyebrow}</p>
+        <h2 className={`${SECTION_HEAD} mt-1`}>{title}</h2>
+        {sub && <p className={SECTION_SUB}>{sub}</p>}
+      </div>
+      {open
+        ? <ChevronUp className="h-4 w-4 text-slate-400 flex-shrink-0" />
+        : <ChevronDown className="h-4 w-4 text-slate-400 flex-shrink-0" />}
+    </button>
+    {open && (
+      <div className="px-5 pb-5 -mt-1 border-t border-slate-100 pt-4">
+        {children}
+      </div>
+    )}
+  </section>
+);
 
 const Field = ({ label, value, onChange, prefix, suffix, step = 1, testid, hint, min, max }) => (
   <div className="space-y-1.5">
@@ -307,10 +334,15 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
   // ============ Step 5 — Spending ============
   const [annualSpending, setAnnualSpending] = useState(defaults.annualSpending || (defaults.relationship === "couple" ? ASFA.couple_comfortable : ASFA.single_comfortable));
 
-  // ============ Step 6 — Advanced (collapsible) ============
-  const [showAdvanced, setShowAdvanced] = useState(false);
+  // ============ Step 6 — Advanced ============
   const [inflationPct, setInflationPct] = useState(2.5);
   const [lifeExpectancyOverride, setLifeExpectancyOverride] = useState(0);
+
+  // ============ Section open/collapse state ============
+  // First section open by default; rest collapsed to keep the page short.
+  const [openSection, setOpenSection] = useState("about");
+  const [showAnnualised, setShowAnnualised] = useState(false);
+  const toggle = (key) => setOpenSection((o) => o === key ? null : key);
 
   // Keep taxableIncome aligned to salary if user hasn't manually drifted.
   useEffect(() => {
@@ -570,11 +602,15 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
 
       {/* ===== Questions: stacked top-down ===== */}
       <div className="space-y-5">
-        <section className={SECTION_CLASS} data-testid="section-about-you">
-          <p className={EYEBROW}>Step 1</p>
-          <h2 className={SECTION_HEAD}>About you</h2>
-          <p className={SECTION_SUB}>Tell us a little about yourself — your age, when you plan to retire, and whether you own your home.</p>
-          <div className="space-y-5">
+        <Section
+          eyebrow="Step 1"
+          title="About you"
+          sub="Tell us a little about yourself — your age, when you plan to retire, and whether you own your home."
+          open={openSection === "about"}
+          onToggle={() => toggle("about")}
+          testid="section-about-you"
+        >
+          <div className="space-y-4">
             <div className="flex items-center gap-4 flex-wrap">
               <Label className="text-[11px] tracking-wide text-slate-600 w-32 flex-shrink-0">Relationship</Label>
               <Segment options={[{ value: "single", label: "Single" }, { value: "couple", label: "Couple" }]} value={relationship} onChange={setRelationship} testid="seg-relationship" />
@@ -592,14 +628,18 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
               </div>
             </div>
           </div>
-        </section>
+        </Section>
 
         {/* ----- Step 1b — Partner ----- */}
         {computed.isCouple && (
-          <section className={SECTION_CLASS} data-testid="section-about-partner">
-            <p className={EYEBROW}>Step 1b</p>
-            <h2 className={SECTION_HEAD}>About your partner</h2>
-            <p className={SECTION_SUB}>Their age and gender help estimate how long the household income needs to last.</p>
+          <Section
+            eyebrow="Step 1b"
+            title="About your partner"
+            sub="Their age and gender help estimate how long the household income needs to last."
+            open={openSection === "partner"}
+            onToggle={() => toggle("partner")}
+            testid="section-about-partner"
+          >
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               <Field label="Partner age" value={partnerAge} onChange={setPartnerAge} suffix="years" testid="input-partner-age" min={18} max={80} />
               <div className="space-y-1.5">
@@ -607,31 +647,38 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
                 <Segment options={[{ value: "male", label: "Male" }, { value: "female", label: "Female" }]} value={partnerGender} onChange={setPartnerGender} testid="seg-partner-gender" />
               </div>
             </div>
-          </section>
+          </Section>
         )}
 
         {/* ----- Step 2 — Income ----- */}
-        <section className={SECTION_CLASS} data-testid="section-income">
-          <p className={EYEBROW}>Step 2</p>
-          <h2 className={SECTION_HEAD}>Your income</h2>
-          <p className={SECTION_SUB}>Your current gross annual salary{computed.isCouple ? " and your partner's" : ""} — used to project employer super contributions and tax saved.</p>
+        <Section
+          eyebrow="Step 2"
+          title="Your income"
+          sub={`Your current gross annual salary${computed.isCouple ? " and your partner's" : ""} — used to project employer super contributions and tax saved.`}
+          open={openSection === "income"}
+          onToggle={() => toggle("income")}
+          testid="section-income"
+        >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Field label="Your gross annual salary" value={yourSalary} onChange={setYourSalary} prefix="$" testid="input-your-salary" />
             {computed.isCouple && <Field label="Partner's gross annual salary" value={partnerSalary} onChange={setPartnerSalary} prefix="$" testid="input-partner-salary" />}
             <Field label="Your taxable income" value={taxableIncome} onChange={setTaxableIncome} prefix="$" testid="input-taxable-income" hint="Drives marginal rate & Div 293 calcs" />
           </div>
-          <div className="mt-5 pt-4 border-t border-slate-100 flex flex-wrap items-center gap-4 text-xs text-slate-500">
+          <div className="mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center gap-4 text-xs text-slate-500">
             <Toggle label="Include the Age Pension in my retirement income" hint="Assumes you'll meet residency, age, and means tests at retirement." checked={includeAgePension} onChange={setIncludeAgePension} testid="toggle-age-pension" />
             <span className="ml-auto">Marginal rate · <span className="font-mono text-[#1a2744]">{computed.marginalPct.toFixed(0)}%</span></span>
           </div>
-        </section>
+        </Section>
 
         {/* ----- Step 3 — Itemized super ----- */}
-        <section className={SECTION_CLASS} data-testid="section-super">
-          <p className={EYEBROW}>Step 3</p>
-          <h2 className={SECTION_HEAD}>Your super</h2>
-          <p className={SECTION_SUB}>Every super account in the household, each editable. Add or remove rows to match the real structure — the projection uses the live total.</p>
-
+        <Section
+          eyebrow="Step 3"
+          title="Your super"
+          sub="Every super account in the household, each editable. Add or remove rows to match the real structure — the projection uses the live total."
+          open={openSection === "super"}
+          onToggle={() => toggle("super")}
+          testid="section-super"
+        >
           {/* Super accounts list */}
           <div className="space-y-3">
             <div className="grid grid-cols-[1fr_180px_36px] gap-2 text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">
@@ -660,7 +707,7 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
             </button>
           </div>
 
-          <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-100">
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 pt-3 border-t border-slate-100">
             <Field label="Employer SG rate" value={yourSgRate} onChange={setYourSgRate} suffix="%" step={0.5} testid="input-sg-rate" min={0} max={15} hint="2025-26 = 12%" />
             <div className="md:col-span-2 grid grid-cols-2 gap-4">
               <div>
@@ -675,13 +722,17 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
               )}
             </div>
           </div>
-        </section>
+        </Section>
 
         {/* ----- Step 4 — Other assets, contribution strategy, fees & investment option ----- */}
-        <section className={SECTION_CLASS} data-testid="section-other">
-          <p className={EYEBROW}>Step 4</p>
-          <h2 className={SECTION_HEAD}>Other assets, savings &amp; contribution strategy</h2>
-          <p className={SECTION_SUB}>Anything else you'll draw on in retirement, plus the contribution mix, fund fees, and investment option that drive your projection.</p>
+        <Section
+          eyebrow="Step 4"
+          title="Other assets, savings & contribution strategy"
+          sub="Anything else you'll draw on in retirement, plus the contribution mix, fund fees, and investment option that drive your projection."
+          open={openSection === "other"}
+          onToggle={() => toggle("other")}
+          testid="section-other"
+        >
 
           {/* 4a — Itemized other liquid assets */}
           <div className="mb-7">
@@ -785,19 +836,23 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
               })}
             </div>
           </div>
-        </section>
+        </Section>
 
         {/* ----- Step 5 — Spending ----- */}
-        <section className={SECTION_CLASS} data-testid="section-spending">
-          <p className={EYEBROW}>Step 5</p>
-          <h2 className={SECTION_HEAD}>Your spending in retirement</h2>
-          <p className={SECTION_SUB}>How much you want to spend each year in retirement (today's dollars). The ASFA Retirement Standard is a useful starting point.</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+        <Section
+          eyebrow="Step 5"
+          title="Your spending in retirement"
+          sub="How much you want to spend each year in retirement (today's dollars). The ASFA Retirement Standard is a useful starting point."
+          open={openSection === "spending"}
+          onToggle={() => toggle("spending")}
+          testid="section-spending"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <Field label="Desired annual spending" value={annualSpending} onChange={setAnnualSpending} prefix="$" testid="input-spending" />
             <div className="hidden md:block" />
           </div>
-          <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold mb-3">ASFA Retirement Standard · 2025</p>
-          <div className="grid grid-cols-2 gap-2.5">
+          <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold mb-2.5">ASFA Retirement Standard · 2025</p>
+          <div className="grid grid-cols-2 gap-2">
             {[
               { key: "single_modest", label: "Single · Modest", value: ASFA.single_modest },
               { key: "single_comfortable", label: "Single · Comfortable", value: ASFA.single_comfortable },
@@ -810,36 +865,33 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
                   key={p.key}
                   type="button"
                   onClick={() => applyAsfa(p.key)}
-                  className={`text-left rounded-xl border p-3.5 transition-all ${selected ? "border-[#1a2744] bg-slate-50 ring-1 ring-[#1a2744]/20" : "border-slate-200 bg-white hover:border-slate-400"}`}
+                  className={`text-left rounded-xl border p-3 transition-all ${selected ? "border-[#1a2744] bg-slate-50 ring-1 ring-[#1a2744]/20" : "border-slate-200 bg-white hover:border-slate-400"}`}
                   data-testid={`asfa-${p.key}`}
                 >
-                  <p className="text-[11px] tracking-[0.16em] uppercase text-slate-500">{p.label}</p>
-                  <p className="font-serif text-lg text-[#1a2744] mt-0.5 tabular-nums">{fmt(p.value)}</p>
+                  <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500">{p.label}</p>
+                  <p className="font-serif text-base text-[#1a2744] mt-0.5 tabular-nums">{fmt(p.value)}</p>
                 </button>
               );
             })}
           </div>
-        </section>
+        </Section>
 
-        {/* ----- Step 6 — Advanced (collapsible) ----- */}
-        <section className={SECTION_CLASS} data-testid="section-advanced">
-          <button type="button" onClick={() => setShowAdvanced((v) => !v)} className="w-full flex items-center justify-between gap-4" data-testid="toggle-advanced">
-            <div className="text-left">
-              <p className={EYEBROW}>Step 6 · Optional</p>
-              <h2 className={SECTION_HEAD}>Advanced assumptions</h2>
-              <p className="text-sm text-slate-500">Inflation, life expectancy. The investment-return and fee defaults sit in Step 4 above.</p>
-            </div>
-            {showAdvanced ? <ChevronUp className="h-5 w-5 text-slate-400 flex-shrink-0" /> : <ChevronDown className="h-5 w-5 text-slate-400 flex-shrink-0" />}
-          </button>
-          {showAdvanced && (
-            <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Field label="Inflation (CPI)" value={inflationPct} onChange={setInflationPct} suffix="% p.a." step={0.1} testid="input-inflation" />
-              <Field label="Life expectancy override" value={lifeExpectancyOverride} onChange={setLifeExpectancyOverride} suffix="years" testid="input-life-exp" hint={`Leave 0 to use ABS default (${computed.yourLifeExp})`} />
-            </div>
-          )}
-        </section>
+        {/* ----- Step 6 — Advanced ----- */}
+        <Section
+          eyebrow="Step 6 · Optional"
+          title="Advanced assumptions"
+          sub="Inflation, life expectancy. The investment-return and fee defaults sit in Step 4 above."
+          open={openSection === "advanced"}
+          onToggle={() => toggle("advanced")}
+          testid="section-advanced"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Field label="Inflation (CPI)" value={inflationPct} onChange={setInflationPct} suffix="% p.a." step={0.1} testid="input-inflation" />
+            <Field label="Life expectancy override" value={lifeExpectancyOverride} onChange={setLifeExpectancyOverride} suffix="years" testid="input-life-exp" hint={`Leave 0 to use ABS default (${computed.yourLifeExp})`} />
+          </div>
+        </Section>
 
-        <p className="text-[11px] text-slate-400 leading-relaxed px-2 pb-4">
+        <p className="text-[11px] text-slate-400 leading-relaxed px-2 pb-2">
           Projections use MoneySmart methodology: nominal returns less fees and inflation, projected over your time-to-retirement and life expectancy, drawn down at a sustainable rate. Age Pension is estimated on the assets test only and assumes you'll meet eligibility at retirement.
         </p>
       </div>
@@ -911,52 +963,59 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
         </CardContent>
       </Card>
 
-      {/* ===== Annualised projection table ===== */}
+      {/* ===== Annualised projection table — collapsible to keep page short ===== */}
       <Card className="border-slate-200" data-testid="annualised-table-card">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-            <div>
-              <p className={EYEBROW}>Annualised</p>
-              <h3 className="font-serif text-2xl text-[#1a2744] leading-tight">Year-by-year projection</h3>
-              <p className="text-sm text-slate-500 mt-1">Deterministic accumulation → drawdown table. Excludes Age Pension cash-flow until drawdown.</p>
-            </div>
-            <span className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">
-              {computed.annualisedTable.length} years · option {computed.option.label}
-            </span>
+        <button
+          type="button"
+          onClick={() => setShowAnnualised((v) => !v)}
+          className="w-full flex items-center justify-between gap-4 p-5 hover:bg-slate-50/40 transition-colors rounded-2xl text-left"
+          data-testid="toggle-annualised"
+        >
+          <div>
+            <p className={EYEBROW}>Annualised</p>
+            <h3 className="font-serif text-xl text-[#1a2744] leading-tight mt-1">Year-by-year projection</h3>
+            <p className="text-xs text-slate-500 mt-0.5">{computed.annualisedTable.length} years · option {computed.option.label}{showAnnualised ? "" : " · click to expand"}</p>
           </div>
-          <div className="overflow-x-auto -mx-2">
-            <table className="w-full text-sm" data-testid="annualised-table">
-              <thead>
-                <tr className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold border-b border-slate-200">
-                  <th className="text-left px-2 py-2.5">Age</th>
-                  <th className="text-left px-2 py-2.5">Phase</th>
-                  <th className="text-right px-2 py-2.5">Opening</th>
-                  <th className="text-right px-2 py-2.5">Contribs</th>
-                  <th className="text-right px-2 py-2.5">Net return</th>
-                  <th className="text-right px-2 py-2.5">Fees</th>
-                  <th className="text-right px-2 py-2.5">Withdraw</th>
-                  <th className="text-right px-2 py-2.5">Closing</th>
-                </tr>
-              </thead>
-              <tbody>
-                {computed.annualisedTable.map((row, i) => (
-                  <tr key={i} className={`border-b border-slate-100 hover:bg-slate-50/60 transition-colors ${row.phase === "Drawdown" ? "bg-[#D4A84C]/[0.02]" : ""}`} data-testid={`annualised-row-${i}`}>
-                    <td className="px-2 py-2 font-mono text-[#1a2744]">{row.age}</td>
-                    <td className="px-2 py-2 text-slate-600">
-                      <span className={`text-[10px] tracking-wide uppercase font-semibold ${row.phase === "Accumulation" ? "text-[#1a2744]" : "text-[#8a6c1a]"}`}>{row.phase}</span>
-                    </td>
-                    <td className="px-2 py-2 font-mono text-[#1a2744] text-right">{fmtCompact(row.opening)}</td>
-                    <td className="px-2 py-2 font-mono text-[#1a2744] text-right">{row.contribs ? fmtCompact(row.contribs) : "—"}</td>
-                    <td className="px-2 py-2 font-mono text-[#1a2744] text-right">{fmtCompact(row.netReturn)}</td>
-                    <td className="px-2 py-2 font-mono text-slate-500 text-right">−{fmtCompact(row.fees)}</td>
-                    <td className="px-2 py-2 font-mono text-slate-500 text-right">{row.withdraw ? `−${fmtCompact(row.withdraw)}` : "—"}</td>
-                    <td className="px-2 py-2 font-mono text-[#1a2744] text-right font-semibold">{fmtCompact(row.closing)}</td>
+          {showAnnualised
+            ? <ChevronUp className="h-4 w-4 text-slate-400 flex-shrink-0" />
+            : <ChevronDown className="h-4 w-4 text-slate-400 flex-shrink-0" />}
+        </button>
+        {showAnnualised && (
+          <div className="px-5 pb-5 -mt-1 border-t border-slate-100 pt-4">
+            <div className="overflow-x-auto -mx-2">
+              <table className="w-full text-sm" data-testid="annualised-table">
+                <thead>
+                  <tr className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold border-b border-slate-200">
+                    <th className="text-left px-2 py-2.5">Age</th>
+                    <th className="text-left px-2 py-2.5">Phase</th>
+                    <th className="text-right px-2 py-2.5">Opening</th>
+                    <th className="text-right px-2 py-2.5">Contribs</th>
+                    <th className="text-right px-2 py-2.5">Net return</th>
+                    <th className="text-right px-2 py-2.5">Fees</th>
+                    <th className="text-right px-2 py-2.5">Withdraw</th>
+                    <th className="text-right px-2 py-2.5">Closing</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {computed.annualisedTable.map((row, i) => (
+                    <tr key={i} className={`border-b border-slate-100 hover:bg-slate-50/60 transition-colors ${row.phase === "Drawdown" ? "bg-[#D4A84C]/[0.02]" : ""}`} data-testid={`annualised-row-${i}`}>
+                      <td className="px-2 py-2 font-mono text-[#1a2744]">{row.age}</td>
+                      <td className="px-2 py-2 text-slate-600">
+                        <span className={`text-[10px] tracking-wide uppercase font-semibold ${row.phase === "Accumulation" ? "text-[#1a2744]" : "text-[#8a6c1a]"}`}>{row.phase}</span>
+                      </td>
+                      <td className="px-2 py-2 font-mono text-[#1a2744] text-right">{fmtCompact(row.opening)}</td>
+                      <td className="px-2 py-2 font-mono text-[#1a2744] text-right">{row.contribs ? fmtCompact(row.contribs) : "—"}</td>
+                      <td className="px-2 py-2 font-mono text-[#1a2744] text-right">{fmtCompact(row.netReturn)}</td>
+                      <td className="px-2 py-2 font-mono text-slate-500 text-right">−{fmtCompact(row.fees)}</td>
+                      <td className="px-2 py-2 font-mono text-slate-500 text-right">{row.withdraw ? `−${fmtCompact(row.withdraw)}` : "—"}</td>
+                      <td className="px-2 py-2 font-mono text-[#1a2744] text-right font-semibold">{fmtCompact(row.closing)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </CardContent>
+        )}
       </Card>
     </div>
   );
