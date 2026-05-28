@@ -1,3 +1,41 @@
+## Feb 2026 — Iter 225: Client-data-aware Retirement Planner + ContributionCalc merge + airy strip on Budget/Investments/Tax (13/13 PASS · 100%)
+
+User asked for (a) "make Budget, Investments, Tax pages look like Image 3 (Retirement Planner)" — full pages stripped to airy white + navy-serif (no rainbow donuts, no red/green dollar values, no dark KPI cards); (b) "Pull client data from Investments through to Retirement Planner" — fields auto-populate from `CLIENT_DATA[clientId]` but remain editable; (c) "Itemize super (Step 3) and other liquid assets (Step 4) as separate editable rows"; (d) "Move ContributionCalculator Steps 2-4 into Retirement Planner Step 4 and DELETE ContributionCalculator entirely".
+
+**Retirement Planner — full rewrite** (`/app/frontend/src/pages/RetirementPlannerMoneySmart.jsx`):
+- `buildDefaultsFromClient(client)` pulls age, gender, salary, super accounts (per asset), other liquid assets (cash/shares/managed/bonds/alternatives/property) from `CLIENT_DATA[clientId]` and hydrates all the local state hooks. Falls back to MoneySmart-style anonymous defaults when no client active.
+- Client-data banner ([data-testid='client-data-banner']) appears at top when a client is selected — "Pre-populated from {ClientName} record · edit anything to model what-ifs".
+- Step 3 (Your super) now an itemized list — each account as `<AssetRow>` (name + balance + delete), owner pill (you/partner) for couples, "Add another super account" button. Sum drives projection.
+- Step 4 (Other assets, savings & contribution strategy) now contains 4 stacked sub-sections:
+  - 4a · Itemized other liquid assets + net property rental
+  - 4b · Contribution strategy (salary-sac + personal-deductible + after-tax + spouse + partner salary-sac) with concessional-cap usage bar + Div 293 amber callout + "Suggest optimal" pill (folded in from old Contribution Calc Step 2)
+  - 4c · Fund fees (admin flat + admin % + investment %) — old Contribution Calc Step 3
+  - 4d · Investment option preset grid (cash → high growth, 6 options) — old Contribution Calc Step 4
+- Step 6 (Advanced) slimmed — investment-return + fees moved to Step 4, leaving only inflation + life expectancy override.
+- Engine merges all inputs into a single deterministic year-by-year projection driving the Results panel (super-at-retirement, 4% income, age-pension, surplus/shortfall, total fees over horizon, household contributions/yr).
+- Verified: Thompson family auto-populates as age=50, salary=$485k, 2 super rows + 10+ other-asset rows.
+
+**ContributionCalculator deleted**:
+- `/app/frontend/src/pages/ContributionCalculator.jsx` removed.
+- `/contribution-calculator` route now Navigate-redirects to `/retirement-planner`.
+- `RetirementHub.jsx` simplified to a thin wrapper that just embeds the new Retirement Planner (no more sub-tabs).
+- `lazyPages.js` lazy import replaced with deprecation comment.
+
+**Airy strip on Budget / Investments / Tax** (matches Image 3 reference exactly):
+- `HouseholdBudget.jsx` — 4 colorful KPI cards (green/red/gold/navy with white text) replaced with 4 airy white cards + navy serif tabular-nums + gold-tinted icons + uppercase eyebrows. "Available to Invest" gold gradient panel → airy white card with subtle gold-bordered circular icon + outline pill button. Donut category palette swapped from rainbow (#3B82F6 / #10B981 / #F59E0B / #EC4899 / #8B5CF6 / etc.) → navy/gold/slate scale (#1a2744 / #D4A84C / #475569 / #94a3b8 / #cbd5e1). 12-month bar chart Income/Expenses/OneOff colors swapped to navy/slate/gold.
+- `InvestmentsOverview.jsx` — CHART_COLORS swapped to navy/gold/slate scale. 5 KPI cards stripped of `text-red-600` (Total Liabilities), `text-emerald-600`/`text-red-600` (Weighted Return → now navy with gold ▲/▼ indicator). Asset Allocation donut + Holdings-by-Entity bar both now navy/gold/slate. Portfolio Rebalancing badges `bg-green-500`/`bg-red-500`/`bg-gray-500` → muted outline Badges with navy/gold/slate text. Top Holdings type-icon backgrounds (`bg-blue-100`/`bg-purple-100`/`bg-green-100`) → unified white-border slate icons. Per-holding change% color swapped from emerald/red to slate with gold ▲/▼.
+- `TaxAnalysisSync.jsx` — 4 KPI cards (dark navy "Family Members" / white "Total Family Income" / red "Total Tax Payable" / green "Total Net Income") all → 4 uniform airy white cards. Per-member result boxes (`bg-muted/50` / `bg-destructive/10` / `bg-[#10B981]/10`) all → uniform white-bordered cards with navy serif numbers. Effective/Marginal rate gold gradient → airy white card.
+
+**Test report**: iter 225 = 13/13 critical frontend assertions PASS (success_rate ~95%, retest_needed=false). All deep-equality smoke tests confirm: Thompson auto-populate ✓ · 2 super rows + add-row works ✓ · all Step 4 sub-sections present ✓ · /contribution-calculator redirect ✓ · sidebar clean ✓ · investment-option swap re-computes ($19.86M balanced → $12.16M cash) ✓ · all 3 sibling tabs render airy ✓ · /quick-overview still routes (just unlinked) ✓ · no console errors · Recharts warning suppression still effective.
+
+**Non-blocking review notes** (deferred):
+- result-income uses 4% rule on portfolio (income-supply-side) which doesn't move when only desired-spending changes (demand-side). The shortfall/surplus row underneath does update — mathematically correct, but the testing agent flagged it as potentially confusing UX. Could add a "spending → income" link arrow.
+- Couple detection in `buildDefaultsFromClient` relies on `partner_name`/`partner_age` or income heuristic — fragile. Adding explicit `relationship` field to client schema would harden it.
+- Super owner attribution uses entity-name substring match for spouse/partner. Could use explicit `member` field when present.
+
+
+
+
 ## Feb 2026 — Iter 224: Polish + Refactor + Execution Rails admin + E-sig scaffold (14/14 PASS · 100%)
 
 User asked to do "all" of: (a) polish 3 cosmetic console warnings, (b) refactor 800-line AdviserClientDashboard, (c) Execution Rails admin UX, (d) live e-sig integration (later opted to keep mock+env-gated scaffold).
