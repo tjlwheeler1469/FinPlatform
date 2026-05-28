@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { TrendingUp, TrendingDown, Sparkles, Target, Sliders } from "lucide-react";
+import { Sparkles, Target, Sliders } from "lucide-react";
 import { CLIENT_DATA, getActiveClientId } from "@/data/clientData";
 import { whatMovesTheNeedle } from "@/engine/retirementReadinessEngine";
 import { computeReadinessCached } from "@/engine/readinessCache";
@@ -57,33 +57,33 @@ const ClientHome = () => {
         {/* The 4 things that matter — everything else is noise */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           {/* 1 — Score */}
-          <Card className="bg-gradient-to-br from-[#0f1d35] to-[#1a2744] text-white border-0">
+          <Card className="border-slate-200">
             <CardContent className="p-6 flex items-center gap-6">
               <ReadinessDial score={baseline.score} size={160} testId="home-score-dial" />
               <div className="flex-1">
-                <p className="text-xs uppercase tracking-wider text-white/60">Retirement Readiness</p>
-                <p className="text-4xl font-bold mt-1">{baseline.score}<span className="text-white/40 text-lg">/100</span></p>
-                <p className="text-sm text-white/80 mt-2">You're <span className="font-bold">{baseline.classification.label}</span> for retirement at age {client.retirement?.retirement_age}.</p>
+                <p className="text-[10px] tracking-[0.18em] uppercase text-slate-500 font-semibold">Retirement readiness</p>
+                <p className="font-serif text-4xl text-[#1a2744] mt-1 tabular-nums">{baseline.score}<span className="text-slate-400 text-lg font-sans font-normal">/100</span></p>
+                <p className="text-sm text-slate-600 mt-2">You're <span className="font-semibold text-[#1a2744]">{baseline.classification.label}</span> for retirement at age {client.retirement?.retirement_age}.</p>
               </div>
             </CardContent>
           </Card>
 
           {/* 2 — Future Income · 3 — Gap */}
           <div className="grid grid-cols-1 gap-5">
-            <Card data-testid="home-future-income">
+            <Card data-testid="home-future-income" className="border-slate-200">
               <CardContent className="p-5">
-                <p className="text-xs uppercase tracking-wider text-muted-foreground">Future Income (real, /year)</p>
-                <p className="text-4xl font-bold text-emerald-700 mt-1 tabular-nums">{fmt(baseline.outcome.sustainableIncome)}</p>
-                <p className="text-xs text-muted-foreground mt-1">Against a target of {fmt(client.retirement?.retirement_spending || 0)}/yr.</p>
+                <p className="text-[10px] tracking-[0.18em] uppercase text-slate-500 font-semibold">Future income (real, /year)</p>
+                <p className="font-serif text-4xl text-[#1a2744] mt-1 tabular-nums">{fmt(baseline.outcome.sustainableIncome)}</p>
+                <p className="text-[11px] text-slate-500 mt-1">Against a target of {fmt(client.retirement?.retirement_spending || 0)}/yr.</p>
               </CardContent>
             </Card>
-            <Card data-testid="home-gap" className={baseline.outcome.fundingGap > 0 ? "border-amber-300" : "border-emerald-300"}>
+            <Card data-testid="home-gap" className="border-slate-200">
               <CardContent className="p-5">
-                <p className="text-xs uppercase tracking-wider text-muted-foreground">Funding Gap</p>
-                <p className={`text-4xl font-bold mt-1 tabular-nums ${baseline.outcome.fundingGap > 0 ? "text-amber-700" : "text-emerald-700"}`}>
+                <p className="text-[10px] tracking-[0.18em] uppercase text-slate-500 font-semibold">Funding gap</p>
+                <p className="font-serif text-4xl text-[#1a2744] mt-1 tabular-nums">
                   {baseline.outcome.fundingGap > 0 ? fmt(baseline.outcome.fundingGap) : "Fully funded"}
                 </p>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-[11px] text-slate-500 mt-1">
                   {baseline.outcome.fundingGap > 0
                     ? `You'd need roughly ${fmt(baseline.inputs.requiredCapital)} to fully fund spend — gap shown is the shortfall today.`
                     : "You're on track to fund your target spend under the 4% rule."}
@@ -95,19 +95,19 @@ const ClientHome = () => {
 
         {/* 4 — Next Best Action */}
         {nextBest && (
-          <Card className="border-[#D4A84C]/40 bg-[#D4A84C]/5" data-testid="home-next-action">
+          <Card className="border-[#D4A84C]/40 bg-white" data-testid="home-next-action">
             <CardContent className="p-5 flex items-start gap-4">
-              <div className="w-10 h-10 rounded-full bg-[#D4A84C]/20 flex items-center justify-center flex-shrink-0">
-                <Target className="h-5 w-5 text-[#7a5d1f]" />
+              <div className="w-10 h-10 rounded-full border border-[#D4A84C]/40 bg-white flex items-center justify-center flex-shrink-0">
+                <Target className="h-4 w-4 text-[#D4A84C]" strokeWidth={1.5} />
               </div>
               <div className="flex-1">
-                <p className="text-xs uppercase tracking-wider text-[#7a5d1f]">Next Best Action</p>
-                <h3 className="text-lg font-semibold text-[#1a2744] mt-0.5">{nextBest.label}</h3>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Projected readiness after change: <span className="font-bold text-emerald-700">{nextBest.score}</span> ({nextBest.uplift >= 0 ? "+" : ""}{nextBest.uplift} pts)
+                <p className="text-[10px] tracking-[0.18em] uppercase text-[#8a6c1a] font-semibold">Next best action</p>
+                <h3 className="font-serif text-lg text-[#1a2744] mt-0.5">{nextBest.label}</h3>
+                <p className="text-[11px] text-slate-500 mt-1">
+                  Projected readiness after change: <span className="font-mono text-[#1a2744] font-semibold">{nextBest.score}</span> ({nextBest.uplift >= 0 ? "+" : ""}{nextBest.uplift} pts)
                 </p>
               </div>
-              <Button size="sm" className="bg-[#1a2744] hover:bg-[#0f1d35]" onClick={() => window.location.assign("/client-portal?tab=msgs")} data-testid="home-discuss-btn">
+              <Button size="sm" variant="outline" className="border-[#1a2744] text-[#1a2744] hover:bg-[#1a2744] hover:text-white rounded-full" onClick={() => window.location.assign("/client-portal?tab=msgs")} data-testid="home-discuss-btn">
                 Discuss with adviser
               </Button>
             </CardContent>
@@ -115,35 +115,35 @@ const ClientHome = () => {
         )}
 
         {/* What if tool — live recalc */}
-        <Card data-testid="home-whatif">
+        <Card data-testid="home-whatif" className="border-slate-200">
           <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base"><Sliders className="h-4 w-4 text-[#D4A84C]" /> What if…</CardTitle>
+            <CardTitle className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold flex items-center gap-2"><Sliders className="h-3.5 w-3.5 text-[#D4A84C]" strokeWidth={1.5} /> What if…</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="space-y-4">
                 <div>
-                  <div className="flex justify-between mb-1.5"><Label>Retire at age</Label><span className="font-semibold tabular-nums">{retireAge}</span></div>
+                  <div className="flex justify-between mb-1.5"><Label className="text-[11px] tracking-wide text-slate-600">Retire at age</Label><span className="font-mono text-sm text-[#1a2744] tabular-nums">{retireAge}</span></div>
                   <Slider value={[retireAge]} min={55} max={75} step={1} onValueChange={(v) => setRetireAge(v[0])} data-testid="home-slider-age" />
                 </div>
                 <div>
-                  <div className="flex justify-between mb-1.5"><Label>Contribute /year</Label><span className="font-semibold tabular-nums">{fmt(contrib)}</span></div>
+                  <div className="flex justify-between mb-1.5"><Label className="text-[11px] tracking-wide text-slate-600">Contribute /year</Label><span className="font-mono text-sm text-[#1a2744] tabular-nums">{fmt(contrib)}</span></div>
                   <Slider value={[contrib]} min={0} max={60000} step={1000} onValueChange={(v) => setContrib(v[0])} data-testid="home-slider-contrib" />
                 </div>
               </div>
-              <div className="flex flex-col items-center justify-center p-4 bg-muted/40 rounded-lg">
-                <p className="text-xs uppercase tracking-wider text-muted-foreground">New score</p>
+              <div className="flex flex-col items-center justify-center p-4 border border-slate-200 rounded-lg bg-white">
+                <p className="text-[10px] tracking-[0.18em] uppercase text-slate-500 font-semibold">New score</p>
                 <ReadinessDial score={scenario.score} size={140} testId="home-scenario-dial" />
-                <div className={`mt-2 flex items-center gap-1 font-bold text-sm ${delta >= 0 ? "text-emerald-600" : "text-rose-600"}`}>
-                  {delta >= 0 ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
+                <div className="mt-2 flex items-center gap-1 font-mono text-sm text-[#1a2744]">
+                  <span className="text-[#D4A84C]">{delta >= 0 ? "▲" : "▼"}</span>
                   <NumberRoll
                     value={delta}
                     format={(v) => (v >= 0 ? "+" : "") + Math.round(v) + " pts vs today"}
                     testId="home-delta-roll"
                   />
                 </div>
-                <p className="text-[11px] text-muted-foreground mt-2">
-                  New income: <NumberRoll value={scenario.outcome.sustainableIncome} format={fmt} className="font-semibold text-emerald-700" testId="home-income-roll" />/yr
+                <p className="text-[11px] text-slate-500 mt-2">
+                  New income: <NumberRoll value={scenario.outcome.sustainableIncome} format={fmt} className="font-mono font-semibold text-[#1a2744]" testId="home-income-roll" />/yr
                 </p>
               </div>
             </div>
@@ -151,11 +151,11 @@ const ClientHome = () => {
         </Card>
 
         {/* Footer */}
-        <Card className="border-muted">
+        <Card className="border-slate-200">
           <CardContent className="p-4 flex items-center gap-3">
-            <Sparkles className="h-4 w-4 text-[#D4A84C] flex-shrink-0" />
-            <p className="text-xs text-muted-foreground flex-1">
-              Want the full readiness view on your phone? <a href="/client-readiness" className="font-semibold text-[#1a2744] hover:underline" data-testid="home-open-mobile-portal">Open mobile portal</a> · for investments & goals use your <a href="/client-portal" className="font-semibold text-[#1a2744] hover:underline">dashboard</a>.
+            <Sparkles className="h-3.5 w-3.5 text-[#D4A84C] flex-shrink-0" strokeWidth={1.5} />
+            <p className="text-[11px] text-slate-500 flex-1">
+              Want the full readiness view on your phone? <a href="/client-readiness" className="font-semibold text-[#1a2744] hover:underline" data-testid="home-open-mobile-portal">Open mobile portal</a> · for investments &amp; goals use your <a href="/client-portal" className="font-semibold text-[#1a2744] hover:underline">dashboard</a>.
             </p>
           </CardContent>
         </Card>

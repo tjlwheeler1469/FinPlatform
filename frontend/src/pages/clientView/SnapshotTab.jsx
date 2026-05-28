@@ -49,9 +49,9 @@ const SnapshotTab = ({ client }) => {
   }, [client]);
 
   const alData = [
-    { name: "Assets", value: totalAssets, color: "#10b981" },
-    { name: "Debt", value: totalLiab, color: "#ef4444" },
-    { name: "Net Worth", value: netWorth, color: "#1a2744" },
+    { name: "Assets", value: totalAssets, color: "#1a2744" },
+    { name: "Debt", value: totalLiab, color: "#94a3b8" },
+    { name: "Net Worth", value: netWorth, color: "#D4A84C" },
   ];
 
   return (
@@ -84,7 +84,7 @@ const SnapshotTab = ({ client }) => {
                 </AreaChart>
               </ResponsiveContainer>
             </div>
-            <p className="text-[11px] text-slate-500 mt-1"><span className="text-emerald-600 font-semibold">+{(((netWorth - netWorthTrend[0].value) / netWorthTrend[0].value) * 100).toFixed(1)}%</span> this year</p>
+            <p className="text-[11px] text-slate-500 mt-1"><span className="text-[#1a2744] font-semibold tabular-nums">+{(((netWorth - netWorthTrend[0].value) / netWorthTrend[0].value) * 100).toFixed(1)}%</span> this year</p>
           </CardContent>
         </Card>
       </div>
@@ -125,8 +125,8 @@ const SnapshotTab = ({ client }) => {
                   <YAxis tick={{ fontSize: 10, fill: "#64748b" }} tickFormatter={(v) => `$${Math.round(v/1000)}k`} width={50} axisLine={false} tickLine={false} />
                   <Tooltip formatter={(v) => fmt(v)} />
                   <Legend iconSize={10} wrapperStyle={{ fontSize: 10 }} />
-                  <Bar dataKey="income" fill="#10b981" radius={[4, 4, 0, 0]} name="Income" />
-                  <Bar dataKey="expenses" fill="#ef4444" radius={[4, 4, 0, 0]} name="Expenses" />
+                  <Bar dataKey="income" fill="#1a2744" radius={[4, 4, 0, 0]} name="Income" />
+                  <Bar dataKey="expenses" fill="#94a3b8" radius={[4, 4, 0, 0]} name="Expenses" />
                 </BarChart>
               </ResponsiveContainer>
             </div>

@@ -186,21 +186,36 @@ const buildDefaultsFromClient = (client) => {
       superAccounts: [{ id: "default-super", name: "Your super", value: 180000, owner: "you" }],
       otherAssets: [{ id: "default-cash", name: "Savings", value: 50000, type: "Cash" }],
       taxableIncome: 95000,
+      annualSpending: 0,
     };
   }
   const prof = client.profile || {};
   const ret  = client.retirement || {};
   const assets = client.assets || [];
+  const budget = client.budget || {};
 
-  // Itemize super into separate rows preserving entity for spouse detection.
+  // EXPLICIT relationship field — falls back to legacy heuristic only when missing.
+  const isCouple = prof.relationship
+    ? prof.relationship === "couple"
+    : !!prof.partner_first_name || !!prof.partner_age;
+
+  // Itemize super into separate rows. Honour the explicit `member` field when
+  // present (preferred) — fall back to entity-name substring heuristic otherwise.
   const superAssets = assets.filter((a) => a.type === "Super" || a.type === "SMSF");
   const superAccounts = superAssets.length > 0
-    ? superAssets.map((a, i) => ({
-        id: `${a.name || "super"}-${i}`,
-        name: a.name || a.type || "Super account",
-        value: a.value || 0,
-        owner: (a.entity || "").toLowerCase().includes("spouse") || (a.entity || "").toLowerCase().includes("partner") ? "partner" : "you",
-      }))
+    ? superAssets.map((a, i) => {
+        let owner = a.member;
+        if (!owner) {
+          const ent = (a.entity || "").toLowerCase();
+          owner = ent.includes("spouse") || ent.includes("partner") ? "partner" : "you";
+        }
+        return {
+          id: `${a.name || "super"}-${i}`,
+          name: a.name || a.type || "Super account",
+          value: a.value || 0,
+          owner,
+        };
+      })
     : [{ id: "client-super-default", name: `${prof.first_name || "Client"} super`, value: 0, owner: "you" }];
 
   // Itemize non-super liquid assets (excludes principal home for Age Pension assets test).
@@ -218,22 +233,32 @@ const buildDefaultsFromClient = (client) => {
     otherAssets.push({ id: "default-cash", name: "Savings", value: 0, type: "Cash" });
   }
 
-  // Couple detection — household income heuristic + partner age presence.
-  const isCouple = !!prof.partner_name || !!prof.partner_age || (prof.incomeHousehold && prof.personal_income && prof.incomeHousehold > prof.personal_income);
+  // ----- Budget integration -----
+  // Salary auto-syncs to (Budget.monthlyIncome × 12) when budget is present, else
+  // falls back to personal_income or split household income.
+  const annualIncomeFromBudget = budget.monthlyIncome ? Math.round(budget.monthlyIncome * 12) : null;
+  const yourSalary = prof.personal_income || annualIncomeFromBudget || prof.incomeHousehold || 95000;
+  const partnerSalary = isCouple ? (prof.partner_income || Math.round((prof.incomeHousehold || 0) - (prof.personal_income || 0)) || 0) : 0;
+
+  // Annual spending auto-syncs to (Budget.monthlyExpenses × 12) when present, else
+  // falls back to retirement.retirement_spending or expensesAnnual.
+  const annualSpendingFromBudget = budget.monthlyExpenses ? Math.round(budget.monthlyExpenses * 12) : null;
+  const annualSpending = ret.retirement_spending || annualSpendingFromBudget || prof.expensesAnnual || 0;
 
   return {
     relationship: isCouple ? "couple" : "single",
     yourAge: prof.age || ret.current_age || 50,
     yourGender: (prof.gender || "male").toLowerCase().startsWith("f") ? "female" : "male",
-    retireAge: ret.retirement_age || prof.retirement_age || 67,
+    retireAge: ret.retirement_age || prof.retirement_age || prof.retirementAge || 67,
     homeowner: prof.homeowner !== false,
     partnerAge: prof.partner_age || (prof.age ? prof.age - 2 : 48),
     partnerGender: (prof.partner_gender || "female").toLowerCase().startsWith("m") ? "male" : "female",
-    yourSalary: prof.personal_income || Math.round((prof.incomeHousehold || 0) / (isCouple ? 1.6 : 1)) || 95000,
-    partnerSalary: prof.partner_income || Math.round((prof.incomeHousehold || 0) - (prof.personal_income || 0)) || 0,
+    yourSalary,
+    partnerSalary,
     superAccounts,
     otherAssets,
-    taxableIncome: prof.personal_income || prof.incomeHousehold || 0,
+    taxableIncome: prof.personal_income || yourSalary,
+    annualSpending,
   };
 };
 
@@ -280,13 +305,7 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
   const [propertyRental, setPropertyRental] = useState(0);
 
   // ============ Step 5 — Spending ============
-  const [annualSpending, setAnnualSpending] = useState(0);
-  useEffect(() => {
-    if (annualSpending === 0) {
-      setAnnualSpending(relationship === "couple" ? ASFA.couple_comfortable : ASFA.single_comfortable);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const [annualSpending, setAnnualSpending] = useState(defaults.annualSpending || (defaults.relationship === "couple" ? ASFA.couple_comfortable : ASFA.single_comfortable));
 
   // ============ Step 6 — Advanced (collapsible) ============
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -398,6 +417,67 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
     const sustainableFromSuper = sim.portfolioAtRetirement * 0.04;
     const projectedIncome = sustainableFromSuper + agePensionAnnual;
     const shortfall = annualSpending - projectedIncome;
+    // Headline number — what the household can ACTUALLY spend each year. This
+    // ties spending → result so the headline visibly responds when the user
+    // drags the desired-spending slider down: if they ask for less than what
+    // their portfolio can produce, the headline drops to the asked-for level.
+    const achievableSpending = Math.min(projectedIncome, annualSpending);
+    const fundingStatus = shortfall <= 0 ? "fully_funded" : shortfall < annualSpending * 0.15 ? "minor_gap" : "underfunded";
+
+    // ------------------------------------------------------------------
+    // Annualised year-by-year projection table (accumulation phase only).
+    // Each row covers one full year: starting balance → returns + contribs
+    // → fees → ending balance. Drawdown phase (post-retirement) appended
+    // below with negative net flow.
+    // ------------------------------------------------------------------
+    const annualisedTable = [];
+    {
+      let bal = householdLiquidAssets;
+      for (let i = 0; i < yearsToRetirement; i++) {
+        const ageNow = yourAge + i;
+        const opening = bal;
+        const grossReturn = bal * nominalReturn;
+        const feesPaid = adminFeeDollar + bal * (totalFeesPct / 100);
+        const netReturn$ = grossReturn - feesPaid;
+        const contribs = annualGrossContrib + propertyRental - (div293Applicable ? div293Cost : 0);
+        const closing = Math.max(0, opening + netReturn$ + contribs);
+        annualisedTable.push({
+          age: ageNow,
+          phase: "Accumulation",
+          opening: Math.round(opening),
+          contribs: Math.round(contribs),
+          returnPct: nominalReturn * 100,
+          netReturn: Math.round(netReturn$),
+          fees: Math.round(feesPaid),
+          withdraw: 0,
+          closing: Math.round(closing),
+        });
+        bal = closing;
+      }
+      // Drawdown phase — uses the achievable spending (incl. age pension)
+      for (let i = 0; i < Math.min(yearsInRetirement, 25); i++) {
+        const ageNow = retireAge + i;
+        const opening = bal;
+        const grossReturn = bal * nominalReturn;
+        const feesPaid = adminFeeDollar + bal * (totalFeesPct / 100);
+        const netReturn$ = grossReturn - feesPaid;
+        const withdrawNet = Math.max(0, annualSpending - agePensionAnnual);
+        const closing = Math.max(0, opening + netReturn$ - withdrawNet);
+        annualisedTable.push({
+          age: ageNow,
+          phase: "Drawdown",
+          opening: Math.round(opening),
+          contribs: 0,
+          returnPct: nominalReturn * 100,
+          netReturn: Math.round(netReturn$),
+          fees: Math.round(feesPaid),
+          withdraw: Math.round(withdrawNet),
+          closing: Math.round(closing),
+        });
+        bal = closing;
+        if (bal <= 0) break;
+      }
+    }
 
     return {
       isCouple,
@@ -413,6 +493,7 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
       projection,
       sim, chartData: sim.trajectory.map((t) => ({ year: yourAge + t.year, median: Math.round(t.p50), low: Math.round(t.p10), high: Math.round(t.p90) })),
       agePensionAnnual, sustainableFromSuper, projectedIncome, shortfall,
+      achievableSpending, fundingStatus, annualisedTable,
     };
   }, [
     relationship, yourAge, yourGender, retireAge,
@@ -442,21 +523,53 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
   // Render
   // -----------------------------------------------------------
   const body = (
-    <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6" data-testid="retirement-planner-page">
-      {/* ===== Left: Input sections ===== */}
-      <div className="space-y-5">
+    <div className="space-y-5" data-testid="retirement-planner-page">
+      {/* ===== Top: KPI summary strip — Investments-style ===== */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3" data-testid="planner-kpi-strip">
+        <Card className="border-slate-200">
+          <CardContent className="p-4">
+            <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Achievable spending</p>
+            <p className="font-serif text-xl text-[#1a2744] mt-1.5 tabular-nums" data-testid="result-income">{fmtCompact(computed.achievableSpending)}</p>
+            <p className="text-[10px] text-slate-500 mt-1 font-mono">per year · {computed.fundingStatus === "fully_funded" ? "fully funded" : computed.fundingStatus === "minor_gap" ? "minor gap" : "underfunded"}</p>
+          </CardContent>
+        </Card>
+        <Card className="border-slate-200">
+          <CardContent className="p-4">
+            <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Desired spending</p>
+            <p className="font-serif text-xl text-[#1a2744] mt-1.5 tabular-nums" data-testid="result-desired-spending">{fmtCompact(annualSpending)}</p>
+            <p className="text-[10px] text-slate-500 mt-1 font-mono">your target</p>
+          </CardContent>
+        </Card>
+        <Card className="border-slate-200">
+          <CardContent className="p-4">
+            <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">{computed.shortfall > 0 ? "Annual shortfall" : "Annual surplus"}</p>
+            <p className={`font-serif text-xl mt-1.5 tabular-nums ${computed.shortfall > 0 ? "text-rose-600" : "text-[#1a2744]"}`} data-testid="result-gap">
+              {computed.shortfall > 0 ? "−" : "+"}{fmtCompact(Math.abs(computed.shortfall))}
+            </p>
+            <p className="text-[10px] text-slate-500 mt-1 font-mono">{confidence}% confidence</p>
+          </CardContent>
+        </Card>
+        <Card className="border-slate-200">
+          <CardContent className="p-4">
+            <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Super at retirement</p>
+            <p className="font-serif text-xl text-[#1a2744] mt-1.5 tabular-nums" data-testid="result-super-at-retirement">{fmtCompact(computed.sim.portfolioAtRetirement)}</p>
+            <p className="text-[10px] text-slate-500 mt-1 font-mono">P90 {fmtCompact(computed.sim.p90AtLifeEnd)} · age {computed.yearsToRetirement + yourAge}</p>
+          </CardContent>
+        </Card>
+      </div>
 
-        {clientName && (
-          <div className="flex items-center gap-3 rounded-2xl border border-[#D4A84C]/40 bg-white p-4" data-testid="client-data-banner">
-            <Users className="h-4 w-4 text-[#D4A84C]" />
-            <div className="flex-1">
-              <p className="text-[10px] tracking-[0.18em] uppercase text-[#8a6c1a] font-semibold">Pre-populated from client record</p>
-              <p className="text-sm text-[#1a2744]">All fields below reflect the <span className="font-semibold">{clientName}</span> household. Edit anything to model what-ifs — the underlying client record is unchanged.</p>
-            </div>
+      {clientName && (
+        <div className="flex items-center gap-3 rounded-2xl border border-[#D4A84C]/40 bg-white p-4" data-testid="client-data-banner">
+          <Users className="h-4 w-4 text-[#D4A84C]" />
+          <div className="flex-1">
+            <p className="text-[10px] tracking-[0.18em] uppercase text-[#8a6c1a] font-semibold">Pre-populated from client record</p>
+            <p className="text-sm text-[#1a2744]">All fields below reflect the <span className="font-semibold">{clientName}</span> household — including their budgeted income and expenses. Edit anything to model what-ifs; the underlying record is unchanged.</p>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* ----- Step 1 — About you ----- */}
+      {/* ===== Questions: stacked top-down ===== */}
+      <div className="space-y-5">
         <section className={SECTION_CLASS} data-testid="section-about-you">
           <p className={EYEBROW}>Step 1</p>
           <h2 className={SECTION_HEAD}>About you</h2>
@@ -731,73 +844,120 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
         </p>
       </div>
 
-      {/* ===== Right: Sticky Results panel ===== */}
-      <aside className="lg:sticky lg:top-6 self-start" data-testid="results-panel">
-        <Card className="border-slate-200">
-          <CardContent className="p-6">
-            <p className={EYEBROW}>Result</p>
-            <h3 className="font-serif text-xl text-[#1a2744] leading-tight">Annual retirement income</h3>
-            <p className="font-serif text-4xl text-[#1a2744] mt-3 tabular-nums" data-testid="result-income">{fmtCompact(computed.projectedIncome)}</p>
-            <p className="text-[11px] text-slate-500 mt-1">
-              in today's dollars · {computed.isCouple ? "couple" : "single"} · {includeAgePension ? "incl. Age Pension" : "excl. Age Pension"}
-            </p>
-
-            <div className="mt-4 flex items-center gap-2 text-xs">
+      {/* ===== Bottom: Projection chart + annualised table — Investments-style stacked ===== */}
+      <Card className="border-slate-200" data-testid="results-panel">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between mb-1 flex-wrap gap-2">
+            <div>
+              <p className={EYEBROW}>Projection</p>
+              <h3 className="font-serif text-2xl text-[#1a2744] leading-tight">Portfolio trajectory</h3>
+              <p className="text-sm text-slate-500 mt-1">Monte Carlo · 500 simulations · {computed.isCouple ? "couple" : "single"} · {includeAgePension ? "incl. Age Pension" : "excl. Age Pension"}</p>
+            </div>
+            <div className="flex items-center gap-2 text-xs">
               <span className={`w-1.5 h-1.5 rounded-full ${isOnTrack ? "bg-emerald-500" : confidence >= 60 ? "bg-amber-500" : "bg-rose-500"}`} />
               <span className="font-mono text-[#1a2744]">{confidence}% confidence</span>
               <span className="text-slate-400">·</span>
               <span className="text-slate-500">{isOnTrack ? "On track" : confidence >= 60 ? "Monitor" : "At risk"}</span>
             </div>
+          </div>
 
-            <div className="h-[180px] mt-5 -mx-1" style={{ minWidth: 0 }}>
-              <ResponsiveContainer width="100%" height="100%" debounce={50} minHeight={180}>
-                <AreaChart data={computed.chartData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="bandHi" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#D4A84C" stopOpacity={0.25} />
-                      <stop offset="100%" stopColor="#D4A84C" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-                  <XAxis dataKey="year" tick={{ fontSize: 9, fill: "#64748b" }} axisLine={false} tickLine={false} />
-                  <YAxis tickFormatter={(v) => `$${(v / 1_000_000).toFixed(1)}M`} tick={{ fontSize: 9, fill: "#64748b" }} axisLine={false} tickLine={false} width={45} />
-                  <Tooltip formatter={(v) => fmt(v)} labelFormatter={(v) => `Age ${v}`} contentStyle={{ borderRadius: 8, border: "1px solid #e2e8f0", fontSize: 11 }} />
-                  <Area type="monotone" dataKey="high" stackId="band" stroke="none" fill="url(#bandHi)" />
-                  <Area type="monotone" dataKey="median" stroke="#1a2744" strokeWidth={2} fill="none" name="Median" />
-                  <ReferenceLine x={retireAge} stroke="#D4A84C" strokeDasharray="3 3" label={{ value: "Retire", position: "top", fill: "#D4A84C", fontSize: 9 }} />
-                </AreaChart>
-              </ResponsiveContainer>
+          {/* Chart */}
+          <div className="h-[280px] mt-5 -mx-1" style={{ minWidth: 0 }}>
+            <ResponsiveContainer width="100%" height="100%" debounce={50} minHeight={240}>
+              <AreaChart data={computed.chartData} margin={{ top: 4, right: 12, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="bandHi" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#D4A84C" stopOpacity={0.25} />
+                    <stop offset="100%" stopColor="#D4A84C" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                <XAxis dataKey="year" tick={{ fontSize: 10, fill: "#64748b" }} axisLine={false} tickLine={false} />
+                <YAxis tickFormatter={(v) => `$${(v / 1_000_000).toFixed(1)}M`} tick={{ fontSize: 10, fill: "#64748b" }} axisLine={false} tickLine={false} width={55} />
+                <Tooltip formatter={(v) => fmt(v)} labelFormatter={(v) => `Age ${v}`} contentStyle={{ borderRadius: 8, border: "1px solid #e2e8f0", fontSize: 11 }} />
+                <Area type="monotone" dataKey="high" stackId="band" stroke="none" fill="url(#bandHi)" />
+                <Area type="monotone" dataKey="median" stroke="#1a2744" strokeWidth={2} fill="none" name="Median" />
+                <ReferenceLine x={retireAge} stroke="#D4A84C" strokeDasharray="3 3" label={{ value: "Retire", position: "top", fill: "#D4A84C", fontSize: 10 }} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Side metrics under the chart — Investments KPI strip pattern */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-5 pt-5 border-t border-slate-100">
+            <div>
+              <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">From super (4%)</p>
+              <p className="font-serif text-base text-[#1a2744] mt-0.5 tabular-nums">{fmt(computed.sustainableFromSuper)}</p>
             </div>
-
-            <div className="space-y-2.5 mt-5 pt-4 border-t border-slate-100">
-              <div className="flex justify-between text-xs"><span className="text-slate-500">From super (4% rule)</span><span className="font-mono text-[#1a2744]">{fmt(computed.sustainableFromSuper)}</span></div>
-              <div className="flex justify-between text-xs"><span className="text-slate-500">From Age Pension</span><span className="font-mono text-[#1a2744]">{includeAgePension ? fmt(computed.agePensionAnnual) : "—"}</span></div>
-              <div className="flex justify-between text-xs pt-2 border-t border-slate-100"><span className="text-slate-600 font-medium">Desired spending</span><span className="font-mono text-[#1a2744]">{fmt(annualSpending)}</span></div>
-              <div className="flex justify-between text-xs"><span className="text-slate-500">{computed.shortfall > 0 ? "Shortfall" : "Surplus"}</span><span className={`font-mono ${computed.shortfall > 0 ? "text-rose-600" : "text-emerald-600"}`}>{computed.shortfall > 0 ? "−" : "+"}{fmt(Math.abs(computed.shortfall))}</span></div>
+            <div>
+              <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">From age pension</p>
+              <p className="font-serif text-base text-[#1a2744] mt-0.5 tabular-nums">{includeAgePension ? fmt(computed.agePensionAnnual) : "—"}</p>
             </div>
-
-            <div className="mt-5 pt-4 border-t border-slate-100">
-              <p className={EYEBROW}>Super at retirement (median)</p>
-              <p className="font-serif text-2xl text-[#1a2744] tabular-nums" data-testid="result-super-at-retirement">{fmtCompact(computed.sim.portfolioAtRetirement)}</p>
-              <p className="text-[10px] text-slate-400 mt-1">P10 → P90 band: {fmtCompact(computed.sim.p10AtLifeEnd)} → {fmtCompact(computed.sim.p90AtLifeEnd)} at age {computed.yourLifeExp}</p>
+            <div>
+              <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Household contribs / yr</p>
+              <p className="font-serif text-base text-[#1a2744] mt-0.5 tabular-nums">{fmt(computed.annualGrossContrib)}</p>
             </div>
-
-            <div className="mt-4 pt-4 border-t border-slate-100 space-y-1.5 text-[11px]">
-              <div className="flex justify-between"><span className="text-slate-500">Household contributions / yr</span><span className="font-mono text-[#1a2744]">{fmt(computed.annualGrossContrib)}</span></div>
-              <div className="flex justify-between"><span className="text-slate-500">Total fees over horizon (est.)</span><span className="font-mono text-[#1a2744]">{fmtCompact(computed.totalFeesPaid)}</span></div>
-              <div className="flex justify-between"><span className="text-slate-500">Investment option</span><span className="font-mono text-[#1a2744]">{computed.option.label} · {computed.option.nominal}%</span></div>
+            <div>
+              <p className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">Total fees est.</p>
+              <p className="font-serif text-base text-[#1a2744] mt-0.5 tabular-nums">{fmtCompact(computed.totalFeesPaid)}</p>
             </div>
+          </div>
 
-            {computed.shortfall > 0 && (
-              <div className="mt-5 flex items-start gap-2 text-[11px] text-amber-700 bg-amber-50/60 border border-amber-200 rounded-lg p-3">
-                <Info className="h-3.5 w-3.5 flex-shrink-0 mt-0.5" />
-                <span>To close the gap of <span className="font-mono">{fmtCompact(computed.shortfall)}</span>, try adding {fmtCompact(Math.round(computed.shortfall / 0.04 / Math.max(1, computed.yearsToRetirement)))}/yr more in contributions, or pushing retirement back 2-3 years.</span>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-        <p className="text-[10px] text-slate-400 text-center mt-3">Updates live as you change inputs · MoneySmart-aligned methodology</p>
-      </aside>
+          {computed.shortfall > 0 && (
+            <div className="mt-5 flex items-start gap-2 text-xs text-amber-700 bg-amber-50/60 border border-amber-200 rounded-lg p-3" data-testid="shortfall-hint">
+              <Info className="h-3.5 w-3.5 flex-shrink-0 mt-0.5" />
+              <span>To close the gap of <span className="font-mono">{fmtCompact(computed.shortfall)}</span>, try adding {fmtCompact(Math.round(computed.shortfall / 0.04 / Math.max(1, computed.yearsToRetirement)))}/yr more in contributions, or pushing retirement back 2-3 years.</span>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* ===== Annualised projection table ===== */}
+      <Card className="border-slate-200" data-testid="annualised-table-card">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+            <div>
+              <p className={EYEBROW}>Annualised</p>
+              <h3 className="font-serif text-2xl text-[#1a2744] leading-tight">Year-by-year projection</h3>
+              <p className="text-sm text-slate-500 mt-1">Deterministic accumulation → drawdown table. Excludes Age Pension cash-flow until drawdown.</p>
+            </div>
+            <span className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">
+              {computed.annualisedTable.length} years · option {computed.option.label}
+            </span>
+          </div>
+          <div className="overflow-x-auto -mx-2">
+            <table className="w-full text-sm" data-testid="annualised-table">
+              <thead>
+                <tr className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold border-b border-slate-200">
+                  <th className="text-left px-2 py-2.5">Age</th>
+                  <th className="text-left px-2 py-2.5">Phase</th>
+                  <th className="text-right px-2 py-2.5">Opening</th>
+                  <th className="text-right px-2 py-2.5">Contribs</th>
+                  <th className="text-right px-2 py-2.5">Net return</th>
+                  <th className="text-right px-2 py-2.5">Fees</th>
+                  <th className="text-right px-2 py-2.5">Withdraw</th>
+                  <th className="text-right px-2 py-2.5">Closing</th>
+                </tr>
+              </thead>
+              <tbody>
+                {computed.annualisedTable.map((row, i) => (
+                  <tr key={i} className={`border-b border-slate-100 hover:bg-slate-50/60 transition-colors ${row.phase === "Drawdown" ? "bg-[#D4A84C]/[0.02]" : ""}`} data-testid={`annualised-row-${i}`}>
+                    <td className="px-2 py-2 font-mono text-[#1a2744]">{row.age}</td>
+                    <td className="px-2 py-2 text-slate-600">
+                      <span className={`text-[10px] tracking-wide uppercase font-semibold ${row.phase === "Accumulation" ? "text-[#1a2744]" : "text-[#8a6c1a]"}`}>{row.phase}</span>
+                    </td>
+                    <td className="px-2 py-2 font-mono text-[#1a2744] text-right">{fmtCompact(row.opening)}</td>
+                    <td className="px-2 py-2 font-mono text-[#1a2744] text-right">{row.contribs ? fmtCompact(row.contribs) : "—"}</td>
+                    <td className="px-2 py-2 font-mono text-[#1a2744] text-right">{fmtCompact(row.netReturn)}</td>
+                    <td className="px-2 py-2 font-mono text-slate-500 text-right">−{fmtCompact(row.fees)}</td>
+                    <td className="px-2 py-2 font-mono text-slate-500 text-right">{row.withdraw ? `−${fmtCompact(row.withdraw)}` : "—"}</td>
+                    <td className="px-2 py-2 font-mono text-[#1a2744] text-right font-semibold">{fmtCompact(row.closing)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 
@@ -810,10 +970,10 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
         subtitle="Project your retirement income — your super accounts, the Age Pension, contribution strategy, fund fees, and any other savings — all in one MoneySmart-aligned flow. Edit any field and the results recalculate instantly."
         meta="MONEYSMART · METHODOLOGY ALIGNED"
         metrics={[
-          { label: "Annual income at retirement", value: fmtCompact(computed.projectedIncome) },
+          { label: "Achievable spending", value: fmtCompact(computed.achievableSpending) },
+          { label: "Desired spending", value: fmtCompact(annualSpending) },
           { label: "Confidence", value: `${confidence}%` },
           { label: "Years to retirement", value: String(computed.yearsToRetirement) },
-          { label: "Years in retirement", value: String(computed.yearsInRetirement) },
         ]}
       >
         {body}

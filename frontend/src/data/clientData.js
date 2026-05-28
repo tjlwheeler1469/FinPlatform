@@ -5,8 +5,8 @@
 export const CLIENT_DATA = {
   thompson_family: {
     assets: [
-      { id: 1, name: 'David - AustralianSuper (Balanced)', type: 'Super', entity: 'Super', value: 1850000, change: 8.2 },
-      { id: 2, name: 'Sarah - REST Super (Growth)', type: 'Super', entity: 'Super', value: 1420000, change: 7.8 },
+      { id: 1, name: 'David - AustralianSuper (Balanced)', type: 'Super', entity: 'Super', member: 'you', value: 1850000, change: 8.2 },
+      { id: 2, name: 'Sarah - REST Super (Growth)', type: 'Super', entity: 'Super', member: 'partner', value: 1420000, change: 7.8 },
       { id: 3, name: 'Family Home - Glen Waverley', type: 'Property', entity: 'Personal', value: 2850000, change: 4.1 },
       { id: 4, name: 'Investment Unit - Brunswick', type: 'Property', entity: 'Joint', value: 1280000, change: 3.8, purchaseDate: '2026-05-20', costBase: 620000 },
       { id: 5, name: 'Holiday House - Portsea', type: 'Property', entity: 'Joint', value: 1950000, change: 5.2 },
@@ -29,7 +29,7 @@ export const CLIENT_DATA = {
     ],
     profile: {
       user_id: 'thompson_family', name: 'David & Sarah Thompson', first_name: 'David', last_name: 'Thompson',
-      partner_first_name: 'Sarah', age: 50, retirementAge: 67, yearsToRetirement: 17,
+      partner_first_name: 'Sarah', relationship: 'couple', age: 50, partner_age: 48, retirementAge: 67, yearsToRetirement: 17,
       riskProfile: 'Balanced', incomeHousehold: 485000, expensesAnnual: 210000, children: 2, status: 'Married',
       email: 'david.thompson@email.com', phone: '0412 345 678', address: '18 Elm Street, Glen Waverley VIC 3150',
       advisor: 'Sarah Chen', occupation: 'IT Director', employer: 'NAB',
@@ -52,8 +52,8 @@ export const CLIENT_DATA = {
       { id: 2, name: 'Chen Family Trust - Global Equities', type: 'Trust Portfolio', entity: 'Trust', value: 3100000, change: 14.3 },
       { id: 3, name: 'Chen Family Trust - Fixed Income', type: 'Trust Portfolio', entity: 'Trust', value: 2800000, change: 5.4 },
       { id: 4, name: 'Chen Family Trust - Alternatives/PE', type: 'Trust Portfolio', entity: 'Trust', value: 1500000, change: 8.7 },
-      { id: 5, name: 'Michael - AMP Super (Aggressive)', type: 'Super', entity: 'Super', value: 2800000, change: 9.1 },
-      { id: 6, name: 'Lisa - Hostplus Super (Growth)', type: 'Super', entity: 'Super', value: 1950000, change: 8.5 },
+      { id: 5, name: 'Michael - AMP Super (Aggressive)', type: 'Super', entity: 'Super', member: 'you', value: 2800000, change: 9.1 },
+      { id: 6, name: 'Lisa - Hostplus Super (Growth)', type: 'Super', entity: 'Super', member: 'partner', value: 1950000, change: 8.5 },
       { id: 7, name: 'Family Home - Mosman', type: 'Property', entity: 'Personal', value: 5200000, change: 3.2 },
       { id: 8, name: 'Investment Apartment - Surry Hills', type: 'Property', entity: 'Trust', value: 1850000, change: 4.1, purchaseDate: '2026-06-10', costBase: 850000 },
       { id: 9, name: 'Cash Management Account', type: 'Cash', entity: 'Trust', value: 600000, change: 4.5 },
@@ -81,7 +81,7 @@ export const CLIENT_DATA = {
   },
   client_3: {
     assets: [
-      { id: 1, name: 'Robert - Colonial First State Super', type: 'Super', entity: 'Personal', value: 3200000, change: 2.3 },
+      { id: 1, name: 'Robert - Colonial First State Super', type: 'Super', entity: 'Personal', member: 'you', value: 3200000, change: 2.3 },
       { id: 2, name: 'Managed Portfolio - Macquarie Wrap', type: 'Managed Fund', entity: 'Personal', value: 2100000, change: 3.1 },
       { id: 3, name: 'Term Deposits - CBA (ladder)', type: 'Cash', entity: 'Personal', value: 1250000, change: 4.5 },
       { id: 4, name: 'Government Bonds (Aust)', type: 'Bonds', entity: 'Personal', value: 800000, change: 4.0 },
@@ -91,7 +91,7 @@ export const CLIENT_DATA = {
     liabilities: [],
     profile: {
       user_id: 'client_3', name: 'Robert Mitchell', first_name: 'Robert', last_name: 'Mitchell',
-      partner_first_name: '', age: 62, retirementAge: 65, yearsToRetirement: 3,
+      partner_first_name: '', relationship: 'single', age: 62, retirementAge: 65, yearsToRetirement: 3,
       riskProfile: 'Conservative', incomeHousehold: 520000, expensesAnnual: 240000, children: 0, status: 'Single',
       email: 'r.mitchell@company.com', phone: '0434 567 890', address: '15 Elizabeth Street, Sydney NSW 2000',
       advisor: 'Sarah Chen', occupation: 'CFO', employer: 'Mitchell & Associates',
@@ -108,8 +108,8 @@ export const CLIENT_DATA = {
   },
   client_4: {
     assets: [
-      { id: 1, name: 'Emma - Sunsuper (High Growth)', type: 'Super', entity: 'Super', value: 420000, change: 9.2 },
-      { id: 2, name: 'David W - AustralianSuper', type: 'Super', entity: 'Super', value: 510000, change: 8.8 },
+      { id: 1, name: 'Emma - Sunsuper (High Growth)', type: 'Super', entity: 'Super', member: 'you', value: 420000, change: 9.2 },
+      { id: 2, name: 'David W - AustralianSuper', type: 'Super', entity: 'Super', member: 'partner', value: 510000, change: 8.8 },
       { id: 3, name: 'Family Home - Fitzroy', type: 'Property', entity: 'Joint', value: 1850000, change: 3.5 },
       { id: 4, name: 'Investment Unit - Richmond', type: 'Property', entity: 'Joint', value: 920000, change: 4.1 },
       { id: 5, name: 'Savings Account - ING', type: 'Cash', entity: 'Joint', value: 85000, change: 4.2 },
@@ -121,7 +121,7 @@ export const CLIENT_DATA = {
     ],
     profile: {
       user_id: 'client_4', name: 'Emma & David Williams', first_name: 'Emma', last_name: 'Williams',
-      partner_first_name: 'David', age: 39, retirementAge: 67, yearsToRetirement: 28,
+      partner_first_name: 'David', relationship: 'couple', age: 39, partner_age: 41, retirementAge: 67, yearsToRetirement: 28,
       riskProfile: 'Growth', incomeHousehold: 310000, expensesAnnual: 165000, children: 1, status: 'Married',
       email: 'emma.williams@email.com', phone: '0445 678 901', address: '8 Rose Street, Fitzroy VIC 3065',
       advisor: 'Sarah Chen', occupation: 'Marketing Director', employer: 'Telstra',
@@ -137,8 +137,8 @@ export const CLIENT_DATA = {
   },
   client_5: {
     assets: [
-      { id: 1, name: 'Patel Family SMSF - Equities', type: 'SMSF', entity: 'Trust', value: 5800000, change: 6.7 },
-      { id: 2, name: 'Patel Family SMSF - Infrastructure', type: 'SMSF', entity: 'Trust', value: 2200000, change: 8.4 },
+      { id: 1, name: 'Patel Family SMSF - Equities', type: 'SMSF', entity: 'Trust', member: 'joint', value: 5800000, change: 6.7 },
+      { id: 2, name: 'Patel Family SMSF - Infrastructure', type: 'SMSF', entity: 'Trust', member: 'joint', value: 2200000, change: 8.4 },
       { id: 3, name: 'Commercial Property - Parramatta CBD', type: 'Property', entity: 'Trust', value: 3500000, change: 4.2 },
       { id: 4, name: 'Medical Practice Building - Westmead', type: 'Property', entity: 'Trust', value: 2800000, change: 3.8 },
       { id: 5, name: 'Raj - Personal Super', type: 'Super', entity: 'Personal', value: 1800000, change: 7.5 },
@@ -152,7 +152,7 @@ export const CLIENT_DATA = {
     ],
     profile: {
       user_id: 'client_5', name: 'Raj & Priya Patel', first_name: 'Raj', last_name: 'Patel',
-      partner_first_name: 'Priya', age: 54, retirementAge: 60, yearsToRetirement: 6,
+      partner_first_name: 'Priya', relationship: 'couple', age: 54, partner_age: 52, retirementAge: 60, yearsToRetirement: 6,
       riskProfile: 'Aggressive', incomeHousehold: 980000, expensesAnnual: 380000, children: 2, status: 'Married',
       email: 'raj.patel@email.com', phone: '0456 789 012', address: '22 Pacific Hwy, Parramatta NSW 2150',
       advisor: 'Sarah Chen', occupation: 'Surgeon', employer: 'Westmead Hospital',
@@ -171,8 +171,8 @@ export const CLIENT_DATA = {
     assets: [
       { id: 1, name: 'Anderson Partnership Fund - Equities', type: 'Managed Fund', entity: 'Partnership', value: 6500000, change: 5.2 },
       { id: 2, name: 'Anderson Partnership - Fixed Income', type: 'Managed Fund', entity: 'Partnership', value: 3200000, change: 4.1 },
-      { id: 3, name: 'John - AMP Super (Balanced)', type: 'Super', entity: 'Personal', value: 2400000, change: 6.8 },
-      { id: 4, name: 'Partner - REST Super', type: 'Super', entity: 'Personal', value: 1800000, change: 6.1 },
+      { id: 3, name: 'John - AMP Super (Balanced)', type: 'Super', entity: 'Personal', member: 'you', value: 2400000, change: 6.8 },
+      { id: 4, name: 'Partner - REST Super', type: 'Super', entity: 'Personal', member: 'partner', value: 1800000, change: 6.1 },
       { id: 5, name: 'Office Property - Collins St', type: 'Property', entity: 'Partnership', value: 4200000, change: 2.8 },
       { id: 6, name: 'Warehouse - Port Melbourne', type: 'Property', entity: 'Partnership', value: 2800000, change: 3.5 },
       { id: 7, name: 'Cash Management', type: 'Cash', entity: 'Partnership', value: 1100000, change: 4.5 },
@@ -183,7 +183,7 @@ export const CLIENT_DATA = {
     ],
     profile: {
       user_id: 'client_6', name: 'Anderson Partnership', first_name: 'John', last_name: 'Anderson',
-      partner_first_name: '', age: 59, retirementAge: 65, yearsToRetirement: 6,
+      partner_first_name: '', relationship: 'single', age: 59, retirementAge: 65, yearsToRetirement: 6,
       riskProfile: 'Balanced', incomeHousehold: 850000, expensesAnnual: 420000, children: 0, status: 'Partnered',
       email: 'john.anderson@lawfirm.com.au', phone: '0467 890 123', address: '100 Collins St, Melbourne VIC 3000',
       advisor: 'Sarah Chen', occupation: 'Managing Partner', employer: 'Anderson & Co',
@@ -200,7 +200,7 @@ export const CLIENT_DATA = {
   },
   client_7: {
     assets: [
-      { id: 1, name: 'Sarah K - Hostplus Super (High Growth)', type: 'Super', entity: 'Personal', value: 580000, change: 11.2 },
+      { id: 1, name: 'Sarah K - Hostplus Super (High Growth)', type: 'Super', entity: 'Personal', member: 'you', value: 580000, change: 11.2 },
       { id: 2, name: 'Growth Share Portfolio (ASX)', type: 'Shares', entity: 'Personal', value: 1800000, change: 15.3 },
       { id: 3, name: 'US Tech Portfolio (NASDAQ)', type: 'Shares', entity: 'Personal', value: 2200000, change: 22.1 },
       { id: 4, name: 'Startup Equity (Series B vested)', type: 'Other', entity: 'Personal', value: 3500000, change: 35.0 },
@@ -213,7 +213,7 @@ export const CLIENT_DATA = {
     ],
     profile: {
       user_id: 'client_7', name: 'Sarah Kim', first_name: 'Sarah', last_name: 'Kim',
-      partner_first_name: '', age: 34, retirementAge: 50, yearsToRetirement: 16,
+      partner_first_name: '', relationship: 'single', age: 34, retirementAge: 50, yearsToRetirement: 16,
       riskProfile: 'Aggressive', incomeHousehold: 680000, expensesAnnual: 210000, children: 0, status: 'Single',
       email: 'sarah.kim@startup.io', phone: '0478 901 234', address: '45 Flinders Lane, Melbourne VIC 3000',
       advisor: 'Sarah Chen', occupation: 'CTO & Co-founder', employer: 'TechVenture Pty Ltd',

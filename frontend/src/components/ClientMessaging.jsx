@@ -405,7 +405,7 @@ const ClientMessaging = ({ userRole = 'client', userName = 'David Thompson' }) =
                 onClick={() => openMessage(msg)}
                 className={`p-3 border-b cursor-pointer hover:bg-muted/50 ${
                   selectedMessage?.id === msg.id ? 'bg-[#1a2744]/5' : ''
-                } ${!msg.read ? 'bg-blue-50' : ''}`}
+                } ${!msg.read ? 'bg-[#D4A84C]/[0.06]' : ''}`}
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">

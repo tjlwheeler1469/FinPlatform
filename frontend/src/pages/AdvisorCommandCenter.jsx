@@ -122,39 +122,43 @@ const AdvisorCommandCenter = () => {
     nextActions: null
   });
 
+// Safe fetch helper — every request resolves (never throws), so Promise.all
+// won't leave sibling promises unhandled when one is aborted by React
+// StrictMode double-mount cleanup. Returns null on any failure.
+const safeFetch = async (url, signal) => {
+  try {
+    const res = await fetch(url, { signal });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+};
+
   const fetchAllData = useCallback(async (showRefreshToast = false, signal) => {
     if (showRefreshToast) setRefreshing(true);
     else setLoading(true);
-    
+
     try {
-      const [commandRes, monitoringRes, taxRes, intelligenceRes, practiceRes, clientsRes, actionsRes, graphOverviewRes, graphInsightsRes] = await Promise.all([
-        fetch(`${API_URL}/api/command-center/daily-digest`, { signal }),
-        fetch(`${API_URL}/api/monitoring/daily-scan`, { signal }),
-        fetch(`${API_URL}/api/intelligence/tax-opportunities`, { signal }),
-        fetch(`${API_URL}/api/monitoring/book-insights`, { signal }),
-        fetch(`${API_URL}/api/practice-health/dashboard`, { signal }),
-        fetch(`${API_URL}/api/intelligence/comprehensive-analysis`, { signal }),
-        fetch(`${API_URL}/api/next-action/today?limit=8`, { signal }),
-        fetch(`${API_URL}/api/graph/overview`, { signal }),
-        fetch(`${API_URL}/api/graph/insights`, { signal })
-      ]);
-      
       const [command, monitoring, tax, intelligence, practice, clients, actions, graphOv, graphIns] = await Promise.all([
-        commandRes.ok ? commandRes.json() : null,
-        monitoringRes.ok ? monitoringRes.json() : null,
-        taxRes.ok ? taxRes.json() : null,
-        intelligenceRes.ok ? intelligenceRes.json() : null,
-        practiceRes.ok ? practiceRes.json() : null,
-        clientsRes.ok ? clientsRes.json() : null,
-        actionsRes.ok ? actionsRes.json() : null,
-        graphOverviewRes.ok ? graphOverviewRes.json() : null,
-        graphInsightsRes.ok ? graphInsightsRes.json() : null
+        safeFetch(`${API_URL}/api/command-center/daily-digest`, signal),
+        safeFetch(`${API_URL}/api/monitoring/daily-scan`, signal),
+        safeFetch(`${API_URL}/api/intelligence/tax-opportunities`, signal),
+        safeFetch(`${API_URL}/api/monitoring/book-insights`, signal),
+        safeFetch(`${API_URL}/api/practice-health/dashboard`, signal),
+        safeFetch(`${API_URL}/api/intelligence/comprehensive-analysis`, signal),
+        safeFetch(`${API_URL}/api/next-action/today?limit=8`, signal),
+        safeFetch(`${API_URL}/api/graph/overview`, signal),
+        safeFetch(`${API_URL}/api/graph/insights`, signal),
       ]);
-      
-      setData({ 
-        commandCenter: command, 
-        monitoring: monitoring, 
-        taxOpportunities: tax, 
+
+      // Don't render stale data if the request was aborted mid-flight.
+      if (signal?.aborted) return;
+
+      setData({
+        commandCenter: command,
+        monitoring: monitoring,
+        taxOpportunities: tax,
         intelligence: intelligence,
         practiceHealth: practice,
         clients: clients,
@@ -162,23 +166,15 @@ const AdvisorCommandCenter = () => {
       });
       setGraphOverview(graphOv);
       setGraphInsights(graphIns?.insights || []);
-      
+
       if (showRefreshToast) {
         toast.success("Dashboard refreshed");
       }
-    } catch (error) {
-      // Silently ignore aborted requests (StrictMode double-mount, navigation away)
-      if (error?.name === "AbortError") return;
-      // Network failures are non-fatal — page still renders with previous/empty state
-      if (error?.message?.includes("Failed to fetch")) {
-        // transient network blip — log debug-only, don't toast
-        return;
-      }
-      console.error("Error fetching data:", error);
-      toast.error("Failed to load dashboard data");
     } finally {
-      setLoading(false);
-      setRefreshing(false);
+      if (!signal?.aborted) {
+        setLoading(false);
+        setRefreshing(false);
+      }
     }
   }, []);
 

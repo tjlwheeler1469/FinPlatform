@@ -105,10 +105,11 @@ const scoreFlexibility = (client) => {
 
 // ── Classification ─────────────────────────────────────────────────────────
 export const classify = (score) => {
-  if (score >= 90) return { label: "Strong", tone: "emerald", color: "#10b981" };
-  if (score >= 75) return { label: "On Track", tone: "blue", color: "#3b82f6" };
-  if (score >= 60) return { label: "Watchlist", tone: "amber", color: "#f59e0b" };
-  return { label: "At Risk", tone: "rose", color: "#ef4444" };
+  // Airy palette — navy when strong, gold when on track/watchlist, slate when at risk.
+  if (score >= 90) return { label: "Strong", tone: "navy", color: "#1a2744" };
+  if (score >= 75) return { label: "On Track", tone: "navy", color: "#1a2744" };
+  if (score >= 60) return { label: "Watchlist", tone: "gold", color: "#D4A84C" };
+  return { label: "At Risk", tone: "slate", color: "#94a3b8" };
 };
 
 // ── What-moves-the-needle: recompute score under alternative scenarios ────

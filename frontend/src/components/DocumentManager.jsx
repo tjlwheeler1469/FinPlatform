@@ -53,11 +53,11 @@ import {
 
 // Document types
 const DOCUMENT_TYPES = {
-  portfolio_summary: { label: 'Portfolio Summary', icon: FileText, color: 'bg-blue-100 text-blue-600' },
-  soa: { label: 'Statement of Advice', icon: FileCheck, color: 'bg-green-100 text-green-600' },
-  tax_summary: { label: 'Tax Summary', icon: FileText, color: 'bg-amber-100 text-amber-600' },
-  annual_review: { label: 'Annual Review', icon: Calendar, color: 'bg-purple-100 text-purple-600' },
-  other: { label: 'Other', icon: FolderOpen, color: 'bg-gray-100 text-gray-600' }
+  portfolio_summary: { label: 'Portfolio Summary', icon: FileText, color: 'border border-slate-200 bg-white text-[#1a2744]' },
+  soa: { label: 'Statement of Advice', icon: FileCheck, color: 'border border-[#D4A84C]/40 bg-white text-[#8a6c1a]' },
+  tax_summary: { label: 'Tax Summary', icon: FileText, color: 'border border-slate-200 bg-white text-[#1a2744]' },
+  annual_review: { label: 'Annual Review', icon: Calendar, color: 'border border-slate-200 bg-white text-[#1a2744]' },
+  other: { label: 'Other', icon: FolderOpen, color: 'border border-slate-200 bg-white text-slate-600' }
 };
 
 // Mock generated documents

@@ -9,4 +9,5 @@ export const fmtShort = (v) => {
   return `$${Math.round(v || 0)}`;
 };
 
-export const ALLOC_COLORS = ["#1a2744", "#D4A84C", "#10b981", "#8b5cf6", "#06b6d4", "#f43f5e"];
+// Allocation slice palette — navy/gold/slate, matches Retirement Planner reference.
+export const ALLOC_COLORS = ["#1a2744", "#D4A84C", "#475569", "#94a3b8", "#cbd5e1", "#2d3a55"];
