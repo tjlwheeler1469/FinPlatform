@@ -1,3 +1,43 @@
+## Feb 2026 — Iter 229: Refactor RetirementPlanner into 4 sub-components + tfoot a11y fix + health checks (all GREEN)
+
+User asked: (1) Extract `BigResultCard.jsx` / `AnnualisedTable.jsx` / `AccordionStep.jsx` sub-components from the 1054-line `RetirementPlannerMoneySmart.jsx`; (2) Improve `<tfoot>` colSpan semantics for screen-reader clarity; (3) Run health and code checks.
+
+**Sub-component extraction** (new directory `/app/frontend/src/pages/retirementPlanner/`):
+- `plannerHelpers.js` (74 lines) — pure helpers: `fmt`, `fmtCompact`, `ASFA`, `AGE_PENSION`, `estimateAgePension`, `marginalRate`, `INVESTMENT_OPTIONS`, shared shell classes (`SECTION_CLASS`, `SECTION_HEAD`, `SECTION_SUB`, `EYEBROW`). Side-effect free → unit-testable.
+- `AccordionStep.jsx` (34 lines) — collapsible question-section wrapper. Header is always visible; body renders only when `open === true`. Adds `aria-expanded` + `aria-controls` pointing to a stable `body` id so screen readers know which region the chevron toggles.
+- `BigResultCard.jsx` (114 lines) — the prominent end-of-page result panel. text-7xl/8xl serif headline, status pill (FULLY FUNDED / MINOR GAP / UNDERFUNDED), supporting metrics on the right. Pure presentational — takes `computed`, `annualSpending`, `includeAgePension`, `confidence`, `yourAge` props.
+- `AnnualisedTable.jsx` (115 lines) — collapsible year-by-year accumulation → drawdown table. Receives `table`, `optionLabel`, `open`, `onToggle` props.
+
+**Tfoot accessibility improvement** (per testing-agent flag from iter 228):
+- Replaced generic `<td colSpan="3">Total contributions...</td>` with semantic `<th scope="row" colSpan="3">Total contributions (accumulation)</th>`. Same for "Total drawdown" row.
+- Split the previous single packed tfoot row into TWO separate rows (one per total) — each has its own `<th scope="row">` label + `<td>` value pair. Screen readers now announce "Total contributions (accumulation): +$1.68M" then "Total drawdown: −$3.06M" as clean row-header/cell pairs rather than as a confusing multi-column muddle.
+- Decorative empty trailing cells marked `aria-hidden="true"`.
+- Added `<caption className="sr-only">Deterministic accumulation and drawdown projection by age. Last row contains totals.</caption>` and `aria-label` on the table.
+- Verified live: `tfoot th[scope='row']` count = 2 (exactly as expected) on /dashboard → Retirement tab.
+
+**Tbody row-header**: every body row's `Age` cell promoted from `<td>` to `<th scope="row" className="font-normal text-left">` — gives screen readers a clear "this row is about age 50" anchor for the remaining columns.
+
+**Main file cleanup**:
+- `RetirementPlannerMoneySmart.jsx`: 1054 → 867 lines (−17.7%, −187 lines).
+- Removed unused `ChevronDown`, `ChevronUp`, `Info` lucide imports (now used inside the extracted components).
+- Renamed inline `<Section ...>` JSX usages → `<AccordionStep ...>` (6 call sites + closing tags).
+- Inline result-card JSX → single `<BigResultCard ... />` call.
+- Inline annualised-table JSX → single `<AnnualisedTable ... />` call.
+
+**Health checks (all GREEN)**:
+- Supervisor: backend / frontend / mongodb / nginx → all RUNNING.
+- Backend API smoke: 5/5 endpoints 200 (`/api/exec-rails/adapters`, `/api/esignature/provider/health`, `/api/deals`, `/api/webhooks/subscriptions`, `/api/rbac/me`).
+- Python lint (`/app/backend/`): all checks passed (excluding tests/ + __pycache__).
+- JS lint on `/app/frontend/src/pages/retirementPlanner/` + main file: no issues.
+- iter 223 Quick Overview backend tests: 2/2 PASS.
+- Live smoke verification: `result-card` ✓ · `result-income` ✓ · `annualised-table` with 34 rows ✓ · all 6 accordion sections present ✓ · accordion behaviour works (click section-super-toggle → 2 super rows appear) ✓ · 2 semantic `<th scope="row">` in tfoot ✓.
+
+**Known pre-existing test issues (not caused by this refactor)**:
+- `tests/test_3_engines.py` — 4 assertions expect a `best_case` key in the Monte Carlo percentiles dict, but the API has migrated to `p5/p10/p25/p50/p75/p90/p95`. Test schema drift — deferred.
+
+
+
+
 ## Feb 2026 — Iter 228: Big result card at bottom + annual drawdown table + "Retirement & Super" → "Retirement" (100% PASS · 8/8 GREEN)
 
 User asked: (1) Move the Result "Annual retirement income" to the bottom and INCREASE the size + include an annual drawdown/breakdown table; (2) Rename Client View tab "Retirement & Super" → "Retirement".

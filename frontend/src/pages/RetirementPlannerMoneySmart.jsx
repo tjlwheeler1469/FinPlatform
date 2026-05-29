@@ -23,98 +23,19 @@ import { PageShell, PillButton } from "@/components/PageShell";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ChevronDown, ChevronUp, Info, Plus, Trash2, Lightbulb, AlertCircle, Users } from "lucide-react";
+import { Plus, Trash2, Lightbulb, AlertCircle, Users } from "lucide-react";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine,
 } from "recharts";
 import { toast } from "sonner";
 import { projectRetirement } from "@/lib/retirementEngine";
 import { CLIENT_DATA, getActiveClientId } from "@/data/clientData";
-
-const fmt = (v) =>
-  new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD", maximumFractionDigits: 0 }).format(v || 0);
-
-const fmtCompact = (v) => {
-  if (!v) return "$0";
-  if (v >= 1_000_000) return `$${(v / 1_000_000).toFixed(2)}M`;
-  if (v >= 1_000) return `$${Math.round(v / 1_000)}k`;
-  return fmt(v);
-};
-
-// 2025 ASFA Retirement Standard (annual, today's $).
-const ASFA = {
-  single_modest: 33_134,
-  single_comfortable: 52_383,
-  couple_modest: 47_731,
-  couple_comfortable: 73_875,
-};
-
-// 2025 Age Pension single/couple maxima + asset-test thresholds.
-const AGE_PENSION = {
-  single_max: 29_754,
-  couple_max: 44_855,
-  asset_free_single: 314_000,
-  asset_free_couple: 470_000,
-  taper_per_1k: 78,
-};
-
-const estimateAgePension = (relationship, assessableAssets) => {
-  const max = relationship === "couple" ? AGE_PENSION.couple_max : AGE_PENSION.single_max;
-  const threshold = relationship === "couple" ? AGE_PENSION.asset_free_couple : AGE_PENSION.asset_free_single;
-  if (assessableAssets <= threshold) return max;
-  const overK = (assessableAssets - threshold) / 1000;
-  return Math.max(0, max - overK * AGE_PENSION.taper_per_1k);
-};
-
-const marginalRate = (taxableIncome) => {
-  if (taxableIncome <= 18200) return 0;
-  if (taxableIncome <= 45000) return 0.16 + 0.02;
-  if (taxableIncome <= 135000) return 0.30 + 0.02;
-  if (taxableIncome <= 190000) return 0.37 + 0.02;
-  return 0.45 + 0.02;
-};
-
-// MoneySmart investment-option presets (nominal return p.a., before fees & inflation).
-const INVESTMENT_OPTIONS = [
-  { key: "cash",         label: "Cash",         nominal: 3.5, desc: "Lowest risk · cash deposits, term deposits" },
-  { key: "conservative", label: "Conservative", nominal: 4.5, desc: "20% growth assets · low risk" },
-  { key: "moderate",     label: "Moderate",     nominal: 5.5, desc: "50% growth assets · medium-low risk" },
-  { key: "balanced",     label: "Balanced",     nominal: 6.5, desc: "70% growth assets · medium risk (default)" },
-  { key: "growth",       label: "Growth",       nominal: 7.5, desc: "85% growth assets · medium-high risk" },
-  { key: "high_growth",  label: "High Growth",  nominal: 8.5, desc: "100% growth assets · high risk" },
-];
-
-const SECTION_CLASS = "rounded-2xl border border-slate-200 bg-white";
-const SECTION_HEAD = "font-serif text-xl text-[#1a2744] leading-tight";
-const SECTION_SUB  = "text-xs text-slate-500 mt-0.5";
-const EYEBROW      = "text-[10px] tracking-[0.18em] uppercase text-[#D4A84C] font-semibold";
-
-// Collapsible section wrapper — header always visible, body toggles.
-// Sections collapse by default; first one opens automatically.
-const Section = ({ eyebrow, title, sub, open, onToggle, testid, children }) => (
-  <section className={SECTION_CLASS} data-testid={testid}>
-    <button
-      type="button"
-      onClick={onToggle}
-      className="w-full flex items-center justify-between gap-4 p-5 hover:bg-slate-50/40 transition-colors rounded-2xl"
-      data-testid={`${testid}-toggle`}
-    >
-      <div className="text-left">
-        <p className={EYEBROW}>{eyebrow}</p>
-        <h2 className={`${SECTION_HEAD} mt-1`}>{title}</h2>
-        {sub && <p className={SECTION_SUB}>{sub}</p>}
-      </div>
-      {open
-        ? <ChevronUp className="h-4 w-4 text-slate-400 flex-shrink-0" />
-        : <ChevronDown className="h-4 w-4 text-slate-400 flex-shrink-0" />}
-    </button>
-    {open && (
-      <div className="px-5 pb-5 -mt-1 border-t border-slate-100 pt-4">
-        {children}
-      </div>
-    )}
-  </section>
-);
+import {
+  fmt, fmtCompact, ASFA, estimateAgePension, marginalRate, INVESTMENT_OPTIONS, EYEBROW,
+} from "./retirementPlanner/plannerHelpers";
+import { AccordionStep } from "./retirementPlanner/AccordionStep";
+import { BigResultCard } from "./retirementPlanner/BigResultCard";
+import { AnnualisedTable } from "./retirementPlanner/AnnualisedTable";
 
 const Field = ({ label, value, onChange, prefix, suffix, step = 1, testid, hint, min, max }) => (
   <div className="space-y-1.5">
@@ -568,7 +489,7 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
 
       {/* ===== Questions: stacked top-down (accordion) ===== */}
       <div className="space-y-5">
-        <Section
+        <AccordionStep
           eyebrow="Step 1"
           title="About you"
           sub="Tell us a little about yourself — your age, when you plan to retire, and whether you own your home."
@@ -594,11 +515,11 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
               </div>
             </div>
           </div>
-        </Section>
+        </AccordionStep>
 
         {/* ----- Step 1b — Partner ----- */}
         {computed.isCouple && (
-          <Section
+          <AccordionStep
             eyebrow="Step 1b"
             title="About your partner"
             sub="Their age and gender help estimate how long the household income needs to last."
@@ -613,11 +534,11 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
                 <Segment options={[{ value: "male", label: "Male" }, { value: "female", label: "Female" }]} value={partnerGender} onChange={setPartnerGender} testid="seg-partner-gender" />
               </div>
             </div>
-          </Section>
+          </AccordionStep>
         )}
 
         {/* ----- Step 2 — Income ----- */}
-        <Section
+        <AccordionStep
           eyebrow="Step 2"
           title="Your income"
           sub={`Your current gross annual salary${computed.isCouple ? " and your partner's" : ""} — used to project employer super contributions and tax saved.`}
@@ -634,10 +555,10 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
             <Toggle label="Include the Age Pension in my retirement income" hint="Assumes you'll meet residency, age, and means tests at retirement." checked={includeAgePension} onChange={setIncludeAgePension} testid="toggle-age-pension" />
             <span className="ml-auto">Marginal rate · <span className="font-mono text-[#1a2744]">{computed.marginalPct.toFixed(0)}%</span></span>
           </div>
-        </Section>
+        </AccordionStep>
 
         {/* ----- Step 3 — Itemized super ----- */}
-        <Section
+        <AccordionStep
           eyebrow="Step 3"
           title="Your super"
           sub="Every super account in the household, each editable. Add or remove rows to match the real structure — the projection uses the live total."
@@ -688,10 +609,10 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
               )}
             </div>
           </div>
-        </Section>
+        </AccordionStep>
 
         {/* ----- Step 4 — Other assets, contribution strategy, fees & investment option ----- */}
-        <Section
+        <AccordionStep
           eyebrow="Step 4"
           title="Other assets, savings & contribution strategy"
           sub="Anything else you'll draw on in retirement, plus the contribution mix, fund fees, and investment option that drive your projection."
@@ -802,10 +723,10 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
               })}
             </div>
           </div>
-        </Section>
+        </AccordionStep>
 
         {/* ----- Step 5 — Spending ----- */}
-        <Section
+        <AccordionStep
           eyebrow="Step 5"
           title="Your spending in retirement"
           sub="How much you want to spend each year in retirement (today's dollars). The ASFA Retirement Standard is a useful starting point."
@@ -840,10 +761,10 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
               );
             })}
           </div>
-        </Section>
+        </AccordionStep>
 
         {/* ----- Step 6 — Advanced ----- */}
-        <Section
+        <AccordionStep
           eyebrow="Step 6 · Optional"
           title="Advanced assumptions"
           sub="Inflation, life expectancy. The investment-return and fee defaults sit in Step 4 above."
@@ -855,7 +776,7 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
             <Field label="Inflation (CPI)" value={inflationPct} onChange={setInflationPct} suffix="% p.a." step={0.1} testid="input-inflation" />
             <Field label="Life expectancy override" value={lifeExpectancyOverride} onChange={setLifeExpectancyOverride} suffix="years" testid="input-life-exp" hint={`Leave 0 to use ABS default (${computed.yourLifeExp})`} />
           </div>
-        </Section>
+        </AccordionStep>
 
         <p className="text-[11px] text-slate-400 leading-relaxed px-2 pb-2">
           Projections use MoneySmart methodology: nominal returns less fees and inflation, projected over your time-to-retirement and life expectancy, drawn down at a sustainable rate. Age Pension is estimated on the assets test only and assumes you'll meet eligibility at retirement.
@@ -863,61 +784,13 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
       </div>
 
       {/* ===== Bottom: BIG result card — large headline, on-brand ===== */}
-      <Card className="border-slate-200" data-testid="result-card">
-        <CardContent className="p-8 md:p-10">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 items-start">
-            {/* Headline */}
-            <div>
-              <p className={EYEBROW}>Result</p>
-              <h2 className="font-serif text-2xl text-[#1a2744] mt-1.5">Your annual retirement income</h2>
-              <p className="font-serif text-7xl md:text-8xl text-[#1a2744] mt-5 tabular-nums leading-none" data-testid="result-income">
-                {fmtCompact(computed.achievableSpending)}
-              </p>
-              <p className="text-sm text-slate-500 mt-4">
-                per year in today's dollars · {computed.isCouple ? "couple" : "single"} · {includeAgePension ? "incl. Age Pension" : "excl. Age Pension"} · investment option {computed.option.label}
-              </p>
-              <div className="mt-5 flex items-center gap-3 flex-wrap">
-                <span className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] tracking-wide uppercase font-semibold ${computed.fundingStatus === "fully_funded" ? "border-[#1a2744] text-[#1a2744]" : computed.fundingStatus === "minor_gap" ? "border-[#D4A84C] text-[#8a6c1a]" : "border-slate-400 text-slate-600"}`} data-testid="result-status-pill">
-                  <span className={`h-1.5 w-1.5 rounded-full ${computed.fundingStatus === "fully_funded" ? "bg-[#1a2744]" : computed.fundingStatus === "minor_gap" ? "bg-[#D4A84C]" : "bg-slate-400"}`} />
-                  {computed.fundingStatus === "fully_funded" ? "Fully funded" : computed.fundingStatus === "minor_gap" ? "Minor gap" : "Underfunded"}
-                </span>
-                <span className="text-xs text-slate-500 font-mono">{confidence}% confidence</span>
-              </div>
-            </div>
-            {/* Right side — supporting numbers */}
-            <div className="space-y-4 lg:border-l lg:border-slate-100 lg:pl-8">
-              <div>
-                <p className="text-[10px] tracking-[0.18em] uppercase text-slate-500 font-semibold">Desired spending</p>
-                <p className="font-serif text-2xl text-[#1a2744] mt-1 tabular-nums" data-testid="result-desired-spending">{fmtCompact(annualSpending)}</p>
-              </div>
-              <div>
-                <p className="text-[10px] tracking-[0.18em] uppercase text-slate-500 font-semibold">{computed.shortfall > 0 ? "Annual shortfall" : "Annual surplus"}</p>
-                <p className={`font-serif text-2xl mt-1 tabular-nums ${computed.shortfall > 0 ? "text-rose-600" : "text-[#1a2744]"}`} data-testid="result-gap">
-                  {computed.shortfall > 0 ? "−" : "+"}{fmtCompact(Math.abs(computed.shortfall))}
-                </p>
-              </div>
-              <div>
-                <p className="text-[10px] tracking-[0.18em] uppercase text-slate-500 font-semibold">Super at retirement (median)</p>
-                <p className="font-serif text-2xl text-[#1a2744] mt-1 tabular-nums" data-testid="result-super-at-retirement">{fmtCompact(computed.sim.portfolioAtRetirement)}</p>
-                <p className="text-[10px] text-slate-400 mt-0.5 font-mono">at age {computed.yearsToRetirement + yourAge}</p>
-              </div>
-              <div>
-                <p className="text-[10px] tracking-[0.18em] uppercase text-slate-500 font-semibold">From super (4%) / Age pension</p>
-                <p className="font-serif text-base text-[#1a2744] mt-1 tabular-nums">
-                  {fmt(computed.sustainableFromSuper)}{includeAgePension ? ` + ${fmt(computed.agePensionAnnual)}` : ""}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {computed.shortfall > 0 && (
-            <div className="mt-7 flex items-start gap-2 text-xs text-amber-700 bg-amber-50/60 border border-amber-200 rounded-lg p-3" data-testid="shortfall-hint">
-              <Info className="h-3.5 w-3.5 flex-shrink-0 mt-0.5" />
-              <span>To close the gap of <span className="font-mono">{fmtCompact(computed.shortfall)}</span>, try adding {fmtCompact(Math.round(computed.shortfall / 0.04 / Math.max(1, computed.yearsToRetirement)))}/yr more in contributions, or pushing retirement back 2-3 years.</span>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <BigResultCard
+        computed={computed}
+        annualSpending={annualSpending}
+        includeAgePension={includeAgePension}
+        confidence={confidence}
+        yourAge={yourAge}
+      />
 
       {/* ===== Projection trajectory chart ===== */}
       <Card className="border-slate-200" data-testid="results-panel">
@@ -959,73 +832,13 @@ const RetirementPlanner = ({ embedded = false, clientId: propClientId }) => {
         </CardContent>
       </Card>
 
-      {/* ===== Annual drawdown / portfolio breakdown table ===== */}
-      <Card className="border-slate-200" data-testid="annualised-table-card">
-        <button
-          type="button"
-          onClick={() => setShowAnnualised((v) => !v)}
-          className="w-full flex items-center justify-between gap-4 p-5 hover:bg-slate-50/40 transition-colors rounded-2xl text-left"
-          data-testid="toggle-annualised"
-        >
-          <div>
-            <p className={EYEBROW}>Annual drawdown · breakdown</p>
-            <h3 className="font-serif text-xl text-[#1a2744] leading-tight mt-1">Year-by-year portfolio &amp; drawdown table</h3>
-            <p className="text-xs text-slate-500 mt-0.5">{computed.annualisedTable.length} years · accumulation → drawdown · option {computed.option.label}{showAnnualised ? "" : " · click to expand"}</p>
-          </div>
-          {showAnnualised
-            ? <ChevronUp className="h-4 w-4 text-slate-400 flex-shrink-0" />
-            : <ChevronDown className="h-4 w-4 text-slate-400 flex-shrink-0" />}
-        </button>
-        {showAnnualised && (
-          <div className="px-5 pb-5 -mt-1 border-t border-slate-100 pt-4">
-            <div className="overflow-x-auto -mx-2">
-              <table className="w-full text-sm" data-testid="annualised-table">
-                <thead>
-                  <tr className="text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold border-b border-slate-200">
-                    <th className="text-left px-2 py-2.5">Age</th>
-                    <th className="text-left px-2 py-2.5">Phase</th>
-                    <th className="text-right px-2 py-2.5">Opening</th>
-                    <th className="text-right px-2 py-2.5">Contribs</th>
-                    <th className="text-right px-2 py-2.5">Net return</th>
-                    <th className="text-right px-2 py-2.5">Fees</th>
-                    <th className="text-right px-2 py-2.5">Drawdown</th>
-                    <th className="text-right px-2 py-2.5">Closing</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {computed.annualisedTable.map((row, i) => (
-                    <tr key={i} className={`border-b border-slate-100 hover:bg-slate-50/60 transition-colors ${row.phase === "Drawdown" ? "bg-[#D4A84C]/[0.04]" : ""}`} data-testid={`annualised-row-${i}`}>
-                      <td className="px-2 py-2 font-mono text-[#1a2744]">{row.age}</td>
-                      <td className="px-2 py-2 text-slate-600">
-                        <span className={`text-[10px] tracking-wide uppercase font-semibold ${row.phase === "Accumulation" ? "text-[#1a2744]" : "text-[#8a6c1a]"}`}>{row.phase}</span>
-                      </td>
-                      <td className="px-2 py-2 font-mono text-[#1a2744] text-right">{fmtCompact(row.opening)}</td>
-                      <td className="px-2 py-2 font-mono text-[#1a2744] text-right">{row.contribs ? `+${fmtCompact(row.contribs)}` : "—"}</td>
-                      <td className="px-2 py-2 font-mono text-[#1a2744] text-right">{row.netReturn >= 0 ? "+" : ""}{fmtCompact(row.netReturn)}</td>
-                      <td className="px-2 py-2 font-mono text-slate-500 text-right">−{fmtCompact(row.fees)}</td>
-                      <td className="px-2 py-2 font-mono text-slate-500 text-right">{row.withdraw ? `−${fmtCompact(row.withdraw)}` : "—"}</td>
-                      <td className="px-2 py-2 font-mono text-[#1a2744] text-right font-semibold">{fmtCompact(row.closing)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-                <tfoot>
-                  <tr className="border-t-2 border-slate-200 text-[10px] tracking-[0.16em] uppercase text-slate-500 font-semibold">
-                    <td colSpan="3" className="px-2 pt-3">Total contributions (accumulation)</td>
-                    <td className="px-2 pt-3 text-right font-mono">
-                      +{fmtCompact(computed.annualisedTable.filter((r) => r.phase === "Accumulation").reduce((s, r) => s + r.contribs, 0))}
-                    </td>
-                    <td colSpan="2" className="px-2 pt-3 text-right">Total drawdown</td>
-                    <td className="px-2 pt-3 text-right font-mono">
-                      −{fmtCompact(computed.annualisedTable.filter((r) => r.phase === "Drawdown").reduce((s, r) => s + r.withdraw, 0))}
-                    </td>
-                    <td className="px-2 pt-3" />
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
-          </div>
-        )}
-      </Card>
+      {/* ===== Annual drawdown · breakdown table ===== */}
+      <AnnualisedTable
+        table={computed.annualisedTable}
+        optionLabel={computed.option.label}
+        open={showAnnualised}
+        onToggle={() => setShowAnnualised((v) => !v)}
+      />
     </div>
   );
 
